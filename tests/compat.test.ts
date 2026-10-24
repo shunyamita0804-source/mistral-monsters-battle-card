@@ -159,12 +159,12 @@ describe('アプリ名・PWA・配信先（正式名称）', () => {
 
   it('画面・アプリ情報に旧称が残っていない', () => {
     for (const text of [html, JSON.stringify(manifest), JSON.stringify(APP_INFO)]) {
-      expect(text).not.toMatch(/ミストリア|ミルティル|Mistria|Mirtill/);
+      expect(text).not.toMatch(/ミストリア|ミルティル|Mistria|Mirtill|セイクリッド|Sacred Monsters/);
     }
   });
 
   it('Pages の base は新しいリポジトリ名', () => {
-    expect(PAGES_BASE).toBe('/sacred-monsters-battle-card/');
+    expect(PAGES_BASE).toBe('/mistral-monsters-battle-card/');
   });
 
   it('アイコンの画像は決まった大きさ', () => {

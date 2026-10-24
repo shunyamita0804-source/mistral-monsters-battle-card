@@ -11,6 +11,7 @@ import { normalizeSave, REMOVED_CARD_IDS, SAVE_VERSION, type SaveData } from './
  *   1つでもおかしければ読み込まない（いまのセーブを上書きしない）
  * - 知らないカード ID があると normalizeSave() が黙って捨ててしまうので、その前に止めて知らせる
  */
+/** バックアップの形の名前（前のリポジトリ名のまま。変えると前に書き出したファイルが読めなくなる） */
 export const BACKUP_FORMAT = 'sacred-monsters-battle-card/save-backup';
 export const BACKUP_FORMAT_VERSION = 1;
 /** 読み込むファイルの大きさの上限（これより大きいものはセーブではない） */

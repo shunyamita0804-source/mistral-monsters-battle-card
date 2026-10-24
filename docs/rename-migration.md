@@ -12,11 +12,22 @@
 変えたもの：`src/config/app.ts`・`index.html`・`public/manifest.webmanifest`・`package.json` の説明・バックアップのファイル名（`mistral-monsters-bc-backup-…`。
 中身の形は同じで、前のファイルも読み込める）・テスト・`CLAUDE.md`・`README.md`・資料の本編の名前。
 
-変えていないもの（ユーザーの判断・作業が要る）：
-- GitHub のリポジトリ名と公開URL（`sacred-monsters-battle-card`）。リポジトリ設定は Claude が変えない決まり。改名するなら下の 2026-10-22 と同じ手順
-  （改名すると公開URLが変わり、ホーム画面のアプリは置き直し・セーブはバックアップで移す）
-- `package.json` の name・`vite.config.ts` の `REPO_NAME`（リポジトリ名と同じでないと公開が壊れる）
-- セーブのキー `mistria-battle-card/…`・アイコンの原本のファイル名（`sacred-monsters-bc-official-icon*.png`）・過去の依頼文や報告の中の旧称（当時の記録）
+変えていないもの：
+- セーブのキー `mistria-battle-card/…`・バックアップの形の名前 `sacred-monsters-battle-card/save-backup`（変えると前のセーブ・バックアップが読めない）
+- アイコンの原本のファイル名（`sacred-monsters-bc-official-icon*.png`）・過去の依頼文や報告の中の旧称（当時の記録）
+
+### リポジトリ名・公開URLの変更（2026-10-24 ユーザー指示「GitHub のリポジトリ名と公開URLも変更して」）
+
+新しい名前：`mistral-monsters-battle-card`。新しい公開URL：https://shunyamita0804-source.github.io/mistral-monsters-battle-card/
+
+- コード側（済み）：`vite.config.ts` の `REPO_NAME`・`package.json`/`package-lock.json` の name・テスト。
+  公開の仕組み（`deploy-pages.yml`）は実際のリポジトリ名から base を作るので、改名の前に公開しても壊れない
+- GitHub 上の改名（ユーザーが行う。Claude には改名の手段がない）：
+  https://github.com/shunyamita0804-source/sacred-monsters-battle-card/settings → General → Repository name を
+  `mistral-monsters-battle-card` にして「Rename」
+- そのあと Claude が：手元の接続先を新しい URL に、`CLAUDE.md` のリポジトリ名を更新、「Deploy to GitHub Pages」を実行、新しいURLで表示を確認
+- 旧URL（…/sacred-monsters-battle-card/）は改名後 404 になる（転送されない）。ホーム画面のアプリは新しいURLで置き直す。
+  セーブは同じドメインなので Safari では読める見込みだが、ホーム画面のアプリでは見えないことがある → 改名の前に「設定 → セーブをバックアップ」
 
 ※ 名称を変えたことは、商標として安全であることの保証ではない（商標の確認は未実施）。
 

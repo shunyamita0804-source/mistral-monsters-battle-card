@@ -1,7 +1,7 @@
 /**
  * public/ に置いた静的ファイルのURLを、デプロイ先の base パスを考慮して組み立てる。
  *
- * GitHub Pages では `/sacred-monsters-battle-card/` 配下で配信されるため、
+ * GitHub Pages では `/mistral-monsters-battle-card/` 配下で配信されるため、
  * `/images/foo.png` のような絶対パスを直書きするとリンク切れになる。
  * public/ のファイルは必ずこの関数を通して参照する。
  *
