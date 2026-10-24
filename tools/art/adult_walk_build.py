@@ -343,12 +343,38 @@ def head_ratios(stand: Image.Image, wins: list[Image.Image], upright: bool = Tru
 
 
 # 頭の照合がうまく効かない向き（2026-10-24）。女性の後ろ姿は帽子と長い髪のせいで、同じ絵の中でも最大 8% 測り違えた。
-#  'height'：背の高さの真ん中の値でそろえる（歩きのように体がまっすぐな動き向け）
-#  'image'：1枚の絵の全コマを、頭の照合の真ん中の値ひとつでそろえる（走りのように背の高さが変わる動き向け）
+#  'hat'：帽子の横幅（元の絵の解像度）で測り、1枚の絵ごとの真ん中の値でそろえる（後ろ姿でも ±1〜2% で安定して測れた）
 MATCH_MODE: dict[tuple[str, str, str], str] = {
-    ('player_female', 'back', 'walk'): 'height',
-    ('player_female', 'back', 'run'): 'image',
+    ('player_female', 'back', 'walk'): 'hat',
+    ('player_female', 'back', 'run'): 'hat',
 }
+
+
+def hat_ratios(stand: Image.Image, wins: list[Image.Image]) -> list[float]:
+    """帽子の横幅（上から 13% の範囲で、帽子の色の画素の行の幅の 95 パーセンタイル）の、立ち姿に対する比"""
+    color = hat_color(stand)
+
+    def width(im: Image.Image) -> float:
+        f = np.asarray(im)
+        a = f[..., 3] > 200
+        x0, y0, x1, y1 = _bbox(im)
+        m = (np.abs(f[..., :3].astype(int) - color).sum(axis=-1) < 90) & a
+        ys = np.nonzero(m.any(axis=1))[0]
+        m[int(ys[0]) + int((y1 - y0) * 0.13):] = False
+        w = [int(np.ptp(np.nonzero(r)[0])) for r in m if r.any()]
+        return float(np.percentile(w, 95))
+
+    base = width(stand)
+    return [width(w) / base for w in wins]
+
+
+def per_image_median(ratios: list[float], groups: list[list[int]]) -> list[float]:
+    out = list(ratios)
+    for g in groups:
+        med = float(np.median([ratios[i] for i in g]))
+        for i in g:
+            out[i] = med
+    return out
 
 
 def robust(ratios: list[float], groups: list[list[int]], tol: float = 0.02) -> list[float]:
@@ -554,10 +580,10 @@ def main() -> None:
                 # 1コマずつ、頭の大きさを立ち姿とぴったり同じに（2026-10-24 ユーザー「1ミリも変わらないように」）
                 wins = v2_windows(v2_r) + v2_windows(v2_l)
                 mode = MATCH_MODE.get((cid, d, 'walk'), 'head')
-                if mode == 'height':
-                    # 体がまっすぐな歩き：1枚ずつ背の高さの真ん中の値でそろえる（体の上下は残る）
-                    frames = place_poses(wins[:4], sheet) + place_poses(wins[4:], sheet)
-                    head_fix[f'{d}_walk'] = [1.0] * 8
+                if mode == 'hat':
+                    ratios = per_image_median(hat_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
+                    head_fix[f'{d}_walk'] = ratios
+                    frames = place_poses(wins, sheet, scales=[k / r for r in ratios])
                 else:
                     ratios = robust(head_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
                     head_fix[f'{d}_walk'] = ratios
@@ -589,14 +615,12 @@ def main() -> None:
                 walk_src = Image.open(f'{folder}/{cid}_walk_{d}.png').convert('RGBA')
                 if match_heads:
                     wins = run8_windows(run8, walk_src)
-                    ratios = head_ratios(split_poses(walk_src)[0], wins, upright=False)
-                    if MATCH_MODE.get((cid, d, 'run')) == 'image':
-                        med = float(np.median(ratios))
-                        ratios = [med] * 8
+                    if MATCH_MODE.get((cid, d, 'run')) == 'hat':
+                        ratios = per_image_median(hat_ratios(split_poses(walk_src)[0], wins), [list(range(8))])
                         head_fix[f'{d}_run'] = ratios
                         frames = place_poses(wins, walk_src, scales=[k / r for r in ratios])
                     else:
-                        ratios = robust(ratios, [list(range(8))])
+                        ratios = robust(head_ratios(split_poses(walk_src)[0], wins, upright=False), [list(range(8))])
                         head_fix[f'{d}_run'] = ratios
                         frames = refine(wins, walk_src, [k / r for r in ratios], rows[i][8], False)
                 else:
