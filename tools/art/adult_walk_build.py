@@ -343,15 +343,21 @@ def head_ratios(stand: Image.Image, wins: list[Image.Image], upright: bool = Tru
 
 
 def refine(wins: list[Image.Image], walk_sheet: Image.Image, scales: list[float], stand_frame: Image.Image, upright: bool) -> list[Image.Image]:
-    """置いたあとのコマの頭を、同じ向きの立ち姿（置いたもの）ともう一度くらべ、1% より大きくずれたコマだけ倍率を直す（2回まで）"""
+    """置いたあとのコマの頭を、同じ向きの立ち姿（置いたもの）ともう一度くらべ、1% より大きくずれたコマだけ倍率を直す（2回まで）。
+    長い髪の後ろ姿などは測り違えることがあるので、直す幅は最初の値の ±3% まで、くらべ直して良くなったときだけ採用する"""
+    base = list(scales)
     frames = place_poses(wins, walk_sheet, scales=scales)
+    chk = head_ratios(stand_frame, frames, upright=upright)
     for _ in range(2):
-        chk = head_ratios(stand_frame, frames, upright=upright)
         bad = [i for i, c in enumerate(chk) if abs(c - 1) > 0.01]
         if not bad:
             break
-        scales = [sc / chk[i] if i in bad else sc for i, sc in enumerate(scales)]
-        frames = place_poses(wins, walk_sheet, scales=scales)
+        trial = [min(base[i] * 1.03, max(base[i] * 0.97, sc / chk[i])) if i in bad else sc for i, sc in enumerate(scales)]
+        tframes = place_poses(wins, walk_sheet, scales=trial)
+        tchk = head_ratios(stand_frame, [tframes[i] for i in bad], upright=upright)
+        for j, i in enumerate(bad):
+            if abs(tchk[j] - 1) < abs(chk[i] - 1):
+                scales[i], frames[i], chk[i] = trial[i], tframes[i], tchk[j]
     return frames
 
 
