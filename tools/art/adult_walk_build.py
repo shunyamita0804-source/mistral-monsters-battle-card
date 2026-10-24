@@ -286,6 +286,127 @@ def head_scale(stand: Image.Image, frames: list[Image.Image]) -> float:
     return float(np.median(found))
 
 
+def run8_windows(path: Path, walk_sheet: Image.Image) -> list[Image.Image]:
+    """走りの絵（1枚に8ポーズ）を1ポーズずつの窓に分け、色味を歩きに合わせる"""
+    return tone_match(slot_windows(Image.open(path).convert('RGBA'), 4, 2), split_poses(walk_sheet)[0])
+
+
+def _gray(im: Image.Image) -> np.ndarray:
+    f = np.asarray(im).astype(np.float32)
+    a = f[..., 3:4] / 255.0
+    return (f[..., :3] * a + 128 * (1 - a)).astype(np.uint8)
+
+
+def _bbox(im: Image.Image) -> tuple[int, int, int, int]:
+    a = alpha(im)
+    ys = np.nonzero(a.any(axis=1))[0]
+    xs = np.nonzero(a.any(axis=0))[0]
+    return int(xs[0]), int(ys[0]), int(xs[-1]), int(ys[-1])
+
+
+def head_ratios(stand: Image.Image, wins: list[Image.Image], upright: bool = True) -> list[float]:
+    """1コマずつ「そのコマの頭の大きさ ÷ 立ち姿の頭の大きさ」を、元の絵（大きな解像度）で測る（2026-10-24 第2版）。
+    型＝立ち姿の頭（帽子のてっぺん〜上から 26%）。縮尺と傾き（横向きの走りは頭が前に傾く）を、粗く→細かく探す。
+    コマの中の頭の大きさが立ち姿とぴったり同じになるよう、置くときの倍率をこの値で割る。OpenCV が要る"""
+    import cv2
+
+    WORK_H = 640  # 立ち姿の背の高さをこの画素にそろえて測る（大きいほど細かく測れる）
+    x0, y0, x1, y1 = _bbox(stand)
+    sh = y1 - y0
+    ws = WORK_H / sh
+    head = stand.crop((x0, y0, x1 + 1, y0 + int(sh * 0.26)))
+    hx = np.nonzero(alpha(head).any(axis=0))[0]
+    head = head.crop((int(hx[0]), 0, int(hx[-1]) + 1, head.height))
+    tmpl = _gray(head.resize((max(1, round(head.width * ws)), max(1, round(head.height * ws))), Image.LANCZOS))
+    out = []
+    for w in wins:
+        bx0, by0, bx1, by1 = _bbox(w)
+        g0 = (by1 - by0) / sh / (1.0 if upright else 0.9)  # 背の高さから見たおおよその比
+        area = w.crop((max(0, bx0 - 40), max(0, by0 - 20), min(w.width, bx1 + 40), by0 + int((by1 - by0) * 0.6)))
+        f = ws / g0
+        img = _gray(area.resize((max(1, round(area.width * f)), max(1, round(area.height * f))), Image.LANCZOS))
+
+        def score(sc: float, rot: float) -> float:
+            t = cv2.resize(tmpl, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA if sc < 1 else cv2.INTER_CUBIC)
+            if rot:
+                m = cv2.getRotationMatrix2D((t.shape[1] / 2, t.shape[0] / 2), rot, 1.0)
+                t = cv2.warpAffine(t, m, (t.shape[1], t.shape[0]), borderValue=(128, 128, 128))
+            if t.shape[0] >= img.shape[0] or t.shape[1] >= img.shape[1]:
+                return -1.0
+            return float(cv2.matchTemplate(img, t, cv2.TM_CCOEFF_NORMED).max())
+
+        best = max(((score(sc, rot), sc, rot) for sc in np.arange(0.70, 1.45, 0.025) for rot in (-6, 0, 6, 12, 18)))
+        _, sc0, rot0 = best
+        best = max(((score(sc, rot), sc, rot) for sc in np.arange(sc0 - 0.03, sc0 + 0.031, 0.005) for rot in np.arange(rot0 - 4, rot0 + 4.1, 1.0)))
+        out.append(g0 * best[1])
+    return out
+
+
+# 頭の照合がうまく効かない向き（2026-10-24）。女性の後ろ姿は帽子と長い髪のせいで、同じ絵の中でも最大 8% 測り違えた。
+#  'hat'：帽子の横幅（元の絵の解像度）で測り、1枚の絵ごとの真ん中の値でそろえる（後ろ姿でも ±1〜2% で安定して測れた）
+MATCH_MODE: dict[tuple[str, str, str], str] = {
+    ('player_female', 'back', 'walk'): 'hat',
+    ('player_female', 'back', 'run'): 'hat',
+}
+
+
+def hat_ratios(stand: Image.Image, wins: list[Image.Image]) -> list[float]:
+    """帽子の横幅（上から 13% の範囲で、帽子の色の画素の行の幅の 95 パーセンタイル）の、立ち姿に対する比"""
+    color = hat_color(stand)
+
+    def width(im: Image.Image) -> float:
+        f = np.asarray(im)
+        a = f[..., 3] > 200
+        x0, y0, x1, y1 = _bbox(im)
+        m = (np.abs(f[..., :3].astype(int) - color).sum(axis=-1) < 90) & a
+        ys = np.nonzero(m.any(axis=1))[0]
+        m[int(ys[0]) + int((y1 - y0) * 0.13):] = False
+        w = [int(np.ptp(np.nonzero(r)[0])) for r in m if r.any()]
+        return float(np.percentile(w, 95))
+
+    base = width(stand)
+    return [width(w) / base for w in wins]
+
+
+def per_image_median(ratios: list[float], groups: list[list[int]]) -> list[float]:
+    out = list(ratios)
+    for g in groups:
+        med = float(np.median([ratios[i] for i in g]))
+        for i in g:
+            out[i] = med
+    return out
+
+
+def robust(ratios: list[float], groups: list[list[int]], tol: float = 0.02) -> list[float]:
+    """同じ1枚の絵から切ったコマは、画像AIがほぼ同じ大きさで描いている。1枚ごとの中央値から ±tol より外れた値は測り違えとみなし、
+    中央値±tol に寄せる（2026-10-24。女性の後ろ姿で、長い髪のせいで測り違えたコマが大きくなりすぎたため）"""
+    out = list(ratios)
+    for g in groups:
+        med = float(np.median([ratios[i] for i in g]))
+        for i in g:
+            out[i] = min(med * (1 + tol), max(med * (1 - tol), ratios[i]))
+    return out
+
+
+def refine(wins: list[Image.Image], walk_sheet: Image.Image, scales: list[float], stand_frame: Image.Image, upright: bool) -> list[Image.Image]:
+    """置いたあとのコマの頭を、同じ向きの立ち姿（置いたもの）ともう一度くらべ、1% より大きくずれたコマだけ倍率を直す（2回まで）。
+    長い髪の後ろ姿などは測り違えることがあるので、直す幅は最初の値の ±3% まで、くらべ直して良くなったときだけ採用する"""
+    base = list(scales)
+    frames = place_poses(wins, walk_sheet, scales=scales)
+    chk = head_ratios(stand_frame, frames, upright=upright)
+    for _ in range(2):
+        bad = [i for i, c in enumerate(chk) if 0.01 < abs(c - 1) <= 0.05]
+        if not bad:
+            break
+        trial = [min(base[i] * 1.03, max(base[i] * 0.97, sc / chk[i])) if i in bad else sc for i, sc in enumerate(scales)]
+        tframes = place_poses(wins, walk_sheet, scales=trial)
+        tchk = head_ratios(stand_frame, [tframes[i] for i in bad], upright=upright)
+        for j, i in enumerate(bad):
+            if abs(tchk[j] - 1) < abs(chk[i] - 1):
+                scales[i], frames[i], chk[i] = trial[i], tframes[i], tchk[j]
+    return frames
+
+
 def run8_poses(path: Path, walk_sheet: Image.Image, extra: float = 1.0) -> list[Image.Image]:
     """走りの絵（1枚に8ポーズ：2段×4列。docs/design/walk-run-v3-20261024/）の8コマ。
     8人の背の高さの真ん中の値を FIGURE_H にそろえたうえで、帽子の幅が歩きの「立つ」と同じになるように縮める
@@ -302,10 +423,8 @@ def run8_poses(path: Path, walk_sheet: Image.Image, extra: float = 1.0) -> list[
     return place_poses(wins, walk_sheet, extra)
 
 
-def v2_poses(path: Path, walk_sheet: Image.Image, extra: float = 1.0) -> list[Image.Image]:
-    """第2版の絵（1枚に4ポーズ：着く・沈む・足を運ぶ・伸び上がる。docs/design/motion-v2-20261024/）の4コマ。
-    1枚の中は同じ倍率（4人の背の高さの真ん中の値を FIGURE_H に）にして、絵の中の体の上下を残す。
-    足元（いちばん下の足）を FOOT_Y に、上半身を歩きの絵の「立つ」に合わせる"""
+def v2_windows(path: Path) -> list[Image.Image]:
+    """第2版の絵（1枚に4ポーズ）を1ポーズずつの窓に分ける"""
     sheet = Image.open(path).convert('RGBA')
     wins = []
     for p in range(4):
@@ -319,16 +438,24 @@ def v2_poses(path: Path, walk_sheet: Image.Image, extra: float = 1.0) -> list[Im
             arr[..., 3] = np.where(lab == int(np.argmax(sizes)) + 1, arr[..., 3], 0)
             win = Image.fromarray(arr)
         wins.append(win)
-    return place_poses(wins, walk_sheet, extra)
+    return wins
 
 
-def place_poses(wins: list[Image.Image], walk_sheet: Image.Image, extra: float = 1.0) -> list[Image.Image]:
-    """同じ絵から切ったポーズをコマに置く（倍率は全部同じ：背の高さの真ん中の値を FIGURE_H に。extra はさらにかける倍率）"""
+def v2_poses(path: Path, walk_sheet: Image.Image, extra: float = 1.0) -> list[Image.Image]:
+    """第2版の絵（1枚に4ポーズ：着く・沈む・足を運ぶ・伸び上がる。docs/design/motion-v2-20261024/）の4コマ。
+    1枚の中は同じ倍率（4人の背の高さの真ん中の値を FIGURE_H に）にして、絵の中の体の上下を残す。
+    足元（いちばん下の足）を FOOT_Y に、上半身を歩きの絵の「立つ」に合わせる"""
+    return place_poses(v2_windows(path), walk_sheet, extra)
+
+
+def place_poses(wins: list[Image.Image], walk_sheet: Image.Image, extra: float = 1.0, scales: list[float] | None = None) -> list[Image.Image]:
+    """同じ絵から切ったポーズをコマに置く（倍率は全部同じ：背の高さの真ん中の値を FIGURE_H に。extra はさらにかける倍率）。
+    scales を渡すと、1コマずつその倍率で置く（--match-heads：頭の大きさを1コマずつ立ち姿にそろえるとき）"""
     heights = []
     for w in wins:
         ys = np.nonzero(alpha(w).any(axis=1))[0]
         heights.append(int(ys[-1] - ys[0]))
-    k = FIGURE_H / float(np.median(heights)) * extra
+    k_common = FIGURE_H / float(np.median(heights)) * extra
     # 上半身の位置は、歩きの絵の「立つ」を同じ大きさにした形と比べる
     stand = split_poses(walk_sheet)[0]
     sa = alpha(stand)
@@ -336,7 +463,8 @@ def place_poses(wins: list[Image.Image], walk_sheet: Image.Image, extra: float =
     ks = FIGURE_H / int(sy[-1] - sy[0])
     ref = np.array(Image.fromarray(sa).resize((round(stand.width * ks), round(stand.height * ks)), Image.NEAREST))
     out = []
-    for w in wins:
+    for i, w in enumerate(wins):
+        k = scales[i] if scales else k_common
         m = np.array(Image.fromarray(alpha(w)).resize((round(w.width * k), round(w.height * k)), Image.NEAREST))
         hh, ww = max(ref.shape[0], m.shape[0]), max(ref.shape[1], m.shape[1])
         r2 = np.pad(ref, ((0, hh - ref.shape[0]), (0, ww - ref.shape[1])))
@@ -448,11 +576,20 @@ def main() -> None:
         v2_l = Path(f'{folder}/motion-v2/{cid}_{d}_walk_l.png')
         if not npc and v2_r.exists() and v2_l.exists():
             # 第2版：1周8コマ（右足の1歩4コマ＋左足の1歩4コマ）
-            frames = v2_poses(v2_r, sheet) + v2_poses(v2_l, sheet)
             if match_heads:
-                s = head_scale(stand, frames)
-                head_fix[f'{d}_walk'] = s
-                frames = v2_poses(v2_r, sheet, 1 / s) + v2_poses(v2_l, sheet, 1 / s)
+                # 1コマずつ、頭の大きさを立ち姿とぴったり同じに（2026-10-24 ユーザー「1ミリも変わらないように」）
+                wins = v2_windows(v2_r) + v2_windows(v2_l)
+                mode = MATCH_MODE.get((cid, d, 'walk'), 'head')
+                if mode == 'hat':
+                    ratios = per_image_median(hat_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
+                    head_fix[f'{d}_walk'] = ratios
+                    frames = place_poses(wins, sheet, scales=[k / r for r in ratios])
+                else:
+                    ratios = robust(head_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
+                    head_fix[f'{d}_walk'] = ratios
+                    frames = refine(wins, sheet, [k / r for r in ratios], stand, True)
+            else:
+                frames = v2_poses(v2_r, sheet) + v2_poses(v2_l, sheet)
             rows.append(frames + [stand])
         elif npc:
             rows.append([right_fwd, pass_r, left_fwd, pass_l])
@@ -476,17 +613,31 @@ def main() -> None:
             run8 = Path(f'{folder}/motion-v2/{cid}_{d}_run8.png')
             if run8.exists():
                 walk_src = Image.open(f'{folder}/{cid}_walk_{d}.png').convert('RGBA')
-                frames = run8_poses(run8, walk_src)
                 if match_heads:
-                    s = head_scale(rows[i][8], frames)
-                    head_fix[f'{d}_run'] = s
-                    frames = run8_poses(run8, walk_src, 1 / s)
+                    wins = run8_windows(run8, walk_src)
+                    if MATCH_MODE.get((cid, d, 'run')) == 'hat':
+                        ratios = per_image_median(hat_ratios(split_poses(walk_src)[0], wins), [list(range(8))])
+                        head_fix[f'{d}_run'] = ratios
+                        frames = place_poses(wins, walk_src, scales=[k / r for r in ratios])
+                    else:
+                        ratios = robust(head_ratios(split_poses(walk_src)[0], wins, upright=False), [list(range(8))])
+                        head_fix[f'{d}_run'] = ratios
+                        frames = refine(wins, walk_src, [k / r for r in ratios], rows[i][8], False)
+                else:
+                    frames = run8_poses(run8, walk_src)
                 rows.append(frames + [rows[i][8]])
             else:
                 rows.append(list(rows[i]))
         rows.append([f.transpose(Image.FLIP_LEFT_RIGHT) for f in rows[-1]])
     if head_fix:
-        print('  頭の大きさ（立ち姿に対する倍率。この値で割ってそろえた）:', {k: round(v, 3) for k, v in head_fix.items()})
+        print('  頭の大きさ（元の絵での立ち姿に対する比。1コマずつこの値で割ってそろえた）:')
+        for key, v in head_fix.items():
+            print(f'    {key}: {[round(x, 3) for x in v]}')
+        # 確かめ：できあがったコマの頭を、同じ向きの立ち姿とくらべる（1.000 に近いほどよい）
+        for name, r in (('front_walk', 0), ('back_walk', 1), ('left_walk', 2), ('front_run', 4), ('back_run', 5), ('left_run', 6)):
+            if r < len(rows) and f'{name}' in head_fix:
+                chk = head_ratios(rows[r][8], rows[r][:8], upright=name.endswith('walk'))
+                print(f'  確かめ {name}: {[round(x, 3) for x in chk]}')
     # コマの端に絵がかかっていないか（かかっていると、そこで切れて縦・横の線に見える）
     for r, frames in enumerate(rows):
         cut = [c for c, f in enumerate(frames) if alpha(f)[:, [0, -1]].any() or alpha(f)[0].any()]
@@ -496,11 +647,12 @@ def main() -> None:
     out = Image.new('RGBA', (FW * cols, FH * len(rows)), (0, 0, 0, 0))
     for r, frames in enumerate(rows):
         for c, f in enumerate(frames):
+            if '--tone' in args:
+                f = tone(f)
+            # 縁取りはコマごとに付ける（シート全体に付けると、大きいコマの縁取りがとなりのコマにはみ出して線に見えた。2026-10-24）
+            if outline_arg:
+                f = outline(f, int(outline_arg))
             out.alpha_composite(f, (c * FW, r * FH))
-    if '--tone' in args:
-        out = tone(out)
-    if outline_arg:
-        out = outline(out, int(outline_arg))
     if out_path.endswith('.webp'):
         out.save(out_path, quality=92, method=6)
     else:
