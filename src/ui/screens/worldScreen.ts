@@ -122,8 +122,11 @@ const ROOM_ZOOM_MAX = 1.35;
  * （tools/art/adult_walk_build.py --match-heads。走りの絵は頭が 1.1〜1.27 倍で描かれていた）、全体を走りの大きさ（1.35×約1.15）に
  */
 const FIGURE_ZOOM = 1.55;
-/** 主人公だけ横幅を広げる倍率（2026-10-23 ユーザー指示「横幅をもう少し大きく」。比べる画像で 1.1 倍を選んだ） */
-const PLAYER_WIDEN = 1.1;
+/**
+ * 人物の横幅を広げる倍率（2026-10-23 ユーザー指示「主人公の横幅をもう少し大きく」。比べる画像で 1.1 倍を選んだ）。
+ * 2026-10-24 ユーザー「NPC と少しサイズ感が違う」：背の高さ・頭の大きさは同じで、違いはこの倍率が主人公だけだったこと → 人（NPC）にも同じ倍率をかける
+ */
+const FIGURE_WIDEN = 1.1;
 /** 部屋の絵が画面の高さのどれくらいを占めるか */
 const ROOM_FILL = 0.9;
 /** 場所を移るときの暗転（ミリ秒） */
@@ -500,7 +503,7 @@ export class WorldView {
   #placeFigure(el: HTMLElement, p: Point, lift = 0, pose: { sx: number; sy: number; deg: number; shadow: number } | null = null): void {
     const k = this.#figureH / (FRAME_H / 2);
     const f = this.#foot(p);
-    const wk = el === this.#player ? k * PLAYER_WIDEN : k;
+    const wk = k * FIGURE_WIDEN;
     const footX = el === this.#player ? PLAYER_FOOT_X : FOOT_X;
     // 体の動き（足元を中心に縮める・傾ける）は transform-origin を足元にして重ねる（#sizeFigure）
     const body = pose ? ` rotate(${pose.deg.toFixed(2)}deg) scale(${pose.sx.toFixed(4)}, ${pose.sy.toFixed(4)})` : '';
@@ -526,7 +529,7 @@ export class WorldView {
 
   #sizeFigure(el: HTMLElement): void {
     const k = this.#figureH / (FRAME_H / 2);
-    const wk = el === this.#player ? k * PLAYER_WIDEN : k;
+    const wk = k * FIGURE_WIDEN;
     // 主人公のコマは横に広い（PLAYER_FRAME_W。走りの絵が切れないように）
     const isPlayer = el === this.#player;
     el.style.width = `${((isPlayer ? PLAYER_FRAME_W : FRAME_W) / 2) * wk}px`;
