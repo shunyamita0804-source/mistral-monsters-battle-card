@@ -6,7 +6,7 @@
 
 | 項目 | 状態 |
 | --- | --- |
-| 正式名称 | **ミストラルモンスターズ バトルカード**（Mistral Monsters Battle Card・短縮「ミストラルBC」。2026-10-24 ユーザー決定。本編もミストラルモンスターズ〔旧ミスティックモンスターズ〕）。旧称ミルティル・ミストリア・セイクリッドモンスターズ。リポジトリ名・公開URLは `sacred-monsters-battle-card` のまま（`docs/rename-migration.md`） |
+| 正式名称 | **ミストラルモンスターズ バトルカード**（Mistral Monsters Battle Card・短縮「ミストラルBC」。2026-10-24 ユーザー決定。本編もミストラルモンスターズ〔旧ミスティックモンスターズ〕）。旧称ミルティル・ミストリア・セイクリッドモンスターズ。リポジトリ名・公開URLは **`mistral-monsters-battle-card` に変更予定**（コード側は済み・GitHub 上の改名はユーザー待ち。手順と改名後に Claude がすることは `docs/rename-migration.md`） |
 | アプリのアイコン | 2026-10-23 に新しい正式アイコンへ差し替え（原本 `assets/images/icons/sacred-monsters-bc-official-icon-v2.png`。作り方は `assets/README.md`）。タイトル画面のアイコンも同じ |
 | 公開URL | https://shunyamita0804-source.github.io/sacred-monsters-battle-card/ （`main` の `4d218a1` を公開。2026-10-24。名称ミストラルモンスターズ・人物の大きさをそろえた版。deploy-pages #36〜#40 成功。男性4方向の歩き8コマ＋走り8コマ・絵を4方向に・歩く速さ185・歩きの確認画面〔`?qa=1&lab=walk`〕。その後、左向きの走りを B に差し替えて再公開）。旧URL（…/mirtill-monsters-battle-card/）は 404 |
 | リポジトリ | https://github.com/shunyamita0804-source/sacred-monsters-battle-card （Public。2026-10-22 ユーザーが改名。旧名 mirtill-monsters-battle-card） |
