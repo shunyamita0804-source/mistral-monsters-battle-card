@@ -342,6 +342,17 @@ def head_ratios(stand: Image.Image, wins: list[Image.Image], upright: bool = Tru
     return out
 
 
+def robust(ratios: list[float], groups: list[list[int]], tol: float = 0.02) -> list[float]:
+    """同じ1枚の絵から切ったコマは、画像AIがほぼ同じ大きさで描いている。1枚ごとの中央値から ±tol より外れた値は測り違えとみなし、
+    中央値±tol に寄せる（2026-10-24。女性の後ろ姿で、長い髪のせいで測り違えたコマが大きくなりすぎたため）"""
+    out = list(ratios)
+    for g in groups:
+        med = float(np.median([ratios[i] for i in g]))
+        for i in g:
+            out[i] = min(med * (1 + tol), max(med * (1 - tol), ratios[i]))
+    return out
+
+
 def refine(wins: list[Image.Image], walk_sheet: Image.Image, scales: list[float], stand_frame: Image.Image, upright: bool) -> list[Image.Image]:
     """置いたあとのコマの頭を、同じ向きの立ち姿（置いたもの）ともう一度くらべ、1% より大きくずれたコマだけ倍率を直す（2回まで）。
     長い髪の後ろ姿などは測り違えることがあるので、直す幅は最初の値の ±3% まで、くらべ直して良くなったときだけ採用する"""
@@ -349,7 +360,7 @@ def refine(wins: list[Image.Image], walk_sheet: Image.Image, scales: list[float]
     frames = place_poses(wins, walk_sheet, scales=scales)
     chk = head_ratios(stand_frame, frames, upright=upright)
     for _ in range(2):
-        bad = [i for i, c in enumerate(chk) if abs(c - 1) > 0.01]
+        bad = [i for i, c in enumerate(chk) if 0.01 < abs(c - 1) <= 0.05]
         if not bad:
             break
         trial = [min(base[i] * 1.03, max(base[i] * 0.97, sc / chk[i])) if i in bad else sc for i, sc in enumerate(scales)]
@@ -533,7 +544,7 @@ def main() -> None:
             if match_heads:
                 # 1コマずつ、頭の大きさを立ち姿とぴったり同じに（2026-10-24 ユーザー「1ミリも変わらないように」）
                 wins = v2_windows(v2_r) + v2_windows(v2_l)
-                ratios = head_ratios(split_poses(sheet)[0], wins)
+                ratios = robust(head_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
                 head_fix[f'{d}_walk'] = ratios
                 frames = refine(wins, sheet, [k / r for r in ratios], stand, True)
             else:
@@ -563,7 +574,7 @@ def main() -> None:
                 walk_src = Image.open(f'{folder}/{cid}_walk_{d}.png').convert('RGBA')
                 if match_heads:
                     wins = run8_windows(run8, walk_src)
-                    ratios = head_ratios(split_poses(walk_src)[0], wins, upright=False)
+                    ratios = robust(head_ratios(split_poses(walk_src)[0], wins, upright=False), [list(range(8))])
                     head_fix[f'{d}_run'] = ratios
                     frames = refine(wins, walk_src, [k / r for r in ratios], rows[i][8], False)
                 else:
