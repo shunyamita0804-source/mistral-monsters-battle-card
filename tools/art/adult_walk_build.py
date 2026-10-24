@@ -342,6 +342,15 @@ def head_ratios(stand: Image.Image, wins: list[Image.Image], upright: bool = Tru
     return out
 
 
+# 頭の照合がうまく効かない向き（2026-10-24）。女性の後ろ姿は帽子と長い髪のせいで、同じ絵の中でも最大 8% 測り違えた。
+#  'height'：背の高さの真ん中の値でそろえる（歩きのように体がまっすぐな動き向け）
+#  'image'：1枚の絵の全コマを、頭の照合の真ん中の値ひとつでそろえる（走りのように背の高さが変わる動き向け）
+MATCH_MODE: dict[tuple[str, str, str], str] = {
+    ('player_female', 'back', 'walk'): 'height',
+    ('player_female', 'back', 'run'): 'image',
+}
+
+
 def robust(ratios: list[float], groups: list[list[int]], tol: float = 0.02) -> list[float]:
     """同じ1枚の絵から切ったコマは、画像AIがほぼ同じ大きさで描いている。1枚ごとの中央値から ±tol より外れた値は測り違えとみなし、
     中央値±tol に寄せる（2026-10-24。女性の後ろ姿で、長い髪のせいで測り違えたコマが大きくなりすぎたため）"""
@@ -544,9 +553,15 @@ def main() -> None:
             if match_heads:
                 # 1コマずつ、頭の大きさを立ち姿とぴったり同じに（2026-10-24 ユーザー「1ミリも変わらないように」）
                 wins = v2_windows(v2_r) + v2_windows(v2_l)
-                ratios = robust(head_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
-                head_fix[f'{d}_walk'] = ratios
-                frames = refine(wins, sheet, [k / r for r in ratios], stand, True)
+                mode = MATCH_MODE.get((cid, d, 'walk'), 'head')
+                if mode == 'height':
+                    # 体がまっすぐな歩き：1枚ずつ背の高さの真ん中の値でそろえる（体の上下は残る）
+                    frames = place_poses(wins[:4], sheet) + place_poses(wins[4:], sheet)
+                    head_fix[f'{d}_walk'] = [1.0] * 8
+                else:
+                    ratios = robust(head_ratios(split_poses(sheet)[0], wins), [[0, 1, 2, 3], [4, 5, 6, 7]])
+                    head_fix[f'{d}_walk'] = ratios
+                    frames = refine(wins, sheet, [k / r for r in ratios], stand, True)
             else:
                 frames = v2_poses(v2_r, sheet) + v2_poses(v2_l, sheet)
             rows.append(frames + [stand])
@@ -574,9 +589,16 @@ def main() -> None:
                 walk_src = Image.open(f'{folder}/{cid}_walk_{d}.png').convert('RGBA')
                 if match_heads:
                     wins = run8_windows(run8, walk_src)
-                    ratios = robust(head_ratios(split_poses(walk_src)[0], wins, upright=False), [list(range(8))])
-                    head_fix[f'{d}_run'] = ratios
-                    frames = refine(wins, walk_src, [k / r for r in ratios], rows[i][8], False)
+                    ratios = head_ratios(split_poses(walk_src)[0], wins, upright=False)
+                    if MATCH_MODE.get((cid, d, 'run')) == 'image':
+                        med = float(np.median(ratios))
+                        ratios = [med] * 8
+                        head_fix[f'{d}_run'] = ratios
+                        frames = place_poses(wins, walk_src, scales=[k / r for r in ratios])
+                    else:
+                        ratios = robust(ratios, [list(range(8))])
+                        head_fix[f'{d}_run'] = ratios
+                        frames = refine(wins, walk_src, [k / r for r in ratios], rows[i][8], False)
                 else:
                     frames = run8_poses(run8, walk_src)
                 rows.append(frames + [rows[i][8]])
@@ -601,11 +623,12 @@ def main() -> None:
     out = Image.new('RGBA', (FW * cols, FH * len(rows)), (0, 0, 0, 0))
     for r, frames in enumerate(rows):
         for c, f in enumerate(frames):
+            if '--tone' in args:
+                f = tone(f)
+            # 縁取りはコマごとに付ける（シート全体に付けると、大きいコマの縁取りがとなりのコマにはみ出して線に見えた。2026-10-24）
+            if outline_arg:
+                f = outline(f, int(outline_arg))
             out.alpha_composite(f, (c * FW, r * FH))
-    if '--tone' in args:
-        out = tone(out)
-    if outline_arg:
-        out = outline(out, int(outline_arg))
     if out_path.endswith('.webp'):
         out.save(out_path, quality=92, method=6)
     else:
