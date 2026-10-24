@@ -26,6 +26,7 @@
   https://github.com/shunyamita0804-source/sacred-monsters-battle-card/settings → General → Repository name を
   `mistral-monsters-battle-card` にして「Rename」
 - そのあと Claude が：手元の接続先を新しい URL に、`CLAUDE.md` のリポジトリ名を更新、「Deploy to GitHub Pages」を実行、新しいURLで表示を確認
+- **2026-10-24 完了**：ユーザーが改名 → Claude が接続先を変更・新しいリポジトリで公開
 - 旧URL（…/sacred-monsters-battle-card/）は改名後 404 になる（転送されない）。ホーム画面のアプリは新しいURLで置き直す。
   セーブは同じドメインなので Safari では読める見込みだが、ホーム画面のアプリでは見えないことがある → 改名の前に「設定 → セーブをバックアップ」
 
