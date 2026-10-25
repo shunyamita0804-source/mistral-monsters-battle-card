@@ -254,11 +254,13 @@
   box-shadow: 0 0 14px rgb(255 77 109 / 0.85);
 }
 
-.battle__monster.is-acted .battle-portrait {
+.battle__monster.is-acted .battle-portrait,
+.battle__monster.is-acted .battle-card {
   filter: brightness(0.55);
 }
 
-.battle__monster.is-down .battle-portrait {
+.battle__monster.is-down .battle-portrait,
+.battle__monster.is-down .battle-card {
   filter: grayscale(1) brightness(0.4);
 }
 

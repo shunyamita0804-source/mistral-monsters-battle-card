@@ -41,7 +41,8 @@ import { openCardDetail } from '../components/cardDetail.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import { commandButton, confirmCommand } from '../components/commandButton.ts';
 import { createMonsterPortrait } from '../components/monsterPortrait.ts';
-import { createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
+import { resolveCardArt } from '../cardArtSources.ts';
+import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
 import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
@@ -89,11 +90,13 @@ function showcaseSound(card: PlayCard): SoundId {
 /** 相手の1手ごとの間（ミリ秒） */
 const AI_STEP_MS = 1100;
 /**
- * 場のモンスターのアイコン（正方形）の一辺（2026-10-25 バトル画面リデザイン：カードの枠をやめ、PS版のように顔〜上半身のアイコンに。指示書の目安 72〜80）
+ * 場のモンスターの幅（論理px。指示書の目安 72〜80）。2026-10-25 ユーザー指示「ずっと出ているカードが新しいデザインの方」：
+ * バトル用カード（800×920）のあるモンスターはそのカードで、まだ無いモンスターは同じ縦横比に切り抜いたアイコンで出す
  */
 const MONSTER_ICON = 76;
-/** アイコンをタップしたときに見せるバトル用カードの幅（論理px。800×920 の比率で高さが決まる） */
-const BATTLE_CARD_DETAIL_W = 270;
+const MONSTER_ICON_H = Math.round(MONSTER_ICON * BATTLE_CARD_RATIO);
+/** 場のモンスターをタップしたときに見せる正式カードの絵の幅（論理px） */
+const OFFICIAL_CARD_DETAIL_W = 250;
 /**
  * 手札のカードの幅（論理px）。2026-10-25 リデザイン パートB：上下の空の帯をなくした表面（battleCard.ts）にして 66→70。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
@@ -895,14 +898,15 @@ export const battleScreen: ScreenDefinition = {
         t(`battle.monster.owner.${side}`),
         t(monster.acted ? 'battle.monster.lifeActed' : 'battle.monster.life', { life: monster.life, max: monster.maxLife }),
       ];
-      // バトル用カード（2026-10-25・いまはソラモだけ）があれば、それを大きく見せる（案A：ふだんはアイコン、タップしたときだけ）
-      if (hasBattleCard(monster.cardId)) {
+      // 正式カードの絵（名前・LIFE 入り）があれば、それを大きく見せる（2026-10-25 ユーザー指示「タップすると正式絵に」）。無ければいままでの詳しい表示
+      const card = getMonster(monster.cardId);
+      const officialUrl = resolveCardArt(card.art);
+      if (officialUrl) {
+        const img = h('img', { class: 'battle-card-detail__official', attrs: { src: officialUrl, alt: cardName(card), draggable: 'false' } });
+        img.style.width = `${OFFICIAL_CARD_DETAIL_W}px`;
         const handle = openModal(element, {
           className: 'battle-card-detail',
-          body: [
-            createBattleMonsterCard(getMonster(monster.cardId), BATTLE_CARD_DETAIL_W, { current: monster.life, max: monster.maxLife }),
-            ...extra.map((text) => h('p', { class: 'battle-card-detail__line', text })),
-          ],
+          body: [img, ...extra.map((text) => h('p', { class: 'battle-card-detail__line', text }))],
           actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
         });
         return;
@@ -1018,7 +1022,9 @@ export const battleScreen: ScreenDefinition = {
             h(
               'span',
               { class: 'battle__monster-icon' },
-              createMonsterPortrait(getMonster(m.cardId), MONSTER_ICON),
+              hasBattleCard(m.cardId)
+                ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? m.life, max: m.maxLife })
+                : createMonsterPortrait(getMonster(m.cardId), MONSTER_ICON, MONSTER_ICON_H),
               down ? h('span', { class: 'battle__monster-down', text: t('card.down') }) : null,
               m.acted && !down ? h('span', { class: 'battle__acted', text: t('battle.monster.acted') }) : null,
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印

@@ -586,6 +586,13 @@
   gap: 8px;
 }
 
+.battle-card-detail__official {
+  display: block;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
+}
+
 .battle-card-detail__line {
   margin: 0;
   font-size: 14px;

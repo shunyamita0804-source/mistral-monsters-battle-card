@@ -6,15 +6,15 @@ import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
 
 /**
- * 対戦画面のモンスターのアイコン（正方形。2026-10-25 バトル画面リデザイン）。
+ * 対戦画面のモンスターのアイコン（2026-10-25 バトル画面リデザイン。height を渡すと縦長に切り抜く：バトル用カードがまだ無いモンスター）。
  * バトル用の絵（文字なし）を顔〜上半身で切り抜いて見せる（切り抜き位置は src/data/monsterPortraits.ts）。
  * バトル用の絵がないモンスター（仮のモンスター・絵が未着のミュロルなど）は、名前の1文字と「仮」で出す
  */
-export function createMonsterPortrait(monster: MonsterCard, size: number): HTMLElement {
+export function createMonsterPortrait(monster: MonsterCard, size: number, height = size): HTMLElement {
   const url = resolveCardArt(monster.battleArt);
   const el = h('span', { class: 'battle-portrait', attrs: { 'aria-hidden': 'true' } });
   el.style.width = `${size}px`;
-  el.style.height = `${size}px`;
+  el.style.height = `${height}px`;
   el.style.setProperty('--theme', monster.themeColor);
   if (url) {
     const f = portraitFocus(monster.id);
