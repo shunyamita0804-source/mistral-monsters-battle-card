@@ -164,3 +164,10 @@
   背は立ち姿の +0.4〜+3.6%（かがまない走りなので伸ばさない）
 ・左向き（player_female_left_run8_u.png）：下の段が上の段とほぼ同じ（ひざを上げるのが8人とも手前の足）→ 同じ会話で female/left/14_FIX_run_legs.txt
 ・そのあと python3 tools/art/ground_figures.py
+
+■ 2026-10-25　女性・左向きの走り（2回目・下の段の足の直しのあと・player_female_left_run8_u2.png）
+・下の段の3人目は奥のひざを上げる形に近づいた（手前の足に一部かくれる）。1・2・4 は上の段とほぼ同じ輪郭。判断：使う
+  python3 tools/art/unified_build.py … female 6 …/player_female_left_run8_u2_alpha.png --stand design-parts/characters-adult/player_female_left_stand_u.png --stretch-run …/player_female_left_walk8_u2_alpha.png --walk-cols 5
+・ユーザー「歩幅大きいけど大丈夫なのかな」：着地のコマの足の開き（足元の幅 ÷ 背の高さ）は 女性 0.78・0.82、男性 0.63・0.68（女性が約2割大きい）。
+  ゲームの1歩の長さ（walkAnim.ts STEP_BY_VIEW の横・走り 0.68）は男性の絵で測った値で男女共通 → 女性は足が地面より少し先へ動いて見える（すべる）おそれ
+・動画：female/video/run_side_female_vs_male.mp4（歩きの確認画面・カメラ追従・2倍。女性→男性、それぞれ通常→低速 1/4）
