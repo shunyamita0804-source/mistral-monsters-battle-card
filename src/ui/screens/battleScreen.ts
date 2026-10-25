@@ -1331,7 +1331,7 @@ export const battleScreen: ScreenDefinition = {
 
     /**
      * 場面の表示（あなたのターン・マナ化など）。場面が変わったときだけ短く出す。
-     * 2026-10-25 リデザイン パートD：画面の真ん中の大きな帯をやめ、上の手番の帯のすぐ下に小さな札を1行だけ（手番の帯の文言もそのとき光る）
+     * 2026-10-25 リデザイン パートD：画面の真ん中の大きな帯をやめ、経過の1行の上に小さな札を1行だけ（上の手番の帯の文言もそのとき光る）
      */
     const phaseBanner = (s: BattleState): HTMLElement | null => {
       if (s.phase === 'ended' || s.phase === 'defense') return null;
@@ -1345,7 +1345,11 @@ export const battleScreen: ScreenDefinition = {
         t(s.phase === 'mana' && s.manaConvertLimit === null ? `battle.banner.mana.${s.active}` : `battle.banner.turn.${s.active}`),
       );
       setTimeout(() => el.remove(), BANNER_MS);
-      return el;
+      // 経過の1行の上に重ねる（情報の1行・モンスターを隠さない）
+      const mid = element.querySelector('.battle-mid');
+      if (!mid) return el;
+      mid.append(el);
+      return null;
     };
 
     /** 真ん中の帯（相手の列と自分の列の間）：左に場のカード（なければ先攻・後攻）、右に最新の経過1行。押すと経過をすべて見る */
