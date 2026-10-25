@@ -4,7 +4,8 @@
 正式名称：ミストラルモンスターズ バトルカード（Mistral Monsters Battle Card、短縮表示「ミストラルBC」。2026-10-24 ユーザー決定）。旧名「ミルティル」「ミストリア」「セイクリッドモンスターズ」。
 本編（`shunyamita0804-source/mystic-monsters`）の名前もミストラルモンスターズ（旧ミスティックモンスターズ）。
 リポジトリ名は `mistral-monsters-battle-card`（2026-10-24 ユーザーが改名。旧 `sacred-monsters-battle-card`・`mirtill-monsters-battle-card`。名前の変更は `docs/rename-migration.md`）。
-公開URL：https://shunyamita0804-source.github.io/mistral-monsters-battle-card/セーブのキー `mistria-battle-card/…` は互換のため変えない。
+公開URL：https://shunyamita0804-source.github.io/mistral-monsters-battle-card/
+セーブのキー `mistria-battle-card/…` は互換のため変えない。
 
 ## 資料の読み方（時間短縮のため必ず守る）
 
