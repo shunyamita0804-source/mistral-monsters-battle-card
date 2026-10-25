@@ -121,3 +121,13 @@
   → python3 tools/art/ground_figures.py（女性は青い服ではないので blue_tone.py はかけない）
 ・頭を立ち絵にそろえると、背は立ち絵の −5〜−8%（男性の正面は −2〜−4%）
 ・動画：female/front/video/female_front_walk_lab.mp4（歩きの確認画面・3倍・通常→低速 1/4）
+
+■ 2026-10-25　女性・左向きの歩き（1枚目・player_female_left_walk8_u.png。5列×2段・左端が左向きの立ち姿・背景は緑）
+・上の段の4人は1歩としてそろっている（3 で手前の足を持ち上げる）。下の段はほぼ上の段と同じ絵（足・腕とも）→ 男性と同じ失敗
+・判断：同じ会話で下の段だけ足を入れ替えてもらう（female/left/13_FIX_walk_legs.txt）。横は左右反転の見本が使えない（反転すると右向きになる）
+
+■ 2026-10-25　女性・背中の歩き（1枚目・player_female_back_walk8_u.png。5列×2段・左端が背中の立ち姿・背景は緑）
+・8コマのほとんどで、後ろに残る足（靴の裏が見える足）が画面の右の足。足が交互にならない
+・判断：1歩としてつながる 3（着く）→ 2（けり出し）→ 7（後ろの足がいちばん高い）→ 4（前へ運ぶ）を上の段に、その人物だけの左右反転を下の段にした見本
+　female/back/mirror/1_pose_ref.png を作った。2_stand は届いた絵の左端の立ち姿（design-parts/characters-adult/player_female_back_stand_u.png にも保存）
+・次：新しい会話で 1_pose_ref・2_stand を添付し female/back/mirror/3_PROMPT.txt（かばんを画面の右の腰に戻す）
