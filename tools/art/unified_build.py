@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 """主人公の「立ち・歩き・走り」をそろえて描き直した絵（docs/design/walk-unified-20261025/）を、ゲームのシートの1行に入れる（2026-10-25）
 
-届く絵：1536×1024 に 4列×2段の8ポーズ（上の段 1〜4＝右足の1歩、下の段 5〜8＝左足の1歩）。背景は透明か、格子模様が焼き込まれた白。
-大きさは「頭の大きさ」を正式の立ち絵（design-parts/characters-adult/player_{male,female}_stand_v2.png）にそろえる
-（adult_walk_build.head_ratios：立ち絵の頭を型にして、1コマずつ縮尺を探す）。頭がそろえば、同じ割合で描かれた歩きは背の高さもそろう
-（歩きは脚が開くぶん立ち絵の −2〜−4%）。
-走りは画像AIがどうしても沈んだ形（頭をそろえると背が −8〜−11%）に描くので、--stretch-run で腰から下だけを縦に伸ばして、
+届く絵：1536×1024 に 4列×2段の8ポーズ（上の段 1〜4＝右足の1歩、下の段 5〜8＝左足の1歩）。5列×2段のときは左端が見本の列（--cols 5）。
+背景は透明か、格子模様が焼き込まれた白。人物のまわりのうすい光の輪は使わない（不透明な部分だけ）。
+大きさは「頭の大きさ」を正式の立ち絵にそろえる（adult_walk_build.head_ratios：立ち絵の頭を型にして、1コマずつ縮尺を探す）。
+頭がそろえば、同じ割合で描かれた歩きは背の高さもそろう（歩きは脚が開くぶん立ち絵の −2〜−4%）。
+  - 正面：design-parts/characters-adult/player_{male,female}_stand_v2.png（正式の立ち絵）
+  - 左向き・背中：--stand でその向きの立ち絵を渡す（頭の大きさはその立ち絵で比べる）。--stand sample は届いた絵の見本の列の立ち姿。その立ち絵は、背の高さを正面の立ち絵と同じにする
+    （立ち姿どうしなら、向きが違っても背の高さで比べられる）。--set-idle でその向きの立ち止まりの列にも入れる
+走りは画像AIが沈んだ形（頭をそろえると背が −8〜−11%）に描くので、--stretch-run で腰から下だけを縦に伸ばして、
 背の高さを歩きの真ん中の値にそろえる（頭・胴・腕はそのまま。2026-10-25 ユーザーに比較の絵で確認）。
 色は Lab の平均・ばらつきを、シートの正面の立ち止まり（正式の立ち絵）にそろえる（tools/art/match_stand.py の tone_fit）。
-暗い輪郭 2px を付ける（ほかのコマと同じ）。
+暗い輪郭 2px を付ける（ほかのコマと同じ）。左の行（2・6）を入れると、右（3・7）は左右反転で入る。
 
 使い方:
-  python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--stretch-run 歩きの届いた絵.png] [--out 出力.webp] [--check 確認.png]
-  行：0 正面・1 背中・2 左 の歩き、4 正面・5 背中・6 左 の走り（左の行を入れると、右〈3・7〉は左右反転で入る）
+  python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--cols 5] [--stand 向きの立ち絵.png|sample [--set-idle]]
+      [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--out 出力.webp] [--check 確認.png]
+  行：0 正面・1 背中・2 左 の歩き、4 正面・5 背中・6 左 の走り
 """
 import sys
 from pathlib import Path
@@ -28,33 +32,51 @@ from match_stand import FH, FOOT_X, FOOT_Y, FW, IDLE, MIRROR, cell, tone_apply, 
 STANDS = {g: Path(__file__).resolve().parents[2] / f'design-parts/characters-adult/player_{g}_stand_v2.png' for g in ('male', 'female')}
 # 腰から下として伸ばす範囲（人物の上から何割より下か）
 LOWER_FROM = 0.42
+# これより薄い画素は使わない（画像AIが人物のまわりに付けるうすい光の輪を消す）
+ALPHA_MIN = 200
 
 
-def load_poses(path: str) -> list[Image.Image]:
-    """届いた絵を8ポーズに分ける（つながった形ごとに、近いマスへ）。格子模様の背景は、まわりから続く明るい灰色として消す"""
-    im = Image.open(path)
-    arr = np.array(im.convert('RGBA'))
+def clean_alpha(arr: np.ndarray) -> np.ndarray:
+    """格子模様の背景（透明でない絵）は、まわりから続く明るい灰色を背景として消す。不透明度は ALPHA_MIN で 0 か 255 に"""
+    arr = arr.copy()
     if (arr[..., 3] < 250).mean() < 0.2:
         rgb = arr[..., :3].astype(int)
         bg_like = (rgb.min(-1) > 195) & ((rgb.max(-1) - rgb.min(-1)) < 14)
         lab, _ = ndimage.label(bg_like)
         edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
-        fg = ndimage.binary_opening(~np.isin(lab, list(edge)), iterations=1)
-        arr[..., 3] = np.where(fg, 255, 0)
-    a = arr[..., 3] > 128
+        arr[..., 3] = np.where(ndimage.binary_opening(~np.isin(lab, list(edge)), iterations=1), 255, 0)
+    arr[..., 3] = np.where(arr[..., 3] >= ALPHA_MIN, 255, 0)
+    return arr
+
+
+def opaque(im: Image.Image) -> Image.Image:
+    """1人の立ち絵：不透明な部分だけ、いちばん大きなかたまり（人物）だけ残す"""
+    arr = clean_alpha(np.array(im.convert('RGBA')))
+    a = arr[..., 3] > 0
+    lab, n = ndimage.label(ndimage.binary_dilation(a, iterations=2))
+    if n > 1:
+        sizes = ndimage.sum(a, lab, range(1, n + 1))
+        arr[..., 3] = np.where(a & (lab == int(np.argmax(sizes)) + 1), 255, 0)
+    return Image.fromarray(arr)
+
+
+def load_poses(path: str, cols: int = 4) -> tuple[list[Image.Image], list[Image.Image]]:
+    """届いた絵を8ポーズに分ける（つながった形ごとに、近いマスへ）。cols＝5 のときは各段の左端（見本の列）を別に返す"""
+    arr = clean_alpha(np.array(Image.open(path).convert('RGBA')))
+    a = arr[..., 3] > 0
     lab, _ = ndimage.label(ndimage.binary_dilation(a, iterations=2))
-    cw, rh = arr.shape[1] / 4, arr.shape[0] / 2
-    out = [np.zeros_like(arr) for _ in range(8)]
+    cw, rh = arr.shape[1] / cols, arr.shape[0] / 2
+    out = [np.zeros_like(arr) for _ in range(cols * 2)]
     for i, _sl in enumerate(ndimage.find_objects(lab), start=1):
         m = (lab == i) & a
         if m.sum() < 300:
             continue
         ys, xs = np.nonzero(m)
-        out[int(ys.mean() // rh) * 4 + int(xs.mean() // cw)][m] = arr[m]
-    # うすい光の輪などの半透明は使わない（不透明な部分だけ）
-    for o in out:
-        o[..., 3] = np.where(o[..., 3] > 128, 255, 0)
-    return [Image.fromarray(o) for o in out]
+        out[int(ys.mean() // rh) * cols + int(xs.mean() // cw)][m] = arr[m]
+    ims = [Image.fromarray(o) for o in out]
+    if cols == 5:
+        return ims[1:5] + ims[6:10], [ims[0], ims[5]]
+    return ims, []
 
 
 def crop(im: Image.Image) -> Image.Image:
@@ -95,22 +117,28 @@ def height_ratios(stand: Image.Image, poses: list[Image.Image]) -> tuple[list[fl
     return heads, [crop(p).height / hd / sh for p, hd in zip(poses, heads)]
 
 
+def opt(args: list[str], name: str, default: str | None = None) -> str | None:
+    return args[args.index(name) + 1] if name in args else default
+
+
 def main(args: list[str]) -> None:
     sheet_path, gender, row, src = args[0], args[1], int(args[2]), args[3]
-    out_path = args[args.index('--out') + 1] if '--out' in args else sheet_path
+    out_path = opt(args, '--out', sheet_path)
     sheet = np.array(Image.open(sheet_path).convert('RGBA'))
-    stand = Image.open(STANDS[gender]).convert('RGBA')
+    poses, samples = load_poses(src, int(opt(args, '--cols', '4')))
+    # --stand sample：届いた絵の見本の列（左端・上の段）に画像AIが描いた立ち姿を使う（同じ絵の中なので歩きと同じ割合。2026-10-25 左向き）
+    stand_arg = opt(args, '--stand')
+    stand = samples[0] if stand_arg == 'sample' else opaque(Image.open(stand_arg or STANDS[gender]))
     # ゲームのコマでの立ち絵の背の高さ（正面の立ち止まり。輪郭 2px のぶんを引く）＝ 原本の立ち絵の何倍で置くか
     idle = cell(sheet, 0, IDLE)
     ys = np.nonzero((idle[..., 3] > 128).any(axis=1))[0]
     game_h = int(ys[-1] - ys[0] + 1) - 4
     k_stand = game_h / crop(stand).height
-    poses = load_poses(src)
     heads, hs = height_ratios(stand, poses)
     print('頭の比', [round(x, 3) for x in heads])
     print('頭をそろえたときの背の高さ（立ち絵＝1）', [round(x, 3) for x in hs])
     if '--stretch-run' in args:
-        walk = load_poses(args[args.index('--stretch-run') + 1])
+        walk, _ = load_poses(opt(args, '--stretch-run'), int(opt(args, '--walk-cols', '4')))
         target = float(np.median(height_ratios(stand, walk)[1]))
         poses = [stretch_lower(p, 1 + (target - h) / (1 - LOWER_FROM) / h) if h < target else p for p, h in zip(poses, hs)]
         print(f'走りの腰から下を伸ばして、背の高さを歩きの真ん中の値 {target:.3f} に')
@@ -119,17 +147,22 @@ def main(args: list[str]) -> None:
     frames = [np.array(outline(Image.fromarray(tone_apply(f, fit)), 2)) for f in frames]
     for c, f in enumerate(frames):
         sheet[row * FH:(row + 1) * FH, c * FW:(c + 1) * FW] = f
-    # 背中・横の立ち止まりは今の列のまま。左の行を入れたら右（反転）にも
+    if '--set-idle' in args:
+        # 立ち止まりの列（歩きの行と走りの行の両方）をこの向きの立ち絵に
+        still = place(stand, k_stand)
+        still = np.array(outline(Image.fromarray(tone_apply(still, tone_fit([still], [idle]))), 2))
+        for r in (row % 4, row % 4 + 4):
+            sheet[r * FH:(r + 1) * FH, IDLE * FW:(IDLE + 1) * FW] = still
     for r, src_r in MIRROR.items():
-        if src_r == row:
-            for c in range(8):
+        if src_r % 4 == row % 4:
+            for c in range(9):
                 sheet[r * FH:(r + 1) * FH, c * FW:(c + 1) * FW] = cell(sheet, src_r, c)[:, ::-1]
     Image.fromarray(sheet).save(out_path, quality=92, method=6)
     print('書き出し:', out_path)
     if '--check' in args:
         from match_stand import check_image
 
-        check_image(sheet, args[args.index('--check') + 1])
+        check_image(sheet, opt(args, '--check'))
 
 
 if __name__ == '__main__':

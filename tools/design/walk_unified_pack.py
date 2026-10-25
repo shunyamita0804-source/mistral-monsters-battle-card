@@ -101,7 +101,7 @@ def frame(stand: Image.Image | None, label0: str) -> Image.Image:
     return img.convert('RGB')
 
 
-def ref_image(stand: Image.Image, old: Path | None) -> Image.Image:
+def ref_image(stand: Image.Image, old: Path | str | None, right_title: str | None = None) -> Image.Image:
     """参考画像：左＝新しい立ち絵（正面）、右＝その向きのいまの絵（あれば。人物の見た目の参考。大きさの参考ではない）"""
     s = cut_out(stand)
     a = np.array(s)[..., 3] > 128
@@ -113,6 +113,10 @@ def ref_image(stand: Image.Image, old: Path | None) -> Image.Image:
     panels = [s]
     if old is not None:
         o = Image.open(old).convert('RGBA')
+        if o.mode == 'RGBA' and (np.array(o)[..., 3] < 250).mean() > 0.2:
+            bg = Image.new('RGBA', o.size, (255, 255, 255, 255))
+            bg.alpha_composite(o)
+            o = bg
         k2 = 900 / o.height
         panels.append(o.resize((round(o.width * k2), 900), Image.LANCZOS))
     width = sum(p.width for p in panels) + 40 * (len(panels) + 1)
@@ -122,7 +126,7 @@ def ref_image(stand: Image.Image, old: Path | None) -> Image.Image:
     x = 40
     for i, p in enumerate(panels):
         img.alpha_composite(p, (x, 100))
-        d.text((x, 20), '正式の立ち姿\n（この大きさ・この色）' if i == 0 else '参考：この向きのいまの絵\n（大きさ・色は左に合わせる）', fill=(0, 0, 0, 255), font=font)
+        d.text((x, 20), '正式の立ち姿\n（この大きさ・この色）' if i == 0 else (right_title or '参考：この向きのいまの絵\n（大きさ・色は左に合わせる）'), fill=(0, 0, 0, 255), font=font)
         x += p.width + 40
     return img.convert('RGB')
 
