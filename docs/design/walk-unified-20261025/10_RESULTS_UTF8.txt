@@ -75,3 +75,10 @@
   左 player_male_left_walk8_final.png ＝ u3 の 1〜5、u2 の 6、u3 の 7・8
   python3 tools/art/unified_build.py … male 0 …front_walk8_final.png ／ … male 2 …left_walk8_final.png --stand design-parts/characters-adult/player_male_left_stand_u.png
   そのあと python3 tools/art/blue_tone.py assets/images/characters/player_male_sheet.webp
+
+■ 2026-10-25　正面の歩き：反対の足の1歩を Claude が作る（ユーザー承認「1の正面を直して公開して」）
+・上の段 1〜4（u2）はそのまま、下の段 5〜8 は 1〜4 の腰から下（人物の上から 65% より下。鎖の飾りの先より下）だけを左右反転
+  python3 tools/art/front_flip_walk.py design-parts/characters-adult/motion-v2/player_male_front_walk8_u2.png design-parts/characters-adult/motion-v2/player_male_front_walk8_flip.png --cut 0.65
+  python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 0 design-parts/characters-adult/motion-v2/player_male_front_walk8_flip.png
+  python3 tools/art/blue_tone.py assets/images/characters/player_male_sheet.webp
+・8コマすべて違う絵になり、前に出る足が1歩ごとに入れ替わる。横向きは前の組み込みのまま（iPhone で確認）
