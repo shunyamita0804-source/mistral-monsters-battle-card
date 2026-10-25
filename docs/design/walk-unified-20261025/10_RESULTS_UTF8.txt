@@ -82,3 +82,8 @@
   python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 0 design-parts/characters-adult/motion-v2/player_male_front_walk8_flip.png
   python3 tools/art/blue_tone.py assets/images/characters/player_male_sheet.webp
 ・8コマすべて違う絵になり、前に出る足が1歩ごとに入れ替わる。横向きは前の組み込みのまま（iPhone で確認）
+
+■ 2026-10-25　試遊「歩いている時に左手が動いていない」
+・正面の絵は 8コマとも同じ腕の形（画面の右の腕が下がったまま）。腰から下だけ反転した直しでは、腕が交互にならない
+・ユーザーが案2を選択：上の段を丸ごと左右反転した見本（mirror/1_pose_ref.png）を渡し、「このポーズのまま、かばん・飾りだけ元の側に」と頼む
+  正面 male/front/mirror/、背中 male/back/mirror/（1_pose_ref・2_stand・3_PROMPT）
