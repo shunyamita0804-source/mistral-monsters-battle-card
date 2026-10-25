@@ -406,12 +406,13 @@
   will-change: transform;
 }
 
-/* 移動のスティック：指を置いた所に、触っている間だけ半透明で出る */
+/* 移動のスティック：指を置いた所に、触っている間だけ半透明で出る。
+   2026-10-25 ユーザー指示で大きさを2倍に（104→208px・つまみ 46→92px。worldScreen.ts の STICK_RING_R・STICK_RADIUS も） */
 .world__stick {
   position: absolute;
-  width: 104px;
-  height: 104px;
-  margin: -52px 0 0 -52px;
+  width: 208px;
+  height: 208px;
+  margin: -104px 0 0 -104px;
   border-radius: 50%;
   border: 2px solid rgb(255 255 255 / 0.55);
   background: radial-gradient(circle, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.2));
@@ -430,8 +431,8 @@
 }
 
 .world__stick-knob {
-  width: 46px;
-  height: 46px;
+  width: 92px;
+  height: 92px;
   border-radius: 50%;
   background: rgb(255 255 255 / 0.5);
   border: 2px solid rgb(255 255 255 / 0.75);
@@ -450,7 +451,8 @@
   left: 12px;
   /* 画面（.stage）はもうセーフエリアの内側にあるので、ここでセーフエリアを足さない（2026-10-24。二重に空いて下が広く空いていた） */
   bottom: 16px;
-  max-width: 280px;
+  /* 右下の「調べる」（2026-10-25 に 144px）に重ならない幅 */
+  max-width: 200px;
   padding: 6px 10px;
   border-radius: 10px;
   background: rgb(0 0 0 / 0.4);
@@ -462,21 +464,21 @@
   z-index: 3;
 }
 
-/* しらべる：右下の半透明の丸（金のふち・虫めがねの印） */
+/* しらべる：右下の半透明の丸（金のふち・虫めがねの印）。2026-10-25 ユーザー指示で大きさを2倍に（72→144px。印・文字も2倍） */
 .world__action {
   position: absolute;
   right: 14px;
   /* 画面（.stage）はもうセーフエリアの内側にあるので、ここでセーフエリアを足さない（2026-10-24。二重に空いて下が広く空いていた） */
   bottom: 16px;
   z-index: 3;
-  width: 72px;
-  height: 72px;
+  width: 144px;
+  height: 144px;
   padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 4px;
   border: 2px solid rgb(201 162 74 / 0.9);
   border-radius: 50%;
   background: radial-gradient(circle at 50% 35%, rgb(52 56 64 / 0.55), rgb(16 18 22 / 0.55));
@@ -489,8 +491,8 @@
 
 .world__action-icon {
   position: relative;
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
 }
 
 /* 虫めがね（輪と柄） */
@@ -499,27 +501,27 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 13px;
-  height: 13px;
-  border: 3px solid #f3dc8a;
+  width: 26px;
+  height: 26px;
+  border: 6px solid #f3dc8a;
   border-radius: 50%;
 }
 
 .world__action-icon::after {
   content: '';
   position: absolute;
-  left: 15px;
-  top: 14px;
-  width: 4px;
-  height: 9px;
-  border-radius: 2px;
+  left: 30px;
+  top: 28px;
+  width: 8px;
+  height: 18px;
+  border-radius: 4px;
   background: #f3dc8a;
   transform: rotate(-45deg);
   transform-origin: top center;
 }
 
 .world__action-label {
-  font-size: 10px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);

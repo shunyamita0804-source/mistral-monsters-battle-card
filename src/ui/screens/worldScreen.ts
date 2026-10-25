@@ -18,9 +18,6 @@ import {
   adjacentCellOf,
   canStep,
   DIR_DELTA,
-  findPath,
-  findPathToObject,
-  findPathWhere,
   isBlocked,
   isNearNpc,
   mapSize,
@@ -135,10 +132,10 @@ const FADE_OUT_MS = 170;
 const REVEAL_TIMEOUT_MS = 3000;
 /** スティック：これ以上指を動かしたら移動の操作にする／スティックの半径／方向を決める最小の距離（論理px） */
 const STICK_START = 12;
-const STICK_RADIUS = 42;
+const STICK_RADIUS = 84;
 const STICK_DEAD = 16;
-/** スティックの輪の半径（CSS の .world__stick 104px の半分）と、輪を出さない上の帯の高さ（論理px） */
-const STICK_RING_R = 52;
+/** スティックの輪の半径（CSS の .world__stick 208px の半分。2026-10-25 に2倍）と、輪を出さない上の帯の高さ（論理px） */
+const STICK_RING_R = 104;
 const STICK_TOP = 64;
 /**
  * 歩く速さ・歩幅・コマ送りの計算は src/game/world/walkAnim.ts（確認画面と共用。2026-10-24）。
@@ -182,8 +179,8 @@ const CAMERA_LOOK_RATE = 2.5;
  * 街：1.00・1.15・1.30 倍を比べて 1.15 倍（家の入口・道が見えたまま、主人公が少し大きく見える。1.30 倍は先が見えにくい。記録は docs/battle-layout-r2.md）。部屋は画面の高さに合わせて別に決めている（#artScale）
  */
 const VIEW_ZOOM: Readonly<Record<MapDefinition['area'], number>> = { town: 1.15, interior: 1, dungeon: 1.5 };
-/** スティックの向きを変えるまでの余裕（ラジアン）。8方向の境目（22.5度）を 8度こえるまで前の向きのまま */
-const STICK_HOLD = Math.PI / 8 + (8 * Math.PI) / 180;
+/** スティックの向きを変えるまでの余裕（ラジアン）。4方向の境目（45度）を 8度こえるまで前の向きのまま */
+const STICK_HOLD = Math.PI / 4 + (8 * Math.PI) / 180;
 /**
  * 進めない向き（壁など）へスティックを倒したとき、その場で向きを変えるまでの時間（ミリ秒）。
  * 2026-10-23 ユーザー「指でなぞると人物がクルクル回ってチープ」：指のわずかな動きで、その場で向きが次々変わらないように
@@ -472,6 +469,11 @@ export class WorldView {
     return this.#store.save.player.gender === 'female' ? 'female' : 'male';
   }
 
+  /** 走れる場所か（街だけ。建物の中・ダンジョンでは走らない：2026-10-25 ユーザー指示） */
+  get #canRun(): boolean {
+    return this.#map.area === 'town';
+  }
+
   /** いまの1歩の長さ（論理px） */
   get #stride(): number {
     return strideOf(this.#figureH, this.#running);
@@ -754,8 +756,8 @@ export class WorldView {
       button(t('world.menu'), () => this.#menu(), 'btn btn--small'),
     );
 
-    // 移動：画面のどこでも指を置いてすべらせると、その方向へ歩く（指を置いた所に半透明のスティックが出る。8方向）。
-    // すべらせずに離したら、これまでどおりタップ（その場所へ歩く・人や家具に話す・調べる）
+    // 移動：画面のどこでも指を置いてすべらせると、その方向へ歩く（指を置いた所に半透明のスティックが出る。上下左右の4方向）。
+    // すべらせずに離したらタップ（近くの人・となりの家具に話す・調べる。タップでは歩かない：2026-10-25）
     this.#stick = h('div', { class: 'world__stick', attrs: { 'aria-hidden': 'true' } }, h('div', { class: 'world__stick-knob' }));
     this.#viewport.append(this.#stick);
     this.#viewport.addEventListener('pointerdown', (e) => this.#pointerDown(e));
@@ -1262,16 +1264,18 @@ export class WorldView {
       this.#held = null;
       return;
     }
-    // 大きく倒すと走る。少し戻しただけでは歩きに戻さない
-    if (dist >= STICK_RUN) this.#running = true;
+    // 大きく倒すと走る。少し戻しただけでは歩きに戻さない。建物の中・ダンジョンでは走らない（2026-10-25 ユーザー指示）
+    if (!this.#canRun) this.#running = false;
+    else if (dist >= STICK_RUN) this.#running = true;
     else if (dist < STICK_WALK_BACK) this.#running = false;
     this.#stick.classList.toggle('is-run', this.#running);
-    // 8方向：45度ずつ。境目のあたりで指がふるえても向きが行ったり来たりしないよう、少しこえるまで前の向きのまま
+    // 上下左右の4方向：90度ずつ（2026-10-25 ユーザー「斜めには進めないように」。それまでは8方向）。
+    // 境目のあたりで指がふるえても向きが行ったり来たりしないよう、少しこえるまで前の向きのまま
     const angle = Math.atan2(dy, dx);
     const held = this.#held;
     if (held && Math.abs(angleDiff(angle, Math.atan2(held.y, held.x))) <= STICK_HOLD) return;
-    const sector = Math.round(angle / (Math.PI / 4));
-    const a = (sector * Math.PI) / 4;
+    const sector = Math.round(angle / (Math.PI / 2));
+    const a = (sector * Math.PI) / 2;
     this.#held = { x: Math.round(Math.cos(a)), y: Math.round(Math.sin(a)) };
     this.#heldAt = performance.now();
   }
@@ -1332,20 +1336,15 @@ export class WorldView {
     const dir = ({ ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' } as const)[e.key as 'ArrowUp'];
     if (dir) {
       e.preventDefault();
-      // パソコンでは Shift を押しながらで走る
-      this.#running = e.shiftKey;
+      // パソコンでは Shift を押しながらで走る（街だけ）
+      this.#running = e.shiftKey && this.#canRun;
       if (down) {
         this.#path = [];
         this.#keys.add(dir);
       } else this.#keys.delete(dir);
-      // 押している方向キーを合わせて8方向に
-      let x = 0;
-      let y = 0;
-      for (const k of this.#keys) {
-        x += DIR_DELTA[k].x;
-        y += DIR_DELTA[k].y;
-      }
-      this.#held = x === 0 && y === 0 ? null : { x: Math.sign(x), y: Math.sign(y) };
+      // 上下左右の4方向だけ（2026-10-25 ユーザー「斜めには進めないように」）。2つ押しているときは、あとから押した方
+      const last = [...this.#keys].pop();
+      this.#held = last ? { ...DIR_DELTA[last] } : null;
       this.#heldAt = performance.now();
     } else if (down && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
@@ -1372,42 +1371,22 @@ export class WorldView {
     });
     // 話しかけ・調べる対象（出入口は歩いて踏むので対象外）
     const target = person ?? objectsAt(this.#map, x, y, this.#isVisible).find((o) => o.type !== 'warp');
-    const from = this.#move ? this.#move.to : this.#tile;
+    // 2026-10-25 ユーザー「タップでは動かないように」：タップで歩かない（その場所へ歩く・人や家具まで歩いてから話すのをやめた）。
+    // 話せる範囲の人・となりの家具だけ、その場で話す・調べる（向きだけ変える）。移動はスティック（画面をなぞる）だけ
+    if (this.#move) return;
     if (person && this.#map.art) {
-      // 人：話せる範囲（NPC_TALK_RANGE マス以内）まで歩いてから話す。押したことが分かるよう小さな音（ボタンと同じ音）
+      if (Math.max(Math.abs(this.#tile.x - person.x), Math.abs(this.#tile.y - person.y)) > NPC_TALK_RANGE) return;
+      // 押したことが分かるよう小さな音（ボタンと同じ音）
       sound.tap();
-      const inRange = (px: number, py: number): boolean => Math.max(Math.abs(px - person.x), Math.abs(py - person.y)) <= NPC_TALK_RANGE;
-      if (inRange(from.x, from.y) && !this.#move) {
-        this.#talkTo(person);
-        return;
-      }
-      const path = findPathWhere(this.#map, from, inRange, this.#blocked);
-      if (!path) return;
-      this.#held = null;
-      this.#path = path;
-      this.#afterPath = person;
+      this.#talkTo(person);
       return;
     }
-    if (target) {
-      const here = adjacentCellOf(target, from);
-      if (here && !this.#move) {
-        this.#dir = this.#dirTo(here);
-        this.#diag = null;
-        this.#interactAt(here.x, here.y);
-        return;
-      }
-      const path = findPathToObject(this.#map, from, target, this.#blocked);
-      if (!path) return;
-      this.#held = null;
-      this.#path = path;
-      this.#afterPath = target;
-      return;
+    const here = target ? adjacentCellOf(target, this.#tile) : null;
+    if (here) {
+      this.#dir = this.#dirTo(here);
+      this.#diag = null;
+      this.#interactAt(here.x, here.y);
     }
-    const path = findPath(this.#map, from, { x, y }, this.#blocked);
-    if (!path) return;
-    this.#held = null;
-    this.#path = path;
-    this.#afterPath = null;
   }
 
   /** 話しかけ・調べることができる、となりのマス（正面を先に） */

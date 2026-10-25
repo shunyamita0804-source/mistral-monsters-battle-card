@@ -20,8 +20,8 @@ export const WORLD = {
   'world.menu': { ja: 'メニュー', en: 'Menu' },
   'world.player': { ja: 'プレイヤー', en: 'Player' },
   'world.hint': {
-    ja: '画面をなぞって移動・タップでその場所へ\n人や家具をタップで話す・調べる',
-    en: 'Slide to walk · tap to go there\nTap people or furniture to talk or check',
+    ja: '画面をなぞって移動\n近くの人や家具は\nタップか右下のボタンで\n話す・調べる',
+    en: 'Slide to walk\nTap nearby people or\nfurniture, or the button,\nto talk or check',
   },
   'world.examine': { ja: '調べる', en: 'Check' },
   // 話せる人のそばでは、右下のボタンの文字を「話す」に（2026-10-24 改訂R2 フェーズ1）
