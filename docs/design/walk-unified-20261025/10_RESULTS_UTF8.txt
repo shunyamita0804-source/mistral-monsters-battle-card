@@ -36,3 +36,10 @@
 ・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 2 design-parts/characters-adult/motion-v2/player_male_left_walk8_u.png --cols 5 --stand sample --set-idle
   （行2＝左の歩き・行3＝右は反転、立ち止まりの列は行2・3・6・7とも新しい左向きの立ち姿）
 ・次：左向きの走り。枠 male/left/2_frame_run.png（見本に左向きの立ち姿）・参考 male/left/1_ref_run.png
+
+■ 2026-10-25　男性・左向きの走り8コマ
+・4列×2段・背景透明。頭を左向きの立ち姿（player_male_left_stand_u.png）にそろえると、背の高さが −13〜−18%（前傾と深いひざ）
+・判断：使う。正面の走りと同じく、腰から下だけを縦に伸ばして、背を左向きの歩きの真ん中の値（−1.5%）にそろえた
+・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 6 design-parts/characters-adult/motion-v2/player_male_left_run8_u.png --stand design-parts/characters-adult/player_male_left_stand_u.png --stretch-run design-parts/characters-adult/motion-v2/player_male_left_walk8_u.png --walk-cols 5
+  （行6＝左の走り・行7＝右は反転）
+・次：背中の歩き（male/back/。見本の列に背中の立ち姿も描いてもらう）
