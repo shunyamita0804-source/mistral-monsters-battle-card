@@ -92,3 +92,8 @@
 ・組み込み：1回目（m1）の8コマをそのまま使う（腕・足は交互、かばん・飾りは1歩ごとに左右へ移る。ユーザーに事前に説明済み）
   python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_male_sheet.webp male 0 design-parts/characters-adult/motion-v2/player_male_front_walk8_m1.png
   → blue_tone.py → sheets-outlined/ に上書き → python3 tools/art/ground_figures.py
+
+■ 2026-10-25　背中の歩き（見本から描き直し・player_male_back_walk8_m1.png）
+・足と腕は見本どおり（下の段は反対の足・反対の腕）。かばんは下の段でばらつく（後ろ姿では小さく目立ちにくい）。ユーザー「修正を行い公開まで」
+・組み込み：python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_male_sheet.webp male 1 design-parts/characters-adult/motion-v2/player_male_back_walk8_m1.png --stand design-parts/characters-adult/player_male_back_stand_u.png --by hat
+  → blue_tone.py → sheets-outlined/ に上書き → ground_figures.py。背は立ち姿の −4〜−7%
