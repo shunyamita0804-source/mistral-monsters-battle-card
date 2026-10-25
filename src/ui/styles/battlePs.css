@@ -937,3 +937,100 @@
   line-height: 1.7;
   color: #d9cdb4;
 }
+
+/* ---------- 相手の手札（裏向き）とカメラ（2026-10-25 ユーザー指示で戻した） ----------
+ * 盤面のいちばん上に、相手の手札を自分の手札と同じ大きさの裏向きで並べる。
+ * カメラ：相手が動く・守るときは上（相手の手札まで全部見える）、自分の番は下へ寄せて相手の手札が半分ほど上へ隠れる。
+ * 寄せた分だけフォーカスエリアが広がる（大きなカードは欄に入る大きさに縮める：fitFocusCards） */
+.battle-camera {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+}
+
+.battle-hand--opponent {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(var(--hand-card-h) + 10px);
+  margin: 0 -10px;
+  padding: 4px 10px;
+  background: rgb(6 10 20 / 0.35);
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  transition: margin-top 560ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.battle-camera[data-focus='bottom'] .battle-hand--opponent {
+  margin-top: calc((var(--hand-card-h) + 10px) * -0.5);
+}
+
+.battle-board {
+  padding-top: 0;
+}
+
+.battle-hand__back {
+  flex: none;
+  width: var(--hand-card-w);
+  height: var(--hand-card-h);
+  border-radius: 5px;
+  background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
+
+/* 2枚目からは少しすき間。入りきらないときは重ねる（--n は枚数） */
+.battle-hand--opponent .battle-hand__back + .battle-hand__back {
+  margin-left: min(6px, calc((100% - var(--n) * var(--hand-card-w)) / max(var(--n) - 1, 1)));
+}
+
+/* 新しく引いたカード：右上（相手の山札の方）から来る */
+.battle-hand__back.is-dealt {
+  animation: opp-deal-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
+}
+
+@keyframes opp-deal-in {
+  from {
+    opacity: 0;
+    transform: translate(120px, 30px) rotate(-10deg) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 相手が使うカード：手札の中で持ち上がって光ってから、フォーカスエリアへ動く */
+.battle__opp-fly {
+  position: absolute;
+  z-index: 38;
+  animation: opp-fly-center 520ms cubic-bezier(0.4, 0, 0.3, 1) forwards;
+}
+
+@keyframes opp-fly-center {
+  0% { transform: none; opacity: 1; filter: none; }
+  40% { transform: translateY(-18px) scale(1.08); opacity: 1; filter: brightness(1.35) drop-shadow(0 0 8px rgb(255 214 120 / 0.95)); }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0.6; filter: brightness(1.2); }
+}
+
+/* フォーカスエリアのカードの入れ物：欄の高さに合わせる（はみ出す分は fitFocusCards が縮める） */
+.battle-detail__card,
+.battle-spot__card {
+  min-height: 0;
+  align-self: stretch;
+  align-items: center;
+}
+
+.battle-detail {
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-hand__back.is-dealt,
+  .battle__opp-fly,
+  .battle-hand--opponent {
+    animation-duration: 1ms;
+    transition: none;
+  }
+}

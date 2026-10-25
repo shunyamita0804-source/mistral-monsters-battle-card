@@ -9,6 +9,7 @@ import {
   createBattle,
   findMonster,
   manaOf,
+  otherSide,
   incomingDamage,
   supportUsesLeft,
   targetsFor,
@@ -104,6 +105,8 @@ const SPOT_CARD_W = 112;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
 const DEFENSE_ATTACK_W = 112;
 const DEFENSE_CARD_W = 60;
+/** 相手の手札の裏向きのカードが、フォーカスエリアへ動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる） */
+const OPP_CARD_FLY_MS = 520;
 /** 相手のひと言を大きく出しておく時間（ミリ秒）。押すと先に消える */
 const TALK_MS = 2200;
 /** ひと言を1文字ずつ出す間隔（ミリ秒。PS版の会話のように） */
@@ -248,6 +251,8 @@ export const battleScreen: ScreenDefinition = {
     };
     /** 表示済みの手札（新しく来たカードだけを配る演出にする） */
     const shownHand = new Set<string>();
+    /** 表示済みの相手の手札（新しく引いたカードだけ山札から来る動きにする。中身は画面に出さない） */
+    const shownOppHand = new Set<string>();
     /** 配っている間は操作と相手の行動を待たせる */
     let busyUntil = 0;
     /** 前回描画時のライフ（ダメージ・回復の演出に使う） */
@@ -270,13 +275,32 @@ export const battleScreen: ScreenDefinition = {
     const manaFlying = new Set<string>();
     /** 描き直しても外さない演出の層（飛んでいくカード。外すとアニメーションが最初からになる） */
     const fxLayer = h('div', { class: 'battle__fx-layer', attrs: { 'aria-hidden': 'true' } });
-    /** 画面を描き直す（演出の層は外さずに残す。外すとアニメーションが最初からになる） */
+    /**
+     * カメラ（2026-10-24 ユーザー指示、2026-10-25 リデザイン後に戻した）：相手が動く・守るときは上（相手の手札）へ、
+     * 自分が動く・守るときは下へ寄せる（相手の手札が半分ほど画面の上へ出る）。
+     * 動きをなめらかにするため、カメラの枠（camera）とレンズ（lens）は描き直しても作り直さない（中の盤面だけ入れ替える）
+     */
+    const lens = h('div', { class: 'battle-camera__lens' });
+    const camera = h('div', { class: 'battle-camera', dataset: { focus: 'none' } }, lens);
+    /** カメラを寄せる側：相手が動く・守る＝上、自分が動く・守る＝下、終わったら寄せない */
+    const cameraFocus = (s: BattleState): 'top' | 'bottom' | 'none' => {
+      if (s.phase === 'ended') return 'none';
+      const side = s.phase === 'defense' && s.pending ? otherSide(s.pending.attacker) : s.active;
+      return side === 'opponent' ? 'top' : 'bottom';
+    };
+    /** 画面を描き直す（演出の層・カメラ・開いている窓は外さずに残す。外すとアニメーションが最初からになる／窓がすぐ閉じてしまう） */
     const replaceView = (...nodes: (Node | string)[]): void => {
-      // 開いている窓（カードの詳しい表示・経過・ルール・確認）は消さない（相手の番の描き直しで、開いた窓がすぐ閉じてしまうため。2026-10-25）
       const keep = (child: ChildNode): boolean =>
-        child === fxLayer || (child instanceof HTMLElement && (child.classList.contains('modal') || child.classList.contains('command-confirm')));
+        child === fxLayer ||
+        (child === camera && nodes.includes(camera)) ||
+        (child instanceof HTMLElement && (child.classList.contains('modal') || child.classList.contains('command-confirm')));
       for (const child of [...element.childNodes]) if (!keep(child)) child.remove();
-      element.prepend(...nodes);
+      const i = nodes.indexOf(camera);
+      if (i >= 0) {
+        if (!camera.isConnected) element.prepend(camera);
+        camera.before(...nodes.slice(0, i));
+        camera.after(...nodes.slice(i + 1));
+      } else element.prepend(...nodes);
       if (!fxLayer.isConnected) element.append(fxLayer);
     };
     /** 最後に出した場面の表示（同じ表示を繰り返さない） */
@@ -306,6 +330,57 @@ export const battleScreen: ScreenDefinition = {
       return hand ? { cardId: hand.cardId, side: action.side } : null;
     };
 
+    /**
+     * 相手が手札のカードを使う・守備に出す・マナにするとき、そのカードの裏向きの絵の位置（画面の座標）。
+     * 並び順だけで探す（カードの中身は使わない）
+     */
+    const opponentCardFrom = (s: BattleState, action: BattleAction): DOMRect | null => {
+      if (action.side !== 'opponent') return null;
+      const uid = action.type === 'useCard' || action.type === 'convertToMana' || action.type === 'defend' ? action.cardUid : null;
+      if (!uid) return null;
+      const index = s.sides.opponent.hand.findIndex((c) => c.uid === uid);
+      const back = index >= 0 ? element.querySelectorAll('.battle-hand--opponent .battle-hand__back')[index] : undefined;
+      return back ? back.getBoundingClientRect() : null;
+    };
+
+    /**
+     * 相手の手札の裏向きのカードを、フォーカスエリア（使ったカードを大きく見せる所）へ動かす（使う・守備に出す）。見た目だけ。
+     * 着いたら showcase で表を見せる（使ったカードは公開される場面なので、ここで初めて表にする）
+     */
+    const flyOpponentCard = (from: DOMRect): void => {
+      const root = element.getBoundingClientRect();
+      const scale = stageScale();
+      const x = (from.left - root.left) / scale;
+      const y = (from.top - root.top) / scale;
+      const goal = element.querySelector('.battle-detail')?.getBoundingClientRect();
+      const gx = goal ? (goal.left + goal.width / 2 - root.left) / scale : element.offsetWidth / 2;
+      const gy = goal ? (goal.top + goal.height / 2 - root.top) / scale : element.offsetHeight / 2;
+      const w = from.width / scale;
+      const hgt = from.height / scale;
+      const fly = h('span', { class: 'battle-hand__back battle__opp-fly' });
+      fly.style.left = `${x}px`;
+      fly.style.top = `${y}px`;
+      fly.style.setProperty('--dx', `${gx - (x + w / 2)}px`);
+      fly.style.setProperty('--dy', `${gy - (y + hgt / 2)}px`);
+      fxLayer.append(fly);
+      setTimeout(() => fly.remove(), OPP_CARD_FLY_MS + 60);
+    };
+
+    /** 相手がマナにしたカード（裏向き）を、手札の場所で光らせて消す。見た目だけ */
+    const vanishOpponentCard = (from: DOMRect): void => {
+      const root = element.getBoundingClientRect();
+      const scale = stageScale();
+      const ghost = h('span', { class: 'battle-hand__back battle__mana-vanish battle__mana-vanish--opponent' });
+      ghost.style.left = `${(from.left - root.left) / scale}px`;
+      ghost.style.top = `${(from.top - root.top) / scale}px`;
+      ghost.style.width = `${from.width / scale}px`;
+      ghost.style.height = `${from.height / scale}px`;
+      // ルールの処理（音）は先に済んでいるので、はじける所から始める
+      ghost.style.setProperty('--delay', `${-Math.round(MANA_VANISH_MS * 0.35)}ms`);
+      fxLayer.append(ghost);
+      setTimeout(() => ghost.remove(), MANA_VANISH_MS);
+    };
+
     /** 見せ終えた「相手の手札の確認」（engine の reveal の seq。同じものを2度出さない） */
     let shownRevealSeq = 0;
     /** 不思議な嗅覚（正式：ノビトン 2026-10-25）：相手の手札をすべて表で見せる窓。手札そのものは裏向きのまま動かさない */
@@ -328,6 +403,7 @@ export const battleScreen: ScreenDefinition = {
     const dispatch = (action: BattleAction): void => {
       if (!state) return;
       const played = playedCard(state, action);
+      const oppFrom = opponentCardFrom(state, action);
       const before = state;
       const next = applyAction(state, action);
       if (next === state) return;
@@ -341,19 +417,34 @@ export const battleScreen: ScreenDefinition = {
         setTimeout(() => !destroyed && showReveal(ids), SHOWCASE_MS);
       }
       if (selectedUid && !state.sides.player.hand.some((c) => c.uid === selectedUid)) selectedUid = null;
-      // 相手の手札は画面に出さない（2026-10-25 リデザイン）ので、相手のカードもその場で表を見せる
+      // 相手のカードは、裏向きのまま手札からフォーカスエリアへ動いてから表を見せる
+      const revealDelay = played && oppFrom ? OPP_CARD_FLY_MS : 0;
       if (played) {
-        busyUntil = Math.max(busyUntil, Date.now() + SHOWCASE_MS - 150);
-        showcaseUntil = Date.now() + SHOWCASE_MS;
+        busyUntil = Math.max(busyUntil, Date.now() + revealDelay + SHOWCASE_MS - 150);
+        // 相手のカードが動いている間も、指のマークはまだ出さない
+        showcaseUntil = Date.now() + revealDelay + SHOWCASE_MS;
       }
       // 誰に向けた技か分かるよう、対象のモンスターに指のマークを出す（自分・相手どちらの技も。攻撃は守備が終わるまでも出る）
       if (action.type === 'useCard' && action.targetUid) {
-        const until = Date.now() + SHOWCASE_MS + POINTER_EXTRA_MS;
+        const until = Date.now() + revealDelay + SHOWCASE_MS + POINTER_EXTRA_MS;
         pointed = { uid: action.targetUid, until };
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
-      if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null);
+      const show = (): void => {
+        if (!played || destroyed) return;
+        showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null);
+        render();
+      };
       render();
+      if (oppFrom) {
+        // 相手のマナ化も、手札の場所で光って消える
+        if (action.type === 'convertToMana') vanishOpponentCard(oppFrom);
+        else flyOpponentCard(oppFrom);
+      }
+      if (played) {
+        if (revealDelay > 0) setTimeout(show, revealDelay);
+        else show();
+      }
     };
 
     /** カードを使ったモンスター（技：行動済になったモンスター、守備：狙われたモンスター、サポート：なし） */
@@ -977,6 +1068,33 @@ export const battleScreen: ScreenDefinition = {
     };
 
     /**
+     * 相手の手札（裏向き。2026-10-23 ユーザー指示「相手の手札は見えたらダメ」。2026-10-25 リデザインでいったん外し、ユーザー指示で戻した）。
+     * 自分の手札と同じ大きさで、実際の枚数だけ並べる。押しても何も出さない。入りきらないときは重ねる
+     */
+    const opponentHand = (s: BattleState): HTMLElement => {
+      const hand = s.sides.opponent.hand;
+      let newIndex = 0;
+      const row = h(
+        'div',
+        { class: 'battle-hand battle-hand--opponent', attrs: { role: 'img', 'aria-label': t('battle.oppHand.count', { n: hand.length }) } },
+        ...hand.map((c) => {
+          const back = h('span', { class: 'battle-hand__back' });
+          if (!shownOppHand.has(c.uid)) {
+            // 新しく引いたカード：山札の方から1枚ずつ来る
+            back.classList.add('is-dealt');
+            back.style.animationDelay = `${newIndex * DEAL_MS}ms`;
+            newIndex++;
+            shownOppHand.add(c.uid);
+          }
+          return back;
+        }),
+        hand.length === 0 ? h('span', { class: 'battle-hand__empty', text: t('battle.oppHand.empty') }) : null,
+      );
+      row.style.setProperty('--n', String(Math.max(1, hand.length)));
+      return row;
+    };
+
+    /**
      * 相手のひと言（2026-10-23 ユーザー指示：顔の絵とセリフは大きく、カードの上に重ねてよい。PS版の対戦画面にならう）。
      * 押すと先に消える。顔の絵がない相手（ダンジョンなど）は吹き出しだけ
      */
@@ -1567,6 +1685,21 @@ export const battleScreen: ScreenDefinition = {
       return LIFE_TICK_START_MS + (from - to - 1) * LIFE_TICK_MS;
     };
 
+    /**
+     * フォーカスエリアの大きなカードを、欄に入る大きさに縮める（相手の番はカメラが上へ寄るので欄が狭くなる。2026-10-25）。
+     * 縮めるだけで、大きくはしない
+     */
+    const fitFocusCards = (): void => {
+      for (const box of element.querySelectorAll<HTMLElement>('.battle-detail__card, .battle-spot__card')) {
+        const card = box.firstElementChild as HTMLElement | null;
+        if (!card) continue;
+        card.style.zoom = '';
+        const room = box.clientHeight;
+        const need = card.offsetHeight;
+        if (room > 0 && need > room) card.style.zoom = String(Math.max(0.5, (room / need) * 0.97));
+      }
+    };
+
     const render = (): void => {
       element.dataset.stage = state ? 'play' : 'order';
       if (!state) {
@@ -1591,14 +1724,12 @@ export const battleScreen: ScreenDefinition = {
       const menu = commandMenu(s, blocked);
       // 2026-10-25 リデザイン（PS版にならう）：上から 手番の帯 → 相手の情報1行 → 相手3体 → 経過1行 → 自分3体 → 自分の情報1行
       // → フォーカスエリア（説明と大きなカード。残りの高さに広がる）→ 手札 → 操作のボタン（横一列）
-      replaceView(
-        header(s),
-        qaBar() ?? '',
-        h('div', { class: 'battle-board' }, infoLine(s, 'opponent'), monsterRow(s, 'opponent'), midBand(s), monsterRow(s, 'player'), infoLine(s, 'player')),
-        detailPanel(s),
-        hand,
-        commandPanel(s, blocked),
+      camera.dataset.focus = cameraFocus(s);
+      lens.replaceChildren(
+        h('div', { class: 'battle-board' }, opponentHand(s), infoLine(s, 'opponent'), monsterRow(s, 'opponent'), midBand(s), monsterRow(s, 'player'), infoLine(s, 'player')),
       );
+      replaceView(header(s), qaBar() ?? '', camera, detailPanel(s), hand, commandPanel(s, blocked));
+      fitFocusCards();
       const overlays = [talkOverlay(s), menu, resultOverlay(s), phaseBanner(s), hintOverlay(s)].filter((o): o is HTMLElement => o !== null);
       element.append(...overlays);
       const handEl = element.querySelector('.battle__hand');
