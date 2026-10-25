@@ -116,3 +116,8 @@
 ・バンダナのリボンは下の段で画面の右のまま（戻っていない）→ Claude が下の段の頭（てっぺんから 130px）だけを帽子の中心で左右反転し、下 25px をなめらかにつないだ。継ぎ目は見えない
 ・大きいほうのかばんは1歩ごとに左右へ移る（男性と同じ。ゲームの大きさでは目立ちにくい）
 ・組み込み用：design-parts/characters-adult/motion-v2/player_female_front_walk8_final.png（まだシートには入れていない）
+・組み込み（2026-10-25・ユーザー「1」）：緑の背景を透明にした版（…_final_alpha.png。緑のにじみも落とした）を正面の歩き（行0）に入れた
+  python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_female_sheet.webp female 0 design-parts/characters-adult/motion-v2/player_female_front_walk8_final_alpha.png
+  → python3 tools/art/ground_figures.py（女性は青い服ではないので blue_tone.py はかけない）
+・頭を立ち絵にそろえると、背は立ち絵の −5〜−8%（男性の正面は −2〜−4%）
+・動画：female/front/video/female_front_walk_lab.mp4（歩きの確認画面・3倍・通常→低速 1/4）
