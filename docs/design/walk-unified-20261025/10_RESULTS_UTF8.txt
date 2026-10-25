@@ -87,3 +87,4 @@
 ・正面の絵は 8コマとも同じ腕の形（画面の右の腕が下がったまま）。腰から下だけ反転した直しでは、腕が交互にならない
 ・ユーザーが案2を選択：上の段を丸ごと左右反転した見本（mirror/1_pose_ref.png）を渡し、「このポーズのまま、かばん・飾りだけ元の側に」と頼む
   正面 male/front/mirror/、背中 male/back/mirror/（1_pose_ref・2_stand・3_PROMPT）
+・正面（player_male_front_walk8_m1.png）：下の段の足と腕は見本どおり（反対の足・反対の腕が前）。かばん・くさりの飾りは画面の右のまま（戻っていない）→ male/front/mirror/4_FIX_bag.txt
