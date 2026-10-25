@@ -93,10 +93,10 @@ const MONSTER_ICON = 76;
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
 const HAND_CARD_W = 70;
-/** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：欄を画面の約1/3に広げ、名前・絵・効果文の入る大きなカード（battleCard.ts）で 138 */
-const DETAIL_CARD_W = 138;
+/** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：欄を画面の約1/3に広げ、名前・絵・効果文の入る大きなカード（battleCard.ts）で 132（QA の帯があっても欄に収まる大きさ） */
+const DETAIL_CARD_W = 132;
 /** 技の演出で大きく見せるカードの幅（上に1行あるので、説明の欄のカードより少し小さく） */
-const SPOT_CARD_W = 122;
+const SPOT_CARD_W = 112;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
 const DEFENSE_ATTACK_W = 112;
 const DEFENSE_CARD_W = 60;
@@ -1329,21 +1329,20 @@ export const battleScreen: ScreenDefinition = {
           )
         : null;
 
-    /** 場面の表示（あなたのターン・マナ化など）。場面が変わったときだけ短く出す */
+    /**
+     * 場面の表示（あなたのターン・マナ化など）。場面が変わったときだけ短く出す。
+     * 2026-10-25 リデザイン パートD：画面の真ん中の大きな帯をやめ、上の手番の帯のすぐ下に小さな札を1行だけ（手番の帯の文言もそのとき光る）
+     */
     const phaseBanner = (s: BattleState): HTMLElement | null => {
       if (s.phase === 'ended' || s.phase === 'defense') return null;
       const key = `${s.turn}-${s.active}-${s.phase}`;
       if (key === bannerKey) return null;
       bannerKey = key;
-      const sub =
-        s.manaConvertLimit !== null
-          ? t('battle.banner.subFirst', { n: s.manaConvertLimit })
-          : t(s.phase === 'mana' ? 'battle.banner.subMana' : 'battle.banner.subMain');
+      element.querySelector('.battle__turn-text')?.classList.add('is-changed');
       const el = h(
         'div',
-        { class: `battle__banner battle__banner--${s.active}`, attrs: { 'aria-hidden': 'true' } },
-        h('span', { class: 'battle__banner-main', text: t(s.phase === 'mana' && s.manaConvertLimit === null ? `battle.banner.mana.${s.active}` : `battle.banner.turn.${s.active}`) }),
-        h('span', { class: 'battle__banner-sub', text: sub }),
+        { class: `battle__phase-chip battle__phase-chip--${s.active}`, attrs: { 'aria-hidden': 'true' } },
+        t(s.phase === 'mana' && s.manaConvertLimit === null ? `battle.banner.mana.${s.active}` : `battle.banner.turn.${s.active}`),
       );
       setTimeout(() => el.remove(), BANNER_MS);
       return el;
