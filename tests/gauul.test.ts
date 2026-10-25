@@ -79,7 +79,6 @@ describe('ガウル16技：正式データ（2026-10-24 承認。正本 JSON を
     expect(readdirSync('design-parts/cards-original/lazuck')).toEqual(['Razuk_Itazura_Approved_USER_IMAGE.jpeg']);
     expect(readFileSync('design-parts/cards-original/lazuck/Razuk_Itazura_Approved_USER_IMAGE.jpeg').subarray(0, 2).toString('hex')).toBe('ffd8');
     expect(existsSync('assets/images/cards/skills/laz_sk_itazura.webp')).toBe(true);
- 
     // 原本の大きな画像を全部読んで照合するので、重いときでも時間切れにならないよう余裕を持たせる
   }, 30000);
 
