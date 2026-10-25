@@ -35,6 +35,8 @@ export const CARDS = {
   'card.effect.handToDeck': { ja: '特殊', en: 'Special' },
   'card.effect.redrawHand': { ja: '特殊', en: 'Special' },
   'card.effect.revealHand': { ja: '特殊', en: 'Special' },
+  'card.effect.shield': { ja: '特殊', en: 'Special' },
+  'card.effect.healSelf': { ja: '特殊', en: 'Special' },
   'card.supportKind.field': { ja: '全体', en: 'Field' },
 
   // 技の効果説明（ゲーム側で描く文字）
@@ -113,6 +115,7 @@ export const CARDS = {
   'card.pending.life': { ja: 'ライフ', en: 'life' },
   'card.pending.art': { ja: '絵', en: 'art' },
   'card.pending.rarity': { ja: 'レアリティ', en: 'rarity' },
+  'card.pending.availability': { ja: '配布の区分（初期・収集）', en: 'distribution group' },
   'card.detail.supportKind': { ja: '区分', en: 'Category' },
   'card.detail.supportField': { ja: '全体（場に残る）', en: 'Field (stays in play)' },
   'card.detail.supportInstant': { ja: 'すぐ効果（1ターンに1回まで）', en: 'Instant (once per turn)' },

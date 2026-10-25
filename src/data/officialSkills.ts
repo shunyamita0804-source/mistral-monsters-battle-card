@@ -13,7 +13,8 @@ export interface OfficialSkill {
   readonly damage: number | null;
   readonly category: string;
   readonly effect_text_ja: string | null;
-  readonly availability: string;
+  /** initial＝初期、それ以外＝収集。なし＝配布区分が未確定（画面に区分を出さない。ミュロル 2026-10-25） */
+  readonly availability?: string;
 }
 
 export interface OfficialSkillSource {
@@ -72,7 +73,7 @@ export function officialSkill(o: OfficialSkill, src: OfficialSkillSource, over: 
     stat: attack && o.damage !== null ? { type: category as 'force' | 'wisdom', value: o.damage } : null,
     category,
     effectTextJa: o.effect_text_ja,
-    availability: o.availability === 'initial' ? 'initial' : 'collect',
+    ...(o.availability !== undefined ? { availability: o.availability === 'initial' ? ('initial' as const) : ('collect' as const) } : {}),
     ...(over.displayNo !== undefined ? { displayNo: over.displayNo } : {}),
     effect,
     isPlaceholder: false,

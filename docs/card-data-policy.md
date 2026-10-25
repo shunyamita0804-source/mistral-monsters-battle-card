@@ -58,6 +58,8 @@
 | GAU-SK-01〜16 | `skl-gauul-01`〜`skl-gauul-16`（番号は同じ） | つつく〜灼熱の飛翔 |
 | （モンスター） | `mon-nobiton` | ノビトン（ライフ8。2026-10-25 に技16種と一緒に届き、正式へ） |
 | NOB-SK-01〜16 | `skl-nobiton-01`〜`skl-nobiton-16`（番号は同じ） | はなビンタ〜必死によける |
+| （モンスター） | `mon-myurol` | ミュロル（ライフ7。2026-10-25 に技16種が届き、正式へ。モンスターカードの絵はまだ無い） |
+| myurol_01〜16 | `skl-myurol-01`〜`skl-myurol-16`（番号は同じ） | たいあたり〜すべってよける |
 
 ラズックの正本は `src/data/official/lazuck_cards_OFFICIAL.json`（無改変）、読み込みは `src/data/lazuck.ts`（ソラモと同じ作り方 `src/data/officialSkills.ts`）。
 絵は `laz_sk_NN.webp`。**初期・収集の配分が食い違っている**（全体方針は初期8・収集8、1枚ずつの指定を足すと初期10〔01〜08・11・14〕・収集6）。データは1枚ずつの指定のまま持ち、配布・スターター・パックには使っていない（ユーザー確認待ち）
@@ -66,6 +68,21 @@
 - レアリティは未定（`rarity: null`。モンスターのランク C とは別物）。パックには入れていない
 - 英語は仮訳（`src/i18n/contentEnOfficialDraft.ts` に分けて管理）
 - 登録だけのモンスターは、いまはいない（ガウルは 2026-10-24 に正式へ）
+
+### 2026-10-25 ミュロル（Mistral_Myurol_16Skills_Claude_Approved_20261025）
+
+- 届いたもの：技の絵16枚（01〜07 PNG・08〜16 JPEG。ユーザーが全16枚を正式採用）・技一覧 CSV・技データ JSON・画像の照合表・実装指示。
+  ZIP の中身をすべて `design-parts/cards-original/myurol/` に無改変で保管
+- 正本は JSON（`src/data/official/myurol_skills_OFFICIAL_20261025.json`・無改変。CSV も同じフォルダに無改変）。読み込みは `src/data/myurol.ts`
+  （JSON の id `myurol_NN` はデザイン ID として持ち、ゲームの ID は `skl-myurol-NN`。技名・マナ・効果の文は書き換えない）
+- 絵：`myu_sk_NN.png`（01〜07）・`myu_sk_NN.jpg`（08〜16）。JSON の image に書かれたファイルを番号で1対1に写しただけで、**中身は1バイトも変えていない**
+  （変換・再圧縮・縮小・切り抜きなし。ファイル名だけ素材の命名規則に合わせた）。`tests/myurol.test.ts` で照合表の SHA-256・容量・寸法と突き合わせる。
+  そのため1枚 0.6〜2.6MB と、ほかのモンスターの技の絵（WebP 約0.2MB）より重い（16枚で約23MB。カードを表示したときに読み込む）
+- **初期配布／収集用は「案」のまま**（JSON の distribution_confirmed: false）。案（初期＝01・02・05・06・08・10・11・13、収集＝03・04・07・09・12・14・15・16）は
+  `MYUROL_DISTRIBUTION_PROPOSAL` に持つだけで、カードの区分（availability）には入れず画面にも出さない（カードの説明に「まだ決まっていない項目：配布の区分」と出る）
+- **未定**：モンスターカードの絵（届いていない。仮の絵「ル」と「仮」で表示）、枠色（`monster_theme_colors.json` に無いので、技の絵の水色 `#7EC4E8` を仮の候補に）、
+  レアリティ、正式英語（仮訳）、配る枚数・パック・価格・敵の編成（ノビトンと同じく、スターター・パック・相手の編成には入れていない。QA の「全カード」で手に入る）
+- 効果の裁定（要仕様確定）は `docs/battle-rules.md`「正式カード（ミュロル）」
 
 ### 2026-10-25 ノビトン（MistralMonstersBC_Nobiton_FINAL_Part1/Part2_20261025）
 

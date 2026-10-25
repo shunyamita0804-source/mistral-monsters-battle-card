@@ -9,7 +9,7 @@ import {
   createBattle,
   manaOf,
   otherSide,
-  pendingDamage,
+  incomingDamage,
   supportUsesLeft,
   targetsFor,
   type BattleAction,
@@ -61,6 +61,8 @@ function showcaseSound(card: PlayCard): SoundId {
     case 'weaken':
     case 'taunt':
     case 'handToDeck':
+    case 'shield':
+    case 'healSelf':
       return 'cardSpecial';
     case 'seal':
       return 'cardSeal';
@@ -957,6 +959,11 @@ export const battleScreen: ScreenDefinition = {
       if (m.weakenTurn && m.weakenTurn.turn >= s.turn) items.push(weakenBadge(m.weakenTurn.stat, m.weakenTurn.amount));
       if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) items.push(h('span', { class: 'battle__status-text', text: t('battle.status.sealed') }));
       if (m.taunt && m.taunt.turn >= s.turn) items.push(h('span', { class: 'battle__status-text', text: t('battle.status.taunted', { only: cardName(m.taunt.monsterId) }) }));
+      // しめったはだ：受けるダメージ−（使った手番と相手の次の手番の間だけ出す）
+      if (m.shield && m.shield.untilTurn >= s.turn) {
+        const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
+        items.push(h('span', { class: 'battle__status-text', text: t('battle.status.shield', { stat, n: m.shield.reduce }) }));
+      }
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
     };
@@ -1065,7 +1072,7 @@ export const battleScreen: ScreenDefinition = {
                     stat: statLabel(p.stat),
                     power: p.power,
                   })
-                : t('battle.prompt.attacking', { skill: cardName(p.cardId), n: pendingDamage(p) }),
+                : t('battle.prompt.attacking', { skill: cardName(p.cardId), n: incomingDamage(s, p) }),
           }),
         ];
       } else if (s.phase === 'mana' && s.active === 'player') {
@@ -1230,7 +1237,7 @@ export const battleScreen: ScreenDefinition = {
           }),
           h('p', {
             class: 'battle__defense-hint',
-            text: used ? t('battle.defense.damageUsed', { n: pendingDamage(pending), used }) : t('battle.defense.damage', { n: pendingDamage(pending) }),
+            text: used ? t('battle.defense.damageUsed', { n: incomingDamage(s, pending), used }) : t('battle.defense.damage', { n: incomingDamage(s, pending) }),
           }),
           h(
             'div',

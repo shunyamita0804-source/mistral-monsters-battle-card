@@ -57,6 +57,7 @@ export const BATTLE = {
   // ノビトン（2026-10-25）
   'battle.log.manaDrain': { ja: '{side}のマナが{n}減った。', en: "{side}'s mana went down by {n}." },
   'battle.log.stun': { ja: '{name}は次のターン行動できない。', en: "{name} can't act next turn." },
+  'battle.log.shield': { ja: '{name}が受ける{stat}技のダメージ-{n}（相手の次のターンまで）。', en: '{name} takes -{n} {stat} damage (until the end of the next turn).' },
   'battle.log.redrawHand': {
     ja: '{side}は手札{n}枚を山札に戻してシャッフルし、{n}枚引いた。',
     en: '{side} shuffled {n} {n|card|cards} from hand into the deck and drew {n}.',
@@ -85,6 +86,7 @@ export const BATTLE = {
   'battle.ng.noHandToReturn': { ja: '戻す手札がありません', en: 'No other cards in hand to return' },
   'battle.ng.stunned': { ja: 'このターンは行動できません（まきつく）', en: "Can't act this turn (Coil)" },
   'battle.ng.evadeMinCost': { ja: '必要マナ{n}以上の攻撃にしか使えません', en: 'Only works against attacks costing {n}+ mana' },
+  'battle.ng.maxCost': { ja: '必要マナ{n}以下の攻撃にしか使えません', en: 'Only works against attacks costing {n} mana or less' },
   'battle.ng.defenseOnAttack': {
     ja: '防御・回避カードは相手の攻撃を受けたときに使います',
     en: 'Guard/Dodge cards are used when you are attacked',
@@ -103,6 +105,7 @@ export const BATTLE = {
   'battle.talk.win': { ja: '今回はわたしの勝ちだね。', en: 'This one goes to me.' },
   'battle.talk.lose': { ja: '参った……強いね。', en: "I give up... you're strong." },
   'battle.status.taunted': { ja: '{only}だけ', en: '{only} only' },
+  'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（すなかけ）', en: "Can't attack this turn (Sand Throw)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
 
