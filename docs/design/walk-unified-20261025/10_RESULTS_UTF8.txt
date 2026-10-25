@@ -151,3 +151,16 @@
 ・5_PROMPT_{front,left,back}_run.txt を書き直し：かがまない（前の文の「前傾のまま」「ひざが深く曲がって体がいちばん低い」をやめた）・上の段と下の段で足と腕が入れ替わる・腕をコマごとに指定・横は手前と奥の足・背中は靴の裏の見える足・緑の背景
 ・左・背中の枠 2_frame_run.png と参考 1_ref_run.png を作った（見本のマスは歩きの絵で届いた左向き・背中の立ち姿。
   design-parts/characters-adult/player_female_{left,back}_stand_u.png。いちばん大きなかたまりだけ残し、緑のふちを1画素けずった）
+
+■ 2026-10-25　女性の走り（1枚目・3方向。どれも4列×2段・背景は緑・かがんでいない）
+・正面（player_female_front_run8_u.png）：上の段と下の段で足が入れ替わらない（1・2 と 5・6 は同じ足で着く。腕だけ逆）
+  → 1歩としてつながる 5（着地）→ 6（体重を受ける）→ 3（ひざを前へ）→ 4（浮く）を上の段に、その人物の左右反転（頭だけ元の向きに戻してリボンを画面の左に）を下の段に
+  player_female_front_run8_final(_alpha).png。かばんは1歩ごとに左右へ移る（歩きと同じ）
+  python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_female_sheet.webp female 4 …/player_female_front_run8_final_alpha.png --stretch-run …/player_female_front_walk8_final_alpha.png
+  （頭をそろえると背は立ち絵の −4〜−8%、浮くコマ 4・8 は −15%。腰から下を伸ばして歩きの真ん中の値 −6% に）
+・背中（player_female_back_run8_u.png）：上の段は画面の左、下の段は画面の右の足の裏が見え、足が入れ替わっている → そのまま使う
+  帽子の幅の照合が 1.47 と外れた（自分で測ると 107px ÷ 立ち姿 105px ＝ 1.02）→ unified_build.py に --ratio を足した
+  python3 tools/art/unified_build.py … female 5 …/player_female_back_run8_u_alpha.png --stand design-parts/characters-adult/player_female_back_stand_u.png --by hat --ratio 1.02
+  背は立ち姿の +0.4〜+3.6%（かがまない走りなので伸ばさない）
+・左向き（player_female_left_run8_u.png）：下の段が上の段とほぼ同じ（ひざを上げるのが8人とも手前の足）→ 同じ会話で female/left/14_FIX_run_legs.txt
+・そのあと python3 tools/art/ground_figures.py

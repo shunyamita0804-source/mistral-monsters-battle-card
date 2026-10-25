@@ -15,7 +15,8 @@
 
 使い方:
   python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--cols 5|6 [--pick 1,2,…]] [--stand 向きの立ち絵.png|sample [--set-idle]]
-      [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--by hat] [--one-scale] [--out 出力.webp] [--check 確認.png]
+      [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--by hat] [--ratio 比] [--one-scale] [--out 出力.webp] [--check 確認.png]
+  --ratio 1.02：8コマとも頭の比をこの値にする（帽子の幅を自分で測ったとき。女性の背中の走りで帽子の照合が 1.47 と外れた）
   --one-scale：8コマとも同じ縮尺（測った頭の比の真ん中の値）。届いた絵の中で大きさがそろっているのに、照合が一部のコマで外れるとき（2026-10-25 女性の背中）
   行：0 正面・1 背中・2 左 の歩き、4 正面・5 背中・6 左 の走り
 """
@@ -149,6 +150,10 @@ def main(args: list[str]) -> None:
     k_stand = game_h / crop(stand).height
     by = opt(args, '--by', 'head')
     heads, hs = height_ratios(stand, poses, by)
+    if '--ratio' in args:
+        fixed = float(opt(args, '--ratio'))
+        hs = [h * hd / fixed for h, hd in zip(hs, heads)]
+        heads = [fixed] * len(heads)
     if '--one-scale' in args:
         mid = float(np.median(heads))
         hs = [h * hd / mid for h, hd in zip(hs, heads)]
