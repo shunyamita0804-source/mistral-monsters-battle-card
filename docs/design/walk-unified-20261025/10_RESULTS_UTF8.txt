@@ -50,3 +50,9 @@
 ・背中の立ち姿は見本の列のもの（player_male_back_stand_u.png）。背の高さは正面の立ち絵と同じにした
 ・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 1 design-parts/characters-adult/motion-v2/player_male_back_walk_u_6col.png --cols 6 --pick 10,1,2,3,4,6,7,8 --stand sample --set-idle
 ・次：背中の走り（male/back/1_ref_run.png・2_frame_run.png・3_guide_run.png・5_PROMPT_back_run.txt）
+
+■ 2026-10-25　男性・背中の走り8コマ
+・4列×2段・背景透明。後ろ姿は顔が無く、頭の照合が外れた（頭が大きすぎる判定で帽子が枠から切れた）→ 帽子の横幅で比べる（--by hat）
+・帽子をそろえると背が +10〜+12%（この絵は頭が小さめに描かれていた）→ 腰から下を縮めて、背中の歩きの真ん中の値（−2%）にそろえた
+・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 5 design-parts/characters-adult/motion-v2/player_male_back_run8_u.png --stand design-parts/characters-adult/player_male_back_stand_u.png --by hat --stretch-run design-parts/characters-adult/motion-v2/player_male_back_walk_u_6col.png --walk-cols 6
+・これで男性は立ち・歩き・走りの4方向すべてが新しい絵（同じ頭の大きさ・背の高さ・色）。次は女性（female/ を同じ順番で）

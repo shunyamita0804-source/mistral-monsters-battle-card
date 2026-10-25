@@ -15,7 +15,7 @@
 
 使い方:
   python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--cols 5|6 [--pick 1,2,…]] [--stand 向きの立ち絵.png|sample [--set-idle]]
-      [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--out 出力.webp] [--check 確認.png]
+      [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--by hat] [--out 出力.webp] [--check 確認.png]
   行：0 正面・1 背中・2 左 の歩き、4 正面・5 背中・6 左 の走り
 """
 import sys
@@ -111,9 +111,17 @@ def place(im: Image.Image, k: float) -> np.ndarray:
     return np.array(frame)
 
 
-def height_ratios(stand: Image.Image, poses: list[Image.Image]) -> tuple[list[float], list[float]]:
-    """1コマずつ（頭の大きさ ÷ 立ち絵の頭、頭をそろえたときの背の高さ ÷ 立ち絵の背の高さ）"""
-    heads = head_ratios(stand, poses)
+def height_ratios(stand: Image.Image, poses: list[Image.Image], by: str = 'head') -> tuple[list[float], list[float]]:
+    """1コマずつ（頭の大きさ ÷ 立ち絵の頭、頭をそろえたときの背の高さ ÷ 立ち絵の背の高さ）。
+    by＝'hat' は頭の代わりに帽子の横幅で比べる（後ろ姿は顔が無く、頭の照合が外れることがある。2026-10-25 背中の走り）"""
+    if by == 'hat':
+        from adult_walk_build import cap_width, hat_color
+
+        color = hat_color(stand)
+        base = cap_width(stand, color)
+        heads = [cap_width(p, color) / base for p in poses]
+    else:
+        heads = head_ratios(stand, poses)
     sh = crop(stand).height
     return heads, [crop(p).height / hd / sh for p, hd in zip(poses, heads)]
 
@@ -138,14 +146,16 @@ def main(args: list[str]) -> None:
     ys = np.nonzero((idle[..., 3] > 128).any(axis=1))[0]
     game_h = int(ys[-1] - ys[0] + 1) - 4
     k_stand = game_h / crop(stand).height
-    heads, hs = height_ratios(stand, poses)
+    by = opt(args, '--by', 'head')
+    heads, hs = height_ratios(stand, poses, by)
     print('頭の比', [round(x, 3) for x in heads])
     print('頭をそろえたときの背の高さ（立ち絵＝1）', [round(x, 3) for x in hs])
     if '--stretch-run' in args:
         walk, _ = load_poses(opt(args, '--stretch-run'), int(opt(args, '--walk-cols', '4')))
-        target = float(np.median(height_ratios(stand, walk)[1]))
-        poses = [stretch_lower(p, 1 + (target - h) / (1 - LOWER_FROM) / h) if h < target else p for p, h in zip(poses, hs)]
-        print(f'走りの腰から下を伸ばして、背の高さを歩きの真ん中の値 {target:.3f} に')
+        target = float(np.median(height_ratios(stand, walk, by)[1]))
+        # 低ければ腰から下を伸ばし、高ければ縮める（背中の走りは頭が小さく描かれ、頭をそろえると背が +10〜+12% になった）
+        poses = [stretch_lower(p, 1 + (target - h) / (1 - LOWER_FROM) / h) if abs(h - target) > 0.01 else p for p, h in zip(poses, hs)]
+        print(f'走りの腰から下を伸び縮みさせて、背の高さを歩きの真ん中の値 {target:.3f} に')
     frames = [place(p, k_stand / hd) for p, hd in zip(poses, heads)]
     fit = tone_fit(frames, [idle])
     frames = [np.array(outline(Image.fromarray(tone_apply(f, fit)), 2)) for f in frames]
