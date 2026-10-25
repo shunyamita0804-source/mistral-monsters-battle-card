@@ -27,7 +27,7 @@ describe('カードデータ（仮）', () => {
     for (const c of [...MONSTERS, ...SKILLS, ...SUPPORTS]) {
       const official =
         ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol'].includes(c.id) ||
-        ['skl-soramo-', 'skl-lazuck-', 'skl-gauul-', 'skl-nobiton-', 'skl-myurol-'].some((p) => c.id.startsWith(p));
+        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul-', 'skl-nobiton-', 'skl-myurol-'].some((p) => c.id.startsWith(p));
       expect(c.isPlaceholder).toBe(!official);
     }
   });

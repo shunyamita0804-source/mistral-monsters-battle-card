@@ -348,7 +348,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (state.phase === 'mana') return NO(t('battle.ng.manaPhase'));
   if (skill.effect.type === 'defense' || skill.effect.type === 'evade') return NO(t('battle.ng.defenseOnAttack'));
   // いたずら・不思議な嗅覚：相手の手札がないときは使えない（いたずらは 2026-10-24 ユーザー指示。嗅覚も同じ扱い）
-  if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
+  if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'discardRandom' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
     return NO(t('battle.ng.noOpponentHand'));
   }
   // 考える：このカードのほかに戻す手札がないときは使えない
@@ -742,6 +742,8 @@ function useCard(
     }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));
+    case 'discardRandom':
+      return discardRandom(next, otherSide(side));
     case 'redrawHand':
       return redrawHand(next, side);
     case 'revealHand':
@@ -804,6 +806,19 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
     }
   }
   return next;
+}
+
+/**
+ * 吠える（正式：ソラモ14技 2026-10-25）「相手の手札からランダムに1枚を捨てさせる」：side の手札からランダムに1枚を、その捨て札へ。補充はしない。
+ * 手札が0枚のときは使えない（cardUsability。いたずらと同じ）
+ */
+function discardRandom(state: BattleState, side: Side): BattleState {
+  const s = state.sides[side];
+  if (s.hand.length === 0) return state;
+  const pick = nextInt(state.seed, s.hand.length);
+  const card = s.hand[pick.value] as HandCard;
+  const next = updateSide({ ...state, seed: pick.seed }, side, { hand: s.hand.filter((c) => c.uid !== card.uid), discard: [...s.discard, card.cardId] });
+  return addLog(next, t('battle.log.discardRandom', { player: s.name, card: nameOf(card.cardId) }));
 }
 
 /**

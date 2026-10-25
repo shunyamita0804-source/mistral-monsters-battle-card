@@ -145,11 +145,14 @@ describe('数値の欄のきまり（2026-10-25：特殊は「効果」・回避
       else if (cat === 'evade') expect(skillValueBadgeText(b)).toBe('回避');
       else expect(skillValueBadgeText(b)).toBe('効果');
     }
-    // ソラモのすなかけ（特殊）・まるまる（防御 -3）
-    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo-08')))).toBe('効果');
-    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo-11')))).toBe('-3');
+    // ソラモ14技：09 すなかけ・10 吠える（特殊）・11 まるまる（防御 -3）・13 ひらりジャンプ（回避）・01（攻撃）
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-09')))).toBe('効果');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-10')))).toBe('効果');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-11')))).toBe('-3');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-13')))).toBe('回避');
+    expect(skillValueBadge(getSkill('skl-soramo14-01')).kind).toBe('damage');
     setLanguage('en');
-    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo-08')))).toBe('Effect');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-09')))).toBe('Effect');
     setLanguage('ja');
   });
 });

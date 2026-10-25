@@ -121,7 +121,7 @@ export function chooseAction(state: BattleState, side: Side): BattleAction | nul
     if (user && !covered && attackersWith(state, otherSide(side), against) > 0) return { type: 'useCard', side, cardUid: shield.card.uid, userUid: user.uid };
   }
   // いたずら：相手の手札が2枚以上あるときに使う（仮の思考）
-  const prank = options.filter(isSkillOption).find((o) => o.def.effect.type === 'handToDeck');
+  const prank = options.filter(isSkillOption).find((o) => o.def.effect.type === 'handToDeck' || o.def.effect.type === 'discardRandom');
   if (prank && state.sides[otherSide(side)].hand.length >= 2) return { type: 'useCard', side, cardUid: prank.card.uid };
   // 考える：攻撃できる技がなく、ほかの手札が2枚以上あるときに引き直す（仮の思考）
   const redraw = options.filter(isSkillOption).find((o) => o.def.effect.type === 'redrawHand');

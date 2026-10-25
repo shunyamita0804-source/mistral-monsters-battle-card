@@ -379,201 +379,7 @@
   bottom: 64px;
 }
 
-/* ---------- パートB：技カードの表面（手札でも「何マナか」「威力いくつか」が一瞬で読める） ---------- */
-.bcard {
-  /* --u：幅 70 を 1px とした大きさ。大きなカードでも数字は 1.45 倍まで */
-  --k: min(var(--u, 1px), 1.45px);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 2px solid var(--frame, #8a7a5a);
-  border-radius: 6px;
-  background: #0f131c;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
-  color: #fff;
-  user-select: none;
-}
-
-.bcard__pic {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.bcard__art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-.bcard__art--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.05) 0 6px, transparent 6px 12px),
-    linear-gradient(160deg, #e9dcc0, #c9b58e);
-}
-
-.bcard__art-mark {
-  font-size: calc(28 * var(--u, 1px));
-  font-weight: 900;
-  color: rgb(90 70 40 / 0.55);
-}
-
-.bcard__temp {
-  position: absolute;
-  top: calc(3 * var(--k));
-  right: calc(3 * var(--k));
-  padding: 0 calc(3 * var(--k));
-  border-radius: 3px;
-  background: rgb(0 0 0 / 0.55);
-  font-size: calc(8 * var(--k));
-  line-height: 1.5;
-}
-
-/* 左上：マナの丸いバッジ（青・太字） */
-.bcard__mana {
-  position: absolute;
-  top: calc(2 * var(--k));
-  left: calc(2 * var(--k));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(25 * var(--k));
-  height: calc(25 * var(--k));
-  border: calc(1.5 * var(--k)) solid #cfe6ff;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #4d9be6, #15569a 70%);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
-}
-
-.bcard__mana-num {
-  font-size: calc(18 * var(--k));
-  font-weight: 900;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.6);
-}
-
-/* 右下：種類の札（小）と威力の数字（大・縁取り）。明るい絵でも読めるよう暗い下地 */
-.bcard__power {
-  position: absolute;
-  right: calc(2 * var(--k));
-  bottom: calc(2 * var(--k));
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: calc(1 * var(--k));
-}
-
-.bcard__type {
-  padding: 0 calc(4 * var(--k));
-  border-radius: calc(3 * var(--k));
-  background: var(--cat);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
-  font-size: calc(8.5 * var(--k));
-  font-weight: 800;
-  line-height: 1.55;
-  white-space: nowrap;
-}
-
-.bcard__power.is-label-only .bcard__type {
-  font-size: calc(10 * var(--k));
-  padding: 0 calc(5 * var(--k));
-}
-
-.bcard__value {
-  display: flex;
-  align-items: center;
-  gap: calc(1 * var(--k));
-  padding: 0 calc(3 * var(--k)) 0 calc(1 * var(--k));
-  border-radius: calc(5 * var(--k));
-  background: rgb(0 0 0 / 0.58);
-}
-
-.bcard__icon {
-  width: calc(15 * var(--k));
-  height: calc(15 * var(--k));
-}
-
-.bcard__shield {
-  display: flex;
-  width: calc(14 * var(--k));
-  height: calc(14 * var(--k));
-  color: #b9c6dc;
-}
-
-.bcard__shield svg {
-  width: 100%;
-  height: 100%;
-}
-
-.bcard__num {
-  font-size: calc(23 * var(--k));
-  font-weight: 900;
-  line-height: 1.05;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
-  -webkit-text-stroke: calc(1 * var(--k)) rgb(0 0 0 / 0.75);
-  paint-order: stroke fill;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
-}
-
-.bcard[data-category='force'] .bcard__num {
-  color: #ffd2cc;
-}
-
-.bcard[data-category='wisdom'] .bcard__num {
-  color: #d4ffe0;
-}
-
-.bcard__value--guard .bcard__num {
-  color: #dfe8f7;
-}
-
-/* 大きなカード（フォーカスエリア）：上に名前、下に効果文 */
-.bcard--focus .bcard__name {
-  flex: none;
-  height: 17%;
-  max-height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--frame) 35%, #1a1f2b), #141822);
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 800;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bcard--focus .bcard__pic {
-  flex: none;
-  aspect-ratio: 827 / 937;
-}
-
-.bcard--focus .bcard__text {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  padding: 4px 7px;
-  background: #141822;
-  border-top: 1px solid rgb(255 255 255 / 0.12);
-  font-size: 12.5px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: #f3ead5;
-  overflow: hidden;
-}
+/* ---------- パートB：技カードの表面 → 2026-10-25 から全画面共通の新UI（skillCard.ts・cards.css）に統一 ---------- */
 
 /* ---------- パートC：技を使ったときの演出（フォーカスエリアに大きく・誰が誰に・タップで次へ） ---------- */
 .battle-spot {
@@ -971,8 +777,10 @@
 }
 
 .battle-hand__back {
+  /* 裏面の絵（400×586）の縦横比のまま、自分の手札と同じ高さ（2026-10-25：手札が新UIのほぼ正方形になったので、幅は絵の比率で） */
+  --opp-card-w: calc(var(--hand-card-h) * 400 / 586);
   flex: none;
-  width: var(--hand-card-w);
+  width: var(--opp-card-w);
   height: var(--hand-card-h);
   border-radius: 5px;
   background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
@@ -982,7 +790,7 @@
 
 /* 2枚目からは少しすき間。入りきらないときは重ねる（--n は枚数） */
 .battle-hand--opponent .battle-hand__back + .battle-hand__back {
-  margin-left: min(6px, calc((100% - var(--n) * var(--hand-card-w)) / max(var(--n) - 1, 1)));
+  margin-left: min(6px, calc((100% - var(--n) * var(--opp-card-w)) / max(var(--n) - 1, 1)));
 }
 
 /* 新しく引いたカード：右上（相手の山札の方）から来る */

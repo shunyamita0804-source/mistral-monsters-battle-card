@@ -63,8 +63,8 @@ export const SCREENS = {
   },
   'bed.aboutSprites': { ja: '主人公の歩行グラフィックは QA 試作品です', en: 'The hero’s walking sprites are QA prototypes' },
   'bed.aboutTemplate': {
-    ja: '技カードの枠は「技カードUIテンプレート V4（承認待ち）」を使用',
-    en: 'Skill cards use the “Skill Card UI Template V4 (awaiting approval)” frame',
+    ja: '技カードの枠は新UI（2026-10-25 承認）を使用',
+    en: 'Skill cards use the new card UI (approved 2026-10-25)',
   },
   'bed.delete': { ja: 'セーブデータを消す', en: 'Delete Save Data' },
   'bed.deleteConfirm': { ja: 'セーブデータを消しますか？', en: 'Delete your save data?' },

@@ -1,6 +1,6 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
 import { LAZUCK_SKILLS, lazuckSkillId } from '../../data/lazuck.ts';
-import { SORAMO_SKILLS, SORAMO_TEAM, soramoSkillId } from '../../data/soramo.ts';
+import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
@@ -127,15 +127,15 @@ export function createPlaceholderStarterDeck(): Deck {
 }
 
 /**
- * 【テスト用】ソラモのデッキ（2026-10-23 ユーザー指示「技の発動を見るため、仮のカードはすべてソラモに」）。
- * ソラモ3体＋ソラモの技16種を3枚ずつ（48枚）＋仮サポート1〜6を2枚ずつ（12枚）＝60枚。
- * 正式なスターターデッキの内訳は未承認（これは技を試すための仮の組み合わせ）
+ * 【古いセーブの変換用・2026-10-23】ソラモのデッキ（そのときのユーザー指示「技の発動を見るため、仮のカードはすべてソラモに」）。
+ * ソラモ3体＋旧ソラモの技16種を3枚ずつ（48枚）＋仮サポート1〜6を2枚ずつ（12枚）＝60枚。
+ * 旧ソラモの技（skl-soramo-01〜16）は 2026-10-25 に削除したので、セーブの version 6・7 の変換と、その見分けにだけ使う
  */
 const TEST_SORAMO_SUPPORT_COPIES = 2;
 export function createSoramoTestDeck(): Deck {
   const skills: string[] = [];
-  for (const skill of SORAMO_SKILLS) {
-    for (let i = 0; i < DECK_RULES.maxCopies; i++) skills.push(skill.id);
+  for (const id of SORAMO_OLD_SKILL_IDS) {
+    for (let i = 0; i < DECK_RULES.maxCopies; i++) skills.push(id);
   }
   for (const card of SUPPORTS) {
     for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(card.id);
@@ -144,27 +144,44 @@ export function createSoramoTestDeck(): Deck {
 }
 
 /**
- * 【テスト用】ソラモとラズックのデッキ（2026-10-23 ユーザー指示「仮置きで、ソラモしかいない所にラズックも出して」）。
+ * 【古いセーブの変換用・2026-10-23〜24】ソラモとラズックのデッキ（そのときのユーザー指示「仮置きで、ソラモしかいない所にラズックも出して」）。
+ * 旧ソラモの技を使うので、セーブの version 7 の変換と、その見分けにだけ使う（新しいデッキは createStarterDeck）。
  * ソラモ・ラズック・ソラモ（TEST_TEAM）＋両方の技16種を1枚ずつ（32枚）＋両方の技01〜08をもう1枚ずつ（16枚）＋仮サポート1〜6を2枚ずつ（12枚）＝60枚。
  * 2026-10-24：ラズックの16種はクロスガードの代わりにいたずら（クロスガードは退役）
  * 正式なスターターデッキの内訳は未承認（これは技を試すための仮の組み合わせ）
  */
 const TEST_EXTRA_COPY_UPTO = 8;
 export function createMixedTestDeck(): Deck {
-  const both = [SORAMO_SKILLS, LAZUCK_SKILLS];
-  const skills: string[] = both.flatMap((list) => list.map((s) => s.id));
+  const both = [SORAMO_OLD_SKILL_IDS, LAZUCK_SKILLS.map((s) => s.id)];
+  const skills: string[] = both.flat();
   // もう1枚ずつ入れるのは、元の番号 01〜08 の技（2026-10-24 にラズックの表示の順が変わっても、ID で同じカードを選ぶ）
-  const extra = new Set(Array.from({ length: TEST_EXTRA_COPY_UPTO }, (_, i) => [soramoSkillId(i + 1), lazuckSkillId(i + 1)]).flat());
-  for (const list of both) skills.push(...list.filter((s) => extra.has(s.id)).map((s) => s.id));
+  const extra = new Set(Array.from({ length: TEST_EXTRA_COPY_UPTO }, (_, i) => [SORAMO_OLD_SKILL_IDS[i] as string, lazuckSkillId(i + 1)]).flat());
+  for (const list of both) skills.push(...list.filter((id) => extra.has(id)));
   for (const card of SUPPORTS) {
     for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(card.id);
   }
   return { monsters: [...TEST_TEAM], skills };
 }
 
-/** 新しく始めたときのデッキ。いまはテスト用のソラモとラズックのデッキ（仮モンスターA〜C の旧スターターは createPlaceholderStarterDeck） */
+/** 初期デッキの残り2体分の技の枚数・サポートの枚数（2026-10-25 ユーザー指示：3体分の技45枚＋サポート15枚＝60枚。ソラモ枠は16枚） */
+export const STARTER_OTHER_SKILLS = 29;
+export const STARTER_SUPPORT_COUNT = 15;
+
+/**
+ * 新しく始めたときのデッキ（2026-10-25）。
+ * - ソラモ枠16枚：正式（02・03・04・07・09・10・11・13 を2枚ずつ。src/data/soramo.ts の SORAMO_STARTER）
+ * - 残り2体の技29枚・サポート15枚：**未確定**。3体の組み合わせも未決定なので、それまでの仮の編成（ソラモ・ラズック・ソラモ）のまま、
+ *   ラズックの技16種を1枚ずつ＋表示の順で先頭13種をもう1枚（29枚）、仮サポート1〜6を順に3枚まで（15枚）を【仮】で入れる
+ */
 export function createStarterDeck(): Deck {
-  return createMixedTestDeck();
+  const skills: string[] = SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  const lazuck = LAZUCK_SKILLS.map((s) => s.id);
+  skills.push(...lazuck, ...lazuck.slice(0, STARTER_OTHER_SKILLS - lazuck.length));
+  const supports: string[] = [];
+  for (let round = 0; round < DECK_RULES.maxCopies && supports.length < STARTER_SUPPORT_COUNT; round++) {
+    for (const card of SUPPORTS) if (supports.length < STARTER_SUPPORT_COUNT) supports.push(card.id);
+  }
+  return { monsters: [...TEST_TEAM], skills: [...skills, ...supports] };
 }
 
 /** 旧スターター（仮モンスターA〜C）と同じ内容の所持カード（テスト用） */

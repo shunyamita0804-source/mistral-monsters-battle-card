@@ -21,7 +21,7 @@ import {
   type Side,
 } from '../src/game/battle/engine.ts';
 import { skillCardFace } from '../src/game/cards/cardFace.ts';
-import { createMixedTestDeck, createSoramoTestDeck, validateDeck } from '../src/game/deck/deck.ts';
+import { createMixedTestDeck, createSoramoTestDeck, createStarterDeck, validateDeck } from '../src/game/deck/deck.ts';
 import { packCardRates } from '../src/game/economy/gacha.ts';
 import { createNewSave, migrate, normalizeSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
@@ -130,8 +130,8 @@ describe('ラズック16技：正式データ（正本 JSON を無改変で導�
 
 /* ---------- 技の効果（バトル） ---------- */
 
-// 両方とも ソラモ（m1）・ラズック（m2）・ソラモ（m3）
-const mixedDeck = createMixedTestDeck();
+// 両方とも ソラモ（m1）・ラズック（m2）・ソラモ（m3）。2026-10-25 からはソラモ14技の初期デッキ
+const mixedDeck = createStarterDeck();
 
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}): BattleState {
   const s = createBattle({ name: 'P', deck: mixedDeck }, { name: 'O', deck: mixedDeck }, 7, 'player');
@@ -233,28 +233,28 @@ describe('ラズックの技の効果', () => {
     expect(cardUsability(s, 'player', 'p0').usable).toBe(true);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(monster(s, 'o-m1').weakenTurn).toEqual({ stat: 'force', amount: 1, turn: s.turn + 1 });
-    // ソラモの吠える（次に使うまで）とは別のしくみ
+    // 次に使うまで弱める効果（weaken）とは別のしくみ
     expect(monster(s, 'o-m1').weaken ?? null).toBeNull();
     const next = opponentTurn(s, s.turn + 1, []);
-    expect(attackPower(next, getSkill(sor(4)), monster(next, 'o-m1'))).toBe(1); // 連続ひっかき：ちから2 → 1
-    expect(attackPower(next, getSkill(sor(9)), monster(next, 'o-m1'))).toBe(4); // ソラモビーム：かしこさ4 のまま
-    expect(attackPower(next, getSkill(sor(4)), monster(next, 'o-m3'))).toBe(2);
+    expect(attackPower(next, getSkill(sor(3)), monster(next, 'o-m1'))).toBe(1); // たいあたり：ちから2 → 1
+    expect(attackPower(next, getSkill(sor(7)), monster(next, 'o-m1'))).toBe(4); // スターダストレイ：かしこさ4 のまま
+    expect(attackPower(next, getSkill(sor(3)), monster(next, 'o-m3'))).toBe(2);
     expect(attackPower(next, getSkill(sor(1)), monster(next, 'o-m1'))).toBe(0); // ひっかき：ちから1 → 0（0 未満にならない）
     // 使っても消えず、その手番の間は効く。手番が過ぎたら効かない
-    let used = applyAction(opponentTurn(s, s.turn + 1, [sor(4), sor(4)], ['o-m1']), { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' });
+    let used = applyAction(opponentTurn(s, s.turn + 1, [sor(3), sor(3)], ['o-m1']), { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' });
     expect(used.pending?.power).toBe(1);
     used = applyAction(used, { type: 'defend', side: 'player', cardUid: null });
     expect(monster(used, 'o-m1').weakenTurn?.turn).toBe(s.turn + 1);
     const later = opponentTurn(s, s.turn + 3, []);
-    expect(attackPower(later, getSkill(sor(4)), monster(later, 'o-m1'))).toBe(2);
+    expect(attackPower(later, getSkill(sor(3)), monster(later, 'o-m1'))).toBe(2);
   });
 
   it('ちょうはつ：選んだ相手モンスターは次の手番、ラズックにしか攻撃できない（ほかの相手モンスターは自由）', () => {
     let s = scene({ player: [laz(7)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(monster(s, 'o-m1').taunt).toEqual({ monsterId: 'mon-lazuck', turn: s.turn + 1 });
-    const next = opponentTurn(s, s.turn + 1, [sor(4)]);
-    const attack = getSkill(sor(4));
+    const next = opponentTurn(s, s.turn + 1, [sor(3)]);
+    const attack = getSkill(sor(3));
     // 攻撃できる相手：ちょうはつされた o-m1 はラズック（p-m2）だけ、o-m3 は全員
     expect(targetsFor(next, 'opponent', attack, monster(next, 'o-m1')).map((m) => m.uid)).toEqual(['p-m2']);
     expect(targetsFor(next, 'opponent', attack, monster(next, 'o-m3')).map((m) => m.uid)).toEqual(['p-m1', 'p-m2', 'p-m3']);
@@ -262,10 +262,10 @@ describe('ラズックの技の効果', () => {
     expect(applyAction(next, { type: 'useCard', side: 'opponent', cardUid: 'x0', userUid: 'o-m1', targetUid: 'p-m1' })).toBe(next);
     const byM3 = applyAction(next, { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' });
     expect(byM3.pending?.userUid).toBe('o-m3');
-    // 特殊の技（吠える）は限らない
-    expect(targetsFor(next, 'opponent', getSkill(sor(7)), monster(next, 'o-m1'))).toHaveLength(3);
+    // 特殊の技（すなかけ）は限らない
+    expect(targetsFor(next, 'opponent', getSkill(sor(9)), monster(next, 'o-m1'))).toHaveLength(3);
     // 次の次の相手の手番では元どおり
-    const later = opponentTurn(s, s.turn + 3, [sor(4)]);
+    const later = opponentTurn(s, s.turn + 3, [sor(3)]);
     expect(targetsFor(later, 'opponent', attack, monster(later, 'o-m1'))).toHaveLength(3);
   });
 
@@ -274,7 +274,7 @@ describe('ラズックの技の効果', () => {
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     // p-m1 のライフを1にして、ふつうなら倒しに行く場面にする
     const weak = { ...s, sides: { ...s.sides, player: { ...s.sides.player, monsters: s.sides.player.monsters.map((m) => (m.uid === 'p-m1' ? { ...m, life: 1 } : m)) } } };
-    const next = opponentTurn(weak, s.turn + 1, [sor(4), sor(6)], ['o-m1']);
+    const next = opponentTurn(weak, s.turn + 1, [sor(3), sor(5)], ['o-m1']);
     const action = chooseAction(next, 'opponent');
     expect(action).toMatchObject({ type: 'useCard', targetUid: 'p-m2' });
   });
@@ -283,8 +283,8 @@ describe('ラズックの技の効果', () => {
     let s = scene({ player: [laz(7)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     const down = { ...s, sides: { ...s.sides, player: { ...s.sides.player, monsters: s.sides.player.monsters.map((m) => (m.uid === 'p-m2' ? { ...m, life: 0 } : m)) } } };
-    const next = opponentTurn(down, s.turn + 1, [sor(4)]);
-    expect(targetsFor(next, 'opponent', getSkill(sor(4)), monster(next, 'o-m1')).map((m) => m.uid)).toEqual(['p-m1', 'p-m3']);
+    const next = opponentTurn(down, s.turn + 1, [sor(3)]);
+    expect(targetsFor(next, 'opponent', getSkill(sor(3)), monster(next, 'o-m1')).map((m) => m.uid)).toEqual(['p-m1', 'p-m3']);
   });
 
   it('ソラモとラズックの混ざったデッキで、相手の思考どうしが最後まで対戦できる', () => {
@@ -327,28 +327,32 @@ describe('ラズックの技カードの面と日英', () => {
 });
 
 describe('テスト用の編成とセーブ（version 7）', () => {
-  it('新しいセーブのデッキはソラモとラズックで、そのまま使える', () => {
+  it('新しいセーブのデッキはソラモとラズック（2026-10-25 からはソラモ14技の初期デッキ）で、そのまま使える', () => {
     const save = createNewSave();
-    expect(save.deck).toEqual(createMixedTestDeck());
+    expect(save.deck).toEqual(createStarterDeck());
     expect(validateDeck(save.deck, save.collection)).toEqual([]);
   });
 
-  it('version 6 で配ったソラモのデッキのままなら、ソラモとラズックのデッキに替わり、カードを受け取る', () => {
-    const v6 = { ...createNewSave(), version: 6, deck: createSoramoTestDeck(), collection: { 'mon-soramo': 3, [sor(1)]: 5 } };
+  it('version 6 で配ったソラモのデッキのままなら、初期デッキに替わり、カードを受け取る（旧ソラモの技は version 9 で削除）', () => {
+    const v6 = { ...createNewSave(), version: 6, deck: createSoramoTestDeck(), collection: { 'mon-soramo': 3, 'skl-soramo-01': 5, [sor(2)]: 4 } };
     const save = normalizeSave(v6);
     if (!save) throw new Error('save');
-    expect(save.deck).toEqual(createMixedTestDeck());
+    expect(save.deck).toEqual(createStarterDeck());
     expect(save.collection['mon-lazuck']).toBe(1);
     expect(save.collection[laz(1)]).toBe(2);
-    expect(save.collection[sor(1)]).toBe(5); // 持っていた枚数は減らさない
+    expect(save.collection[sor(2)]).toBe(4); // 持っていた枚数は減らさない
+    expect(save.collection['skl-soramo-01']).toBeUndefined();
     expect(validateDeck(save.deck, save.collection)).toEqual([]);
   });
 
-  it('自分で組み直したデッキはそのまま（カードだけ受け取る）', () => {
+  it('自分で組み直したデッキは組み直したまま（カードだけ受け取る。旧ソラモの技だけ外れる）', () => {
     const custom = { monsters: ['mon-soramo', 'mon-soramo', 'mon-soramo'], skills: createSoramoTestDeck().skills.slice(0, 59).concat('sup-1') };
     const v6 = { ...createNewSave(), version: 6, deck: custom };
     const migrated = migrate(v6);
-    expect(migrated?.deck).toEqual(custom);
+    const deck = migrated?.deck as { monsters: string[]; skills: string[] };
+    expect(deck.monsters).toEqual(custom.monsters);
+    expect(deck.skills).toContain('sup-1');
+    expect(deck.skills.some((id) => id.startsWith('skl-soramo-'))).toBe(false);
     expect((migrated?.collection as Record<string, number>)[laz(16)]).toBe(1);
   });
 });

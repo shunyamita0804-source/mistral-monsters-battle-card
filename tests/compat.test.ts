@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { APP_INFO } from '../src/config/app.ts';
 import { createBackup, parseBackup, serializeBackup } from '../src/game/save/backup.ts';
-import { createPlaceholderStarterDeck, createMixedTestDeck } from '../src/game/deck/deck.ts';
+import { createPlaceholderStarterDeck, createStarterDeck } from '../src/game/deck/deck.ts';
 import { DEFAULT_LOCATION, migrate } from '../src/game/save/saveData.ts';
 import { MemoryStorage, SAVE_KEY } from '../src/game/save/saveRepository.ts';
 import { DEFAULT_SETTINGS, effectiveBgmVolume, effectiveSeVolume, normalizeSettings, SETTINGS_KEY } from '../src/game/settings/settings.ts';
@@ -56,11 +56,13 @@ describe('改名前のセーブを新しい名前のアプリで読む', () => {
     expect(store.loadResult.status).toBe('loaded');
     const s = store.save;
     expect(s.coins).toBe(777);
-    // 持っていたカードはそのまま。2026-10-23（version 6）にテスト用のソラモのデッキ、（version 7）にソラモとラズックのデッキのカードを受け取り、デッキはそれに替わる
+    // 持っていたカードはそのまま。2026-10-23（version 6・7）に受け取ったテスト用のデッキは、2026-10-25（version 9）に
+    // ソラモ14技の初期配布のデッキに替わる（旧ソラモの技は削除）
     expect(s.collection).toMatchObject(OLD_SAVE.collection);
-    expect(s.collection['skl-soramo-01']).toBe(3);
+    expect(s.collection['skl-soramo-01']).toBeUndefined();
+    expect(s.collection['skl-soramo14-02']).toBe(2);
     expect(s.collection['skl-lazuck-01']).toBe(2);
-    expect(s.deck).toEqual(createMixedTestDeck());
+    expect(s.deck).toEqual(createStarterDeck());
     expect(s.tournaments).toEqual(OLD_SAVE.tournaments);
     expect(s.fragments).toEqual(OLD_SAVE.fragments);
     // 街を正式な絵に作り直した（version 4）ので、街にいたセーブは主人公の家の前に移る

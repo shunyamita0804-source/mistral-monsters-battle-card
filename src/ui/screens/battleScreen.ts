@@ -75,6 +75,7 @@ function showcaseSound(card: PlayCard): SoundId {
     case 'weaken':
     case 'taunt':
     case 'handToDeck':
+    case 'discardRandom':
     case 'shield':
     case 'healSelf':
       return 'cardSpecial';
@@ -551,7 +552,7 @@ export const battleScreen: ScreenDefinition = {
       const scale = stageScale();
       // 先に全部の位置を測って写しを置く（1枚ずつ手札から抜けると、残りのカードの位置がずれるため）
       for (const [i, uid] of picks.entries()) {
-        const from = element.querySelector(`.battle__hand-card[data-uid="${uid}"] .bcard`);
+        const from = element.querySelector(`.battle__hand-card[data-uid="${uid}"] .skill-card`);
         if (!from) continue;
         const r = from.getBoundingClientRect();
         const ghost = from.cloneNode(true) as HTMLElement;

@@ -1,7 +1,7 @@
 /**
  * カードのデータ型。
  *
- * 技カードの表示は「技カード UI テンプレート V4」（マナ＝青、ちから＝赤、かしこさ＝緑、数字1〜10）に合わせる。
+ * 技カードの表示は新UI v5（src/ui/components/skillCard.ts）。
  * 数値・効果の具体的な値は正式仕様が未確定のため、src/data/ の仮データで与える。
  */
 import { OFFICIAL_DRAFT_EN } from '../../i18n/contentEnOfficialDraft.ts';
@@ -125,6 +125,8 @@ export type SkillEffect =
   | { readonly type: 'taunt' }
   /** 特殊（正式：ラズックのいたずら 2026-10-24）：相手の手札からランダムに1枚を相手の山札へ戻してシャッフルする。相手は補充しない */
   | { readonly type: 'handToDeck' }
+  /** 特殊（正式：ソラモ14技の吠える 2026-10-25）：相手の手札からランダムに1枚を相手の捨て札へ。相手は補充しない */
+  | { readonly type: 'discardRandom' }
   /** 特殊（正式：ノビトンの考える 2026-10-25）：自分の手札をすべて山札へ戻してシャッフルし、戻した枚数だけ引く */
   | { readonly type: 'redrawHand' }
   /** 特殊（正式：ノビトンの不思議な嗅覚 2026-10-25）：相手の手札をすべて確認する（画面に表を見せる。手札は動かさない） */
@@ -302,8 +304,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'redrawHand', 'revealHand', 'shield', 'healSelf'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

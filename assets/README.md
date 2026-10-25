@@ -34,7 +34,7 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 
 | パス | 内容 | 状態 |
 | --- | --- | --- |
-| `images/ui/skillcard/skillcard_master_v4.png` ほか | 技カードUIテンプレート V4（マスター・外枠マスク・マナ/ちから/かしこさのバー・数字1〜10） | ユーザー提供・**正式承認待ちの版**。マスターと外枠マスクは 972×1618 を 1/2 に縮小、数字は 128→64px に縮小（描き換えなし） |
+| （退役）`images/ui/skillcard/` | 技カードUIテンプレート V4。2026-10-25 に新UI v5 へ替えたので `design-parts/ui-skillcard-v4-retired/` に移した（ゲームでは使わない） | 退役 |
 | `images/ui/button/btn_command_blank.png`・`btn_command_blank_wine.png` | コマンドボタン（金の枠・青地／ワインレッド地）。無地に場面ごとの文字を重ねて使う | ユーザー提供（2026-10-22）の「はい／いいえ」画像から切り出し、1/2 に縮小。「はい」の文字の部分を左右の色でつないで消した（「はい／いいえ」の文字入りは使わない：ユーザー指示）。ワインレッドは青地だけを塗り替えたもの（金の枠はそのまま） |
 | `images/characters/player_{male,female}_idle_front.png` | 主人公の正面の立ち姿（主人公を選ぶ画面） | 2026-10-23 の大人の絵の正面「立つ」コマ（`tools/art/adult_walk_build.py --idle`） |
 | `images/characters/player_{male,female}_sheet.webp` | **ゲームで使う主人公の絵**（5列×4行：右足を前・立つ・左足を前・立つ・立ち止まり） | 2026-10-23 納品の大人の絵（男性は同じ日の別便）（原本 `design-parts/characters-adult/`）から `tools/art/adult_walk_build.py` が作る。人ごとに背の高さをそろえて縮小・位置合わせ（足元と上半身）・右向きは左向きの反転だけ（描き換えなし）。2026-10-23 に人物を 1.2 倍で表示するため、全員 `--scale 1.5`（1コマ 324×432）・WebP で作り直した |
@@ -81,9 +81,7 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 
 | パス | 内容 | 状態 |
 | --- | --- | --- |
-| `images/cards/skills/sor_sk_01〜16.webp` | ソラモの技カードの絵16枚（ZIP「Seimon_Soramo_Claude_FirstImplementation_20261023」の 05_SKILL_ART_16） | ユーザー承認の正式画像。827×937 のまま WebP（品質88）に。02・03 は差し替え済みの新しい絵 |
-| `images/ui/skillcard/bar_defense.png`・`bar_evade.png`・`bar_special.png` | 防御（盾）・回避（翼）・特殊（渦）のバー（同 ZIP の 03_UI_ADDON） | 正式。そのまま（390×118） |
-| `images/ui/skillcard/badge_*_blank.png` | 空の数値枠（マナ0 など文字で数字を書くとき） | 正式。128→64px に縮小 |
+| （削除）`images/cards/skills/sor_sk_01〜16.webp` | 旧ソラモの技16種の絵。2026-10-25 にソラモ14技へ替えたので削除（原本は design-parts に残る） | 削除 |
 | `images/cards/monsters/{soramo,gauul,lazuck}_{official,battle}.webp` | モンスターカード（正式カード＝名前・LIFE 入り／バトル用＝文字なし）（ZIP「Mismon_MonsterCards_Official_and_Battle_20261023」） | ユーザー提供。WebP（品質90）。ガウル・ラズックは登録のみ（ゲームで未使用） |
 | `images/backgrounds/title_bg.webp`・`battle_arena.webp` | タイトルの背景・大会の対戦の背景（ZIP「UI画像10種」） | ユーザー提供（画像生成）。WebP |
 | `images/ui/frame/*.webp`・`images/ui/card_back.webp`・`images/ui/packs/pack_0N.webp` | 共通背景・見出しの帯・窓の枠・一覧のパネル・カードの裏面・パック3種（同） | 切り抜きと 1/2 縮小（枠・帯・パネル）、背景は 512px、裏面は幅400、パックは幅240。描き換えなし |
@@ -94,3 +92,10 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | `images/characters/face_resident_{a,b,c,d,e}.webp` | 住人A〜E の顔の絵（ZIP「Seimon_Faces_Residents_20261023」） | ユーザー提供（画像生成）。384px に縮小。会話の絵として使う |
 | `images/ui/battle/*.webp`・`images/ui/card_unknown.webp`・`images/ui/gacha_machine.webp`・`images/ui/banners/*.webp`・`images/ui/hud/joystick_*.webp`・`images/ui/reward_glow.webp`・`images/maps/dungeon/boss_symbol.webp`・`images/backgrounds/newgame_bg.webp` | デザイン第4弾10種（ZIP「Seimon_UI_Quality4_20261023」） | ユーザー提供（画像生成）。切り抜きと縮小。描き換えなし |
 | `images/characters/face_{researcher,teacher,opponent_e1〜e3,opponent_d1〜d3}.webp` | 研究員・先生・大会の対戦相手6人の顔の絵（ZIP「Seimon_Faces_FIXED」） | ユーザー提供（画像生成）。384px に縮小 |
+
+## 配置した素材（2026-10-25）
+
+| パス | 内容 | 状態 |
+| --- | --- | --- |
+| `images/cards/skills/sor14_sk_01〜14.png` | ソラモ14技の絵（ZIP「MistralBC_Soramo14_Claude_NewUI_Implementation_20261025」の 01_SKILL_IMAGES） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/soramo14-20261025/` |
+| `images/ui/skillcard_v5/frame_{normal,hand}_*.png`・`mana_0〜10.png`・`icon_*.png` | 技カードの新UI（v5）の枠・マナの玉・技種別アイコン | 承認済みの参考画像から切り出し（`tools/art/skillcard_v5_extract.py`）、全分類を同じ形にして色付け（`tools/art/skillcard_v5_monster_color.py`）。参考画像の解像度の都合で、枠は幅 253px（手札用 208px）まで |

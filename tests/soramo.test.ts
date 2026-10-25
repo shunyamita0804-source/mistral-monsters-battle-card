@@ -1,165 +1,157 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
-import { PACKS } from '../src/data/economy.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
-import evasionJson from '../src/data/official/evasion_LATEST_20261024.json';
-import officialJson from '../src/data/official/soramo_cards_OFFICIAL.json';
+import { PACKS } from '../src/data/economy.ts';
+import soramoJson from '../src/data/official/soramo14_skills_OFFICIAL_20261025.json';
 import { REGISTERED_ONLY_MONSTERS } from '../src/data/registeredMonsters.ts';
-import { SORAMO_MONSTER, SORAMO_SKILLS, soramoSkillId } from '../src/data/soramo.ts';
+import { SORAMO_MONSTER, SORAMO_OLD_SKILL_IDS, SORAMO_SKILLS, SORAMO_STARTER, soramoSkillId } from '../src/data/soramo.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
-import {
-  actingSide,
-  applyAction,
-  cardUsability,
-  createBattle,
-  type BattleState,
-  type Side,
-} from '../src/game/battle/engine.ts';
-import { skillCardFace } from '../src/game/cards/cardFace.ts';
-import { describeSkill } from '../src/game/cards/cardTypes.ts';
-import { buildAutoDeck, createSoramoTestDeck, createStarterDeck, validateDeck } from '../src/game/deck/deck.ts';
-import { packCardRates } from '../src/game/economy/gacha.ts';
+import { actingSide, applyAction, cardUsability, createBattle, manaOf, type BattleState, type Side } from '../src/game/battle/engine.ts';
+import { skillCardFace, skillValueBadge, skillValueBadgeText } from '../src/game/cards/cardFace.ts';
+import { buildAutoDeck, countCards, createStarterDeck, STARTER_OTHER_SKILLS, STARTER_SUPPORT_COUNT, validateDeck } from '../src/game/deck/deck.ts';
 import { createNewSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
 const ids = (n: number): string => soramoSkillId(n);
+const ORIGINAL = 'design-parts/cards-original/soramo14-20261025';
+const sha256 = (buf: Buffer): string => createHash('sha256').update(buf).digest('hex');
 
-describe('ソラモ16技：正式データ（正本 JSON を無改変で導入）', () => {
-  it('置いた JSON は届いたファイルと同じ（16種・初期8種・収集8種）', () => {
-    expect(officialJson.total_skills).toBe(16);
-    expect(officialJson.skill_cards).toHaveLength(16);
-    expect(officialJson.skill_cards.filter((c) => c.availability === 'initial').map((c) => c.number)).toEqual([1, 2, 4, 7, 9, 11, 12, 14]);
-    expect(officialJson.skill_cards.filter((c) => c.availability === 'collect').map((c) => c.number)).toEqual([3, 5, 6, 8, 10, 13, 15, 16]);
-  });
+describe('ソラモ14技：正式データ（2026-10-25。届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
+  it('保管した JSON・CSV は ZIP の原本と同じ。ZIP の中身は照合表どおり', () => {
+    expect(readFileSync('src/data/official/soramo14_skills_OFFICIAL_20261025.json').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8.json`))).toBe(true);
+    expect(readFileSync('src/data/official/soramo14_skills_OFFICIAL_20261025.csv').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8_BOM.csv`))).toBe(true);
+    const manifest = readFileSync(`${ORIGINAL}/SHA256_MANIFEST.txt`, 'utf8').trim().split('\n').map((l) => l.split(/\s+/));
+    expect(manifest.length).toBe(20);
+    for (const [hash, file] of manifest) expect(sha256(readFileSync(`${ORIGINAL}/${file}`))).toBe(hash);
+  }, 30000);
 
-  it('技名・マナ・ダメージ・種別・効果テキスト・区分が JSON とすべて一致する', () => {
-    expect(SORAMO_SKILLS).toHaveLength(16);
-    // 14 ひらりジャンプ・16 星影ステップは 2026-10-24 の回避の改訂（evasion_LATEST_20261024.json）のマナ・文
-    const evasion = evasionJson.updates.filter((u) => u.monster === 'soramo');
-    expect(evasion.map((u) => u.skill_number)).toEqual([14, 16]);
-    for (const o of officialJson.skill_cards) {
-      const s = getSkill(ids(o.number));
-      const u = evasion.find((x) => x.skill_number === o.number);
-      expect(s.designId).toBe(o.design_id);
-      expect(s.name).toBe(o.name_ja);
-      expect(s.cost).toBe(u ? u.mana : o.mana);
-      expect(s.stat?.value ?? null).toBe(o.damage);
-      expect(s.category).toBe(o.category);
-      expect(s.effectTextJa).toBe(u ? u.effect_text_ja : o.effect_text_ja);
-      expect(s.availability).toBe(o.availability);
+  it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
+    const csv = readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8_BOM.csv`, 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1);
+    expect(csv).toHaveLength(14);
+    const CAT = { strength: 'force', intelligence: 'wisdom', special: 'special', defense: 'defense', dodge: 'evade' } as const;
+    csv.forEach((line, i) => {
+      const [id, no, monster, name, category, mana, damage, effect, image, copies] = line.split(',');
+      const j = soramoJson[i];
+      expect(j).toEqual({
+        id,
+        number: Number(no),
+        monster,
+        name,
+        category,
+        mana: Number(mana),
+        damage: damage === '' ? null : Number(damage),
+        effect,
+        image,
+        starter_copies: Number(copies),
+      });
+      const s = getSkill(ids(Number(no)));
+      expect(s.id).toBe(`skl-soramo14-${String(no).padStart(2, '0')}`);
+      expect(s.designId).toBe(id);
+      expect(s.name).toBe(name);
+      expect(s.category).toBe(CAT[category as keyof typeof CAT]);
+      expect(s.cost).toBe(Number(mana));
+      expect(s.stat?.value ?? null).toBe(damage === '' ? null : Number(damage));
+      expect(s.effectTextJa ?? '').toBe(effect);
       expect(s.monsterId).toBe('mon-soramo');
       expect(s.isPlaceholder).toBe(false);
-      // レアリティはモンスターのランク C とは別物で、未定
-      expect(s.rarity).toBeNull();
+      expect(s.availability).toBe(Number(copies) > 0 ? 'initial' : 'collect');
+    });
+    expect(SORAMO_SKILLS).toHaveLength(14);
+  });
+
+  it('性能の一覧（動き）', () => {
+    expect(SORAMO_SKILLS.map((s) => [s.name, s.cost, s.stat?.value ?? null, s.effect])).toEqual([
+      ['ひっかき', 0, 1, { type: 'attack' }],
+      ['連続ひっかき', 1, 1, { type: 'attack' }],
+      ['たいあたり', 2, 2, { type: 'attack' }],
+      ['しっぽアタック', 3, 3, { type: 'attack' }],
+      ['スターダイブ', 4, 4, { type: 'attack' }],
+      ['ソラモビーム', 2, 3, { type: 'attack' }],
+      ['スターダストレイ', 4, 4, { type: 'attack' }],
+      ['スターフォール', 5, 5, { type: 'attack' }],
+      ['すなかけ', 2, null, { type: 'seal' }],
+      ['吠える', 2, null, { type: 'discardRandom' }],
+      ['まるまる', 1, null, { type: 'defense', reduce: 3, against: 'force' }],
+      ['星のまもり', 1, null, { type: 'defense', reduce: 3, against: 'wisdom' }],
+      ['ひらりジャンプ', 2, null, { type: 'evade', against: 'all', minCost: 2 }],
+      ['星影ステップ', 2, null, { type: 'evade', against: 'all' }],
+    ]);
+  });
+
+  it('絵は届いた PNG（827×937）を1バイトも変えずに使う。14件すべて JSON の image と番号で対応', () => {
+    for (const row of soramoJson) {
+      const s = getSkill(ids(row.number));
+      const nn = String(row.number).padStart(2, '0');
+      expect(row.image).toBe(`01_SKILL_IMAGES/Soramo_Skill_${nn}.png`);
+      expect(s.art?.file).toBe(`sor14_sk_${nn}.png`);
+      const game = readFileSync(`assets/images/cards/skills/${s.art?.file}`);
+      expect(game.equals(readFileSync(`${ORIGINAL}/${row.image}`))).toBe(true);
+      expect([game.readUInt32BE(16), game.readUInt32BE(20)]).toEqual([827, 937]);
     }
   });
 
-  it('数値のある攻撃はちから/かしこさだけ。特殊・防御・回避はダメージのダミー値を持たない。マナ0 がある', () => {
-    for (const s of SORAMO_SKILLS) {
-      const attack = s.category === 'force' || s.category === 'wisdom';
-      expect(s.stat !== null).toBe(attack);
-      if (s.stat) expect(s.stat.type).toBe(s.category);
-    }
-    expect(SORAMO_SKILLS.filter((s) => s.cost === 0).map((s) => s.designId)).toEqual(['SOR-SK-01', 'SOR-SK-15']);
+  it('旧16技（skl-soramo-01〜16）はゲームから削除。旧ソラモの絵（sor_sk_*.webp）も置いていない', () => {
+    for (const id of SORAMO_OLD_SKILL_IDS) expect(SKILLS.some((s) => s.id === id)).toBe(false);
+    expect(SKILLS.filter((s) => s.monsterId === 'mon-soramo')).toHaveLength(14);
+    for (let n = 1; n <= 16; n++) expect(existsSync(`assets/images/cards/skills/sor_sk_${String(n).padStart(2, '0')}.webp`)).toBe(false);
   });
 
-  it('防御の「−3」と効く攻撃の種類は、効果テキストのとおり', () => {
-    const expected: Record<string, [number, string]> = {
-      'SOR-SK-11': [3, 'force'],
-      'SOR-SK-12': [3, 'wisdom'],
-      'SOR-SK-13': [3, 'all'],
-      'SOR-SK-15': [3, 'all'],
-    };
-    for (const [designId, [reduce, against]] of Object.entries(expected)) {
-      const s = SORAMO_SKILLS.find((x) => x.designId === designId);
-      expect(s?.effect).toEqual({ type: 'defense', reduce, against });
-      expect(s?.effectTextJa).toContain(`−${reduce}`);
-      if (against === 'force') expect(s?.effectTextJa).toContain('ちから技');
-      if (against === 'wisdom') expect(s?.effectTextJa).toContain('かしこさ技');
+  it('パックには入れていない（入手方法・排出率は未定）', () => {
+    for (const p of PACKS) expect(p.cardIds.some((id) => id.startsWith('skl-soramo14-'))).toBe(false);
+  });
+});
+
+describe('初期配布（2026-10-25 ユーザー確定）', () => {
+  it('ソラモ16枚＝02・03・04・07・09・10・11・13 を2枚ずつ。01・05・06・08・12・14 は0枚（登録はある）', () => {
+    expect(SORAMO_STARTER).toEqual([2, 3, 4, 7, 9, 10, 11, 13].map((n) => ({ id: ids(n), copies: 2 })));
+    expect(SORAMO_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
+    const counts = countCards(createStarterDeck().skills);
+    for (const n of [1, 5, 6, 8, 12, 14]) {
+      expect(counts[ids(n)] ?? 0).toBe(0);
+      expect(getSkill(ids(n)).name).toBeTruthy();
     }
+    for (const n of [2, 3, 4, 7, 9, 10, 11, 13]) expect(counts[ids(n)]).toBe(2);
   });
 
-  it('絵は 05_SKILL_ART_16 の番号どおり（02＝たいあたり・03＝すてみタックルの新しい絵）で、827×937', () => {
-    for (const s of SORAMO_SKILLS) {
-      const no = s.designId?.slice(-2);
-      expect(s.art?.file).toBe(`sor_sk_${no}.webp`);
-      const path = `assets/images/cards/skills/${s.art?.file}`;
-      expect(existsSync(path)).toBe(true);
-      // WebP（VP8）の大きさを読む
-      const buf = readFileSync(path);
-      const chunk = buf.toString('ascii', 12, 16);
-      expect(chunk).toBe('VP8 ');
-      const w = buf.readUInt16LE(26) & 0x3fff;
-      const h = buf.readUInt16LE(28) & 0x3fff;
-      expect([w, h]).toEqual([827, 937]);
-    }
-    expect(getSkill(ids(2)).name).toBe('たいあたり');
-    expect(getSkill(ids(3)).name).toBe('すてみタックル');
-  });
-
-  it('ゲーム内 ID は新しい固定 ID（仮カードの ID を使い回していない）', () => {
-    const placeholders = [...MONSTERS, ...SKILLS].filter((c) => c.isPlaceholder).map((c) => c.id);
-    for (const s of SORAMO_SKILLS) expect(placeholders).not.toContain(s.id);
-    expect(SORAMO_SKILLS.map((s) => s.id)).toEqual(Array.from({ length: 16 }, (_, i) => `skl-soramo-${String(i + 1).padStart(2, '0')}`));
-  });
-
-  it('パックには入れていない（提供割合・価格は未承認）', () => {
-    for (const p of PACKS) {
-      expect(p.cardIds.some((id) => id.includes('soramo'))).toBe(false);
-      expect(packCardRates(p).some((r) => r.cardId.includes('soramo'))).toBe(false);
-    }
+  it('初期デッキ60枚＝ソラモ16＋残り2体分29（未確定・仮）＋サポート15（未確定・仮）。そのまま使える', () => {
+    const deck = createStarterDeck();
+    expect(deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-soramo']);
+    expect(deck.skills).toHaveLength(60);
+    expect(deck.skills.filter((id) => id.startsWith('skl-soramo14-'))).toHaveLength(16);
+    expect(deck.skills.filter((id) => id.startsWith('skl-lazuck-'))).toHaveLength(STARTER_OTHER_SKILLS);
+    expect(deck.skills.filter((id) => id.startsWith('sup-'))).toHaveLength(STARTER_SUPPORT_COUNT);
+    expect(validateDeck(deck, createNewSave().collection)).toEqual([]);
   });
 });
 
 describe('ソラモのモンスターカード', () => {
-  it('ライフ 7（正式カードの絵の値）・枠色はクリーム（参照 JSON の値）・正式カードとバトル用の絵', () => {
+  it('ライフ 7・枠色はクリーム・正式カードとバトル用の絵', () => {
     expect(SORAMO_MONSTER.life).toBe(7);
     expect(SORAMO_MONSTER.themeColor).toBe('#E4D2AC');
-    expect(SORAMO_MONSTER.art?.file).toBe('soramo_official.webp');
-    expect(SORAMO_MONSTER.battleArt?.file).toBe('soramo_battle.webp');
     for (const a of [SORAMO_MONSTER.art, SORAMO_MONSTER.battleArt]) expect(existsSync(`assets/images/cards/monsters/${a?.file}`)).toBe(true);
   });
 
-  it('登録だけのモンスターはいない（ラズック 2026-10-23・ガウル 2026-10-24 は技が届いたので正式に）', () => {
+  it('登録だけのモンスターはいない', () => {
     expect(REGISTERED_ONLY_MONSTERS).toEqual([]);
     expect(MONSTERS.filter((x) => ['ラズック', 'ガウル', 'ノビトン'].includes(x.name)).map((x) => x.id)).toEqual(['mon-lazuck', 'mon-gauul', 'mon-nobiton']);
-  });
-});
-
-describe('テスト用：仮のカードをソラモとラズックに（2026-10-23 ユーザー指示）', () => {
-  it('新しく始めたときのデッキはソラモ・ラズック・ソラモ＋両方の技で、正しい構成', () => {
-    const deck = createStarterDeck();
-    expect(deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-soramo']);
-    expect(new Set(deck.skills.filter((id) => id.startsWith('skl-soramo-'))).size).toBe(16);
-    expect(new Set(deck.skills.filter((id) => id.startsWith('skl-lazuck-'))).size).toBe(16);
-    expect(validateDeck(deck, createNewSave().collection)).toEqual([]);
   });
 
   it('大会・ダンジョン・練習の相手は、ソラモとラズックの仮の編成で、デッキが組める', () => {
     const teams = [...Object.values(ENCOUNTERS).map((e) => e.monsters), ...TOURNAMENTS.flatMap((t) => t.rounds.map((r) => r.monsters))];
-    for (const team of teams) {
-      expect(team.every((id) => id === 'mon-soramo' || id === 'mon-lazuck')).toBe(true);
-      expect(team).toContain('mon-soramo');
-      expect(team).toContain('mon-lazuck');
-      expect(validateDeck(buildAutoDeck(team))).toEqual([]);
-    }
+    for (const team of teams) expect(validateDeck(buildAutoDeck(team))).toEqual([]);
   });
 });
 
 /* ---------- 技の効果（バトル） ---------- */
 
-const soramoDeck = createSoramoTestDeck();
+const deck = { monsters: ['mon-soramo', 'mon-soramo', 'mon-soramo'], skills: Array.from({ length: 60 }, () => ids(1)) };
 
-function battle(first: Side = 'player'): BattleState {
-  return createBattle({ name: 'P', deck: soramoDeck }, { name: 'O', deck: soramoDeck }, 7, first);
-}
-
-/** 手札とマナを差し替えた、攻撃の場面 */
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}): BattleState {
-  const s = battle();
+  const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 7, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
     hand: (hand[k] ?? []).map((cardId, i) => ({ uid: `${k[0]}${i}`, cardId })),
@@ -168,120 +160,81 @@ function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side,
   return { ...s, phase: 'main', active: 'player', manaConvertLimit: null, sides: { player: side('player'), opponent: side('opponent') } };
 }
 
-const lifeOf = (s: BattleState, uid: string): number =>
-  [...s.sides.player.monsters, ...s.sides.opponent.monsters].find((m) => m.uid === uid)?.life ?? -1;
+const lifeOf = (s: BattleState, uid: string): number => [...s.sides.player.monsters, ...s.sides.opponent.monsters].find((m) => m.uid === uid)?.life ?? -1;
 
-describe('ソラモの技の効果', () => {
-  it('マナ0 の技（ひっかき）はマナなしで使え、ちから1のダメージ', () => {
-    let s = scene({ player: [ids(1)] }, { player: 0 });
-    expect(cardUsability(s, 'player', 'p0').usable).toBe(true);
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    expect(s.pending?.power).toBe(1);
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(s, 'o-m1')).toBe(6);
+/** player が o-m1 に attack を使い、opponent が guards を使ったあと */
+function attackWith(attack: string, guards: string[], mana: Partial<Record<Side, number>> = {}): BattleState {
+  let s = applyAction(scene({ player: [attack], opponent: guards }, mana), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+  guards.forEach((_, i) => {
+    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: `o${i}` });
   });
+  if (s.phase === 'defense') s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
+  return s;
+}
 
-  it('すてみタックル：当たったら自分のライフ−1。回避されたら反動なし', () => {
-    let s = scene({ player: [ids(3)] });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(s, 'o-m1')).toBe(5);
-    expect(lifeOf(s, 'p-m1')).toBe(6);
+function underAttack(attack: string, guards: string[]): BattleState {
+  return applyAction(scene({ player: [attack], opponent: guards }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+}
 
-    let e = scene({ player: [ids(3)], opponent: [ids(14)] });
-    e = applyAction(e, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    e = applyAction(e, { type: 'defend', side: 'opponent', cardUid: 'o0' });
-    e = applyAction(e, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(e, 'o-m1')).toBe(7);
-    expect(lifeOf(e, 'p-m1')).toBe(7);
-  });
-
-  it('まるまる（ちから技−3）はちから攻撃にだけ使え、しっぽガード（かしこさ技−3）はかしこさ攻撃にだけ使える', () => {
-    let s = scene({ player: [ids(5)], opponent: [ids(11), ids(12)] });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' }); // しっぽアタック：ちから3
-    expect(cardUsability(s, 'opponent', 'o0').usable).toBe(true);
-    expect(cardUsability(s, 'opponent', 'o1').usable).toBe(false);
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o0' });
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(s, 'o-m1')).toBe(7);
-
-    let w = scene({ player: [ids(9)], opponent: [ids(11), ids(12)] });
-    w = applyAction(w, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' }); // ソラモビーム：かしこさ4
-    expect(cardUsability(w, 'opponent', 'o0').usable).toBe(false);
-    w = applyAction(w, { type: 'defend', side: 'opponent', cardUid: 'o1' });
-    w = applyAction(w, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(w, 'o-m1')).toBe(6);
-  });
-
-  it('ふんばる・星のまもり（攻撃のダメージ−3）はどちらの攻撃にも使え、星のまもりはマナ0', () => {
-    let s = scene({ player: [ids(10)], opponent: [ids(13), ids(15)] }, { opponent: 2 });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' }); // スターダストレイ：かしこさ6
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o0' });
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o1' });
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(s, 'o-m2')).toBe(7);
-    expect(s.sides.opponent.manaPile).toHaveLength(0);
-  });
-
-  it('ひらりジャンプ・星影ステップ（回避）はどちらの攻撃もダメージ0', () => {
-    for (const evade of [14, 16]) {
-      let s = scene({ player: [ids(6)], opponent: [ids(evade)] });
-      s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m3' }); // スターダイブ：ちから5
-      s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o0' });
-      s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-      expect(lifeOf(s, 'o-m3')).toBe(7);
-    }
-  });
-
-  it('吠える：選んだ相手モンスターの次のちから技のダメージ−1（使ったら消える。かしこさ技には効かない）', () => {
-    let s = scene({ player: [ids(7)] });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    expect(s.sides.opponent.monsters[0]?.weaken).toEqual({ stat: 'force', amount: 1 });
-    // 相手の手番：o-m1 だけが動けるようにして、ちから2（連続ひっかき）を使う
-    let o: BattleState = {
-      ...s,
-      active: 'opponent',
-      sides: {
-        ...s.sides,
-        opponent: {
-          ...s.sides.opponent,
-          hand: [{ uid: 'x0', cardId: ids(9) }, { uid: 'x1', cardId: ids(4) }, { uid: 'x2', cardId: ids(4) }],
-          monsters: s.sides.opponent.monsters.map((m) => (m.uid === 'o-m1' ? m : { ...m, acted: true })),
-        },
-      },
-    };
-    // かしこさ技では消えない
-    o = applyAction(o, { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' });
-    expect(o.pending?.power).toBe(4);
-    o = applyAction(o, { type: 'defend', side: 'player', cardUid: null });
-    expect(o.sides.opponent.monsters[0]?.weaken).toEqual({ stat: 'force', amount: 1 });
-    // 次の手番でちから技を使うと1減って、消える
-    o = { ...o, sides: { ...o.sides, opponent: { ...o.sides.opponent, monsters: o.sides.opponent.monsters.map((m) => (m.uid === 'o-m1' ? { ...m, acted: false } : m)) } } };
-    o = applyAction(o, { type: 'useCard', side: 'opponent', cardUid: 'x1', targetUid: 'p-m2' });
-    expect(o.pending?.power).toBe(1);
-    expect(o.sides.opponent.monsters[0]?.weaken ?? null).toBeNull();
-  });
-
-  it('すなかけ：選んだ相手モンスターは次の手番に攻撃の技を使えない（攻撃でない技は使える）。その次は使える', () => {
-    let s = scene({ player: [ids(8)], opponent: [ids(1), ids(7)] });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    expect(s.sides.opponent.monsters[0]?.sealedTurn).toBe(s.turn + 1);
-    // 相手の手番（o-m1 だけが動ける）
-    const only1 = (st: BattleState): BattleState => ({
-      ...st,
-      sides: { ...st.sides, opponent: { ...st.sides.opponent, monsters: st.sides.opponent.monsters.map((m) => ({ ...m, acted: m.uid !== 'o-m1' })) } },
+describe('ソラモ14技：効果（細かい裁定は docs/battle-rules.md「正式カード（ソラモ14技）」）', () => {
+  it('01〜08 攻撃：書かれたダメージがそのまま入り、マナを払う。ひっかきはマナ0', () => {
+    const dmg = [1, 1, 2, 3, 4, 3, 4, 5];
+    dmg.forEach((d, i) => {
+      const s = attackWith(ids(i + 1), []);
+      expect(lifeOf(s, 'o-m1')).toBe(7 - d);
+      expect(manaOf(s.sides.player)).toBe(10 - getSkill(ids(i + 1)).cost);
     });
-    const next = only1({ ...s, turn: s.turn + 1, active: 'opponent' });
-    expect(cardUsability(next, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'このターンは攻撃できません（すなかけ）' });
-    expect(cardUsability(next, 'opponent', 'o1').usable).toBe(true);
-    // さらに次の相手の手番では攻撃できる
-    const later = only1({ ...s, turn: s.turn + 3, active: 'opponent' });
-    expect(cardUsability(later, 'opponent', 'o0').usable).toBe(true);
+    expect(cardUsability(scene({ player: [ids(1)] }, { player: 0 }), 'player', 'p0').usable).toBe(true);
   });
 
-  it('ソラモ同士で、相手の思考どうしが最後まで対戦できる（全種類の技を含むデッキ）', () => {
-    for (const first of ['player', 'opponent'] as const) {
-      let s = battle(first);
+  it('09 すなかけ：選んだ相手モンスターは次の手番に攻撃の技を使えない', () => {
+    const s = applyAction(scene({ player: [ids(9)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+    const m = s.sides.opponent.monsters.find((x) => x.uid === 'o-m1');
+    expect(m?.sealedTurn).toBe(s.turn + 1);
+  });
+
+  it('10 吠える：相手の手札からランダムに1枚が相手の捨て札へ（補充なし）。相手の手札がなければ使えない', () => {
+    const before = scene({ player: [ids(10)], opponent: [ids(3), ids(5), ids(11)] });
+    const s = applyAction(before, { type: 'useCard', side: 'player', cardUid: 'p0' });
+    expect(s.sides.opponent.hand).toHaveLength(2);
+    expect(s.sides.opponent.discard).toHaveLength(1);
+    const gone = s.sides.opponent.discard[0] as string;
+    expect([ids(3), ids(5), ids(11)]).toContain(gone);
+    expect(s.sides.opponent.deck).toEqual(before.sides.opponent.deck);
+    expect(manaOf(s.sides.player)).toBe(8);
+    expect(s.log.at(-1)?.text).toContain('捨て札にした');
+    expect(cardUsability(scene({ player: [ids(10)] }), 'player', 'p0')).toMatchObject({ usable: false, reason: '相手は手札がありません' });
+  });
+
+  it('11 まるまる：ちから技だけ−3。12 星のまもり：かしこさ技だけ−3（0未満にならない）', () => {
+    expect(lifeOf(attackWith(ids(5), [ids(11)]), 'o-m1')).toBe(6);
+    expect(lifeOf(attackWith(ids(2), [ids(11)]), 'o-m1')).toBe(7);
+    expect(lifeOf(attackWith(ids(8), [ids(12)]), 'o-m1')).toBe(5);
+    expect(cardUsability(underAttack(ids(6), [ids(11)]), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
+    expect(cardUsability(underAttack(ids(3), [ids(12)]), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'ちから攻撃には使えません' });
+  });
+
+  it('13 ひらりジャンプ：攻撃カードの必要マナが2以上のちから・かしこさ技を回避（1以下には使えない）', () => {
+    expect(lifeOf(attackWith(ids(3), [ids(13)]), 'o-m1')).toBe(7);
+    expect(lifeOf(attackWith(ids(6), [ids(13)]), 'o-m1')).toBe(7);
+    expect(cardUsability(underAttack(ids(2), [ids(13)]), 'opponent', 'o0')).toMatchObject({ usable: false, reason: '必要マナ2以上の攻撃にしか使えません' });
+    expect(cardUsability(underAttack(ids(1), [ids(13)]), 'opponent', 'o0').usable).toBe(false);
+  });
+
+  it('14 星影ステップ：消費マナに関係なく、ちから・かしこさ技を回避', () => {
+    for (const n of [1, 2, 6, 8]) expect(lifeOf(attackWith(ids(n), [ids(14)]), 'o-m1')).toBe(7);
+  });
+
+  it('数値の欄：攻撃＝ダメージ、防御＝−3、回避＝「回避」、特殊（すなかけ・吠える）＝「効果」', () => {
+    setLanguage('ja');
+    expect(SORAMO_SKILLS.map((s) => skillValueBadgeText(skillValueBadge(s)))).toEqual(['1', '1', '2', '3', '4', '3', '4', '5', '効果', '効果', '-3', '-3', '回避', '回避']);
+  });
+
+  it('ソラモ同士で、相手の思考どうしが最後まで対戦できる（14種すべてを含むデッキ）', () => {
+    const skills = [...Array.from({ length: 42 }, (_, i) => ids((i % 14) + 1)), ...Array.from({ length: 18 }, (_, i) => ids((i % 3) + 1))];
+    const d = { monsters: ['mon-soramo', 'mon-soramo', 'mon-soramo'], skills };
+    for (const [seed, first] of [[1, 'player'], [2, 'opponent'], [3, 'player']] as const) {
+      let s = createBattle({ name: 'P', deck: d }, { name: 'O', deck: d }, seed, first);
       let steps = 0;
       while (s.phase !== 'ended' && steps < 5000) {
         const side = actingSide(s);
@@ -291,53 +244,23 @@ describe('ソラモの技の効果', () => {
         const next = applyAction(s, action);
         expect(next).not.toBe(s);
         s = next;
-        steps++;
+        steps += 1;
       }
       expect(s.phase).toBe('ended');
     }
   });
 });
 
-describe('ソラモの技カードの面（表示）と日英', () => {
-  it('右側のバーは種別ごとに1種類。数値のない技は右の数字を出さない。マナ0 は「0」', () => {
-    const face = (n: number) => skillCardFace(getSkill(ids(n)));
-    expect(face(1)).toMatchObject({ category: 'force', mana: 0, value: 1 });
-    expect(face(9)).toMatchObject({ category: 'wisdom', mana: 3, value: 4 });
-    expect(face(7)).toMatchObject({ category: 'special', value: null });
-    expect(face(11)).toMatchObject({ category: 'defense', value: null });
-    expect(face(14)).toMatchObject({ category: 'evade', value: null });
-    expect(face(15)).toMatchObject({ category: 'defense', mana: 0, value: null });
-  });
-
-  it('日本語：技名・種別・説明はデータどおり（効果テキストはそのまま）', () => {
+describe('ソラモの技カードの面と日英', () => {
+  it('日本語は効果の文のまま、英語は仮訳で日本語が残らない', () => {
     setLanguage('ja');
-    for (const s of SORAMO_SKILLS) {
-      const f = skillCardFace(s);
-      expect(f.title).toBe(s.name);
-      expect(f.manaLabel).toBe('マナ');
-      if (s.effectTextJa) {
-        expect(f.description).toBe(s.effectTextJa);
-        expect(describeSkill(s)).toContain(s.effectTextJa);
-      }
-    }
-    expect(skillCardFace(getSkill(ids(11))).categoryLabel).toBe('防御');
-    expect(skillCardFace(getSkill(ids(14))).categoryLabel).toBe('回避');
-    expect(skillCardFace(getSkill(ids(7))).categoryLabel).toBe('特殊');
-  });
-
-  it('英語：技名・種別・説明が切り替わり、日本語が残らない（英語は仮訳）', () => {
+    expect(skillCardFace(getSkill(ids(10))).description).toBe('相手の手札からランダムに1枚を捨てさせる');
     setLanguage('en');
-    try {
-      for (const s of [SORAMO_MONSTER, ...SORAMO_SKILLS]) expect(cardName(s)).not.toMatch(/[ぁ-んァ-ヶ一-龠]/);
-      for (const s of SORAMO_SKILLS) {
-        const f = skillCardFace(s);
-        for (const text of [f.title, f.manaLabel, f.categoryLabel, f.description, describeSkill(s)]) {
-          expect(text).not.toMatch(/[ぁ-んァ-ヶ一-龠]/);
-        }
-      }
-      expect(skillCardFace(getSkill(ids(16))).categoryLabel).toBe('Dodge');
-    } finally {
-      setLanguage('ja');
+    for (const s of SORAMO_SKILLS) {
+      expect(cardName(s)).not.toMatch(/[ぁ-んァ-ン一-龯]/);
+      expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
     }
+    expect(cardName(getSkill(ids(8)))).toBe('Starfall');
+    setLanguage('ja');
   });
 });

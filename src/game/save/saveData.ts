@@ -12,6 +12,7 @@ import {
   topUpDeck,
   type Deck,
 } from '../deck/deck.ts';
+import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
 
@@ -22,7 +23,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -240,7 +241,9 @@ function migrateLazuckTestV7(raw: RawObject): RawObject {
  * ゲームから削除したカードの ID（2026-10-24：ラズックの旧13 クロスガード。ユーザー決定「クロスガードはゲームから削除」）。
  * 古いセーブ・バックアップに残っていても、読み込み時の変換（migrateRemoveCrossGuardV8）で外すので、バックアップの読み込みでは止めない
  */
-export const REMOVED_CARD_IDS: readonly string[] = ['skl-lazuck-13'];
+const CROSS_GUARD_IDS: readonly string[] = ['skl-lazuck-13'];
+/** ゲームから削除したカードすべて（クロスガード・旧ソラモの16技）。バックアップの読み込みでは止めない */
+export const REMOVED_CARD_IDS: readonly string[] = [...CROSS_GUARD_IDS, ...SORAMO_OLD_SKILL_IDS];
 
 /**
  * version 7 → 8（2026-10-24）：クロスガード（skl-lazuck-13）をゲームから削除した。
@@ -248,11 +251,40 @@ export const REMOVED_CARD_IDS: readonly string[] = ['skl-lazuck-13'];
  * 代わりのカードは配らない
  */
 function migrateRemoveCrossGuardV8(raw: RawObject): RawObject {
-  const removed = new Set(REMOVED_CARD_IDS);
+  const removed = new Set(CROSS_GUARD_IDS);
   const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
   for (const id of removed) delete collection[id];
   const deck = raw.deck;
   if (!isObject(deck) || !Array.isArray(deck.skills) || !Array.isArray(deck.monsters)) return { ...raw, collection };
+  const skills = (deck.skills as unknown[]).filter((id) => !(typeof id === 'string' && removed.has(id)));
+  if (skills.length === deck.skills.length) return { ...raw, collection };
+  const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
+  const filled = topUpDeck({ monsters: deck.monsters as string[], skills: skills as string[] }, counts);
+  return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
+}
+
+/**
+ * version 8 → 9（2026-10-25）：ソラモの技を新しい14技に替えた。旧16技（skl-soramo-01〜16）はユーザー決定「削除」で、所持カードとデッキから外す。
+ * 代わりに、新しく始めたときと同じソラモの初期配布16枚（SORAMO_STARTER）を持たせる（足りない分だけ）。
+ * デッキ：配られたままのデッキ（version 7 の仮のデッキ）なら新しい初期デッキに替え、その分のカードも持たせる。
+ * 自分で組み直したデッキは、旧ソラモの技を外した残りに、持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
+ */
+function migrateSoramo14V9(raw: RawObject): RawObject {
+  const removed = new Set(SORAMO_OLD_SKILL_IDS);
+  const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
+  for (const id of removed) delete collection[id];
+  const grant = (counts: Record<string, number>): void => {
+    for (const [id, n] of Object.entries(counts)) collection[id] = Math.max(typeof collection[id] === 'number' ? collection[id] : 0, n);
+  };
+  grant(Object.fromEntries(SORAMO_STARTER.map((s) => [s.id, s.copies])));
+  const deck = raw.deck;
+  if (!isObject(deck) || !Array.isArray(deck.skills) || !Array.isArray(deck.monsters)) return { ...raw, collection };
+  const old = createMixedTestDeck();
+  if (sameCards(deck.monsters as string[], old.monsters) && sameCards(deck.skills as string[], old.skills)) {
+    const starter = createStarterDeck();
+    grant(countCards([...starter.monsters, ...starter.skills]));
+    return { ...raw, collection, deck: starter };
+  }
   const skills = (deck.skills as unknown[]).filter((id) => !(typeof id === 'string' && removed.has(id)));
   if (skills.length === deck.skills.length) return { ...raw, collection };
   const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
@@ -269,6 +301,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   5: migrateSoramoTestV6,
   6: migrateLazuckTestV7,
   7: migrateRemoveCrossGuardV8,
+  8: migrateSoramo14V9,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

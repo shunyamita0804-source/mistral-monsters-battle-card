@@ -100,17 +100,17 @@ UI はセーブを直接書き換えず、`GameStore.update(純粋関数)` で�
 - `ai.ts`：相手の思考（回復 → 倒せる相手を攻撃 → 強い攻撃 → マナ/ドロー → 攻撃終了。マナ化は守備1枚と次に使う技1枚を残して残りをマナに。守備は大きいダメージなら回避、それ以外は防御を重ねてダメージ0まで）
 - ルールの数値は `src/data/rules.ts`（**仮ルール**。画面の「ルール（仮）」にも表示）
 
-## 技カード UI（V4 テンプレート）
+## 技カード UI（新UI v5。2026-10-25）
 
-`src/ui/components/skillCard.ts`。同梱の `SkillCard_MasterV4`（承認待ちの版）を `assets/images/ui/skillcard/` に置き、
-`07_SPECS/master_layout_v4.json` の重ね順と座標どおりに重ねる。
+`src/ui/components/skillCard.ts`。図鑑・デッキ編集・ショップ・ガチャ・カードの詳しい表示・対戦（手札・大きなカード・守備・演出）まで、
+技カードとサポートカードはすべてこれで描く（`battleCard.ts` は対戦用の呼び出し口）。旧テンプレート V4 は退役（部品は `design-parts/ui-skillcard-v4-retired/` に保管。ゲームでは読まない）。
 
-1. イラスト（`art_rect`。正式画像がなければ仮の絵）
-2. 外枠マスク（白）をモンスターのテーマ色で着色（CSS の mask）
-3. 空欄のマスター
-4. マナのバー＋数字（青）
-5. ちから（赤）か かしこさ（緑）の **どちらか一方** のバー＋数字
-6. 技名・説明（ゲーム側の文字）
+- 枠：`assets/images/ui/skillcard_v5/frame_{normal,hand}_{分類}[_{モンスター}].png`。承認済みの参考画像
+  （`design-parts/ui-skillcard-v5/approved_ui_reference.png`）から `tools/art/skillcard_v5_extract.py` で切り出し、
+  `tools/art/skillcard_v5_monster_color.py` で全分類を同じ形にして色を付ける（ソラモ＝クリーム、ほかは分類の色、サポートはシルバー）
+- 'normal'（縦長 253×382）：図鑑・詳しい表示・大きなカード。'hand'（ほぼ正方形 208×210）：対戦の手札・守備のカード
+- 重ね順：イラスト（縦横比を保って全体を入れ、すき間は同じ絵をぼかして埋める）→ 枠 → マナの玉の数字 → 技名・数値の欄・説明（ゲーム側の文字）
+- 数値の欄：攻撃＝ダメージ、防御＝盾と軽減値、回避＝「回避」、特殊＝「効果」（`cardFace.ts` の `skillValueBadge`）
 
 モンスターカードの正式テンプレートはないため、テーマ色の枠と仮の絵で表示している（`monsterCard.ts`）。
 

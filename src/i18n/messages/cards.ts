@@ -33,6 +33,7 @@ export const CARDS = {
   'card.effect.seal': { ja: '特殊', en: 'Special' },
   'card.effect.taunt': { ja: '特殊', en: 'Special' },
   'card.effect.handToDeck': { ja: '特殊', en: 'Special' },
+  'card.effect.discardRandom': { ja: '特殊', en: 'Special' },
   'card.effect.redrawHand': { ja: '特殊', en: 'Special' },
   'card.effect.revealHand': { ja: '特殊', en: 'Special' },
   'card.effect.shield': { ja: '特殊', en: 'Special' },
@@ -117,6 +118,8 @@ export const CARDS = {
   'card.pending.rarity': { ja: 'レアリティ', en: 'rarity' },
   // 数値の欄（ダメージのない技）：回避＝「回避」、特殊＝「効果」（2026-10-25）
   'card.badge.evade': { ja: '回避', en: 'Dodge' },
+  'card.badge.damage': { ja: 'ダメージ', en: 'DMG' },
+  'card.badge.guard': { ja: '軽減', en: 'Guard' },
   'card.badge.effect': { ja: '効果', en: 'Effect' },
   'card.pending.availability': { ja: '配布の区分（初期・収集）', en: 'distribution group' },
   'card.detail.supportKind': { ja: '区分', en: 'Category' },

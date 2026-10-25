@@ -4,7 +4,7 @@ python3 -I tools/design/stat_icon_crop.py
 """
 from PIL import Image, ImageDraw
 
-SRC = 'assets/images/ui/skillcard'
+SRC = 'design-parts/ui-skillcard-v4-retired'  # 旧V4 の部品（2026-10-25 に退役。ゲームでは使わない）
 OUT = 'assets/images/ui/battle'
 for stat in ('force', 'wisdom'):
     bar = Image.open(f'{SRC}/bar_{stat}.png').convert('RGBA')

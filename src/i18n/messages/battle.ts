@@ -52,6 +52,7 @@ export const BATTLE = {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',
     en: "{name}'s {stat} skills deal {n} less damage next turn.",
   },
+  'battle.log.discardRandom': { ja: '{player}の手札から「{card}」を1枚、捨て札にした。', en: '{player} discarded {card} from their hand.' },
   'battle.log.handToDeck': { ja: '{player}の手札を1枚、山札に戻してシャッフルした。', en: "Returned 1 card from {player}'s hand to the deck and shuffled it." },
   'battle.log.taunt': { ja: '{name}は次のターン、{only}にしか攻撃できない。', en: '{name} can only attack {only} next turn.' },
   // ノビトン（2026-10-25）

@@ -13,7 +13,7 @@ import { applyAction, attackPower, cardUsability, createBattle, type BattleMonst
 import { skillCardFace } from '../src/game/cards/cardFace.ts';
 import { validateDeck } from '../src/game/deck/deck.ts';
 import { BACKUP_FORMAT, parseBackup } from '../src/game/save/backup.ts';
-import { createNewSave, normalizeSave } from '../src/game/save/saveData.ts';
+import { createNewSave, normalizeSave, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
@@ -234,30 +234,13 @@ describe('ガウルの技の効果', () => {
   });
 });
 
-describe('ソラモの回避の改訂（2026-10-24）', () => {
-  it('14 ひらりジャンプ：マナ3・ちから/かしこさ技を条件なしで回避', () => {
-    const s = getSkill(sor(14));
-    expect(s.cost).toBe(3);
-    expect(s.effectTextJa).toBe('ちから技・かしこさ技を回避');
-    expect(s.effect).toEqual({ type: 'evade', against: 'all' });
-    expect(guardUsable(laz(1), 'o-m3', sor(14)).usable).toBe(true); // マナ0 も回避
-  });
-
-  it('16 星影ステップ：マナ2・必要マナ2以上のちから/かしこさ技を回避（1は不可、2は可）', () => {
-    const s = getSkill(sor(16));
-    expect(s.cost).toBe(2);
-    expect(s.effectTextJa).toBe('必要マナ2以上のちから技・かしこさ技を回避');
-    expect(s.effect).toEqual({ type: 'evade', against: 'all', minCost: 2 });
-    expect(guardUsable(gau(6), 'o-m3', sor(16)).usable).toBe(false); // マナ1
-    expect(guardUsable(gau(1), 'o-m3', sor(16)).usable).toBe(false); // マナ1
-    expect(guardUsable(gau(7), 'o-m3', sor(16)).usable).toBe(true); // マナ2
-    expect(guardUsable(gau(2), 'o-m3', sor(16)).usable).toBe(true); // マナ2
-  });
-
-  it('回避8件の動きは承認 JSON（evasion_LATEST）の条件と同じ', () => {
-    const ids: Record<string, (n: number) => string> = { soramo: sor, lazuck: laz, gauul: gau };
-    expect(evasionJson.updates).toHaveLength(8);
-    for (const u of evasionJson.updates) {
+describe('回避の改訂（2026-10-24）', () => {
+  // ソラモの2件（旧14・16）は、2026-10-25 のソラモ14技（13 ひらりジャンプ・14 星影ステップ）に置き換わった（tests/soramo.test.ts）
+  it('ラズック・ガウルの回避6件の動きは承認 JSON（evasion_LATEST）の条件と同じ', () => {
+    const ids: Record<string, (n: number) => string> = { lazuck: laz, gauul: gau };
+    const updates = evasionJson.updates.filter((u) => u.monster !== 'soramo');
+    expect(updates).toHaveLength(6);
+    for (const u of updates) {
       const s = getSkill((ids[u.monster] as (n: number) => string)(u.skill_number));
       expect(s.name).toBe(u.name_ja);
       expect(s.cost).toBe(u.mana);
@@ -265,6 +248,12 @@ describe('ソラモの回避の改訂（2026-10-24）', () => {
       const against = u.against.length === 2 ? 'all' : u.against[0];
       expect(s.effect).toEqual(u.min_incoming_attack_required_mana ? { type: 'evade', against, minCost: u.min_incoming_attack_required_mana } : { type: 'evade', against });
     }
+  });
+
+  it('ソラモの回避（13 ひらりジャンプ・14 星影ステップ）も同じきまりで動く', () => {
+    expect(guardUsable(gau(6), 'o-m3', sor(13)).usable).toBe(false); // マナ1 は避けられない
+    expect(guardUsable(gau(7), 'o-m3', sor(13)).usable).toBe(true); // マナ2 は避けられる
+    expect(guardUsable(laz(1), 'o-m3', sor(14)).usable).toBe(true); // マナ0 も避けられる
   });
 });
 
@@ -323,22 +312,22 @@ describe('ラズックのいたずら（2026-10-24）', () => {
 });
 
 describe('クロスガードの削除と旧セーブ（version 8）', () => {
-  /** version 7 のセーブ（新しいデッキのいたずらをクロスガードに替え、クロスガードを2枚持っている） */
+  /** version 7 のセーブ（新しいデッキのいたずら〔2枚〕をクロスガードに替え、クロスガードを2枚持っている） */
   const oldSave = () => {
     const save = createNewSave();
-    const deckSkills = [...save.deck.skills];
-    deckSkills[deckSkills.indexOf(LAZUCK_ITAZURA_ID)] = LAZUCK_CROSS_GUARD_ID;
+    const deckSkills = save.deck.skills.map((id) => (id === LAZUCK_ITAZURA_ID ? LAZUCK_CROSS_GUARD_ID : id));
     const collection: Record<string, number> = { ...save.collection, [LAZUCK_CROSS_GUARD_ID]: 2 };
     delete collection[LAZUCK_ITAZURA_ID];
     return { ...save, version: 7, deck: { ...save.deck, skills: deckSkills }, collection };
   };
 
   it('所持・デッキからクロスガードが消え、デッキの抜けた分は持っているカードで埋まる（代わりのカードは配らない）', () => {
-    // デッキに入れていない予備のカード（星影ステップをもう2枚）を持っている
+    // デッキに入れていない予備のカード（連続ひっかき・たいあたりをもう1枚ずつ）を持っている
     const save = oldSave();
-    const loaded = normalizeSave(JSON.parse(JSON.stringify({ ...save, collection: { ...save.collection, [sor(16)]: 3 } })));
+    expect(save.deck.skills.filter((id) => id === LAZUCK_CROSS_GUARD_ID)).toHaveLength(2);
+    const loaded = normalizeSave(JSON.parse(JSON.stringify({ ...save, collection: { ...save.collection, [sor(2)]: 3, [sor(3)]: 3 } })));
     if (!loaded) throw new Error('読み込めない');
-    expect(loaded.version).toBe(8);
+    expect(loaded.version).toBe(SAVE_VERSION);
     expect(loaded.collection[LAZUCK_CROSS_GUARD_ID]).toBeUndefined();
     expect(loaded.collection[LAZUCK_ITAZURA_ID]).toBeUndefined();
     expect(loaded.deck.skills).not.toContain(LAZUCK_CROSS_GUARD_ID);
@@ -346,10 +335,10 @@ describe('クロスガードの削除と旧セーブ（version 8）', () => {
     expect(validateDeck(loaded.deck, loaded.collection)).toEqual([]);
   });
 
-  it('埋める予備のカードがなければ、デッキは1枚足りないまま（デッキ編集で直す。カードは配らない）', () => {
+  it('埋める予備のカードがなければ、デッキは足りないまま（デッキ編集で直す。カードは配らない）', () => {
     const loaded = normalizeSave(JSON.parse(JSON.stringify(oldSave())));
     if (!loaded) throw new Error('読み込めない');
-    expect(loaded.deck.skills).toHaveLength(59);
+    expect(loaded.deck.skills).toHaveLength(58);
     expect(loaded.deck.skills).not.toContain(LAZUCK_CROSS_GUARD_ID);
     expect(validateDeck(loaded.deck, loaded.collection).length).toBeGreaterThan(0);
   });
