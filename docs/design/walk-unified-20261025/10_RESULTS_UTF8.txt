@@ -14,6 +14,16 @@
 ・直しの一言：male/front/8_FIX_run_1st.txt（比較の絵 male/front/11_check_1st.png）
 ・原本：design-parts/characters-adult/motion-v2/player_male_front_run8_u.png
 
-■ 組み込み（まだ）
-・正面の走りが通ったら、正面の歩き・走りをまとめてゲームに入れる。立ち止まりは player_male_stand_v2.png。
-　大きさは頭の大きさで立ち絵にそろえ、色は Lab の平均・ばらつきを立ち絵に合わせる（tools/art/match_stand.py の tone）
+■ 2026-10-25　男性・正面の走り8コマ（2回目・直しの一言のあと）
+・頭の大きさを立ち絵に合わせると、背の高さが −8〜−11%（1回目 −7〜−15% より少しそろったが、まだ沈んでいる）
+・正面から見た走りは、ひざがこちらへ出て脚が短く見える形を画像AIが毎回描く。3回目も同じになる見込みが高い
+・判断：この絵を使い、Claude が腰から下（人物の上から 42% より下）だけを縦に伸ばして、背の高さを歩きの真ん中の値（立ち絵の −3%）にそろえる。
+　頭・胴・腕はそのまま。比較の絵 male/front/12_check_2nd.png（3段目が直した走り）
+・原本：design-parts/characters-adult/motion-v2/player_male_front_run8_u2.png
+
+■ 組み込み（2026-10-25）
+・正面の歩き（行0）・正面の走り（行4）をゲームのシートに入れた：
+  python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 0 design-parts/characters-adult/motion-v2/player_male_front_walk8_u.png
+  python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 4 design-parts/characters-adult/motion-v2/player_male_front_run8_u2.png --stretch-run design-parts/characters-adult/motion-v2/player_male_front_walk8_u.png
+・大きさは頭の大きさで立ち絵（正面の立ち止まり）にそろえ、色は Lab の平均・ばらつきを立ち止まりに合わせ、輪郭 2px
+・背中・横の歩き・走りと、背中・横の立ち止まりは前のまま（新しい絵が届いたら同じ道具で入れる）
