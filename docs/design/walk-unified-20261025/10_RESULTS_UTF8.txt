@@ -131,3 +131,18 @@
 ・判断：1歩としてつながる 3（着く）→ 2（けり出し）→ 7（後ろの足がいちばん高い）→ 4（前へ運ぶ）を上の段に、その人物だけの左右反転を下の段にした見本
 　female/back/mirror/1_pose_ref.png を作った。2_stand は届いた絵の左端の立ち姿（design-parts/characters-adult/player_female_back_stand_u.png にも保存）
 ・次：新しい会話で 1_pose_ref・2_stand を添付し female/back/mirror/3_PROMPT.txt（かばんを画面の右の腰に戻す）
+
+■ 2026-10-25　女性・左向きの歩き（2回目・下の段の足の直しのあと・player_female_left_walk8_u2.png）
+・下の段 7 は奥の足を後ろへ持ち上げる形に（直った）。6 は足が交差する形。5・8 は上の段の 1・4 と見分けにくい（横から見た「着く」形は手前・奥が違っても輪郭がほぼ同じ）
+・判断：使う（3 と 7 で持ち上げる足が手前・奥で入れ替わるので、片足で歩いて見えない）
+・組み込み：緑を透明にした …_u2_alpha.png を
+  python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_female_sheet.webp female 2 design-parts/characters-adult/motion-v2/player_female_left_walk8_u2_alpha.png --cols 5 --stand sample --set-idle
+  （行2＝左・行3＝右は反転。立ち止まりの列は行2・3・6・7とも新しい左向きの立ち姿）。背は立ち姿の −0.5〜−7%
+
+■ 2026-10-25　女性・背中の歩き（見本から描き直し・player_female_back_walk8_m1.png）
+・足と腕は見本どおり（下の段は反対の足・反対の腕）。かばんは下の段で画面の左のまま（戻っていない。男性と同じく1歩ごとに左右へ移る）
+・帽子の幅の照合が 4・8 だけ外れた（1.14。届いた絵では8人とも背の高さ・帽子の幅が ±1% でそろっていた）→ unified_build.py に --one-scale（8コマとも同じ縮尺）を足した
+  python3 tools/art/unified_build.py … female 1 design-parts/characters-adult/motion-v2/player_female_back_walk8_m1_alpha.png --stand design-parts/characters-adult/player_female_back_stand_u.png --by hat --one-scale --set-idle
+・そのあと python3 tools/art/ground_figures.py。背は立ち姿の −0.4〜−2.3%
+・動画：female/video/female_walk_4dir_lab.mp4（歩きの確認画面・3倍。背中→左→右→正面、低速 1/4 で左・背中）
+・これで女性の歩きは4方向とも新しい絵。走り4方向は前の絵のまま
