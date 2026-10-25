@@ -7,6 +7,7 @@ import {
   canConvertToMana,
   cardUsability,
   createBattle,
+  findMonster,
   manaOf,
   incomingDamage,
   supportUsesLeft,
@@ -18,7 +19,18 @@ import {
   type Side,
 } from '../../game/battle/engine.ts';
 import { opponentFace, opponentFaceUrl } from '../components/opponentFace.ts';
-import { describePlayCard, effectLabel, guardReduction, statLabel, supportShortText, targetsEnemy, type PlayCard, type StatType } from '../../game/cards/cardTypes.ts';
+import {
+  categoryLabel,
+  describePlayCard,
+  effectLabel,
+  guardReduction,
+  skillCategory,
+  statLabel,
+  supportShortText,
+  targetsEnemy,
+  type PlayCard,
+  type StatType,
+} from '../../game/cards/cardTypes.ts';
 import { buildAutoDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
@@ -83,12 +95,20 @@ const MONSTER_ICON = 76;
 const HAND_CARD_W = 70;
 /** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：欄を画面の約1/3に広げ、名前・絵・効果文の入る大きなカード（battleCard.ts）で 138 */
 const DETAIL_CARD_W = 138;
+/** 技の演出で大きく見せるカードの幅（上に1行あるので、説明の欄のカードより少し小さく） */
+const SPOT_CARD_W = 122;
+/** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
+const DEFENSE_ATTACK_W = 112;
+const DEFENSE_CARD_W = 60;
 /** 相手のひと言を大きく出しておく時間（ミリ秒）。押すと先に消える */
 const TALK_MS = 2200;
 /** ひと言を1文字ずつ出す間隔（ミリ秒。PS版の会話のように） */
 const TALK_CHAR_MS = 45;
-/** 使ったカードを大きく見せる時間（2026-10-23。PS版のように「何を使ったか」を見せる） */
-const SHOWCASE_MS = 1150;
+/**
+ * 技を使ったときの演出の長さ（ミリ秒。2026-10-25 リデザイン パートC：指示書「約1〜1.5秒、タップでスキップ」。ここだけで調整する）。
+ * 使ったカードをフォーカスエリアに大きく出し、「誰が誰に使ったか」の1行と、使った側・対象のアイコンの光りを見せる。見せている間は操作と相手の行動を待たせる
+ */
+const SHOWCASE_MS = 1200;
 /** 命中したときの一瞬の間（ヒットストップ）と画面の揺れ */
 const HIT_PAUSE_MS = 320;
 /** 状態の印の能力の絵（技カードのバーの拳・本の丸。tools/design/stat_icon_crop.py） */
@@ -232,6 +252,8 @@ export const battleScreen: ScreenDefinition = {
     let pointed: { uid: string; until: number } | null = null;
     /** 使ったカードを大きく見せ終わる時刻（それまで指のマークを出さない） */
     let showcaseUntil = 0;
+    /** いま大きく見せている技（パートC）。user＝使ったモンスター（守備は守ったモンスター）、target＝対象 */
+    let spotlight: { cardId: string; side: Side; userUid: string | null; targetUid: string | null; until: number } | null = null;
     /** ダメージでライフを1ずつ減らしている間の、表示中のライフ（数え終わったら消す） */
     const lifeShown = new Map<string, number>();
     /** 前回描画時のマナ（マナが増えた演出に使う） */
@@ -299,6 +321,7 @@ export const battleScreen: ScreenDefinition = {
     const dispatch = (action: BattleAction): void => {
       if (!state) return;
       const played = playedCard(state, action);
+      const before = state;
       const next = applyAction(state, action);
       if (next === state) return;
       state = next;
@@ -322,31 +345,91 @@ export const battleScreen: ScreenDefinition = {
         pointed = { uid: action.targetUid, until };
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
+      if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null);
       render();
-      if (played) showcase(played.cardId, played.side);
+    };
+
+    /** カードを使ったモンスター（技：行動済になったモンスター、守備：狙われたモンスター、サポート：なし） */
+    const playedBy = (before: BattleState, after: BattleState, action: BattleAction): string | null => {
+      if (action.type === 'defend') return before.pending?.targetUid ?? null;
+      if (action.type !== 'useCard') return null;
+      const was = before.sides[action.side].monsters;
+      return after.sides[action.side].monsters.find((m, i) => m.acted && !was[i]?.acted)?.uid ?? null;
+    };
+
+    /** 演出をタップで飛ばす：大きく見せるのをやめ、待たせていた操作・相手の行動をすぐ進める */
+    const skipSpotlight = (): void => {
+      if (!spotlight || Date.now() >= spotlight.until) return;
+      spotlight = null;
+      showcaseUntil = Date.now();
+      busyUntil = Math.min(busyUntil, Date.now());
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      render();
     };
 
     /**
-     * 使ったカードを画面の真ん中に大きく見せる（技のアニメーションではなく、カードそのものを見せる）。
-     * 見せている間は操作と相手の行動を待たせる
+     * 使ったカードをフォーカスエリアに大きく見せる（2026-10-25 リデザイン パートC。技のアニメーションではなく、カードそのものを見せる）。
+     * 見せている間は操作と相手の行動を待たせる（タップで飛ばせる）
      */
-    const showcase = (cardId: string, side: Side): void => {
-      const card = getPlayCard(cardId);
-      const el = h(
-        'div',
-        { class: `battle__showcase battle__showcase--${side}` },
-        h('div', { class: 'battle__showcase-band' }),
-        h('div', { class: 'battle__showcase-card' }, createBattleCard(card, { width: 156, size: 'focus' })),
-        h('p', { class: 'battle__showcase-text', text: t('battle.showcase', { side: t(`battle.side.${side}`), card: cardName(card) }) }),
-      );
-      fxLayer.append(el);
-      showcaseUntil = Date.now() + SHOWCASE_MS;
+    const showcase = (cardId: string, side: Side, userUid: string | null, targetUid: string | null): void => {
+      const until = Date.now() + SHOWCASE_MS;
+      spotlight = { cardId, side, userUid, targetUid, until };
+      showcaseUntil = until;
       setTimeout(() => {
-        el.remove();
-        // 見せ終わったら、技の対象に指のマークを出すために描き直す
-        if (!destroyed && state) render();
-      }, SHOWCASE_MS);
-      sound.play(showcaseSound(card));
+        // 見せ終わったら、技の対象に指のマークを出す・守備の選択を出すために描き直す
+        if (!destroyed && state && spotlight && spotlight.until === until) render();
+      }, SHOWCASE_MS + 10);
+      sound.play(showcaseSound(getPlayCard(cardId)));
+    };
+
+    /** 演出の1行：「ラズックの「しっぽアタック」！ → ミュロル」（相手のモンスターには「相手の」を付ける） */
+    const spotlightLine = (s: BattleState, sp: NonNullable<typeof spotlight>): string => {
+      const who = (uid: string | null): string | null => {
+        const found = uid ? findMonster(s, uid) : null;
+        if (!found) return null;
+        return t(found.side === 'opponent' ? 'battle.spot.whoOpponent' : 'battle.spot.whoPlayer', { name: cardName(found.monster.cardId) });
+      };
+      const user = who(sp.userUid) ?? t(`battle.side.${sp.side}`);
+      const card = cardName(getPlayCard(sp.cardId));
+      const target = who(sp.targetUid);
+      return target ? t('battle.spot.lineTarget', { user, card, target }) : t('battle.spot.line', { user, card });
+    };
+
+    /** 演出の中身：上に1行、左に名前・種類・威力・効果の文、右にカードを大きく。タップで飛ばす */
+    const spotlightPanel = (s: BattleState, sp: NonNullable<typeof spotlight>): HTMLElement => {
+      const card = getPlayCard(sp.cardId);
+      const kind = card.kind === 'skill' ? categoryLabel(skillCategory(card)) : t(card.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support');
+      const power =
+        card.kind === 'skill' && card.stat
+          ? t('battle.spot.power', { stat: kind, n: card.stat.value })
+          : card.kind === 'skill' && card.effect.type === 'defense'
+            ? t('battle.spot.guard', { n: guardReduction(card) })
+            : kind;
+      return h(
+        'div',
+        {
+          class: `battle-detail battle-spot battle-spot--${sp.side}`,
+          attrs: { role: 'button', 'aria-label': t('battle.spot.skip') },
+          on: { click: skipSpotlight },
+        },
+        h('p', { class: 'battle-spot__line', text: spotlightLine(s, sp) }),
+        h(
+          'div',
+          { class: 'battle-spot__body' },
+          h(
+            'div',
+            { class: 'battle-spot__info' },
+            h('p', { class: 'battle-spot__name', text: cardName(card) }),
+            h('p', { class: 'battle-spot__power', text: power }),
+            h('p', { class: 'battle-spot__desc', text: describePlayCard(card) }),
+            h('p', { class: 'battle-spot__skip', text: t('battle.spot.tapToSkip') }),
+          ),
+          h('div', { class: 'battle-spot__card' }, createBattleCard(card, { width: SPOT_CARD_W, size: 'focus' })),
+        ),
+      );
     };
 
     /** いまの画面の拡大率（ステージは拡大縮小されているので、位置の計算に使う） */
@@ -804,13 +887,16 @@ export const battleScreen: ScreenDefinition = {
           // 使ったカードを大きく見せている間は出さない（2026-10-24 ユーザー指示）。見せ終わってから
           const isPointed = m.life > 0 && Date.now() >= showcaseUntil && (isPendingTarget || (pointed?.uid === m.uid && Date.now() < pointed.until));
           const down = m.life <= 0;
+          // 技の演出の間：使った側と対象のアイコンを光らせる（つながりが分かるように）
+          const spot = spotlight && Date.now() < spotlight.until ? spotlight : null;
+          const spotClass = spot?.userUid === m.uid ? ' is-spot-user' : spot?.targetUid === m.uid ? ' is-spot-target' : '';
           const bar = h('span', { class: 'battle__monster-bar' }, h('span', { class: 'battle__monster-bar-fill' }));
           (bar.firstElementChild as HTMLElement).style.width = `${Math.max(0, (m.life / m.maxLife) * 100)}%`;
           return h(
             'button',
             {
               // 対象を選ぶ間は、選べないモンスターを暗くして候補と見分ける
-              class: `battle__monster battle__monster--${side}${isTarget ? ' is-target' : targeting ? ' is-not-target' : ''}${isPendingTarget ? ' is-attacked' : ''}${m.acted && !down ? ' is-acted' : ''}${down ? ' is-down' : ''}${diff < 0 ? ' is-hit' : ''}`,
+              class: `battle__monster battle__monster--${side}${isTarget ? ' is-target' : targeting ? ' is-not-target' : ''}${isPendingTarget ? ' is-attacked' : ''}${m.acted && !down ? ' is-acted' : ''}${down ? ' is-down' : ''}${diff < 0 ? ' is-hit' : ''}${spotClass}`,
               attrs: { type: 'button', 'aria-label': t('battle.monster.aria', { name: cardName(m.cardId), life: m.life }) },
               dataset: { uid: m.uid },
               on: { click: () => tapMonster(side, m) },
@@ -925,6 +1011,10 @@ export const battleScreen: ScreenDefinition = {
     };
 
     const detailPanel = (s: BattleState): HTMLElement => {
+      // 技を使った演出の間は、そのカードを大きく（パートC）。相手の攻撃に守れるときは、攻撃のカードの下に守備の選択
+      if (spotlight && Date.now() < spotlight.until) return spotlightPanel(s, spotlight);
+      const defense = defensePanel(s);
+      if (defense) return defense;
       const hand = selectedUid ? s.sides.player.hand.find((c) => c.uid === selectedUid) : undefined;
       const card = hand ? getPlayCard(hand.cardId) : undefined;
       let body: (HTMLElement | null)[];
@@ -1064,9 +1154,16 @@ export const battleScreen: ScreenDefinition = {
       return row;
     };
 
-    const defenseOverlay = (s: BattleState): HTMLElement | null => {
-      if (auto || s.phase !== 'defense' || !s.pending || s.pending.attacker !== 'opponent') return null;
-      if (noDefensePossible(s)) return null;
+    /** 相手の攻撃に守れるか（自分が操作していて、守備に使えるカードがある） */
+    const canChooseDefense = (s: BattleState): boolean =>
+      !auto && s.phase === 'defense' && !!s.pending && s.pending.attacker === 'opponent' && !noDefensePossible(s);
+
+    /**
+     * 守備の選択（2026-10-25 リデザイン パートC：それまでの画面全体の窓をやめ、フォーカスエリアに。働きは同じ）。
+     * 上に攻撃の1行、攻撃のカードを大きく、その横に威力・いまのダメージ、下に守備に使えるカード。「守備しない／守備を終える」は下の操作のボタン
+     */
+    const defensePanel = (s: BattleState): HTMLElement | null => {
+      if (!canChooseDefense(s) || !s.pending) return null;
       const pending = s.pending;
       const target = s.sides.player.monsters.find((m) => m.uid === pending.targetUid);
       // 守備に使えるのは狙われたモンスターのカードだけなので、そのカードだけ並べる
@@ -1075,57 +1172,55 @@ export const battleScreen: ScreenDefinition = {
         return card.kind === 'skill' && ['defense', 'evade'].includes(card.effect.type) && card.monsterId === target?.cardId;
       });
       const used = pending.responses.map((id) => cardName(id)).join(t('common.listSeparator'));
+      const attacker = findMonster(s, pending.userUid);
       return h(
         'div',
-        { class: 'battle__defense' },
+        { class: 'battle-detail battle-spot battle-spot--opponent battle__defense' },
+        h('p', {
+          class: 'battle-spot__line',
+          text: spotlightLine(s, { cardId: pending.cardId, side: 'opponent', userUid: attacker ? pending.userUid : null, targetUid: pending.targetUid, until: 0 }),
+        }),
         h(
           'div',
-          { class: 'battle__defense-panel' },
-          h('p', { class: 'battle__defense-title', text: t('battle.defense.title') }),
-          h('p', {
-            class: 'battle__defense-text',
-            text: target
-              ? t('battle.defense.text', { skill: cardName(pending.cardId), name: cardName(target.cardId), stat: statLabel(pending.stat), power: pending.power })
-              : t('battle.defense.textNoTarget', { skill: cardName(pending.cardId), stat: statLabel(pending.stat), power: pending.power }),
-          }),
-          h('p', {
-            class: 'battle__defense-hint',
-            text: t('battle.defense.hint', { stat: statLabel(pending.stat), n: manaOf(s.sides.player) }),
-          }),
-          h('p', {
-            class: 'battle__defense-hint',
-            text: used ? t('battle.defense.damageUsed', { n: incomingDamage(s, pending), used }) : t('battle.defense.damage', { n: incomingDamage(s, pending) }),
-          }),
+          { class: 'battle-spot__body' },
           h(
             'div',
-            { class: 'battle__defense-cards' },
-            ...options.map((c) => {
-              const usable = cardUsability(s, 'player', c.uid);
-              const skill = getSkill(c.cardId);
-              const label = skill.effect.type === 'evade' ? effectLabel('evade') : `-${guardReduction(skill)}`;
-              const b = h(
-                'button',
-                {
-                  class: `battle__defense-card${usable.usable ? '' : ' is-unusable'}`,
-                  attrs: { type: 'button', 'aria-label': t('battle.defense.cardAria', { name: cardName(skill) }) },
-                  on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
-                },
-                createBattleCard(skill, { width: 70, size: 'hand' }),
-                h('span', { class: 'battle__defense-label', text: usable.usable ? label : (usable.reason ?? '') }),
-              );
-              b.disabled = !usable.usable;
-              return b;
+            { class: 'battle-spot__info' },
+            h('p', { class: 'battle__defense-title', text: t('battle.defense.title') }),
+            h('p', {
+              class: 'battle__defense-text',
+              text: target
+                ? t('battle.defense.text', { skill: cardName(pending.cardId), name: cardName(target.cardId), stat: statLabel(pending.stat), power: pending.power })
+                : t('battle.defense.textNoTarget', { skill: cardName(pending.cardId), stat: statLabel(pending.stat), power: pending.power }),
             }),
+            h('p', {
+              class: 'battle__defense-hint',
+              text: used ? t('battle.defense.damageUsed', { n: incomingDamage(s, pending), used }) : t('battle.defense.damage', { n: incomingDamage(s, pending) }),
+            }),
+            h('p', { class: 'battle__defense-hint', text: t('battle.defense.hint', { stat: statLabel(pending.stat), n: manaOf(s.sides.player) }) }),
           ),
-          (() => {
-            const end = commandButton(
-              t(pending.responses.length === 0 ? 'battle.defense.pass' : 'battle.defense.done'),
-              () => dispatch({ type: 'defend', side: 'player', cardUid: null }),
-              'cancel',
+          h('div', { class: 'battle-spot__card' }, createBattleCard(getPlayCard(pending.cardId), { width: DEFENSE_ATTACK_W, size: 'focus' })),
+        ),
+        h(
+          'div',
+          { class: 'battle__defense-cards' },
+          ...options.map((c) => {
+            const usable = cardUsability(s, 'player', c.uid);
+            const skill = getSkill(c.cardId);
+            const label = skill.effect.type === 'evade' ? effectLabel('evade') : `-${guardReduction(skill)}`;
+            const b = h(
+              'button',
+              {
+                class: `battle__defense-card${usable.usable ? '' : ' is-unusable'}`,
+                attrs: { type: 'button', 'aria-label': t('battle.defense.cardAria', { name: cardName(skill) }) },
+                on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
+              },
+              createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'hand' }),
+              h('span', { class: 'battle__defense-label', text: usable.usable ? label : (usable.reason ?? '') }),
             );
-            end.classList.add('battle__defense-end');
-            return end;
-          })(),
+            b.disabled = !usable.usable;
+            return b;
+          }),
         ),
       );
     };
@@ -1356,8 +1451,12 @@ export const battleScreen: ScreenDefinition = {
       } else if (mine && s.phase === 'mana') {
         if (manaPicks.size > 0 && canConvertToMana(s, 'player')) buttons.push(commandButton(t('battle.cmd.makeMana', { n: manaPicks.size }), convertPicked));
         buttons.push(commandButton(t('battle.cmd.endTurn'), () => requestEndTurn(), 'cancel'));
+      } else if (canChooseDefense(s) && s.pending) {
+        // 守備の選択はフォーカスエリア。「守備しない／守備を終える」はここ（いちばん右）
+        const pass = s.pending.responses.length === 0;
+        buttons.push(commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel'));
       } else if (s.phase === 'defense' && s.pending?.attacker === 'opponent' && !auto) {
-        buttons.push(statusTag(t(noDefensePossible(s) ? 'battle.dock.noDefense' : 'battle.dock.defense')));
+        buttons.push(statusTag(t('battle.dock.noDefense')));
       } else {
         buttons.push(statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting')));
       }
@@ -1475,7 +1574,7 @@ export const battleScreen: ScreenDefinition = {
         hand,
         commandPanel(s, blocked),
       );
-      const overlays = [talkOverlay(s), menu, defenseOverlay(s), resultOverlay(s), phaseBanner(s), hintOverlay(s)].filter((o): o is HTMLElement => o !== null);
+      const overlays = [talkOverlay(s), menu, resultOverlay(s), phaseBanner(s), hintOverlay(s)].filter((o): o is HTMLElement => o !== null);
       element.append(...overlays);
       const handEl = element.querySelector('.battle__hand');
       if (handEl) handEl.scrollLeft = handScroll;
@@ -1494,6 +1593,7 @@ export const battleScreen: ScreenDefinition = {
           prevLife.set(m.uid, m.life);
         }
       }
+      element.classList.toggle('is-defending', canChooseDefense(s) && !(spotlight && Date.now() < spotlight.until));
       element.dataset.phase = s.phase;
       element.dataset.active = s.active;
       element.dataset.acting = blocked ? 'dealing' : (actingSide(s) ?? 'none');

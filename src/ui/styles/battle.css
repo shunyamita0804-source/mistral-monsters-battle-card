@@ -233,8 +233,7 @@
   text-overflow: ellipsis;
 }
 
-/* 拡大表示 */
-.battle__defense,
+/* 結果の窓（守備の選択は 2026-10-25 からフォーカスエリアの中。battlePs.css） */
 .battle__result {
   position: absolute;
   inset: 0;
@@ -247,7 +246,6 @@
   animation: fade-in 120ms ease-out;
 }
 
-.battle__defense-panel,
 .battle__result-panel {
   display: flex;
   gap: 12px;
@@ -260,7 +258,6 @@
   box-shadow: 0 12px 40px rgb(0 0 0 / 0.5);
 }
 
-.battle__defense-panel,
 .battle__result-panel {
   flex-direction: column;
   align-items: center;
@@ -518,17 +515,6 @@
   width: 140px;
 }
 
-.battle-detail__empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 136px;
-  height: 226px;
-  border: 2px dashed var(--color-line);
-  border-radius: 10px;
-  color: var(--color-sub);
-  font-size: 12px;
-}
 
 
 
@@ -1014,81 +1000,8 @@
   font-size: 15px;
 }
 
-/* 直前に使われたカード（何も選んでいないとき） */
-.battle-detail__recent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  opacity: 0.92;
-}
 
-.battle-detail__recent-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--color-sub);
-}
 
-/* 使ったカードを大きく見せる（技のアニメーションではなく、カードそのもの） */
-.battle__showcase {
-  position: absolute;
-  inset: 0;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  pointer-events: none;
-  animation: showcase-fade 1150ms ease-in-out both;
-}
-
-.battle__showcase-band {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 340px;
-  transform: translateY(-50%);
-  background: linear-gradient(90deg, rgb(6 7 10 / 0) 0%, rgb(6 7 10 / 0.82) 18%, rgb(6 7 10 / 0.86) 50%, rgb(6 7 10 / 0.82) 82%, rgb(6 7 10 / 0) 100%);
-  box-shadow: inset 0 1px 0 rgb(201 162 74 / 0.7), inset 0 -1px 0 rgb(201 162 74 / 0.7);
-}
-
-.battle__showcase--opponent .battle__showcase-band {
-  background: linear-gradient(90deg, rgb(30 6 10 / 0) 0%, rgb(30 8 12 / 0.84) 18%, rgb(36 8 14 / 0.88) 50%, rgb(30 8 12 / 0.84) 82%, rgb(30 6 10 / 0) 100%);
-}
-
-.battle__showcase-card {
-  position: relative;
-  filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.7)) drop-shadow(0 0 14px rgb(216 184 106 / 0.45));
-  animation: showcase-card 1150ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
-}
-
-.battle__showcase-text {
-  position: relative;
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 800;
-  color: #fbf3da;
-  text-shadow: 0 2px 6px rgb(0 0 0 / 0.9);
-  animation: showcase-card 1150ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
-}
-
-@keyframes showcase-fade {
-  0% { opacity: 0; }
-  12% { opacity: 1; }
-  82% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes showcase-card {
-  0% { transform: translateY(26px) scale(0.82); }
-  18% { transform: translateY(0) scale(1.04); }
-  28% { transform: scale(1); }
-  100% { transform: scale(1); }
-}
-
-/* 命中したときの画面の揺れ（強攻撃は大きく） */
 .battle.is-shake {
   animation: board-shake 300ms ease-out;
 }

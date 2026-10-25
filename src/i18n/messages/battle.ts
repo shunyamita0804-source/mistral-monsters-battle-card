@@ -92,8 +92,15 @@ export const BATTLE = {
     en: 'Guard/Dodge cards are used when you are attacked',
   },
   'battle.ng.acted': { ja: '使えるモンスターは行動済みです', en: 'The monster has already acted' },
-  'battle.detail.recent': { ja: '{side}が使ったカード', en: 'Played by {side}' },
-  'battle.showcase': { ja: '{side}の「{card}」！', en: '{side}: {card}!' },
+  // 技を使ったときの演出（2026-10-25 リデザイン パートC）：フォーカスエリアに大きく、誰が誰に使ったかを1行で
+  'battle.spot.line': { ja: '{user}の「{card}」！', en: '{user}: {card}!' },
+  'battle.spot.lineTarget': { ja: '{user}の「{card}」！ → {target}', en: '{user}: {card}! → {target}' },
+  'battle.spot.whoPlayer': { ja: '{name}', en: '{name}' },
+  'battle.spot.whoOpponent': { ja: '相手の{name}', en: "Foe's {name}" },
+  'battle.spot.power': { ja: '{stat} {n}', en: '{stat} {n}' },
+  'battle.spot.guard': { ja: '防御 −{n}', en: 'Guard -{n}' },
+  'battle.spot.skip': { ja: 'タップで次へ', en: 'Tap to continue' },
+  'battle.spot.tapToSkip': { ja: 'タップで次へ', en: 'Tap to continue' },
   'battle.status.weaken': { ja: '{stat}−{n}', en: '{stat} -{n}' },
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
@@ -206,7 +213,6 @@ export const BATTLE = {
     ja: '手札のカードをタップするか指でなぞると、ここに説明と拡大したカードが出ます。',
     en: 'Tap or swipe across your hand to see card details and a larger view here.',
   },
-  'battle.detail.empty': { ja: 'カード', en: 'Card' },
 
   // 手札
   'battle.hand.aria': { ja: '手札', en: 'Hand' },

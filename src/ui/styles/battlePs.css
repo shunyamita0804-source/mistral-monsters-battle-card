@@ -574,3 +574,182 @@
   color: #f3ead5;
   overflow: hidden;
 }
+
+/* ---------- パートC：技を使ったときの演出（フォーカスエリアに大きく・誰が誰に・タップで次へ） ---------- */
+.battle-spot {
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  animation: spot-in 180ms ease-out both;
+}
+
+@keyframes spot-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.battle-spot__line {
+  flex: none;
+  margin: 0;
+  padding: 4px 8px;
+  border-left: 4px solid var(--spot-color);
+  background: rgb(10 14 24 / 0.7);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle-spot--player {
+  --spot-color: var(--side-player);
+}
+
+.battle-spot--opponent {
+  --spot-color: var(--side-opponent);
+}
+
+.battle-spot__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.battle-spot__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid rgb(184 120 72 / 0.6);
+  border-radius: 6px;
+  background: rgb(9 11 16 / 0.72);
+}
+
+.battle-spot__info p {
+  margin: 0;
+}
+
+.battle-spot__name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.battle-spot__power {
+  align-self: flex-start;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.1);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.battle-spot__desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #f3ead5;
+}
+
+.battle-spot__skip {
+  margin-top: auto !important;
+  font-size: 11px;
+  color: var(--color-sub);
+}
+
+.battle-spot__card {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  animation: spot-card 260ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+@keyframes spot-card {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 使った側・対象のアイコンを光らせて揺らす（つながりが分かるように） */
+.battle__monster.is-spot-user .battle__monster-icon {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 14px rgb(255 214 120 / 0.9);
+  animation: spot-user 0.5s ease-in-out 2 alternate;
+}
+
+.battle__monster.is-spot-target .battle__monster-icon {
+  border-color: #ff6b7d;
+  box-shadow: 0 0 14px rgb(255 90 110 / 0.85);
+  animation: spot-target 0.36s ease-in-out 3;
+}
+
+@keyframes spot-user {
+  to { transform: translateY(-4px) scale(1.06); }
+}
+
+@keyframes spot-target {
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* 守備の選択（相手の攻撃のカードの下に、守備に使えるカード）。選んでいる間は手札の列をたたむ */
+.battle__defense {
+  cursor: default;
+}
+
+.battle__defense .battle-spot__info {
+  gap: 4px;
+  text-align: left;
+}
+
+.battle__defense .battle__defense-title {
+  font-size: 17px;
+}
+
+.battle__defense .battle__defense-text {
+  font-size: 14px;
+}
+
+.battle__defense-cards {
+  flex: none;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.battle__defense-card {
+  flex: none;
+  min-height: 44px;
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.battle__defense-label {
+  max-width: 70px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle.is-defending .battle__hand {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-spot,
+  .battle-spot__card,
+  .battle__monster.is-spot-user .battle__monster-icon,
+  .battle__monster.is-spot-target .battle__monster-icon {
+    animation: none;
+  }
+}
