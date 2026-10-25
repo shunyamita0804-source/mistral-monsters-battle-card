@@ -1,0 +1,162 @@
+[
+  {
+    "number": 1,
+    "name": "はなビンタ",
+    "file": "01_はなビンタ.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "975727bb58dc019f598b398fdc63b066269e355a06a69e6293c62d841e5ccc1f",
+    "bytes": 2198242
+  },
+  {
+    "number": 2,
+    "name": "ずつき",
+    "file": "02_ずつき.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "ea09ebcad9c15eea759a3a345fd0eadfeec34179db1977bb2eee6cb2dc3ba933",
+    "bytes": 2705099
+  },
+  {
+    "number": 3,
+    "name": "まきつく",
+    "file": "03_まきつく.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "8fc30afe148bbfd9626c751c39b9e2d9ba5f631c0b3c49d6d9d0007511e2bfb8",
+    "bytes": 2770917
+  },
+  {
+    "number": 4,
+    "name": "ギガントノーズ",
+    "file": "04_ギガントノーズ.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "78720d0e706120a442ab5fa10fa70f7fd5e5e06599cf336325b517137916e095",
+    "bytes": 2801883
+  },
+  {
+    "number": 5,
+    "name": "くしゃみ",
+    "file": "05_くしゃみ.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "51a1bc411f61190fd3efe62e923f634705f986f67e6e39ed0fc72d437c677d71",
+    "bytes": 2679980
+  },
+  {
+    "number": 6,
+    "name": "ミラージュノーズ",
+    "file": "06_ミラージュノーズ.png",
+    "width": 1182,
+    "height": 1330,
+    "color_mode": "RGB",
+    "sha256": "4f59ad96b21588a2055da293d4e37c4f0186dbbf59f58afa54b6e0dfc226b5ec",
+    "bytes": 2832666
+  },
+  {
+    "number": 7,
+    "name": "ダウナーミスト",
+    "file": "07_ダウナーミスト.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "916b7951a9294cf7492841b534dfdc1a8abf4cfbb667cf82a2f8e7841b0ed343",
+    "bytes": 2662111
+  },
+  {
+    "number": 8,
+    "name": "考える",
+    "file": "08_考える.png",
+    "width": 1182,
+    "height": 1330,
+    "color_mode": "RGB",
+    "sha256": "eecdd91bdd6fdd204c0718c8cba31fc917e3a849f0794e90c226a70c0761df0a",
+    "bytes": 2584780
+  },
+  {
+    "number": 9,
+    "name": "不思議な嗅覚",
+    "file": "09_不思議な嗅覚.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "0d5e712746c8667e112a688fb29a130fa8904d8b33fc9b13541652f637e2f64f",
+    "bytes": 3011119
+  },
+  {
+    "number": 10,
+    "name": "鼻でまもる",
+    "file": "10_鼻でまもる.png",
+    "width": 1182,
+    "height": 1330,
+    "color_mode": "RGB",
+    "sha256": "84ae15f9bdcbd528b4117dd9f2d95d7c4fade638541d9239a785597072ae5de2",
+    "bytes": 2274567
+  },
+  {
+    "number": 11,
+    "name": "サイコガード",
+    "file": "11_サイコガード.png",
+    "width": 1182,
+    "height": 1330,
+    "color_mode": "RGB",
+    "sha256": "52c8f39aeaf1b8231071d4c8fa17bf4399ad7a58135b1edfb642851d9749c5c7",
+    "bytes": 2442407
+  },
+  {
+    "number": 12,
+    "name": "のびのびガード",
+    "file": "12_のびのびガード.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "672715533585aece5d577e4d4ab051b9dc898a9f93eb01eca0a9bfdaa862f088",
+    "bytes": 2560357
+  },
+  {
+    "number": 13,
+    "name": "ぐっとがまん",
+    "file": "13_ぐっとがまん.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "f2521d8ab42660fe14a1707f1ac3887f4aa78053829f8e9a6ff673dca604e108",
+    "bytes": 2646687
+  },
+  {
+    "number": 14,
+    "name": "ねばりガード",
+    "file": "14_ねばりガード.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "648f364ecdd03084c3ca40bd0ef24051a0937239df9883807fd6c410ccb2404f",
+    "bytes": 2691993
+  },
+  {
+    "number": 15,
+    "name": "横によける",
+    "file": "15_横によける.png",
+    "width": 1179,
+    "height": 1334,
+    "color_mode": "RGB",
+    "sha256": "379fe8ef36be0e789e69bca8170ca9f062957f53a27804c0d3e702683bf42a9f",
+    "bytes": 2629458
+  },
+  {
+    "number": 16,
+    "name": "必死によける",
+    "file": "16_必死によける.png",
+    "width": 1178,
+    "height": 1335,
+    "color_mode": "RGB",
+    "sha256": "bb0528be6af04da424b0a2d18e3e1f76c3af89f0c919d4b6cc83279a9b29171d",
+    "bytes": 2657773
+  }
+]

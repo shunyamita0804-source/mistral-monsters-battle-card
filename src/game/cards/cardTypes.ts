@@ -83,6 +83,10 @@ export type SkillEffect =
       readonly halfOnEvade?: boolean;
       /** 技が当たったとき、使ったモンスターのライフを減らす量（正式：すてみタックル） */
       readonly selfDamageOnHit?: number;
+      /** 回避されなかったとき、相手（守る側）のマナを減らす量。0 より下にはならない（正式：ノビトンのくしゃみ・ダウナーミスト 2026-10-25） */
+      readonly manaDrain?: number;
+      /** 回避されなかったとき、対象は次の手番に行動できない（正式：ノビトンのまきつく 2026-10-25） */
+      readonly stunTarget?: boolean;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -114,6 +118,10 @@ export type SkillEffect =
   | { readonly type: 'taunt' }
   /** 特殊（正式：ラズックのいたずら 2026-10-24）：相手の手札からランダムに1枚を相手の山札へ戻してシャッフルする。相手は補充しない */
   | { readonly type: 'handToDeck' }
+  /** 特殊（正式：ノビトンの考える 2026-10-25）：自分の手札をすべて山札へ戻してシャッフルし、戻した枚数だけ引く */
+  | { readonly type: 'redrawHand' }
+  /** 特殊（正式：ノビトンの不思議な嗅覚 2026-10-25）：相手の手札をすべて確認する（画面に表を見せる。手札は動かさない） */
+  | { readonly type: 'revealHand' }
   | { readonly type: 'heal' }
   | { readonly type: 'mana' }
   | { readonly type: 'draw' };
@@ -268,6 +276,12 @@ export function officialEffectText(skill: SkillCard): string | null {
   return OFFICIAL_DRAFT_EN[`card:${skill.id}:effect`] ?? ja;
 }
 
+/** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'redrawHand' | 'revealHand';
+function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
+  return type === 'weaken' || type === 'seal' || type === 'taunt' || type === 'handToDeck' || type === 'redrawHand' || type === 'revealHand';
+}
+
 /** 技カードの効果説明（ゲーム側で表示する文字） */
 export function describeSkill(card: SkillCard): string {
   const official = officialEffectText(card);
@@ -278,7 +292,7 @@ export function describeSkill(card: SkillCard): string {
     return official ? `${base}${getLanguage() === 'en' ? ' ' : ''}${official}`.trim() : base;
   }
   if (official) return official;
-  if (card.effect.type === 'weaken' || card.effect.type === 'seal' || card.effect.type === 'taunt' || card.effect.type === 'handToDeck') return '';
+  if (isTextOnlySpecial(card.effect.type)) return '';
   return t(`card.skill.${card.effect.type}`, { stat, v });
 }
 
@@ -289,7 +303,7 @@ export function skillShortText(skill: SkillCard): string {
   const v = skillValue(skill);
   const e = skill.effect;
   if (e.type === 'attack') return t(e.unblockable && e.undodgeable ? 'card.short.attackSure' : 'card.short.attack', { v });
-  if (e.type === 'weaken' || e.type === 'seal' || e.type === 'taunt' || e.type === 'handToDeck') return '';
+  if (isTextOnlySpecial(e.type)) return '';
   return t(`card.short.${e.type}`, { v });
 }
 

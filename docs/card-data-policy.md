@@ -56,6 +56,8 @@
 | （なし） | `skl-lazuck-itazura` | いたずら（2026-10-24 新規。番号の ID と取り違えないよう名前の ID） |
 | （モンスター） | `mon-gauul` | ガウル（ライフ6。2026-10-24 に技が届き、登録のみから正式へ） |
 | GAU-SK-01〜16 | `skl-gauul-01`〜`skl-gauul-16`（番号は同じ） | つつく〜灼熱の飛翔 |
+| （モンスター） | `mon-nobiton` | ノビトン（ライフ8。2026-10-25 に技16種と一緒に届き、正式へ） |
+| NOB-SK-01〜16 | `skl-nobiton-01`〜`skl-nobiton-16`（番号は同じ） | はなビンタ〜必死によける |
 
 ラズックの正本は `src/data/official/lazuck_cards_OFFICIAL.json`（無改変）、読み込みは `src/data/lazuck.ts`（ソラモと同じ作り方 `src/data/officialSkills.ts`）。
 絵は `laz_sk_NN.webp`。**初期・収集の配分が食い違っている**（全体方針は初期8・収集8、1枚ずつの指定を足すと初期10〔01〜08・11・14〕・収集6）。データは1枚ずつの指定のまま持ち、配布・スターター・パックには使っていない（ユーザー確認待ち）
@@ -64,6 +66,19 @@
 - レアリティは未定（`rarity: null`。モンスターのランク C とは別物）。パックには入れていない
 - 英語は仮訳（`src/i18n/contentEnOfficialDraft.ts` に分けて管理）
 - 登録だけのモンスターは、いまはいない（ガウルは 2026-10-24 に正式へ）
+
+### 2026-10-25 ノビトン（MistralMonstersBC_Nobiton_FINAL_Part1/Part2_20261025）
+
+- 届いたもの：技の絵 PNG 16枚・モンスターカード2枚（正式 JPEG 921×1536・バトル用 PNG 556×941）・技データ TSV・実装指示・QA。
+  すべて `design-parts/cards-original/nobiton/` に無改変で保管（`ASSET_SHA256.json` に照合表。`cards/` と `docs/` も）
+- 正本は TSV（`src/data/official/nobiton_skills_OFFICIAL_20261025.tsv`・無改変）。ゲームはそれを写した `nobiton_cards_OFFICIAL_20261025.json` を読む
+  （技名・マナ・効果の文・区分は書き換えない。`tests/nobiton.test.ts` で TSV と照らし合わせる）。読み込みは `src/data/nobiton.ts`
+- 絵：技 `nob_sk_NN.webp`（`tools/art/card_art_webp.py` で幅 827 へ縮小のみ）。モンスター `nobiton_official.webp`（幅 508 へ縮小のみ）・
+  `nobiton_battle.webp`（556×941 をそのまま WebP に。ソラモ・ガウルのバトル用と同じ大きさ）。絵の切り抜き・文字入れはしない
+- 初期配布8種（01・02・05・08・10・11・13・15）／収集用8種（03・04・06・07・09・12・14・16）＝ユーザー正式確定（TSV の区分どおり）
+- **未定**：枠色（`monster_theme_colors.json` に無いので、バトル用カードの枠の金色 `#E8C654` を仮の候補に）、レアリティ、正式英語（仮訳）、
+  配る枚数・パック・価格・敵の編成（ガウルと同じく、スターター・パック・相手の編成には入れていない。QA の「全カード」で手に入る）
+- 効果の裁定（要仕様確定）は `docs/battle-rules.md`「正式カード（ノビトン）」
 
 ### 2026-10-24 の改訂（Seimon_Claude_Gaul16_RazukSoramoPatch_20261024_CONTROL）
 

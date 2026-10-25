@@ -170,8 +170,8 @@ export const SCREENS = {
   // 図鑑・カード一覧
   'collection.title': { ja: '図鑑', en: 'Card Album' },
   'collection.count': {
-    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズックのみ。ほかは仮データ）',
-    en: 'Registered {owned}/{total} (only Soramo and Lazuck cards are official; others are temporary)',
+    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン。ほかは仮データ）',
+    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul and Nobiton cards are official; others are temporary)',
   },
   'cardList.title': { ja: 'カード一覧', en: 'Card List' },
   'cardList.heading': { ja: 'カードを見る', en: 'View Cards' },

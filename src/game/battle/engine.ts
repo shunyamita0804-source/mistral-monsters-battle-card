@@ -52,6 +52,8 @@ export interface BattleMonster {
   readonly weakenTurn?: { readonly stat: StatType; readonly amount: number; readonly turn: number } | null;
   /** この手番（turn）の間は、monsterId の種類のモンスターにしか攻撃できない（正式：ラズックのちょうはつ） */
   readonly taunt?: { readonly monsterId: string; readonly turn: number } | null;
+  /** この手番（turn）の間は技を使えない（攻撃も特殊も。正式：ノビトンのまきつく「次ターン行動不可」2026-10-25。守備のカードは使える） */
+  readonly stunnedTurn?: number | null;
 }
 
 export interface HandCard {
@@ -146,6 +148,11 @@ export interface BattleState {
   /** 効果音のきっかけ（新しい順に最大20件だけ残す） */
   readonly fx: readonly BattleFx[];
   readonly fxSeq: number;
+  /**
+   * 手札の確認（正式：ノビトンの不思議な嗅覚 2026-10-25）。viewer が cardIds（相手の手札）を見た。
+   * 画面は seq が変わったときだけ表を見せる（手札そのものは動かさない。ふだん相手の手札は裏向きのまま）
+   */
+  readonly reveal?: { readonly seq: number; readonly viewer: Side; readonly cardIds: readonly string[] } | null;
 }
 
 export type BattleAction =
@@ -261,11 +268,11 @@ export function findHandCard(state: BattleState, side: Side, cardUid: string): H
   return state.sides[side].hand.find((c) => c.uid === cardUid);
 }
 
-/** その技を使えるモンスター（適合・生存・未行動。攻撃の技は、すなかけで封じられていないこと） */
+/** その技を使えるモンスター（適合・生存・未行動・まきつくで止められていない。攻撃の技は、すなかけで封じられていないこと） */
 export function availableUsers(state: BattleState, side: Side, skill: SkillCard): BattleMonster[] {
   const attack = skill.effect.type === 'attack';
   return state.sides[side].monsters.filter(
-    (m) => m.cardId === skill.monsterId && m.life > 0 && !m.acted && !(attack && m.sealedTurn === state.turn),
+    (m) => m.cardId === skill.monsterId && m.life > 0 && !m.acted && m.stunnedTurn !== state.turn && !(attack && m.sealedTurn === state.turn),
   );
 }
 
@@ -331,11 +338,17 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (state.active !== side) return NO(t('battle.ng.opponentTurn'));
   if (state.phase === 'mana') return NO(t('battle.ng.manaPhase'));
   if (skill.effect.type === 'defense' || skill.effect.type === 'evade') return NO(t('battle.ng.defenseOnAttack'));
-  // いたずら：相手の手札がないときは使えない（2026-10-24 ユーザー指示）
-  if (skill.effect.type === 'handToDeck' && state.sides[otherSide(side)].hand.length === 0) return NO(t('battle.ng.noOpponentHand'));
+  // いたずら・不思議な嗅覚：相手の手札がないときは使えない（いたずらは 2026-10-24 ユーザー指示。嗅覚も同じ扱い）
+  if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
+    return NO(t('battle.ng.noOpponentHand'));
+  }
+  // 考える：このカードのほかに戻す手札がないときは使えない
+  if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
   if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
   if (availableUsers(state, side, skill).length === 0) {
-    // すなかけで攻撃を封じられているだけのとき
+    // まきつくで止められている・すなかけで攻撃を封じられているだけのとき
+    const stunned = owner.some((m) => m.life > 0 && !m.acted && m.stunnedTurn === state.turn);
+    if (stunned) return NO(t('battle.ng.stunned'));
     const sealed = owner.some((m) => m.life > 0 && !m.acted && m.sealedTurn === state.turn);
     return NO(t(sealed && skill.effect.type === 'attack' ? 'battle.ng.sealed' : 'battle.ng.acted'));
   }
@@ -511,7 +524,8 @@ function resolvePending(state: BattleState): BattleState {
   if (damage > 0) withFx = addFx(next, hitKind(pending.cardId), pending.attacker);
   else if (evaded) withFx = addFx(next, 'evade', target?.side ?? otherSide(pending.attacker));
   const after = applyDamage(withFx, pending.targetUid, damage);
-  return damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : after;
+  const recoiled = damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : after;
+  return evaded ? recoiled : attackRiders(recoiled, pending.cardId, pending.attacker, pending.targetUid);
 }
 
 /**
@@ -634,7 +648,7 @@ function useCard(
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
         const hit = applyDamage(power > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, power);
-        return power > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit;
+        return attackRiders(power > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, side, target.uid);
       }
       return {
         ...next,
@@ -687,10 +701,68 @@ function useCard(
     }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));
+    case 'redrawHand':
+      return redrawHand(next, side);
+    case 'revealHand':
+      return revealHand(next, side);
     case 'defense':
     case 'evade':
       return state;
   }
+}
+
+/**
+ * 考える（正式：ノビトン 2026-10-25）：使ったカードを除いた自分の手札をすべて山札へ戻してシャッフルし、戻した枚数だけ引く。
+ * 戻す手札がないときは使えない（cardUsability）
+ */
+function redrawHand(state: BattleState, side: Side): BattleState {
+  const s = state.sides[side];
+  const n = s.hand.length;
+  if (n === 0) return state;
+  const mixed = shuffle([...s.deck, ...s.hand.map((c) => c.cardId)], state.seed);
+  const emptied = updateSide({ ...state, seed: mixed.seed }, side, { hand: [], deck: mixed.items });
+  const drawn = drawCards(emptied.sides[side], n, emptied.nextUid);
+  const next = updateSide({ ...emptied, nextUid: drawn.nextUid }, side, drawn.side);
+  return addLog(next, t('battle.log.redrawHand', { side: sideLabel(side), n }));
+}
+
+/**
+ * 不思議な嗅覚（正式：ノビトン 2026-10-25）：相手の手札をすべて確認する。手札は動かさず、画面に表を見せる（state.reveal）。
+ * 相手の手札がないときは使えない（cardUsability）
+ */
+function revealHand(state: BattleState, side: Side): BattleState {
+  const other = otherSide(side);
+  const cardIds = state.sides[other].hand.map((c) => c.cardId);
+  const next: BattleState = { ...state, reveal: { seq: (state.reveal?.seq ?? 0) + 1, viewer: side, cardIds } };
+  return addLog(next, t('battle.log.revealHand', { side: sideLabel(side), other: sideLabel(other), n: cardIds.length }));
+}
+
+/** 相手（side の反対）のマナを n 減らす（0 より下にはならない）。減らしたカードは捨て札へ */
+function drainMana(state: BattleState, side: Side, n: number): BattleState {
+  const victim = otherSide(side);
+  const before = manaOf(state.sides[victim]);
+  const next = payMana(state, victim, n);
+  const lost = before - manaOf(next.sides[victim]);
+  return addLog(next, t('battle.log.manaDrain', { side: sideLabel(victim), n: lost }));
+}
+
+/**
+ * 攻撃に付いた効果（正式：ノビトン 2026-10-25。くしゃみ・ダウナーミストの「相手マナ−」、まきつくの「対象は次ターン行動不可」）。
+ * 【要仕様確定】回避されなければ発動する（防御でダメージが0になっても発動。回避されたら発動しない）。勝負がついたあとは何もしない
+ */
+function attackRiders(state: BattleState, skillId: string, attacker: Side, targetUid: string): BattleState {
+  const e = getSkill(skillId).effect;
+  if (e.type !== 'attack' || state.phase === 'ended') return state;
+  let next = state;
+  if (e.manaDrain) next = drainMana(next, attacker, e.manaDrain);
+  if (e.stunTarget) {
+    const target = findMonster(next, targetUid);
+    if (target && target.monster.life > 0) {
+      next = updateMonster(next, targetUid, { stunnedTurn: state.turn + 1 });
+      next = addLog(next, t('battle.log.stun', { name: nameOf(target.monster.cardId) }));
+    }
+  }
+  return next;
 }
 
 /**

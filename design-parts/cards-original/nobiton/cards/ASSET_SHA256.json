@@ -1,0 +1,18 @@
+[
+  {
+    "file": "battle_card_official.png",
+    "width": 556,
+    "height": 941,
+    "format": "PNG",
+    "sha256": "634b949929fa6e7210fb6f47630c5f0546a28fc9619c562362d48246b2a6611e",
+    "bytes": 761969
+  },
+  {
+    "file": "monster_card_LIFE8_official.jpeg",
+    "width": 921,
+    "height": 1536,
+    "format": "JPEG",
+    "sha256": "a504887401dd35849daa94b5e4ba263e0b5033efe64b9ca731167b53c6437893",
+    "bytes": 636032
+  }
+]

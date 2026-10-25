@@ -125,7 +125,7 @@ describe('ソラモのモンスターカード', () => {
 
   it('登録だけのモンスターはいない（ラズック 2026-10-23・ガウル 2026-10-24 は技が届いたので正式に）', () => {
     expect(REGISTERED_ONLY_MONSTERS).toEqual([]);
-    expect(MONSTERS.filter((x) => ['ラズック', 'ガウル'].includes(x.name)).map((x) => x.id)).toEqual(['mon-lazuck', 'mon-gauul']);
+    expect(MONSTERS.filter((x) => ['ラズック', 'ガウル', 'ノビトン'].includes(x.name)).map((x) => x.id)).toEqual(['mon-lazuck', 'mon-gauul', 'mon-nobiton']);
   });
 });
 

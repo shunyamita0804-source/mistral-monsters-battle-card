@@ -682,3 +682,24 @@
     transition: none;
   }
 }
+
+/* 不思議な嗅覚（ノビトン 2026-10-25）：相手の手札を表で見せる窓。カードを並べ、下に名前の一覧 */
+.battle-reveal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.battle-reveal__card {
+  flex: none;
+}
+
+.battle-reveal__names {
+  margin: 0;
+  padding: 0 0 0 18px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text);
+}

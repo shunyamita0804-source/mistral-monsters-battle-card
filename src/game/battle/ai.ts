@@ -110,6 +110,12 @@ export function chooseAction(state: BattleState, side: Side): BattleAction | nul
   // いたずら：相手の手札が2枚以上あるときに使う（仮の思考）
   const prank = options.filter(isSkillOption).find((o) => o.def.effect.type === 'handToDeck');
   if (prank && state.sides[otherSide(side)].hand.length >= 2) return { type: 'useCard', side, cardUid: prank.card.uid };
+  // 考える：攻撃できる技がなく、ほかの手札が2枚以上あるときに引き直す（仮の思考）
+  const redraw = options.filter(isSkillOption).find((o) => o.def.effect.type === 'redrawHand');
+  if (redraw && attacks.length === 0 && mine.hand.length >= 3) return { type: 'useCard', side, cardUid: redraw.card.uid };
+  // 不思議な嗅覚：相手の手札が3枚以上あり、マナに余裕があるときだけ（仮の思考。思考は手札を見なくても動く）
+  const sniff = options.filter(isSkillOption).find((o) => o.def.effect.type === 'revealHand');
+  if (sniff && state.sides[otherSide(side)].hand.length >= 3 && manaOf(mine) >= sniff.def.cost + 3) return { type: 'useCard', side, cardUid: sniff.card.uid };
 
   // 5. マナ・ドロー
   // 山札が足りないと負けになるので、山札を動かす効果は山札に余裕があるときだけ。

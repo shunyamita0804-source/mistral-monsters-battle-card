@@ -352,6 +352,25 @@ export const battleScreen: ScreenDefinition = {
       setTimeout(() => ghost.remove(), MANA_VANISH_MS);
     };
 
+    /** 見せ終えた「相手の手札の確認」（engine の reveal の seq。同じものを2度出さない） */
+    let shownRevealSeq = 0;
+    /** 不思議な嗅覚（正式：ノビトン 2026-10-25）：相手の手札をすべて表で見せる窓。手札そのものは裏向きのまま動かさない */
+    const showReveal = (cardIds: readonly string[]): void => {
+      const handle = openModal(element, {
+        title: t('battle.reveal.title'),
+        body: [
+          h('p', { class: 'modal__text', text: t('battle.reveal.lead') }),
+          h(
+            'div',
+            { class: 'battle-reveal' },
+            ...cardIds.map((id) => h('div', { class: 'battle-reveal__card' }, createPlayCard(getPlayCard(id), { width: 78, showText: false }))),
+          ),
+          h('ul', { class: 'battle-reveal__names' }, ...cardIds.map((id) => h('li', { text: cardName(getPlayCard(id)) }))),
+        ],
+        actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
+      });
+    };
+
     const dispatch = (action: BattleAction): void => {
       if (!state) return;
       const played = playedCard(state, action);
@@ -360,6 +379,13 @@ export const battleScreen: ScreenDefinition = {
       if (next === state) return;
       state = next;
       targeting = null;
+      // 自分が不思議な嗅覚を使ったら、カードを大きく見せたあとに相手の手札を表で見せる（相手が使ったときは経過の1行だけ）
+      const reveal = state.reveal;
+      if (reveal && reveal.viewer === 'player' && reveal.seq !== shownRevealSeq) {
+        shownRevealSeq = reveal.seq;
+        const ids = reveal.cardIds;
+        setTimeout(() => !destroyed && showReveal(ids), SHOWCASE_MS);
+      }
       if (selectedUid && !state.sides.player.hand.some((c) => c.uid === selectedUid)) selectedUid = null;
       // 相手のカードは、裏向きのまま手札から真ん中へ動いてから表を見せる
       const revealDelay = played && oppFrom ? OPP_CARD_FLY_MS : 0;

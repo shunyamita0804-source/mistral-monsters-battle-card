@@ -54,6 +54,16 @@ export const BATTLE = {
   },
   'battle.log.handToDeck': { ja: '{player}の手札を1枚、山札に戻してシャッフルした。', en: "Returned 1 card from {player}'s hand to the deck and shuffled it." },
   'battle.log.taunt': { ja: '{name}は次のターン、{only}にしか攻撃できない。', en: '{name} can only attack {only} next turn.' },
+  // ノビトン（2026-10-25）
+  'battle.log.manaDrain': { ja: '{side}のマナが{n}減った。', en: "{side}'s mana went down by {n}." },
+  'battle.log.stun': { ja: '{name}は次のターン行動できない。', en: "{name} can't act next turn." },
+  'battle.log.redrawHand': {
+    ja: '{side}は手札{n}枚を山札に戻してシャッフルし、{n}枚引いた。',
+    en: '{side} shuffled {n} {n|card|cards} from hand into the deck and drew {n}.',
+  },
+  'battle.log.revealHand': { ja: '{side}は{other}の手札{n}枚を確認した。', en: "{side} looked at {other}'s hand ({n} {n|card|cards})." },
+  'battle.reveal.title': { ja: '相手の手札', en: "Opponent's hand" },
+  'battle.reveal.lead': { ja: '不思議な嗅覚で、相手の手札をすべて確認した。', en: 'Curious Sniff revealed every card in the opponent’s hand.' },
 
   // 使えない理由（engine.ts の cardUsability）
   'battle.ng.defenseOnly': { ja: 'いまは防御・回避カードしか使えません', en: 'Only Guard/Dodge cards now' },
@@ -72,6 +82,8 @@ export const BATTLE = {
   'battle.ng.unblockable': { ja: 'この攻撃は防御できません', en: "This attack can't be guarded" },
   'battle.ng.undodgeable': { ja: 'この攻撃は回避できません', en: "This attack can't be dodged" },
   'battle.ng.noOpponentHand': { ja: '相手は手札がありません', en: 'The opponent has no cards in hand' },
+  'battle.ng.noHandToReturn': { ja: '戻す手札がありません', en: 'No other cards in hand to return' },
+  'battle.ng.stunned': { ja: 'このターンは行動できません（まきつく）', en: "Can't act this turn (Coil)" },
   'battle.ng.evadeMinCost': { ja: '必要マナ{n}以上の攻撃にしか使えません', en: 'Only works against attacks costing {n}+ mana' },
   'battle.ng.defenseOnAttack': {
     ja: '防御・回避カードは相手の攻撃を受けたときに使います',
