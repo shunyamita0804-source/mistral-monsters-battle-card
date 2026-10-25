@@ -31,7 +31,7 @@ import { createMonsterPortrait } from '../components/monsterPortrait.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
 import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
-import { createPlayCard, createSkillCard, skillCardHeight } from '../components/skillCard.ts';
+import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
 import { bgm } from '../bgm.ts';
 import { button, h } from '../dom.ts';
 import { once, type BattleRequest } from '../gameStore.ts';
@@ -77,12 +77,12 @@ const AI_STEP_MS = 1100;
  */
 const MONSTER_ICON = 76;
 /**
- * 手札のカードの幅（論理px）。自分の手札（表）と相手の手札（裏）で同じ値を使い、外形をそろえる（2026-10-24 改訂R2）。
- * 高さは技カードの縦横比から skillCardHeight() で出す
+ * 手札のカードの幅（論理px）。2026-10-25 リデザイン パートB：上下の空の帯をなくした表面（battleCard.ts）にして 66→70。
+ * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
-const HAND_CARD_W = 66;
-/** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザインで欄を画面の約1/3に広げたので 124→150 */
-const DETAIL_CARD_W = 150;
+const HAND_CARD_W = 70;
+/** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：欄を画面の約1/3に広げ、名前・絵・効果文の入る大きなカード（battleCard.ts）で 138 */
+const DETAIL_CARD_W = 138;
 /** 相手のひと言を大きく出しておく時間（ミリ秒）。押すと先に消える */
 const TALK_MS = 2200;
 /** ひと言を1文字ずつ出す間隔（ミリ秒。PS版の会話のように） */
@@ -189,7 +189,7 @@ export const battleScreen: ScreenDefinition = {
     }
     // 手札のカードの大きさ（自分の手札＝表・相手の手札＝裏で同じ値。CSS の --hand-card-w / --hand-card-h）
     element.style.setProperty('--hand-card-w', `${HAND_CARD_W}px`);
-    element.style.setProperty('--hand-card-h', `${skillCardHeight(HAND_CARD_W).toFixed(2)}px`);
+    element.style.setProperty('--hand-card-h', `${battleCardHeight(HAND_CARD_W, 'hand').toFixed(2)}px`);
     const save = ctx.store.save;
     const seed = randomSeed();
 
@@ -288,7 +288,7 @@ export const battleScreen: ScreenDefinition = {
           h(
             'div',
             { class: 'battle-reveal' },
-            ...cardIds.map((id) => h('div', { class: 'battle-reveal__card' }, createPlayCard(getPlayCard(id), { width: 78, showText: false }))),
+            ...cardIds.map((id) => h('div', { class: 'battle-reveal__card' }, createBattleCard(getPlayCard(id), { width: 70, size: 'hand' }))),
           ),
           h('ul', { class: 'battle-reveal__names' }, ...cardIds.map((id) => h('li', { text: cardName(getPlayCard(id)) }))),
         ],
@@ -336,7 +336,7 @@ export const battleScreen: ScreenDefinition = {
         'div',
         { class: `battle__showcase battle__showcase--${side}` },
         h('div', { class: 'battle__showcase-band' }),
-        h('div', { class: 'battle__showcase-card' }, createPlayCard(card, { width: 156, showText: true })),
+        h('div', { class: 'battle__showcase-card' }, createBattleCard(card, { width: 156, size: 'focus' })),
         h('p', { class: 'battle__showcase-text', text: t('battle.showcase', { side: t(`battle.side.${side}`), card: cardName(card) }) }),
       );
       fxLayer.append(el);
@@ -366,7 +366,7 @@ export const battleScreen: ScreenDefinition = {
       const scale = stageScale();
       // 先に全部の位置を測って写しを置く（1枚ずつ手札から抜けると、残りのカードの位置がずれるため）
       for (const [i, uid] of picks.entries()) {
-        const from = element.querySelector(`.battle__hand-card[data-uid="${uid}"] .skill-card`);
+        const from = element.querySelector(`.battle__hand-card[data-uid="${uid}"] .bcard`);
         if (!from) continue;
         const r = from.getBoundingClientRect();
         const ghost = from.cloneNode(true) as HTMLElement;
@@ -565,7 +565,7 @@ export const battleScreen: ScreenDefinition = {
         swipeGhost = h(
           'div',
           { class: `battle__hand-ghost${isMyMana(s) || usability.usable ? '' : ' is-unusable'}`, dataset: { uid: hand.uid }, attrs: { 'aria-hidden': 'true' } },
-          createPlayCard(getPlayCard(hand.cardId), { width: 78, showText: false }),
+          createBattleCard(getPlayCard(hand.cardId), { width: 78, size: 'hand' }),
           h('span', { class: 'battle__hand-ghost-label', text: label }),
         );
       }
@@ -997,7 +997,7 @@ export const battleScreen: ScreenDefinition = {
           { class: 'battle-detail__left' },
           h('div', { class: 'battle-text' }, h('div', { class: 'battle-text__body' }, ...body)),
         ),
-        card ? h('div', { class: 'battle-detail__card' }, createPlayCard(card, { width: detailW, showText: true })) : null,
+        card ? h('div', { class: 'battle-detail__card' }, createBattleCard(card, { width: detailW, size: 'focus' })) : null,
       );
     };
 
@@ -1045,7 +1045,7 @@ export const battleScreen: ScreenDefinition = {
                 },
               },
             },
-            createPlayCard(card, { width: HAND_CARD_W, showText: false }),
+            createBattleCard(card, { width: HAND_CARD_W, size: 'hand' }),
             h('span', { class: 'battle__hand-name', text: cardName(card) }),
             picked ? h('span', { class: 'battle__hand-mana', text: t('card.detail.mana') }) : null,
           );
@@ -1110,7 +1110,7 @@ export const battleScreen: ScreenDefinition = {
                   attrs: { type: 'button', 'aria-label': t('battle.defense.cardAria', { name: cardName(skill) }) },
                   on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
                 },
-                createSkillCard(skill, { width: 70, showText: false }),
+                createBattleCard(skill, { width: 70, size: 'hand' }),
                 h('span', { class: 'battle__defense-label', text: usable.usable ? label : (usable.reason ?? '') }),
               );
               b.disabled = !usable.usable;
