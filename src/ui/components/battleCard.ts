@@ -1,6 +1,6 @@
 import { getMonster } from '../../data/cards.ts';
-import { skillCardFace } from '../../game/cards/cardFace.ts';
-import { guardReduction, supportShortText, type PlayCard, type SkillCard, type SkillCategory, type SupportCard } from '../../game/cards/cardTypes.ts';
+import { skillCardFace, skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
+import { supportShortText, type PlayCard, type SkillCard, type SkillCategory, type SupportCard } from '../../game/cards/cardTypes.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
@@ -50,24 +50,38 @@ export function battleCardHeight(width: number, size: BattleCardSize): number {
 const SHIELD_SVG =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" fill="currentColor"/></svg>';
 
-/** 右下の威力：ちから・かしこさ＝数字、防御＝盾と「-3」、回避・特殊・サポート＝種類の札だけ */
+/**
+ * 右下の威力（skillValueBadge のきまり。2026-10-25）：ちから・かしこさ＝数字、防御＝盾と「-3」、回避＝「回避」、特殊＝「効果」の文字。
+ * 種類は上の札で分かるので、回避・特殊は種類の札を重ねて出さない。サポートは種類の札だけ
+ */
 function powerBadge(category: SkillCategory | 'support', label: string, skill: SkillCard | null): HTMLElement {
-  const el = h('span', { class: 'bcard__power' }, h('span', { class: 'bcard__type', text: label }));
-  if (skill?.stat && (category === 'force' || category === 'wisdom')) {
-    el.append(
+  if (!skill) return h('span', { class: 'bcard__power is-label-only' }, h('span', { class: 'bcard__type', text: label }));
+  const badge = skillValueBadge(skill);
+  if (badge.kind === 'damage') {
+    return h(
+      'span',
+      { class: 'bcard__power' },
+      h('span', { class: 'bcard__type', text: label }),
       h(
         'span',
         { class: 'bcard__value' },
         h('img', { class: 'bcard__icon', attrs: { src: category === 'force' ? iconStatForce : iconStatWisdom, alt: '', draggable: 'false' } }),
-        h('span', { class: 'bcard__num', text: String(skill.stat.value) }),
+        h('span', { class: 'bcard__num', text: skillValueBadgeText(badge) }),
       ),
     );
-  } else if (skill && category === 'defense') {
+  }
+  if (badge.kind === 'guard') {
     const shield = h('span', { class: 'bcard__shield' });
     shield.innerHTML = SHIELD_SVG;
-    el.append(h('span', { class: 'bcard__value bcard__value--guard' }, shield, h('span', { class: 'bcard__num', text: `-${guardReduction(skill)}` })));
-  } else el.classList.add('is-label-only');
-  return el;
+    return h(
+      'span',
+      { class: 'bcard__power' },
+      h('span', { class: 'bcard__type', text: label }),
+      h('span', { class: 'bcard__value bcard__value--guard' }, shield, h('span', { class: 'bcard__num', text: skillValueBadgeText(badge) })),
+    );
+  }
+  // 回避・特殊：数値は出さず、短い文字だけ（0 ダメージと間違えないように）
+  return h('span', { class: `bcard__power is-label-only is-${badge.kind}` }, h('span', { class: 'bcard__type', text: skillValueBadgeText(badge) }));
 }
 
 function artLayer(url: string | undefined, mark: string): HTMLElement {

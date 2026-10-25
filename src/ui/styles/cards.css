@@ -428,3 +428,99 @@
     repeating-linear-gradient(45deg, rgb(255 255 255 / 0.18) 0 4cqw, transparent 4cqw 8cqw),
     linear-gradient(160deg, #f2e2b0, #c8a660);
 }
+
+/* ===== バトル用カード（800×920・2026-10-25）：共通の背景 → モンスター → モンスターの色の枠 → 名前・ライフ ===== */
+.battle-card {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  /* 枠の外形（frame_shape.png）で切り抜く。影は切り抜かれるので付けない */
+  -webkit-mask: var(--shape) center / 100% 100% no-repeat;
+  mask: var(--shape) center / 100% 100% no-repeat;
+}
+
+.battle-card__bg,
+.battle-card__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.battle-card__bg {
+  object-fit: cover;
+}
+
+/* モンスター：カードと同じ縦横比の絵を、モンスターごとの割合（--art-scale）で真ん中に。体の大小の差は割合で残す */
+.battle-card__art {
+  position: absolute;
+  left: calc((1 - var(--art-scale, 1)) * 50%);
+  top: calc((1 - var(--art-scale, 1)) * 50% + var(--art-offset, 0) * 100%);
+  width: calc(var(--art-scale, 1) * 100%);
+  height: calc(var(--art-scale, 1) * 100%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.battle-card__life {
+  position: absolute;
+  top: 6%;
+  right: 8.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: calc(44px * var(--u, 1));
+  padding: calc(2px * var(--u, 1)) calc(7px * var(--u, 1)) calc(3px * var(--u, 1));
+  border: 1px solid rgb(255 236 190 / 0.7);
+  border-radius: calc(6px * var(--u, 1));
+  background: rgb(104 72 32 / 0.92);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  color: #fff3d6;
+}
+
+.battle-card__life-label {
+  font-size: calc(10px * var(--u, 1));
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.battle-card__life-value {
+  font-size: calc(22px * var(--u, 1));
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.battle-card__name {
+  position: absolute;
+  left: 8.5%;
+  bottom: 6.5%;
+  max-width: 70%;
+  padding: calc(3px * var(--u, 1)) calc(12px * var(--u, 1));
+  border: 1px solid rgb(255 236 190 / 0.6);
+  border-radius: calc(5px * var(--u, 1));
+  background: rgb(52 36 18 / 0.82);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: calc(17px * var(--u, 1));
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* タップしたときの窓（対戦画面） */
+.battle-card-detail .modal__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.battle-card-detail__line {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text);
+}

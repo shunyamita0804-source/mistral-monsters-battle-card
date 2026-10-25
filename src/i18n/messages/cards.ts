@@ -115,6 +115,9 @@ export const CARDS = {
   'card.pending.life': { ja: 'ライフ', en: 'life' },
   'card.pending.art': { ja: '絵', en: 'art' },
   'card.pending.rarity': { ja: 'レアリティ', en: 'rarity' },
+  // 数値の欄（ダメージのない技）：回避＝「回避」、特殊＝「効果」（2026-10-25）
+  'card.badge.evade': { ja: '回避', en: 'Dodge' },
+  'card.badge.effect': { ja: '効果', en: 'Effect' },
   'card.pending.availability': { ja: '配布の区分（初期・収集）', en: 'distribution group' },
   'card.detail.supportKind': { ja: '区分', en: 'Category' },
   'card.detail.supportField': { ja: '全体（場に残る）', en: 'Field (stays in play)' },

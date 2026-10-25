@@ -40,10 +40,12 @@ import { openCardDetail } from '../components/cardDetail.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import { commandButton, confirmCommand } from '../components/commandButton.ts';
 import { createMonsterPortrait } from '../components/monsterPortrait.ts';
+import { createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
 import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
 import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
+import { skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { bgm } from '../bgm.ts';
 import { button, h } from '../dom.ts';
 import { once, type BattleRequest } from '../gameStore.ts';
@@ -88,6 +90,8 @@ const AI_STEP_MS = 1100;
  * 場のモンスターのアイコン（正方形）の一辺（2026-10-25 バトル画面リデザイン：カードの枠をやめ、PS版のように顔〜上半身のアイコンに。指示書の目安 72〜80）
  */
 const MONSTER_ICON = 76;
+/** アイコンをタップしたときに見せるバトル用カードの幅（論理px。800×920 の比率で高さが決まる） */
+const BATTLE_CARD_DETAIL_W = 270;
 /**
  * 手札のカードの幅（論理px）。2026-10-25 リデザイン パートB：上下の空の帯をなくした表面（battleCard.ts）にして 66→70。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
@@ -268,7 +272,10 @@ export const battleScreen: ScreenDefinition = {
     const fxLayer = h('div', { class: 'battle__fx-layer', attrs: { 'aria-hidden': 'true' } });
     /** 画面を描き直す（演出の層は外さずに残す。外すとアニメーションが最初からになる） */
     const replaceView = (...nodes: (Node | string)[]): void => {
-      for (const child of [...element.childNodes]) if (child !== fxLayer) child.remove();
+      // 開いている窓（カードの詳しい表示・経過・ルール・確認）は消さない（相手の番の描き直しで、開いた窓がすぐ閉じてしまうため。2026-10-25）
+      const keep = (child: ChildNode): boolean =>
+        child === fxLayer || (child instanceof HTMLElement && (child.classList.contains('modal') || child.classList.contains('command-confirm')));
+      for (const child of [...element.childNodes]) if (!keep(child)) child.remove();
       element.prepend(...nodes);
       if (!fxLayer.isConnected) element.append(fxLayer);
     };
@@ -402,12 +409,16 @@ export const battleScreen: ScreenDefinition = {
     const spotlightPanel = (s: BattleState, sp: NonNullable<typeof spotlight>): HTMLElement => {
       const card = getPlayCard(sp.cardId);
       const kind = card.kind === 'skill' ? categoryLabel(skillCategory(card)) : t(card.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support');
+      // 数値の行（skillValueBadge のきまり）：ダメージ＝「ちから 3」、防御＝「防御 −3」、回避＝「回避」、特殊＝「効果」
+      const badge = card.kind === 'skill' ? skillValueBadge(card) : null;
       const power =
-        card.kind === 'skill' && card.stat
-          ? t('battle.spot.power', { stat: kind, n: card.stat.value })
-          : card.kind === 'skill' && card.effect.type === 'defense'
-            ? t('battle.spot.guard', { n: guardReduction(card) })
-            : kind;
+        badge?.kind === 'damage'
+          ? t('battle.spot.power', { stat: kind, n: badge.value })
+          : badge?.kind === 'guard'
+            ? t('battle.spot.guard', { n: badge.value })
+            : badge
+              ? skillValueBadgeText(badge)
+              : kind;
       return h(
         'div',
         {
@@ -788,12 +799,23 @@ export const battleScreen: ScreenDefinition = {
         dispatch({ type: 'useCard', side: 'player', cardUid: targeting.cardUid, targetUid: monster.uid });
         return;
       }
-      openCardDetail(element, getMonster(monster.cardId), {
-        extra: [
-          t(`battle.monster.owner.${side}`),
-          t(monster.acted ? 'battle.monster.lifeActed' : 'battle.monster.life', { life: monster.life, max: monster.maxLife }),
-        ],
-      });
+      const extra = [
+        t(`battle.monster.owner.${side}`),
+        t(monster.acted ? 'battle.monster.lifeActed' : 'battle.monster.life', { life: monster.life, max: monster.maxLife }),
+      ];
+      // バトル用カード（2026-10-25・いまはソラモだけ）があれば、それを大きく見せる（案A：ふだんはアイコン、タップしたときだけ）
+      if (hasBattleCard(monster.cardId)) {
+        const handle = openModal(element, {
+          className: 'battle-card-detail',
+          body: [
+            createBattleMonsterCard(getMonster(monster.cardId), BATTLE_CARD_DETAIL_W, { current: monster.life, max: monster.maxLife }),
+            ...extra.map((text) => h('p', { class: 'battle-card-detail__line', text })),
+          ],
+          actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
+        });
+        return;
+      }
+      openCardDetail(element, getMonster(monster.cardId), { extra });
     };
 
     const surrender = (): void => {
