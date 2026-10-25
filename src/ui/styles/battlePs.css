@@ -1,0 +1,380 @@
+/* ===== 2026-10-25 バトル画面リデザイン（PS版「モンスターファーム バトルカード」にならう） =====
+ * モンスターはカードではなくキャラクター（正方形のアイコン）。画面の主役は「いま使われている技カード」。
+ * 上から：手番の帯／相手の情報1行／相手3体／経過1行／自分3体／自分の情報1行／フォーカスエリア（説明と大きなカード）／手札／操作のボタン（横一列）。
+ * battle.css・battleTable.css より後に読み込む（main.ts）ので、ここに書いた値が優先される。
+ */
+
+/* ---------- パートA：配置 ---------- */
+.battle {
+  --side-player: #5b8fd0;
+  --side-opponent: #a8664a;
+}
+
+.battle-board {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px 0;
+}
+
+/* 情報の1行：左＝誰か・いまの状態、右＝マナ・山札・手札・捨札 */
+.battle-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  background: rgb(10 14 24 / 0.55);
+  font-size: 12px;
+}
+
+.battle-line--opponent {
+  --line-color: rgb(168 102 74 / 0.75);
+}
+
+.battle-line--player {
+  --line-color: rgb(91 143 208 / 0.75);
+}
+
+.battle-line__who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.battle-line__tag {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.battle-line--opponent .battle-line__tag {
+  background: var(--side-opponent);
+  color: #fff4ec;
+}
+
+.battle-line--player .battle-line__tag {
+  background: var(--side-player);
+  color: #f2f7ff;
+}
+
+.battle-line__name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  color: #f0e4c8;
+}
+
+.battle-line__state {
+  flex: none;
+  color: var(--color-sub);
+  font-weight: 700;
+}
+
+.battle-line.is-active .battle-line__state {
+  color: var(--color-accent);
+}
+
+.battle-line__counts {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.battle-line .battle-info__mana {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.battle-line .battle-info__mana-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9cc8ff;
+}
+
+.battle-line .battle-info__mana-value {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  color: #e6f2ff;
+}
+
+.battle-line .battle-info__count {
+  font-size: 11.5px;
+  color: var(--color-sub);
+  white-space: nowrap;
+}
+
+/* モンスター3体：正方形のアイコンを横一列 */
+.battle-side {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 4px 0 2px;
+}
+
+.battle__monster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  animation: none;
+}
+
+.battle__monster-icon {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 2px solid var(--side-color);
+  border-radius: 8px;
+  transition: border-color 150ms, box-shadow 150ms, filter 150ms;
+}
+
+.battle__monster--player {
+  --side-color: var(--side-player);
+}
+
+.battle__monster--opponent {
+  --side-color: var(--side-opponent);
+}
+
+/* 切り抜いたアイコン（素材の絵はそのまま。表示のときに顔〜上半身を切り抜く） */
+.battle-portrait {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #1b2130;
+}
+
+.battle-portrait__img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--zoom) * 100%);
+  max-width: none;
+  height: auto;
+  transform: translate(calc(var(--fx) * -100%), calc(var(--fy) * -100%));
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 絵のないモンスター（仮）：名前の1文字と「仮」 */
+.battle-portrait--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 0.06) 0 6px, transparent 6px 12px),
+    color-mix(in srgb, var(--theme, #6a7a90) 55%, #1b2130);
+}
+
+.battle-portrait__mark {
+  font-size: 34px;
+  font-weight: 900;
+  color: rgb(255 255 255 / 0.85);
+  text-shadow: 0 2px 3px rgb(0 0 0 / 0.4);
+}
+
+.battle-portrait__tag {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+/* ライフ：細いバー（控えめ）と、大きめの数字 */
+.battle__monster-bar {
+  display: block;
+  width: 76px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.14);
+  overflow: hidden;
+}
+
+.battle__monster-bar-fill {
+  display: block;
+  height: 100%;
+  background: #6fd16a;
+  transition: width 300ms;
+}
+
+.battle__monster-life {
+  margin: 0;
+  line-height: 1;
+}
+
+.battle__monster-life-now {
+  font-size: 19px;
+}
+
+.battle__monster-life-max {
+  font-size: 12px;
+}
+
+/* 状態：対象の候補＝金の枠が脈打つ、狙われている＝赤く光る、行動済＝暗く＋札、戦闘不能＝灰色＋札 */
+.battle__monster.is-target .battle__monster-icon {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgb(255 207 90 / 0.85);
+  animation: target-pulse 0.9s ease-in-out infinite;
+}
+
+.battle__monster.is-not-target {
+  filter: brightness(0.5) saturate(0.6);
+}
+
+.battle__monster.is-attacked .battle__monster-icon {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 14px rgb(255 77 109 / 0.85);
+}
+
+.battle__monster.is-acted .battle-portrait {
+  filter: brightness(0.55);
+}
+
+.battle__monster.is-down .battle-portrait {
+  filter: grayscale(1) brightness(0.4);
+}
+
+.battle__monster.is-down .battle__monster-icon {
+  border-color: rgb(120 120 120 / 0.6);
+}
+
+.battle__monster-down {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd1d8;
+  font-size: 13px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+  pointer-events: none;
+}
+
+.battle__monster .battle__acted {
+  top: 2px;
+  left: 2px;
+  z-index: 2;
+  font-size: 10px;
+}
+
+.battle__monster.is-hit .battle-portrait {
+  animation: hit-flash 0.45s ease-out;
+}
+
+.battle__monster .battle__status {
+  top: 26%;
+}
+
+.battle__monster .battle__pointer {
+  top: -14px;
+}
+
+/* 経過1行 */
+.battle-mid {
+  height: 32px;
+  margin: 0;
+}
+
+/* フォーカスエリア：画面の約1/3。左＝説明、右＝カードを大きく。何も選んでいないときは説明だけ */
+.battle-detail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 10px 6px;
+}
+
+.battle-detail.is-guide .battle-detail__left {
+  flex: 1;
+}
+
+.battle-detail__card {
+  width: auto;
+  align-items: center;
+}
+
+/* 手札 */
+.battle__hand {
+  flex: none;
+}
+
+/* 操作のボタン：手札の下に横一列。左に「コマンド」、いちばん右は場面の主なボタン（攻撃終了・ターン終了）か状態の札 */
+.battle-cmds {
+  flex: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  gap: 6px;
+  min-height: 58px;
+  padding: 6px 10px 8px;
+}
+
+.battle-cmds .command-btn {
+  flex: none;
+  width: auto;
+  min-width: 84px;
+  height: 46px;
+}
+
+.battle-cmds .command-btn__label {
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+.battle-cmds .command-btn.is-long .command-btn__label {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.battle-cmds > .is-main {
+  margin-left: auto;
+}
+
+.battle-cmds .command-btn.is-main {
+  min-width: 118px;
+}
+
+.battle-cmds__status {
+  min-height: 46px;
+  padding: 0 6px;
+}
+
+/* コマンドの一覧：「コマンド」の上に開く */
+.battle__cmd-list {
+  left: 10px;
+  right: auto;
+  top: auto;
+  bottom: 64px;
+}

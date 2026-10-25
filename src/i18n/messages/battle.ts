@@ -154,7 +154,7 @@ export const BATTLE = {
   'battle.log.title': { ja: 'これまでの経過', en: 'Battle Log' },
   'battle.log.open': { ja: 'これまでの経過を見る', en: 'Show battle log' },
   'battle.log.more': { ja: '経過', en: 'Log' },
-  // 操作のボタン（自分のモンスターの右）：自分の番でないときの札
+  // 操作のボタン（手札の下）：自分の番でないときの札
   'battle.dock.waiting': { ja: '相手の番', en: "Opponent's turn" },
   'battle.dock.defense': { ja: '守備を選ぶ', en: 'Choose defense' },
   'battle.dock.noDefense': { ja: '守備できるカードなし', en: 'No defense cards' },
@@ -199,8 +199,8 @@ export const BATTLE = {
   'battle.prompt.usable': { ja: '使えます', en: 'Usable' },
   'battle.prompt.unusable': { ja: '使えません', en: 'Cannot use' },
   'battle.prompt.hintMain': {
-    ja: '手札をタップ（指でなぞると見比べられます）すると、説明と「使う」が出ます。上へはじくとすぐ使えます。攻撃を終えるときは、自分のモンスターの右の「攻撃終了」',
-    en: 'Tap a card (swipe to compare) to see it and "Use". Flick a card up to use it right away. To end your attack, tap "End Attack" to the right of your monsters',
+    ja: '手札をタップ（指でなぞると見比べられます）すると、説明と「使う」が出ます。上へはじくとすぐ使えます。攻撃を終えるときは、下の「攻撃終了」',
+    en: 'Tap a card (swipe to compare) to see it and "Use". Flick a card up to use it right away. To end your attack, tap "End Attack" at the bottom',
   },
   'battle.prompt.hint': {
     ja: '手札のカードをタップするか指でなぞると、ここに説明と拡大したカードが出ます。',

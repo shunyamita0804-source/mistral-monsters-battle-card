@@ -59,51 +59,6 @@
   flex-direction: column;
 }
 
-/* 手札の列（相手・自分で同じ高さのカード） */
-.battle-hand--opponent {
-  position: relative;
-  flex: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(var(--hand-card-h) + 10px);
-  padding: 4px 10px;
-  background: rgb(0 0 0 / 0.22);
-  border-bottom: 1px solid rgb(201 162 74 / 0.28);
-}
-
-/* 相手の手札：裏向きのカード（自分の手札のカードと同じ外形）。押しても何も出さない */
-.battle-hand__back {
-  flex: none;
-  width: var(--hand-card-w);
-  height: var(--hand-card-h);
-  border-radius: 5px;
-  background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
-  box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
-  pointer-events: none;
-}
-
-/* 2枚目からは少しすき間。入りきらないときは重ねる（--n は枚数） */
-.battle-hand--opponent .battle-hand__back + .battle-hand__back {
-  margin-left: min(8px, calc((100% - var(--n) * var(--hand-card-w)) / max(var(--n) - 1, 1)));
-}
-
-/* 新しく引いたカード：右上（相手の山札の方）から来る */
-.battle-hand__back.is-dealt {
-  animation: opp-deal-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
-}
-
-@keyframes opp-deal-in {
-  from {
-    opacity: 0;
-    transform: translate(120px, 30px) rotate(-10deg) scale(0.7);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 .battle-hand__empty {
   align-self: center;
   margin: auto;
@@ -512,27 +467,6 @@
   filter: brightness(1.25);
 }
 
-/* ---------- 相手のカードの動き（見た目だけ） ---------- */
-.battle__opp-fly {
-  position: absolute;
-  z-index: 38;
-  animation: opp-fly-center 520ms cubic-bezier(0.4, 0, 0.3, 1) forwards;
-}
-
-/* 相手が使うカード：手札の中で持ち上がって光ってから（PS版で選んだカードが目立つように）、真ん中へ動く */
-@keyframes opp-fly-center {
-  0% { transform: none; opacity: 1; filter: none; }
-  40% { transform: translateY(-18px) scale(1.08); opacity: 1; filter: brightness(1.35) drop-shadow(0 0 8px rgb(255 214 120 / 0.95)); }
-  100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0.6; filter: brightness(1.2); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .battle-hand__back.is-dealt,
-  .battle__opp-fly {
-    animation-duration: 1ms;
-  }
-}
-
 /* ---------- 相手のひと言：顔の絵と吹き出しを大きく、相手の手札の上に重ねる ---------- */
 .battle__talk {
   position: absolute;
@@ -640,46 +574,6 @@
 @media (prefers-reduced-motion: reduce) {
   .battle__pointer {
     animation: none;
-  }
-}
-
-/* ---------- カメラ（2026-10-24 ユーザー指示：PS版のように、手札を見せる側へ動く） ----------
- * 対戦テーブルを少し拡大し、相手の番は上（相手の手札・場）、自分の番は下（自分の手札・場）へ寄せる。
- * 寄せた反対側の手札は半分ほど画面の外へ出る（左右も少しだけ切れる） */
-.battle-camera {
-  /* 拡大の倍率。左右が (倍率−1)／2 ずつ切れるので、その分だけ左右の欄を内側へ寄せる（下の .battle-side） */
-  --camera-zoom: 1.06;
-  position: relative;
-  flex: none;
-  overflow: hidden;
-}
-
-.battle-camera .battle-side {
-  padding-inline: 13px;
-}
-
-.battle-camera__lens {
-  transform-origin: 50% 0;
-  transition:
-    transform 560ms cubic-bezier(0.45, 0, 0.2, 1),
-    transform-origin 560ms cubic-bezier(0.45, 0, 0.2, 1);
-}
-
-.battle-camera[data-focus='top'] .battle-camera__lens {
-  transform: scale(var(--camera-zoom));
-  transform-origin: 50% 0;
-}
-
-.battle-camera[data-focus='bottom'] .battle-camera__lens {
-  transform: scale(var(--camera-zoom));
-  transform-origin: 50% 100%;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .battle-camera__lens,
-  .battle-camera[data-focus] .battle-camera__lens {
-    transform: none;
-    transition: none;
   }
 }
 
