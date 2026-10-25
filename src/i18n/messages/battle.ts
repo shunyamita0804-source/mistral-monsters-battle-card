@@ -57,6 +57,7 @@ export const BATTLE = {
   // ノビトン（2026-10-25）
   'battle.log.manaDrain': { ja: '{side}のマナが{n}減った。', en: "{side}'s mana went down by {n}." },
   'battle.log.stun': { ja: '{name}は次のターン行動できない。', en: "{name} can't act next turn." },
+  'battle.log.shield': { ja: '{name}が受ける{stat}技のダメージ-{n}（相手の次のターンまで）。', en: '{name} takes -{n} {stat} damage (until the end of the next turn).' },
   'battle.log.redrawHand': {
     ja: '{side}は手札{n}枚を山札に戻してシャッフルし、{n}枚引いた。',
     en: '{side} shuffled {n} {n|card|cards} from hand into the deck and drew {n}.',
@@ -85,13 +86,21 @@ export const BATTLE = {
   'battle.ng.noHandToReturn': { ja: '戻す手札がありません', en: 'No other cards in hand to return' },
   'battle.ng.stunned': { ja: 'このターンは行動できません（まきつく）', en: "Can't act this turn (Coil)" },
   'battle.ng.evadeMinCost': { ja: '必要マナ{n}以上の攻撃にしか使えません', en: 'Only works against attacks costing {n}+ mana' },
+  'battle.ng.maxCost': { ja: '必要マナ{n}以下の攻撃にしか使えません', en: 'Only works against attacks costing {n} mana or less' },
   'battle.ng.defenseOnAttack': {
     ja: '防御・回避カードは相手の攻撃を受けたときに使います',
     en: 'Guard/Dodge cards are used when you are attacked',
   },
   'battle.ng.acted': { ja: '使えるモンスターは行動済みです', en: 'The monster has already acted' },
-  'battle.detail.recent': { ja: '{side}が使ったカード', en: 'Played by {side}' },
-  'battle.showcase': { ja: '{side}の「{card}」！', en: '{side}: {card}!' },
+  // 技を使ったときの演出（2026-10-25 リデザイン パートC）：フォーカスエリアに大きく、誰が誰に使ったかを1行で
+  'battle.spot.line': { ja: '{user}の「{card}」！', en: '{user}: {card}!' },
+  'battle.spot.lineTarget': { ja: '{user}の「{card}」！ → {target}', en: '{user}: {card}! → {target}' },
+  'battle.spot.whoPlayer': { ja: '{name}', en: '{name}' },
+  'battle.spot.whoOpponent': { ja: '相手の{name}', en: "Foe's {name}" },
+  'battle.spot.power': { ja: '{stat} {n}', en: '{stat} {n}' },
+  'battle.spot.guard': { ja: '防御 −{n}', en: 'Guard -{n}' },
+  'battle.spot.skip': { ja: 'タップで次へ', en: 'Tap to continue' },
+  'battle.spot.tapToSkip': { ja: 'タップで次へ', en: 'Tap to continue' },
   'battle.status.weaken': { ja: '{stat}−{n}', en: '{stat} -{n}' },
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
@@ -103,6 +112,7 @@ export const BATTLE = {
   'battle.talk.win': { ja: '今回はわたしの勝ちだね。', en: 'This one goes to me.' },
   'battle.talk.lose': { ja: '参った……強いね。', en: "I give up... you're strong." },
   'battle.status.taunted': { ja: '{only}だけ', en: '{only} only' },
+  'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（すなかけ）', en: "Can't attack this turn (Sand Throw)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
 
@@ -151,7 +161,7 @@ export const BATTLE = {
   'battle.log.title': { ja: 'これまでの経過', en: 'Battle Log' },
   'battle.log.open': { ja: 'これまでの経過を見る', en: 'Show battle log' },
   'battle.log.more': { ja: '経過', en: 'Log' },
-  // 操作のボタン（自分のモンスターの右）：自分の番でないときの札
+  // 操作のボタン（手札の下）：自分の番でないときの札
   'battle.dock.waiting': { ja: '相手の番', en: "Opponent's turn" },
   'battle.dock.defense': { ja: '守備を選ぶ', en: 'Choose defense' },
   'battle.dock.noDefense': { ja: '守備できるカードなし', en: 'No defense cards' },
@@ -196,14 +206,13 @@ export const BATTLE = {
   'battle.prompt.usable': { ja: '使えます', en: 'Usable' },
   'battle.prompt.unusable': { ja: '使えません', en: 'Cannot use' },
   'battle.prompt.hintMain': {
-    ja: '手札をタップ（指でなぞると見比べられます）すると、説明と「使う」が出ます。上へはじくとすぐ使えます。攻撃を終えるときは、自分のモンスターの右の「攻撃終了」',
-    en: 'Tap a card (swipe to compare) to see it and "Use". Flick a card up to use it right away. To end your attack, tap "End Attack" to the right of your monsters',
+    ja: '手札をタップ（指でなぞると見比べられます）すると、説明と「使う」が出ます。上へはじくとすぐ使えます。攻撃を終えるときは、下の「攻撃終了」',
+    en: 'Tap a card (swipe to compare) to see it and "Use". Flick a card up to use it right away. To end your attack, tap "End Attack" at the bottom',
   },
   'battle.prompt.hint': {
     ja: '手札のカードをタップするか指でなぞると、ここに説明と拡大したカードが出ます。',
     en: 'Tap or swipe across your hand to see card details and a larger view here.',
   },
-  'battle.detail.empty': { ja: 'カード', en: 'Card' },
 
   // 手札
   'battle.hand.aria': { ja: '手札', en: 'Hand' },
@@ -240,9 +249,6 @@ export const BATTLE = {
   'battle.banner.turn.opponent': { ja: '相手のターン', en: "Opponent's Turn" },
   'battle.banner.mana.player': { ja: 'あなたのマナ化', en: 'Your Mana Phase' },
   'battle.banner.mana.opponent': { ja: '相手のマナ化', en: "Opponent's Mana Phase" },
-  'battle.banner.subFirst': { ja: '先攻1ターン目：マナ化だけ（{n}枚まで）', en: 'First turn: Mana only (up to {n})' },
-  'battle.banner.subMana': { ja: 'マナ化', en: 'Mana Phase' },
-  'battle.banner.subMain': { ja: 'ドロー → 攻撃', en: 'Draw → Attack' },
   'battle.turnBar': { ja: '{n}手番・{who}・{phase}', en: 'Turn {n} · {who} · {phase}' },
   'battle.turnBar.ended': { ja: '対戦終了', en: 'Battle Over' },
   'battle.phase.main': { ja: '攻撃', en: 'Attack' },

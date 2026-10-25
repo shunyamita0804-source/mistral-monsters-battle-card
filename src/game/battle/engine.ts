@@ -3,8 +3,9 @@ import { BATTLE_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import {
-  evadeMinCost,
   guardAgainst,
+  guardMaxCost,
+  guardMinCost,
   guardReduction,
   skillValue,
   statLabel,
@@ -54,6 +55,11 @@ export interface BattleMonster {
   readonly taunt?: { readonly monsterId: string; readonly turn: number } | null;
   /** この手番（turn）の間は技を使えない（攻撃も特殊も。正式：ノビトンのまきつく「次ターン行動不可」2026-10-25。守備のカードは使える） */
   readonly stunnedTurn?: number | null;
+  /**
+   * 受ける against の技のダメージを reduce 減らす。untilTurn の手番が終わるまで（正式：ミュロルのしめったはだ 2026-10-25。
+   * 使った手番を含む2手番＝相手の次の手番まで）。重ねがけはしない
+   */
+  readonly shield?: { readonly against: StatType | 'all'; readonly reduce: number; readonly untilTurn: number } | null;
 }
 
 export interface HandCard {
@@ -328,9 +334,12 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (attack.type === 'attack' && type === 'defense' && attack.unblockable) return NO(t('battle.ng.unblockable'));
     // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）
     if (attack.type === 'attack' && type === 'evade' && attack.undodgeable) return NO(t('battle.ng.undodgeable'));
-    // 「必要マナ2以上の〜を回避」：受ける攻撃カードに印字された必要マナで判定（いまのマナの残りではない）
-    const minCost = evadeMinCost(skill);
+    // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
+    // 受ける攻撃カードに印字された必要マナで判定（いまのマナの残りではない）
+    const minCost = guardMinCost(skill);
     if (minCost > 0 && attackCard.cost < minCost) return NO(t('battle.ng.evadeMinCost', { n: minCost }));
+    const maxCost = guardMaxCost(skill);
+    if (maxCost !== null && attackCard.cost > maxCost) return NO(t('battle.ng.maxCost', { n: maxCost }));
     if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
     return YES;
   }
@@ -513,11 +522,27 @@ export function pendingDamage(pending: PendingAttack): number {
   return Math.max(0, pending.power - reduction);
 }
 
+/** monster にかかっている「受ける stat の技のダメージ−」の量（正式：ミュロルのしめったはだ。期限が過ぎていれば 0） */
+export function shieldOf(state: BattleState, monster: BattleMonster | undefined, stat: StatType): number {
+  const sh = monster?.shield;
+  if (!sh || state.turn > sh.untilTurn) return 0;
+  return sh.against === 'all' || sh.against === stat ? sh.reduce : 0;
+}
+
+/**
+ * 守備のあとに実際に受けるダメージ（pendingDamage から、狙われたモンスターのしめったはだの分を引く。0未満にならない）。
+ * 防御カードの合計と同じく、引いてから最後に0で止める
+ */
+export function incomingDamage(state: BattleState, pending: PendingAttack): number {
+  const target = findMonster(state, pending.targetUid)?.monster;
+  return Math.max(0, pendingDamage(pending) - shieldOf(state, target, pending.stat));
+}
+
 function resolvePending(state: BattleState): BattleState {
   const pending = state.pending;
   if (!pending) return state;
   const next: BattleState = { ...state, phase: 'main', pending: null };
-  const damage = pendingDamage(pending);
+  const damage = incomingDamage(state, pending);
   const target = findMonster(state, pending.targetUid);
   const evaded = pending.responses.some((id) => getSkill(id).effect.type === 'evade');
   let withFx = next;
@@ -622,9 +647,11 @@ function useCard(
   const skill = card;
   const users = availableUsers(state, side, skill);
   // 使うモンスターの指定がなければ、選んだ相手に攻撃できるモンスター（ちょうはつで限られていないもの）を選ぶ
+  // みずあび（自分を回復）は、指定がなければライフの一番減っているモンスターが使う（同じモンスターが2体以上いるとき）
+  const selfHealer = skill.effect.type === 'healSelf' ? [...users].sort((a, b) => a.life - a.maxLife - (b.life - b.maxLife))[0] : undefined;
   const user = userUid
     ? users.find((m) => m.uid === userUid)
-    : (targetUid ? users.find((u) => targetsFor(state, side, skill, u).some((m) => m.uid === targetUid)) : undefined) ?? users[0];
+    : (selfHealer ?? (targetUid ? users.find((u) => targetsFor(state, side, skill, u).some((m) => m.uid === targetUid)) : undefined) ?? users[0]);
   if (!user) return state;
 
   const targets = targetsFor(state, side, skill, user);
@@ -647,8 +674,10 @@ function useCard(
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
-        const hit = applyDamage(power > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, power);
-        return attackRiders(power > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, side, target.uid);
+        // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
+        const dealt = Math.max(0, power - shieldOf(state, target, skill.stat.type));
+        const hit = applyDamage(dealt > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, dealt);
+        return attackRiders(dealt > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, side, target.uid);
       }
       return {
         ...next,
@@ -666,6 +695,18 @@ function useCard(
     }
     case 'heal':
       return target ? healMonster(next, target, skillValue(skill)) : state;
+    case 'healSelf': {
+      // みずあび：使ったモンスター自身を回復（最大ライフまで）
+      const self = findMonster(next, user.uid)?.monster;
+      return self ? healMonster(next, self, skill.effect.amount) : state;
+    }
+    case 'shield': {
+      // しめったはだ：使った手番（turn）を含めて turns 手番のあいだ。重ねがけはせず、もう一度使ったら期限だけ新しく
+      const e = skill.effect;
+      next = updateMonster(next, user.uid, { shield: { against: e.against, reduce: e.reduce, untilTurn: state.turn + e.turns - 1 } });
+      const stat = e.against === 'all' ? t('card.stat.all') : statLabel(e.against);
+      return addLog(next, t('battle.log.shield', { name: nameOf(user.cardId), stat, n: e.reduce }));
+    }
     case 'mana':
       return deckToMana(next, side, skillValue(skill));
     case 'draw':

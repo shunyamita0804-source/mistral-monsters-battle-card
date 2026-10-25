@@ -8,7 +8,8 @@ import {
   cardUsability,
   manaOf,
   otherSide,
-  pendingDamage,
+  incomingDamage,
+  shieldOf,
   targetsFor,
   type BattleAction,
   type BattleMonster,
@@ -78,6 +79,10 @@ export function chooseAction(state: BattleState, side: Side): BattleAction | nul
   if (wounded && heal) {
     return { type: 'useCard', side, cardUid: heal.card.uid, targetUid: wounded.uid };
   }
+  // みずあび（自分を回復）：使えるモンスターのライフが半分以下なら使う（仮の思考）
+  const selfHeal = options.filter(isSkillOption).find((o) => o.def.effect.type === 'healSelf');
+  const selfHealer = selfHeal ? availableUsers(state, side, selfHeal.def).find((m) => m.life <= m.maxLife / 2) : undefined;
+  if (selfHeal && selfHealer) return { type: 'useCard', side, cardUid: selfHeal.card.uid, userUid: selfHealer.uid };
 
   // 2. 全体カード：いまの場より自分に得になるときだけ出す（入れ替え合いでマナを無駄にしない）
   const current = state.field ? fieldScore(state, side, getSupport(state.field.cardId)) : 0;
@@ -107,6 +112,14 @@ export function chooseAction(state: BattleState, side: Side): BattleAction | nul
   const special = options.filter(isSkillOption).find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type));
   const strongestEnemy = [...enemies].sort((a, b) => b.life - a.life)[0];
   if (special && strongestEnemy) return attackAction(state, side, special, strongestEnemy.uid);
+  // しめったはだ：まだかかっておらず、相手にその種類の攻撃技を持つモンスターがいるときに使う（仮の思考）
+  const shield = options.filter(isSkillOption).find((o) => o.def.effect.type === 'shield');
+  if (shield && shield.def.effect.type === 'shield') {
+    const against = shield.def.effect.against;
+    const user = availableUsers(state, side, shield.def)[0];
+    const covered = user !== undefined && shieldOf(state, user, against === 'all' ? 'force' : against) > 0;
+    if (user && !covered && attackersWith(state, otherSide(side), against) > 0) return { type: 'useCard', side, cardUid: shield.card.uid, userUid: user.uid };
+  }
   // いたずら：相手の手札が2枚以上あるときに使う（仮の思考）
   const prank = options.filter(isSkillOption).find((o) => o.def.effect.type === 'handToDeck');
   if (prank && state.sides[otherSide(side)].hand.length >= 2) return { type: 'useCard', side, cardUid: prank.card.uid };
@@ -169,7 +182,7 @@ function chooseDefense(state: BattleState, side: Side): BattleAction | null {
   const pending = state.pending;
   if (!pending || pending.attacker === side) return null;
   const end: BattleAction = { type: 'defend', side, cardUid: null };
-  const damage = pendingDamage(pending);
+  const damage = incomingDamage(state, pending);
   if (damage === 0) return end;
   const target = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
   const options = usableOptions(state, side).filter(isSkillOption);

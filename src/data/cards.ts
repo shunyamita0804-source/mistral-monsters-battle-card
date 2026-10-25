@@ -2,6 +2,7 @@ import { createCardCatalog } from '../game/cards/cardCatalog.ts';
 import type { MonsterCard, PlayCard, Rarity, SkillCard, SkillEffect, StatType, SupportCard } from '../game/cards/cardTypes.ts';
 import { GAUUL_MONSTER, GAUUL_SKILLS } from './gauul.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
+import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
 import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
 
@@ -15,6 +16,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-23：初めての正式カード（ソラモの技16種）を src/data/soramo.ts から足した。仮カードは消さずに残す（セーブの所持カードを守るため）。
  * 2026-10-23：ラズックと技16種を src/data/lazuck.ts から足した（用途は未定）。
  * 2026-10-25：ノビトンと技16種を src/data/nobiton.ts から足した。
+ * 2026-10-25：ミュロルと技16種を src/data/myurol.ts から足した（モンスターカードの絵はまだ無い）。
  */
 
 interface MonsterSeed {
@@ -122,7 +124,7 @@ const HIDDEN_SKILLS: SkillCard[] = makeSkills('hidden', 'wisdom', [
   { no: 3, cost: 4, stat: 'main', value: 7, effect: { type: 'attack', unblockable: true, undodgeable: true }, rarity: 'R' },
 ]).map((s) => ({ ...s, name: s.name.replace('仮技HIDDEN', '隠し技（未確定）') }));
 
-export const MONSTERS: readonly MonsterCard[] = [...MONSTER_SEEDS.map(makeMonster), HIDDEN_MONSTER, SORAMO_MONSTER, LAZUCK_MONSTER, GAUUL_MONSTER, NOBITON_MONSTER];
+export const MONSTERS: readonly MonsterCard[] = [...MONSTER_SEEDS.map(makeMonster), HIDDEN_MONSTER, SORAMO_MONSTER, LAZUCK_MONSTER, GAUUL_MONSTER, NOBITON_MONSTER, MYUROL_MONSTER];
 
 export const SKILLS: readonly SkillCard[] = [
   ...MONSTER_SEEDS.flatMap((seed, i) => makeSkills(seed.key, seed.main, skillSeeds(i))),
@@ -131,6 +133,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...LAZUCK_SKILLS,
   ...GAUUL_SKILLS,
   ...NOBITON_SKILLS,
+  ...MYUROL_SKILLS,
 ];
 
 /**

@@ -132,16 +132,16 @@ export const STORY = {
   'story.hint.title': { ja: 'ヒント', en: 'Tip' },
   'story.hint.ok': { ja: 'わかった', en: 'Got it' },
   'story.hint.monsters': {
-    ja: '下の3体があなたのモンスターカード、上の3体が相手。カードの下の数字がライフです。',
-    en: "The three cards at the bottom are your monsters; the top three are your opponent's. The number under each card is its Life.",
+    ja: '下の3体があなたのモンスター、上の3体が相手。絵の下の数字がライフです。',
+    en: "The three monsters at the bottom are yours; the top three are your opponent's. The number under each one is its Life.",
   },
   'story.hint.firstMana': {
     ja: '先攻の最初のターンは攻撃できません。手札を2枚までマナにできます（カード1枚＝1マナ）。選んだら「マナにする」、終わったら「ターン終了」。',
     en: "On the first player's first turn you can't attack. You can turn up to 2 cards into Mana (1 card = 1 Mana). Pick them, tap Make Mana, then End Turn.",
   },
   'story.hint.attack': {
-    ja: '攻撃：手札の技カードを選んで「使う」。マナが足りる技だけ使えます（1体につき1ターン1回）。攻撃を終えるときは、自分のモンスターの右の「攻撃終了」。',
-    en: "Attack: pick a skill card in your hand and tap Use. You can only use skills you have enough Mana for (once per monster per turn). To finish attacking, tap End Attack to the right of your monsters.",
+    ja: '攻撃：手札の技カードを選んで「使う」。マナが足りる技だけ使えます（1体につき1ターン1回）。攻撃を終えるときは、下の「攻撃終了」。',
+    en: "Attack: pick a skill card in your hand and tap Use. You can only use skills you have enough Mana for (once per monster per turn). To finish attacking, tap End Attack at the bottom.",
   },
   'story.hint.mana': {
     ja: 'マナ化：使わないカードを選んで「マナにする」。カード1枚＝1マナで、マナは次のターンにも残ります。終わったら「ターン終了」。',

@@ -1,0 +1,17 @@
+﻿id,number,name,type,mana,effect_text,distribution_proposal,distribution_confirmed,image
+myurol_01,1,たいあたり,ちから,1,ダメージ1,initial,False,SKILLS/Myurol_01_たいあたり.png
+myurol_02,2,しっぽたたき,ちから,2,ダメージ2,initial,False,SKILLS/Myurol_02_しっぽたたき.png
+myurol_03,3,連続ひっかき,ちから,3,ダメージ3,collectible,False,SKILLS/Myurol_03_連続ひっかき.png
+myurol_04,4,アクアテール,ちから,4,ダメージ4,collectible,False,SKILLS/Myurol_04_アクアテール.png
+myurol_05,5,みずでっぽう,かしこさ,1,ダメージ1,initial,False,SKILLS/Myurol_05_みずでっぽう.png
+myurol_06,6,バブルショット,かしこさ,2,ダメージ2,initial,False,SKILLS/Myurol_06_バブルショット.png
+myurol_07,7,アクアボール,かしこさ,3,ダメージ3,collectible,False,SKILLS/Myurol_07_アクアボール.png
+myurol_08,8,しめったはだ,特殊,2,発動ターンを含む2ターン、受けるちから技ダメージ-1（重複なし）,initial,False,SKILLS/Myurol_08_しめったはだ.jpg
+myurol_09,9,みずあび,特殊,3,自分のライフ1回復（最大7）,collectible,False,SKILLS/Myurol_09_みずあび.jpg
+myurol_10,10,しっぽガード,防御,1,ちから技ダメージ-2,initial,False,SKILLS/Myurol_10_しっぽガード.jpg
+myurol_11,11,みずのまく,防御,1,かしこさ技ダメージ-2,initial,False,SKILLS/Myurol_11_みずのまく.jpg
+myurol_12,12,ぬるぬるガード,防御,1,ちから・かしこさ技ダメージ-2,collectible,False,SKILLS/Myurol_12_ぬるぬるガード.jpg
+myurol_13,13,ぷるぷるガード,防御,0,ちから・かしこさ技ダメージ-1,initial,False,SKILLS/Myurol_13_ぷるぷるガード.jpg
+myurol_14,14,スリップガード,防御,2,相手の消費マナ3以上のちから・かしこさ技ダメージ-4,collectible,False,SKILLS/Myurol_14_スリップガード.jpg
+myurol_15,15,ひらりよける,回避,2,ちから技を完全回避,collectible,False,SKILLS/Myurol_15_ひらりよける.jpg
+myurol_16,16,すべってよける,回避,3,相手の消費マナ2以下のちから・かしこさ技を完全回避,collectible,False,SKILLS/Myurol_16_すべってよける.jpg

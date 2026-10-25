@@ -92,12 +92,19 @@ export type SkillEffect =
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
    * 仮カードは持たず、stat の値と種類を使う
    */
-  | { readonly type: 'defense'; readonly reduce?: number; readonly against?: StatType | 'all' }
+  | {
+      readonly type: 'defense';
+      readonly reduce?: number;
+      readonly against?: StatType | 'all';
+      /** 受ける攻撃カードに印字された必要マナがこの値以上のときだけ使える（正式：ミュロルのスリップガード 2026-10-25。いまのマナの残りではない） */
+      readonly minCost?: number;
+    }
   /**
    * 回避：ダメージを0に。正式カードは against（'all'＝攻撃すべて）。仮カードは stat の種類。
    * minCost（2026-10-24）：受ける攻撃カードに印字された必要マナがこの値以上のときだけ回避できる（なければ条件なし）
+   * maxCost（2026-10-25 正式：ミュロルのすべってよける）：受ける攻撃カードに印字された必要マナがこの値以下のときだけ回避できる
    */
-  | { readonly type: 'evade'; readonly against?: StatType | 'all'; readonly minCost?: number }
+  | { readonly type: 'evade'; readonly against?: StatType | 'all'; readonly minCost?: number; readonly maxCost?: number }
   /**
    * 特殊：選んだ相手モンスターの stat の技のダメージを amount 減らす。
    * duration なし（正式：ソラモの吠える）＝次にその種類の技を使うまで。'nextTurn'（正式：ラズックのダストキック）＝相手の次の手番の間だけ
@@ -122,6 +129,13 @@ export type SkillEffect =
   | { readonly type: 'redrawHand' }
   /** 特殊（正式：ノビトンの不思議な嗅覚 2026-10-25）：相手の手札をすべて確認する（画面に表を見せる。手札は動かさない） */
   | { readonly type: 'revealHand' }
+  /**
+   * 特殊（正式：ミュロルのしめったはだ 2026-10-25）：使ったモンスターが受ける against の技のダメージを reduce 減らす。
+   * 使った手番を含めて turns 手番のあいだ続く。重ねがけはしない（もう一度使っても reduce は同じまま、期限だけ新しく）
+   */
+  | { readonly type: 'shield'; readonly against: StatType | 'all'; readonly reduce: number; readonly turns: number }
+  /** 特殊（正式：ミュロルのみずあび 2026-10-25）：使ったモンスターのライフを amount 回復する（最大ライフまで） */
+  | { readonly type: 'healSelf'; readonly amount: number }
   | { readonly type: 'heal' }
   | { readonly type: 'mana' }
   | { readonly type: 'draw' };
@@ -180,6 +194,17 @@ export function guardAgainst(skill: SkillCard): StatType | 'all' {
 /** 回避できる攻撃の必要マナの下限（「必要マナ2以上の〜を回避」）。条件がなければ 0 */
 export function evadeMinCost(skill: SkillCard): number {
   return skill.effect.type === 'evade' ? (skill.effect.minCost ?? 0) : 0;
+}
+
+/** 防御・回避が使える攻撃カードの必要マナの下限（防御：ミュロルのスリップガード、回避：evadeMinCost と同じ）。条件がなければ 0 */
+export function guardMinCost(skill: SkillCard): number {
+  const e = skill.effect;
+  return e.type === 'defense' || e.type === 'evade' ? (e.minCost ?? 0) : 0;
+}
+
+/** 回避が使える攻撃カードの必要マナの上限（正式：ミュロルのすべってよける「消費マナ2以下」）。条件がなければ null */
+export function guardMaxCost(skill: SkillCard): number | null {
+  return skill.effect.type === 'evade' ? (skill.effect.maxCost ?? null) : null;
 }
 
 /** 相手モンスター1体を選んで使う技か（攻撃・特殊） */
@@ -277,9 +302,10 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'redrawHand' | 'revealHand';
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'redrawHand', 'revealHand', 'shield', 'healSelf'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
-  return type === 'weaken' || type === 'seal' || type === 'taunt' || type === 'handToDeck' || type === 'redrawHand' || type === 'revealHand';
+  return TEXT_ONLY_SPECIALS.includes(type);
 }
 
 /** 技カードの効果説明（ゲーム側で表示する文字） */

@@ -352,19 +352,6 @@
   font-family: var(--font-display);
 }
 
-/* ===== 第6弾 1：使ったカードを見せるときの光の帯（今の暗い帯の真ん中に重ねる） ===== */
-.battle__showcase-band {
-  background:
-    url('@assets/images/ui/battle/showcase_band.webp') center / 100% auto no-repeat,
-    linear-gradient(90deg, rgb(6 7 10 / 0) 0%, rgb(6 7 10 / 0.82) 18%, rgb(6 7 10 / 0.86) 50%, rgb(6 7 10 / 0.82) 82%, rgb(6 7 10 / 0) 100%);
-}
-
-.battle__showcase--opponent .battle__showcase-band {
-  background:
-    url('@assets/images/ui/battle/showcase_band.webp') center / 100% auto no-repeat,
-    linear-gradient(90deg, rgb(30 6 10 / 0) 0%, rgb(30 8 12 / 0.84) 18%, rgb(36 8 14 / 0.88) 50%, rgb(30 8 12 / 0.84) 82%, rgb(30 6 10 / 0) 100%);
-}
-
 /* ===== 第6弾 2：ターンの切り替わりの帯（自分＝紺・相手＝えんじ） ===== */
 .battle__banner {
   left: 8px;

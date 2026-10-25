@@ -1,0 +1,185 @@
+{
+  "monster": "ミュロル",
+  "rank": "C",
+  "life": 7,
+  "images_approved": true,
+  "distribution_confirmed": false,
+  "skills": [
+    {
+      "id": "myurol_01",
+      "number": 1,
+      "name": "たいあたり",
+      "type": "ちから",
+      "mana": 1,
+      "effect_text": "ダメージ1",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_01_たいあたり.png"
+    },
+    {
+      "id": "myurol_02",
+      "number": 2,
+      "name": "しっぽたたき",
+      "type": "ちから",
+      "mana": 2,
+      "effect_text": "ダメージ2",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_02_しっぽたたき.png"
+    },
+    {
+      "id": "myurol_03",
+      "number": 3,
+      "name": "連続ひっかき",
+      "type": "ちから",
+      "mana": 3,
+      "effect_text": "ダメージ3",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_03_連続ひっかき.png"
+    },
+    {
+      "id": "myurol_04",
+      "number": 4,
+      "name": "アクアテール",
+      "type": "ちから",
+      "mana": 4,
+      "effect_text": "ダメージ4",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_04_アクアテール.png"
+    },
+    {
+      "id": "myurol_05",
+      "number": 5,
+      "name": "みずでっぽう",
+      "type": "かしこさ",
+      "mana": 1,
+      "effect_text": "ダメージ1",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_05_みずでっぽう.png"
+    },
+    {
+      "id": "myurol_06",
+      "number": 6,
+      "name": "バブルショット",
+      "type": "かしこさ",
+      "mana": 2,
+      "effect_text": "ダメージ2",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_06_バブルショット.png"
+    },
+    {
+      "id": "myurol_07",
+      "number": 7,
+      "name": "アクアボール",
+      "type": "かしこさ",
+      "mana": 3,
+      "effect_text": "ダメージ3",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_07_アクアボール.png"
+    },
+    {
+      "id": "myurol_08",
+      "number": 8,
+      "name": "しめったはだ",
+      "type": "特殊",
+      "mana": 2,
+      "effect_text": "発動ターンを含む2ターン、受けるちから技ダメージ-1（重複なし）",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_08_しめったはだ.jpg"
+    },
+    {
+      "id": "myurol_09",
+      "number": 9,
+      "name": "みずあび",
+      "type": "特殊",
+      "mana": 3,
+      "effect_text": "自分のライフ1回復（最大7）",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_09_みずあび.jpg"
+    },
+    {
+      "id": "myurol_10",
+      "number": 10,
+      "name": "しっぽガード",
+      "type": "防御",
+      "mana": 1,
+      "effect_text": "ちから技ダメージ-2",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_10_しっぽガード.jpg"
+    },
+    {
+      "id": "myurol_11",
+      "number": 11,
+      "name": "みずのまく",
+      "type": "防御",
+      "mana": 1,
+      "effect_text": "かしこさ技ダメージ-2",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_11_みずのまく.jpg"
+    },
+    {
+      "id": "myurol_12",
+      "number": 12,
+      "name": "ぬるぬるガード",
+      "type": "防御",
+      "mana": 1,
+      "effect_text": "ちから・かしこさ技ダメージ-2",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_12_ぬるぬるガード.jpg"
+    },
+    {
+      "id": "myurol_13",
+      "number": 13,
+      "name": "ぷるぷるガード",
+      "type": "防御",
+      "mana": 0,
+      "effect_text": "ちから・かしこさ技ダメージ-1",
+      "distribution_proposal": "initial",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_13_ぷるぷるガード.jpg"
+    },
+    {
+      "id": "myurol_14",
+      "number": 14,
+      "name": "スリップガード",
+      "type": "防御",
+      "mana": 2,
+      "effect_text": "相手の消費マナ3以上のちから・かしこさ技ダメージ-4",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_14_スリップガード.jpg"
+    },
+    {
+      "id": "myurol_15",
+      "number": 15,
+      "name": "ひらりよける",
+      "type": "回避",
+      "mana": 2,
+      "effect_text": "ちから技を完全回避",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_15_ひらりよける.jpg"
+    },
+    {
+      "id": "myurol_16",
+      "number": 16,
+      "name": "すべってよける",
+      "type": "回避",
+      "mana": 3,
+      "effect_text": "相手の消費マナ2以下のちから・かしこさ技を完全回避",
+      "distribution_proposal": "collectible",
+      "distribution_confirmed": false,
+      "image": "SKILLS/Myurol_16_すべってよける.jpg"
+    }
+  ]
+}
