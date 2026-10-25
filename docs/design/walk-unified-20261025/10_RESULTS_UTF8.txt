@@ -88,3 +88,7 @@
 ・ユーザーが案2を選択：上の段を丸ごと左右反転した見本（mirror/1_pose_ref.png）を渡し、「このポーズのまま、かばん・飾りだけ元の側に」と頼む
   正面 male/front/mirror/、背中 male/back/mirror/（1_pose_ref・2_stand・3_PROMPT）
 ・正面（player_male_front_walk8_m1.png）：下の段の足と腕は見本どおり（反対の足・反対の腕が前）。かばん・くさりの飾りは画面の右のまま（戻っていない）→ male/front/mirror/4_FIX_bag.txt
+・正面（m2・かばんの直しのあと）：かばん・飾りは 5 だけ動いて 6〜8 は右のまま（ばらばら）→ 使わない
+・組み込み：1回目（m1）の8コマをそのまま使う（腕・足は交互、かばん・飾りは1歩ごとに左右へ移る。ユーザーに事前に説明済み）
+  python3 tools/art/unified_build.py design-parts/characters-adult/sheets-outlined/player_male_sheet.webp male 0 design-parts/characters-adult/motion-v2/player_male_front_walk8_m1.png
+  → blue_tone.py → sheets-outlined/ に上書き → python3 tools/art/ground_figures.py
