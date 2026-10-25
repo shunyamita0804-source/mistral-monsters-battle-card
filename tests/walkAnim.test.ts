@@ -9,6 +9,7 @@ import {
   facing,
   FRAMES_PER_STEP,
   frameOf,
+  frameWeightsOf,
   framesPerSecond,
   isContactFrame,
   isWalking,
@@ -16,8 +17,11 @@ import {
   sheetRow,
   sheetStatus,
   squashOf,
+  SIDE_FRAME_WEIGHTS,
+  STEP_BY_VIEW,
   STEP_PER_HEIGHT,
   strideOf,
+  viewOf,
   WALK_COLS,
   WALK_HOLD_MS,
   WALK_PX,
@@ -275,5 +279,41 @@ describe('シートに入っている絵', () => {
     expect(sheetRow('left', 'downleft', false)).toBe(2);
     expect(sheetStatus('male', 3).mirrored).toBe(true);
     expect(sheetStatus('male', 2).mirrored).toBe(false);
+  });
+});
+
+describe('向きごとの歩幅とコマの長さ（2026-10-25 描き直した絵）', () => {
+  it('横（左・右）は絵で測った歩幅、縦（正面・背中）は足の回り方を遅くした長い歩幅', () => {
+    expect(viewOf('left')).toBe('side');
+    expect(viewOf('right')).toBe('side');
+    expect(viewOf('up')).toBe('vertical');
+    expect(viewOf('down')).toBe('vertical');
+    expect(strideOf(FIGURE_H, false, 'side')).toBeCloseTo(FIGURE_H * STEP_BY_VIEW.side.walk);
+    expect(strideOf(FIGURE_H, true, 'side')).toBeCloseTo(FIGURE_H * STEP_BY_VIEW.side.run);
+    // 縦は前の値より足の回り方が遅い（1歩が長い）
+    expect(strideOf(FIGURE_H, false, 'vertical')).toBeGreaterThan(strideOf(FIGURE_H, false));
+    expect(strideOf(FIGURE_H, true, 'vertical')).toBeGreaterThan(strideOf(FIGURE_H, true));
+  });
+
+  it('横の行は、1歩の4コマを割合どおりの長さで出す。順に 0〜7 をくり返し、飛び・戻りがない', () => {
+    const w = frameWeightsOf('left', false);
+    expect(w).toEqual(SIDE_FRAME_WEIGHTS.walk);
+    expect(frameWeightsOf('up', false)).toBeUndefined();
+    const seen: number[] = [];
+    const length = new Map<number, number>();
+    const d = 1 / 2000;
+    for (let phase = 0; phase < 4; phase += d) {
+      const f = frameOf(phase, w);
+      if (f !== seen[seen.length - 1]) seen.push(f);
+      length.set(f, (length.get(f) ?? 0) + d);
+    }
+    expect(seen).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7]);
+    // 2周したので、各コマの長さは 割合×2
+    SIDE_FRAME_WEIGHTS.walk.forEach((x, i) => {
+      expect(length.get(i)).toBeCloseTo(x * 2, 2);
+      expect(length.get(i + 4)).toBeCloseTo(x * 2, 2);
+    });
+    // 割合を渡さなければ前と同じ（同じ長さずつ）
+    expect(frameOf(0.3)).toBe(1);
   });
 });

@@ -26,6 +26,28 @@ export const RUN_RATE = 1.7;
  */
 export const STEP_PER_HEIGHT = 0.38;
 /**
+ * 2026-10-25（描き直した絵・ユーザー「上下は足が動く割に進まない。左右は歩幅が大きい割に進まない。走りも歩幅と進む距離がずれる」）：
+ * 1歩の長さを向きごとに。コマの高さ（figureH）に対する割合。
+ * - 横（左・右）：新しい絵で、地面に着いた足がコマからコマへ動く位置を読み、その足が地面にとどまって見える長さ（下の割合と組み合わせて、
+ *   足のすべりがいちばん小さくなる値。画面では横に FIGURE_WIDEN 1.1 倍で出すのも入れて計算）。
+ *   歩き 0.44（前は 0.38。前の値では絵の歩幅より進まなかった）・走り 0.68（前は 0.7）。計算上の足のすべりは 歩き 49→26px・走り 47→24px（コマの高さ 360px）
+ * - 縦（正面・背中）：足が奥・手前に動くので絵から測れない。ユーザー「足が動く割に進まない」から、足の回り方を遅くした
+ *   （歩きは前の 0.38 の約 1.3 倍、走りは 0.7 の約 1.15 倍。Claude の判断。iPhone で確認して直す）
+ */
+export const STEP_BY_VIEW: Readonly<Record<'side' | 'vertical', { readonly walk: number; readonly run: number }>> = {
+  side: { walk: 0.44, run: 0.68 },
+  vertical: { walk: 0.5, run: 0.8 },
+};
+/**
+ * 横の行で、1歩（4コマ）のうち各コマを出す長さの割合（2026-10-25）。新しい絵は、コマからコマへ地面の足が動く量がそろっていない
+ * （歩き：つま先が 66→80→154→200 px、走り：着地のあと 40→107→202 px で、そのあと宙に浮く）。同じ長さずつ出すと足がすべって見えるので、
+ * 足が大きく動くコマを長く、着いた直後のコマ（次の1歩の1コマ目とほぼ同じ絵）を短く。左足の1歩（コマ4〜7）も同じ割合
+ */
+export const SIDE_FRAME_WEIGHTS: Readonly<Record<'walk' | 'run', readonly [number, number, number, number]>> = {
+  walk: [0.1, 0.35, 0.45, 0.1],
+  run: [0.22, 0.4, 0.28, 0.1],
+};
+/**
  * 走りの1歩（コマの高さに対する割合）。2026-10-24 第3版の走りの絵（男性・左向き）：着地のときの前後の足の幅がコマの高さの約 0.56、
  * そこに両足が浮いて進むぶんを足して 0.7 に（走る速さ 315px/秒 で約 4.6歩/秒・18コマ/秒）。走りの絵が無い向きも同じ値
  */
@@ -87,9 +109,15 @@ export const PLAYER_V2_ROWS: Readonly<Record<PlayerGender, ReadonlySet<number>>>
  */
 export const PLAYER_RUN_ART_ROWS: Readonly<Record<PlayerGender, ReadonlySet<number>>> = { male: new Set([4, 5, 6, 7]), female: new Set([6, 7]) };
 
-/** 1歩の長さ（論理px）。figureH は人物のコマの高さ（論理px） */
-export function strideOf(figureH: number, running: boolean): number {
+/** 1歩の長さ（論理px）。figureH は人物のコマの高さ（論理px）。view を渡すと向きごとの長さ（STEP_BY_VIEW。2026-10-25〜 歩行画面はこちら） */
+export function strideOf(figureH: number, running: boolean, view?: 'side' | 'vertical'): number {
+  if (view) return figureH * STEP_BY_VIEW[view][running ? 'run' : 'walk'];
   return figureH * (running ? RUN_STEP_PER_HEIGHT : STEP_PER_HEIGHT);
+}
+
+/** 向き → 1歩の長さの種類（左・右＝横、正面・背中＝縦） */
+export function viewOf(dir: Direction): 'side' | 'vertical' {
+  return dir === 'left' || dir === 'right' ? 'side' : 'vertical';
 }
 
 /**
@@ -133,9 +161,27 @@ export function advancePhase(phase: number, dist: number, stride: number, animSc
   return phase + (dist / stride) * animScale;
 }
 
-/** 位相（歩数）→ 歩きのコマ（0〜7）。右足が着く＝0、左足が着く＝4 */
-export function frameOf(phase: number): number {
-  return Math.floor(phase * FRAMES_PER_STEP) % WALK_COLS;
+/**
+ * 位相（歩数）→ 歩きのコマ（0〜7）。右足が着く＝0、左足が着く＝4。
+ * weights（1歩の4コマを出す長さの割合。SIDE_FRAME_WEIGHTS）を渡すと、コマごとに出す長さを変える（なければ同じ長さずつ）
+ */
+export function frameOf(phase: number, weights?: readonly number[]): number {
+  if (!weights) return Math.floor(phase * FRAMES_PER_STEP) % WALK_COLS;
+  const steps = Math.floor(phase);
+  const half = steps % 2;
+  const total = weights.reduce((a, b) => a + b, 0);
+  let t = (phase - steps) * total;
+  let i = 0;
+  while (i < FRAMES_PER_STEP - 1 && t >= (weights[i] ?? 0)) {
+    t -= weights[i] ?? 0;
+    i += 1;
+  }
+  return half * FRAMES_PER_STEP + i;
+}
+
+/** その行の、1歩の4コマを出す長さの割合（横の行だけ。縦の行は同じ長さずつ＝undefined） */
+export function frameWeightsOf(dir: Direction, running: boolean): readonly number[] | undefined {
+  return viewOf(dir) === 'side' ? SIDE_FRAME_WEIGHTS[running ? 'run' : 'walk'] : undefined;
 }
 
 /** 足が地面に着くコマか（足音を鳴らすコマ） */

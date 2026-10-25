@@ -38,6 +38,7 @@ import {
   PLAYER_FOOT_X,
   PLAYER_FRAME_W,
   frameOf,
+  frameWeightsOf,
   FRAMES_PER_STEP,
   framesPerSecond,
   IDLE_COL,
@@ -50,6 +51,7 @@ import {
   sheetRow,
   squashOf,
   strideOf,
+  viewOf,
   walkSpeed,
   type Diagonal,
   type PlayerGender,
@@ -476,7 +478,7 @@ export class WorldView {
 
   /** いまの1歩の長さ（論理px） */
   get #stride(): number {
-    return strideOf(this.#figureH, this.#running);
+    return strideOf(this.#figureH, this.#running, viewOf(this.#dir));
   }
 
   /** 確認画面の「その場で動かす」で歩いている最中か */
@@ -910,9 +912,10 @@ export class WorldView {
   #oneFrameDt(): number {
     const dev = this.#dev?.state;
     if (!dev) return 0;
-    const before = frameOf(this.#phase);
+    const weights = frameWeightsOf(this.#dir, this.#running);
+    const before = frameOf(this.#phase, weights);
     let total = 0;
-    for (let i = 0; i < 400 && frameOf(this.#phase) === before; i += 1) {
+    for (let i = 0; i < 400 && frameOf(this.#phase, weights) === before; i += 1) {
       const slice = 1 / 240;
       if (this.#busy) break;
       this.#step(slice);
@@ -1091,7 +1094,7 @@ export class WorldView {
     const hgt = parseFloat(this.#player.style.height);
     if (!walking) this.#phase = 0;
     // 1歩を4コマで送る（1周＝右足・左足の2歩＝8コマ）。背たけが小さいダンジョンでは歩幅も小さく、走るときは歩幅を大きく（walkAnim.ts）
-    const step = frameOf(this.#phase);
+    const step = frameOf(this.#phase, frameWeightsOf(this.#dir, walking && this.#running));
     const col = walking ? step : IDLE_COL;
     // 足音：足が地面に着くコマ（右足が着く＝0・左足が着く＝4）に変わったときに1歩
     if (!walking) this.#stepCol = -1;

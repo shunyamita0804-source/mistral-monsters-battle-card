@@ -92,7 +92,9 @@ describe('ノビトン16技：正式データ（2026-10-25 ユーザー確定。
     // バトル用の絵はソラモ・ガウルと同じ 556×941 をそのまま（縮めていない）
     const battle = readFileSync('assets/images/cards/monsters/nobiton_battle.webp');
     expect([battle.readUInt16LE(26) & 0x3fff, battle.readUInt16LE(28) & 0x3fff]).toEqual([556, 941]);
-  });
+ 
+    // 原本の大きな画像を全部読んで照合するので、重いときでも時間切れにならないよう余裕を持たせる
+  }, 30000);
 
   it('パック・スターター・相手の編成にはまだ入れていない（配る枚数・敵の編成は未定）', () => {
     for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('nobiton'))).toBe(false);

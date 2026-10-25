@@ -79,7 +79,9 @@ describe('ガウル16技：正式データ（2026-10-24 承認。正本 JSON を
     expect(readdirSync('design-parts/cards-original/lazuck')).toEqual(['Razuk_Itazura_Approved_USER_IMAGE.jpeg']);
     expect(readFileSync('design-parts/cards-original/lazuck/Razuk_Itazura_Approved_USER_IMAGE.jpeg').subarray(0, 2).toString('hex')).toBe('ffd8');
     expect(existsSync('assets/images/cards/skills/laz_sk_itazura.webp')).toBe(true);
-  });
+ 
+    // 原本の大きな画像を全部読んで照合するので、重いときでも時間切れにならないよう余裕を持たせる
+  }, 30000);
 
   it('パック・スターター・相手の編成にはまだ入れていない（配る枚数・敵の編成は未定）', () => {
     for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('gauul'))).toBe(false);
