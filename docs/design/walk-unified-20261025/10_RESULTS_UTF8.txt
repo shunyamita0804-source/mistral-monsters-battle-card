@@ -43,3 +43,10 @@
 ・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 6 design-parts/characters-adult/motion-v2/player_male_left_run8_u.png --stand design-parts/characters-adult/player_male_left_stand_u.png --stretch-run design-parts/characters-adult/motion-v2/player_male_left_walk8_u.png --walk-cols 5
   （行6＝左の走り・行7＝右は反転）
 ・次：背中の歩き（male/back/。見本の列に背中の立ち姿も描いてもらう）
+
+■ 2026-10-25　男性・背中の歩き（6列×2段：左端が背中の立ち姿、歩きは1段5コマ＝10コマ）
+・頭を見本の列の立ち姿にそろえると、背は −3〜+1%（9 だけ −6%）。色も近い
+・足の運び（靴の裏が見える＝後ろの足）：1〜3・9＝左足が後ろ、4〜8・10＝右足が後ろ。8コマに 10,1,2,3,4,6,7,8 を使う（9 は小さく見えるので使わない）
+・背中の立ち姿は見本の列のもの（player_male_back_stand_u.png）。背の高さは正面の立ち絵と同じにした
+・組み込み：python3 tools/art/unified_build.py assets/images/characters/player_male_sheet.webp male 1 design-parts/characters-adult/motion-v2/player_male_back_walk_u_6col.png --cols 6 --pick 10,1,2,3,4,6,7,8 --stand sample --set-idle
+・次：背中の走り（male/back/1_ref_run.png・2_frame_run.png・3_guide_run.png・5_PROMPT_back_run.txt）

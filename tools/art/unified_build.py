@@ -14,7 +14,7 @@
 暗い輪郭 2px を付ける（ほかのコマと同じ）。左の行（2・6）を入れると、右（3・7）は左右反転で入る。
 
 使い方:
-  python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--cols 5] [--stand 向きの立ち絵.png|sample [--set-idle]]
+  python3 tools/art/unified_build.py シート.webp male|female 行 届いた絵.png [--cols 5|6 [--pick 1,2,…]] [--stand 向きの立ち絵.png|sample [--set-idle]]
       [--stretch-run 歩きの届いた絵.png [--walk-cols 5]] [--out 出力.webp] [--check 確認.png]
   行：0 正面・1 背中・2 左 の歩き、4 正面・5 背中・6 左 の走り
 """
@@ -74,8 +74,9 @@ def load_poses(path: str, cols: int = 4) -> tuple[list[Image.Image], list[Image.
         ys, xs = np.nonzero(m)
         out[int(ys.mean() // rh) * cols + int(xs.mean() // cw)][m] = arr[m]
     ims = [Image.fromarray(o) for o in out]
-    if cols == 5:
-        return ims[1:5] + ims[6:10], [ims[0], ims[5]]
+    if cols >= 5:
+        # 各段の左端は見本の列（立ち姿）。残りを上の段・下の段の順に並べる（6列のときは10コマ。--pick で8コマを選ぶ）
+        return ims[1:cols] + ims[cols + 1:], [ims[0], ims[cols]]
     return ims, []
 
 
@@ -126,6 +127,9 @@ def main(args: list[str]) -> None:
     out_path = opt(args, '--out', sheet_path)
     sheet = np.array(Image.open(sheet_path).convert('RGBA'))
     poses, samples = load_poses(src, int(opt(args, '--cols', '4')))
+    if '--pick' in args:
+        # 届いた絵のコマ（1から）のうち、ゲームの8コマに使うもの（例：6列で1段5コマのとき 1,2,3,4,6,7,8,9）
+        poses = [poses[int(n) - 1] for n in opt(args, '--pick').split(',')]
     # --stand sample：届いた絵の見本の列（左端・上の段）に画像AIが描いた立ち姿を使う（同じ絵の中なので歩きと同じ割合。2026-10-25 左向き）
     stand_arg = opt(args, '--stand')
     stand = samples[0] if stand_arg == 'sample' else opaque(Image.open(stand_arg or STANDS[gender]))
