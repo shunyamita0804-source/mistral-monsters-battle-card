@@ -62,3 +62,7 @@
 ・Claude の合成（正面：すねから下を左右反転、横：足の前後を入れ替え）は継ぎ目・見分けがつかない点が残り、使えなかった（tools/art/leg_swap.py は試作として残す）
 ・直し：下の段だけ足を入れ替えて描き直してもらう（male/front/13_FIX_walk_legs.txt・male/left/13_FIX_walk_legs.txt。1枚目に 14_now_*.png を添付）
 ・帽子・服の青：走りの青だけが鮮やか（左の走り +16%）→ tools/art/blue_tone.py で青い画素だけを行ごとに立ち止まりの青へ（全行）
+
+■ 2026-10-25　足の描き直し（1回目）
+・正面（player_male_front_walk8_u2.png）：下の段の 5・7 は反対の足が前（直った）。6・8 はまだ同じ足 → 15_FIX_walk_legs_2nd.txt で 6・8 だけ
+・左（player_male_left_walk8_u2.png）：下の段の 6 だけ直った。5・7・8 はまだ同じ形 → 15_FIX_walk_legs_2nd.txt で 5・7・8 だけ
