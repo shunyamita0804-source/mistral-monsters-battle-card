@@ -524,9 +524,11 @@ export class WorldView {
     const cls = el === this.#player ? 'world__shadow world__shadow--player' : 'world__shadow';
     const shadow = h('div', { class: cls, attrs: { 'aria-hidden': 'true' } });
     // 2026-10-23：人物が地面に立って見えるよう、影を大きく濃く（背景の絵の影の強さに合わせる）
-    // 2026-10-23（2回目）：靴に隠れないよう少し広く・少し下へ（足が地面に着いて見えるように）
-    const w = this.#figureH * 0.72;
-    Object.assign(shadow.style, { width: `${w}px`, height: `${w * 0.3}px`, marginLeft: `${-w / 2}px`, marginTop: `${-w * 0.11}px` });
+    // 2026-10-25 ユーザー「まだ背景に浮いているように見える。NPC も」：影の真ん中が足の裏より下にあり、影の上に立って（浮いて）見えた。
+    // 影の真ん中を足の裏の線に合わせ、平たい楕円に（濃い所は靴のまわりだけ。CSS の .world__shadow）。絵の縁取り・足元の暗さは tools/art/ground_figures.py
+    const w = this.#figureH * 0.71;
+    const sh = this.#figureH * 0.19;
+    Object.assign(shadow.style, { width: `${w}px`, height: `${sh}px`, marginLeft: `${-w / 2}px`, marginTop: `${-sh / 2}px` });
     this.#shadows.set(el, shadow);
     this.#mapLayer.append(shadow);
   }
