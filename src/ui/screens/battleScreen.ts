@@ -1306,7 +1306,7 @@ export const battleScreen: ScreenDefinition = {
             back.classList.add('is-dealt');
             back.style.animationDelay = `${newIndex * DEAL_MS}ms`;
             // 相手が引くときも同じ音（2026-10-26 ユーザー指示「本当の人間と戦ってるようなイメージ」）
-            sound.play('cardDraw', newIndex * DEAL_MS);
+            sound.deal(newIndex * DEAL_MS);
             newIndex++;
             shownOppHand.add(c.uid);
           }
@@ -1474,7 +1474,7 @@ export const battleScreen: ScreenDefinition = {
         const deal = { slide: now + i * DEAL_MS, flip: flipFrom + i * HAND_FLIP_STAGGER_MS };
         handDeal.set(c.uid, deal);
         shownHand.add(c.uid);
-        sound.play('cardDraw', deal.slide - now);
+        sound.deal(deal.slide - now);
         sound.play('cardFlip', deal.flip - now + HAND_FLIP_MS / 2);
       }
       if (fresh.length > 0) {

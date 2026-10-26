@@ -1,4 +1,4 @@
-import cardDealMp3 from '@assets/audio/se/card_deal.mp3';
+import cardDealSwishMp3 from '@assets/audio/se/card_deal/swish_1.mp3';
 import cardFlipMp3 from '@assets/audio/se/card_flip.mp3';
 import cardSlideMp3 from '@assets/audio/se/card_slide.mp3';
 import cardRevealMp3 from '@assets/audio/se/card_reveal.mp3';
@@ -121,9 +121,13 @@ type SoundEntry = (
   readonly gain: number;
 };
 
+/** カードを配る音の大きさ（届いた音は大きめなので、ほかの効果音とそろえる） */
+const DEAL_GAIN = 0.45;
+
 export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
-  // カードを引く・手札に配る（1枚ごと）：効果音ラボ「カードを配る」から1枚ぶんを切り出した音（2026-10-24 ユーザー指示「カードとかトランプのSEに」）
-  cardDraw: { mp3: cardDealMp3, gain: 1.4 },
+  // カードを引く・手札に配る（1枚ごと）：2026-10-26 ユーザー提供の「Motion-Swish07」（利用確認済み）。対戦では sound.deal() で7種類から選ぶ。
+  // 前は効果音ラボ「カードを配る」から切り出した card_deal.mp3（ファイルは残している）
+  cardDraw: { mp3: cardDealSwishMp3, gain: DEAL_GAIN },
   // 2026-10-26 ユーザー指示「SEも適切なもの探して」：Kenney「Casino Audio」（CC0・クレジット不要）から切り出した音
   // 配った手札が1枚ずつ表になる（パラパラ）：card-place-1
   cardFlip: { mp3: cardFlipMp3, gain: 0.8 },
@@ -195,6 +199,12 @@ const STEP_URLS: Readonly<Record<string, readonly string[]>> = Object.entries(ST
     if (surface) (acc[surface] ??= []).push(url);
     return acc;
   }, {});
+/** カードを配る音（7種類。続けて同じ音にならないよう毎回選ぶ。1枚ずつ高速で鳴るので少し小さく） */
+const DEAL_URLS: readonly string[] = Object.entries(
+  import.meta.glob<string>('/assets/audio/se/card_deal/*.mp3', { eager: true, query: '?url', import: 'default' }),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, url]) => url);
 /** 足音の音量。歩くと1秒に6歩ほど鳴るので、ほかの音よりずっと小さく */
 const STEP_GAIN = { walk: 0.16, run: 0.24 } as const;
 /** 水中のループの音量 */
@@ -217,6 +227,7 @@ class SoundPlayer {
   #buffers = new Map<string, AudioBuffer>();
   #loading = new Map<string, Promise<void>>();
   #lastStep = '';
+  #lastDeal = '';
   #ambient: AmbientState | null = null;
   #unlockInstalled = false;
   /** 設定の効果音の音量（0〜1） */
@@ -275,6 +286,7 @@ class SoundPlayer {
   preload(): void {
     for (const id of Object.keys(SE_REGISTRY) as SoundId[]) void this.#load(this.#source(SE_REGISTRY[id]));
     for (const urls of Object.values(STEP_URLS)) for (const url of urls) void this.#load(url);
+    for (const url of DEAL_URLS) void this.#load(url);
   }
 
   #load(url: string): Promise<void> {
@@ -328,6 +340,15 @@ class SoundPlayer {
 
   play(id: SoundId, delayMs = 0): void {
     this.#playUrl(this.#source(SE_REGISTRY[id]), SE_REGISTRY[id].gain, delayMs);
+  }
+
+  /** カードを1枚配る・引く音（delayMs 後）。7種類から、前と同じ音が続かないように選ぶ */
+  deal(delayMs = 0): void {
+    const choices = DEAL_URLS.length > 1 ? DEAL_URLS.filter((u) => u !== this.#lastDeal) : DEAL_URLS;
+    const url = choices[Math.floor(Math.random() * choices.length)];
+    if (!url) return this.play('cardDraw', delayMs);
+    this.#lastDeal = url;
+    this.#playUrl(url, DEAL_GAIN, delayMs);
   }
 
   /** 足が地面に着いたときの1歩の音。前と同じ音が続かないように選ぶ */
