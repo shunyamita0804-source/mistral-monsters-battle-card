@@ -5,6 +5,7 @@ import { confirmModal } from '../components/modal.ts';
 import { bgm } from '../bgm.ts';
 import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
+import titleLogo from '@assets/images/ui/title/title_logo.webp';
 
 export const titleScreen: ScreenDefinition = {
   id: 'title',
@@ -35,10 +36,9 @@ export const titleScreen: ScreenDefinition = {
         { class: 'title__logo' },
         // ユーザー承認の正式アイコン（2026-10-23 新しい版。原本を縮小し、外側の黒い角を透明にしただけで描き換えていない）
         h('img', { class: 'title__icon', attrs: { src: resolvePublicPath('icons/icon-512.png'), alt: '', draggable: 'false' } }),
-        h('p', { class: 'title__series', text: en ? APP_INFO.seriesNameEn : APP_INFO.seriesName }),
-        h('h1', { class: 'title__name', text: t('title.battleCard') }),
-        // 英語表示のときは、日本語の正式名称を下に添える
-        h('p', { class: 'title__en', text: en ? APP_INFO.gameName : APP_INFO.gameNameEn }),
+        // タイトルロゴ（2026-10-26 デザイン第9弾。英字の「MISTRAL MONSTERS / BATTLE CARD」）。日本語の正式名称は下に文字で添える（英語表示でも日本語）
+        h('h1', { class: 'title__name title__name--logo' }, h('img', { class: 'title__logo-art', attrs: { src: titleLogo, alt: en ? APP_INFO.gameNameEn : APP_INFO.gameName, draggable: 'false' } })),
+        h('p', { class: 'title__en', text: APP_INFO.gameName }),
       ),
       store.loadResult.status === 'unreadable'
         ? h('p', {

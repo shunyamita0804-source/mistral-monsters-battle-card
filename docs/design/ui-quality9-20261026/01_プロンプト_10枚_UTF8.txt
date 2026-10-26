@@ -1,0 +1,233 @@
+【プロンプト】まだ足りないデザイン10枚・第9弾（2026-10-26）
+
+使い方：1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼る。日本語でうまくいかないときは English version
+1（ロゴ）と 9（背景）は、番号の文の中に専用のルールを書いた（共通ルールは付けない）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（部品用。2〜8・10 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品（窓の枠・勝ちの帯・カードの裏面）にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】画面を真正面から見た平らな部品（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること
+▲ここまで
+▼English
+Draw a UI part for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts (window frame, win banner, card back).
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] Flat parts seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　タイトルロゴ → title_logo.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/公式アイコン.png、今の画面/タイトル.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」のタイトルロゴを描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+横長 1536×1024 の真ん中に、ロゴを1つ。背景は透明（できなければマゼンタ一色 #FF00FF）。
+・文字：英字の「MISTRAL MONSTERS」を大きく1行（すべて大文字。つづりを1文字も間違えない：M-I-S-T-R-A-L　M-O-N-S-T-E-R-S）。その下に小さく「BATTLE CARD」（B-A-T-T-L-E　C-A-R-D）
+・文字の形：太めのセリフ体の飾り文字。くすんだ金の金属の文字に、濃いこげ茶の縁取りと、紺の影。上の面が少し明るく光る
+・飾り：文字の後ろに、扇のように少し開いたカード3枚のシルエット（紺と金）。「MISTRAL」の上に小さな星を1つ。左右の端に小さな唐草
+・ファンタジーで落ち着いた大人向けの雰囲気。派手な虹色・ネオン・3DCG風にしない。日本語の文字は描かない（日本語はゲームが下に重ねる）
+・添付の公式アイコンの真下に置くので、アイコンの金の縁と同じ金の色味に
+▲ここまで
+▼English
+Draw the title logo for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+One logo centered on a 1536x1024 canvas. Transparent background (or solid magenta #FF00FF).
+- Text: "MISTRAL MONSTERS" large on one line (all caps; spell it exactly M-I-S-T-R-A-L M-O-N-S-T-E-R-S), and below it smaller "BATTLE CARD" (B-A-T-T-L-E C-A-R-D).
+- Lettering: bold ornamental serif. Muted gold metal letters with a dark brown outline and a navy drop shadow; the top faces catch a little light.
+- Ornaments: behind the text, the silhouette of three cards fanned slightly open (navy and gold). One small star above "MISTRAL". Small scrollwork at the left and right ends.
+- Calm fantasy mood for adults. No rainbow colors, no neon, no 3D render look. No Japanese text (the game adds it below).
+- It sits right under the attached official icon, so match the gold of the icon's rim.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　技の対象を示す矢印（自分・相手）→ target_arrows.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、今の画面/対象の指と流れる文字.png（いまは絵文字の「👇」）
+▼ここからコピー
+カードゲームの対戦で、技を向けたモンスターの上に出す「下向きの矢印」を描いてください。横長 1536×1024 に、同じ形の矢印を左右に2つ。
+・形：先のとがった下向きの矢じり（盾の先のような形）。上に小さな宝石の飾り。高さは画像の高さの6割くらい
+・左＝自分の技の対象：紺と明るい青、くすんだ金の縁
+・右＝相手の技の対象：えんじと赤茶、くすんだ金の縁
+・小さく（高さ30px くらい）表示しても向きと色が分かるように、形は単純に、縁ははっきりと。光は控えめ
+▲ここまで
+▼English
+Draw a "downward arrow" shown above the monster targeted by a skill in a card battle. Two arrows of the same shape side by side on a 1536x1024 canvas.
+- Shape: a pointed downward arrowhead (like the tip of a shield) with a small gem ornament on top. About 60% of the canvas height.
+- Left = target of the player's skill: navy and bright blue with a muted-gold rim.
+- Right = target of the opponent's skill: wine and reddish brown with a muted-gold rim.
+- Readable at a small size (about 30 px tall): simple shape, clear rim, subtle glow.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　戦闘不能の印 → knockout_mark.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、今の画面/戦闘不能.png（いまは灰色の絵に「戦闘不能」の文字）
+▼ここからコピー
+カードゲームの対戦で、倒れたモンスターの絵の上に重ねる「戦闘不能の印」を描いてください。正方形 1024×1024 の真ん中に1つ。
+・形：ひびが入って割れかけた丸い盾（くすんだ鉄色）の上に、交差した2本の折れた剣。盾の真ん中は無地（文字を置かない）
+・色：鉄の灰色・こげ茶・くすんだ金の縁。暗い赤を少しだけ（ひびの奥）
+・モンスターの絵（縦長のカード）の真ん中に重ねるので、輪郭ははっきり。光らせない。絵が透けないよう中は不透明に
+▲ここまで
+▼English
+Draw a "knocked out" mark overlaid on the art of a defeated monster in a card battle, centered on a 1024x1024 canvas.
+- Shape: a round shield (dull iron) cracked and about to break, with two broken swords crossed over it. The shield center is plain (no text).
+- Colors: iron grey, dark brown, muted-gold rim, a touch of dark red deep inside the cracks.
+- It is placed over the middle of the monster's portrait card, so keep a clear outline, no glow, and an opaque interior.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　状態のアイコン（6種）→ status_icons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/マナのアイコン.png、見本/山札のアイコン.png
+▼ここからコピー
+カードゲームの対戦で、モンスターにかかっている状態を示す小さなアイコンを6個描いてください。横長 1536×1024 に、3列×2行（重ならないように間を空ける）。文字なし。
+・1 攻撃できない：交差した剣に、鎖が巻きついている（えんじ）
+・2 行動できない：モンスターに巻きつく太い蔓（くすんだ緑）と、小さな渦巻き（目が回る）
+・3 ちょうはつ：牙をむいた獣の口と、小さな怒りの印（えんじ・金）
+・4 受けるダメージが減る：小さな丸い盾に、下向きの矢印（青）
+・5 行動済：砂時計（くすんだ金と灰色）
+・6 能力が下がる：下向きの太い矢印と、ひびの入った小さな結晶（紫を使わず、灰色と暗い青）
+・どれも同じ大きさの丸い台座（紺・くすんだ金の縁）の上に描く。添付のマナ・山札のアイコンと同じ描き方
+・小さく（20px くらい）表示しても形が分かるように、単純な形で
+▲ここまで
+▼English
+Draw six small icons that show a status on a monster in a card battle. 3 columns x 2 rows on a 1536x1024 canvas, with space between. No text.
+1 Can't attack: crossed swords wrapped in a chain (wine).
+2 Can't act: a thick vine (dull green) coiled around, with a small swirl (dizzy).
+3 Taunted: a beast's bared fangs with a small anger mark (wine and gold).
+4 Takes less damage: a small round shield with a downward arrow (blue).
+5 Already acted: an hourglass (muted gold and grey).
+6 Stat down: a thick downward arrow and a small cracked crystal (no purple; grey and dark blue).
+- Draw each on the same round base (navy with a muted-gold rim), in the same style as the attached mana and deck icons.
+- Simple shapes, readable at about 20 px.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　ライフのゲージ（枠と中身3色）→ life_gauge.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、今の画面/対象の指と流れる文字.png（モンスターの下の緑の棒）
+▼ここからコピー
+カードゲームの対戦で、モンスターの下に出す「ライフのゲージ」の部品を描いてください。横長 1536×1024 に、次の4本を上下に並べる（重ならないように）。
+・1 枠：横に細長い（横:縦＝10:1）くぼんだ溝。くすんだ金の細い縁、中は暗い紺（空っぽの状態）。左右の端に小さな金具
+・2 中身（緑）：1 の溝の中に入る、つやのある液体のような棒。ライフが多いとき
+・3 中身（黄土色）：同じ形。ライフが半分くらいのとき
+・4 中身（赤）：同じ形。ライフが少ないとき
+・中身は左右の端が丸い。横に伸び縮みして使う（模様は横にくり返しても目立たないように）
+▲ここまで
+▼English
+Draw the parts of a "life gauge" shown under each monster in a card battle. Four bars stacked vertically on a 1536x1024 canvas, no overlap.
+1 Frame: a long thin recessed groove (10:1), thin muted-gold rim, dark navy inside (empty), small metal fittings at both ends.
+2 Fill (green): a glossy liquid-like bar that fits inside the groove. Used when life is high.
+3 Fill (ochre): same shape. Life around half.
+4 Fill (red): same shape. Life low.
+- Fills have rounded ends and are stretched horizontally (any texture must repeat unobtrusively).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　流れる文字の帯と情報の欄の枠 → battle_frames.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/勝ち抜き表の札.png、今の画面/対象の指と流れる文字.png（上の帯・モンスターの左の欄）
+▼ここからコピー
+カードゲームの対戦画面の、細身の枠を3つ描いてください。横長 1536×1024 に、重ならないように並べる。中は文字を置くので無地。
+・1 上の帯：とても横に長い（横:縦＝9:1）、両端が丸い帯。暗い紺の地に、くすんだ金の細い縁。左右の端に小さな飾り（中は横に伸ばして使う）
+・2 自分の情報の欄：縦長（横:縦＝3:4）の角の丸い板。暗い紺の地に、青みのある細い縁。上の角に小さな金の飾り
+・3 相手の情報の欄：2 と同じ形。暗いえんじの地に、赤茶の細い縁
+・飾りは控えめに（対戦の画面は細い枠の方針）。添付の勝ち抜き表の札と同じくらいの細さ
+▲ここまで
+▼English
+Draw three slim frames for the card battle screen on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Top bar: a very long (9:1) bar with rounded ends, dark navy base, thin muted-gold rim, small ornaments at both ends (the middle is stretched).
+2 Player info panel: a portrait (3:4) panel with rounded corners, dark navy base, thin bluish rim, small gold ornaments at the top corners.
+3 Opponent info panel: same shape as 2, dark wine base, thin reddish-brown rim.
+- Restrained decoration (the battle screen uses thin frames), about as slim as the attached bracket plate.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　マナの光の効果（3種）→ mana_effects.png　※背景は真っ黒
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/マナのアイコン.png
+▼ここからコピー
+カードゲームの対戦で、マナに関わるときに一瞬だけ出す光の効果を3種描いてください。横長 1536×1024 に、3つを横に並べる（1つはほぼ正方形のマスに収める）。
+背景は真っ黒 #000000（ゲームで「光を足す」重ね方をするため。透明にしない）。文字なし。
+・1 マナが増えた：青く光る小さな結晶が、下から上へ集まってくる
+・2 カードをマナにした：カードの形の光がほどけて、青い光の粒になって消えていく
+・3 マナを払った：青い光の粒が、内側から外へはじけて散る
+・どれも手描きの筆の質感の光。添付のマナのアイコンと同じ青。真ん中を明るく、外側はやわらかく消える
+▲ここまで
+▼English
+Draw three brief light effects for mana events in a card battle. Three side by side on a 1536x1024 canvas, each in a roughly square cell.
+Background: solid black #000000 (the game uses additive blending; do NOT make it transparent). No text.
+1 Mana gained: small glowing blue crystals gather from bottom to top.
+2 Card turned into mana: a card-shaped light unravels into blue particles and fades away.
+3 Mana spent: blue particles burst outward from the center and scatter.
+- Hand-painted brush-stroke light, the same blue as the attached mana icon. Bright core, soft fading edges.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 8　手札の印（選んだ・マナにする・使えない）→ hand_marks.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、今の画面/手札を選ぶ.png（いまは青い四角の枠と「マナ」の文字）
+▼ここからコピー
+カードゲームの手札のカードに重ねる印を描いてください。横長 1536×1024 に、次の4つを重ならないように並べる。
+・1 選んだカードの枠：ほぼ正方形の角の丸い光る枠（中は透明）。くすんだ金の縁が明るく光る
+・2 マナにするカードの枠：1 と同じ形で、青く光る枠
+・3 マナにする印：小さな横長の札（青い結晶の飾りつき。中は無地。ゲームが「マナ」の文字を重ねる）
+・4 使えないカードのくもり：1 と同じ形の、半透明の暗い灰色のくもり（中までうすく暗くする）
+・1・2・4 は同じ大きさ・同じ角の丸みにする（カードの上にぴったり重ねるため）
+▲ここまで
+▼English
+Draw marks overlaid on cards in the player's hand. Four items on a 1536x1024 canvas, no overlap.
+1 Selected-card frame: a nearly square frame with rounded corners (transparent inside); the muted-gold rim glows brightly.
+2 Mana-card frame: same shape as 1, glowing blue.
+3 Mana tag: a small horizontal tag with a blue crystal ornament, blank inside (the game writes "Mana").
+4 Unusable-card veil: same shape as 1, a semi-transparent dark grey veil covering the whole card lightly.
+- 1, 2 and 4 must have the same size and corner radius (they sit exactly on the card).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 9　練習試合の対戦の背景 → battle_bg_practice.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/練習場の部屋.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の、練習試合の対戦画面の背景を1枚描いてください。縦長 1024×1536、不透明（画面いっぱいに敷く）。
+・場所：添付の「カード練習場」の中。対戦用の木の机を真上に近い斜め上から見下ろす。机の上は濃い緑のフェルトの布、四隅に金具
+・机の上には何も置かない（カード・人・モンスターを描かない。ゲームがその上にカードやモンスターを並べる）
+・全体を暗めに（上に文字やカードを重ねても読みやすいように）。真ん中が少し明るく、まわりはやわらかく暗く
+・画風は添付の画風見本と同じ、筆で塗り重ねた手描きの質感。文字・ロゴは描かない
+▲ここまで
+▼English
+Draw the background for practice matches in the commercial smartphone 2D card game "Mistral Monsters Battle Card". Portrait 1024x1536, opaque (fills the screen).
+- Place: inside the attached "card training hall". A wooden match table seen from nearly straight above at a slight angle; the tabletop is dark green felt with metal fittings at the corners.
+- Nothing on the table (no cards, people or monsters; the game places them).
+- Keep it dark overall so text and cards on top stay readable: slightly brighter in the center, soft darkness around the edges.
+- Same hand-painted brush style as the attached style sample. No text or logos.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 10　ダンジョンの案内板（下り・上り・出口）→ dungeon_signs.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/ダンジョンの床と壁.png、今の画面/ダンジョンの階段.png（いまは「B1Fへ」「街へ帰る」の文字だけ）
+▼ここからコピー
+ダンジョンの階段や出口のそばの床に立てる、小さな案内板を3つ描いてください。横長 1536×1024 に、横に並べる。斜め上から見下ろす視点。
+・形：短い木の杭に打ちつけた、小さな板（横:縦＝3:2）。板の中は無地（ゲームが「B2Fへ」などの文字を重ねる）
+・1 下り：板の上に、下向きの矢印の金具
+・2 上り：板の上に、上向きの矢印の金具
+・3 出口：板の上に、小さな扉の形の金具と、ランタンを1つ
+・添付のダンジョンの石の床と壁に合う、古い木とさびた鉄。足元に小さな影
+▲ここまで
+▼English
+Draw three small signposts placed on the floor near stairs and exits in a dungeon. Side by side on a 1536x1024 canvas, three-quarter top-down view.
+- Shape: a small board (3:2) nailed to a short wooden post. The board face is blank (the game writes "To B2F" etc.).
+- 1 Down: a downward-arrow metal fitting on top of the board.
+- 2 Up: an upward-arrow metal fitting on top.
+- 3 Exit: a small door-shaped metal fitting on top and one lantern.
+- Old wood and rusty iron that suit the attached dungeon stone floor and walls, with a small shadow at the foot.
+▲
+

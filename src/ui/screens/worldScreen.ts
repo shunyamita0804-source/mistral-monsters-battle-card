@@ -1,6 +1,6 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
-import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject } from '../../data/maps.ts';
+import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { getMonster } from '../../data/cards.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
@@ -99,6 +99,10 @@ import chestGold4 from '@assets/images/maps/dungeon/chest_03_anim_04.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import { bgm } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
+import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
+import signDownArt from '@assets/images/maps/dungeon/sign_down.webp';
+import signUpArt from '@assets/images/maps/dungeon/sign_up.webp';
+import signExitArt from '@assets/images/maps/dungeon/sign_exit.webp';
 import { t, type Params } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName } from '../../i18n/content.ts';
@@ -288,6 +292,16 @@ const coins = (n: number): string => t('common.coins', { n } satisfies Params);
 
 /** 2つの角度の差（-π〜π） */
 const angleDiff = (a: number, b: number): number => Math.atan2(Math.sin(a - b), Math.cos(a - b));
+
+/** ダンジョンの案内板の絵（2026-10-26 デザイン第9弾） */
+const DUNGEON_SIGN_ART = { down: signDownArt, up: signUpArt, exit: signExitArt } as const;
+
+/** ダンジョンの案内板の種類（下り＝次の階・上り＝前の階・出口＝街へ） */
+function dungeonSignKind(target: WarpTarget): 'down' | 'up' | 'exit' | null {
+  if (target.kind === 'floor') return target.delta > 0 ? 'down' : 'up';
+  if (target.kind === 'leaveDungeon') return 'exit';
+  return null;
+}
 
 export const worldScreen: ScreenDefinition = {
   id: 'world',
@@ -827,9 +841,17 @@ export class WorldView {
       if (obj.type !== 'interact' && obj.type !== 'warp') continue;
       // 正式な絵の部屋では、使える家具（調べると画面が開く物）と出口だけに名前を出す
       if (map.art && obj.type === 'interact' && obj.action === 'message') continue;
-      const el = map.art
-        ? h('div', { class: `world__label world__label--${obj.type}` }, h('span', { class: 'world__label-text', text: objectLabel(obj) }))
-        : h('div', { class: `world__label world__label--${obj.type}`, text: objectLabel(obj) });
+      // ダンジョンの階段・出口：案内板の絵（2026-10-26 デザイン第9弾。下り・上り・出口）の板に名前を重ねる
+      const signKind = map.area === 'dungeon' && obj.type === 'warp' ? dungeonSignKind(obj.target) : null;
+      const el = signKind
+        ? h(
+            'div',
+            { class: `world__label world__label--warp world__dungeon-sign world__dungeon-sign--${signKind}` },
+            h('span', { class: 'world__dungeon-sign-post' }, h('img', { attrs: { src: DUNGEON_SIGN_ART[signKind], alt: '', draggable: 'false' } }), h('span', { class: 'world__dungeon-sign-text', text: objectLabel(obj) })),
+          )
+        : map.art
+          ? h('div', { class: `world__label world__label--${obj.type}` }, h('span', { class: 'world__label-text', text: objectLabel(obj) }))
+          : h('div', { class: `world__label world__label--${obj.type}`, text: objectLabel(obj) });
       Object.assign(el.style, { left: `${obj.x * cell}px`, top: `${obj.y * cell}px`, width: `${obj.w * cell}px`, height: `${obj.h * cell}px` });
       this.#mapLayer.append(el);
     }
@@ -1595,6 +1617,9 @@ export class WorldView {
       title: t('story.practice.title'),
       opponent,
       allowSurrender: true,
+      // 練習場の対戦の机（2026-10-26 デザイン第9弾）
+      background: practiceBattleBg,
+      backgroundVivid: true,
       tutorial: tutorial && store.save.story.intro !== 'completed',
       onFinish: (winner) => {
         store.practiceResult = { winner, tutorial, withGuide };

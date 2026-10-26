@@ -104,6 +104,7 @@ export const BATTLE = {
   'battle.spot.tapToSkip': { ja: 'タップで次へ', en: 'Tap to continue' },
   'battle.status.weaken': { ja: '{stat}−{n}', en: '{stat} -{n}' },
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
+  'battle.status.stunned': { ja: '行動不可', en: "Can't act" },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
   'battle.cmd.menu': { ja: 'コマンド', en: 'Command' },
   // 対戦相手のひと言（【仮】台詞。正式な台詞・人物ごとの言い回しは未定）

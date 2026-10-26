@@ -4,7 +4,6 @@ import type { MessageEntry } from '../i18n.ts';
 export const SCREENS = {
   // タイトル
   'title.title': { ja: 'タイトル', en: 'Title' },
-  'title.battleCard': { ja: 'バトルカード', en: 'Battle Card' },
   'title.continue': { ja: '続きから', en: 'Continue' },
   'title.newGame': { ja: '最初から', en: 'New Game' },
   'title.settings': { ja: '設定', en: 'Settings' },
