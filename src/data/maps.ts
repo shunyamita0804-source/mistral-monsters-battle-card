@@ -501,7 +501,41 @@ export const DUNGEON_B3: MapDefinition = {
   spawn: { x: 6, y: 14, dir: 'up' },
 };
 
-export const MAPS: readonly MapDefinition[] = [TOWN, HOME, NEIGHBOR, SHOP, LAB, HALL, PRACTICE, ...HOUSES, DUNGEON_B1, DUNGEON_B2, DUNGEON_B3];
+/**
+ * ダンジョンの階を、別のダンジョン用に写す（2026-10-26 ユーザー指示「ダンジョンの細かい設計は今後やるので、一旦いまのダンジョンを複製」）。
+ * 宝箱・敵は1度だけの処理を ID で見分けるので、物の ID の頭に prefix を付ける。敵の編成は encounters で置き換えられる（欠片は写さない）
+ */
+function copyFloor(map: MapDefinition, id: string, prefix: string, encounters: Readonly<Record<string, string>> = {}): MapDefinition {
+  return {
+    ...map,
+    id,
+    objects: map.objects.map((o) =>
+      o.type === 'enemy' ? { ...o, id: `${prefix}${o.id}`, encounterId: encounters[o.encounterId] ?? o.encounterId } : { ...o, id: `${prefix}${o.id}` },
+    ),
+  };
+}
+
+/** 【仮】森のダンジョン（2026-10-26）：いまは遺跡（dungeon-01）の写し。ボスだけ森の編成 */
+export const FOREST_B1: MapDefinition = copyFloor(DUNGEON_B1, 'dungeon-02-b1', 'forest-');
+export const FOREST_B2: MapDefinition = copyFloor(DUNGEON_B2, 'dungeon-02-b2', 'forest-');
+export const FOREST_B3: MapDefinition = copyFloor(DUNGEON_B3, 'dungeon-02-b3', 'forest-', { 'enc-b3-boss': 'enc-forest-boss' });
+
+export const MAPS: readonly MapDefinition[] = [
+  TOWN,
+  HOME,
+  NEIGHBOR,
+  SHOP,
+  LAB,
+  HALL,
+  PRACTICE,
+  ...HOUSES,
+  DUNGEON_B1,
+  DUNGEON_B2,
+  DUNGEON_B3,
+  FOREST_B1,
+  FOREST_B2,
+  FOREST_B3,
+];
 
 export function getMap(id: string): MapDefinition | undefined {
   return MAPS.find((m) => m.id === id);

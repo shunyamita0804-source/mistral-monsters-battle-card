@@ -58,8 +58,10 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:d-3:name': 'Temp opponent (D, Final)',
 
   // ダンジョン（仮）
-  'dungeon:dungeon-01:name': 'Dungeon 1 (Temp name)',
-  'dungeon:dungeon-01:description': '3 basement floors. Defeat the boss at the bottom to clear it. (Name and enemies are temporary)',
+  'dungeon:dungeon-01:name': 'Moonshadow Ruins (Temp name)',
+  'dungeon:dungeon-01:description': 'Ruins with 3 basement floors. Defeat the boss at the bottom to clear it. (Name and enemies are temporary)',
+  'dungeon:dungeon-02:name': 'Spirit Forest (Temp name)',
+  'dungeon:dungeon-02:description': 'A forest with 3 basement floors. Defeat the boss at the bottom to clear it. (Name and enemies are temporary; same layout as the ruins for now)',
   'opponent:enc-b1-a:name': 'Wild monster pack (Temp)',
   'opponent:enc-b1-b:name': 'Wild monster pack (Temp)',
   'opponent:enc-b2-a:name': 'Treasure guards (Temp)',
@@ -67,7 +69,8 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:enc-b2-c:name': 'Stairway keeper (Temp)',
   'opponent:enc-b3-a:name': 'Deep-floor pack (Temp)',
   'opponent:enc-b3-b:name': 'Deep-floor pack (Temp)',
-  'opponent:enc-b3-boss:name': 'Boss of the depths (Temp)',
+  'opponent:enc-b3-boss:name': 'Master of the Ruins (Temp)',
+  'opponent:enc-forest-boss:name': 'Master of the Forest (Temp)',
   'opponent:enc-practice:name': 'Practice partner (Temp)',
 
   // ---------- マップ・扉・家具（仮マップ。src/data/maps.ts） ----------
@@ -86,6 +89,9 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'map:dungeon-01-b1:name': 'B1F',
   'map:dungeon-01-b2:name': 'B2F',
   'map:dungeon-01-b3:name': 'B3F',
+  'map:dungeon-02-b1:name': 'B1F',
+  'map:dungeon-02-b2:name': 'B2F',
+  'map:dungeon-02-b3:name': 'B3F',
   // 街
   'object:door-practice:label': 'Card Practice Hall',
   'object:door-hall:label': 'Tournament Hall',
@@ -194,4 +200,9 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:b2-down:label': 'To B3F',
   'object:b2-up:label': 'To B1F',
   'object:b3-up:label': 'To B2F',
+  'object:forest-b1-down:label': 'To B2F',
+  'object:forest-b1-exit:label': 'Back to town',
+  'object:forest-b2-down:label': 'To B3F',
+  'object:forest-b2-up:label': 'To B1F',
+  'object:forest-b3-up:label': 'To B2F',
 };

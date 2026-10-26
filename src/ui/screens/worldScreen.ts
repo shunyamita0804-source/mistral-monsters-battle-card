@@ -1,4 +1,4 @@
-import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
+import { getDungeon, ENCOUNTERS, type DungeonDefinition } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
@@ -69,6 +69,8 @@ import {
 import { playScene } from '../components/dialogue.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { button, h } from '../dom.ts';
+import { once } from '../gameStore.ts';
+import { DUNGEON_SPOTS } from '../../data/worldMap.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
 import femaleSheet from '@assets/images/characters/player_female_sheet.webp';
 import guideSheet from '@assets/images/characters/npc_neighbor_guide_walk.webp';
@@ -98,7 +100,8 @@ import chestGold3 from '@assets/images/maps/dungeon/chest_03_anim_03.webp';
 import chestGold4 from '@assets/images/maps/dungeon/chest_03_anim_04.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
-import { bgm } from '../bgm.ts';
+import meadowBattleBg from '@assets/images/backgrounds/battle_field_meadow.webp';
+import { bgm, type BgmId } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
 import signDownArt from '@assets/images/maps/dungeon/sign_down.webp';
@@ -229,13 +232,33 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-01-b1': dungeonBattleBg,
   'dungeon-01-b2': dungeonBattleBg,
   'dungeon-01-b3': dungeonBattleBg,
+  // 【仮】森のダンジョン（2026-10-26）：ミスモンの野外（草原）の背景。森の絵が届いたら入れ替える
+  'dungeon-02-b1': meadowBattleBg,
+  'dungeon-02-b2': meadowBattleBg,
+  'dungeon-02-b3': meadowBattleBg,
 };
+/**
+ * ダンジョンに入ったときの札の挿絵（2026-10-26 ユーザー指示「ダンジョン入った時に挿絵みたいなのとダンジョン名の名前を入れたい」）。
+ * 【仮】専用の絵はまだ無いので、そのダンジョンの対戦の背景を使う
+ */
+const DUNGEON_INTRO_ART: Readonly<Record<string, string>> = {
+  'dungeon-01': dungeonBattleBg,
+  'dungeon-02': meadowBattleBg,
+};
+/** ダンジョンに入ったときの札を出しておく時間（ミリ秒。押すと先に消える） */
+const DUNGEON_INTRO_MS = 2800;
+/** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
+const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
+/** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
+const ROOM_BGM: Readonly<Record<string, BgmId>> = { shop: 'shop', practice: 'practice', lab: 'lab' };
 /**
  * ダンジョンごとの足音の地面と環境音（2026-10-23）。新しいダンジョンを足すときはここに1行
  * （例：水のダンジョンなら { ground: 'wet', ambient: 'underwater' }、雪なら 'snow'、砂漠なら 'sand'）。無いダンジョンは洞窟と同じ
  */
 const DUNGEON_SOUND: Readonly<Record<string, { readonly ground: StepSurface; readonly ambient: AmbientId | null }>> = {
   'dungeon-01': { ground: 'gravel', ambient: 'drip' },
+  // 【仮】森：芝生の足音・水滴なし（マップの絵はまだ遺跡の写し）
+  'dungeon-02': { ground: 'grass', ambient: null },
 };
 const DEFAULT_DUNGEON_SOUND = { ground: 'gravel', ambient: 'drip' } as const;
 /** 街の南の出口へ続く土の道（この行から下）。ほかの道は石畳 */
@@ -590,7 +613,8 @@ export class WorldView {
     this.#scale = this.#artScale(map);
     this.#phase = 0;
     if (!dev) {
-      bgm.play(map.area === 'dungeon' ? 'dungeon' : 'town');
+      const dungeonId = this.#store.save.activeDungeon?.dungeonId ?? '';
+      bgm.play(map.area === 'dungeon' ? (DUNGEON_BGM[dungeonId] ?? 'dungeon') : (ROOM_BGM[map.id] ?? 'town'));
       sound.ambient(map.area === 'dungeon' ? this.#dungeonSound().ambient : null);
     }
     this.#build(true);
@@ -602,7 +626,13 @@ export class WorldView {
     const scene = dev ? null : this.#sceneOnLoad();
     // ダンジョンの帯（2026-10-26 デザイン第10弾）：クリアして街に戻ったとき・階に入ったとき（対戦から戻ったときは出さない）
     const banner = dev ? null : this.#store.flashBanner;
-    if (banner) {
+    const intro = dev ? null : this.#store.dungeonIntro;
+    this.#store.dungeonIntro = null;
+    const introDungeon = intro && map.area === 'dungeon' ? getDungeon(intro) : undefined;
+    if (introDungeon) {
+      // ダンジョンに入った直後：挿絵とダンジョン名の札（階の帯の代わり）
+      this.#dungeonIntro(introDungeon, map);
+    } else if (banner) {
       this.#store.flashBanner = null;
       this.#banner('clear', t('world.bannerClear'));
     } else if (!dev && !flash && map.area === 'dungeon') {
@@ -617,6 +647,34 @@ export class WorldView {
     } else if (scene) {
       this.#playScene(scene);
     }
+  }
+
+  /** ダンジョンに入った直後の札：挿絵・地方・ダンジョン名・階（PS版の場所の札にならう）。押すと先に消える */
+  #dungeonIntro(dungeon: DungeonDefinition, map: MapDefinition): void {
+    const art = DUNGEON_INTRO_ART[dungeon.id];
+    const region = DUNGEON_SPOTS[dungeon.id]?.region;
+    const close = once(() => {
+      el.classList.add('is-closing');
+      setTimeout(() => el.remove(), 400);
+    });
+    const el = h(
+      'div',
+      { class: 'world__dungeon-intro', attrs: { role: 'button', 'aria-label': dungeonName(dungeon) }, on: { click: close } },
+      h(
+        'div',
+        { class: 'world__dungeon-intro-card' },
+        art ? h('img', { class: 'world__dungeon-intro-art', attrs: { src: art, alt: '', draggable: 'false' } }) : null,
+        h(
+          'div',
+          { class: 'world__dungeon-intro-text' },
+          region ? h('p', { class: 'world__dungeon-intro-region', text: t(`world.region.${region}`) }) : null,
+          h('p', { class: 'world__dungeon-intro-name', text: dungeonName(dungeon) }),
+          h('p', { class: 'world__dungeon-intro-floor', text: mapName(map) }),
+        ),
+      ),
+    );
+    this.#root.append(el);
+    setTimeout(close, DUNGEON_INTRO_MS);
   }
 
   /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階）。タップの邪魔をしない */

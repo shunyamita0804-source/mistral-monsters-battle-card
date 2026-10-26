@@ -16,12 +16,24 @@ export interface DungeonDefinition {
   readonly isPlaceholder: boolean;
 }
 
+/**
+ * 2026-10-26 ユーザー指示：最初からあるダンジョンは「遺跡」と「森」の2つ。遺跡のボスはジオル、森のボスはフルーネを使い、
+ * 勝つとそのモンスターのモンスターカードと技カードが少しもらえる（ジオル・フルーネのカードのデータがまだ無いので未実装。ボスは仮の編成）。
+ * 細かい設計はこれから。いまは森も遺跡（dungeon-01）の写しで、名前は仮
+ */
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
     id: 'dungeon-01',
-    name: '第1ダンジョン（仮名）',
-    description: '地下3階。最奥のボスを倒すとクリア。（名称・敵編成は仮）',
+    name: '月影の遺跡（仮名）',
+    description: '地下3階の遺跡。最奥のボスを倒すとクリア。（名称・敵編成は仮）',
     floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
+    isPlaceholder: true,
+  },
+  {
+    id: 'dungeon-02',
+    name: '精霊の森（仮名）',
+    description: '地下3階の森。最奥のボスを倒すとクリア。（名称・敵編成は仮。いまは遺跡と同じ作り）',
+    floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
     isPlaceholder: true,
   },
 ];
@@ -38,7 +50,10 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b2-c': { id: 'enc-b2-c', name: '階段の番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.8 },
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
-  'enc-b3-boss': { id: 'enc-b3-boss', name: '最奥のボス（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
+  // 遺跡のボス（正式はジオルを使う。カードのデータが届くまで仮の編成）
+  'enc-b3-boss': { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
+  // 森のボス（正式はフルーネを使う。カードのデータが届くまで仮の編成）
+  'enc-forest-boss': { id: 'enc-forest-boss', name: '森の主（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // カード練習場の練習相手（序盤の練習試合）。スターターと同じモンスター3体を少し弱くしたもの（仮。正式な練習相手のデッキは未定）
   'enc-practice': { id: 'enc-practice', name: '練習相手（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
 };

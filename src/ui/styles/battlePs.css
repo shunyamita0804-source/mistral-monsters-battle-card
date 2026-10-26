@@ -1159,7 +1159,7 @@
 /* 相手が使ったカード：裏向きのまま、大きなカードの場所へ大きくなりながら飛ぶ（--dx・--dy・--sx・--sy は flyOpponentCard が決める） */
 .battle__opp-fly {
   transform-origin: 0 0;
-  animation: opp-fly-in 480ms cubic-bezier(0.35, 0, 0.25, 1) forwards;
+  animation: opp-fly-in 620ms cubic-bezier(0.35, 0, 0.25, 1) forwards;
 }
 
 @keyframes opp-fly-in {
@@ -1173,7 +1173,7 @@
   position: relative;
   animation:
     spot-appear 1ms linear var(--arrive-delay, 0ms) both,
-    spot-flip 420ms ease-in-out var(--arrive-delay, 0ms) both;
+    spot-flip 520ms ease-in-out var(--arrive-delay, 0ms) both;
 }
 
 .battle-spot__back {
@@ -1181,12 +1181,12 @@
   inset: 0;
   border-radius: 6px;
   background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
-  animation: flip-cover 420ms linear var(--arrive-delay, 0ms) both;
+  animation: flip-cover 520ms linear var(--arrive-delay, 0ms) both;
 }
 
 .battle-spot.is-arriving .battle-spot__line,
 .battle-spot.is-arriving .battle-spot__info {
-  animation: spot-text-in 240ms ease-out calc(var(--arrive-delay, 0ms) + 210ms) both;
+  animation: spot-text-in 260ms ease-out calc(var(--arrive-delay, 0ms) + 260ms) both;
 }
 
 @keyframes spot-appear {

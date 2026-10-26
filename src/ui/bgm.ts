@@ -5,6 +5,11 @@ import tournamentBattleMp3 from '@assets/audio/bgm/bgm_tournament_battle.mp3';
 import dungeonMp3 from '@assets/audio/bgm/bgm_dungeon.mp3';
 import battleMp3 from '@assets/audio/bgm/bgm_battle.mp3';
 import bossBattleMp3 from '@assets/audio/bgm/bgm_boss_battle.mp3';
+import dungeonRuinsMp3 from '@assets/audio/bgm/bgm_dungeon_ruins.mp3';
+import dungeonForestMp3 from '@assets/audio/bgm/bgm_dungeon_forest.mp3';
+import shopMp3 from '@assets/audio/bgm/bgm_shop.mp3';
+import practiceMp3 from '@assets/audio/bgm/bgm_practice.mp3';
+import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -18,7 +23,19 @@ import { sound } from './sound.ts';
  * - 画面が隠れたら（ホームに戻る・別のアプリ）止め、戻ったら続きから
  * - 設定の BGM の音量（0〜1）を BGM_REGISTRY の gain に掛ける。0（ミュート含む）なら止める
  */
-export type BgmId = 'title' | 'town' | 'tournament' | 'tournamentBattle' | 'dungeon' | 'battle' | 'bossBattle';
+export type BgmId =
+  | 'title'
+  | 'town'
+  | 'tournament'
+  | 'tournamentBattle'
+  | 'dungeon'
+  | 'dungeonRuins'
+  | 'dungeonForest'
+  | 'shop'
+  | 'practice'
+  | 'lab'
+  | 'battle'
+  | 'bossBattle';
 
 interface BgmEntry {
   readonly src: string;
@@ -35,8 +52,19 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   tournament: { src: tournamentMp3, gain: 0.69 },
   // 大会の対戦（公式ランク戦）：Conflict / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   tournamentBattle: { src: tournamentBattleMp3, gain: 0.37 },
-  // ダンジョンの探索：Spirits Forest / HydroGene（CC0）
+  // ダンジョンの探索（曲の決まっていないダンジョン用）：Spirits Forest / HydroGene（CC0）
   dungeon: { src: dungeonMp3, gain: 1.1 },
+  // 2026-10-26 ユーザー提供（利用確認済み）
+  // 遺跡のダンジョン：月の廃墟 / ユーフルカ（Wingless Seraph）
+  dungeonRuins: { src: dungeonRuinsMp3, gain: 0.38 },
+  // 森のダンジョン：古代エルフの聖域 / ユーフルカ（Wingless Seraph）
+  dungeonForest: { src: dungeonForestMp3, gain: 0.39 },
+  // カードショップ（店の中とショップの画面）：セールストーク / BGMer
+  shop: { src: shopMp3, gain: 0.48 },
+  // カード練習場（ユーザーの言う「教習所」）：無心になれる作業 / BGMer
+  practice: { src: practiceMp3, gain: 0.56 },
+  // カード研究所（研究所の中と図鑑）：開かれし封印の扉 / ユーフルカ（Wingless Seraph）
+  lab: { src: labMp3, gain: 0.76 },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）

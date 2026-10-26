@@ -39,6 +39,8 @@ export class GameStore {
   flashMessage: string | null = null;
   /** 歩行画面に戻ったときに出す帯（2026-10-26 デザイン第10弾：ダンジョンをクリアしたとき） */
   flashBanner: 'clear' | null = null;
+  /** ダンジョンに入った直後に出す、挿絵とダンジョン名の札（ダンジョンの ID。2026-10-26 ユーザー指示） */
+  dungeonIntro: string | null = null;
   /** 練習試合の結果（歩行画面に戻ったとき、対戦後の会話に使う） */
   practiceResult: PracticeResult | null = null;
   /** QA用の機能を出すか（URL に ?qa=1） */

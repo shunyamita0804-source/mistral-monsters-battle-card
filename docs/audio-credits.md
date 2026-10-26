@@ -86,6 +86,23 @@ ZIP の並び順と「順番に」の並びが合わないため、**曲のフ�
 
 - 英語の曲名はローマ字の仮表記（Hourousha no Machi・Shinju no Shiren・Onore to Nakama wo Shinjite）
 
+### 2026-10-26 追加の5曲（ダンジョン2つ・カードショップ・カード練習場・カード研究所）
+
+ユーザー指示「ダンジョンのBGM送りました（遺跡と森）」「カードショップのBGM、教習所、研究所のBGM送ります」（2026-10-26。利用確認済み）。
+届いたファイル名は文字化けしていたので、曲の中身と名前の文字数で割り当てた（教習所＝ゲームの「カード練習場」）。
+ユーフルカの3曲は `make_bgm_loops_wingless.py`（.txt のループ位置）、BGMer の2曲は曲の終わりがフェードアウトするので
+`tools/audio/find_loop.py` で同じ音がもう一度始まる所を探し、`tools/audio/make_bgm_loops_bgmer.py` でその間を切り出した。音量は gain で約 -18.5 LUFS に。
+
+| 場面（BGM_REGISTRY） | ファイル | 曲名 / 作者 | 出典 | ループ |
+| --- | --- | --- | --- | --- |
+| `dungeonRuins`：遺跡のダンジョン（dungeon-01） | bgm_dungeon_ruins.mp3 | 月の廃墟 / ユーフルカ | Wingless Seraph | .txt の位置 |
+| `dungeonForest`：森のダンジョン（dungeon-02） | bgm_dungeon_forest.mp3 | 古代エルフの聖域 / ユーフルカ | Wingless Seraph | .txt の位置 |
+| `lab`：カード研究所（図鑑の画面も続けて） | bgm_lab.mp3 | 開かれし封印の扉 / ユーフルカ | Wingless Seraph | .txt の位置 |
+| `shop`：カードショップ（ショップの画面も続けて） | bgm_shop.mp3 | セールストーク / BGMer | BGMer | 170.02〜266.02 秒（96 秒ごとに同じ曲がくり返す） |
+| `practice`：カード練習場 | bgm_practice.mp3 | 無心になれる作業 / BGMer | BGMer | 27.89〜87.36 秒 |
+
+- いままでのダンジョンの曲 `dungeon`（Spirits Forest / HydroGene）は、曲の決まっていないダンジョン用に残した（いまは鳴る場所なし）
+
 ## ミスモンの画像（2026-10-22 追加）
 
 ユーザー指示「ダンジョンと景品のアイコン、ボタン、金貨を使って。残りは使わない」（2026-10-22）。本編の正式素材をそのまま（大きさの縮小だけ）。
@@ -212,3 +229,5 @@ OtoLogic は設定画面のクレジットに前から表記している）。
 `assets/audio/se/card_deal/swish_1〜7.mp3`：頭の無音を切り、0.05〜0.47 秒を使って最後 0.08 秒をフェードアウト（音色・大きさは変えていない。鳴らす大きさは `DEAL_GAIN` 0.45）。
 自分・相手がカードを引く・配るたびに、7種類から前と違うものを選んで鳴らす（`sound.deal()`）。`cardDraw`（設定画面の試し鳴らし）も swish_1 に。
 前の `card_deal.mp3`（効果音ラボ「カードを配る」）は使わなくなった（ファイルは残している）。
+- 2026-10-26（同じ日の2回目）：ユーザー指示「カードの音はこれ1つで1枚に1度鳴らすように」で、届いた `Motion-Swish07-5.mp3` だけにした
+  （`assets/audio/se/card_deal/swish.mp3`。切り出しは同じ。7種類から選ぶのはやめた）
