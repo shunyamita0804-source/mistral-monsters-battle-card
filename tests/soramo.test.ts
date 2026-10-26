@@ -11,7 +11,7 @@ import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { actingSide, applyAction, cardUsability, createBattle, manaOf, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { skillCardFace, skillValueBadge, skillValueBadgeText } from '../src/game/cards/cardFace.ts';
-import { buildAutoDeck, countCards, createStarterDeck, STARTER_OTHER_SKILLS, STARTER_SUPPORT_COUNT, validateDeck } from '../src/game/deck/deck.ts';
+import { buildAutoDeck, countCards, createStarterDeck, STARTER_SUPPORT_COUNT, STARTER_THIRD_SKILLS, validateDeck } from '../src/game/deck/deck.ts';
 import { createNewSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
@@ -116,10 +116,11 @@ describe('ソラモ14技：正式データ（2026-10-26 Art Ver.2。届いた JS
 });
 
 describe('初期配布（2026-10-25 ユーザー確定）', () => {
-  it('ソラモ16枚＝02・03・04・07・09・10・11・13 を2枚ずつ。01・05・06・08・12・14 は0枚（登録はある）', () => {
+  it('ソラモ16枚＝02・03・04・07・09・10・11・13 を2枚ずつ。01・05・06・08・12・14 は初期配布0枚（登録はある）', () => {
     expect(SORAMO_STARTER).toEqual([2, 3, 4, 7, 9, 10, 11, 13].map((n) => ({ id: ids(n), copies: 2 })));
     expect(SORAMO_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
-    const counts = countCards(createStarterDeck().skills);
+    // 初期デッキの先頭16枚がソラモの初期配布（そのあとの3体目の13枚は【仮】。下のテスト）
+    const counts = countCards(createStarterDeck().skills.slice(0, 16));
     for (const n of [1, 5, 6, 8, 12, 14]) {
       expect(counts[ids(n)] ?? 0).toBe(0);
       expect(getSkill(ids(n)).name).toBeTruthy();
@@ -127,13 +128,15 @@ describe('初期配布（2026-10-25 ユーザー確定）', () => {
     for (const n of [2, 3, 4, 7, 9, 10, 11, 13]) expect(counts[ids(n)]).toBe(2);
   });
 
-  it('初期デッキ60枚＝ソラモ16＋残り2体分29（未確定・仮）＋サポート15（未確定・仮）。そのまま使える', () => {
+  it('初期デッキ60枚＝ソラモ16＋ラズック16（2026-10-26 正式）＋3体目13（未確定・仮。いまの3体目はソラモ）＋サポート15（未確定・仮）。そのまま使える', () => {
     const deck = createStarterDeck();
     expect(deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-soramo']);
     expect(deck.skills).toHaveLength(60);
-    expect(deck.skills.filter((id) => id.startsWith('skl-soramo14-'))).toHaveLength(16);
-    expect(deck.skills.filter((id) => id.startsWith('skl-lazuck-'))).toHaveLength(STARTER_OTHER_SKILLS);
+    expect(deck.skills.slice(0, 16)).toEqual(SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id)));
+    expect(deck.skills.filter((id) => id.startsWith('skl-lazuck-'))).toHaveLength(16);
+    expect(deck.skills.slice(32, 32 + STARTER_THIRD_SKILLS).every((id) => id.startsWith('skl-soramo14-'))).toBe(true);
     expect(deck.skills.filter((id) => id.startsWith('sup-'))).toHaveLength(STARTER_SUPPORT_COUNT);
+    expect(Math.max(...Object.values(countCards(deck.skills)))).toBeLessThanOrEqual(3);
     expect(validateDeck(deck, createNewSave().collection)).toEqual([]);
   });
 });

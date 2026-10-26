@@ -1,23 +1,32 @@
+import cardBackUrl from '@assets/images/ui/card_back.webp';
+import deckIconUrl from '@assets/images/ui/battle/icon_deck.webp';
 import { cardCatalog, getMonster, MONSTERS, skillsOf, SUPPORTS } from '../../data/cards.ts';
 import { DECK_RULES } from '../../data/rules.ts';
-import { categoryLabel, effectLabel, skillCategory, type PlayCard } from '../../game/cards/cardTypes.ts';
-import { cardName } from '../../i18n/content.ts';
+import { describePlayCard, effectLabel, categoryLabel, skillCategory, type MonsterCard, type PlayCard } from '../../game/cards/cardTypes.ts';
+import { cardDescription, cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
-import { buildDeckFromCollection, countCards, validateDeck, type Deck } from '../../game/deck/deck.ts';
-import { openCardDetail } from '../components/cardDetail.ts';
+import { buildDeckFromCollection, countCards, countRoles, validateDeck, type Deck } from '../../game/deck/deck.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { createMonsterCard } from '../components/monsterCard.ts';
+import { createMonsterPortrait } from '../components/monsterPortrait.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { createPlayCard } from '../components/skillCard.ts';
 import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
 
-/** タブ「サポート」の印（モンスターIDと重ならない値） */
-const SUPPORT_TAB = '__support';
+/** 技カードの組「サポート」の印（モンスターIDと重ならない値） */
+const SUPPORT_GROUP = '__support';
+
+/** 画面の段：表（全体）→ モンスターを選ぶ／技カードを選ぶ */
+type View = 'menu' | 'monsters' | 'skills';
 
 /**
- * デッキ編集（家の机）。モンスター3体＋山札60枚（適合技とサポート。仮ルール：同じカード4枚まで）。
- * 不正な構成は保存できない。所持枚数を超えては入れられない。
+ * デッキ編集（家の机）。モンスター3体＋山札60枚（適合技とサポート。仮ルール：同じカード3枚まで）。
+ * 2026-10-26 ユーザー指示「デッキ編成は PS版（モンスターファーム バトルカード）の動画のように」で3段にした：
+ * - 表：デッキ全体と、モンスターごと・サポートの「攻撃・守り・計」の枚数。下に「モンスターを選ぶ・技カードを選ぶ・おまかせ・中止・終了」
+ * - モンスターを選ぶ：3つの枠から入れかえる枠を選び、持っているモンスターの一覧から入れる（上に大きな絵）
+ * - 技カードを選ぶ：モンスター（またはサポート）ごとの一覧に「使う・残り」の枚数。タップしたカードを上に大きく出す
+ * 不正な構成は保存できない。所持枚数を超えては入れられない。デッキは1つだけ（複数のデッキは今回は作らない）
  */
 export const deckScreen: ScreenDefinition = {
   id: 'deck',
@@ -27,7 +36,13 @@ export const deckScreen: ScreenDefinition = {
     const element = h('main', { class: 'screen deck' });
     let draft: Deck = { monsters: [...store.save.deck.monsters], skills: [...store.save.deck.skills] };
     let dirty = false;
-    let tab: string | null = null;
+    let view: View = 'menu';
+    /** 技カードを選ぶ：いま見ている組（モンスターID か SUPPORT_GROUP） */
+    let group: string | null = null;
+    /** 上に大きく出すカード（モンスター・技・サポート） */
+    let focus: string | null = null;
+    /** モンスターを選ぶ：入れかえる枠（0〜2） */
+    let slot = 0;
     let listScroll = 0;
 
     const collection = (): Readonly<Record<string, number>> => store.save.collection;
@@ -38,28 +53,41 @@ export const deckScreen: ScreenDefinition = {
       render();
     };
 
-    /**
-     * モンスターをタップ：入れる／外す。同じモンスターを何体も入れられる決まり（DECK_RULES.allowDuplicateMonsters）のときは、
-     * 持っている数までタップするたびに1体ずつ足し、それ以上は外す（全部）
-     */
-    const toggleMonster = (id: string): void => {
-      const inDraft = draft.monsters.filter((m) => m === id).length;
-      const canAddCopy =
-        DECK_RULES.allowDuplicateMonsters && inDraft > 0 && inDraft < (collection()[id] ?? 0) && draft.monsters.length < DECK_RULES.monsterCount;
-      if (inDraft > 0 && !canAddCopy) {
-        const removed = draft.skills.filter((s) => cardCatalog.get(s)?.kind === 'skill' && skillsOf(id).some((k) => k.id === s)).length;
-        setDraft({ monsters: draft.monsters.filter((m) => m !== id), skills: draft.skills.filter((s) => !skillsOf(id).some((k) => k.id === s)) });
-        if (removed > 0) messageModal(element, t('deck.removedSkills', { name: cardName(getMonster(id)), n: removed }));
+    const go = (next: View): void => {
+      view = next;
+      listScroll = 0;
+      render();
+    };
+
+    /** デッキからいなくなったモンスターの技を外す（外した枚数を知らせる） */
+    const withMonsters = (monsters: readonly string[]): void => {
+      const gone = [...new Set(draft.monsters)].filter((m) => !monsters.includes(m));
+      const goneSkills = new Set(gone.flatMap((m) => skillsOf(m).map((s) => s.id)));
+      const removed = draft.skills.filter((s) => goneSkills.has(s)).length;
+      setDraft({ monsters, skills: draft.skills.filter((s) => !goneSkills.has(s)) });
+      if (removed > 0) messageModal(element, t('deck.removedSkills', { name: gone.map((m) => cardName(getMonster(m))).join('・'), n: removed }));
+    };
+
+    /** 選んだ枠に入れる（空きの枠なら後ろに足す）。持っている数より多くは入れない */
+    const putMonster = (id: string): void => {
+      const next = [...draft.monsters];
+      if (slot < next.length) next[slot] = id;
+      else next.push(id);
+      const used = next.filter((m) => m === id).length;
+      if (used > (collection()[id] ?? 0) || (!DECK_RULES.allowDuplicateMonsters && used > 1)) {
+        messageModal(element, t('deck.issue.notOwned', { name: cardName(getMonster(id)), owned: collection()[id] ?? 0, count: used }));
         return;
       }
-      if (draft.monsters.length >= DECK_RULES.monsterCount) {
-        messageModal(element, t('deck.monsterLimit', { n: DECK_RULES.monsterCount }));
-        return;
-      }
-      setDraft({ ...draft, monsters: [...draft.monsters, id] });
+      withMonsters(next);
+    };
+
+    const removeMonster = (): void => {
+      if (slot >= draft.monsters.length) return;
+      withMonsters(draft.monsters.filter((_, i) => i !== slot));
     };
 
     const changeSkill = (id: string, delta: 1 | -1): void => {
+      focus = id;
       if (delta === 1) {
         setDraft({ ...draft, skills: [...draft.skills, id] });
       } else {
@@ -83,16 +111,19 @@ export const deckScreen: ScreenDefinition = {
       }
     };
 
-    const save = (): void => {
-      const issues = validateDeck(draft, collection());
-      if (issues.length > 0) {
+    /** 終了：変えていれば保存して戻る（決まりに合わなければ問題を見せて残る） */
+    const finish = (): void => {
+      if (!dirty) {
+        ctx.back('world');
+        return;
+      }
+      if (validateDeck(draft, collection()).length > 0) {
         showIssues();
         return;
       }
       store.update((s) => ({ ...s, deck: draft }));
       dirty = false;
-      messageModal(element, t('deck.saved'));
-      render();
+      messageModal(element, t('deck.saved'), () => ctx.back('world'));
     };
 
     const showIssues = (): void => {
@@ -107,6 +138,7 @@ export const deckScreen: ScreenDefinition = {
       });
     };
 
+    /** 中止：変えていれば、捨ててよいか聞いてから戻る */
     const leave = (): void => {
       if (!dirty) {
         ctx.back('world');
@@ -115,107 +147,294 @@ export const deckScreen: ScreenDefinition = {
       confirmModal(element, t('deck.leaveConfirm'), [h('p', { class: 'modal__text', text: t('deck.leaveConfirmText') })], () => ctx.back('world'));
     };
 
-    const render = (): void => {
-      listScroll = element.querySelector('.deck__skills')?.scrollTop ?? listScroll;
-      const issues = validateDeck(draft, collection());
-      const counts = countCards(draft.skills);
-      const coll = collection();
-      const ownedMonsters = MONSTERS.filter((m) => (coll[m.id] ?? 0) > 0);
+    const groupsOf = (): string[] => [...new Set(draft.monsters), SUPPORT_GROUP];
 
-      const status = h(
+    /** 組のカード（サポートは持っているか入っているものだけ） */
+    const groupCards = (g: string): PlayCard[] => {
+      if (g !== SUPPORT_GROUP) return skillsOf(g);
+      const counts = countCards(draft.skills);
+      return SUPPORTS.filter((c) => (collection()[c.id] ?? 0) > 0 || (counts[c.id] ?? 0) > 0);
+    };
+
+    const openSkills = (g: string): void => {
+      group = g;
+      focus = null;
+      go('skills');
+    };
+
+    const statusBar = (): HTMLElement => {
+      const issues = validateDeck(draft, collection());
+      return h(
         'button',
         { class: `deck__status${issues.length === 0 ? ' is-ok' : ' is-ng'}`, attrs: { type: 'button' }, on: { click: showIssues } },
         h('span', { text: t('deck.statusMonsters', { n: draft.monsters.length, max: DECK_RULES.monsterCount }) }),
         h('span', { text: t('deck.statusDeck', { n: draft.skills.length, max: DECK_RULES.skillCount }) }),
         h('span', { class: 'deck__status-state', text: issues.length === 0 ? t('deck.statusOk') : t('deck.statusNg', { n: issues.length }) }),
       );
+    };
 
-      const monsters = h(
+    const hint = (text: string): HTMLElement => h('p', { class: 'deck__hint', text });
+
+    /** サポートの組の印（モンスターの絵の代わりにカードの裏面） */
+    const supportIcon = (size: number): HTMLElement => {
+      const img = h('img', { class: 'deck__support-icon', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } });
+      img.style.width = `${size}px`;
+      img.style.height = `${size}px`;
+      return img;
+    };
+
+    // ===== 表（全体） =====
+    const renderMenu = (): HTMLElement[] => {
+      const num = (n: number | null): HTMLElement => h('span', { class: 'deck-table__num', text: n === null ? t('deck.table.none') : String(n) });
+      const all = countRoles(draft.skills);
+      const team = h(
         'div',
-        { class: 'deck__monsters' },
-        ...ownedMonsters.map((m) =>
+        { class: 'deck-table__row deck-table__row--team' },
+        h(
+          'span',
+          { class: 'deck-table__name' },
+          h('img', { class: 'deck-table__icon', attrs: { src: deckIconUrl, alt: '', draggable: 'false' } }),
+          h('span', { class: 'deck-table__label', text: t('deck.table.team') }),
+        ),
+        num(all.atk),
+        num(all.guard),
+        h('span', { class: 'deck-table__num', text: `${all.total}/${DECK_RULES.skillCount}` }),
+      );
+      const rows = groupsOf().map((g) => {
+        const cards = draft.skills.filter((id) => (g === SUPPORT_GROUP ? cardCatalog.get(id)?.kind === 'support' : skillsOf(g).some((s) => s.id === id)));
+        const c = countRoles(cards);
+        const copies = g === SUPPORT_GROUP ? 0 : draft.monsters.filter((m) => m === g).length;
+        return h(
+          'button',
+          { class: 'deck-table__row', attrs: { type: 'button' }, dataset: { group: g }, on: { click: () => openSkills(g) } },
           h(
+            'span',
+            { class: 'deck-table__name' },
+            g === SUPPORT_GROUP ? supportIcon(28) : createMonsterPortrait(getMonster(g), 28),
+            h('span', { class: 'deck-table__label', text: g === SUPPORT_GROUP ? t('card.kind.support') : cardName(getMonster(g)) }),
+            copies > 1 ? h('span', { class: 'deck-table__copies', text: `×${copies}` }) : null,
+          ),
+          num(g === SUPPORT_GROUP ? null : c.atk),
+          num(g === SUPPORT_GROUP ? null : c.guard),
+          num(c.total),
+        );
+      });
+      const head = h(
+        'div',
+        { class: 'deck-table__head' },
+        h('span', {}),
+        h('span', { text: t('deck.table.atk') }),
+        h('span', { text: t('deck.table.guard') }),
+        h('span', { text: t('deck.table.total') }),
+      );
+      const firstGroup = groupsOf()[0] ?? SUPPORT_GROUP;
+      return [
+        statusBar(),
+        h('div', { class: 'deck-table' }, head, team, ...rows),
+        h(
+          'div',
+          { class: 'deck__menu' },
+          button(t('deck.menu.monsters'), () => {
+            slot = Math.min(draft.monsters.length, DECK_RULES.monsterCount - 1);
+            focus = draft.monsters[slot] ?? null;
+            go('monsters');
+          }, 'btn'),
+          button(t('deck.menu.skills'), () => openSkills(firstGroup), 'btn'),
+          button(t('deck.auto'), auto, 'btn'),
+          button(t('deck.menu.cancel'), leave, 'btn'),
+          button(t('deck.menu.finish'), finish, 'btn btn--primary deck__menu-finish'),
+        ),
+        h('div', { class: 'deck__spacer' }),
+        hint(t('deck.hint.menu')),
+        h('p', { class: 'deck__note', text: t('deck.rulesNote') }),
+      ];
+    };
+
+    // ===== モンスターを選ぶ =====
+    const renderMonsters = (): HTMLElement[] => {
+      const coll = collection();
+      const owned = MONSTERS.filter((m) => (coll[m.id] ?? 0) > 0);
+      const focused = focus ? cardCatalog.get(focus) : undefined;
+      const monster = focused?.kind === 'monster' ? focused : undefined;
+      const info = (m: MonsterCard): HTMLElement =>
+        h(
+          'div',
+          { class: 'deck-preview__info' },
+          h('p', { class: 'deck-preview__name', text: cardName(m) }),
+          h('p', { class: 'deck-preview__meta', text: t('deck.monsterInfo', { life: m.life, n: skillsOf(m.id).length, owned: coll[m.id] ?? 0 }) }),
+          h('p', { class: 'deck-preview__text', text: cardDescription(m) }),
+        );
+      const put = button(t('deck.put'), () => monster && putMonster(monster.id), 'btn btn--primary btn--small');
+      put.disabled = !monster || draft.monsters[slot] === monster.id;
+      const remove = button(t('deck.removeSlot'), removeMonster, 'btn btn--small');
+      remove.disabled = slot >= draft.monsters.length;
+      const preview = h(
+        'div',
+        { class: 'deck-preview' },
+        monster ? createMonsterCard(monster, { width: 88 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        monster ? info(monster) : h('div', { class: 'deck-preview__info' }, h('p', { class: 'deck-preview__text', text: t('deck.previewEmpty') })),
+      );
+      const slots = h(
+        'div',
+        { class: 'deck__slots' },
+        ...Array.from({ length: DECK_RULES.monsterCount }, (_, i) => {
+          const id = draft.monsters[i];
+          // 空きの枠は、いま入っている数のすぐ後ろの1つだけ選べる（間を空けない）
+          const selectable = i <= draft.monsters.length;
+          const b = h(
             'button',
             {
-              class: `deck__monster${draft.monsters.includes(m.id) ? ' is-selected' : ''}`,
-              attrs: { type: 'button', 'aria-pressed': String(draft.monsters.includes(m.id)) },
-              dataset: { id: m.id },
-              on: { click: () => toggleMonster(m.id) },
+              class: `deck__slot${i === slot ? ' is-selected' : ''}${id ? '' : ' is-empty'}`,
+              attrs: { type: 'button', 'aria-pressed': String(i === slot) },
+              on: {
+                click: () => {
+                  slot = i;
+                  focus = id ?? focus;
+                  render();
+                },
+              },
             },
-            createMonsterCard(m, { width: 68, showName: true }),
-            draft.monsters.filter((x) => x === m.id).length > 1
-              ? h('span', { class: 'deck__monster-count', text: `×${draft.monsters.filter((x) => x === m.id).length}` })
-              : null,
-          ),
-        ),
+            h('span', { class: 'deck__slot-no', text: t('deck.slot', { n: i + 1 }) }),
+            id ? createMonsterPortrait(getMonster(id), 52) : h('span', { class: 'deck__slot-empty', text: t('deck.slotEmpty') }),
+            h('span', { class: 'deck__slot-name', text: id ? cardName(getMonster(id)) : '' }),
+          );
+          (b as HTMLButtonElement).disabled = !selectable;
+          return b;
+        }),
       );
+      const list = h(
+        'div',
+        { class: 'deck__list' },
+        h('div', { class: 'deck__list-head' }, h('span', { text: t('deck.col.name') }), h('span', { text: t('deck.col.stock') })),
+        ...owned.map((m) => {
+          const left = (coll[m.id] ?? 0) - draft.monsters.filter((x) => x === m.id).length;
+          return h(
+            'button',
+            {
+              class: `deck__item${focus === m.id ? ' is-focused' : ''}`,
+              attrs: { type: 'button' },
+              dataset: { id: m.id },
+              on: {
+                click: () => {
+                  focus = m.id;
+                  render();
+                },
+              },
+            },
+            createMonsterPortrait(m, 32),
+            h('span', { class: 'deck__item-name', text: cardName(m) }),
+            h('span', { class: 'deck__item-num', text: String(left) }),
+          );
+        }),
+      );
+      return [preview, h('div', { class: 'deck__actions' }, put, remove), slots, list, hint(t('deck.hint.monsters'))];
+    };
 
+    // ===== 技カードを選ぶ =====
+    const renderSkills = (): HTMLElement[] => {
+      const coll = collection();
+      const counts = countCards(draft.skills);
+      const groups = groupsOf();
+      if (!group || !groups.includes(group)) group = groups[0] ?? SUPPORT_GROUP;
+      const g = group;
+      const cards = groupCards(g);
+      const focused = focus ? cardCatalog.get(focus) : undefined;
+      const card = focused && focused.kind !== 'monster' ? focused : undefined;
+      const known = card ? (coll[card.id] ?? 0) > 0 || (counts[card.id] ?? 0) > 0 : false;
+      const meta = (c: PlayCard): string =>
+        c.kind === 'skill'
+          ? c.stat
+            ? t('deck.metaSkill', { effect: effectLabel(c.effect.type), cost: c.cost, stat: categoryLabel(skillCategory(c)), v: c.stat.value })
+            : t('deck.metaSkillNoValue', { category: categoryLabel(skillCategory(c)), cost: c.cost })
+          : t('deck.metaSupport', { kind: t(c.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support'), cost: c.cost });
+      const preview = h(
+        'div',
+        { class: 'deck-preview' },
+        card && known ? createPlayCard(card, { width: 92 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        card && known
+          ? h(
+              'div',
+              { class: 'deck-preview__info' },
+              h('p', { class: 'deck-preview__name', text: cardName(card) }),
+              h('p', { class: 'deck-preview__meta', text: meta(card) }),
+              h('p', { class: 'deck-preview__text', text: describePlayCard(card) }),
+            )
+          : h('div', { class: 'deck-preview__info' }, h('p', { class: 'deck-preview__text', text: t(card ? 'deck.previewUnknown' : 'deck.previewEmpty') })),
+      );
       const tabs = h(
         'div',
         { class: 'deck__tabs' },
-        ...[null, ...new Set(draft.monsters), SUPPORT_TAB].map((id) =>
-          button(id === SUPPORT_TAB ? t('card.kind.support') : id ? cardName(getMonster(id)) : t('common.all'), () => {
-            tab = id;
+        ...groups.map((id) =>
+          button(id === SUPPORT_GROUP ? t('card.kind.support') : cardName(getMonster(id)), () => {
+            group = id;
+            focus = null;
             listScroll = 0;
             render();
-          }, `deck__tab${tab === id ? ' is-active' : ''}`),
+          }, `deck__tab${g === id ? ' is-active' : ''}`),
         ),
       );
-      if (tab && tab !== SUPPORT_TAB && !draft.monsters.includes(tab)) tab = null;
-
-      // サポートはモンスターに関係なく入れられる。持っているものだけ並べる
-      const supports: PlayCard[] = SUPPORTS.filter((c) => (coll[c.id] ?? 0) > 0 || (counts[c.id] ?? 0) > 0);
-      const listed: PlayCard[] =
-        tab === SUPPORT_TAB ? supports : [...(tab ? [tab] : [...new Set(draft.monsters)]).flatMap((mid) => skillsOf(mid)), ...(tab ? [] : supports)];
-      const meta = (card: PlayCard): string =>
-        card.kind === 'skill'
-          ? card.stat
-            ? t('deck.metaSkill', { effect: effectLabel(card.effect.type), cost: card.cost, stat: categoryLabel(skillCategory(card)), v: card.stat.value })
-            : t('deck.metaSkillNoValue', { category: categoryLabel(skillCategory(card)), cost: card.cost })
-          : t('deck.metaSupport', { kind: t(card.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support'), cost: card.cost });
-      const skillRows = listed.map((skill) => {
-        const owned = coll[skill.id] ?? 0;
-        const inDeck = counts[skill.id] ?? 0;
-        const plus = button('＋', () => changeSkill(skill.id, 1), 'deck__step deck__step--plus');
+      const rows = cards.map((c) => {
+        const owned = coll[c.id] ?? 0;
+        const inDeck = counts[c.id] ?? 0;
+        const plus = button('＋', () => changeSkill(c.id, 1), 'deck__step deck__step--plus');
         plus.disabled = inDeck >= owned || inDeck >= DECK_RULES.maxCopies || draft.skills.length >= DECK_RULES.skillCount;
-        const minus = button('－', () => changeSkill(skill.id, -1), 'deck__step deck__step--minus');
+        const minus = button('－', () => changeSkill(c.id, -1), 'deck__step deck__step--minus');
         minus.disabled = inDeck === 0;
+        const unknown = owned === 0 && inDeck === 0;
         return h(
           'div',
-          { class: `deck__row${owned === 0 ? ' is-unowned' : ''}`, dataset: { id: skill.id } },
-          h('button', { class: 'deck__row-card', attrs: { type: 'button', 'aria-label': t('deck.detail', { name: cardName(skill) }) }, on: { click: () => openCardDetail(element, skill, { owned }) } }, createPlayCard(skill, { width: 44, showText: false })),
+          { class: `deck__item deck__item--card${focus === c.id ? ' is-focused' : ''}${unknown ? ' is-unowned' : ''}`, dataset: { id: c.id } },
           h(
-            'div',
-            { class: 'deck__row-info' },
-            h('span', { class: 'deck__row-name', text: cardName(skill) }),
-            h('span', { class: 'deck__row-meta', text: meta(skill) }),
-            h('span', { class: 'deck__row-owned', text: t('deck.owned', { n: owned }) }),
+            'button',
+            {
+              class: 'deck__item-name',
+              attrs: { type: 'button', 'aria-label': t('deck.detail', { name: unknown ? t('deck.unknownCard') : cardName(c) }) },
+              on: {
+                click: () => {
+                  focus = c.id;
+                  render();
+                },
+              },
+            },
+            unknown ? t('deck.unknownCard') : cardName(c),
           ),
           minus,
           h('span', { class: 'deck__row-count', text: String(inDeck) }),
           plus,
+          h('span', { class: 'deck__item-num', text: String(Math.max(0, owned - inDeck)) }),
         );
       });
-
-      const saveBtn = button(t('deck.save'), save, 'btn btn--primary btn--small');
-      saveBtn.disabled = !dirty;
-      element.replaceChildren(
-        createScreenHeader({ title: t('deck.title'), back: { label: t('common.back'), onTap: leave }, right: saveBtn }),
-        status,
-        h('p', { class: 'deck__caption', text: t('deck.captionMonsters', { n: DECK_RULES.monsterCount }) }),
-        monsters,
-        h('p', { class: 'deck__caption', text: t('deck.captionDeck', { n: DECK_RULES.maxCopies }) }),
+      const inGroup = cards.reduce((n, c) => n + (counts[c.id] ?? 0), 0);
+      return [
+        preview,
         tabs,
         h(
           'div',
-          { class: 'deck__skills' },
-          ...(skillRows.length > 0
-            ? skillRows
-            : [h('p', { class: 'deck__empty', text: t(tab === SUPPORT_TAB ? 'deck.noSupports' : 'deck.chooseMonsters') })]),
+          { class: 'deck__list' },
+          h(
+            'div',
+            { class: 'deck__list-head deck__list-head--card' },
+            h('span', { text: t('deck.col.name') }),
+            h('span', { text: t('deck.col.use') }),
+            h('span', { text: t('deck.col.stock') }),
+          ),
+          ...(rows.length > 0 ? rows : [h('p', { class: 'deck__empty', text: t('deck.noSupports') })]),
         ),
-        h('footer', { class: 'deck__footer' }, button(t('deck.auto'), auto, 'btn'), h('span', { class: 'deck__note', text: t('deck.rulesNote') })),
+        h('p', { class: 'deck__group-count', text: t('deck.groupCount', { n: inGroup, d: draft.skills.length, max: DECK_RULES.skillCount }) }),
+        hint(t('deck.hint.skills', { n: DECK_RULES.maxCopies })),
+      ];
+    };
+
+    const render = (): void => {
+      listScroll = element.querySelector('.deck__list')?.scrollTop ?? listScroll;
+      const title = view === 'monsters' ? t('deck.menu.monsters') : view === 'skills' ? t('deck.menu.skills') : t('deck.title');
+      const back = view === 'menu' ? leave : () => go('menu');
+      element.dataset.view = view;
+      element.replaceChildren(
+        createScreenHeader({ title, back: { label: t('common.back'), onTap: back } }),
+        ...(view === 'monsters' ? renderMonsters() : view === 'skills' ? renderSkills() : renderMenu()),
       );
-      const list = element.querySelector('.deck__skills');
+      const list = element.querySelector('.deck__list');
       if (list) list.scrollTop = listScroll;
     };
 

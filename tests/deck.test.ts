@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { cardCatalog, monsterId, skillId, supportId } from '../src/data/cards.ts';
+import { cardCatalog, monsterId, SKILLS, skillId, supportId } from '../src/data/cards.ts';
+import { skillCategory } from '../src/game/cards/cardTypes.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { DECK_RULES } from '../src/data/rules.ts';
@@ -7,6 +8,7 @@ import {
   buildAutoDeck,
   buildDeckFromCollection,
   countCards,
+  countRoles,
   createPlaceholderStarterCollection,
   createPlaceholderStarterDeck,
   validateDeck,
@@ -82,5 +84,14 @@ describe('デッキ構成チェック（仮ルール）', () => {
     expect(validateDeck(deck, collection)).toEqual([]);
     const short = buildDeckFromCollection([monsterId('a'), monsterId('b'), monsterId('d')], collection);
     expect(short.skills.length).toBeLessThan(60);
+  });
+});
+
+describe('デッキ編集の表の枚数（攻撃・守り・計）', () => {
+  it('ちから・かしこさは攻撃、防御・回避は守り、特殊とサポートは計だけに入る', () => {
+    const pick = (cats: readonly string[]): string => SKILLS.find((s) => cats.includes(skillCategory(s)))!.id;
+    const ids = [pick(['force']), pick(['wisdom']), pick(['defense']), pick(['evade']), pick(['special']), supportId(1)];
+    expect(countRoles(ids)).toEqual({ atk: 2, guard: 2, total: 6 });
+    expect(countRoles([])).toEqual({ atk: 0, guard: 0, total: 0 });
   });
 });

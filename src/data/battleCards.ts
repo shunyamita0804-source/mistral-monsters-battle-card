@@ -1,3 +1,4 @@
+import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 
 /**
@@ -12,7 +13,7 @@ import { SORAMO_MONSTER_ID } from './soramo.ts';
  * - scale：モンスターの絵（800×920 の配置用）をカードに対して縮める割合。耳・しっぽ・足先が枠に隠れない大きさ。
  *   モンスターごとに決め、体の大小の差はこの値で残す（全部を同じ大きさにそろえない）
  * - offsetY：上下のずらし（カードの高さに対する割合。＋で下へ）
- * まだソラモだけ（ほかのモンスターへは承認後に広げる）
+ * ソラモ（2026-10-25）とラズック（2026-10-26）。ほかのモンスターは素材が届いてから
  */
 export interface BattleCardSpec {
   /** モンスターの透過 PNG（assets/images/cards/monsters/） */
@@ -26,6 +27,9 @@ export interface BattleCardSpec {
 export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // ソラモ：枠はクリーム（#E4D2AC）。0.84 で耳の先・しっぽ・足先が枠の飾りに重ならない
   [SORAMO_MONSTER_ID]: { art: 'soramo_battlecard.png', frame: 'soramo', scale: 0.84, offsetY: 0.016 },
+  // ラズック（2026-10-26）：枠は紫（#844DC5。届いた 06_Razuk_PurpleAccent の色）。絵は届いた 02_Razuk_Battle_800x920_RGBA.png を無改変。
+  // 0.94：届いた確認用の重ね絵（07_Razuk_BattleCard_Preview）に近い大きさで、しっぽ・足先が枠に隠れない
+  [LAZUCK_MONSTER_ID]: { art: 'lazuck_battlecard.png', frame: 'lazuck', scale: 0.94, offsetY: 0.01 },
 };
 
 export function battleCardOf(monsterId: string): BattleCardSpec | undefined {

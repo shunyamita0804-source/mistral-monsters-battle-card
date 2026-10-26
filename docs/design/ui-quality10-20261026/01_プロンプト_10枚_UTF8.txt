@@ -1,0 +1,231 @@
+【プロンプト】まだ足りないデザイン10枚・第10弾（2026-10-26）
+
+使い方：1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼る。日本語でうまくいかないときは English version
+4（演出の光）は背景が真っ黒なので、共通ルールの【背景】の行は無視してよい（番号の文の方を優先）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（全部の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品（窓の枠・勝ちの帯・金のボタン）にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】画面を真正面から見た平らな部品（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【伸ばして使う】ゲームで横や縦に伸ばして使う。四隅の飾りは角に寄せ、真ん中は無地（模様は伸ばしても目立たない細かさに）
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること
+▲ここまで
+▼English
+Draw a UI part for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts (window frame, win banner, gold button).
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] Flat parts seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Stretching] The game stretches these parts. Keep ornaments in the corners; keep the middle plain (any texture fine enough to stretch unnoticed).
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　対戦の操作のボタン（青・えんじ×ふつう・押した・使えない）→ battle_buttons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/いまの操作ボタン.png、見本/金のボタン.png、今の画面/対戦_操作のボタン.png（下の「コマンド」「攻撃終了」）
+▼ここからコピー
+カードゲームの対戦画面の下に並べる、横長のボタンを6つ描いてください。横長 1536×1024 に、2列×3行で並べる（左の列＝青、右の列＝えんじ）。
+・形：横:縦＝2.5:1 の、角の丸い板。添付の「いまの操作ボタン」と同じ色と形（紺の地・えんじの地に、くすんだ金の細い縁と、四隅の小さな葉の飾り）を、細かく描き直す
+・1行目＝ふつう：地の上の方が少し明るく、つやがある
+・2行目＝押した：全体が少し暗く、地がへこんで見える（縁はそのまま）
+・3行目＝使えない：地は灰色がかった色に沈み、縁の金もくすむ
+・中は無地（ゲームが「ターン終了」などの文字を重ねる）。縁は細く（対戦の画面は細い枠の方針）。高さ 46px くらいに縮めても縁と四隅の飾りが見えるように、縁ははっきりと
+▲ここまで
+▼English
+Draw six horizontal buttons placed at the bottom of a card battle screen. On a 1536x1024 canvas, 2 columns x 3 rows (left column navy, right column wine).
+- Shape: a rounded rectangle, 2.5:1. Redraw the attached "current buttons" in finer detail with the same colors and shape (navy base / wine base, thin muted-gold rim, small leaf ornaments in the four corners).
+- Row 1 = normal: the upper part of the base is slightly brighter and glossy.
+- Row 2 = pressed: darker overall, the base looks pushed in (rim unchanged).
+- Row 3 = disabled: the base sinks to a greyish tone and the gold rim dulls.
+- Plain interior (the game writes "End Turn" etc.). Thin rim (the battle screen uses thin frames), but crisp enough that the rim and corner ornaments stay visible when shrunk to about 46 px tall.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　対戦の窓の枠（確認・コマンドの一覧・結果）→ battle_windows.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/情報の欄の枠.png、今の画面/対戦_確認の窓.png、今の画面/対戦_コマンド.png、今の画面/対戦_負け.png
+▼ここからコピー
+カードゲームの対戦画面の上に開く、窓の枠を3つ描いてください。横長 1536×1024 に、重ならないように並べる。中は文字やボタンを置くので無地。
+・1 確認の窓：横:縦＝3:2 の角の丸い窓。暗い紺の地（少しだけ透ける感じの深い紺）、くすんだ金の細い縁、四隅に小さな飾り。上の縁の真ん中に小さな宝石を1つ
+・2 コマンドの一覧：縦長（横:縦＝2:3）の小さな窓。1 と同じ地と縁で、飾りはもっと控えめ。下の縁の左寄りに、下を指す小さな三角のでっぱり（「コマンド」のボタンから開いたことを示す）
+・3 結果の窓：横:縦＝4:3 の窓。1 より少し立派に、縁を二重の細い金の線にして、四隅に羽根の形の小さな飾り。上の部分は、勝ち・負けの帯（添付の勝ちの帯）を重ねるので無地で広めに空ける
+・対戦の画面は「細い枠」の方針。添付の情報の欄の枠と同じくらいの細さ
+▲ここまで
+▼English
+Draw three window frames that open over a card battle screen, on a 1536x1024 canvas with no overlap. Interiors are plain (for text and buttons).
+1 Confirm window: rounded rectangle 3:2, deep navy base (feels slightly translucent), thin muted-gold rim, small corner ornaments, one small gem at the top center of the rim.
+2 Command list: a small portrait window (2:3) with the same base and rim but even simpler ornaments; a small triangular tab on the bottom rim, left of center, pointing down (it opens from the "Command" button).
+3 Result window: 4:3, a bit grander than 1: a double thin gold line rim and small feather-shaped ornaments in the corners. Leave the upper area plain and roomy (the win/lose banner is placed there).
+- The battle screen uses thin frames; about as slim as the attached info panel frame.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　対戦の説明の欄の枠 → battle_focus_frame.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/上の帯.png、見本/情報の欄の枠.png、今の画面/対戦_説明の欄.png（真ん中の大きな線の箱）、今の画面/対戦_説明の欄_カードを選んだとき.png
+▼ここからコピー
+カードゲームの対戦画面の真ん中にある、大きな説明の欄の枠を1つ描いてください。縦長 1024×1536 の真ん中に1つ。
+・形：横:縦＝5:4 の角の丸い大きな板（縦長の画像の中に、横長の板を置く。上下は透明のまま）
+・地：とても暗い紺。真ん中に向かってほんの少しだけ明るく、ふちは暗く沈む（上に白い文字と拡大したカードを置くので、模様は入れない）
+・縁：くすんだ金の細い1本線。四隅だけ小さなL字の金具。上の縁の真ん中に、小さなひし形の飾りを1つ
+・飾りは控えめに（添付の上の帯・情報の欄の枠と同じ細さ）。真ん中は縦にも横にも伸ばして使う
+▲ここまで
+▼English
+Draw one large frame for the description area in the middle of a card battle screen, centered on a portrait 1024x1536 canvas.
+- Shape: a large rounded panel, 5:4 landscape (a landscape panel inside the portrait canvas; leave the rest transparent).
+- Base: very dark navy, only slightly brighter toward the center, darker at the edges. No pattern (white text and an enlarged card are placed on it).
+- Rim: a single thin muted-gold line, small L-shaped metal fittings at the four corners only, one small diamond ornament at the top center.
+- Restrained, as slim as the attached top bar and info panel. The middle is stretched both ways.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　敵とぶつかったときの演出（3コマ）→ encounter_fx.png　※背景は真っ黒
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/ダンジョンの床と壁.png、今の画面/ダンジョン.png
+▼ここからコピー
+ダンジョンで敵にぶつかってから対戦の画面に切り替わるまでの、一瞬の光の演出を3コマ描いてください。横長 1536×1024 に、3つを横に並べる（1コマは縦長のマス。横:縦＝9:19 のスマホの画面の形）。
+背景は真っ黒 #000000（ゲームで「光を足す」重ね方をするため。透明にしない）。文字なし。
+・1コマ目：画面の真ん中を、斜めに横切る細い光の裂け目（くすんだ金と青白い光）。まわりに小さな火の粉
+・2コマ目：裂け目が太く広がり、そこから放射状に光の筋が走る
+・3コマ目：画面の大部分が白く明るい光で満たされ、ふちだけ金色に残る（ここで対戦の画面に切り替える）
+・3コマとも、裂け目の位置と角度はそろえる（右上から左下へ）。手描きの筆の質感の光。派手な虹色やネオンにしない
+▲ここまで
+▼English
+Draw a three-frame light effect that plays between bumping into an enemy in a dungeon and switching to the battle screen. Three frames side by side on a 1536x1024 canvas (each frame a portrait cell shaped like a phone screen, 9:19).
+Background: solid black #000000 (the game uses additive blending; do NOT make it transparent). No text.
+- Frame 1: a thin slit of light cutting diagonally across the middle of the screen (muted gold and pale blue light), with small embers around it.
+- Frame 2: the slit widens and light rays shoot out radially from it.
+- Frame 3: most of the screen is filled with bright white light, only the edges stay gold (the game switches to the battle screen here).
+- Keep the slit at the same position and angle in all three frames (top right to bottom left). Hand-painted brush-stroke light. No rainbow colors or neon.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　ダンジョンの帯（階に入った・クリア・ボスの階）→ dungeon_banners.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/勝ちの帯.png、見本/案内板.png、見本/ダンジョンの床と壁.png、今の画面/ダンジョン.png
+▼ここからコピー
+ダンジョンの画面の真ん中に、少しの間だけ出す横長の帯を3つ描いてください。横長 1536×1024 に、上下に3本並べる（重ならないように）。中は文字を置くので無地。
+・1 階に入った：横:縦＝5:1。古い石の板に、さびた鉄の枠と鋲。左右の端に小さなたいまつの飾り（ゲームが「B1F」と階の名前を重ねる）
+・2 クリア：横:縦＝5:1。紺の布の帯に、くすんだ金の縁。左右に小さな月桂樹の枝、上の真ん中に小さな星（添付の勝ちの帯と同じ金の描き方）
+・3 ボスの階：横:縦＝5:1。黒に近いえんじの布の帯に、とげのある鉄の縁。左右の端に小さな角（つの）の飾り。不気味だが、怖すぎない
+・3本とも同じ大きさ。添付のダンジョンの石の床と壁に合う色味に
+▲ここまで
+▼English
+Draw three horizontal banners shown briefly in the middle of the dungeon screen. Stack them vertically on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Floor entered: 5:1. An old stone slab with a rusty iron frame and rivets; small torch ornaments at both ends (the game writes "B1F" and the floor name).
+2 Cleared: 5:1. A navy cloth banner with a muted-gold rim, small laurel branches at both sides and a small star at the top center (gold drawn like the attached win banner).
+3 Boss floor: 5:1. A near-black wine cloth banner with a thorny iron rim and small horn ornaments at both ends. Ominous but not too scary.
+- All three the same size, colored to suit the attached dungeon stone floor and walls.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　歩く画面の小物（名札・出口の印・操作の案内の札・次への印）→ walk_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/場所の札.png、見本/調べるボタン.png、見本/会話の窓.png、今の画面/家の中.png、今の画面/店の中.png
+▼ここからコピー
+街や建物の中を歩く画面に置く、小さな部品を4種描いてください。横長 1536×1024 に、重ならないように並べる。
+・1 物の名札：家具や場所の上に浮かべる、小さな横長の札（横:縦＝3:1）。こげ茶の木の地に、くすんだ金の細い縁。下の真ん中に小さな三角のでっぱり（下の物を指す）。中は無地
+・2 出口の印：床に置く、下向きの金の矢じり（盾の先のような形）と、その下の小さな光の輪（床に平らに置いた楕円）。斜め上から見下ろす視点
+・3 操作の案内の札：画面の左下に置く、横:縦＝2:1 の角の丸い札。半透明に見える暗い紺の地に、くすんだ金の細い縁。左上に、画面をなぞる「指」の小さなアイコン（金の線画）。中は文字を置くので無地
+・4 次への印：会話の窓の右下に出す、小さな下向きの三角（くすんだ金、小さな宝石つき）。同じ形で、少し下にずれた2コマ（上下にはねる動きに使う）
+・添付の場所の札・調べるボタン・会話の窓と同じ金の色と描き方
+▲ここまで
+▼English
+Draw four kinds of small parts for the screens where you walk around the town and inside buildings. On a 1536x1024 canvas, no overlap.
+1 Object label: a small horizontal tag (3:1) floating above furniture or places. Dark brown wood base, thin muted-gold rim, a small triangular tab at the bottom center pointing down. Plain inside.
+2 Exit marker: a downward gold arrowhead (like a shield tip) placed on the floor, with a small ring of light under it (a flat ellipse on the floor). Three-quarter top-down view.
+3 Controls hint plate: a rounded plate (2:1) for the lower-left of the screen. Dark navy base that looks semi-transparent, thin muted-gold rim, a small "finger swiping" icon (gold line art) at the top left. Plain inside for text.
+4 "Next" marker: a small downward triangle shown at the bottom right of the dialogue window (muted gold with a small gem). Two frames of the same shape, the second slightly lower (for a bouncing motion).
+- Same gold color and drawing style as the attached place plate, examine button and dialogue window.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　手に入れたときの小窓と「不思議な欠片」の絵 → item_get.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/景品の袋.png、見本/コイン.png、見本/カードの裏面.png
+▼ここからコピー
+宝箱を開けたときや、落ちている物を拾ったときに出す部品を描いてください。横長 1536×1024 に、重ならないように並べる。
+・1 手に入れたときの小窓：横:縦＝2:1 の角の丸い窓。暗い紺の地に、くすんだ金の縁。左に、手に入れた物の絵を置く丸い台座（金の輪の中が少し明るい）。右は文字を置くので無地
+・2 台座の後ろの光：1 の丸い台座の後ろに重ねる、やわらかい金色の放射状の光（ゆっくり回して使う。真ん中は透明に近く）
+・3 不思議な欠片：手のひらに乗るくらいの、割れた石板のかけら。表面に、青く淡く光る古い模様の線（文字にしない）。ふちは欠けてでこぼこ。くすんだ灰色と青
+・4 カードの束：裏向きのカードが3枚、少しずらして重なった小さな絵（添付のカードの裏面と同じ紺と金）
+・3 と 4 は、添付の景品の袋・コインと同じくらいの大きさと描き方（小さく表示してもはっきり分かるように）
+▲ここまで
+▼English
+Draw parts shown when you open a treasure chest or pick up an item. On a 1536x1024 canvas, no overlap.
+1 Item-get window: a rounded window (2:1), dark navy base, muted-gold rim. On the left, a round pedestal for the item picture (slightly brighter inside a gold ring). The right side is plain for text.
+2 Glow behind the pedestal: soft golden radial rays placed behind the round pedestal of 1 (slowly rotated in the game; nearly transparent in the center).
+3 Mysterious Shard: a palm-sized broken fragment of a stone tablet, with old pattern lines glowing faintly blue on its surface (not letters). Chipped, uneven edges. Dull grey and blue.
+4 Card bundle: three face-down cards stacked slightly offset (same navy and gold as the attached card back).
+- 3 and 4 are about the same size and style as the attached prize pouch and coin (clearly readable when small).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 8　カードショップのメニューの札（3つ）→ shop_menu_plates.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/店員の帯.png、見本/ガチャの機械.png、見本/カードの裏面.png、今の画面/ショップのメニュー.png
+▼ここからコピー
+カードショップの画面に縦に並べる、横長のメニューの札を3つ描いてください。横長 1536×1024 に、上下に3枚並べる（重ならないように）。
+・形：横:縦＝4:1 の角の丸い札。こげ茶の木の地に、くすんだ金の縁。札の左の4分の1に、絵を入れる窓（金の細い枠）。右の4分の3は文字を置くので無地
+・1 カードを見る：窓の中に、ガラスのショーケースに並んだカード（紺と金の裏面）
+・2 売る：窓の中に、木のカウンターの上の小さな天秤と、コインの小さな山
+・3 カードガチャ：窓の中に、添付のガチャの機械を小さく正面から
+・3枚とも同じ形と大きさ。窓の絵は店の中の明るさ（暖かいランプの光）で
+▲ここまで
+▼English
+Draw three horizontal menu plates stacked on the card shop screen. Stack them vertically on a 1536x1024 canvas, no overlap.
+- Shape: a rounded plate (4:1), dark brown wood base, muted-gold rim. The left quarter holds a picture window (thin gold frame); the right three quarters are plain for text.
+- 1 Browse cards: in the window, cards (navy-and-gold backs) lined up in a glass showcase.
+- 2 Sell: in the window, a small balance scale on a wooden counter and a small pile of coins.
+- 3 Card gacha: in the window, the attached gacha machine, small, seen from the front.
+- All three the same shape and size. Pictures lit like the inside of the shop (warm lamp light).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 9　ベッドの画面の「冒険の記録」の板 → record_board.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/主人公の顔_男.png、見本/主人公の顔_女.png、今の画面/ベッド.png（主人公・ランク・所持金などが表だけ）
+▼ここからコピー
+主人公の冒険の記録を見せる、横長の板を1つ描いてください。横長 1536×1024 の真ん中に1つ。
+・形：横:縦＝16:10 の、革の表紙の手帳を開いたような板。こげ茶の革のふち、くすんだ金の角の金具。中は古い紙の色（明るすぎない生成り）
+・左の3分の1：主人公の顔を入れる丸い窓（金の縁、中は透明）と、その下にランクの紋章を置く小さな丸い台
+・右の3分の2：文字を置く無地の紙。うすい罫線を5本（横に）。罫線の左端に、小さなアイコンの台（丸）を5つ縦に並べる（ゲームが所持金・カード・対戦などのアイコンを置く）
+・中に文字は描かない
+▲ここまで
+▼English
+Draw one horizontal board that shows the hero's adventure record, centered on a 1536x1024 canvas.
+- Shape: 16:10, like an open notebook with a leather cover. Dark brown leather edge, muted-gold corner fittings, old paper inside (off-white, not too bright).
+- Left third: a round window for the hero's face (gold rim, transparent inside) and, below it, a small round base for the rank emblem.
+- Right two thirds: plain paper for text with five faint horizontal ruled lines; at the left end of each line, a small round icon base (five in a column; the game places money, cards, battles and other icons).
+- No text inside.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 10　デッキ編集の部品（表の行・大きなカードの台・モンスターの枠）→ deck_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+※2026-10-26 書き直し：デッキ編集を「表 → モンスターを選ぶ／技カードを選ぶ」の3段にした（ユーザー指示「PS版の動画のように」）ので、それに合う部品にした
+添付：style_master.png、見本/窓の枠.png、見本/金のボタン.png、今の画面/デッキ編集_表.png、今の画面/デッキ編集_技カードを選ぶ.png、今の画面/デッキ編集_モンスターを選ぶ.png
+▼ここからコピー
+カードゲームのデッキを組む画面の部品を5つ描いてください。横長 1536×1024 に、重ならないように並べる。中は文字や数字を置くので無地。
+・1 表の行の板：とても横に長い（横:縦＝8:1）板。古いこげ茶の木の板に、くすんだ金の細い縁。左端に小さな丸い窓（モンスターの小さな絵を入れる。金の縁、中は透明）。右の3分の1に、数字を置く浅いくぼみを3つ並べる（区切りの細い線）
+・2 表の行の板（選んだとき）：1 と同じ形。木が少し明るく、縁の金が光る
+・3 表の見出しの板：1 と同じ横幅で、高さは半分。濃い紺の地に、くすんだ金の細い縁（「攻撃・守り・計」などの小さな文字を置く）
+・4 大きなカードの台：横:縦＝2:1 の角の丸い板。左の3分の1に、縦長のカードを立てる台（金の縁の浅いくぼみ。中は透明）。右の3分の2は、説明の文字を置く古い紙（明るすぎない生成り。うすい罫線なし）
+・5 モンスターの枠：縦長（横:縦＝4:5）の小さな枠を2種。左＝ふつう（こげ茶の木と細い金の縁、中は透明）、右＝選んだとき（金の縁が光る）。上の縁の真ん中に、番号を置く小さな札（中は無地）
+・古い木の机の上に並べた札のような、落ち着いた手描きの質感。飾りは控えめに
+▲ここまで
+▼English
+Draw five parts for the deck-building screen of a card game on a 1536x1024 canvas, no overlap. Interiors are plain (for text and numbers).
+1 Table row plank: a very long (8:1) plank of old dark brown wood with a thin muted-gold rim. A small round window at the left end (for a small monster picture; gold rim, transparent inside). Three shallow recesses for numbers in the right third (thin dividing lines).
+2 Table row plank (selected): same shape as 1, the wood slightly brighter and the gold rim glowing.
+3 Table header plate: as wide as 1 and half as tall. Dark navy base with a thin muted-gold rim (small labels like "ATK / DEF / Total" go here).
+4 Large card stand: a rounded panel (2:1). The left third is a stand for an upright portrait card (a shallow recess with a gold rim, transparent inside). The right two thirds are old paper for description text (off-white, not too bright, no ruled lines).
+5 Monster slot: two small portrait frames (4:5). Left = normal (dark brown wood with a thin gold rim, transparent inside); right = selected (the gold rim glows). A small blank tag at the top center of the rim for the slot number.
+- Calm hand-painted look, like plaques laid on an old wooden desk. Restrained ornaments.
+▲

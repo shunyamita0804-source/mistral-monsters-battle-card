@@ -53,8 +53,8 @@
 | soramo_skill_01〜14 | `skl-soramo14-01`〜`skl-soramo14-14`（番号は同じ） | ひっかき〜星影ステップ（2026-10-25） |
 | （削除）SOR-SK-01〜16 | `skl-soramo-01`〜`skl-soramo-16` | 旧16技。セーブ version 9 で所持・デッキから外す |
 | （モンスター） | `mon-lazuck` | ラズック（ライフ6。2026-10-23 に技が届き、登録のみから正式へ） |
-| LAZ-SK-01〜16 | `skl-lazuck-01`〜`skl-lazuck-16`（番号は同じ） | ひっかき〜ミラージュダッシュ |
-| （なし） | `skl-lazuck-itazura` | いたずら（2026-10-24 新規。番号の ID と取り違えないよう名前の ID） |
+| LAZ14-SK-01〜14 | 同じ名前の技の ID のまま（01〜04＝`skl-lazuck-01〜04`、05 しっぷうタックル＝`-06`、06・07＝`-09`・`-10`、08・09＝`-07`・`-08`、10 いたずら＝`skl-lazuck-itazura`、11・12＝`-11`・`-12`、13 シャドウスリップ＝`-15`、14 フェイントステップ＝`-14`） | ひっかき〜フェイントステップ（2026-10-26 正式14技） |
+| （削除）LAZ-SK-05・13・16 | `skl-lazuck-05`・`-13`・`-16` | しっぽアタック・クロスガード・ミラージュダッシュ。セーブ version 8（13）・version 11（05・16）で所持・デッキから外す |
 | （モンスター） | `mon-gauul` | ガウル（ライフ6。2026-10-24 に技が届き、登録のみから正式へ） |
 | gaul_skill_01〜14 | `skl-gauul14-01`〜`skl-gauul14-14`（番号は同じ） | つつく〜高速飛行（2026-10-26。旧16技 `skl-gauul-01〜16` はゲームから外した） |
 | （モンスター） | `mon-nobiton` | ノビトン（ライフ8。2026-10-25 に技16種と一緒に届き、正式へ） |
@@ -62,7 +62,9 @@
 | （モンスター） | `mon-myurol` | ミュロル（ライフ7。2026-10-25 に技16種が届き、正式へ。モンスターカードの絵はまだ無い） |
 | myurol_01〜16 | `skl-myurol-01`〜`skl-myurol-16`（番号は同じ） | たいあたり〜すべってよける |
 
-ラズックの正本は `src/data/official/lazuck_cards_OFFICIAL.json`（無改変）、読み込みは `src/data/lazuck.ts`（ソラモと同じ作り方 `src/data/officialSkills.ts`）。
+**2026-10-26 からラズックは正式14技**：正本 `src/data/official/lazuck14_skills_OFFICIAL_20261026.json`（無改変）、ZIP の中身は `design-parts/cards-original/lazuck14-20261026/`、
+絵 `laz14_sk_NN.png`（827×937 の PNG を無改変）、枠は紫（#844DC5）。初期配布16枚（JSON の initial_copies のまま）。性能が変わった技も ID は同じ（しっぽいなしマナ2・シャドウガード−3・フェイントステップは両方の技）。
+以下はそれまでの記録。ラズックの正本は `src/data/official/lazuck_cards_OFFICIAL.json`（無改変）、読み込みは `src/data/lazuck.ts`（ソラモと同じ作り方 `src/data/officialSkills.ts`）。
 絵は `laz_sk_NN.webp`。**初期・収集の配分が食い違っている**（全体方針は初期8・収集8、1枚ずつの指定を足すと初期10〔01〜08・11・14〕・収集6）。データは1枚ずつの指定のまま持ち、配布・スターター・パックには使っていない（ユーザー確認待ち）
 
 - 絵：技 `assets/images/cards/skills/sor_sk_NN.webp`（827×937 のまま WebP）、モンスター `soramo_official.webp`（ショップ・図鑑など）・`soramo_battle.webp`（バトル）
