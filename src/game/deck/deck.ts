@@ -3,6 +3,7 @@ import { LAZUCK_SKILLS, lazuckSkillId } from '../../data/lazuck.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
+import { skillCategory } from '../cards/cardTypes.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 
@@ -18,6 +19,26 @@ export function countCards(ids: readonly string[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const id of ids) counts[id] = (counts[id] ?? 0) + 1;
   return counts;
+}
+
+/** デッキ編集の表の1行：攻撃（ちから・かしこさ）・守り（防御・回避）・計の枚数（特殊とサポートは計だけに入る） */
+export interface RoleCounts {
+  readonly atk: number;
+  readonly guard: number;
+  readonly total: number;
+}
+
+export function countRoles(ids: readonly string[]): RoleCounts {
+  let atk = 0;
+  let guard = 0;
+  for (const id of ids) {
+    const card = cardCatalog.get(id);
+    if (card?.kind !== 'skill') continue;
+    const c = skillCategory(card);
+    if (c === 'force' || c === 'wisdom') atk++;
+    else if (c === 'defense' || c === 'evade') guard++;
+  }
+  return { atk, guard, total: ids.length };
 }
 
 export type DeckIssueCode =

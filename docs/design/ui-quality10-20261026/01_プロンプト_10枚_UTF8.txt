@@ -207,22 +207,25 @@ Draw one horizontal board that shows the hero's adventure record, centered on a 
 ▲
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-■ 10　デッキ編集の帯と一覧の行の枠 → deck_parts.png
+■ 10　デッキ編集の部品（表の行・大きなカードの台・モンスターの枠）→ deck_parts.png
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-添付：style_master.png、見本/窓の枠.png、見本/金のボタン.png、今の画面/デッキ編集.png（上の帯と技の一覧）
+※2026-10-26 書き直し：デッキ編集を「表 → モンスターを選ぶ／技カードを選ぶ」の3段にした（ユーザー指示「PS版の動画のように」）ので、それに合う部品にした
+添付：style_master.png、見本/窓の枠.png、見本/金のボタン.png、今の画面/デッキ編集_表.png、今の画面/デッキ編集_技カードを選ぶ.png、今の画面/デッキ編集_モンスターを選ぶ.png
 ▼ここからコピー
-デッキを組む画面の部品を4つ描いてください。横長 1536×1024 に、重ならないように並べる。中は文字を置くので無地。
-・1 状態の帯（使える）：とても横に長い（横:縦＝10:1）角の丸い帯。暗い紺の地に、くすんだ金の細い縁。右端に、緑がかった小さな宝石の飾り（デッキが使えるとき）
-・2 状態の帯（問題あり）：1 と同じ形。右端の宝石が、えんじの小さな宝石（デッキに問題があるとき）
-・3 一覧の行の枠：横:縦＝5:1 の角の丸い板。こげ茶と濃い灰色の地に、ごく細い金の縁。左に、カードの小さな絵を入れる縦長の窓（金の細い枠）。右寄りに、ゲームが「−」「数」「＋」のボタンを置くので無地
-・4 空きの枠：モンスターを入れる縦長（横:縦＝3:4）の空いた枠。点線のような金の縁と、真ん中に小さな「＋」の形の金具（文字ではなく飾り）
-・どれも細い枠で、飾りは控えめに
+カードゲームのデッキを組む画面の部品を5つ描いてください。横長 1536×1024 に、重ならないように並べる。中は文字や数字を置くので無地。
+・1 表の行の板：とても横に長い（横:縦＝8:1）板。古いこげ茶の木の板に、くすんだ金の細い縁。左端に小さな丸い窓（モンスターの小さな絵を入れる。金の縁、中は透明）。右の3分の1に、数字を置く浅いくぼみを3つ並べる（区切りの細い線）
+・2 表の行の板（選んだとき）：1 と同じ形。木が少し明るく、縁の金が光る
+・3 表の見出しの板：1 と同じ横幅で、高さは半分。濃い紺の地に、くすんだ金の細い縁（「攻撃・守り・計」などの小さな文字を置く）
+・4 大きなカードの台：横:縦＝2:1 の角の丸い板。左の3分の1に、縦長のカードを立てる台（金の縁の浅いくぼみ。中は透明）。右の3分の2は、説明の文字を置く古い紙（明るすぎない生成り。うすい罫線なし）
+・5 モンスターの枠：縦長（横:縦＝4:5）の小さな枠を2種。左＝ふつう（こげ茶の木と細い金の縁、中は透明）、右＝選んだとき（金の縁が光る）。上の縁の真ん中に、番号を置く小さな札（中は無地）
+・古い木の机の上に並べた札のような、落ち着いた手描きの質感。飾りは控えめに
 ▲ここまで
 ▼English
-Draw four parts for the deck-building screen on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
-1 Status bar (ready): a very long (10:1) rounded bar, dark navy base, thin muted-gold rim, a small greenish gem ornament at the right end (deck is ready).
-2 Status bar (problem): same shape as 1, with a small wine gem at the right end (deck has a problem).
-3 List row frame: a rounded plate (5:1), dark brown and dark grey base, very thin gold rim. On the left, a portrait window (thin gold frame) for a small card picture. The right side stays plain (the game places "-", count and "+" buttons).
-4 Empty slot: an empty portrait slot (3:4) for a monster, with a dotted-looking gold rim and a small plus-shaped metal fitting in the center (an ornament, not text).
-- All with thin frames and restrained ornaments.
+Draw five parts for the deck-building screen of a card game on a 1536x1024 canvas, no overlap. Interiors are plain (for text and numbers).
+1 Table row plank: a very long (8:1) plank of old dark brown wood with a thin muted-gold rim. A small round window at the left end (for a small monster picture; gold rim, transparent inside). Three shallow recesses for numbers in the right third (thin dividing lines).
+2 Table row plank (selected): same shape as 1, the wood slightly brighter and the gold rim glowing.
+3 Table header plate: as wide as 1 and half as tall. Dark navy base with a thin muted-gold rim (small labels like "ATK / DEF / Total" go here).
+4 Large card stand: a rounded panel (2:1). The left third is a stand for an upright portrait card (a shallow recess with a gold rim, transparent inside). The right two thirds are old paper for description text (off-white, not too bright, no ruled lines).
+5 Monster slot: two small portrait frames (4:5). Left = normal (dark brown wood with a thin gold rim, transparent inside); right = selected (the gold rim glows). A small blank tag at the top center of the rim for the slot number.
+- Calm hand-painted look, like plaques laid on an old wooden desk. Restrained ornaments.
 ▲
