@@ -9,6 +9,27 @@ import { h } from '../dom.ts';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import type { ScreenDefinition } from './types.ts';
 
+/** 集めた割合のメダル（2026-10-26 デザイン第11弾）：25%＝銅・50%＝銀・75%＝金・100%＝完成 */
+const MEDAL_ART = Object.values(
+  import.meta.glob<string>('/assets/images/ui/collection/medal_*.webp', { eager: true, query: '?url', import: 'default' }),
+);
+
+/** 集めた割合の帯（左にメダル、まだ25%に届かなければメダルなし） */
+function collectionProgress(owned: number, total: number): HTMLElement {
+  const pct = total > 0 ? Math.floor((owned / total) * 100) : 0;
+  const tier = Math.min(4, Math.floor(pct / 25));
+  const medal = tier > 0 ? MEDAL_ART[tier - 1] : undefined;
+  const fill = h('span', { class: 'collection-progress__fill' });
+  fill.style.width = `${pct}%`;
+  return h(
+    'div',
+    { class: 'collection-progress', attrs: { role: 'img', 'aria-label': t('collection.progress', { n: pct }) } },
+    medal ? h('img', { class: 'collection-progress__medal', attrs: { src: medal, alt: '', draggable: 'false' } }) : h('span', { class: 'collection-progress__medal is-empty' }),
+    h('span', { class: 'collection-progress__bar' }, fill),
+    h('span', { class: 'collection-progress__text', text: t('collection.progress', { n: pct }) }),
+  );
+}
+
 /** 図鑑（家の本棚）：すべてのカード。未入手は影、隠しモンスターは復元するまで「？？？」 */
 export const collectionScreen: ScreenDefinition = {
   id: 'collection',
@@ -27,6 +48,7 @@ export const collectionScreen: ScreenDefinition = {
         h('img', { class: 'shop-menu__clerk-figure shop-menu__face', attrs: { src: researcherFace, alt: t('story.speaker.researcher'), draggable: 'false' } }),
         h('p', { class: 'shop-menu__bubble', text: t('collection.count', { owned: ownedKinds, total: cards.length }) }),
       ),
+      collectionProgress(ownedKinds, cards.length),
       createCardGrid({ cards, owned: save.collection, hideUnowned: true, modalParent: element }),
     );
     return { element };

@@ -4,6 +4,9 @@ import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import { kindLabel, rarityLabel } from '../../game/cards/cardTypes.ts';
 import { packCardRates, purchasePack } from '../../game/economy/gacha.ts';
 import { canRestoreHidden, fragmentCount, restoreHidden } from '../../game/progress/fragments.ts';
+import restoreSceneArt from '@assets/images/ui/restore/restore_scene.webp';
+import restoreFxArt from '@assets/images/effects/fx_restore.webp';
+
 import { randomSeed } from '../../game/rng.ts';
 import { cardName, packDescription, packName, packUnlockHint } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -23,6 +26,9 @@ import packLockedArt from '@assets/images/ui/packs/pack_locked.webp';
 import gachaMachineArt from '@assets/images/ui/gacha_machine.webp';
 import pack02Art from '@assets/images/ui/packs/pack_02.webp';
 import pack03Art from '@assets/images/ui/packs/pack_03.webp';
+
+/** 特別復元の光を見せる時間 */
+const RESTORE_FX_MS = 1600;
 
 /**
  * パックの絵（2026-10-23 納品「UI画像10種」のカードパック3種：紺・緑・赤）。
@@ -73,11 +79,21 @@ export const shopMenuScreen: ScreenDefinition = {
         return;
       }
       const tx = newId('restore');
-      confirmModal(element, t('shop.restoreTitle'), [h('p', { class: 'modal__text', text: t('shop.restoreConfirm') })], () => {
+      // 特別復元の場面（2026-10-26 デザイン第11弾）：欠片の祭壇の絵を確認の窓に、復元したら祭壇に光があふれてから結果を出す
+      const scene = (): HTMLElement => h('img', { class: 'restore-scene', attrs: { src: restoreSceneArt, alt: '', draggable: 'false' } });
+      confirmModal(element, t('shop.restoreTitle'), [scene(), h('p', { class: 'modal__text', text: t('shop.restoreConfirm') })], () => {
         const r = restoreHidden(store.save, tx);
         if (r.status !== 'ok') return;
         store.update(() => r.save);
         sound.play('reward');
+        const fx = h('div', { class: 'restore-fx', attrs: { 'aria-hidden': 'true' } }, scene(), h('img', { class: 'restore-fx__light', attrs: { src: restoreFxArt, alt: '', draggable: 'false' } }));
+        element.append(fx);
+        setTimeout(() => {
+          fx.remove();
+          showResult();
+        }, RESTORE_FX_MS);
+      });
+      const showResult = (): void => {
         const monster = getMonster(HIDDEN_MONSTER_ID);
         const handle = openModal(element, {
           title: t('shop.restoreSuccess'),
@@ -89,13 +105,21 @@ export const shopMenuScreen: ScreenDefinition = {
           actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
           onClose: render,
         });
-      });
+      };
     };
 
     render();
     return { element };
   },
 };
+
+/** レア度の割合の円グラフ（丸い台の中に、コモン・アンコモン・レアの順に色を塗る） */
+function ratesPie(pack: PackDefinition): HTMLElement {
+  const { C, U } = pack.rarityRates;
+  const chart = h('span', { class: 'rates-pie__chart' });
+  chart.style.background = `conic-gradient(var(--rate-c) 0 ${C}%, var(--rate-u) ${C}% ${C + U}%, var(--rate-r) ${C + U}% 100%)`;
+  return h('span', { class: 'rates-pie', attrs: { 'aria-hidden': 'true' } }, chart);
+}
 
 /** カードガチャマシン（カプセルではなくカードパックが出る） */
 export const gachaScreen: ScreenDefinition = {
@@ -114,7 +138,13 @@ export const gachaScreen: ScreenDefinition = {
         body: [
           h('p', { class: 'modal__text modal__text--warn', text: t('gacha.ratesWarn') }),
           h('p', { class: 'modal__text', text: t('gacha.ratesPerCard', { n: pack.cardsPerPack }) }),
-          h('p', { class: 'modal__text', text: t('gacha.ratesByRarity', { rates: (['C', 'U', 'R'] as const).map((r) => `${rarityLabel(r)} ${pack.rarityRates[r]}%`).join(' / ') }) }),
+          // レア度ごとの割合の円グラフ（2026-10-26 デザイン第11弾の丸い台。色はレア度の宝石：コモン銀・アンコモン青緑・レア金）
+          h(
+            'div',
+            { class: 'rates-summary' },
+            ratesPie(pack),
+            h('p', { class: 'modal__text', text: t('gacha.ratesByRarity', { rates: (['C', 'U', 'R'] as const).map((r) => `${rarityLabel(r)} ${pack.rarityRates[r]}%`).join(' / ') }) }),
+          ),
           h(
             'table',
             { class: 'gacha-rates__table' },
@@ -126,7 +156,7 @@ export const gachaScreen: ScreenDefinition = {
                 const card = cardCatalog.get(r.cardId);
                 return h(
                   'tr',
-                  {},
+                  { class: `is-${r.rarity.toLowerCase()}` },
                   h('td', { text: card ? cardName(card) : r.cardId }),
                   h('td', { text: card ? kindLabel(card.kind) : '' }),
                   h('td', { text: r.rarity }),

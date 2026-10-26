@@ -25,7 +25,8 @@ export const titleScreen: ScreenDefinition = {
         ctx.navigate('newGame');
       }
     };
-    const continueBtn = button(t('title.continue'), () => ctx.reset('world'), 'btn btn--primary btn--large');
+    // ボタンの絵（2026-10-26 デザイン第11弾）：続きから＝金、最初から＝紺、設定＝小さな紺
+    const continueBtn = button(t('title.continue'), () => ctx.reset('world'), 'btn btn--primary btn--large title__btn title__btn--continue');
     continueBtn.disabled = !store.hasSave;
     const en = getLanguage() === 'en';
 
@@ -48,8 +49,8 @@ export const titleScreen: ScreenDefinition = {
         'div',
         { class: 'title__buttons' },
         continueBtn,
-        button(t('title.newGame'), start, store.hasSave ? 'btn btn--large' : 'btn btn--primary btn--large'),
-        button(t('title.settings'), () => ctx.navigate('options'), 'btn'),
+        button(t('title.newGame'), start, `btn btn--large title__btn ${store.hasSave ? 'title__btn--new' : 'title__btn--continue'}`),
+        button(t('title.settings'), () => ctx.navigate('options'), 'btn title__btn title__btn--settings'),
         // 開発用（?qa=1 のときだけ）：歩きの確認画面
         store.qa ? button(t('walkLab.title'), () => ctx.navigate('walkLab'), 'btn btn--small') : null,
       ),

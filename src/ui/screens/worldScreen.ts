@@ -97,6 +97,7 @@ import chestGold2 from '@assets/images/maps/dungeon/chest_03_anim_02.webp';
 import chestGold3 from '@assets/images/maps/dungeon/chest_03_anim_03.webp';
 import chestGold4 from '@assets/images/maps/dungeon/chest_03_anim_04.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
+import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import { bgm } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
@@ -1735,7 +1736,8 @@ export class WorldView {
       opponent,
       allowSurrender: true,
       bgm: enemy.boss ? 'bossBattle' : 'battle',
-      ...(DUNGEON_BATTLE_BG[this.#map.id] ? { background: DUNGEON_BATTLE_BG[this.#map.id] } : {}),
+      // ボスとの対戦はボス戦の背景（2026-10-26 デザイン第11弾）
+      ...(enemy.boss ? { background: bossBattleBg } : DUNGEON_BATTLE_BG[this.#map.id] ? { background: DUNGEON_BATTLE_BG[this.#map.id] } : {}),
       onFinish: (winner) => {
         if (winner === 'player') {
           const r = defeatEnemy(store.save, enemy.id, enemy.boss);

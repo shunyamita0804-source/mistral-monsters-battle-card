@@ -37,6 +37,7 @@ import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutori
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, opponentName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
+import type { MessageKey } from '../../i18n/messages/index.ts';
 import { openCardDetail } from '../components/cardDetail.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import { commandButton, confirmCommand } from '../components/commandButton.ts';
@@ -70,6 +71,13 @@ import statusTauntArt from '@assets/images/ui/battle/status_taunt.webp';
 import statusShieldArt from '@assets/images/ui/battle/status_shield.webp';
 import statusActedArt from '@assets/images/ui/battle/status_acted.webp';
 import statusWeakenArt from '@assets/images/ui/battle/status_weaken.webp';
+import rulesArt1 from '@assets/images/ui/rules/rules_1.webp';
+import rulesArt2 from '@assets/images/ui/rules/rules_2.webp';
+import rulesArt3 from '@assets/images/ui/rules/rules_3.webp';
+import rulesArt4 from '@assets/images/ui/rules/rules_4.webp';
+
+/** ルールの窓の図（2026-10-26 デザイン第11弾）：マナにする・攻撃と守り・サポート・勝ち負け */
+const RULES_ART = [rulesArt1, rulesArt2, rulesArt3, rulesArt4];
 import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
 import { skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { bgm } from '../bgm.ts';
@@ -1030,6 +1038,14 @@ export const battleScreen: ScreenDefinition = {
       const handle = openModal(element, {
         title: t('battle.rulesTitle'),
         body: [
+          // 図（2026-10-26 デザイン第11弾）：マナにする・攻撃と守り・サポート・勝ち負け
+          h(
+            'div',
+            { class: 'rules-art' },
+            ...RULES_ART.map((src, i) =>
+              h('figure', { class: 'rules-art__item' }, h('img', { attrs: { src, alt: '', draggable: 'false' } }), h('figcaption', { text: t(`battle.rulesArt.${i + 1}` as MessageKey) })),
+            ),
+          ),
           h('p', { class: 'modal__text', text: t('battle.rulesLead') }),
           h('ul', { class: 'rule-list' }, ...provisionalRuleNotes().map((note) => h('li', { text: note }))),
         ],
@@ -1427,7 +1443,8 @@ export const battleScreen: ScreenDefinition = {
           }
           return el;
         }),
-        s.sides.player.hand.length === 0 ? h('span', { class: 'battle-hand__empty', text: t('battle.hand.empty') }) : null,
+        // 空の手札の台（2026-10-26 デザイン第11弾）の上に「手札なし」
+        s.sides.player.hand.length === 0 ? h('span', { class: 'battle-hand__empty battle-hand__empty--tray', text: t('battle.hand.empty') }) : null,
       );
       if (newIndex > 0) busyUntil = Math.max(busyUntil, Date.now() + newIndex * DEAL_MS + 200);
       return row;
@@ -1727,7 +1744,11 @@ export const battleScreen: ScreenDefinition = {
         targeting = null;
         render();
       };
-      const statusTag = (text: string): HTMLElement => h('span', { class: 'battle-cmds__status', text });
+      // 状態の札。相手の番を待つときは、えんじの札の丸い窓に砂時計（2026-10-26 デザイン第11弾。4コマで落ちる）
+      const statusTag = (text: string, waiting = false): HTMLElement =>
+        waiting
+          ? h('span', { class: 'battle-cmds__status battle-cmds__status--wait' }, h('span', { class: 'battle-cmds__sand', attrs: { 'aria-hidden': 'true' } }), h('span', { text }))
+          : h('span', { class: 'battle-cmds__status', text });
       if (mine && s.phase === 'main') {
         if (!targeting && selected && cardUsability(s, 'player', selected.uid).usable) buttons.push(commandButton(t('battle.cmd.use'), () => useCard(selected.uid)));
         if (targeting || selected) buttons.push(commandButton(t('common.cancel'), deselect, 'cancel'));
@@ -1740,9 +1761,9 @@ export const battleScreen: ScreenDefinition = {
         const pass = s.pending.responses.length === 0;
         buttons.push(commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel'));
       } else if (s.phase === 'defense' && s.pending?.attacker === 'opponent' && !auto) {
-        buttons.push(statusTag(t('battle.dock.noDefense')));
+        buttons.push(statusTag(t('battle.dock.noDefense'), true));
       } else {
-        buttons.push(statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting')));
+        buttons.push(statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting'), !auto));
       }
       // 手札の下に横一列（2026-10-25 リデザイン）：左に「コマンド」、いちばん右は場面の主なボタン（攻撃終了・ターン終了）か状態の札
       buttons.unshift(commandMenuButton());

@@ -135,6 +135,10 @@ export const BATTLE = {
   'battle.surrenderText': { ja: '負けとして扱われます。', en: 'It will count as a loss.' },
   'battle.rules': { ja: 'ルール', en: 'Rules' },
   'battle.rulesTitle': { ja: 'ルール（仮）', en: 'Rules (Temp)' },
+  'battle.rulesArt.1': { ja: 'カードをマナにする', en: 'Turn cards into mana' },
+  'battle.rulesArt.2': { ja: '攻撃と守り', en: 'Attack and defense' },
+  'battle.rulesArt.3': { ja: 'サポートは場全体に', en: 'Supports affect the field' },
+  'battle.rulesArt.4': { ja: '相手3体を倒せば勝ち', en: 'Defeat all 3 to win' },
   'battle.rulesLead': {
     ja: '正式なルール資料が未着手のため、以下は仮のルールです。',
     en: 'The official rules are not ready yet, so these rules are temporary.',
