@@ -199,7 +199,8 @@ npx vite preview --port 4173 --host 127.0.0.1   # 画面の確認（ビルド後
 
 **2026-10-26：タイトル画面のアイコンを消してロゴを上に・新しいタイトル背景の依頼文（作業ブランチ `claude/title-20261026`。未公開）**
 - ユーザー指示「アイコンは消して、ロゴをその分上に」→「もう少し下に」（上の余白 100px）。アプリのアイコン（ホーム画面）はそのまま
-- 新しいタイトル背景の依頼文 `docs/design/title-bg-20261026/`（案A モンスターたちとカード〔おすすめ〕・案B 空の祭壇・案C 決勝の舞台）。届いたら title_bg.webp を差し替える
+- 新しいタイトル背景の依頼文 `docs/design/title-bg-20261026/`（案A モンスターたちとカード〔おすすめ〕・案B 空の祭壇・案C 決勝の舞台）
+- 背景が届いたので差し替え済み（原本 `design-parts/title-bg-20261026/title_bg_v2.png` → `assets/images/backgrounds/title_bg.webp`）。明るい昼の絵なので、暗い膜は上と下だけうすく（`uiFrames.css`）。ロゴ下の日本語名と版の表示に暗い帯（`uiParts9.css`）
 
 **2026-10-26：デザイン第9弾10枚の組み込み（`de1fbf8` で公開・iPhone 確認待ち）**
 - 10枚とも使った（`docs/design/ui-quality9-20261026/10_受け取り結果_UTF8.txt`）。見た目は `src/ui/styles/uiParts9.css`、切り出しは `tools/design/ui9_build.py`
