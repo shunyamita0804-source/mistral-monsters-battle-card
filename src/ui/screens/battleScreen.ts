@@ -116,13 +116,13 @@ const OFFICIAL_CARD_DETAIL_W = 250;
 const HAND_CARD_W = 70;
 /**
  * フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：名前・絵・効果文の入る大きなカード（battleCard.ts）で 132。
- * 2026-10-26 ユーザー指示「説明の欄はスペースがあるので縮めて」で欄を詰めたので 108（演出・守備のカードも 112→88。上に1行あるので欄からはみ出さない大きさ）
+ * 2026-10-26 ユーザー指示「説明の欄はスペースがあるので縮めて」で一度 108 にしたが、同じ日に情報を列の左へ移して欄に余裕ができたので 132 に戻した（演出・守備のカードも 112）
  */
-const DETAIL_CARD_W = 108;
+const DETAIL_CARD_W = 132;
 /** 技の演出で大きく見せるカードの幅（上に1行あるので、説明の欄のカードより少し小さく） */
-const SPOT_CARD_W = 88;
+const SPOT_CARD_W = 112;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
-const DEFENSE_ATTACK_W = 88;
+const DEFENSE_ATTACK_W = 112;
 const DEFENSE_CARD_W = 60;
 /** 相手の手札の裏向きのカードが、フォーカスエリアへ動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる） */
 const OPP_CARD_FLY_MS = 520;
@@ -179,6 +179,11 @@ type HitFxKind = 'force' | 'wisdom' | 'defense' | 'evade' | 'special' | 'heal';
 const HIT_FX_ART: Readonly<Record<HitFxKind, string>> = { force: fxForce, wisdom: fxWisdom, defense: fxDefense, evade: fxEvade, special: fxSpecial, heal: fxHeal };
 /** 光を見せる時間（ミリ秒） */
 const HIT_FX_MS = 700;
+
+/** 上の帯の流れる文字：流れる速さ（論理px／秒）・帯の幅の目安・1文字の幅の目安（流れる時間の計算に使う） */
+const TICKER_SPEED = 48;
+const TICKER_BOX_PX = 190;
+const TICKER_CHAR_PX = 13;
 
 /** 先攻・後攻のカード（表示の文字は orderFace() で引く） */
 type OrderLabel = 'first' | 'second';
@@ -289,6 +294,8 @@ export const battleScreen: ScreenDefinition = {
     let pointed: { uid: string; until: number } | null = null;
     /** モンスターに重ねている技の光（from〜until の間だけ出す） */
     let hitFx: { uid: string; kind: HitFxKind; from: number; until: number }[] = [];
+    /** 上の帯の流れる文字（文が変わった時刻） */
+    let tickerState = { text: '', start: 0 };
     /** 使ったカードを大きく見せ終わる時刻（それまで指のマークを出さない） */
     let showcaseUntil = 0;
     /** いま大きく見せている技（パートC）。user＝使ったモンスター（守備は守ったモンスター）、target＝対象 */
@@ -1039,54 +1046,44 @@ export const battleScreen: ScreenDefinition = {
     };
 
     /**
-     * 情報の1行（2026-10-25 リデザイン：PS版のように、マナ・山札・手札・捨札を1行に）。
-     * 左＝誰か（相手は顔の絵と名前）といまの状態、右＝マナ・山札・手札・捨札。相手の手札は裏向きのカードを並べず、この数だけで示す
+     * 情報の欄（2026-10-26 ユーザー指示「あなた・相手とマナ、山札や手札はモンスターカードの左に寄せる」）。
+     * モンスターの列の左に縦に並べる：誰か（相手は顔の絵と名前）・いまの状態・マナ・山札・手札・捨札（アイコン＋文字。文字も残す）
      */
-    const infoLine = (s: BattleState, side: Side): HTMLElement => {
+    const sideStats = (s: BattleState, side: Side): HTMLElement => {
       const st = s.sides[side];
       const active = s.active === side && s.phase !== 'ended';
-      // 2026-10-26 ユーザー指示「マナなどの表記はアイコンに。テキストも削除はせずに」：アイコン＋文字
       const icon = (src: string): HTMLElement => h('img', { class: 'battle-info__icon', attrs: { src, alt: '', 'aria-hidden': 'true', draggable: 'false' } });
       const count = (src: string, text: string): HTMLElement => h('span', { class: 'battle-info__count' }, icon(src), h('span', { text }));
-      // 2段：上＝誰か（相手は顔の絵と名前）とマナ、下＝いまの状態と山札・手札・捨札（2026-10-26 アイコンを付けて1行に入りきらなくなったため）
       return h(
         'div',
-        { class: `battle-line battle-line--${side}${active ? ' is-active' : ''}` },
+        { class: `battle-stats battle-stats--${side}${active ? ' is-active' : ''}` },
         h(
-          'div',
-          { class: 'battle-line__row' },
-          h(
-            'span',
-            { class: 'battle-line__who' },
-            h('span', { class: 'battle-line__tag', text: t(`battle.side.${side}`) }),
-            side === 'opponent' && req.opponent.id ? opponentFace(req.opponent.id, 18) : null,
-            side === 'opponent' ? h('span', { class: 'battle-line__name', text: st.name }) : null,
-          ),
-          h(
-            'span',
-            { class: 'battle-info__mana', attrs: { 'aria-label': t('battle.info.manaAria', { n: manaOf(st) }) } },
-            icon(iconMana),
-            h('span', { class: 'battle-info__mana-label', text: t('card.detail.mana') }),
-            h('span', { class: 'battle-info__mana-value', text: String(manaOf(st)) }),
-          ),
+          'span',
+          { class: 'battle-stats__who' },
+          h('span', { class: 'battle-line__tag', text: t(`battle.side.${side}`) }),
+          side === 'opponent' && req.opponent.id ? opponentFace(req.opponent.id, 16) : null,
         ),
+        side === 'opponent' ? h('span', { class: 'battle-stats__name', text: st.name }) : null,
+        h('span', { class: 'battle-stats__state', text: sideState(s, side) }),
         h(
-          'div',
-          { class: 'battle-line__row' },
-          h('span', { class: 'battle-line__state', text: sideState(s, side) }),
-          h(
-            'span',
-            { class: 'battle-line__counts' },
-            count(iconDeck, t('battle.info.deck', { n: st.deck.length })),
-            count(iconHand, t('battle.info.hand', { n: st.hand.length })),
-            count(iconDiscard, t('battle.info.discard', { n: st.discard.length })),
-          ),
+          'span',
+          { class: 'battle-info__mana', attrs: { 'aria-label': t('battle.info.manaAria', { n: manaOf(st) }) } },
+          icon(iconMana),
+          h('span', { class: 'battle-info__mana-label', text: t('card.detail.mana') }),
+          h('span', { class: 'battle-info__mana-value', text: String(manaOf(st)) }),
         ),
+        count(iconDeck, t('battle.info.deck', { n: st.deck.length })),
+        count(iconHand, t('battle.info.hand', { n: st.hand.length })),
+        count(iconDiscard, t('battle.info.discard', { n: st.discard.length })),
       );
     };
 
-    /** モンスター3体（正方形のアイコンを横一列。2026-10-25 リデザイン：カードの枠をやめ、ライフはアイコンの下に数字で大きく） */
+    /** モンスターの列：左に情報の欄、右にモンスター3体 */
     const monsterRow = (s: BattleState, side: Side): HTMLElement =>
+      h('div', { class: `battle-row battle-row--${side}` }, sideStats(s, side), monsterSet(s, side));
+
+    /** モンスター3体（正方形のアイコンを横一列。2026-10-25 リデザイン：カードの枠をやめ、ライフはアイコンの下に数字で大きく） */
+    const monsterSet = (s: BattleState, side: Side): HTMLElement =>
       h(
         'div',
         { class: `battle-side battle-side--${side}` },
@@ -1534,22 +1531,38 @@ export const battleScreen: ScreenDefinition = {
       );
 
     /** 上の帯：降参（左端・確かめてから）／対戦の名前といまの手番・場面／ルール（右端） */
+    /**
+     * 上の帯（2026-10-26 ユーザー指示「真ん中の経過の1行を画面上部へ。文字が自動で流れるように。ダンジョン戦などの項目も」）。
+     * 左右のボタンの間に、手番・最新の経過・対戦の名前・先攻後攻を1行にして流す。押すと経過をすべて見る。場の全体カードがあれば左に札
+     */
+    const tickerText = (s: BattleState | null): string => {
+      if (!s) return req.title;
+      const turn = s.phase === 'ended' ? t('battle.turnBar.ended') : t('battle.turnBar', { n: s.turn, who: t(`battle.side.${s.active}`), phase: t(`battle.phase.${s.phase}`) });
+      const last = s.log[s.log.length - 1]?.text ?? '';
+      return [turn, last, req.title, t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second')].filter((x) => x !== '').join(t('battle.ticker.separator'));
+    };
+
+    const ticker = (s: BattleState | null): HTMLElement => {
+      const text = tickerText(s);
+      // 描き直しても流れが最初に戻らないよう、文が変わったときだけ流れ始めの時刻を新しくし、経った時間の分だけ進めて出す
+      if (text !== tickerState.text) tickerState = { text, start: Date.now() };
+      const seconds = (TICKER_BOX_PX + [...text].length * TICKER_CHAR_PX) / TICKER_SPEED;
+      const textEl = h('span', { class: 'battle__ticker-text', text });
+      textEl.style.animationDuration = `${seconds.toFixed(2)}s`;
+      textEl.style.animationDelay = `${-(((Date.now() - tickerState.start) / 1000) % seconds).toFixed(2)}s`;
+      return h(
+        'button',
+        { class: 'battle__ticker', attrs: { type: 'button', 'aria-label': `${text}（${t('battle.log.open')}）` }, on: { click: () => s && showLog() } },
+        textEl,
+      );
+    };
+
     const header = (s: BattleState | null = null): HTMLElement =>
       h(
         'header',
         { class: `battle__header${s ? ` battle__header--${s.phase === 'ended' ? 'ended' : s.active}` : ''}` },
         req.allowSurrender ? topButton('surrender', t('battle.surrender'), surrender) : h('span'),
-        h(
-          'div',
-          { class: 'battle__heading' },
-          h('h1', { class: 'battle__title', text: req.title }),
-          s
-            ? h('p', {
-                class: 'battle__turn-text',
-                text: s.phase === 'ended' ? t('battle.turnBar.ended') : t('battle.turnBar', { n: s.turn, who: t(`battle.side.${s.active}`), phase: t(`battle.phase.${s.phase}`) }),
-              })
-            : null,
-        ),
+        h('div', { class: 'battle__heading' }, s?.field ? fieldChip(s) : null, ticker(s)),
         topButton('rules', t('battle.rules'), showRules),
       );
 
@@ -1579,37 +1592,21 @@ export const battleScreen: ScreenDefinition = {
       const key = `${s.turn}-${s.active}-${s.phase}`;
       if (key === bannerKey) return null;
       bannerKey = key;
-      element.querySelector('.battle__turn-text')?.classList.add('is-changed');
+      element.querySelector('.battle__ticker')?.classList.add('is-changed');
       const el = h(
         'div',
         { class: `battle__phase-chip battle__phase-chip--${s.active}`, attrs: { 'aria-hidden': 'true' } },
         t(s.phase === 'mana' && s.manaConvertLimit === null ? `battle.banner.mana.${s.active}` : `battle.banner.turn.${s.active}`),
       );
       setTimeout(() => el.remove(), BANNER_MS);
-      // 経過の1行の上に重ねる（情報の1行・モンスターを隠さない）
-      const mid = element.querySelector('.battle-mid');
-      if (!mid) return el;
-      mid.append(el);
+      // 相手の列と自分の列の間（自分のモンスター3体の上の端）に重ねる
+      const row = element.querySelector('.battle-row--player .battle-side');
+      if (!row) return el;
+      row.append(el);
       return null;
     };
 
-    /** 真ん中の帯（相手の列と自分の列の間）：左に場のカード（なければ先攻・後攻）、右に最新の経過1行。押すと経過をすべて見る */
-    const midBand = (s: BattleState): HTMLElement => {
-      const last = s.log[s.log.length - 1];
-      return h(
-        'div',
-        { class: 'battle-mid' },
-        fieldChip(s),
-        h(
-          'button',
-          { class: 'battle-mid__log', attrs: { type: 'button', 'aria-label': t('battle.log.open') }, on: { click: showLog } },
-          h('span', { class: 'battle-mid__log-text', attrs: { 'aria-live': 'polite' }, text: last?.text ?? '' }),
-          h('span', { class: 'battle-mid__log-more', text: t('battle.log.more') }),
-        ),
-      );
-    };
-
-    /** 場の全体カード（真ん中の帯の左に出す。タップで詳しく） */
+    /** 場の全体カード（上の帯の左に出す。タップで詳しく） */
     const fieldChip = (s: BattleState): HTMLElement => {
       if (!s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
       const card = getSupport(s.field.cardId);
@@ -1632,7 +1629,7 @@ export const battleScreen: ScreenDefinition = {
         const before = prevMana.get(side);
         prevMana.set(side, now);
         if (before === undefined || now <= before) continue;
-        const box = element.querySelector(`.battle-line--${side} .battle-info__mana`);
+        const box = element.querySelector(`.battle-stats--${side} .battle-info__mana`);
         if (box) {
           box.classList.add('is-mana-up');
           box.append(h('span', { class: 'battle__mana-float', text: `+${now - before}` }), h('span', { class: 'battle__mana-spark', attrs: { 'aria-hidden': 'true' } }));
@@ -1827,7 +1824,7 @@ export const battleScreen: ScreenDefinition = {
       // → フォーカスエリア（説明と大きなカード。残りの高さに広がる）→ 手札 → 操作のボタン（横一列）
       camera.dataset.focus = cameraFocus(s);
       lens.replaceChildren(
-        h('div', { class: 'battle-board' }, opponentHand(s), infoLine(s, 'opponent'), monsterRow(s, 'opponent'), midBand(s), monsterRow(s, 'player'), infoLine(s, 'player')),
+        h('div', { class: 'battle-board' }, opponentHand(s), monsterRow(s, 'opponent'), monsterRow(s, 'player')),
       );
       replaceView(header(s), qaBar() ?? '', camera, detailPanel(s), hand, commandPanel(s, blocked));
       fitFocusCards();

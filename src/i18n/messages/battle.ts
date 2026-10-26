@@ -160,7 +160,7 @@ export const BATTLE = {
   // 経過（ログ）：真ん中の帯に最新の1行、押すとすべて
   'battle.log.title': { ja: 'これまでの経過', en: 'Battle Log' },
   'battle.log.open': { ja: 'これまでの経過を見る', en: 'Show battle log' },
-  'battle.log.more': { ja: '経過', en: 'Log' },
+  'battle.ticker.separator': { ja: '　◆　', en: '  ◆  ' },
   // 操作のボタン（手札の下）：自分の番でないときの札
   'battle.dock.waiting': { ja: '相手の番', en: "Opponent's turn" },
   'battle.dock.defense': { ja: '守備を選ぶ', en: 'Choose defense' },
