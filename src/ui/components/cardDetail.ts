@@ -6,6 +6,7 @@ import { t, tKey } from '../../i18n/i18n.ts';
 import { h } from '../dom.ts';
 import { createCardView } from './cardView.ts';
 import { openModal, type ModalHandle } from './modal.ts';
+import { rarityBadge } from './rarityBadge.ts';
 
 export interface CardDetailOptions {
   /** 所持枚数（指定すると表示） */
@@ -16,7 +17,7 @@ export interface CardDetailOptions {
 
 /** カードの拡大表示と詳細（分類・効果・数値・所持枚数・収録パック） */
 export function openCardDetail(parent: HTMLElement, card: CardDefinition, options: CardDetailOptions = {}): ModalHandle {
-  const rows: [string, string][] = [[t('card.detail.kind'), t('card.kindCard', { kind: kindLabel(card.kind) })]];
+  const rows: [string, string | HTMLElement][] = [[t('card.detail.kind'), t('card.kindCard', { kind: kindLabel(card.kind) })]];
   if (card.kind === 'skill') {
     rows.push([t('card.detail.monster'), cardName(getMonster(card.monsterId))]);
     if (card.category) rows.push([t('card.detail.category'), categoryLabel(card.category)]);
@@ -32,7 +33,9 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
   }
   if (card.kind === 'skill' && card.displayNo !== undefined) rows.push([t('card.detail.number'), String(card.displayNo).padStart(2, '0')]);
   if (card.designId) rows.push([t('card.detail.designId'), card.designId]);
-  rows.push([t('card.detail.rarity'), rarityLabel(card.rarity)]);
+  // レア度：印（決まっているときだけ）と名前
+  const badge = rarityBadge(card.rarity, 18);
+  rows.push([t('card.detail.rarity'), badge ? h('span', { class: 'card-detail__rarity' }, badge, rarityLabel(card.rarity)) : rarityLabel(card.rarity)]);
   const packs = PACKS.filter((p) => p.cardIds.includes(card.id)).map(packName);
   rows.push([
     t('card.detail.source'),
@@ -52,7 +55,7 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
       h(
         'dl',
         { class: 'card-detail__rows' },
-        ...rows.flatMap(([k, v]) => [h('dt', { text: k }), h('dd', { text: v })]),
+        ...rows.flatMap(([k, v]) => [h('dt', { text: k }), typeof v === 'string' ? h('dd', { text: v }) : h('dd', {}, v)]),
       ),
       card.isPlaceholder ? h('p', { class: 'card-detail__note', text: t('card.detail.placeholderNote') }) : null,
       !card.isPlaceholder && card.pendingSpec && card.pendingSpec.length > 0

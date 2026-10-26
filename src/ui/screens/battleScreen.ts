@@ -41,11 +41,19 @@ import { openCardDetail } from '../components/cardDetail.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import { commandButton, confirmCommand } from '../components/commandButton.ts';
 import { createMonsterPortrait } from '../components/monsterPortrait.ts';
+import { heroFaceUrl } from '../components/heroArt.ts';
+import { versusBanner } from '../components/versusBanner.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
 import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
+import fxForce from '@assets/images/effects/fx_force.webp';
+import fxWisdom from '@assets/images/effects/fx_wisdom.webp';
+import fxDefense from '@assets/images/effects/fx_defense.webp';
+import fxEvade from '@assets/images/effects/fx_evade.webp';
+import fxSpecial from '@assets/images/effects/fx_special.webp';
+import fxHeal from '@assets/images/effects/fx_heal.webp';
 import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
 import { skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { bgm } from '../bgm.ts';
@@ -156,6 +164,15 @@ interface Targeting {
   readonly prompt: string;
 }
 
+/**
+ * 技が当たったときの光（2026-10-26 デザイン第8弾。黒い背景の絵を「光を足す」重ね方でモンスターのアイコンに重ねる）。
+ * ちから・かしこさ＝攻撃でライフが減った、防御・回避＝守備のカードを使った、特殊＝相手を選ぶ特殊の技、回復＝ライフが増えた
+ */
+type HitFxKind = 'force' | 'wisdom' | 'defense' | 'evade' | 'special' | 'heal';
+const HIT_FX_ART: Readonly<Record<HitFxKind, string>> = { force: fxForce, wisdom: fxWisdom, defense: fxDefense, evade: fxEvade, special: fxSpecial, heal: fxHeal };
+/** 光を見せる時間（ミリ秒） */
+const HIT_FX_MS = 700;
+
 /** 先攻・後攻のカード（表示の文字は orderFace() で引く） */
 type OrderLabel = 'first' | 'second';
 
@@ -263,6 +280,8 @@ export const battleScreen: ScreenDefinition = {
     const prevLife = new Map<string, number>();
     /** 技・サポートの対象に選ばれたモンスター（指のマークを出す。until まで） */
     let pointed: { uid: string; until: number } | null = null;
+    /** モンスターに重ねている技の光（from〜until の間だけ出す） */
+    let hitFx: { uid: string; kind: HitFxKind; from: number; until: number }[] = [];
     /** 使ったカードを大きく見せ終わる時刻（それまで指のマークを出さない） */
     let showcaseUntil = 0;
     /** いま大きく見せている技（パートC）。user＝使ったモンスター（守備は守ったモンスター）、target＝対象 */
@@ -434,6 +453,7 @@ export const battleScreen: ScreenDefinition = {
         pointed = { uid: action.targetUid, until };
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
+      queueHitFx(before, next, action, played, played ? revealDelay + SHOWCASE_MS : 0);
       const show = (): void => {
         if (!played || destroyed) return;
         showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null);
@@ -449,6 +469,48 @@ export const battleScreen: ScreenDefinition = {
         if (revealDelay > 0) setTimeout(show, revealDelay);
         else show();
       }
+    };
+
+    /**
+     * 技の光を決める（表示だけ。ルールは変えない）。使ったカードを大きく見せている間は待ち、見せ終わってから出す。
+     * ライフが減った＝攻撃の種類（ちから・かしこさ）、増えた＝回復、守備のカード＝防御・回避、相手を選ぶ特殊の技＝特殊
+     */
+    const queueHitFx = (before: BattleState, after: BattleState, action: BattleAction, played: { cardId: string } | null, delay: number): void => {
+      const list: { uid: string; kind: HitFxKind }[] = [];
+      const attackCard = before.pending?.cardId ?? played?.cardId;
+      const attack = attackCard ? getPlayCard(attackCard) : null;
+      const attackKind: HitFxKind = attack?.kind === 'skill' && attack.stat?.type === 'wisdom' ? 'wisdom' : 'force';
+      for (const side of ['player', 'opponent'] as const) {
+        for (const m of after.sides[side].monsters) {
+          const was = before.sides[side].monsters.find((x) => x.uid === m.uid)?.life ?? m.life;
+          if (m.life < was) list.push({ uid: m.uid, kind: attackKind });
+          else if (m.life > was) list.push({ uid: m.uid, kind: 'heal' });
+        }
+      }
+      const card = played ? getPlayCard(played.cardId) : null;
+      if (action.type === 'defend' && card?.kind === 'skill' && before.pending) {
+        const category = card.category;
+        if (category === 'defense' || category === 'evade') list.push({ uid: before.pending.targetUid, kind: category });
+      }
+      if (action.type === 'useCard' && action.targetUid && card?.kind === 'skill' && card.category === 'special') list.push({ uid: action.targetUid, kind: 'special' });
+      if (list.length === 0) return;
+      const from = Date.now() + delay;
+      const until = from + HIT_FX_MS;
+      hitFx = [...hitFx.filter((f) => f.until > Date.now()), ...list.map((f) => ({ ...f, from, until }))];
+      setTimeout(() => !destroyed && render(), delay + 10);
+      setTimeout(() => !destroyed && render(), delay + HIT_FX_MS + 20);
+    };
+
+    /** いま出している技の光（描き直しても動きが最初に戻らないよう、経った時間の分だけ動きを進める） */
+    const hitFxOn = (uid: string): HTMLElement[] => {
+      const now = Date.now();
+      return hitFx
+        .filter((f) => f.uid === uid && now >= f.from && now < f.until)
+        .map((f) => {
+          const el = h('img', { class: `battle-fx battle-fx--${f.kind}`, attrs: { src: HIT_FX_ART[f.kind], alt: '', 'aria-hidden': 'true', draggable: 'false' } });
+          el.style.animationDelay = `${f.from - now}ms`;
+          return el;
+        });
     };
 
     /** カードを使ったモンスター（技：行動済になったモンスター、守備：狙われたモンスター、サポート：なし） */
@@ -656,6 +718,7 @@ export const battleScreen: ScreenDefinition = {
       return h(
         'div',
         { class: 'battle-order' },
+        versusView(),
         h('p', { class: 'battle-order__title', text: picked === null ? t('battle.order.title') : t(result === 'first' ? 'battle.order.resultFirst' : 'battle.order.resultSecond') }),
         h('p', { class: 'battle-order__hint', text: picked === null ? t('battle.order.hint') : t(result === 'first' ? 'battle.order.startPlayer' : 'battle.order.startOpponent') }),
         h(
@@ -675,7 +738,18 @@ export const battleScreen: ScreenDefinition = {
             ),
           ),
         ),
-        h('p', { class: 'battle-order__vs', text: t('battle.order.vs', { name: opponentName(req.opponent) }) }),
+      );
+    };
+
+    /** 先攻・後攻を決める画面の上の「あなた VS 相手」。相手の顔の絵が無いとき（ダンジョン・練習）は、相手の先頭のモンスターのアイコン */
+    const versusView = (): HTMLElement => {
+      const faceImg = (url: string): HTMLElement => h('img', { attrs: { src: url, alt: '', draggable: 'false' } });
+      const opponentUrl = req.opponent.id ? opponentFaceUrl(req.opponent.id) : undefined;
+      const lead = req.opponent.monsters[0];
+      const opponentFaceEl = opponentUrl ? faceImg(opponentUrl) : lead ? createMonsterPortrait(getMonster(lead), 44) : h('span');
+      return versusBanner(
+        { name: t('battle.side.player'), face: faceImg(heroFaceUrl(save.player.gender)) },
+        { name: opponentName(req.opponent), face: opponentFaceEl },
       );
     };
 
@@ -1030,6 +1104,7 @@ export const battleScreen: ScreenDefinition = {
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印
               !down ? statusBadges(s, m) : null,
               diff < 0 ? h('span', { class: 'battle__burst', attrs: { 'aria-hidden': 'true' } }) : null,
+              ...hitFxOn(m.uid),
               // 回復だけ「+2」のように出す。ダメージは数字を出さず、ライフを1ずつ減らして音で数える（2026-10-24 ユーザー指示）
               diff > 0 ? battleDigits(diff, 'battle__float') : null,
             ),

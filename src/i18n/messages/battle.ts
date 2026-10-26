@@ -127,7 +127,6 @@ export const BATTLE = {
   'battle.order.startPlayer': { ja: 'あなたから始めます', en: 'You start' },
   'battle.order.startOpponent': { ja: '相手から始めます', en: 'The opponent starts' },
   'battle.order.cardAria': { ja: 'カード{n}', en: 'Card {n}' },
-  'battle.order.vs': { ja: 'VS {name}', en: 'VS {name}' },
 
   // 見出し・ルール・降参
   'battle.surrender': { ja: '降参', en: 'Give Up' },

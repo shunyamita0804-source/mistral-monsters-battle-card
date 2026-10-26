@@ -1,0 +1,266 @@
+【プロンプト】足りない画面・仮の見た目のデザイン10枚・第8弾（2026-10-26）
+
+使い方：1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼る。日本語でうまくいかないときは English version
+3・4（主人公の立ち絵）だけは「共通ルール（人物用）」を使う
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（部品用。1・2・5〜10 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品（窓の枠・勝ちの帯・カードの裏面）にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】画面を真正面から見た平らな部品（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること
+▲ここまで
+▼English
+Draw a UI part for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts (window frame, win banner, card back).
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] Flat parts seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（人物用。3・4 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の主人公の立ち絵を1枚描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の「案内役の会話の絵」と同じ描き方（アニメ調の手描き、やわらかい塗り、細い濃い茶色の線）。ベクター風・3DCG風にしない
+【人物】服・髪・色・小物は、添付の設定画とまったく同じにする（変えない・足さない）。頭身は大人（7頭身くらい）。設定画の頭の大きい頭身にはしない
+【光】左上から。床に影を落とさない
+【背景】透明（できなければマゼンタ一色 #FF00FF）。人物の外側に少し余白
+【禁止】文字・数字・ロゴ・透かし・サイン。実在の作品のキャラクターに似せること。人物のほかの物（背景・床・枠・動物）
+▲ここまで
+▼English
+Draw ONE standing illustration of the protagonist for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Exactly like the attached guide character portrait: hand-drawn anime style, soft shading, thin dark-brown lines. NO vector look, NO 3D render look.
+[Character] Clothes, hair, colors and accessories must match the attached design sheet exactly (do not change or add anything). Adult proportions (about 7 heads tall), NOT the big-head proportions of the design sheet.
+[Light] From the upper left. No cast shadow on a floor.
+[Background] Transparent (or solid magenta #FF00FF), with a small margin around the figure.
+[Forbidden] Any text, numbers, logos, watermarks, signatures. Resemblance to existing IP characters. Anything other than the person (background, floor, frame, animals).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　先攻・後攻のカードの表（2枚）→ order_faces.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/カードの裏面.png、今の画面/先攻後攻_選ぶ前.png、今の画面/先攻後攻_めくった後.png
+▼ここからコピー
+対戦の最初に、伏せた2枚のカードから1枚を選んで先攻・後攻を決めます。めくったときに見える「カードの表」を2枚描いてください。
+横長 1536×1024 に、縦長のカード（横:縦＝2:3）を左右に1枚ずつ並べる。2枚は同じ形・同じ大きさ。
+・縁取りと四隅の飾りは、添付のカードの裏面と同じ描き方・同じ太さ（めくったとき、裏と表が対になって見えるように）
+・左＝先攻：くすんだ金の地。真ん中に「昇る太陽と、その前に立てた一本の剣」の紋章
+・右＝後攻：紺と銀の地。真ん中に「三日月と、その前に置いた丸い盾」の紋章
+・紋章の下に、横長の無地の帯（中は無地。ゲームが「先攻」「後攻」の文字を重ねる）
+・2枚は色だけで見分けられるように、金と紺をはっきり分ける。文字・数字は描かない
+▲ここまで
+▼English
+At the start of a match the player picks one of two face-down cards to decide who goes first. Draw the two card FRONTS that appear when a card is flipped.
+On a 1536x1024 canvas, place two portrait cards (2:3) side by side, same shape and size.
+- Border and corner ornaments drawn exactly like the attached card back (same style and line weight), so the front and back look like a matching pair.
+- Left = "goes first": muted gold base. Center emblem: a rising sun with a single upright sword in front of it.
+- Right = "goes second": navy and silver base. Center emblem: a crescent moon with a round shield in front of it.
+- Below the emblem, a blank horizontal band (left empty; the game writes the label).
+- The two must be clearly distinguishable by color alone (gold vs navy). No text, no numbers.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　対戦の始まりの「VS」の部品 → vs_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/情報箱_あなた.png、見本/情報箱_相手.png、見本/対戦相手の顔.png、今の画面/先攻後攻_選ぶ前.png
+▼ここからコピー
+先攻・後攻を決める画面の上に、「あなた VS 相手」を出すための部品を描いてください。横長 1536×1024 に、次の3つを重ならないように並べる。
+・上の真ん中：VS の紋章。交差した2本の剣の上に、丸いメダル（直径は画像の高さの3分の1くらい）。メダルの真ん中は文字を置くので無地のくぼみ（ゲームが「VS」を重ねる）。くすんだ金
+・左下：自分の名札。横長（横:縦＝4:1）、紺の地に細いくすんだ金の縁。左端に顔を入れる丸い窓（窓の中は透明にする）。名前を置く所は無地
+・右下：相手の名札。左下と同じ形を左右反転（丸い窓は右端）、えんじ（暗い赤茶）の地
+・紺とえんじは、添付の情報箱の色にそろえる。対戦の画面は飾りを控えめにしているので、飾りは縁の細い線と小さな角飾りだけ
+▲ここまで
+▼English
+Parts for showing "You VS Opponent" on the screen where turn order is decided. On a 1536x1024 canvas, place these three without overlap:
+- Top center: a VS emblem. Two crossed swords behind a round medal (diameter about one third of the canvas height). The medal center is a plain recess for the game to write "VS". Muted gold.
+- Bottom left: the player's name plate. Horizontal (4:1), navy base with a thin muted-gold edge. A round window for a face at the left end (the window interior must be transparent). The name area is blank.
+- Bottom right: the opponent's name plate. Same shape mirrored (round window at the right end), deep wine (dark reddish brown) base.
+- Match the navy and wine of the attached info boxes. The battle screen uses restrained decoration: only thin edge lines and small corner ornaments.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　主人公の立ち絵（男性）→ hero_male.png　※「共通ルール（人物用）」を使う
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：見本/主人公_男性_設定画.png、見本/案内役の会話の絵.png、今の画面/主人公を選ぶ.png
+▼ここからコピー
+主人公（男性・22歳）の全身の立ち絵を描いてください。縦長 1024×1536。頭の上からブーツの先まで全部入れる（上下に少し余白）。
+・服装（設定画と同じ）：黒い短めの髪（少し無造作）。青い帽子（正面に小さな金の紋章）。青い袖なしの長いベストに金の縁取り、白いシャツは袖をまくる。
+　茶色の革のたすき掛けのベルト、腰に茶色のかばん。濃い灰色のズボン、茶色のロングブーツ、指なしの革手袋
+・ポーズ：体を少しだけ斜めにして、こちらを見て軽くほほえむ。右手に裏向きのカードを1枚、指でつまんで胸の高さに持つ。左手は腰のかばんに軽く添える
+・表情：明るく頼れる雰囲気。目は青
+・この絵は「主人公を選ぶ画面」の大きな絵と、対戦の名札の顔（顔の部分を切り抜く）に使う。顔は正面寄りで、髪や帽子で目が隠れないように
+▲ここまで
+▼English
+A full-body standing illustration of the male protagonist (22 years old). Portrait 1024x1536, the whole figure from the top of the head to the tips of the boots, with a small margin.
+- Outfit (same as the design sheet): short, slightly messy black hair. Blue cap with a small gold emblem on the front. Long sleeveless blue vest with gold trim over a white shirt with rolled-up sleeves. Brown leather cross-body straps, brown satchel at the hip. Dark gray trousers, tall brown boots, fingerless leather gloves.
+- Pose: body turned slightly, looking at the viewer with a light smile. His right hand holds one face-down card between his fingers at chest height; his left hand rests lightly on the satchel.
+- Expression: bright and dependable. Blue eyes.
+- This art is used large on the character-select screen and cropped for a face icon, so keep the face fairly frontal and the eyes not hidden by hair or the cap.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　主人公の立ち絵（女性）→ hero_female.png　※「共通ルール（人物用）」を使う
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：見本/主人公_女性_設定画.png、見本/案内役の会話の絵.png、今の画面/主人公を選ぶ.png、（できた 3 の絵）
+▼ここからコピー
+主人公（女性・22歳）の全身の立ち絵を描いてください。縦長 1024×1536。頭の上からブーツの先まで全部入れる（上下に少し余白）。
+・服装（設定画と同じ）：明るい茶色の長い髪（ゆるいウェーブ）。赤い帽子（リボン付き）。白いブラウス（ふくらんだ短い袖）に、金の刺しゅうの赤いベスト、茶色の革ベルト。
+　白いフリルの上に赤と金のスカート、黒いタイツ、茶色の編み上げのロングブーツ、腰に小さな革のかばん、指なしの革手袋
+・ポーズ：体を少しだけ斜めにして、こちらを見てにっこり笑う。左手に裏向きのカードを1枚、指でつまんで胸の高さに持つ。右手は軽く下ろす
+・表情：明るく前向きな雰囲気。目は茶色
+・男性の立ち絵（添付があれば）と、頭身・線の太さ・塗り・大きさをそろえる（2人を並べて選ぶ画面に出すため）
+・顔は正面寄りで、髪や帽子で目が隠れないように（対戦の名札の顔にも切り抜いて使う）
+▲ここまで
+▼English
+A full-body standing illustration of the female protagonist (22 years old). Portrait 1024x1536, the whole figure from the top of the head to the tips of the boots, with a small margin.
+- Outfit (same as the design sheet): long, softly wavy light-brown hair. Red cap with a ribbon. White blouse with short puffed sleeves, red vest with gold embroidery, brown leather belts. Red-and-gold skirt over white frills, black tights, tall brown lace-up boots, small leather pouch at the hip, fingerless leather gloves.
+- Pose: body turned slightly, looking at the viewer with a big smile. Her left hand holds one face-down card between her fingers at chest height; her right hand hangs relaxed.
+- Expression: cheerful and positive. Brown eyes.
+- Match the male illustration (if attached) in proportions, line weight, shading and scale; both appear side by side on the select screen.
+- Keep the face fairly frontal and the eyes not hidden by hair or the cap (also cropped for a face icon).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　主人公を選ぶ札（ふつう・選んだとき）→ newgame_choice.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/主人公を選ぶ画面の背景.png、今の画面/主人公を選ぶ.png
+▼ここからコピー
+ゲームを始めるときに男性・女性の主人公を選ぶ「札」の地の絵を描いてください。横長 1536×1024 に、同じ形の縦長の札（横:縦＝2:3）を左右に2つ並べる。
+・形：上がゆるいアーチになった縦長の札（窓のような形）。中は人物の絵をゲームが重ねるので、無地の暗い紺のグラデーション（下ほど暗く）
+・縁：細いくすんだ金の縁取り。アーチのいちばん上に小さな飾りを1つ。下の方に、名前を置く横長の無地の帯（札の幅の8割くらい）
+・左＝ふつう：落ち着いた暗さ
+・右＝選んだとき：縁の金が明るく光り、札の内側の下から上へ、やわらかい金色の光がにじむ（人物が光に照らされて見えるように）
+・添付の背景（書斎の窓と本）の上に置くので、背景から浮きすぎない色に
+▲ここまで
+▼English
+The base art for the "cards" used to choose the male or female protagonist when starting the game. On a 1536x1024 canvas, two portrait panels (2:3) of the same shape side by side.
+- Shape: a tall panel with a gently arched top (like a window). The inside is a plain dark navy gradient (darker toward the bottom); the game overlays the character art.
+- Edge: a thin muted-gold border with one small ornament at the top of the arch. Near the bottom, a blank horizontal band for the name (about 80% of the panel width).
+- Left = normal: calm and dark.
+- Right = selected: the gold edge glows brighter and a soft golden light rises from the bottom inside the panel (so the character looks lit).
+- It sits on the attached background (a study with a window and books), so the colors must not stand out too much.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　技が当たったときの効果の絵（6種）→ battle_effects.png　※背景は真っ黒
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、今の画面/対戦中.png
+▼ここからコピー
+カードゲームの対戦で、技が当たったときにモンスターのアイコンの上へ一瞬だけ出す「光の効果」を6種描いてください。
+横長 1536×1024 に、3列×2行で6個（1個はほぼ正方形のマスに収める。マスどうしは重ならない）。
+背景は真っ黒 #000000（ゲームで「光を足す」重ね方をするため。透明にしない）。
+・1　ちから攻撃：斜めに走る3本の爪あとの光（白に近い赤）
+・2　かしこさ攻撃：緑がかった魔法の光がはじける（中心の星形の光と、飛び散る小さな粒）
+・3　防御：灰色がかった青の、半透明の丸い盾の光（受け止めた感じ）
+・4　回避：青緑の風の渦と、横に流れる数本の線（すり抜けた感じ）
+・5　特殊：紫のもやが渦を巻く（この効果だけ紫を使ってよい。暗めの紫）
+・6　回復：金色の光の粒が下から上へ昇る
+・どれも手描きの筆の質感の光。マンガの効果線のような硬い線や、3DCGの光にしない。文字なし
+・小さく（76px 角くらい）表示しても形が分かるように、真ん中を明るく、外側はやわらかく消えていく
+▲ここまで
+▼English
+Six "hit effects" that flash briefly over a monster icon when a skill lands in a card battle.
+Landscape 1536x1024 canvas, 3 columns x 2 rows, one effect per roughly square cell, no overlap.
+Background: solid black #000000 (the game uses additive blending; do NOT make it transparent).
+1 Power attack: three diagonal claw-slash streaks of light (reddish white).
+2 Wisdom attack: a burst of greenish magic light (a star-shaped flash in the center and small scattering particles).
+3 Defense: a translucent round shield of greyish-blue light (blocking).
+4 Evasion: a teal swirl of wind with a few horizontal streaks (slipping past).
+5 Special: a swirling dark purple mist (purple is allowed only for this one; keep it dark).
+6 Heal: golden light particles rising from bottom to top.
+- Hand-painted brush-stroke light. No hard manga speed lines, no 3D render glow. No text.
+- Readable at small size (about 76 px): bright core, soft fading edges.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　レア度の印と NEW の札 → card_badges.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/カードの裏面.png、今の画面/パック開封.png
+▼ここからコピー
+カードの角に付ける小さな印を描いてください。正方形 1024×1024 に、上の段に3つ、下の段に2つ。文字は入れない。
+・上の段：レア度の印。同じ形の小さな紋章（菱形の宝石を、小さな翼のような金具ではさんだ形）を3つ
+　左＝コモン：銅色の金具に、くすんだ茶色の宝石
+　中＝アンコモン：銀色の金具に、青灰色の宝石
+　右＝レア：金色の金具に、深い紺の宝石（ほかの2つより少しだけ光る）
+・下の段：パックを開けたときに「初めて手に入れたカード」に付ける札
+　左＝ふつう：短い横長のリボンの札（えんじの地に細い金の縁。中は無地。ゲームが「NEW」の文字を重ねる）
+　右＝同じ札の、光が強いとき（縁の金が明るい）
+・どれも小さく（高さ20px くらい）表示しても形と色が分かるように、形は単純に、色ははっきり分ける
+▲ここまで
+▼English
+Small badges for card corners. On a 1024x1024 canvas: three on the top row, two on the bottom row. No text.
+- Top row: rarity badges. The same small emblem shape (a diamond gem held between small wing-like metal fittings), three variants:
+  left = Common: copper fittings, dull brown gem; middle = Uncommon: silver fittings, blue-grey gem; right = Rare: gold fittings, deep navy gem (glowing just slightly more than the others).
+- Bottom row: a tag for cards obtained for the first time when opening a pack.
+  left = normal: a short horizontal ribbon tag (wine base, thin gold edge, blank inside; the game writes "NEW"); right = the same tag in a brighter state (gold edge glowing).
+- Readable at a small size (about 20 px tall): simple shapes, clearly different colors.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 8　まだ買えないパック（鍵つき）→ pack_locked.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/パック_第1弾.png、今の画面/ガチャ.png
+▼ここからコピー
+ガチャの画面で、まだ解放されていない（買えない）カードパックの絵を描いてください。縦長 1024×1536 の真ん中に1つ。
+・形：添付の第1弾のパックとまったく同じ形・同じ大きさの比率（縦長の袋のパック）
+・色：全体がくすんだ灰色と黒っぽい茶色。表の紋章は見えないくらい暗い影になっている
+・パックの上から、細い鉄の鎖が2本、×の形に巻きついていて、真ん中に古い鉄の南京錠が1つ
+・「まだ手に入らない」ことが一目で分かる、静かで重い感じ。光らせない
+▲ここまで
+▼English
+A card pack that is still locked (cannot be bought yet) for the gacha screen, centered on a 1024x1536 canvas.
+- Shape: exactly the same shape and proportions as the attached first pack (a tall foil pouch).
+- Colors: dull grey and blackish brown overall; the emblem on the front is darkened to a faint shadow.
+- Two thin iron chains wrap around it in an X shape, with an old iron padlock in the middle.
+- Quiet and heavy, clearly "not available yet". No glow.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 9　大会の勝ち抜き表の部品 → bracket_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、今の画面/大会の勝ち抜き表.png
+▼ここからコピー
+カード大会の「勝ち抜き表」を組み立てる部品を描いてください。横長 1536×1024 に、次の部品を重ならないように並べる。文字は入れない。
+・回戦の札：横長（横:縦＝5:1）の紺の札、細いくすんだ金の縁。中は無地（ゲームが「1回戦」「決勝」と対戦相手の名前を重ねる）。
+　同じ形で「ふつう」「次に戦う（縁が明るく光る）」「終わった（くすんで暗い）」の3つ
+・勝ち抜きの線：くすんだ金の細い線の部品。まっすぐの線（縦）・直角の角・T字の分かれ道を1つずつ（線の太さは全部同じ）
+・勝ちの印：小さな丸い金のメダルに月桂樹の葉
+・負けの印：小さな丸い灰色のメダルに、ひびの入った盾
+・優勝杯：金の優勝杯。正面にカードと星の飾り。台座はこげ茶の木。部品の中でいちばん大きく（画像の高さの4割くらい）
+▲ここまで
+▼English
+Parts for assembling a card tournament bracket. On a 1536x1024 canvas, without overlap. No text.
+- Round plates: horizontal (5:1) navy plates with a thin muted-gold edge, blank inside (the game writes the round and opponent name). Three states of the same shape: normal, next match (edge glowing brighter), finished (dull and darker).
+- Bracket lines: thin muted-gold line pieces: one straight vertical line, one right-angle corner, one T-junction (all the same thickness).
+- Win mark: a small round gold medal with laurel leaves.
+- Loss mark: a small round grey medal with a cracked shield.
+- Trophy: a gold cup with a card-and-star ornament on the front, dark brown wooden base. The largest part (about 40% of the canvas height).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 10　ランクアップ・優勝の帯 → banner_rankup.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/勝ちの帯.png、見本/ランクの紋章_D.png、今の画面/勝ち.png
+▼ここからコピー
+大会で優勝したときや、ランクが上がったときに出す、特別な帯を描いてください。横長 1536×1024 の真ん中に1つ。文字は入れない。
+・形：添付の「勝ちの帯」と同じ系統の、横長の帯（左右に広げた翼）。勝ちの帯より一段豪華に
+・帯の上の真ん中に、丸い台座（くぼみ）。ここにゲームがランクの紋章（添付）を重ねるので、台座の中は無地
+・帯の両端に月桂樹の葉、帯の後ろから放射状に広がるやわらかい金色の光
+・帯の中（文字を置く所）は無地の紺。ゲームが「ランクアップ！」「優勝！」の文字を重ねる
+・派手な虹色や紙吹雪にはしない。くすんだ金と紺で、落ち着いた祝福の感じ
+▲ここまで
+▼English
+A special banner shown when the player wins a tournament or ranks up, centered on a 1536x1024 canvas. No text.
+- Shape: the same family as the attached win banner (a horizontal ribbon with spread wings), one step more lavish.
+- At the top center of the banner, a round pedestal (recess), blank inside; the game places the rank emblem (attached) there.
+- Laurel leaves at both ends of the banner, and soft golden rays spreading out from behind it.
+- The text area of the banner is plain navy; the game writes "Rank Up!" or "Champion!".
+- No rainbow colors or confetti. Muted gold and navy, a calm sense of celebration.
+▲
