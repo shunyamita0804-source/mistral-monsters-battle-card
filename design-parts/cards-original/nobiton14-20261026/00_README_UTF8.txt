@@ -1,0 +1,5 @@
+ノビトン Art Ver.2 全14技 Claude実装パッケージ
+画像14枚：提供画像を無加工で正式番号順にリネーム
+正式技データ：02_CLAUDE_INSTRUCTIONS/02_14技_正式データ_UTF8.csv
+Claude指示：02_CLAUDE_INSTRUCTIONS/01_Claudeへ送信_実装指示_UTF8.txt
+バトル用モンスターカード外枠：黄色。バトル用カード原画は本ZIPに含まれません。

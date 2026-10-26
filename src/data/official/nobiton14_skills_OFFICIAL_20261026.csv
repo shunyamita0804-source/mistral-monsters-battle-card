@@ -1,0 +1,15 @@
+﻿技番号,技名,分類,消費マナ,ダメージ,特殊効果,画像相対パス
+01,はなビンタ,ちから,1,1,なし,01_SKILL_ART/Nobiton_SK01.jpg
+02,ずつき,ちから,2,2,なし,01_SKILL_ART/Nobiton_SK02.jpg
+03,まきつく,ちから,3,2,相手は次のターン行動不可,01_SKILL_ART/Nobiton_SK03.jpg
+04,ギガントノーズ,ちから,4,4,なし,01_SKILL_ART/Nobiton_SK04.jpg
+05,くしゃみ,かしこさ,3,1,相手のマナを1減らす,01_SKILL_ART/Nobiton_SK05.jpg
+06,ミラージュノーズ,かしこさ,3,2,回避されない,01_SKILL_ART/Nobiton_SK06.jpg
+07,ダウナーミスト,かしこさ,4,2,相手のマナを3減らす,01_SKILL_ART/Nobiton_SK07.jpg
+08,考える,特殊,2,なし,手札をすべて交換,01_SKILL_ART/Nobiton_SK08.jpg
+09,不思議な嗅覚,特殊,3,なし,相手の手札をすべて確認,01_SKILL_ART/Nobiton_SK09.jpg
+10,鼻でまもる,防御,1,なし,ちから技のダメージを2軽減,01_SKILL_ART/Nobiton_SK10.jpg
+11,のびのびガード,防御,2,なし,ちから技・かしこさ技のダメージを3軽減,01_SKILL_ART/Nobiton_SK11.jpg
+12,ぐっとがまん,防御,0,なし,ちから技・かしこさ技のダメージを1軽減,01_SKILL_ART/Nobiton_SK12.jpg
+13,横によける,回避,2,なし,ちから技を回避,01_SKILL_ART/Nobiton_SK13.jpg
+14,必死によける,回避,3,なし,ちから技・かしこさ技を回避,01_SKILL_ART/Nobiton_SK14.jpg
