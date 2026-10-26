@@ -16,12 +16,13 @@ export const FRAGMENTS: readonly FragmentDefinition[] = [
   { id: 'fragment-02', mapId: 'town', x: 107, y: 105 },
   { id: 'fragment-03', mapId: 'town', x: 12, y: 105 },
   { id: 'fragment-04', mapId: 'town', x: 114, y: 59 },
-  { id: 'fragment-05', mapId: 'dungeon-01-b1', x: 9, y: 1 },
-  { id: 'fragment-06', mapId: 'dungeon-01-b1', x: 3, y: 14 },
-  { id: 'fragment-07', mapId: 'dungeon-01-b2', x: 5, y: 11 },
-  { id: 'fragment-08', mapId: 'dungeon-01-b2', x: 12, y: 16 },
-  { id: 'fragment-09', mapId: 'dungeon-01-b3', x: 10, y: 1 },
-  { id: 'fragment-10', mapId: 'dungeon-01-b3', x: 1, y: 16 },
+  // 2026-10-26：太古の遺跡がランダム生成のダンジョンになったので、同じ形の精霊の森（遺跡の写し）の同じ場所へ移した
+  { id: 'fragment-05', mapId: 'dungeon-02-b1', x: 9, y: 1 },
+  { id: 'fragment-06', mapId: 'dungeon-02-b1', x: 3, y: 14 },
+  { id: 'fragment-07', mapId: 'dungeon-02-b2', x: 5, y: 11 },
+  { id: 'fragment-08', mapId: 'dungeon-02-b2', x: 12, y: 16 },
+  { id: 'fragment-09', mapId: 'dungeon-02-b3', x: 10, y: 1 },
+  { id: 'fragment-10', mapId: 'dungeon-02-b3', x: 1, y: 16 },
 ];
 
 export const FRAGMENT_TOTAL = 10;

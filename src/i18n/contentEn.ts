@@ -86,6 +86,8 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:enc-b3-b:name': 'Deep-floor pack (Temp)',
   'opponent:enc-b3-boss:name': 'Master of the Ruins (Temp)',
   'opponent:enc-forest-boss:name': 'Master of the Forest (Temp)',
+  'opponent:enc-run-npc:name': 'Dungeon Duelist (Temp)',
+  'opponent:enc-run-guardian:name': 'Unseen Guardian (Temp)',
   'opponent:enc-practice:name': 'Practice partner (Temp)',
 
   // ---------- マップ・扉・家具（仮マップ。src/data/maps.ts） ----------

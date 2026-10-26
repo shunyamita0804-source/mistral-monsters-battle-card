@@ -1,4 +1,4 @@
-import { getDungeon, ENCOUNTERS, type DungeonDefinition } from '../../data/dungeons.ts';
+import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
@@ -67,9 +67,9 @@ import {
   startPractice,
 } from '../../game/story/intro.ts';
 import { playScene } from '../components/dialogue.ts';
+import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { button, h } from '../dom.ts';
-import { once } from '../gameStore.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
 import femaleSheet from '@assets/images/characters/player_female_sheet.webp';
 import guideSheet from '@assets/images/characters/npc_neighbor_guide_walk.webp';
@@ -100,12 +100,6 @@ import chestGold4 from '@assets/images/maps/dungeon/chest_03_anim_04.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import meadowBattleBg from '@assets/images/backgrounds/battle_field_meadow.webp';
-import ruinsIntroArt from '@assets/images/ui/dungeon_intro/ruins_art.webp';
-import ruinsIntroTitle from '@assets/images/ui/dungeon_intro/ruins_title.webp';
-import ruinsIntroOverlay from '@assets/images/ui/dungeon_intro/ruins_overlay.webp';
-import forestIntroArt from '@assets/images/ui/dungeon_intro/forest_art.webp';
-import forestIntroTitle from '@assets/images/ui/dungeon_intro/forest_title.webp';
-import forestIntroOverlay from '@assets/images/ui/dungeon_intro/forest_overlay.webp';
 import { bgm, type BgmId } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
@@ -242,23 +236,6 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-02-b2': meadowBattleBg,
   'dungeon-02-b3': meadowBattleBg,
 };
-/**
- * ダンジョンに入ったときの挿絵・ダンジョン名の絵・重ねる部品（2026-10-26 ユーザー指示「ダンジョン入った時に挿絵とダンジョン名を入れたい」。
- * 同じ日に届いた6枚。原本 design-parts/dungeon-intro-20261026/、ゲーム用は tools/design/dungeon_intro_build.py）。
- * 挿絵は横長なので、画面いっぱいに切り抜いて真ん中を見せる（artX＝横のどこを見せるか）。絵が無いダンジョンは名前を文字で
- */
-const DUNGEON_INTRO: Readonly<Record<string, { readonly art: string; readonly title: string; readonly overlay: string; readonly artX: string }>> = {
-  'dungeon-01': { art: ruinsIntroArt, title: ruinsIntroTitle, overlay: ruinsIntroOverlay, artX: '50%' },
-  'dungeon-02': { art: forestIntroArt, title: forestIntroTitle, overlay: forestIntroOverlay, artX: '50%' },
-};
-/** 絵の読み込みを待つ長さの上限（ミリ秒。遅い回線でも札がいつまでも残らないように） */
-const DUNGEON_INTRO_LOAD_WAIT_MS = 1500;
-/**
- * ダンジョンに入ったときの挿絵とダンジョン名を出しておく時間と、消える（フェードアウト）時間（ミリ秒。押すと先に消え始める）。
- * 2026-10-26 ユーザー指示：画面の横も縦もいっぱいに出し、フェードアウトしてダンジョンの画面に切り替える
- */
-const DUNGEON_INTRO_MS = 3000;
-const DUNGEON_INTRO_FADE_MS = 900;
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
@@ -654,7 +631,7 @@ export class WorldView {
     const introDungeon = intro && map.area === 'dungeon' ? getDungeon(intro) : undefined;
     if (introDungeon) {
       // ダンジョンに入った直後：挿絵とダンジョン名の札（階の帯の代わり）
-      this.#dungeonIntro(introDungeon);
+      showDungeonIntro(this.#root, introDungeon);
     } else if (banner) {
       this.#store.flashBanner = null;
       this.#banner('clear', t('world.bannerClear'));
@@ -670,39 +647,6 @@ export class WorldView {
     } else if (scene) {
       this.#playScene(scene);
     }
-  }
-
-  /**
-   * ダンジョンに入った直後：画面いっぱいの挿絵とダンジョン名。少し見せてからフェードアウトして、ダンジョンの画面に切り替わる。押すと先に消え始める。
-   * 【仮】挿絵とダンジョン名の絵はまだ無いので、対戦の背景の絵と明朝体の文字（依頼文 docs/design/dungeon-intro-20261026/）
-   */
-  #dungeonIntro(dungeon: DungeonDefinition): void {
-    const intro = DUNGEON_INTRO[dungeon.id];
-    const close = once(() => {
-      el.classList.add('is-closing');
-      setTimeout(() => el.remove(), DUNGEON_INTRO_FADE_MS);
-    });
-    const img = (cls: string, src: string): HTMLImageElement =>
-      h('img', { class: cls, attrs: { src, alt: '', draggable: 'false' } }) as HTMLImageElement;
-    const imgs = intro
-      ? [img('world__dungeon-intro-art', intro.art), img('world__dungeon-intro-overlay', intro.overlay), img('world__dungeon-intro-title', intro.title)]
-      : [];
-    const el = h(
-      'div',
-      { class: 'world__dungeon-intro', attrs: { role: 'button', 'aria-label': dungeonName(dungeon) }, on: { click: close } },
-      ...imgs,
-      intro ? null : h('p', { class: 'world__dungeon-intro-name', text: dungeonName(dungeon) }),
-    );
-    if (intro) imgs[0]?.style.setProperty('object-position', `${intro.artX} 50%`);
-    el.style.setProperty('--intro-fade', `${DUNGEON_INTRO_FADE_MS}ms`);
-    this.#root.append(el);
-    // 絵を読み込み終えてから動きを始め、見せる時間を数える（読み込みが遅くても DUNGEON_INTRO_LOAD_WAIT_MS で始める）
-    const loaded = Promise.all(imgs.map((i) => (i.decode ? i.decode().catch(() => undefined) : Promise.resolve())));
-    const wait = new Promise((resolve) => setTimeout(resolve, DUNGEON_INTRO_LOAD_WAIT_MS));
-    void Promise.race([loaded, wait]).then(() => {
-      el.classList.add('is-ready');
-      setTimeout(close, DUNGEON_INTRO_MS);
-    });
   }
 
   /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階）。タップの邪魔をしない */

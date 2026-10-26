@@ -1,8 +1,11 @@
 import worldMapArt from '@assets/images/ui/worldmap/world_map.webp';
 import { DUNGEONS } from '../../data/dungeons.ts';
+import { isRunDungeon } from '../../data/dungeonRun.ts';
 import { DUNGEON_SPOTS, TOWN_SPOT, type WorldMapSpot } from '../../data/worldMap.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
+import { startRun } from '../../game/dungeon/run.ts';
 import { dungeonRecord, startDungeon } from '../../game/progress/dungeon.ts';
+import { randomSeed } from '../../game/rng.ts';
 import { messageModal } from '../components/modal.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { h } from '../dom.ts';
@@ -45,8 +48,14 @@ export const dungeonSelectScreen: ScreenDefinition = {
     const depart = once((dungeonId: string) => {
       // ダンジョンの門を開けて入る
       sound.play('gateOpen');
-      store.update((s) => startDungeon(s, dungeonId));
       store.dungeonIntro = dungeonId;
+      // ランダム生成のダンジョン（2026-10-26 試作。いまは太古の遺跡だけ）は、毎回ちがう形の階で挑戦を始める
+      if (isRunDungeon(dungeonId)) {
+        store.update((s) => startRun(s, dungeonId, randomSeed()));
+        ctx.reset('dungeonRun');
+        return;
+      }
+      store.update((s) => startDungeon(s, dungeonId));
       ctx.reset('world');
     });
     const go = (dungeonId: string): void => {

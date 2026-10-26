@@ -26,7 +26,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -70,6 +70,36 @@ export interface ActiveDungeon {
   readonly defeatedEnemies: readonly string[];
 }
 
+/**
+ * ランダム生成のダンジョンの挑戦中の状態（2026-10-26 試作。中断して再開すると同じ階・同じ位置から）。
+ * 階の形はシードから毎回同じに作り直すので、保存するのは「どこにいるか・何を見たか・何を倒した／開けたか」だけ。
+ * ロジックは src/game/dungeon/run.ts
+ */
+export interface DungeonRun {
+  readonly dungeonId: string;
+  /** 挑戦のシード（階の形を作る） */
+  readonly seed: number;
+  /** いまの階（0＝1階） */
+  readonly floor: number;
+  readonly x: number;
+  readonly y: number;
+  readonly dir: Direction;
+  /** いまの階の見たマス（'1'＝見た。左上から1行ずつ） */
+  readonly explored: string;
+  /** 倒したバトラー・見えない番人の ID（全部の階） */
+  readonly defeated: readonly string[];
+  /** 開けた宝箱の ID（全部の階） */
+  readonly opened: readonly string[];
+  /** この挑戦で負けた回数 */
+  readonly losses: number;
+  /** この挑戦で手に入れた技カード（負けて戻されたら失う） */
+  readonly gained: readonly string[];
+  /** 見えない番人が出てこない残りの歩数 */
+  readonly cooldown: number;
+  /** 見えない番人の抽選の乱数の状態 */
+  readonly rng: number;
+}
+
 export interface SaveData {
   readonly version: number;
   readonly createdAt: string;
@@ -86,6 +116,8 @@ export interface SaveData {
   readonly claimedEntries: readonly string[];
   readonly dungeons: Readonly<Record<string, DungeonRecord>>;
   readonly activeDungeon: ActiveDungeon | null;
+  /** ランダム生成のダンジョンの挑戦中の状態（挑戦していなければ null） */
+  readonly dungeonRun: DungeonRun | null;
   /** 集めた欠片ID */
   readonly fragments: readonly string[];
   /** 隠しモンスターを特別復元したか */
@@ -127,6 +159,7 @@ export function createNewSave(now: Date = new Date()): SaveData {
     claimedEntries: [],
     dungeons: {},
     activeDungeon: null,
+    dungeonRun: null,
     fragments: [],
     hiddenRestored: false,
     location: NEW_GAME_LOCATION,
@@ -350,6 +383,11 @@ function migrateNobiton14V12(raw: RawObject): RawObject {
   return removeCardsFromSave(raw, NOBITON_REMOVED_14_IDS);
 }
 
+/** version 12 → 13（2026-10-26）：ランダム生成のダンジョンの挑戦中の状態（dungeonRun）を足した。いままでのセーブは挑戦していない */
+function migrateDungeonRunV13(raw: RawObject): RawObject {
+  return { ...raw, dungeonRun: null };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -363,6 +401,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   9: migrateGaul14V10,
   10: migrateLazuck14V11,
   11: migrateNobiton14V12,
+  12: migrateDungeonRunV13,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -459,6 +498,25 @@ function normalizeActiveDungeon(v: unknown): ActiveDungeon | null {
   return { dungeonId: v.dungeonId, floor: asCount(v.floor), defeatedEnemies: unique(asStringArray(v.defeatedEnemies)) };
 }
 
+function normalizeDungeonRun(v: unknown): DungeonRun | null {
+  if (!isObject(v) || typeof v.dungeonId !== 'string' || typeof v.seed !== 'number' || !Number.isFinite(v.seed)) return null;
+  return {
+    dungeonId: v.dungeonId,
+    seed: Math.floor(v.seed),
+    floor: asCount(v.floor),
+    x: asCount(v.x),
+    y: asCount(v.y),
+    dir: DIRECTIONS.includes(v.dir as Direction) ? (v.dir as Direction) : 'down',
+    explored: typeof v.explored === 'string' && /^[01]*$/.test(v.explored) ? v.explored : '',
+    defeated: unique(asStringArray(v.defeated)),
+    opened: unique(asStringArray(v.opened)),
+    losses: asCount(v.losses),
+    gained: asStringArray(v.gained).filter((id) => !!cardCatalog.get(id)),
+    cooldown: asCount(v.cooldown),
+    rng: typeof v.rng === 'number' && Number.isFinite(v.rng) ? Math.floor(v.rng) : 1,
+  };
+}
+
 /** 生データ（JSON.parse の結果）を検証してセーブデータにする。読めない場合は null */
 export function normalizeSave(raw: unknown): SaveData | null {
   if (!isObject(raw)) return null;
@@ -488,6 +546,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     claimedEntries: unique(asStringArray(migrated.claimedEntries)),
     dungeons: normalizeDungeons(migrated.dungeons),
     activeDungeon: normalizeActiveDungeon(migrated.activeDungeon),
+    dungeonRun: normalizeDungeonRun(migrated.dungeonRun),
     fragments: unique(asStringArray(migrated.fragments)),
     hiddenRestored: asBool(migrated.hiddenRestored, false),
     location: normalizeLocation(migrated.location),
