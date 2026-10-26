@@ -43,4 +43,5 @@ export const TOWN_SPOT: WorldMapSpot = { x: 0.3, y: 0.37, region: 'ferna' };
 /** ダンジョンの印。ダンジョンを足すときはここに1行。【仮】位置 */
 export const DUNGEON_SPOTS: Readonly<Record<string, WorldMapSpot>> = {
   'dungeon-01': { x: 0.2, y: 0.17, region: 'ferna' },
+  'dungeon-02': { x: 0.14, y: 0.46, region: 'ferna' },
 };

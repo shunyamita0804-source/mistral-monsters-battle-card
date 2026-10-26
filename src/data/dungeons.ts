@@ -1,5 +1,8 @@
+import { skillId, TMP_FLUNE_ID, TMP_GEOL_ID } from './cards.ts';
+import { LAZUCK_MONSTER_ID } from './lazuck.ts';
+import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
-import type { OpponentDefinition } from './tournaments.ts';
+import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
 /**
  * 【仮データ】ダンジョンと敵の編成。
@@ -13,15 +16,38 @@ export interface DungeonDefinition {
   readonly description: string;
   /** 階層ごとのマップID（B1F から順） */
   readonly floors: readonly string[];
+  /** 最奥のボスを初めて倒したときにもらえるカード（2026-10-26。1回だけ） */
+  readonly firstClearCards?: readonly CardReward[];
   readonly isPlaceholder: boolean;
 }
 
+/** 【仮】ボスのモンスターのカードを少し：モンスターカード1枚と、技1〜3を1枚ずつ */
+const bossCards = (monsterId: string, key: string): CardReward[] => [
+  { cardId: monsterId, count: 1 },
+  ...[1, 2, 3].map((no) => ({ cardId: skillId(key, no), count: 1 })),
+];
+
+/**
+ * 2026-10-26 ユーザー指示：最初からあるダンジョンは「遺跡」と「森」の2つ。遺跡のボスはジオル、森のボスはフルーネを使い、
+ * 勝つとそのモンスターのモンスターカードと技カードが少しもらえる。ジオル・フルーネの正式データはまだ無いので、仮のジオル・フルーネ（cards.ts）で、
+ * 初めて倒したときに1回だけもらえる（ユーザー「今は仮で適当でいい」）。
+ * 細かい設計はこれから。いまは森も遺跡（dungeon-01）の写しで、名前は仮
+ */
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
     id: 'dungeon-01',
-    name: '第1ダンジョン（仮名）',
-    description: '地下3階。最奥のボスを倒すとクリア。（名称・敵編成は仮）',
+    name: '月影の遺跡（仮名）',
+    description: '地下3階の遺跡。最奥のボスを倒すとクリア。（名称・敵編成は仮）',
     floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
+    firstClearCards: bossCards(TMP_GEOL_ID, 'tmp-geol'),
+    isPlaceholder: true,
+  },
+  {
+    id: 'dungeon-02',
+    name: '精霊の森（仮名）',
+    description: '地下3階の森。最奥のボスを倒すとクリア。（名称・敵編成は仮。いまは遺跡と同じ作り）',
+    floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
+    firstClearCards: bossCards(TMP_FLUNE_ID, 'tmp-flune'),
     isPlaceholder: true,
   },
 ];
@@ -38,7 +64,10 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b2-c': { id: 'enc-b2-c', name: '階段の番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.8 },
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
-  'enc-b3-boss': { id: 'enc-b3-boss', name: '最奥のボス（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
+  // 遺跡のボス：仮のジオルを真ん中に（正式データが届いたら入れ替える）
+  'enc-b3-boss': { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 },
+  // 森のボス：仮のフルーネを真ん中に
+  'enc-forest-boss': { id: 'enc-forest-boss', name: '森の主（仮）', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
   // カード練習場の練習相手（序盤の練習試合）。スターターと同じモンスター3体を少し弱くしたもの（仮。正式な練習相手のデッキは未定）
   'enc-practice': { id: 'enc-practice', name: '練習相手（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
 };

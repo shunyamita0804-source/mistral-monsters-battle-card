@@ -65,6 +65,7 @@ export const dungeonSelectScreen: ScreenDefinition = {
         // ダンジョンの門を開けて入る
         sound.play('gateOpen');
         store.update((s) => startDungeon(s, d.id));
+        store.dungeonIntro = d.id;
         ctx.reset('world');
       });
       const go = (): void => {

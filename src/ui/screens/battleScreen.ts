@@ -120,7 +120,8 @@ function showcaseSound(card: PlayCard): SoundId {
 }
 
 /** 相手の1手ごとの間（ミリ秒） */
-const AI_STEP_MS = 1100;
+/** 2026-10-26 ユーザー指示「相手がカード使った時の処理が早すぎる。何したのか追うのが難しい」で 1100→1500 */
+const AI_STEP_MS = 1500;
 /**
  * 場のモンスターの幅（論理px。指示書の目安 72〜80）。2026-10-25 ユーザー指示「ずっと出ているカードが新しいデザインの方」：
  * バトル用カード（800×920）のあるモンスターはそのカードで、まだ無いモンスターは同じ縦横比に切り抜いたアイコンで出す
@@ -160,9 +161,9 @@ const DEFENSE_CARD_W = 60;
  * 相手の手札の裏向きのカードが、フォーカスエリアのカードの場所へ大きくなりながら動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる）。
  * 2026-10-26 ユーザー指示「大きく見せて裏返しから表向きに。モンスターファームバトルカードをもっと参考に」：着いたら裏から表へ返す（OPP_CARD_FLIP_MS）
  */
-const OPP_CARD_FLY_MS = 480;
+const OPP_CARD_FLY_MS = 620;
 /** 真ん中に来た相手のカードを裏から表へ返す時間（ミリ秒。半分で表に替わる） */
-const OPP_CARD_FLIP_MS = 420;
+const OPP_CARD_FLIP_MS = 520;
 /** 相手のひと言を大きく出しておく時間（ミリ秒）。押すと先に消える */
 const TALK_MS = 2200;
 /** ひと言を1文字ずつ出す間隔（ミリ秒。PS版の会話のように） */
@@ -172,6 +173,8 @@ const TALK_CHAR_MS = 45;
  * 使ったカードをフォーカスエリアに大きく出し、「誰が誰に使ったか」の1行と、使った側・対象のアイコンの光りを見せる。見せている間は操作と相手の行動を待たせる
  */
 const SHOWCASE_MS = 1200;
+/** 相手の使ったカードを表に返してから見せておく時間（ミリ秒。2026-10-26 ユーザー指示「何したのか追うのが難しい」で自分の SHOWCASE_MS より長く。タップで飛ばせる） */
+const OPP_SHOWCASE_MS = 2400;
 /** 命中したときの一瞬の間（ヒットストップ）と画面の揺れ */
 const HIT_PAUSE_MS = 320;
 /** 状態の印の能力の絵（技カードのバーの拳・本の丸。tools/design/stat_icon_crop.py） */
@@ -529,18 +532,20 @@ export const battleScreen: ScreenDefinition = {
       // 相手のカードは、裏向きのまま手札からフォーカスエリアへ大きくなりながら動き、着いたら表に返す（返し終えるまでの時間）
       const flyIn = played && oppFrom && action.type !== 'convertToMana';
       const revealDelay = flyIn ? OPP_CARD_FLY_MS + OPP_CARD_FLIP_MS : 0;
+      // 見せておく時間（相手のカードは長め）
+      const hold = played?.side === 'opponent' ? OPP_SHOWCASE_MS : SHOWCASE_MS;
       if (played) {
-        busyUntil = Math.max(busyUntil, Date.now() + revealDelay + SHOWCASE_MS - 150);
+        busyUntil = Math.max(busyUntil, Date.now() + revealDelay + hold - 150);
         // 相手のカードが動いている間も、指のマークはまだ出さない
-        showcaseUntil = Date.now() + revealDelay + SHOWCASE_MS;
+        showcaseUntil = Date.now() + revealDelay + hold;
       }
       // 誰に向けた技か分かるよう、対象のモンスターに指のマークを出す（自分・相手どちらの技も。攻撃は守備が終わるまでも出る）
       if (action.type === 'useCard' && action.targetUid) {
-        const until = Date.now() + revealDelay + SHOWCASE_MS + POINTER_EXTRA_MS;
+        const until = Date.now() + revealDelay + hold + POINTER_EXTRA_MS;
         pointed = { uid: action.targetUid, until, side: action.side };
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
-      queueHitFx(before, next, action, played, played ? revealDelay + SHOWCASE_MS : 0);
+      queueHitFx(before, next, action, played, played ? revealDelay + hold : 0);
       // 大きく見せる欄を先に出し（相手のカードは着くまで隠しておく）、そこへ相手のカードを飛ばす
       if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null, flyIn ? OPP_CARD_FLY_MS : 0);
       render();
@@ -620,9 +625,9 @@ export const battleScreen: ScreenDefinition = {
      */
     const showcase = (cardId: string, side: Side, userUid: string | null, targetUid: string | null, flyMs = 0): void => {
       const now = Date.now();
-      // 相手のカード（flyMs > 0）：飛んできて着いたら表に返し、返し終えてから SHOWCASE_MS 見せる
+      // 相手のカード（flyMs > 0）：飛んできて着いたら表に返し、返し終えてから OPP_SHOWCASE_MS 見せる（自分のカードは SHOWCASE_MS）
       const reveal = flyMs > 0 ? flyMs + OPP_CARD_FLIP_MS : 0;
-      const until = now + reveal + SHOWCASE_MS;
+      const until = now + reveal + (side === 'opponent' ? OPP_SHOWCASE_MS : SHOWCASE_MS);
       spotlight = { cardId, side, userUid, targetUid, until, arriveAt: flyMs > 0 ? now + flyMs : null };
       showcaseUntil = until;
       setTimeout(() => {

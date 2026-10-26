@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BGM のループ用ファイルを作る（ユーフルカ〔Wingless Seraph〕の曲。2026-10-26 ユーザー提供・利用確認済み）
+"""BGM のループ用ファイルを作る（ユーフルカ〔Wingless Seraph〕の曲。2026-10-26 ユーザー提供・利用確認済み。届いた ZIP をすべて同じフォルダに展開して使う）
 
 使い方: python3 -I tools/audio/make_bgm_loops_wingless.py <ZIP を展開したフォルダ> assets/audio/bgm
 
@@ -24,6 +24,10 @@ TRACKS = {
     'boss_battle': 'Boss-battle',  # ボス戦：己と仲間を信じて
     'tournament_battle': 'Battle-Conflict',  # 公式ランク戦（大会の対戦）：Conflict
     'town': 'Wanderers-City',  # 街：放浪者の街
+    # 2026-10-26 追加（ユーザー提供・利用確認済み）
+    'dungeon_ruins': 'Moon-ruins',  # 遺跡のダンジョン：月の廃墟
+    'dungeon_forest': 'Elven-Sanctuary',  # 森のダンジョン：古代エルフの聖域
+    'lab': 'sealed_room',  # カード研究所：開かれし封印の扉
 }
 
 
