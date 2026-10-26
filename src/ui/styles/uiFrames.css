@@ -106,29 +106,20 @@
   text-shadow: 0 1px 4px rgb(0 0 0 / 0.9);
 }
 
-/* ===== タイトル：背景の絵（上と下は暗めに描かれている） ===== */
+/* ===== タイトル：背景の絵（2026-10-26 新しい背景：昼の空と浮かぶ島の街。明るい絵なので、膜はうすく上と下だけ） ===== */
 .title {
   background:
     linear-gradient(
       180deg,
-      rgb(10 11 14 / 0.3) 0%,
-      rgb(10 11 14 / 0.55) 30%,
-      rgb(10 11 14 / 0.7) 45%,
-      rgb(10 11 14 / 0.15) 58%,
-      rgb(10 11 14 / 0.35) 80%,
-      rgb(10 11 14 / 0.7) 100%
+      rgb(8 14 30 / 0.35) 0%,
+      rgb(8 14 30 / 0.15) 28%,
+      rgb(8 14 30 / 0) 45%,
+      rgb(8 14 30 / 0.1) 60%,
+      rgb(8 14 30 / 0.35) 85%,
+      rgb(8 14 30 / 0.6) 100%
     ),
     url('@assets/images/backgrounds/title_bg.webp') center / cover no-repeat,
     var(--color-stage);
-}
-
-.title .title__icon {
-  width: 170px;
-  height: 170px;
-  /* 2026-10-23 新しいアイコン：金の角丸の枠が絵に入っている（外は透明）ので、角を切らず、影は絵の形に付ける */
-  border-radius: 0;
-  box-shadow: none;
-  filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.5));
 }
 
 .title .title__series,

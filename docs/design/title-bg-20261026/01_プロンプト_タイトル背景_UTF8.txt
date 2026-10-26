@@ -1,0 +1,103 @@
+【プロンプト】タイトル画面の新しい背景（2026-10-26）
+
+■ なぜ頼むか
+ユーザー指示「タイトル画面の背景は街なので、何か新たにデザインしたい」。いまの背景（2026-10-23 第1弾）は夕暮れの街と大会会場。
+タイトル画面はアイコンを消し、ロゴ（MISTRAL MONSTERS / BATTLE CARD）を上に大きく置いた（今の画面/タイトル.png）。
+
+■ 案（どれか1つを選んで描いてもらう。おすすめは A）
+ A　モンスターたちとカード（おすすめ）：星空の丘で、モンスターたちが光るカードを囲む。ゲームの顔になる絵
+ B　空に浮かぶカードの祭壇：モンスターは描かず、空に浮かぶ島の石の祭壇と、舞うカード。神秘的
+ C　大会の決勝の舞台：満員の大きな闘技場の真ん中に、光る対戦の台。盛り上がり重視（人は小さな影だけ）
+
+■ 画面のどこに何が重なるか（全部の案で共通。縦長 1024×1536 のとき）
+・上から 0〜25%：ロゴが重なる。暗めの空など、目立つ物を置かない
+・上から 25〜50%：いちばん見せたい物（主役）を置く場所
+・上から 50〜75%：ボタン（続きから・最初から・設定）が3つ重なる。落ち着いた暗さに（主役の下の方がかかってもよい）
+・上から 75〜100%：手前の飾り（舞うカード・光の粒など）。下の端は暗く
+・左右を少し切っても成り立つように、大事な物は真ん中に寄せる
+
+■ 添付する画像（参考画像フォルダ）
+共通/style_master.png　　　　　　　画風見本（毎回添付）
+見本/公式アイコン.png　　　　　　　モンスターたちの描き方・色の見本（A で使う）
+見本/ソラモ.png・ラズック.png・ガウル.png・ノビトン.png　正式カードの絵（A のモンスターの姿。形と色を変えない）
+見本/タイトルロゴ.png　　　　　　 上に重なるロゴ（色を合わせる）
+今の画面/タイトル.png　　　　　　 いまのタイトル画面（ロゴ・ボタンの位置）
+
+■ 納品のしかた
+・保存名：title_bg_v2.png（縦長 1024×1536、不透明）。案を2つ以上作ったら title_bg_v2_A.png のように案の記号を付ける
+・届いたら Claude がタイトル画面に入れて、今の画面と並べた比較画像を返す
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（毎回、最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」のタイトル画面の背景（キービジュアル）を1枚描いてください。販売する商品なので、市販のスマホRPGのタイトル画面と並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。アニメ調のファンタジー。ベクター風・フラット・3DCG風にしない
+【雰囲気】大人も楽しめる、落ち着いたファンタジー。色は深い藍色・紺・くすんだ金を中心に、光の差し色。紫・ピンク・明るい黄色を全体に使わない
+【形式】縦長 1024×1536、不透明（画面いっぱいに敷く）
+【配置】上から 25% は暗めにあける（ロゴが重なる）。主役は上から 25〜50% に。上から 50〜75% は落ち着いた暗さに（ボタンが重なる）。下の端は暗く。大事な物は真ん中に寄せる
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品のキャラクターや紋章に似せること。人物（主人公や人の顔）を大きく描くこと
+▲ここまで
+▼English
+Draw ONE title screen background (key visual) for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match the title screens of commercial mobile RPGs.
+[Style] Same hand-painted brush style as the attached style sample, anime-style fantasy. NO flat vector art, NO 3D render look.
+[Mood] Calm fantasy that adults can enjoy too. Mainly deep indigo, navy and muted gold, with accents of light. Don't spread purple, pink or bright yellow over the image.
+[Format] Portrait 1024x1536, opaque (fills the screen).
+[Layout] Keep the top 25% dark and open (the logo goes there). Put the main subject at 25-50% from the top. Keep 50-75% calm and dark (buttons go there). Darken the bottom edge. Keep important things centered.
+[Forbidden] Any text, numbers, logos, watermarks or signatures (Japanese or English). Resemblance to existing IP characters or emblems. Large human figures (no protagonists or human faces).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 案A　モンスターたちとカード（おすすめ）→ title_bg_v2.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/公式アイコン.png、見本/ソラモ.png・ラズック.png・ガウル.png・ノビトン.png、見本/タイトルロゴ.png、今の画面/タイトル.png
+▼ここからコピー
+・場所：夜の初めの、星が出はじめた丘の上。遠くに山並みと、小さな街の灯りがうっすら（街は主役にしない）。空は上が深い藍色、地平線の近くが金色に残る夕焼け
+・主役（上から 25〜50%）：丘の上の平らな石の上に、1枚の大きなカードが立って金色に光っている（裏向き。表の絵は見せない）。その光を囲むように、添付の4体のモンスター（ソラモ・ラズック・ガウル・ノビトン）がいる。
+　ガウルはカードの上を飛び、ソラモは手前で見上げ、ラズックとノビトンは左右に。どのモンスターも添付の正式カードの形と色のまま（描き変えない）
+・まわりに、光の粒と、裏向きのカードが数枚ゆっくり舞っている
+・手前（下のほう）：暗い草と石。舞うカードが1〜2枚
+・ワクワクする冒険の始まりの雰囲気。モンスターは小さすぎず、4体とも顔が見えるように
+▲ここまで
+▼English
+- Place: a hilltop at early night, stars just appearing. Faint mountains and the small lights of a town far away (the town is not the subject). Sky: deep indigo above, a lingering golden sunset near the horizon.
+- Main subject (25-50% from the top): one large card standing on a flat stone on the hilltop, glowing gold (face down; don't show its face). Around the light are the four attached monsters (Soramo, Lazuck, Gaul, Nobiton):
+  Gaul flies above the card, Soramo looks up in front, Lazuck and Nobiton on the left and right. Keep every monster exactly as in its attached official card (shape and colors unchanged).
+- Light particles and a few face-down cards float slowly around them.
+- Foreground (lower area): dark grass and stones, one or two floating cards.
+- The excitement of an adventure beginning. The monsters must not be too small; all four faces visible.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 案B　空に浮かぶカードの祭壇 → title_bg_v2_B.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/タイトルロゴ.png、今の画面/タイトル.png
+▼ここからコピー
+・場所：雲の上、夜明け前の空。空に浮かぶ小さな岩の島がいくつか。真ん中のいちばん大きな島に、古い石の祭壇（円い台と、まわりに折れた柱）
+・主役（上から 25〜50%）：祭壇の上で、裏向きのカードが何枚も円を描いて浮かび、真ん中から金色の光の柱が空へ立ち上がる
+・まわり：雲の切れ間に星。小さな島から細い滝が雲へ落ちる。光の粒
+・モンスター・人は描かない。静かで神秘的、これから何かが始まる感じ
+▲ここまで
+▼English
+- Place: above the clouds, the sky before dawn. Several small floating rock islands. On the largest central island, an ancient stone altar (a round platform with broken pillars around it).
+- Main subject (25-50% from the top): above the altar, many face-down cards float in a circle, and a pillar of golden light rises from the center into the sky.
+- Around: stars between the clouds, thin waterfalls falling from the small islands into the clouds, light particles.
+- No monsters, no people. Quiet and mystical, as if something is about to begin.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 案C　大会の決勝の舞台 → title_bg_v2_C.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/タイトルロゴ.png、今の画面/タイトル.png
+▼ここからコピー
+・場所：夜の大きな円形の闘技場の中。客席は暗く、たくさんの小さな灯り（観客は小さな影だけ。顔は描かない）。天井は開いていて星空
+・主役（上から 25〜50%）：闘技場の真ん中の石の対戦台。両側に向かい合う2つの台座。台の真ん中から、金色と青の光が交差して立ち上がる
+・空から台へ、光るカードが何枚も舞い降りる。旗（紺と金。紋章は単純な星だけ）
+・決勝が始まる直前の、静かな高まり
+▲ここまで
+▼English
+- Place: inside a large circular arena at night. Dark stands with many small lights (spectators only as tiny silhouettes, no faces). The roof is open to a starry sky.
+- Main subject (25-50% from the top): a stone duel platform in the center with two pedestals facing each other. Gold and blue light rises from the middle of the platform, crossing.
+- Glowing cards drift down from the sky toward the platform. Banners in navy and gold (emblem: a simple star only).
+- The quiet tension just before the final begins.
+▲

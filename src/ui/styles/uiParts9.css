@@ -4,18 +4,33 @@
  * 練習試合の背景・ダンジョンの案内板。絵に文字は入っていない（ロゴを除く。文字はゲームが重ねる）
  */
 
-/* ===== 1 タイトルロゴ（公式アイコンの下。日本語の正式名称は下に文字で） ===== */
+/* ===== 1 タイトルロゴ（2026-10-26 ユーザー指示でアイコンを消し、ロゴを上に大きく。日本語の正式名称は下に文字で） ===== */
 .title__name--logo {
-  margin-top: 6px;
+  margin-top: 0;
   line-height: 0;
 }
 
 .title__logo-art {
   display: block;
-  width: min(330px, 86vw);
+  width: min(360px, 92vw);
   height: auto;
   margin: 0 auto;
   filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.65));
+}
+
+/* 明るい背景の上でも読めるよう、ロゴの下の日本語名と下の版の表示に、うすい暗い帯 */
+.title .title__en,
+.title .title__footer {
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: rgb(8 14 30 / 0.55);
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* ロゴの上の余白（2026-10-26 ユーザー指示「もう少し下に」で 40→100px） */
+.title.screen {
+  padding-top: 100px;
 }
 
 /* ===== 2 技の対象を示す矢印（自分の技＝青・相手の技＝赤） ===== */
