@@ -131,21 +131,36 @@ const MONSTER_ICON_H = Math.round(MONSTER_ICON * BATTLE_CARD_RATIO);
 const OFFICIAL_CARD_DETAIL_W = 250;
 /**
  * 手札のカードの幅（論理px）。2026-10-25 リデザイン パートB：上下の空の帯をなくした表面（battleCard.ts）にして 66→70。
+ * 2026-10-26 ユーザー指示「手札もう少し大きく」で 70→82（入りきらないときは少し重ねる：handRow の --hand-overlap）。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
-const HAND_CARD_W = 70;
+const HAND_CARD_W = 82;
+/** 幅の狭い画面では手札を少し小さくする（下限）。それでも入りきらない分は重ねる */
+const HAND_CARD_MIN_W = 72;
+/** 小さくするのは、5枚がこの幅だけ重なってもまだ入らないとき（論理px） */
+const HAND_SOFT_OVERLAP = 8;
+/** 手札の列の左右の余白とカードの間（論理px。battlePs.css の .battle__hand と同じ値） */
+const HAND_ROW_PAD = 6;
+const HAND_GAP = 3;
 /**
  * フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：名前・絵・効果文の入る大きなカード（battleCard.ts）で 132。
  * 2026-10-26 ユーザー指示「説明の欄はスペースがあるので縮めて」で一度 108 にしたが、同じ日に情報を列の左へ移して欄に余裕ができたので 132 に戻した（演出・守備のカードも 112）
  */
 const DETAIL_CARD_W = 132;
-/** 技の演出で大きく見せるカードの幅（上に1行あるので、説明の欄のカードより少し小さく） */
-const SPOT_CARD_W = 112;
+/**
+ * 技の演出で大きく見せるカードの幅。2026-10-26 ユーザー指示「大きく見せて」で 112→150（欄に入りきらないときは fitFocusCards が縮める）
+ */
+const SPOT_CARD_W = 150;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
 const DEFENSE_ATTACK_W = 112;
 const DEFENSE_CARD_W = 60;
-/** 相手の手札の裏向きのカードが、フォーカスエリアへ動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる） */
-const OPP_CARD_FLY_MS = 520;
+/**
+ * 相手の手札の裏向きのカードが、フォーカスエリアのカードの場所へ大きくなりながら動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる）。
+ * 2026-10-26 ユーザー指示「大きく見せて裏返しから表向きに。モンスターファームバトルカードをもっと参考に」：着いたら裏から表へ返す（OPP_CARD_FLIP_MS）
+ */
+const OPP_CARD_FLY_MS = 480;
+/** 真ん中に来た相手のカードを裏から表へ返す時間（ミリ秒。半分で表に替わる） */
+const OPP_CARD_FLIP_MS = 420;
 /** 相手のひと言を大きく出しておく時間（ミリ秒）。押すと先に消える */
 const TALK_MS = 2200;
 /** ひと言を1文字ずつ出す間隔（ミリ秒。PS版の会話のように） */
@@ -166,6 +181,13 @@ const LIFE_TICK_MS = 150;
 const LIFE_TICK_START_MS = 220;
 /** カードを1枚配る間隔（ミリ秒） */
 const DEAL_MS = 110;
+/**
+ * 配った手札は、はじめ裏向き。配り終えて少し置いてから、左から1枚ずつ表に返す（2026-10-26 ユーザー指示「最初裏返しで、その後パラパラーっと表向きに」）。
+ * 配り終えてから返し始めるまで・1枚ずつずらす間隔・1枚を返す時間（ミリ秒）
+ */
+const HAND_FLIP_WAIT_MS = 260;
+const HAND_FLIP_STAGGER_MS = 95;
+const HAND_FLIP_MS = 240;
 /** 先攻・後攻のカードをめくってからバトルを始めるまで（ミリ秒） */
 const ORDER_REVEAL_MS = 1300;
 /**
@@ -305,6 +327,11 @@ export const battleScreen: ScreenDefinition = {
     };
     /** 表示済みの手札（新しく来たカードだけを配る演出にする） */
     const shownHand = new Set<string>();
+    /**
+     * 配っている途中の手札：届く時刻（slide）と表に返す時刻（flip）。描き直しても動きが最初に戻らないよう、時刻から動きの途中を出す。
+     * 返し終えたら消す
+     */
+    const handDeal = new Map<string, { slide: number; flip: number }>();
     /** 表示済みの相手の手札（新しく引いたカードだけ山札から来る動きにする。中身は画面に出さない） */
     const shownOppHand = new Set<string>();
     /** 配っている間は操作と相手の行動を待たせる */
@@ -321,7 +348,15 @@ export const battleScreen: ScreenDefinition = {
     /** 使ったカードを大きく見せ終わる時刻（それまで指のマークを出さない） */
     let showcaseUntil = 0;
     /** いま大きく見せている技（パートC）。user＝使ったモンスター（守備は守ったモンスター）、target＝対象 */
-    let spotlight: { cardId: string; side: Side; userUid: string | null; targetUid: string | null; until: number } | null = null;
+    let spotlight: {
+      cardId: string;
+      side: Side;
+      userUid: string | null;
+      targetUid: string | null;
+      until: number;
+      /** 相手のカード：裏向きのカードが飛んできて着く時刻（そこから表に返す）。自分のカードは null（すぐ表で見せる） */
+      arriveAt: number | null;
+    } | null = null;
     /** ダメージでライフを1ずつ減らしている間の、表示中のライフ（数え終わったら消す） */
     const lifeShown = new Map<string, number>();
     /** 前回描画時のマナ（マナが増えた演出に使う） */
@@ -403,26 +438,36 @@ export const battleScreen: ScreenDefinition = {
     };
 
     /**
-     * 相手の手札の裏向きのカードを、フォーカスエリア（使ったカードを大きく見せる所）へ動かす（使う・守備に出す）。見た目だけ。
-     * 着いたら showcase で表を見せる（使ったカードは公開される場面なので、ここで初めて表にする）
+     * 相手の手札の裏向きのカードを、フォーカスエリアの大きなカードの場所へ、大きくしながら動かす（使う・守備に出す）。見た目だけ。
+     * 着いたら、その場所のカード（spotlightPanel）が裏から表へ返る（使ったカードは公開される場面なので、ここで初めて表にする）。
+     * 2026-10-26 ユーザー指示「大きく見せて裏返しから表向きにするみたいなモンスターファームバトルカードをもっと参考に」
      */
     const flyOpponentCard = (from: DOMRect): void => {
       const root = element.getBoundingClientRect();
       const scale = stageScale();
       const x = (from.left - root.left) / scale;
       const y = (from.top - root.top) / scale;
-      const goal = element.querySelector('.battle-detail')?.getBoundingClientRect();
-      const gx = goal ? (goal.left + goal.width / 2 - root.left) / scale : element.offsetWidth / 2;
-      const gy = goal ? (goal.top + goal.height / 2 - root.top) / scale : element.offsetHeight / 2;
       const w = from.width / scale;
       const hgt = from.height / scale;
+      // 行き先：表に返るカードの場所（なければ説明の欄の真ん中に、同じ大きさのまま）
+      const goal = element.querySelector('.battle-spot__flip')?.getBoundingClientRect();
+      const detail = element.querySelector('.battle-detail')?.getBoundingClientRect();
+      const gw = goal ? goal.width / scale : w;
+      const gh = goal ? goal.height / scale : hgt;
+      const gx = goal ? (goal.left - root.left) / scale : detail ? (detail.left + detail.width / 2 - root.left) / scale - w / 2 : x;
+      const gy = goal ? (goal.top - root.top) / scale : detail ? (detail.top + detail.height / 2 - root.top) / scale - hgt / 2 : y;
       const fly = h('span', { class: 'battle-hand__back battle__opp-fly' });
       fly.style.left = `${x}px`;
       fly.style.top = `${y}px`;
-      fly.style.setProperty('--dx', `${gx - (x + w / 2)}px`);
-      fly.style.setProperty('--dy', `${gy - (y + hgt / 2)}px`);
+      fly.style.width = `${w}px`;
+      fly.style.height = `${hgt}px`;
+      fly.style.setProperty('--dx', `${gx - x}px`);
+      fly.style.setProperty('--dy', `${gy - y}px`);
+      fly.style.setProperty('--sx', (gw / w).toFixed(3));
+      fly.style.setProperty('--sy', (gh / hgt).toFixed(3));
       fxLayer.append(fly);
-      setTimeout(() => fly.remove(), OPP_CARD_FLY_MS + 60);
+      sound.play('cardSlide');
+      setTimeout(() => fly.remove(), OPP_CARD_FLY_MS + 40);
     };
 
     /** 相手がマナにしたカード（裏向き）を、手札の場所で光らせて消す。見た目だけ */
@@ -476,8 +521,9 @@ export const battleScreen: ScreenDefinition = {
         setTimeout(() => !destroyed && showReveal(ids), SHOWCASE_MS);
       }
       if (selectedUid && !state.sides.player.hand.some((c) => c.uid === selectedUid)) selectedUid = null;
-      // 相手のカードは、裏向きのまま手札からフォーカスエリアへ動いてから表を見せる
-      const revealDelay = played && oppFrom ? OPP_CARD_FLY_MS : 0;
+      // 相手のカードは、裏向きのまま手札からフォーカスエリアへ大きくなりながら動き、着いたら表に返す（返し終えるまでの時間）
+      const flyIn = played && oppFrom && action.type !== 'convertToMana';
+      const revealDelay = flyIn ? OPP_CARD_FLY_MS + OPP_CARD_FLIP_MS : 0;
       if (played) {
         busyUntil = Math.max(busyUntil, Date.now() + revealDelay + SHOWCASE_MS - 150);
         // 相手のカードが動いている間も、指のマークはまだ出さない
@@ -490,20 +536,13 @@ export const battleScreen: ScreenDefinition = {
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
       queueHitFx(before, next, action, played, played ? revealDelay + SHOWCASE_MS : 0);
-      const show = (): void => {
-        if (!played || destroyed) return;
-        showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null);
-        render();
-      };
+      // 大きく見せる欄を先に出し（相手のカードは着くまで隠しておく）、そこへ相手のカードを飛ばす
+      if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null, flyIn ? OPP_CARD_FLY_MS : 0);
       render();
       if (oppFrom) {
         // 相手のマナ化も、手札の場所で光って消える
         if (action.type === 'convertToMana') vanishOpponentCard(oppFrom);
         else flyOpponentCard(oppFrom);
-      }
-      if (played) {
-        if (revealDelay > 0) setTimeout(show, revealDelay);
-        else show();
       }
     };
 
@@ -574,15 +613,22 @@ export const battleScreen: ScreenDefinition = {
      * 使ったカードをフォーカスエリアに大きく見せる（2026-10-25 リデザイン パートC。技のアニメーションではなく、カードそのものを見せる）。
      * 見せている間は操作と相手の行動を待たせる（タップで飛ばせる）
      */
-    const showcase = (cardId: string, side: Side, userUid: string | null, targetUid: string | null): void => {
-      const until = Date.now() + SHOWCASE_MS;
-      spotlight = { cardId, side, userUid, targetUid, until };
+    const showcase = (cardId: string, side: Side, userUid: string | null, targetUid: string | null, flyMs = 0): void => {
+      const now = Date.now();
+      // 相手のカード（flyMs > 0）：飛んできて着いたら表に返し、返し終えてから SHOWCASE_MS 見せる
+      const reveal = flyMs > 0 ? flyMs + OPP_CARD_FLIP_MS : 0;
+      const until = now + reveal + SHOWCASE_MS;
+      spotlight = { cardId, side, userUid, targetUid, until, arriveAt: flyMs > 0 ? now + flyMs : null };
       showcaseUntil = until;
       setTimeout(() => {
         // 見せ終わったら、技の対象に指のマークを出す・守備の選択を出すために描き直す
         if (!destroyed && state && spotlight && spotlight.until === until) render();
-      }, SHOWCASE_MS + 10);
-      sound.play(showcaseSound(getPlayCard(cardId)));
+      }, until - now + 10);
+      if (flyMs > 0) {
+        // 表に替わる瞬間（返す動きの半分）に、めくる音とカードの種類の音
+        sound.play('cardReveal', flyMs + OPP_CARD_FLIP_MS / 2);
+        sound.play(showcaseSound(getPlayCard(cardId)), flyMs + OPP_CARD_FLIP_MS / 2);
+      } else sound.play(showcaseSound(getPlayCard(cardId)));
     };
 
     /** 演出の1行：「ラズックの「しっぽアタック」！ → ミュロル」（相手のモンスターには「相手の」を付ける） */
@@ -612,10 +658,12 @@ export const battleScreen: ScreenDefinition = {
             : badge
               ? skillValueBadgeText(badge)
               : kind;
-      return h(
+      // 相手のカード：着くまで隠し、着いたら裏から表へ返す。文字は表に替わってから出す（描き直したときは途中から）
+      const arriving = sp.arriveAt !== null && Date.now() < sp.arriveAt + OPP_CARD_FLIP_MS;
+      const panel = h(
         'div',
         {
-          class: `battle-detail battle-spot battle-spot--${sp.side}`,
+          class: `battle-detail battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}`,
           attrs: { role: 'button', 'aria-label': t('battle.spot.skip') },
           on: { click: skipSpotlight },
         },
@@ -631,9 +679,17 @@ export const battleScreen: ScreenDefinition = {
             h('p', { class: 'battle-spot__desc', text: describePlayCard(card) }),
             h('p', { class: 'battle-spot__skip', text: t('battle.spot.tapToSkip') }),
           ),
-          h('div', { class: 'battle-spot__card' }, createBattleCard(card, { width: SPOT_CARD_W, size: 'focus' })),
+          h(
+            'div',
+            { class: 'battle-spot__card' },
+            arriving
+              ? h('div', { class: 'battle-spot__flip' }, createBattleCard(card, { width: SPOT_CARD_W, size: 'focus' }), h('span', { class: 'battle-spot__back' }))
+              : createBattleCard(card, { width: SPOT_CARD_W, size: 'focus' }),
+          ),
         ),
       );
+      if (arriving && sp.arriveAt !== null) panel.style.setProperty('--arrive-delay', `${sp.arriveAt - Date.now()}ms`);
+      return panel;
     };
 
     /** いまの画面の拡大率（ステージは拡大縮小されているので、位置の計算に使う） */
@@ -1389,7 +1445,28 @@ export const battleScreen: ScreenDefinition = {
     const handRow = (s: BattleState): HTMLElement => {
       const myTurnMain = s.phase === 'main' && s.active === 'player';
       const myMana = s.phase === 'mana' && s.active === 'player' && !auto;
-      let newIndex = 0;
+      // カードの大きさ：5枚が少し重なって入る大きさ（HAND_CARD_W〜HAND_CARD_MIN_W）。枚数が減っても大きさは変えない
+      const room = (element.offsetWidth || 390) - HAND_ROW_PAD * 2;
+      const slots = Math.max(5, s.sides.player.hand.length);
+      const cardW = Math.max(HAND_CARD_MIN_W, Math.min(HAND_CARD_W, Math.floor((room - (slots - 1) * (HAND_GAP - HAND_SOFT_OVERLAP)) / slots) - 4));
+      element.style.setProperty('--hand-card-w', `${cardW}px`);
+      element.style.setProperty('--hand-card-h', `${battleCardHeight(cardW, 'hand').toFixed(2)}px`);
+      // 新しく来たカード：1枚ずつ裏向きで配り、配り終えたら左から1枚ずつ表に返す（時刻を決めて handDeal に覚える）
+      const now = Date.now();
+      const fresh = s.sides.player.hand.filter((c) => !shownHand.has(c.uid));
+      const flipFrom = now + fresh.length * DEAL_MS + HAND_FLIP_WAIT_MS;
+      for (const [i, c] of fresh.entries()) {
+        const deal = { slide: now + i * DEAL_MS, flip: flipFrom + i * HAND_FLIP_STAGGER_MS };
+        handDeal.set(c.uid, deal);
+        shownHand.add(c.uid);
+        sound.play('cardDraw', deal.slide - now);
+        sound.play('cardFlip', deal.flip - now + HAND_FLIP_MS / 2);
+      }
+      if (fresh.length > 0) {
+        busyUntil = Math.max(busyUntil, flipFrom + (fresh.length - 1) * HAND_FLIP_STAGGER_MS + HAND_FLIP_MS);
+        // 返し終えたら、裏面の層を外すために描き直す
+        setTimeout(() => !destroyed && render(), busyUntil - now + 30);
+      }
       const row = h(
         'div',
         {
@@ -1401,7 +1478,9 @@ export const battleScreen: ScreenDefinition = {
         ...s.sides.player.hand.map((c) => {
           const card = getPlayCard(c.cardId);
           const usable = cardUsability(s, 'player', c.uid).usable;
-          const isNew = !shownHand.has(c.uid);
+          const deal = handDeal.get(c.uid);
+          if (deal && now >= deal.flip + HAND_FLIP_MS) handDeal.delete(c.uid);
+          const isNew = !!deal && now < deal.flip + HAND_FLIP_MS;
           const picked = myMana && manaPicks.has(c.uid);
           const touching = swipe?.uid === c.uid ? (swipe.lifted ? ' is-lifted' : ' is-touching') : '';
           const leaving = manaFlying.has(c.uid) ? ' is-leaving' : '';
@@ -1430,23 +1509,26 @@ export const battleScreen: ScreenDefinition = {
                 },
               },
             },
-            createBattleCard(card, { width: HAND_CARD_W, size: 'hand' }),
+            isNew
+              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'hand' }), h('span', { class: 'battle__hand-cover' }))
+              : createBattleCard(card, { width: cardW, size: 'hand' }),
             h('span', { class: 'battle__hand-name', text: cardName(card) }),
             picked ? h('span', { class: 'battle__hand-mana' }, h('span', { class: 'battle__hand-mana-text', text: t('card.detail.mana') })) : null,
           );
-          if (isNew) {
-            // 1枚ずつ高速で配る：見た目の遅れと効果音を同じ間隔でずらす
-            el.style.animationDelay = `${newIndex * DEAL_MS}ms`;
-            sound.play('cardDraw', newIndex * DEAL_MS);
-            newIndex++;
-            shownHand.add(c.uid);
+          if (deal && isNew) {
+            // 配る動き・表に返す動きを、決めた時刻に合わせて出す（描き直したときは途中から）
+            el.style.setProperty('--deal-delay', `${deal.slide - now}ms`);
+            el.style.setProperty('--flip-delay', `${deal.flip - now}ms`);
           }
           return el;
         }),
         // 空の手札の台（2026-10-26 デザイン第11弾）の上に「手札なし」
         s.sides.player.hand.length === 0 ? h('span', { class: 'battle-hand__empty battle-hand__empty--tray', text: t('battle.hand.empty') }) : null,
       );
-      if (newIndex > 0) busyUntil = Math.max(busyUntil, Date.now() + newIndex * DEAL_MS + 200);
+      // 入りきらないときは少しずつ重ねる（2026-10-26 手札を大きくしたため。横に送らずに全部見えるように）
+      const n = s.sides.player.hand.length;
+      const need = n * (cardW + 4) + (n - 1) * HAND_GAP;
+      if (n > 1 && need > room) row.style.setProperty('--hand-overlap', `${((room - need) / (n - 1)).toFixed(1)}px`);
       return row;
     };
 
@@ -1474,7 +1556,7 @@ export const battleScreen: ScreenDefinition = {
         { class: 'battle-detail battle-spot battle-spot--opponent battle__defense' },
         h('p', {
           class: 'battle-spot__line',
-          text: spotlightLine(s, { cardId: pending.cardId, side: 'opponent', userUid: attacker ? pending.userUid : null, targetUid: pending.targetUid, until: 0 }),
+          text: spotlightLine(s, { cardId: pending.cardId, side: 'opponent', userUid: attacker ? pending.userUid : null, targetUid: pending.targetUid, until: 0, arriveAt: null }),
         }),
         h(
           'div',
