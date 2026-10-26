@@ -428,3 +428,31 @@
     animation: none;
   }
 }
+
+/* ===== 2026-10-26 ユーザー指示：世界地図は地方の名前を出さず、ダンジョン・街の印と名前を大きく（押すとそのまま行く） ===== */
+.world-map__pin {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+}
+
+.world-map__dot {
+  width: 46px;
+  height: 46px;
+}
+
+.world-map__pin--dungeon .world-map__dot,
+.world-map__pin--cleared .world-map__dot {
+  animation: world-map-pin 1.6s ease-in-out infinite;
+}
+
+.world-map__label {
+  top: 52px;
+  font-size: 14px;
+  font-weight: 700;
+  border-width: 4px 12px;
+}
+
+.world-map__pin:active .world-map__dot {
+  transform: scale(0.92);
+}

@@ -70,7 +70,6 @@ import { playScene } from '../components/dialogue.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { button, h } from '../dom.ts';
 import { once } from '../gameStore.ts';
-import { DUNGEON_SPOTS } from '../../data/worldMap.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
 import femaleSheet from '@assets/images/characters/player_female_sheet.webp';
 import guideSheet from '@assets/images/characters/npc_neighbor_guide_walk.webp';
@@ -245,8 +244,12 @@ const DUNGEON_INTRO_ART: Readonly<Record<string, string>> = {
   'dungeon-01': dungeonBattleBg,
   'dungeon-02': meadowBattleBg,
 };
-/** ダンジョンに入ったときの札を出しておく時間（ミリ秒。押すと先に消える） */
-const DUNGEON_INTRO_MS = 2800;
+/**
+ * ダンジョンに入ったときの挿絵とダンジョン名を出しておく時間と、消える（フェードアウト）時間（ミリ秒。押すと先に消え始める）。
+ * 2026-10-26 ユーザー指示：画面の横も縦もいっぱいに出し、フェードアウトしてダンジョンの画面に切り替える
+ */
+const DUNGEON_INTRO_MS = 2400;
+const DUNGEON_INTRO_FADE_MS = 900;
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
@@ -642,7 +645,7 @@ export class WorldView {
     const introDungeon = intro && map.area === 'dungeon' ? getDungeon(intro) : undefined;
     if (introDungeon) {
       // ダンジョンに入った直後：挿絵とダンジョン名の札（階の帯の代わり）
-      this.#dungeonIntro(introDungeon, map);
+      this.#dungeonIntro(introDungeon);
     } else if (banner) {
       this.#store.flashBanner = null;
       this.#banner('clear', t('world.bannerClear'));
@@ -660,30 +663,23 @@ export class WorldView {
     }
   }
 
-  /** ダンジョンに入った直後の札：挿絵・地方・ダンジョン名・階（PS版の場所の札にならう）。押すと先に消える */
-  #dungeonIntro(dungeon: DungeonDefinition, map: MapDefinition): void {
+  /**
+   * ダンジョンに入った直後：画面いっぱいの挿絵とダンジョン名。少し見せてからフェードアウトして、ダンジョンの画面に切り替わる。押すと先に消え始める。
+   * 【仮】挿絵とダンジョン名の絵はまだ無いので、対戦の背景の絵と明朝体の文字（依頼文 docs/design/dungeon-intro-20261026/）
+   */
+  #dungeonIntro(dungeon: DungeonDefinition): void {
     const art = DUNGEON_INTRO_ART[dungeon.id];
-    const region = DUNGEON_SPOTS[dungeon.id]?.region;
     const close = once(() => {
       el.classList.add('is-closing');
-      setTimeout(() => el.remove(), 400);
+      setTimeout(() => el.remove(), DUNGEON_INTRO_FADE_MS);
     });
     const el = h(
       'div',
       { class: 'world__dungeon-intro', attrs: { role: 'button', 'aria-label': dungeonName(dungeon) }, on: { click: close } },
-      h(
-        'div',
-        { class: 'world__dungeon-intro-card' },
-        art ? h('img', { class: 'world__dungeon-intro-art', attrs: { src: art, alt: '', draggable: 'false' } }) : null,
-        h(
-          'div',
-          { class: 'world__dungeon-intro-text' },
-          region ? h('p', { class: 'world__dungeon-intro-region', text: t(`world.region.${region}`) }) : null,
-          h('p', { class: 'world__dungeon-intro-name', text: dungeonName(dungeon) }),
-          h('p', { class: 'world__dungeon-intro-floor', text: mapName(map) }),
-        ),
-      ),
+      art ? h('img', { class: 'world__dungeon-intro-art', attrs: { src: art, alt: '', draggable: 'false' } }) : null,
+      h('p', { class: 'world__dungeon-intro-name', text: dungeonName(dungeon) }),
     );
+    el.style.setProperty('--intro-fade', `${DUNGEON_INTRO_FADE_MS}ms`);
     this.#root.append(el);
     setTimeout(close, DUNGEON_INTRO_MS);
   }

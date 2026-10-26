@@ -1,0 +1,129 @@
+【プロンプト】ダンジョンの挿絵とダンジョン名（6枚・2026-10-26）
+
+使い方：1枚ごとに新しい会話で、その番号の文を貼り、「添付」の画像をつける。日本語でうまくいかないときは English version
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　太古の遺跡の挿絵 → dungeon_ruins_art.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/入ったとき_太古の遺跡.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」で、ダンジョン「太古の遺跡」に入った瞬間に画面いっぱいに出す挿絵を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【大きさ】縦長 1080×2340（スマホの縦の画面いっぱい）。画面の比率で上下・左右が少し切れるので、大事なものは真ん中（横の80%・縦1800px）に入れる
+【場面】長い年月で崩れた、石造りの太古の遺跡。折れた柱、半分崩れたアーチ、苔むした石段、壊れた建物の壁。石のすき間から草が生え、ところどころに木が育って根が石に絡んでいる。奥へ続く遺跡の入り口（石の門）が見え、その先は少し暗い
+【光】昼過ぎのやわらかい光。木漏れ日が石に差し、空気に細かい砂ぼこりが光って見える。神秘的で少し寂しい雰囲気
+【構図】手前に崩れた石と草、真ん中に遺跡の門、奥に遺跡の建物と空。縦の35〜50%あたり（真ん中の少し上）に、あとでダンジョン名の文字を重ねるので、そこは空や遠景など細かいものが少ない所にする
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。大人向けの落ち着いた色（石の灰色・こげ茶・苔の緑・くすんだ金）
+【禁止】文字・数字・ロゴ・透かし・サイン。人物・モンスター・動物。実在の作品・遺跡に似せること
+▲ここまで
+▼English
+Draw a full-screen illustration shown the moment the player enters the dungeon "Ancient Ruins" in the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Size] Portrait 1080x2340 (fills a phone screen). The edges may be cropped on some screens, so keep important things in the center (80% of the width, 1800px of the height).
+[Scene] Ancient stone ruins crumbled over long ages: broken pillars, half-collapsed arches, mossy stone steps, broken building walls. Grass grows between the stones, a few trees have grown here and there with roots wrapped around the stones. The entrance of the ruins (a stone gate) leads deeper inside, slightly dark beyond.
+[Light] Soft early-afternoon light, sunbeams through the trees falling on the stones, fine dust glittering in the air. Mysterious and a little lonely.
+[Composition] Fallen stones and grass in the foreground, the stone gate in the middle, ruined buildings and sky in the back. The dungeon name will be placed at 35-50% of the height (slightly above the middle), so keep that area calm (sky or distant scenery, few small details).
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Calm colors for adults (stone grey, dark brown, moss green, muted gold).
+[Forbidden] Any text, numbers, logos, watermarks, signatures. People, monsters or animals. Resemblance to existing IP or real ruins.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　太古の遺跡のダンジョン名 → dungeon_ruins_title.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：参考/ダンジョン名の書体の見本.jpg、今の画面/入ったとき_太古の遺跡.png
+▼ここからコピー
+添付の「CHAPTER 1 はじまりの草原」のタイトル文字と、同じ書体・同じ作りで、ダンジョン名「太古の遺跡」のタイトル文字を描いてください。スマホゲームで挿絵の上に重ねて出します。
+【大きさ】横長 1800×600、背景は透明（できなければマゼンタ一色 #FF00FF）
+【文字】大きく「太古の遺跡」（日本語。この5文字を正確に）。その上に小さく英字で「ANCIENT RUINS」（見本の「CHAPTER 1」と同じ位置・同じ書体・左右に小さな飾り）
+【書体と作り】見本と同じ：クリーム色から金へのグラデーションの太い明朝体（筆の入り・はらいのある字）、細い金の縁、やわらかい光。下に細い金の線の飾りと、真ん中に小さな紋章
+【飾り】見本の若葉のつるの代わりに、遺跡に合う飾り：つたの葉と、小さく欠けた石のかけら。控えめに
+【禁止】ほかの文字・ロゴ・透かし。字の形をくずすこと
+▲ここまで
+▼English
+Using the exact same lettering style and construction as the attached title "CHAPTER 1 はじまりの草原", draw the title text for the dungeon name "太古の遺跡" (Ancient Ruins). It is overlaid on an illustration in a smartphone game.
+[Size] Landscape 1800x600, transparent background (or solid magenta #FF00FF).
+[Text] Large Japanese text "太古の遺跡" (exactly these 5 characters). Above it, small English text "ANCIENT RUINS" (same position, typeface and small side ornaments as "CHAPTER 1" in the sample).
+[Lettering] Same as the sample: bold Mincho-style serif with brush entry and sweeps, cream-to-gold gradient, thin gold outline, soft glow. A thin gold line ornament below with a small emblem in the center.
+[Ornaments] Instead of the sample's young leaf vines, use ornaments that fit ruins: ivy leaves and small chipped stone fragments. Keep them subtle.
+[Forbidden] Any other text, logos, watermarks. Do not distort the characters.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　太古の遺跡に重ねる部品 → dungeon_ruins_overlay.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：参考/重ねる部品の見本_雲.jpg、共通/style_master.png
+▼ここからコピー
+添付の雲の絵と同じ作り方で、スマホゲームの挿絵「太古の遺跡」の上に重ねてゆっくり動かす小物を、1枚にばらばらに並べて描いてください。
+【大きさ】横長 2000×1125、背景は透明（できなければマゼンタ一色 #FF00FF）。小物どうしは重ならないよう間を空ける
+【描くもの】舞い落ちる木の葉（緑と枯れ葉色、向きの違うもの6〜8枚）、ふわっと漂う砂ぼこり・霧のかたまり（大小4〜5つ。ふちはやわらかく）、小さな石のかけら（3〜4つ）、光る細かい粒（いくつか）
+【画風】雲の見本と同じ、筆で塗った手描きの質感。挿絵と同じやわらかい昼の光
+【禁止】文字・ロゴ・透かし・人物・動物
+▲ここまで
+▼English
+In the same way as the attached cloud sheet, draw small elements that will slowly drift over the "Ancient Ruins" illustration in a smartphone game, laid out separately on one sheet.
+[Size] Landscape 2000x1125, transparent background (or solid magenta #FF00FF). Leave space so the elements do not overlap.
+[Elements] Falling tree leaves (green and dried-leaf color, 6-8 in different angles), drifting dust / mist puffs (4-5, large and small, soft edges), small stone fragments (3-4), a few glowing specks.
+[Style] Hand-painted like the cloud sample, same soft daytime light as the illustration.
+[Forbidden] Text, logos, watermarks, people, animals.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　精霊の森の挿絵 → dungeon_forest_art.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/入ったとき_精霊の森.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」で、ダンジョン「精霊の森」に入った瞬間に画面いっぱいに出す挿絵を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【大きさ】縦長 1080×2340（スマホの縦の画面いっぱい）。画面の比率で上下・左右が少し切れるので、大事なものは真ん中（横の80%・縦1800px）に入れる
+【場面】精霊が住むという神秘的な深い森。大きな古い木々、木の根が這う小道が奥へ続く。足元や木の根もとにピンクの花がたくさん咲き、ピンクや白の蝶がひらひら舞っている。光る小さな粒が漂う
+【光】木々のあいだから差し込む、やわらかい光の筋。少し霧がかって奥は青緑にかすむ。やさしく神秘的な雰囲気
+【構図】手前に花と草、真ん中に奥へ続く小道、奥に光の差す森。縦の35〜50%あたり（真ん中の少し上）に、あとでダンジョン名の文字を重ねるので、そこは光や霧など細かいものが少ない所にする
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。色は深い緑・青緑・やわらかいピンク（ピンクは花と蝶だけ）
+【禁止】文字・数字・ロゴ・透かし・サイン。人物・モンスター（蝶以外の生き物）。実在の作品に似せること
+▲ここまで
+▼English
+Draw a full-screen illustration shown the moment the player enters the dungeon "Spirit Forest" in the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Size] Portrait 1080x2340 (fills a phone screen). The edges may be cropped on some screens, so keep important things in the center (80% of the width, 1800px of the height).
+[Scene] A mysterious deep forest said to be home to spirits. Large ancient trees, a path with crawling roots leading deeper in. Many pink flowers bloom on the ground and at the roots, pink and white butterflies flutter. Small glowing specks float in the air.
+[Light] Soft rays of light falling between the trees. Slight mist; the depths fade into blue-green. Gentle and mysterious.
+[Composition] Flowers and grass in the foreground, the path leading in at the middle, the sunlit forest in the back. The dungeon name will be placed at 35-50% of the height (slightly above the middle), so keep that area calm (light or mist, few small details).
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Deep green, blue-green and soft pink (pink only for flowers and butterflies).
+[Forbidden] Any text, numbers, logos, watermarks, signatures. People or monsters (no creatures other than butterflies). Resemblance to existing IP.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　精霊の森のダンジョン名 → dungeon_forest_title.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：参考/ダンジョン名の書体の見本.jpg、今の画面/入ったとき_精霊の森.png
+▼ここからコピー
+添付の「CHAPTER 1 はじまりの草原」のタイトル文字と、同じ書体・同じ作りで、ダンジョン名「精霊の森」のタイトル文字を描いてください。スマホゲームで挿絵の上に重ねて出します。
+【大きさ】横長 1800×600、背景は透明（できなければ緑一色 #00FF00。ピンクを使うのでマゼンタは使わない）
+【文字】大きく「精霊の森」（日本語。この4文字を正確に）。その上に小さく英字で「SPIRIT FOREST」（見本の「CHAPTER 1」と同じ位置・同じ書体・左右に小さな飾り）
+【書体と作り】見本と同じ：クリーム色から金へのグラデーションの太い明朝体（筆の入り・はらいのある字）、細い金の縁、やわらかい光。下に細い金の線の飾りと、真ん中に小さな紋章
+【飾り】見本の若葉のつるに、小さなピンクの花と小さな蝶を少し添える。控えめに
+【禁止】ほかの文字・ロゴ・透かし。字の形をくずすこと
+▲ここまで
+▼English
+Using the exact same lettering style and construction as the attached title "CHAPTER 1 はじまりの草原", draw the title text for the dungeon name "精霊の森" (Spirit Forest). It is overlaid on an illustration in a smartphone game.
+[Size] Landscape 1800x600, transparent background (or solid green #00FF00; do not use magenta because the art has pink).
+[Text] Large Japanese text "精霊の森" (exactly these 4 characters). Above it, small English text "SPIRIT FOREST" (same position, typeface and small side ornaments as "CHAPTER 1" in the sample).
+[Lettering] Same as the sample: bold Mincho-style serif with brush entry and sweeps, cream-to-gold gradient, thin gold outline, soft glow. A thin gold line ornament below with a small emblem in the center.
+[Ornaments] Add a few small pink flowers and a small butterfly to the sample's young leaf vines. Keep them subtle.
+[Forbidden] Any other text, logos, watermarks. Do not distort the characters.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　精霊の森に重ねる部品 → dungeon_forest_overlay.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：参考/重ねる部品の見本_雲.jpg、共通/style_master.png
+▼ここからコピー
+添付の雲の絵と同じ作り方で、スマホゲームの挿絵「精霊の森」の上に重ねてゆっくり動かす小物を、1枚にばらばらに並べて描いてください。
+【大きさ】横長 2000×1125、背景は透明（できなければ緑一色 #00FF00。ピンクを使うのでマゼンタは使わない）。小物どうしは重ならないよう間を空ける
+【描くもの】舞うピンクの花びら（向きの違うもの8〜10枚）、ピンクと白の蝶（羽を開いた・閉じかけ・横向きなど5〜6匹）、やわらかく光る粒・小さな光の玉（大小6〜8つ）、薄い霧のかたまり（2〜3つ。ふちはやわらかく）
+【画風】雲の見本と同じ、筆で塗った手描きの質感。挿絵と同じ、木漏れ日のやわらかい光
+【禁止】文字・ロゴ・透かし・人物・蝶以外の生き物
+▲ここまで
+▼English
+In the same way as the attached cloud sheet, draw small elements that will slowly drift over the "Spirit Forest" illustration in a smartphone game, laid out separately on one sheet.
+[Size] Landscape 2000x1125, transparent background (or solid green #00FF00; do not use magenta because of the pink). Leave space so the elements do not overlap.
+[Elements] Drifting pink petals (8-10 in different angles), pink and white butterflies (5-6: wings open, half closed, side view, etc.), softly glowing specks and small light orbs (6-8, large and small), thin mist puffs (2-3, soft edges).
+[Style] Hand-painted like the cloud sample, same soft dappled light as the illustration.
+[Forbidden] Text, logos, watermarks, people, creatures other than butterflies.
+▲
