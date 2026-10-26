@@ -767,7 +767,9 @@
   }
 }
 
-/* ===== ダンジョンに入ったときの挿絵とダンジョン名（2026-10-26 ユーザー指示：画面の横も縦もいっぱいに。フェードアウトしてダンジョンの画面へ。押すと先に消える） ===== */
+/* ===== ダンジョンに入ったときの挿絵とダンジョン名（2026-10-26 ユーザー指示：画面の横も縦もいっぱいに。フェードアウトしてダンジョンの画面へ。押すと先に消える） =====
+   挿絵（横長の絵を画面いっぱいに切り抜く）→ 重ねる部品（名前のまわりをゆっくり回る石・花びら）→ ダンジョン名の絵。
+   絵を読み込み終えたら .is-ready が付いて動き始める */
 .world__dungeon-intro {
   position: absolute;
   inset: 0;
@@ -775,28 +777,62 @@
   overflow: hidden;
   background: #000;
   cursor: pointer;
-  animation: dungeon-intro-in 500ms ease-out both;
 }
 
 .world__dungeon-intro.is-closing {
   animation: dungeon-intro-out var(--intro-fade, 900ms) ease-in both;
 }
 
-.world__dungeon-intro-art {
+.world__dungeon-intro-art,
+.world__dungeon-intro-overlay,
+.world__dungeon-intro-title {
   position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.world__dungeon-intro-art {
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: dungeon-intro-zoom 3400ms ease-out both;
 }
 
-/* ダンジョン名（【仮】名前の絵が届くまでは明朝体の文字）：画面の真ん中より少し上 */
+/* 名前と重ねる部品は、画面の真ん中より少し上 */
+.world__dungeon-intro-overlay {
+  left: 50%;
+  top: 42%;
+  width: 150%;
+  transform: translate(-50%, -50%);
+}
+
+.world__dungeon-intro-title {
+  left: 50%;
+  top: 42%;
+  width: min(96%, 460px);
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55));
+}
+
+.world__dungeon-intro.is-ready .world__dungeon-intro-art {
+  animation: dungeon-intro-art 3600ms ease-out both;
+}
+
+.world__dungeon-intro.is-ready .world__dungeon-intro-overlay {
+  animation: dungeon-intro-overlay 3600ms ease-out 150ms both;
+}
+
+.world__dungeon-intro.is-ready .world__dungeon-intro-title {
+  animation: dungeon-intro-title 900ms cubic-bezier(0.2, 0.8, 0.3, 1) 300ms both;
+}
+
+/* 絵が無いダンジョンの名前（明朝体の文字） */
 .world__dungeon-intro-name {
   position: absolute;
   left: 0;
   right: 0;
-  top: 40%;
+  top: 42%;
   margin: 0;
   padding: 14px 16px;
   text-align: center;
@@ -805,15 +841,8 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   color: #fbeec4;
-  text-shadow: 0 0 10px rgb(255 214 120 / 0.85), 0 2px 6px rgb(0 0 0 / 0.9), 0 0 24px rgb(0 0 0 / 0.7);
-  background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.45) 20%, rgb(0 0 0 / 0.45) 80%, transparent);
+  text-shadow: 0 0 10px rgb(255 214 120 / 0.85), 0 2px 6px rgb(0 0 0 / 0.9);
   transform: translateY(-50%);
-  animation: dungeon-intro-name 900ms 200ms ease-out both;
-}
-
-@keyframes dungeon-intro-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 @keyframes dungeon-intro-out {
@@ -821,21 +850,30 @@
   to { opacity: 0; }
 }
 
-/* 挿絵はゆっくり少しだけ寄る */
-@keyframes dungeon-intro-zoom {
-  from { transform: scale(1.06); }
-  to { transform: scale(1); }
+/* 挿絵：ふわっと出て、ゆっくり少しだけ寄る */
+@keyframes dungeon-intro-art {
+  0% { opacity: 0; transform: scale(1.08); }
+  15% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
 }
 
-@keyframes dungeon-intro-name {
-  from { opacity: 0; letter-spacing: 0.3em; }
-  to { opacity: 1; letter-spacing: 0.12em; }
+/* 重ねる部品：名前のまわりで少し回りながら広がる */
+@keyframes dungeon-intro-overlay {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) rotate(-8deg); }
+  25% { opacity: 1; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) rotate(3deg); }
+}
+
+/* ダンジョン名：少し大きい所から、光りながら落ち着く */
+@keyframes dungeon-intro-title {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55)) brightness(1.6); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55)) brightness(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .world__dungeon-intro,
-  .world__dungeon-intro-art,
-  .world__dungeon-intro-name {
+  .world__dungeon-intro.is-ready .world__dungeon-intro-art,
+  .world__dungeon-intro.is-ready .world__dungeon-intro-overlay,
+  .world__dungeon-intro.is-ready .world__dungeon-intro-title {
     animation-duration: 1ms;
   }
 }
