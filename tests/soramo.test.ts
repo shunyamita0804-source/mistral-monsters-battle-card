@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
-import soramoJson from '../src/data/official/soramo14_skills_OFFICIAL_20261025.json';
+import soramoJson from '../src/data/official/soramo14_artv2_skills_OFFICIAL_20261026.json';
 import { REGISTERED_ONLY_MONSTERS } from '../src/data/registeredMonsters.ts';
 import { SORAMO_MONSTER, SORAMO_OLD_SKILL_IDS, SORAMO_SKILLS, SORAMO_STARTER, soramoSkillId } from '../src/data/soramo.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
@@ -17,24 +17,30 @@ import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
 const ids = (n: number): string => soramoSkillId(n);
-const ORIGINAL = 'design-parts/cards-original/soramo14-20261025';
+const ORIGINAL = 'design-parts/cards-original/soramo14-artv2-20261026';
 const sha256 = (buf: Buffer): string => createHash('sha256').update(buf).digest('hex');
 
-describe('ソラモ14技：正式データ（2026-10-25。届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
-  it('保管した JSON・CSV は ZIP の原本と同じ。ZIP の中身は照合表どおり', () => {
-    expect(readFileSync('src/data/official/soramo14_skills_OFFICIAL_20261025.json').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8.json`))).toBe(true);
-    expect(readFileSync('src/data/official/soramo14_skills_OFFICIAL_20261025.csv').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8_BOM.csv`))).toBe(true);
-    const manifest = readFileSync(`${ORIGINAL}/SHA256_MANIFEST.txt`, 'utf8').trim().split('\n').map((l) => l.split(/\s+/));
-    expect(manifest.length).toBe(20);
-    for (const [hash, file] of manifest) expect(sha256(readFileSync(`${ORIGINAL}/${file}`))).toBe(hash);
+describe('ソラモ14技：正式データ（2026-10-26 Art Ver.2。届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
+  it('保管した JSON・CSV は ZIP の原本と同じ。絵14枚は照合表（SHA-256・827×937）どおり', () => {
+    expect(readFileSync('src/data/official/soramo14_artv2_skills_OFFICIAL_20261026.json').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_ArtV2_Starter16_UTF8.json`))).toBe(true);
+    expect(readFileSync('src/data/official/soramo14_artv2_skills_OFFICIAL_20261026.csv').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_ArtV2_Starter16_UTF8_BOM.csv`))).toBe(true);
+    const manifest = JSON.parse(readFileSync(`${ORIGINAL}/04_QA/IMAGE_VALIDATION_MANIFEST_UTF8.json`, 'utf8')) as { skill_number: number; name: string; filename: string; size: number[]; sha256: string }[];
+    expect(manifest).toHaveLength(14);
+    for (const m of manifest) {
+      const buf = readFileSync(`${ORIGINAL}/01_SKILL_IMAGES/${m.filename}`);
+      expect(sha256(buf)).toBe(m.sha256);
+      expect([buf.readUInt32BE(16), buf.readUInt32BE(20)]).toEqual([827, 937]);
+      expect(m.size).toEqual([827, 937]);
+      expect(getSkill(ids(m.skill_number)).name).toBe(m.name);
+    }
   }, 30000);
 
   it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
-    const csv = readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_UTF8_BOM.csv`, 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1);
+    const csv = readFileSync(`${ORIGINAL}/02_SKILL_DATA/Soramo_14Skills_ArtV2_Starter16_UTF8_BOM.csv`, 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1);
     expect(csv).toHaveLength(14);
     const CAT = { strength: 'force', intelligence: 'wisdom', special: 'special', defense: 'defense', dodge: 'evade' } as const;
     csv.forEach((line, i) => {
-      const [id, no, monster, name, category, mana, damage, effect, image, copies] = line.split(',');
+      const [no, id, monster, name, category, mana, damage, effect, copies, image, artVersion] = line.split(',');
       const j = soramoJson[i];
       expect(j).toEqual({
         id,
@@ -47,7 +53,9 @@ describe('ソラモ14技：正式データ（2026-10-25。届いた JSON・CSV �
         effect,
         image,
         starter_copies: Number(copies),
+        art_version: artVersion,
       });
+      expect(artVersion).toBe('2');
       const s = getSkill(ids(Number(no)));
       expect(s.id).toBe(`skl-soramo14-${String(no).padStart(2, '0')}`);
       expect(s.designId).toBe(id);
@@ -82,15 +90,17 @@ describe('ソラモ14技：正式データ（2026-10-25。届いた JSON・CSV �
     ]);
   });
 
-  it('絵は届いた PNG（827×937）を1バイトも変えずに使う。14件すべて JSON の image と番号で対応', () => {
+  it('絵は届いた Art Ver.2 の PNG（827×937）を1バイトも変えずに使う。14件すべて JSON の image と番号で対応。それまでの絵は置いていない', () => {
     for (const row of soramoJson) {
       const s = getSkill(ids(row.number));
       const nn = String(row.number).padStart(2, '0');
       expect(row.image).toBe(`01_SKILL_IMAGES/Soramo_Skill_${nn}.png`);
-      expect(s.art?.file).toBe(`sor14_sk_${nn}.png`);
+      expect(s.art?.file).toBe(`sor14v2_sk_${nn}.png`);
       const game = readFileSync(`assets/images/cards/skills/${s.art?.file}`);
       expect(game.equals(readFileSync(`${ORIGINAL}/${row.image}`))).toBe(true);
       expect([game.readUInt32BE(16), game.readUInt32BE(20)]).toEqual([827, 937]);
+      // それまでの絵（2026-10-25）は外した
+      expect(existsSync(`assets/images/cards/skills/sor14_sk_${nn}.png`)).toBe(false);
     }
   });
 
