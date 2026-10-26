@@ -1,0 +1,297 @@
+/*
+ * デザイン第9弾（2026-10-26 納品。原本 design-parts/ui-quality9-20261026/、切り出し tools/design/ui9_build.py）。
+ * タイトルロゴ・技の対象の矢印・戦闘不能の印・状態のアイコン・ライフのゲージ・流れる文字の帯と情報の欄の枠・マナの光・手札の印・
+ * 練習試合の背景・ダンジョンの案内板。絵に文字は入っていない（ロゴを除く。文字はゲームが重ねる）
+ */
+
+/* ===== 1 タイトルロゴ（公式アイコンの下。日本語の正式名称は下に文字で） ===== */
+.title__name--logo {
+  margin-top: 6px;
+  line-height: 0;
+}
+
+.title__logo-art {
+  display: block;
+  width: min(330px, 86vw);
+  height: auto;
+  margin: 0 auto;
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.65));
+}
+
+/* ===== 2 技の対象を示す矢印（自分の技＝青・相手の技＝赤） ===== */
+.battle__monster .battle__pointer,
+.battle__pointer {
+  top: -22px;
+  width: 26px;
+  height: auto;
+  font-size: 0;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.75));
+}
+
+/* ===== 3 戦闘不能の印（絵の真ん中に、文字は印の上に） ===== */
+.battle__monster-down {
+  flex-direction: column;
+}
+
+.battle__monster-down-mark {
+  width: 86%;
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.8));
+}
+
+.battle__monster-down-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgb(10 10 14 / 0.72);
+  color: #ffd1d8;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+/* ===== 4 状態のアイコン（丸い印＋文字。文字は残す） ===== */
+.battle__status-art {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.battle__status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px 1px 1px;
+  border-radius: 10px;
+  background: rgb(10 14 24 / 0.85);
+  border: 1px solid rgb(201 162 74 / 0.6);
+}
+
+.battle__status-stat .battle__status-art {
+  margin-right: 1px;
+}
+
+.battle__monster .battle__acted {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px 1px 1px;
+  border-radius: 9px;
+  background: rgb(10 14 24 / 0.82);
+}
+
+.battle__acted .battle__status-art {
+  width: 15px;
+  height: 15px;
+}
+
+/* ===== 5 ライフのゲージ（枠の溝に中身。緑→黄土色→赤） ===== */
+.battle__monster-bar {
+  position: relative;
+  width: 80px;
+  height: 8px;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/life_frame.webp') center / 100% 100% no-repeat;
+  overflow: visible;
+}
+
+/* 中身は溝の中（枠の絵の 5.3%〜94.7%・33%〜67%） */
+.battle__monster-bar-fill {
+  position: absolute;
+  top: 31%;
+  left: 5.3%;
+  max-width: 89.4%;
+  height: 38%;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 0 2px;
+  border-image: url('@assets/images/ui/battle/life_fill_green.webp') 0 12 fill / 0 2px stretch;
+  background: none;
+}
+
+.battle__monster-bar.is-mid .battle__monster-bar-fill {
+  border-image-source: url('@assets/images/ui/battle/life_fill_ochre.webp');
+}
+
+.battle__monster-bar.is-low .battle__monster-bar-fill {
+  border-image-source: url('@assets/images/ui/battle/life_fill_red.webp');
+}
+
+/* ===== 6 上の流れる文字の帯・情報の欄の枠 ===== */
+.battle__ticker {
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/ticker_frame.webp') center / 100% 100% no-repeat;
+  -webkit-mask-image: none;
+  mask-image: none;
+  padding: 0 14px;
+}
+
+.battle__ticker-text {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+}
+
+.battle__ticker {
+  overflow: hidden;
+}
+
+.battle-stats {
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/stats_frame_player.webp') center / 100% 100% no-repeat;
+  padding: 7px 7px 6px;
+}
+
+.battle-stats--opponent {
+  background-image: url('@assets/images/ui/battle/stats_frame_opponent.webp');
+}
+
+/* ===== 7 マナの光（黒い背景は「光を足す」重ね方で消える） ===== */
+.battle__mana-fx {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  animation: mana-fx 850ms ease-out both;
+}
+
+.battle-stats .battle-info__mana .battle__mana-fx {
+  left: 12px;
+}
+
+/* マナにしたカードが消えるとき：カードの上に、ほどけて粒になる光 */
+.battle__mana-fx--convert {
+  width: 140%;
+  height: auto;
+  aspect-ratio: 1;
+  animation-duration: 600ms;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes mana-fx {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+  25% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ===== 8 手札の印（選んだ＝金の光る枠、マナにする＝青い光る枠と札、使えない＝灰色のくもり） ===== */
+.battle__hand-card {
+  position: relative;
+}
+
+.battle__hand-card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(var(--hand-card-h) / 2);
+  width: calc(var(--hand-card-w) * 1.22);
+  height: calc(var(--hand-card-h) * 1.18);
+  transform: translate(-50%, -50%);
+  background: center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.battle__hand-card.is-selected {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.battle__hand-card.is-selected::after {
+  background-image: url('@assets/images/ui/battle/hand_selected.webp');
+}
+
+.battle__hand-card.is-picked {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.battle__hand-card.is-picked::after {
+  background-image: url('@assets/images/ui/battle/hand_mana.webp');
+}
+
+.battle__hand-card.is-unusable {
+  opacity: 1;
+  filter: none;
+}
+
+.battle__hand-card.is-unusable::after {
+  width: var(--hand-card-w);
+  height: var(--hand-card-h);
+  background-image: url('@assets/images/ui/battle/hand_unusable.webp');
+  opacity: 0.7;
+}
+
+.battle__hand-mana {
+  top: -6px;
+  z-index: 2;
+  width: 58px;
+  height: 18px;
+  padding: 0 0 0 16px;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/hand_mana_tag.webp') center / 100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+/* ===== 9 練習試合の背景（机の絵を濃いめに見せる。ほかの背景はうっすらのまま） ===== */
+.battle.has-bg.has-bg--vivid {
+  background:
+    linear-gradient(180deg, rgb(13 20 36 / 0.55) 0%, rgb(13 20 36 / 0.45) 45%, rgb(13 20 36 / 0.7) 100%),
+    var(--battle-bg) center / cover no-repeat,
+    #0d1424;
+}
+
+/* ===== 10 ダンジョンの案内板（階段・出口のマスの左に立てる。右下の「調べる」ボタンに隠れないように。板に名前） ===== */
+.world__dungeon-sign {
+  display: block;
+  overflow: visible;
+}
+
+.world__dungeon-sign-post {
+  position: absolute;
+  right: 72%;
+  bottom: 10%;
+  width: 125%;
+  display: block;
+}
+
+.world__dungeon-sign--exit .world__dungeon-sign-post {
+  width: 140%;
+}
+
+.world__dungeon-sign-post > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+}
+
+/* 名前：板の上（板は案内板の絵の上から 28〜58%） */
+.world__dungeon-sign-text {
+  position: absolute;
+  left: 46%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  color: #fff2d4;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.95), 0 0 3px rgb(0 0 0 / 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle__mana-fx {
+    animation-duration: 1ms;
+  }
+}

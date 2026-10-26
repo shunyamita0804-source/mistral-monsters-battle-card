@@ -58,6 +58,18 @@ import fxDefense from '@assets/images/effects/fx_defense.webp';
 import fxEvade from '@assets/images/effects/fx_evade.webp';
 import fxSpecial from '@assets/images/effects/fx_special.webp';
 import fxHeal from '@assets/images/effects/fx_heal.webp';
+import fxManaGain from '@assets/images/effects/fx_mana_gain.webp';
+import fxManaConvert from '@assets/images/effects/fx_mana_convert.webp';
+import fxManaSpend from '@assets/images/effects/fx_mana_spend.webp';
+import targetPlayerArt from '@assets/images/ui/battle/target_player.webp';
+import targetOpponentArt from '@assets/images/ui/battle/target_opponent.webp';
+import knockoutArt from '@assets/images/ui/battle/knockout_mark.webp';
+import statusSealedArt from '@assets/images/ui/battle/status_sealed.webp';
+import statusStunnedArt from '@assets/images/ui/battle/status_stunned.webp';
+import statusTauntArt from '@assets/images/ui/battle/status_taunt.webp';
+import statusShieldArt from '@assets/images/ui/battle/status_shield.webp';
+import statusActedArt from '@assets/images/ui/battle/status_acted.webp';
+import statusWeakenArt from '@assets/images/ui/battle/status_weaken.webp';
 import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
 import { skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { bgm } from '../bgm.ts';
@@ -245,6 +257,7 @@ export const battleScreen: ScreenDefinition = {
     if (req.background) {
       // 対戦の背景の絵（ダンジョン）。上に暗い膜を重ねて、カードや文字を読みやすくする
       element.classList.add('has-bg');
+      if (req.backgroundVivid) element.classList.add('has-bg--vivid');
       element.style.setProperty('--battle-bg', `url("${req.background}")`);
     }
     // 手札のカードの大きさ（自分の手札＝表・相手の手札＝裏で同じ値。CSS の --hand-card-w / --hand-card-h）
@@ -291,7 +304,8 @@ export const battleScreen: ScreenDefinition = {
     /** 前回描画時のライフ（ダメージ・回復の演出に使う） */
     const prevLife = new Map<string, number>();
     /** 技・サポートの対象に選ばれたモンスター（指のマークを出す。until まで） */
-    let pointed: { uid: string; until: number } | null = null;
+    /** 技の対象に出す矢印（side＝技を使った側。自分の技＝青、相手の技＝赤） */
+    let pointed: { uid: string; until: number; side: Side } | null = null;
     /** モンスターに重ねている技の光（from〜until の間だけ出す） */
     let hitFx: { uid: string; kind: HitFxKind; from: number; until: number }[] = [];
     /** 上の帯の流れる文字（文が変わった時刻） */
@@ -464,7 +478,7 @@ export const battleScreen: ScreenDefinition = {
       // 誰に向けた技か分かるよう、対象のモンスターに指のマークを出す（自分・相手どちらの技も。攻撃は守備が終わるまでも出る）
       if (action.type === 'useCard' && action.targetUid) {
         const until = Date.now() + revealDelay + SHOWCASE_MS + POINTER_EXTRA_MS;
-        pointed = { uid: action.targetUid, until };
+        pointed = { uid: action.targetUid, until, side: action.side };
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
       queueHitFx(before, next, action, played, played ? revealDelay + SHOWCASE_MS : 0);
@@ -639,6 +653,8 @@ export const battleScreen: ScreenDefinition = {
         ghost.style.left = `${(r.left - root.left) / scale}px`;
         ghost.style.top = `${(r.top - root.top) / scale}px`;
         ghost.style.setProperty('--delay', `${i * MANA_VANISH_STAGGER_MS}ms`);
+        // カードがほどけて青い光の粒になる絵（2026-10-26 デザイン第9弾）
+        ghost.append(h('img', { class: 'battle__mana-fx battle__mana-fx--convert', attrs: { src: fxManaConvert, alt: '', 'aria-hidden': 'true', draggable: 'false' } }));
         fxLayer.append(ghost);
         setTimeout(() => ghost.remove(), MANA_VANISH_MS + i * MANA_VANISH_STAGGER_MS + 50);
         element.querySelector(`.battle__hand-card[data-uid="${uid}"]`)?.classList.add('is-leaving');
@@ -1098,7 +1114,9 @@ export const battleScreen: ScreenDefinition = {
           // 技の演出の間：使った側と対象のアイコンを光らせる（つながりが分かるように）
           const spot = spotlight && Date.now() < spotlight.until ? spotlight : null;
           const spotClass = spot?.userUid === m.uid ? ' is-spot-user' : spot?.targetUid === m.uid ? ' is-spot-target' : '';
-          const bar = h('span', { class: 'battle__monster-bar' }, h('span', { class: 'battle__monster-bar-fill' }));
+          // ライフのゲージ（2026-10-26 デザイン第9弾）：1/3 以下＝赤、1/2 以下＝黄土色、それより多い＝緑
+          const lifeLevel = m.life * 3 <= m.maxLife ? ' is-low' : m.life * 2 <= m.maxLife ? ' is-mid' : '';
+          const bar = h('span', { class: `battle__monster-bar${lifeLevel}` }, h('span', { class: 'battle__monster-bar-fill' }));
           (bar.firstElementChild as HTMLElement).style.width = `${Math.max(0, (m.life / m.maxLife) * 100)}%`;
           return h(
             'button',
@@ -1115,8 +1133,11 @@ export const battleScreen: ScreenDefinition = {
               hasBattleCard(m.cardId)
                 ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? m.life, max: m.maxLife })
                 : createMonsterPortrait(getMonster(m.cardId), MONSTER_ICON, MONSTER_ICON_H),
-              down ? h('span', { class: 'battle__monster-down', text: t('card.down') }) : null,
-              m.acted && !down ? h('span', { class: 'battle__acted', text: t('battle.monster.acted') }) : null,
+              // 戦闘不能の印・行動済の印（2026-10-26 デザイン第9弾。文字も残す）
+              down
+                ? h('span', { class: 'battle__monster-down' }, h('img', { class: 'battle__monster-down-mark', attrs: { src: knockoutArt, alt: '', draggable: 'false' } }), h('span', { class: 'battle__monster-down-text', text: t('card.down') }))
+                : null,
+              m.acted && !down ? h('span', { class: 'battle__acted' }, statusIcon(statusActedArt), h('span', { text: t('battle.monster.acted') })) : null,
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印
               !down ? statusBadges(s, m) : null,
               diff < 0 ? h('span', { class: 'battle__burst', attrs: { 'aria-hidden': 'true' } }) : null,
@@ -1132,7 +1153,8 @@ export const battleScreen: ScreenDefinition = {
               h('span', { class: 'battle__monster-life-now', text: String(lifeShown.get(m.uid) ?? m.life) }),
               h('span', { class: 'battle__monster-life-max', text: `/${m.maxLife}` }),
             ),
-            isPointed ? h('span', { class: `battle__pointer battle__pointer--${side}`, attrs: { 'aria-hidden': 'true' }, text: '👇' }) : null,
+            // 技の対象の矢印（2026-10-26 デザイン第9弾。それまでは絵文字の👇）。色は技を使った側：自分の技＝青、相手の技＝赤
+            isPointed ? pointerArrow(isPendingTarget && s.pending ? s.pending.attacker : (pointed?.side ?? otherSide(side))) : null,
           );
         }),
       );
@@ -1141,12 +1163,27 @@ export const battleScreen: ScreenDefinition = {
      * モンスターにかかっている特殊の効果の印（無ければ null）。
      * 技のダメージ−（吠える・ダストキック・熱風の威嚇）は、拳（ちから）・本（かしこさ）の印と赤い数字の「−1」で出す（2026-10-24 ユーザー指示「文字にしない」）
      */
+    /** 状態のアイコン（小さな丸い印） */
+    const statusIcon = (src: string): HTMLElement => h('img', { class: 'battle__status-art', attrs: { src, alt: '', 'aria-hidden': 'true', draggable: 'false' } });
+
+    /** 技の対象の矢印。by＝技を使った側 */
+    const pointerArrow = (by: Side): HTMLElement =>
+      h('img', { class: `battle__pointer battle__pointer--by-${by}`, attrs: { src: by === 'player' ? targetPlayerArt : targetOpponentArt, alt: '', 'aria-hidden': 'true', draggable: 'false' } });
+
+    /** マナの光（約0.8秒で消える） */
+    const manaFx = (src: string, kind: 'gain' | 'spend'): HTMLElement => {
+      const el = h('img', { class: `battle__mana-fx battle__mana-fx--${kind}`, attrs: { src, alt: '', 'aria-hidden': 'true', draggable: 'false' } });
+      setTimeout(() => el.remove(), 900);
+      return el;
+    };
+
     const statusBadges = (s: BattleState, m: BattleMonster): HTMLElement | null => {
       const items: HTMLElement[] = [];
       const weakenBadge = (stat: StatType, n: number): HTMLElement =>
         h(
           'span',
           { class: 'battle__status-stat', attrs: { role: 'img', 'aria-label': t('battle.status.weaken', { stat: statLabel(stat), n }) } },
+          statusIcon(statusWeakenArt),
           h('img', { class: 'battle__status-icon', attrs: { src: STAT_ICON[stat], alt: '', draggable: 'false' } }),
           battleDigits(-n, 'battle__status-num'),
         );
@@ -1154,12 +1191,16 @@ export const battleScreen: ScreenDefinition = {
       if (m.weaken && (m.weaken.untilTurn === undefined || m.weaken.untilTurn >= s.turn)) items.push(weakenBadge(m.weaken.stat, m.weaken.amount));
       // ダストキック：かけた手番（相手の番）と、効く手番（次の手番）の間だけ出す
       if (m.weakenTurn && m.weakenTurn.turn >= s.turn) items.push(weakenBadge(m.weakenTurn.stat, m.weakenTurn.amount));
-      if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) items.push(h('span', { class: 'battle__status-text', text: t('battle.status.sealed') }));
-      if (m.taunt && m.taunt.turn >= s.turn) items.push(h('span', { class: 'battle__status-text', text: t('battle.status.taunted', { only: cardName(m.taunt.monsterId) }) }));
+      // 状態のアイコン（2026-10-26 デザイン第9弾。文字も残す）
+      const textBadge = (art: string, text: string): HTMLElement => h('span', { class: 'battle__status-text' }, statusIcon(art), h('span', { text }));
+      if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) items.push(textBadge(statusSealedArt, t('battle.status.sealed')));
+      // まきつく：次の手番は技を使えない（2026-10-26 から印を出す）
+      if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) items.push(textBadge(statusStunnedArt, t('battle.status.stunned')));
+      if (m.taunt && m.taunt.turn >= s.turn) items.push(textBadge(statusTauntArt, t('battle.status.taunted', { only: cardName(m.taunt.monsterId) })));
       // しめったはだ：受けるダメージ−（使った手番と相手の次の手番の間だけ出す）
       if (m.shield && m.shield.untilTurn >= s.turn) {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
-        items.push(h('span', { class: 'battle__status-text', text: t('battle.status.shield', { stat, n: m.shield.reduce }) }));
+        items.push(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
       }
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
@@ -1375,7 +1416,7 @@ export const battleScreen: ScreenDefinition = {
             },
             createBattleCard(card, { width: HAND_CARD_W, size: 'hand' }),
             h('span', { class: 'battle__hand-name', text: cardName(card) }),
-            picked ? h('span', { class: 'battle__hand-mana', text: t('card.detail.mana') }) : null,
+            picked ? h('span', { class: 'battle__hand-mana' }, h('span', { class: 'battle__hand-mana-text', text: t('card.detail.mana') })) : null,
           );
           if (isNew) {
             // 1枚ずつ高速で配る：見た目の遅れと効果音を同じ間隔でずらす
@@ -1632,7 +1673,7 @@ export const battleScreen: ScreenDefinition = {
         const box = element.querySelector(`.battle-stats--${side} .battle-info__mana`);
         if (box) {
           box.classList.add('is-mana-up');
-          box.append(h('span', { class: 'battle__mana-float', text: `+${now - before}` }), h('span', { class: 'battle__mana-spark', attrs: { 'aria-hidden': 'true' } }));
+          box.append(h('span', { class: 'battle__mana-float', text: `+${now - before}` }), h('span', { class: 'battle__mana-spark', attrs: { 'aria-hidden': 'true' } }), manaFx(fxManaGain, 'gain'));
         }
       }
       // 音はマナの数の差では選ばず、ルールで確定したきっかけで鳴らす（1件につき1回。描き直しでは鳴らさない）
@@ -1641,6 +1682,8 @@ export const battleScreen: ScreenDefinition = {
       for (const fx of s.fx) {
         if (fx.seq <= lastFxSeq) continue;
         sound.play(FX_SOUND[fx.kind]);
+        // マナを払った：情報の欄のマナに、青い粒がはじける光（2026-10-26 デザイン第9弾）
+        if (fx.kind === 'manaSpend') element.querySelector(`.battle-stats--${fx.side} .battle-info__mana`)?.append(manaFx(fxManaSpend, 'spend'));
         // 命中：画面を揺らし、一瞬だけ次の行動を待たせる（ヒットストップ）
         if (fx.kind === 'hitNormal' || fx.kind === 'hitStrong') {
           const cls = fx.kind === 'hitStrong' ? 'is-shake-strong' : 'is-shake';

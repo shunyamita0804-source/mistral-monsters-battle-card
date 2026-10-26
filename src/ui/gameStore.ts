@@ -19,6 +19,8 @@ export interface BattleRequest {
   readonly bgm?: BgmId;
   /** 対戦の背景の絵（無ければ従来の色の背景） */
   readonly background?: string;
+  /** 背景の絵を濃いめに見せる（練習試合の机の絵。ふだんはうっすら） */
+  readonly backgroundVivid?: boolean;
   /** 対戦後に1回だけ呼ばれる */
   readonly onFinish: (winner: BattleWinner) => void;
 }
