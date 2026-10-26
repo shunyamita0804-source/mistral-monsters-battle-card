@@ -314,7 +314,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 2016,
-     "y": -11
+     "y": -6
     }
    },
    "HOUSE_A": {
@@ -384,7 +384,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 464,
-     "y": 2543
+     "y": 2561
     }
    },
    "LAB": {

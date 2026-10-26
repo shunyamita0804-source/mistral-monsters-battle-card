@@ -119,7 +119,7 @@ export type SkillEffect =
        */
       readonly duration?: 'nextTurn' | 'nextUseByNextTurn';
     }
-  /** 特殊（正式：すなかけ）：選んだ相手モンスターは次回攻撃できない */
+  /** 特殊（正式：ソラモのすなかけ・ガウルの威嚇）：選んだ相手モンスターは次回攻撃できない */
   | { readonly type: 'seal' }
   /** 特殊（正式：ラズックのちょうはつ）：選んだ相手モンスターは次の手番、使ったモンスターと同じ種類（ラズック）にしか攻撃できない */
   | { readonly type: 'taunt' }
@@ -316,7 +316,8 @@ export function describeSkill(card: SkillCard): string {
   const stat = card.stat ? statLabel(card.stat.type) : '';
   const v = skillValue(card);
   if (card.effect.type === 'attack') {
-    const base = card.stat ? t('card.skill.attack', { stat, v, note: attackNote(card.effect) }).trim() : '';
+    // 正式カードの効果テキスト（「回避されない」など）があるときは、攻撃の印の説明を足さない（同じ文が2回出ないように）
+    const base = card.stat ? t('card.skill.attack', { stat, v, note: official ? '' : attackNote(card.effect) }).trim() : '';
     return official ? `${base}${getLanguage() === 'en' ? ' ' : ''}${official}`.trim() : base;
   }
   if (official) return official;

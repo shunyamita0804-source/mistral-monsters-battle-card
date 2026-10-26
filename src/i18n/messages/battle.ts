@@ -114,7 +114,7 @@ export const BATTLE = {
   'battle.talk.lose': { ja: '参った……強いね。', en: "I give up... you're strong." },
   'battle.status.taunted': { ja: '{only}だけ', en: '{only} only' },
   'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
-  'battle.ng.sealed': { ja: 'このターンは攻撃できません（すなかけ）', en: "Can't attack this turn (Sand Throw)" },
+  'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
 
   // 先攻・後攻を決める
@@ -127,7 +127,6 @@ export const BATTLE = {
   'battle.order.startPlayer': { ja: 'あなたから始めます', en: 'You start' },
   'battle.order.startOpponent': { ja: '相手から始めます', en: 'The opponent starts' },
   'battle.order.cardAria': { ja: 'カード{n}', en: 'Card {n}' },
-  'battle.order.vs': { ja: 'VS {name}', en: 'VS {name}' },
 
   // 見出し・ルール・降参
   'battle.surrender': { ja: '降参', en: 'Give Up' },

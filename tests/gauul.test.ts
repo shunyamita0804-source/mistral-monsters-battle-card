@@ -1,51 +1,118 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getSkill, MONSTERS, SKILLS, skillsOf } from '../src/data/cards.ts';
+import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
-import { GAUUL_MONSTER, GAUUL_SKILLS, gauulSkillId } from '../src/data/gauul.ts';
+import { GAUL14_ROWS, GAUUL_MONSTER, GAUUL_OLD_SKILL_IDS, GAUUL_SKILLS, gauulSkillId } from '../src/data/gauul.ts';
 import { LAZUCK_CROSS_GUARD_ID, LAZUCK_ITAZURA_ID, lazuckSkillId } from '../src/data/lazuck.ts';
 import evasionJson from '../src/data/official/evasion_LATEST_20261024.json';
-import gauulJson from '../src/data/official/gauul_cards_OFFICIAL_20261024.json';
+import gaulJson from '../src/data/official/gaul14_skills_OFFICIAL_20261026.json';
 import { soramoSkillId } from '../src/data/soramo.ts';
+import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
-import { applyAction, attackPower, cardUsability, createBattle, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
-import { skillCardFace } from '../src/game/cards/cardFace.ts';
-import { validateDeck } from '../src/game/deck/deck.ts';
+import { applyAction, cardUsability, createBattle, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
+import { skillCardFace, skillValueBadge, skillValueBadgeText } from '../src/game/cards/cardFace.ts';
+import { describeSkill } from '../src/game/cards/cardTypes.ts';
+import { countCards, createStarterDeck, validateDeck } from '../src/game/deck/deck.ts';
 import { BACKUP_FORMAT, parseBackup } from '../src/game/save/backup.ts';
-import { createNewSave, normalizeSave, SAVE_VERSION } from '../src/game/save/saveData.ts';
+import { createNewSave, normalizeSave, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
 const gau = (n: number): string => gauulSkillId(n);
 const laz = (n: number): string => lazuckSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
+const ORIGINAL = 'design-parts/cards-original/gaul14-20261026';
+const sha256 = (buf: Buffer): string => createHash('sha256').update(buf).digest('hex');
 
-describe('ガウル16技：正式データ（2026-10-24 承認。正本 JSON を無改変で導入）', () => {
-  it('技名・マナ・ダメージ・種別・効果テキスト・区分が JSON とすべて一致する。初期8・収集8', () => {
-    expect(gauulJson.monster_life).toBe(6);
-    expect(GAUUL_SKILLS).toHaveLength(16);
-    for (const o of gauulJson.skill_cards) {
-      const s = getSkill(gau(o.number));
-      expect(s.designId).toBe(o.design_id);
-      expect(s.name).toBe(o.name_ja);
-      expect(s.cost).toBe(o.mana);
-      expect(s.stat?.value ?? null).toBe(o.damage);
-      expect(s.category).toBe(o.category);
-      expect(s.effectTextJa).toBe(o.effect_text_ja);
-      expect(s.availability).toBe(o.availability);
+describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
+  it('保管した JSON・CSV は ZIP の原本と同じ。絵14枚は照合表（SHA-256）どおりで、ゲームの絵は1バイトも変えていない', () => {
+    expect(readFileSync('src/data/official/gaul14_skills_OFFICIAL_20261026.json').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Gaul_14Skills_UTF8.json`))).toBe(true);
+    expect(readFileSync('src/data/official/gaul14_skills_OFFICIAL_20261026.csv').equals(readFileSync(`${ORIGINAL}/02_SKILL_DATA/Gaul_14Skills_UTF8_BOM.csv`))).toBe(true);
+    const manifest = readFileSync(`${ORIGINAL}/04_QA/ImageManifest_SHA256_UTF8.txt`, 'utf8')
+      .split('\n')
+      .map((l) => /^(\d{2}) (\S+) ([0-9a-f]{64})$/.exec(l.trim()))
+      .filter((m): m is RegExpExecArray => m !== null);
+    expect(manifest).toHaveLength(14);
+    for (const [, no, name, hash] of manifest) {
+      const row = GAUL14_ROWS[Number(no) - 1];
+      expect(row?.name).toBe(name);
+      expect(row?.sha256).toBe(hash);
+      const original = readFileSync(`${ORIGINAL}/01_SKILL_IMAGES/Gaul_Skill_${no}.png`);
+      expect(sha256(original)).toBe(hash);
+      expect([original.readUInt32BE(16), original.readUInt32BE(20)]).toEqual([827, 937]);
+      expect(readFileSync(`assets/images/cards/skills/gau14_sk_${no}.png`).equals(original)).toBe(true);
+      expect(getSkill(gau(Number(no))).art).toEqual({ category: 'skillCards', file: `gau14_sk_${no}.png`, layout: 'frame' });
+    }
+  }, 30000);
+
+  it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
+    const csv = readFileSync(`${ORIGINAL}/02_SKILL_DATA/Gaul_14Skills_UTF8_BOM.csv`, 'utf8').replace(/^﻿/, '').trim().split(/\r?\n/).slice(1);
+    expect(csv).toHaveLength(14);
+    const CAT = { strength: 'force', intelligence: 'wisdom', special: 'special', defense: 'defense', dodge: 'evade' } as const;
+    csv.forEach((line, i) => {
+      const [no, name, category, mana, damage, effect, image, copies] = line.split(',');
+      const j = gaulJson[i];
+      expect(j).toMatchObject({
+        number: Number(no),
+        monster: 'ガウル',
+        name,
+        category,
+        mana: Number(mana),
+        damage: damage === '' ? null : Number(damage),
+        effect,
+        image,
+        starter_copies: null,
+      });
+      expect(copies).toBe('');
+      const s = getSkill(gau(Number(no)));
+      expect(s.id).toBe(`skl-gauul14-${String(no).padStart(2, '0')}`);
+      expect(s.designId).toBe(j?.id);
+      expect(s.name).toBe(name);
+      expect(s.category).toBe(CAT[category as keyof typeof CAT]);
+      expect(s.cost).toBe(Number(mana));
+      expect(s.stat?.value ?? null).toBe(damage === '' ? null : Number(damage));
+      expect(s.effectTextJa ?? '').toBe(effect);
       expect(s.monsterId).toBe('mon-gauul');
       expect(s.isPlaceholder).toBe(false);
       expect(s.rarity).toBeNull();
-    }
-    expect(GAUUL_SKILLS.filter((s) => s.availability === 'initial').map((s) => s.designId)).toEqual(
-      ['01', '02', '06', '07', '09', '11', '12', '15'].map((n) => `GAU-SK-${n}`),
-    );
-    expect(GAUUL_SKILLS.filter((s) => s.availability === 'collect')).toHaveLength(8);
-    expect(new Set(GAUUL_SKILLS.map((s) => s.id)).size).toBe(16);
+      // 初期配布は未確定（null）。0枚（収集）と決めつけず、区分を持たない
+      expect(s.availability).toBeUndefined();
+    });
+    expect(GAUUL_SKILLS).toHaveLength(14);
   });
 
-  it('モンスター：ライフ 6・枠色オレンジ・それまで登録のみだった正式カードとバトル用の絵。ランクは画面に出さない', () => {
+  it('性能の一覧（動き）', () => {
+    expect(GAUUL_SKILLS.map((s) => [s.name, s.cost, s.stat?.value ?? null, s.effect])).toEqual([
+      ['つつく', 1, 1, { type: 'attack' }],
+      ['連続つつき', 2, 2, { type: 'attack' }],
+      ['かぎ爪', 3, 3, { type: 'attack' }],
+      ['急降下アタック', 4, 4, { type: 'attack' }],
+      ['スパイラルダイブ', 5, 5, { type: 'attack' }],
+      ['火の粉', 2, 2, { type: 'attack' }],
+      ['ファイアボール', 3, 3, { type: 'attack' }],
+      ['フレアレイ', 5, 4, { type: 'attack' }],
+      ['聖なる炎', 4, 4, { type: 'attack', undodgeable: true }],
+      ['威嚇', 2, null, { type: 'seal' }],
+      ['翼の盾', 2, null, { type: 'defense', reduce: 3, against: 'force' }],
+      ['炎の壁', 2, null, { type: 'defense', reduce: 3, against: 'all' }],
+      ['上に飛ぶ', 2, null, { type: 'evade', against: 'all', minCost: 2 }],
+      ['高速飛行', 2, null, { type: 'evade', against: 'all' }],
+    ]);
+  });
+
+  it('旧16技（skl-gauul-01〜16）はカードの一覧にない。削除したカードとして扱う', () => {
+    expect(GAUUL_OLD_SKILL_IDS).toHaveLength(16);
+    for (const id of GAUUL_OLD_SKILL_IDS) {
+      expect(SKILLS.some((s) => s.id === id)).toBe(false);
+      expect(REMOVED_CARD_IDS).toContain(id);
+    }
+    expect(skillsOf('mon-gauul').map((s) => s.id)).toEqual(Array.from({ length: 14 }, (_, i) => gau(i + 1)));
+    expect(existsSync('assets/images/cards/skills/gau_sk_01.webp')).toBe(false);
+  });
+
+  it('モンスター：ライフ 6・枠色オレンジ・正式カードとバトル用の絵', () => {
     expect(GAUUL_MONSTER.id).toBe('mon-gauul');
     expect(GAUUL_MONSTER.life).toBe(6);
     expect(GAUUL_MONSTER.themeColor).toBe('#E68A46');
@@ -54,43 +121,36 @@ describe('ガウル16技：正式データ（2026-10-24 承認。正本 JSON を
     expect(MONSTERS.filter((m) => m.id === 'mon-gauul')).toHaveLength(1);
   });
 
-  it('原本 PNG 16枚は届いたものと同じ（SHA-256・大きさ）で、番号と技名が合う。ゲーム用の絵は縦横比を変えずに幅 827', () => {
-    const manifest = JSON.parse(readFileSync('design-parts/cards-original/gauul/ASSET_SHA256.json', 'utf8')) as {
-      number: number;
-      name: string;
-      file: string;
-      width: number;
-      height: number;
-      sha256: string;
-    }[];
-    expect(manifest).toHaveLength(16);
-    for (const m of manifest) {
-      const buf = readFileSync(`design-parts/cards-original/gauul/${m.file}`);
-      expect(createHash('sha256').update(buf).digest('hex')).toBe(m.sha256);
-      expect([buf.readUInt32BE(16), buf.readUInt32BE(20)]).toEqual([m.width, m.height]);
-      expect(m.file.startsWith(`${String(m.number).padStart(2, '0')}_${m.name}.`)).toBe(true);
-      expect(getSkill(gau(m.number)).name).toBe(m.name);
-      const art = readFileSync(`assets/images/cards/skills/gau_sk_${String(m.number).padStart(2, '0')}.webp`);
-      const [w, h] = [art.readUInt16LE(26) & 0x3fff, art.readUInt16LE(28) & 0x3fff];
-      expect(w).toBe(827);
-      expect(h).toBe(Math.round((m.height * 827) / m.width));
+  it('技カード新UI（v5）のガウルの色（オレンジ）の枠が全分類にある', () => {
+    for (const size of ['normal', 'hand']) {
+      for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade']) {
+        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_gauul.png`)).toBe(true);
+      }
     }
-    // ラズックの「いたずら」の原本は JPEG のまま（PNG と偽らない）
-    expect(readdirSync('design-parts/cards-original/lazuck')).toEqual(['Razuk_Itazura_Approved_USER_IMAGE.jpeg']);
-    expect(readFileSync('design-parts/cards-original/lazuck/Razuk_Itazura_Approved_USER_IMAGE.jpeg').subarray(0, 2).toString('hex')).toBe('ffd8');
-    expect(existsSync('assets/images/cards/skills/laz_sk_itazura.webp')).toBe(true);
-    // 原本の大きな画像を全部読んで照合するので、重いときでも時間切れにならないよう余裕を持たせる
-  }, 30000);
-
-  it('パック・スターター・相手の編成にはまだ入れていない（配る枚数・敵の編成は未定）', () => {
-    for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('gauul'))).toBe(false);
-    expect(createNewSave().deck.monsters).not.toContain('mon-gauul');
   });
 
-  it('日本語は効果テキストのまま。英語は仮訳で、日本語が残らない', () => {
+  it('初期配布は未確定なので、スターター・パック・相手の編成にはまだ入れていない', () => {
+    for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('gauul'))).toBe(false);
+    const starter = createStarterDeck();
+    expect(starter.monsters).not.toContain('mon-gauul');
+    expect(starter.skills.some((id) => id.includes('gauul'))).toBe(false);
+    expect(Object.keys(createNewSave().collection).some((id) => id.includes('gauul'))).toBe(false);
+    for (const e of Object.values(ENCOUNTERS)) expect(e.monsters).not.toContain('mon-gauul');
+    for (const t of TOURNAMENTS) for (const r of t.rounds) expect(r.monsters).not.toContain('mon-gauul');
+  });
+
+  it('数値の欄：攻撃＝ダメージ、防御＝−3、回避＝「回避」、威嚇＝「効果」', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(gau(14))).description).toBe('必要マナ2以上のかしこさ技を回避');
-    expect(skillCardFace(getSkill(gau(15))).title).toBe('はばたき');
+    expect(GAUUL_SKILLS.map((s) => skillValueBadgeText(skillValueBadge(s)))).toEqual(['1', '2', '3', '4', '5', '2', '3', '4', '4', '効果', '-3', '-3', '回避', '回避']);
+  });
+
+  it('日本語は効果の文のまま。英語は仮訳で、日本語が残らない', () => {
+    setLanguage('ja');
+    expect(skillCardFace(getSkill(gau(9))).description).toBe('回避されない');
+    // 詳しい表示の説明：「回避されない」は1回だけ（効果テキストと攻撃の印で2回にならない。ラズックのみだれづめも同じ）
+    expect(describeSkill(getSkill(gau(9)))).toBe('相手モンスター1体にかしこさで4ダメージ。回避されない');
+    expect(describeSkill(getSkill(laz(4))).match(/回避されない/g)).toHaveLength(1);
+    expect(skillCardFace(getSkill(gau(14))).description).toBe('消費マナに関係なく、すべてのちから技・かしこさ技を回避する。');
     setLanguage('en');
     expect(cardName(GAUUL_MONSTER)).toBe('Gaul');
     for (const s of GAUUL_SKILLS) {
@@ -142,106 +202,99 @@ function lifeAfter(attack: string, target: string, guards: string[]): number {
 }
 
 describe('ガウルの技の効果', () => {
-  it('03 烈風の翼・08 聖なる炎は回避されない（条件の合う回避でも不可）が、防御はできる', () => {
-    for (const atk of [gau(3), gau(8)]) {
-      expect(getSkill(atk).effect).toEqual({ type: 'attack', undodgeable: true });
-      // 回避：ガウル16（条件なし）・ラズック16（条件なし）・ソラモ14（条件なし）
-      expect(guardUsable(atk, 'o-m1', gau(16))).toEqual({ usable: false, reason: 'この攻撃は回避できません' });
-      expect(guardUsable(atk, 'o-m2', laz(16)).usable).toBe(false);
-      expect(guardUsable(atk, 'o-m3', sor(14)).usable).toBe(false);
-      // 防御は使える：火炎の羽衣（かしこさ−3）
-      expect(guardUsable(atk, 'o-m1', gau(12)).usable).toBe(true);
+  it('攻撃01〜08：マナを払い、印字のダメージをそのまま与える（守備なし）', () => {
+    for (let n = 1; n <= 8; n++) {
+      const s = getSkill(gau(n));
+      expect(lifeAfter(gau(n), 'o-m3', [])).toBe(Math.max(0, 7 - (s.stat?.value ?? 0)));
     }
-    expect(lifeAfter(gau(3), 'o-m1', [gau(12)])).toBe(6); // 2 − 3 → 0
-    expect(lifeAfter(gau(8), 'o-m1', [gau(12)])).toBe(5); // 4 − 3 → 1
   });
 
-  it('09 熱風の威嚇：選んだ相手の次回のかしこさ技だけ −1（ちから技は変わらない）。使ったら消える。使わなくても次のターンが終われば消える', () => {
-    let s = scene({ player: [gau(9)] });
+  it('09 聖なる炎：マナ4・ダメージ4。どの回避でも避けられない（条件の合う回避でも不可）が、防御はできる', () => {
+    const atk = gau(9);
+    expect(lifeAfter(atk, 'o-m3', [])).toBe(3); // ソラモ 7 − 4
+    // 回避：ガウル13（マナ2以上）・ガウル14（条件なし）・ラズック16（条件なし）・ソラモ13・14
+    expect(guardUsable(atk, 'o-m1', gau(13))).toEqual({ usable: false, reason: 'この攻撃は回避できません' });
+    expect(guardUsable(atk, 'o-m1', gau(14))).toEqual({ usable: false, reason: 'この攻撃は回避できません' });
+    expect(guardUsable(atk, 'o-m2', laz(16)).usable).toBe(false);
+    expect(guardUsable(atk, 'o-m3', sor(13)).usable).toBe(false);
+    expect(guardUsable(atk, 'o-m3', sor(14)).usable).toBe(false);
+    // 防御は使える：炎の壁（ちから・かしこさ−3）。翼の盾（ちから−3）はかしこさ技なので使えない
+    expect(guardUsable(atk, 'o-m1', gau(12)).usable).toBe(true);
+    expect(guardUsable(atk, 'o-m1', gau(11)).usable).toBe(false);
+    expect(lifeAfter(atk, 'o-m1', [gau(12)])).toBe(5); // 4 − 3 → 1
+  });
+
+  it('09 の「回避されない」は相手の思考（AI）でも同じ：回避を選ばず、守備しない', () => {
+    let s = scene({ player: [gau(9)], opponent: [gau(14)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    expect(monster(s, 'o-m1').weaken).toEqual({ stat: 'wisdom', amount: 1, untilTurn: s.turn + 1 });
-    expect(attackPower(s, getSkill(gau(7)), monster(s, 'o-m1'))).toBe(2); // 炎の羽ばたき かしこさ3 → 2
-    expect(attackPower(s, getSkill(gau(2)), monster(s, 'o-m1'))).toBe(2); // かぎづめ ちから2 のまま
-    expect(attackPower(s, getSkill(gau(7)), monster(s, 'o-m2'))).toBe(3); // ほかのモンスターは変わらない
-    const opponentTurnAt = (turn: number): BattleState => ({
+    expect(chooseAction(s, 'opponent')).toEqual({ type: 'defend', side: 'opponent', cardUid: null });
+  });
+
+  it('10 威嚇：選んだ相手モンスター1体は、持ち主の次の手番に攻撃の技を使えない（ほかのモンスターは使える）', () => {
+    const s = applyAction(scene({ player: [gau(10)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+    expect(monster(s, 'o-m1').sealedTurn).toBe(s.turn + 1);
+    expect(monster(s, 'o-m2').sealedTurn ?? null).toBeNull();
+    expect(s.sides.player.manaPile).toHaveLength(8);
+    // 相手の次の手番：ガウル（o-m1）の攻撃は使えない
+    const next: BattleState = {
       ...s,
-      turn,
+      turn: s.turn + 1,
       active: 'opponent',
-      sides: {
-        ...s.sides,
-        opponent: {
-          ...s.sides.opponent,
-          hand: [{ uid: 'x0', cardId: gau(7) }, { uid: 'x1', cardId: gau(7) }],
-          monsters: s.sides.opponent.monsters.map((m) => ({ ...m, acted: m.uid !== 'o-m1' })),
-        },
-      },
-    });
-    // 相手の次のターン：1回目のかしこさ技は −1、使ったら消える
-    const used = applyAction(opponentTurnAt(s.turn + 1), { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' });
-    expect(used.pending?.power).toBe(2);
-    expect(monster(used, 'o-m1').weaken ?? null).toBeNull();
-    // 次のターンにかしこさ技を使わなかったら、そのあとのターンでは効かない
-    const later = opponentTurnAt(s.turn + 3);
-    expect(attackPower(later, getSkill(gau(7)), monster(later, 'o-m1'))).toBe(3);
-    expect(applyAction(later, { type: 'useCard', side: 'opponent', cardUid: 'x0', targetUid: 'p-m1' }).pending?.power).toBe(3);
+      phase: 'main',
+      sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [{ uid: 'x0', cardId: gau(1) }] } },
+    };
+    expect(cardUsability(next, 'opponent', 'x0')).toEqual({ usable: false, reason: 'このターンは攻撃できません（攻撃を封じられています）' });
   });
 
-  it('11 翼ガード（ちから−3）・12 火炎の羽衣（かしこさ−3）・13 炎の壁（両方−3）。0 未満にならない。種類が違えば使えない', () => {
-    expect(lifeAfter(gau(5), 'o-m1', [gau(11)])).toBe(5); // スパイラルダイブ 4 − 3
+  it('11 翼の盾：ちから技だけ−3。12 炎の壁：ちから技・かしこさ技とも−3。0 未満にならない', () => {
+    expect(lifeAfter(gau(5), 'o-m1', [gau(11)])).toBe(4); // スパイラルダイブ 5 − 3 → 2
     expect(lifeAfter(gau(2), 'o-m1', [gau(11)])).toBe(6); // 2 − 3 → 0
-    expect(lifeAfter(gau(10), 'o-m1', [gau(12)])).toBe(3); // フレアビーム 6 − 3
-    expect(lifeAfter(gau(5), 'o-m1', [gau(13)])).toBe(5);
-    expect(lifeAfter(gau(10), 'o-m1', [gau(13)])).toBe(3);
-    expect(guardUsable(gau(10), 'o-m1', gau(11)).usable).toBe(false);
-    expect(guardUsable(gau(5), 'o-m1', gau(12)).usable).toBe(false);
+    expect(guardUsable(gau(7), 'o-m1', gau(11))).toEqual({ usable: false, reason: 'かしこさ攻撃には使えません' });
+    expect(lifeAfter(gau(5), 'o-m1', [gau(12)])).toBe(4);
+    expect(lifeAfter(gau(8), 'o-m1', [gau(12)])).toBe(5); // フレアレイ 4 − 3 → 1
+    expect(lifeAfter(gau(6), 'o-m1', [gau(12)])).toBe(6); // 火の粉 2 − 3 → 0
   });
 
-  it('14 火花すり抜け：必要マナ1のかしこさ技は避けられず、2以上は避けられ、ちから技は避けられない', () => {
-    expect(guardUsable(gau(6), 'o-m1', gau(14))).toEqual({ usable: false, reason: '必要マナ2以上の攻撃にしか使えません' }); // 火の粉 マナ1
-    expect(guardUsable(gau(7), 'o-m1', gau(14)).usable).toBe(true); // 炎の羽ばたき マナ2（境目）
-    expect(lifeAfter(gau(7), 'o-m1', [gau(14)])).toBe(6);
-    expect(lifeAfter(gau(10), 'o-m1', [gau(14)])).toBe(6);
-    expect(guardUsable(gau(5), 'o-m1', gau(14)).usable).toBe(false); // ちから技
+  it('13 上に飛ぶ：攻撃カードの必要マナが2以上のちから・かしこさ技を回避。1以下は使えない', () => {
+    expect(guardUsable(gau(1), 'o-m1', gau(13))).toEqual({ usable: false, reason: '必要マナ2以上の攻撃にしか使えません' }); // つつく マナ1
+    expect(guardUsable(laz(1), 'o-m1', gau(13)).usable).toBe(false); // ひっかき マナ0
+    expect(guardUsable(gau(2), 'o-m1', gau(13)).usable).toBe(true); // 連続つつき マナ2（境目）
+    expect(guardUsable(gau(6), 'o-m1', gau(13)).usable).toBe(true); // 火の粉 マナ2（かしこさ）
+    expect(lifeAfter(gau(5), 'o-m1', [gau(13)])).toBe(6);
+    expect(lifeAfter(gau(8), 'o-m1', [gau(13)])).toBe(6);
   });
 
-  it('15 はばたき：必要マナ1のちから技は避けられず、2以上は避けられ、かしこさ技は避けられない', () => {
-    expect(guardUsable(gau(1), 'o-m1', gau(15)).usable).toBe(false); // つつく マナ1
-    expect(guardUsable(gau(2), 'o-m1', gau(15)).usable).toBe(true); // かぎづめ マナ2（境目）
-    expect(lifeAfter(gau(2), 'o-m1', [gau(15)])).toBe(6);
-    expect(guardUsable(gau(7), 'o-m1', gau(15)).usable).toBe(false); // かしこさ技
-  });
-
-  it('16 灼熱の飛翔：必要マナ0・1も含むちから/かしこさ技を回避（回避されない攻撃は除く）', () => {
-    expect(guardUsable(laz(1), 'o-m1', gau(16)).usable).toBe(true); // ひっかき マナ0
-    expect(guardUsable(gau(1), 'o-m1', gau(16)).usable).toBe(true);
-    expect(guardUsable(gau(6), 'o-m1', gau(16)).usable).toBe(true);
-    expect(lifeAfter(laz(1), 'o-m1', [gau(16)])).toBe(6);
-    expect(guardUsable(laz(4), 'o-m1', gau(16)).usable).toBe(false); // みだれづめ（回避されない）
+  it('14 高速飛行：必要マナ0・1も含む、すべてのちから・かしこさ技を回避（回避されない攻撃は除く）', () => {
+    expect(guardUsable(laz(1), 'o-m1', gau(14)).usable).toBe(true); // ひっかき マナ0
+    expect(guardUsable(gau(1), 'o-m1', gau(14)).usable).toBe(true);
+    expect(guardUsable(gau(7), 'o-m1', gau(14)).usable).toBe(true);
+    expect(lifeAfter(gau(5), 'o-m1', [gau(14)])).toBe(6);
+    expect(lifeAfter(gau(8), 'o-m1', [gau(14)])).toBe(6);
+    expect(guardUsable(laz(4), 'o-m1', gau(14)).usable).toBe(false); // みだれづめ（回避されない）
   });
 
   it('必要マナの判定は攻撃カードの印字の値で、攻撃側の残りマナには左右されない', () => {
     // 攻撃側のマナをちょうど使い切っても（残り0）、マナ2の攻撃は「必要マナ2以上」
-    let s = scene({ player: [gau(7)], opponent: [gau(14)] }, { player: 2 });
+    let s = scene({ player: [gau(6)], opponent: [gau(13)] }, { player: 2 });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(s.sides.player.manaPile).toHaveLength(0);
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(true);
   });
 
   it('相手の思考（AI）は使えない回避を選ばない', () => {
-    let s = scene({ player: [gau(6)], opponent: [gau(14)] });
+    let s = scene({ player: [gau(1)], opponent: [gau(13)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(chooseAction(s, 'opponent')).toEqual({ type: 'defend', side: 'opponent', cardUid: null });
   });
 });
 
 describe('回避の改訂（2026-10-24）', () => {
-  // ソラモの2件（旧14・16）は、2026-10-25 のソラモ14技（13 ひらりジャンプ・14 星影ステップ）に置き換わった（tests/soramo.test.ts）
-  it('ラズック・ガウルの回避6件の動きは承認 JSON（evasion_LATEST）の条件と同じ', () => {
-    const ids: Record<string, (n: number) => string> = { lazuck: laz, gauul: gau };
-    const updates = evasionJson.updates.filter((u) => u.monster !== 'soramo');
-    expect(updates).toHaveLength(6);
+  // ソラモの2件は 2026-10-25 のソラモ14技、ガウルの3件は 2026-10-26 のガウル14技（13 上に飛ぶ・14 高速飛行）に置き換わった
+  it('ラズックの回避3件の動きは承認 JSON（evasion_LATEST）の条件と同じ', () => {
+    const updates = evasionJson.updates.filter((u) => u.monster === 'lazuck');
+    expect(updates).toHaveLength(3);
     for (const u of updates) {
-      const s = getSkill((ids[u.monster] as (n: number) => string)(u.skill_number));
+      const s = getSkill(laz(u.skill_number));
       expect(s.name).toBe(u.name_ja);
       expect(s.cost).toBe(u.mana);
       expect(s.effectTextJa).toBe(u.effect_text_ja);
@@ -251,8 +304,8 @@ describe('回避の改訂（2026-10-24）', () => {
   });
 
   it('ソラモの回避（13 ひらりジャンプ・14 星影ステップ）も同じきまりで動く', () => {
-    expect(guardUsable(gau(6), 'o-m3', sor(13)).usable).toBe(false); // マナ1 は避けられない
-    expect(guardUsable(gau(7), 'o-m3', sor(13)).usable).toBe(true); // マナ2 は避けられる
+    expect(guardUsable(gau(1), 'o-m3', sor(13)).usable).toBe(false); // マナ1 は避けられない
+    expect(guardUsable(gau(2), 'o-m3', sor(13)).usable).toBe(true); // マナ2 は避けられる
     expect(guardUsable(laz(1), 'o-m3', sor(14)).usable).toBe(true); // マナ0 も避けられる
   });
 });
@@ -353,5 +406,43 @@ describe('クロスガードの削除と旧セーブ（version 8）', () => {
   it('クロスガードはカードの一覧にない', () => {
     expect(SKILLS.some((s) => s.id === LAZUCK_CROSS_GUARD_ID)).toBe(false);
     expect(skillsOf('mon-lazuck')).toHaveLength(16);
+  });
+});
+
+describe('旧ガウル16技の削除と旧セーブ（version 10）', () => {
+  /** version 9 のセーブ：旧ガウルの技を持ち、デッキにも入れている（ガウル・ラズック・ソラモのデッキ） */
+  const oldSave = (spare: Record<string, number> = {}) => {
+    const save = createNewSave();
+    const oldGaul = ['skl-gauul-01', 'skl-gauul-02'];
+    const kept = save.deck.skills.slice(0, 56);
+    const skills = [...kept, ...oldGaul, ...oldGaul];
+    // 持っているのはデッキに入っている分だけ（予備なし）＋旧ガウル＋ spare
+    const collection: Record<string, number> = { ...countCards([...save.deck.monsters, ...kept]), 'skl-gauul-01': 2, 'skl-gauul-02': 2, 'skl-gauul-16': 3, ...spare };
+    return { ...save, version: 9, deck: { ...save.deck, skills }, collection };
+  };
+
+  it('所持・デッキから旧16技が消え、デッキの抜けた分は持っているカードで埋まる（代わりのカードは配らない）', () => {
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(oldSave({ [sor(1)]: 1, [sor(5)]: 1, [sor(6)]: 1, [sor(8)]: 1 }))));
+    if (!loaded) throw new Error('読み込めない');
+    expect(loaded.version).toBe(SAVE_VERSION);
+    for (const id of GAUUL_OLD_SKILL_IDS) expect(loaded.collection[id]).toBeUndefined();
+    expect(loaded.deck.skills.some((id) => id.startsWith('skl-gauul-'))).toBe(false);
+    expect(Object.keys(loaded.collection).some((id) => id.startsWith('skl-gauul14-'))).toBe(false);
+    expect(loaded.deck.skills).toHaveLength(60);
+    expect(validateDeck(loaded.deck, loaded.collection)).toEqual([]);
+  });
+
+  it('埋める予備のカードがなければ、デッキは足りないまま（デッキ編集で直す）', () => {
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(oldSave())));
+    if (!loaded) throw new Error('読み込めない');
+    expect(loaded.deck.skills.some((id) => id.startsWith('skl-gauul-'))).toBe(false);
+    expect(loaded.deck.skills.length).toBeLessThan(60);
+  });
+
+  it('旧ガウルの技の入ったバックアップも読み込める（読み込むときに外す）', () => {
+    const text = JSON.stringify({ format: BACKUP_FORMAT, formatVersion: 1, exportedAt: null, save: oldSave() });
+    const result = parseBackup(text);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.save.collection['skl-gauul-16']).toBeUndefined();
   });
 });

@@ -98,4 +98,7 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | パス | 内容 | 状態 |
 | --- | --- | --- |
 | `images/cards/skills/sor14_sk_01〜14.png` | ソラモ14技の絵（ZIP「MistralBC_Soramo14_Claude_NewUI_Implementation_20261025」の 01_SKILL_IMAGES） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/soramo14-20261025/` |
-| `images/ui/skillcard_v5/frame_{normal,hand}_*.png`・`mana_0〜10.png`・`icon_*.png` | 技カードの新UI（v5）の枠・マナの玉・技種別アイコン | 承認済みの参考画像から切り出し（`tools/art/skillcard_v5_extract.py`）、全分類を同じ形にして色付け（`tools/art/skillcard_v5_monster_color.py`）。参考画像の解像度の都合で、枠は幅 253px（手札用 208px）まで |
+| `images/cards/skills/gau14_sk_01〜14.png` | ガウル14技の絵（ZIP「Gaul_Implementation_Ver2_Claude」の 01_SKILL_IMAGES。2026-10-26） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/gaul14-20261026/` |
+| （削除）`images/cards/skills/gau_sk_01〜16.webp` | 旧ガウルの技16種の絵。2026-10-26 にガウル14技へ替えたので削除（git の履歴にある） | 削除 |
+| `images/ui/{order,vs,newgame,badges,tournament}/`・`images/ui/packs/pack_locked.webp`・`images/ui/banners/banner_rankup.webp`・`images/effects/fx_*.webp`・`images/characters/{hero,face_hero}_{male,female}.webp` | デザイン第8弾（2026-10-26）：先攻・後攻のカードの表・VS の部品・主人公を選ぶ札・主人公の立ち絵と顔・技の光・レア度と NEW の印・鍵つきパック・勝ち抜き表・ランクアップの帯 | 原本 `design-parts/ui-quality8-20261026/` から `tools/design/ui8_build.py` で切り出し・縮小（描き直しなし）。記録は `docs/design/ui-quality8-20261026/10_受け取り結果_UTF8.txt` |
+| `images/ui/skillcard_v5/frame_{normal,hand}_*.png`・`mana_0〜10.png`・`icon_*.png` | 技カードの新UI（v5）の枠・マナの玉・技種別アイコン | 承認済みの参考画像から切り出し（`tools/art/skillcard_v5_extract.py`）、全分類を同じ形にして色付け（`tools/art/skillcard_v5_monster_color.py`。モンスターの色：ソラモ＝クリーム、ガウル＝オレンジ）。参考画像の解像度の都合で、枠は幅 253px（手札用 208px）まで |

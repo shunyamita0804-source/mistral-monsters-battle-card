@@ -36,6 +36,7 @@ import chestOpenIronMp3 from '@assets/audio/se/chest_open_iron.mp3';
 import registerMp3 from '@assets/audio/se/register.mp3';
 import coinsMp3 from '@assets/audio/se/coins.mp3';
 import dripMp3 from '@assets/audio/se/drip.mp3';
+import ironDoorCloseMp3 from '@assets/audio/se/iron_door_close.mp3';
 import underwaterLoopMp3 from '@assets/audio/se/underwater_loop.mp3';
 
 /**
@@ -84,7 +85,9 @@ export type SoundId =
   | 'chestOpenIron'
   | 'register'
   | 'coins'
-  | 'drip';
+  | 'drip'
+  | 'ironDoorOpen'
+  | 'ironDoorClose';
 
 /**
  * 足音の地面の種類（2026-10-23。ユーザー提供の「〇〇の上を走る」から1歩ぶんずつ切り出した音。tools/audio/world_se_build.py）。
@@ -164,6 +167,9 @@ export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
   register: { mp3: registerMp3, gain: 0.7 },
   coins: { mp3: coinsMp3, gain: 0.9 },
   drip: { mp3: dripMp3, gain: 1.6 },
+  // 2026-10-26 大会会場の鉄の扉（ユーザー提供・利用確認済み。開ける音は宝箱の鉄の箱と同じファイル。閉める音は録音が小さいので gain で大きく）
+  ironDoorOpen: { mp3: chestOpenIronMp3, gain: 0.8 },
+  ironDoorClose: { mp3: ironDoorCloseMp3, gain: 4.0 },
 };
 
 const STEP_FILES = import.meta.glob<string>('/assets/audio/se/steps/*.mp3', { eager: true, query: '?url', import: 'default' });

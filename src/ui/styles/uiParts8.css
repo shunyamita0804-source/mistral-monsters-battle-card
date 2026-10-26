@@ -1,0 +1,418 @@
+/*
+ * デザイン第8弾（2026-10-26 納品。原本 design-parts/ui-quality8-20261026/、切り出し tools/design/ui8_build.py）。
+ * 先攻・後攻のカードの表・VS の部品・主人公を選ぶ札・技の光・レア度と NEW の印・鍵つきパック・勝ち抜き表・ランクアップの帯。
+ * 絵に文字は入っていない（文字はゲームが重ねる）
+ */
+
+/* ===== 先攻・後攻のカード（裏面と同じ縦横比に近づける） ===== */
+.battle-order__card {
+  width: 136px;
+  height: 190px;
+}
+
+.battle-order__face {
+  align-items: flex-end;
+  padding-bottom: 24px;
+  border: 0;
+  border-radius: 8px;
+  background: center / 100% 100% no-repeat;
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.9);
+}
+
+.battle-order__face--first {
+  background-image: url('@assets/images/ui/order/order_first.webp');
+  color: #f6e2a8;
+}
+
+.battle-order__face--second {
+  background-image: url('@assets/images/ui/order/order_second.webp');
+  color: #dbe6ff;
+}
+
+/* ===== あなた VS 相手（先攻・後攻を決める画面の上） ===== */
+.battle-vs {
+  position: relative;
+  width: 100%;
+  max-width: 358px;
+  height: 196px;
+}
+
+.battle-vs__plate {
+  position: absolute;
+  width: 196px;
+  aspect-ratio: 480 / 188;
+  background: center / 100% 100% no-repeat;
+}
+
+.battle-vs__plate--player {
+  top: 0;
+  left: 0;
+  background-image: url('@assets/images/ui/vs/plate_player.webp');
+}
+
+.battle-vs__plate--opponent {
+  right: 0;
+  bottom: 0;
+  background-image: url('@assets/images/ui/vs/plate_opponent.webp');
+}
+
+/* 顔の丸い窓（名札の透明な所。plate_player の x 6.2〜30.4%・y 19〜81%） */
+.battle-vs__face {
+  position: absolute;
+  top: 19%;
+  width: 24.2%;
+  height: 62%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #1b2130;
+}
+
+.battle-vs__plate--player .battle-vs__face {
+  left: 6.2%;
+}
+
+.battle-vs__plate--opponent .battle-vs__face {
+  right: 6.2%;
+}
+
+.battle-vs__face > img,
+.battle-vs__face > .battle-portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  border-radius: 0;
+}
+
+.battle-vs__name {
+  position: absolute;
+  top: 22%;
+  bottom: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 1.15;
+  color: #f3ead2;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+.battle-vs__plate--player .battle-vs__name {
+  left: 36%;
+  right: 9%;
+}
+
+.battle-vs__plate--opponent .battle-vs__name {
+  left: 9%;
+  right: 36%;
+}
+
+.battle-vs__emblem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  aspect-ratio: 360 / 276;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  background: url('@assets/images/ui/vs/vs_emblem.webp') center / 100% 100% no-repeat;
+}
+
+.battle-vs__vs {
+  margin-top: 4%;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 900;
+  color: #f2d68a;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 4px rgb(0 0 0 / 0.9);
+}
+
+/* 先攻・後攻を決める画面：VS の分だけ詰める */
+.battle-order {
+  gap: 10px;
+}
+
+/* ===== 主人公を選ぶ札（ふつう・押したとき光る）と大きな立ち絵 ===== */
+.new-game__choices {
+  gap: 10px;
+}
+
+.new-game__choice {
+  width: 168px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.new-game__panel {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 360 / 547;
+  background: url('@assets/images/ui/newgame/choice_normal.webp') center / 100% 100% no-repeat;
+  transition: transform 120ms ease-out;
+}
+
+.new-game__choice:hover .new-game__panel,
+.new-game__choice:focus-visible .new-game__panel,
+.new-game__choice:active .new-game__panel {
+  background-image: url('@assets/images/ui/newgame/choice_selected.webp');
+}
+
+.new-game__choice:active .new-game__panel {
+  transform: scale(0.98);
+}
+
+/* 立ち絵：札のアーチの中に、足元が名前の帯の上に来るように */
+.new-game__hero {
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  height: 80%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.5));
+}
+
+/* 名前：札の下の帯（choice_normal の y 88.8〜94.7%） */
+.new-game__label {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 87.5%;
+  height: 8.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+.new-game__note {
+  margin-top: 6px;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+/* ===== パックを開けたとき：NEW の札（初めて手に入れたカード）とレア度の印 ===== */
+.pack-open__new {
+  top: -8px;
+  right: -4px;
+  width: 52px;
+  height: 18px;
+  padding: 0 0 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  background: url('@assets/images/ui/badges/new_tag.webp') center / 100% 100% no-repeat;
+  color: #fff4d6;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.8);
+}
+
+.pack-open__card.is-revealed .pack-open__new {
+  background-image: url('@assets/images/ui/badges/new_tag_glow.webp');
+}
+
+.pack-open__card .rarity-badge {
+  position: absolute;
+  top: -8px;
+  left: -4px;
+  width: auto;
+  opacity: 0;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+  transition: opacity 200ms;
+}
+
+.pack-open__card.is-revealed .rarity-badge {
+  opacity: 1;
+}
+
+/* カードの詳しい表示：レア度の印と名前を並べる */
+.card-detail__rarity {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-detail__rarity .rarity-badge {
+  width: auto;
+}
+
+/* ===== まだ買えないパック：鎖と鍵の絵（灰色の四角と「？」の代わり） ===== */
+.gacha__pack.is-locked .gacha__pack-art.has-art {
+  background: none;
+}
+
+/* ===== 大会の勝ち抜き表：下の1回戦から上の優勝杯へ（札・線・メダル・優勝杯） ===== */
+.tournament__trophy {
+  display: block;
+  height: 92px;
+  margin: 0 auto -6px;
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.6));
+}
+
+.tournament__bracket {
+  flex-direction: column-reverse;
+  gap: 16px;
+}
+
+.tournament__round {
+  position: relative;
+  min-height: 66px;
+  padding: 6px 8% 6px 7%;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/tournament/plate_normal.webp') center / 100% 100% no-repeat;
+}
+
+.tournament__round.is-next {
+  background-image: url('@assets/images/ui/tournament/plate_next.webp');
+}
+
+.tournament__round.is-won {
+  opacity: 1;
+  background-image: url('@assets/images/ui/tournament/plate_done.webp');
+  color: rgb(243 234 210 / 0.75);
+}
+
+/* 上の回戦（決勝の上は優勝杯）へつなぐ金の線 */
+.tournament__round::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -17px;
+  width: 6px;
+  height: 18px;
+  transform: translateX(-50%);
+  background: url('@assets/images/ui/tournament/line_vertical.webp') center / 100% 100% no-repeat;
+}
+
+.tournament__medal {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+.tournament__result-art {
+  display: block;
+  height: 64px;
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.6));
+}
+
+.tournament__result-art.is-trophy {
+  height: 120px;
+}
+
+/* ===== 優勝・ランクアップの帯（景品の窓の上） ===== */
+.celebration-banner {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 760 / 450;
+  margin: 0 auto 4px;
+  background: url('@assets/images/ui/banners/banner_rankup.webp') center / 100% 100% no-repeat;
+  animation: celebration-in 420ms ease-out both;
+}
+
+/* 上の丸い台（中心 x 50%・y 22%）にランクの紋章 */
+.celebration-banner__rank {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translate(-50%, -50%);
+}
+
+/* 紺の帯（y 54.5〜74.7%・x 21〜79%）に文字 */
+.celebration-banner__title {
+  position: absolute;
+  left: 21%;
+  right: 21%;
+  top: 54.5%;
+  height: 20.2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: #f6e2a8;
+  white-space: nowrap;
+  text-shadow: 0 2px 3px rgb(0 0 0 / 0.85);
+}
+
+@keyframes celebration-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebration-banner {
+    animation: none;
+  }
+}
+
+/* ===== 技が当たったときの光（モンスターのアイコンに重ねる。黒い背景は「光を足す」重ね方で消える） ===== */
+.battle-fx {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 150%;
+  height: auto;
+  aspect-ratio: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  animation: battle-fx-pop 700ms ease-out both;
+}
+
+/* 回復は下から上へ昇るので、少し上にずらす */
+.battle-fx--heal {
+  top: 40%;
+}
+
+@keyframes battle-fx-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-fx {
+    animation: none;
+    opacity: 0.85;
+  }
+}

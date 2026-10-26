@@ -22,9 +22,14 @@ import { newId, once } from '../gameStore.ts';
 import type { ScreenDefinition } from './types.ts';
 import { opponentFace } from '../components/opponentFace.ts';
 import { rewardGlow } from '../components/rewardGlow.ts';
+import { celebrationBanner } from '../components/celebrationBanner.ts';
+import type { RankId } from '../../data/economy.ts';
 import { sound } from '../sound.ts';
 import faceReceptionist from '@assets/images/characters/face_receptionist.webp';
 import arenaBg from '@assets/images/backgrounds/battle_arena.webp';
+import trophyArt from '@assets/images/ui/tournament/trophy.webp';
+import medalWinArt from '@assets/images/ui/tournament/medal_win.webp';
+import medalLoseArt from '@assets/images/ui/tournament/medal_lose.webp';
 
 /** 大会の対戦の背景（2026-10-23 納品「UI画像10種」の対戦背景：中央が空の紺のテーブル） */
 export const TOURNAMENT_BATTLE_BG = arenaBg;
@@ -113,7 +118,11 @@ export const tournamentScreen: ScreenDefinition = {
       ];
       const handle = openModal(element, {
         title: tr(s.won ? (s.firstWin ? 'tournament.rewardFirst' : 'tournament.rewardWin') : 'tournament.rewardEntry'),
-        body: [rewardGlow(s.won ? medalIcon : coinIcon), ...lines.map((t) => h('p', { class: 'modal__text', text: t }))],
+        // 優勝・ランクアップは特別な帯（2026-10-26 デザイン第8弾）。参加報酬だけのときは今までどおり金貨の光
+        body: [
+          s.won ? celebrationBanner(tr(s.rankUp ? 'tournament.bannerRankUp' : 'tournament.bannerChampion'), (s.rankUp as RankId | null) ?? null) : rewardGlow(coinIcon),
+          ...lines.map((t) => h('p', { class: 'modal__text', text: t })),
+        ],
         actions: [{ label: tr('common.ok'), primary: true, onTap: () => handle.close() }],
         onClose: render,
       });
@@ -174,6 +183,8 @@ export const tournamentScreen: ScreenDefinition = {
         const opponent = t.rounds[active.round];
         body.push(
           h('h2', { class: 'tournament__name', text: tr('tournament.inProgress', { name: tournamentName(t) }) }),
+          // 勝ち抜き表（2026-10-26 デザイン第8弾）：下の1回戦から上の優勝杯へ登っていく。勝った回戦は金のメダル
+          h('img', { class: 'tournament__trophy', attrs: { src: trophyArt, alt: '', draggable: 'false' } }),
           h(
             'ol',
             { class: 'tournament__bracket' },
@@ -183,7 +194,9 @@ export const tournamentScreen: ScreenDefinition = {
                 { class: `tournament__round${i < active.round ? ' is-won' : i === active.round ? ' is-next' : ''}` },
                 h('span', { class: 'tournament__round-label', text: roundLabel(t, i) }),
                 h('span', { class: 'tournament__round-name' }, opponentFace(r.id, 34), h('span', { text: opponentName(r) })),
-                h('span', { class: 'tournament__round-state', text: i < active.round ? tr('tournament.stateWon') : i === active.round ? tr('tournament.stateNext') : tr('common.none') }),
+                i < active.round
+                  ? h('img', { class: 'tournament__medal', attrs: { src: medalWinArt, alt: tr('tournament.stateWon'), draggable: 'false' } })
+                  : h('span', { class: 'tournament__round-state', text: i === active.round ? tr('tournament.stateNext') : tr('common.none') }),
               ),
             ),
           ),
@@ -203,6 +216,8 @@ export const tournamentScreen: ScreenDefinition = {
         const won = active.status === 'won';
         body.push(
           h('div', { class: `tournament__result${won ? ' is-won' : ''}` },
+            // 優勝＝優勝杯、負け＝ひびの入った盾のメダル（2026-10-26 デザイン第8弾）
+            h('img', { class: `tournament__result-art${won ? ' is-trophy' : ''}`, attrs: { src: won ? trophyArt : medalLoseArt, alt: '', draggable: 'false' } }),
             h('p', { class: 'tournament__result-title', text: tr(won ? 'tournament.won' : 'tournament.lost', { name: tournamentName(t) }) }),
             h('p', { class: 'tournament__result-sub', text: won ? tr('tournament.wonSub') : tr('tournament.lostSub', { round: roundLabel(t, active.round) }) }),
           ),

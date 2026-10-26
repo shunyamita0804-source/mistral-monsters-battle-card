@@ -11,6 +11,7 @@ import { openCardDetail } from '../components/cardDetail.ts';
 import { createCardView } from '../components/cardView.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { coinIcon } from '../components/coinIcon.ts';
+import { rarityBadge } from '../components/rarityBadge.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { button, h } from '../dom.ts';
 import { newId } from '../gameStore.ts';
@@ -18,6 +19,7 @@ import type { ScreenDefinition } from './types.ts';
 import { sound } from '../sound.ts';
 import faceClerk from '@assets/images/characters/face_clerk.webp';
 import pack01Art from '@assets/images/ui/packs/pack_01.webp';
+import packLockedArt from '@assets/images/ui/packs/pack_locked.webp';
 import gachaMachineArt from '@assets/images/ui/gacha_machine.webp';
 import pack02Art from '@assets/images/ui/packs/pack_02.webp';
 import pack03Art from '@assets/images/ui/packs/pack_03.webp';
@@ -189,6 +191,7 @@ export const gachaScreen: ScreenDefinition = {
           h('div', { class: 'pack-open__back' }),
           h('div', { class: 'pack-open__face' }, face),
           h('span', { class: 'pack-open__name', text: card ? cardName(card) : id }),
+          card ? rarityBadge(card.rarity, 22) : null,
           isNew ? h('span', { class: 'pack-open__new', text: t('gacha.new') }) : null,
         );
       });
@@ -219,9 +222,12 @@ export const gachaScreen: ScreenDefinition = {
         return h(
           'div',
           { class: `gacha__pack${unlocked ? '' : ' is-locked'}`, dataset: { id: pack.id } },
-          unlocked && PACK_ART[pack.id]
-            ? h('div', { class: 'gacha__pack-art has-art' }, h('img', { attrs: { src: PACK_ART[pack.id] ?? '', alt: packName(pack), draggable: 'false' } }))
-            : h('div', { class: 'gacha__pack-art', text: unlocked ? packName(pack).replace(/（仮）| \(Temp\)/, '') : '？' }),
+          !unlocked
+            ? // まだ買えないパック：鎖と鍵の絵（2026-10-26 デザイン第8弾）
+              h('div', { class: 'gacha__pack-art has-art' }, h('img', { attrs: { src: packLockedArt, alt: t('gacha.lockedState'), draggable: 'false' } }))
+            : PACK_ART[pack.id]
+              ? h('div', { class: 'gacha__pack-art has-art' }, h('img', { attrs: { src: PACK_ART[pack.id] ?? '', alt: packName(pack), draggable: 'false' } }))
+              : h('div', { class: 'gacha__pack-art', text: packName(pack).replace(/（仮）| \(Temp\)/, '') }),
           h(
             'div',
             { class: 'gacha__pack-info' },

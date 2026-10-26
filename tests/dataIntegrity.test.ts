@@ -34,7 +34,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-myurol',
       ...skillIds('soramo14', all.slice(0, 14)),
       ...lazuck,
-      ...skillIds('gauul', all),
+      ...skillIds('gauul14', all.slice(0, 14)),
       ...skillIds('nobiton', all),
       ...skillIds('myurol', all),
     ]);

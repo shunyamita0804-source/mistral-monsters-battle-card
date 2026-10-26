@@ -12,6 +12,7 @@ import {
   topUpDeck,
   type Deck,
 } from '../deck/deck.ts';
+import { GAUUL_OLD_SKILL_IDS } from '../../data/gauul.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
@@ -23,7 +24,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -242,8 +243,8 @@ function migrateLazuckTestV7(raw: RawObject): RawObject {
  * 古いセーブ・バックアップに残っていても、読み込み時の変換（migrateRemoveCrossGuardV8）で外すので、バックアップの読み込みでは止めない
  */
 const CROSS_GUARD_IDS: readonly string[] = ['skl-lazuck-13'];
-/** ゲームから削除したカードすべて（クロスガード・旧ソラモの16技）。バックアップの読み込みでは止めない */
-export const REMOVED_CARD_IDS: readonly string[] = [...CROSS_GUARD_IDS, ...SORAMO_OLD_SKILL_IDS];
+/** ゲームから削除したカードすべて（クロスガード・旧ソラモの16技・旧ガウルの16技）。バックアップの読み込みでは止めない */
+export const REMOVED_CARD_IDS: readonly string[] = [...CROSS_GUARD_IDS, ...SORAMO_OLD_SKILL_IDS, ...GAUUL_OLD_SKILL_IDS];
 
 /**
  * version 7 → 8（2026-10-24）：クロスガード（skl-lazuck-13）をゲームから削除した。
@@ -292,6 +293,23 @@ function migrateSoramo14V9(raw: RawObject): RawObject {
   return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
 }
 
+/**
+ * version 9 → 10（2026-10-26）：ガウルの技を新しい14技に替えた。旧16技（skl-gauul-01〜16）は所持カードとデッキから外す。
+ * ガウルは初期配布が未確定なので、代わりのカードは配らない。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
+ */
+function migrateGaul14V10(raw: RawObject): RawObject {
+  const removed = new Set(GAUUL_OLD_SKILL_IDS);
+  const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
+  for (const id of removed) delete collection[id];
+  const deck = raw.deck;
+  if (!isObject(deck) || !Array.isArray(deck.skills) || !Array.isArray(deck.monsters)) return { ...raw, collection };
+  const skills = (deck.skills as unknown[]).filter((id) => !(typeof id === 'string' && removed.has(id)));
+  if (skills.length === deck.skills.length) return { ...raw, collection };
+  const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
+  const filled = topUpDeck({ monsters: deck.monsters as string[], skills: skills as string[] }, counts);
+  return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -302,6 +320,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   6: migrateLazuckTestV7,
   7: migrateRemoveCrossGuardV8,
   8: migrateSoramo14V9,
+  9: migrateGaul14V10,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
