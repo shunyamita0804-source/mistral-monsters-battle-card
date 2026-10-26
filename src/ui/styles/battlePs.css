@@ -762,7 +762,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(var(--hand-card-h) + 10px);
+  height: calc(var(--opp-card-h, var(--hand-card-h)) + 10px);
   margin: 0 -10px;
   padding: 4px 10px;
   background: rgb(6 10 20 / 0.35);
@@ -771,7 +771,7 @@
 }
 
 .battle-camera[data-focus='bottom'] .battle-hand--opponent {
-  margin-top: calc((var(--hand-card-h) + 10px) * -0.5);
+  margin-top: calc((var(--opp-card-h, var(--hand-card-h)) + 10px) * -0.5);
 }
 
 .battle-board {
@@ -780,10 +780,10 @@
 
 .battle-hand__back {
   /* 裏面の絵（400×586）の縦横比のまま、自分の手札と同じ高さ（2026-10-25：手札が新UIのほぼ正方形になったので、幅は絵の比率で） */
-  --opp-card-w: calc(var(--hand-card-h) * 400 / 586);
+  --opp-card-w: calc(var(--opp-card-h, var(--hand-card-h)) * 400 / 586);
   flex: none;
   width: var(--opp-card-w);
-  height: var(--hand-card-h);
+  height: var(--opp-card-h, var(--hand-card-h));
   border-radius: 5px;
   background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
   box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
@@ -1056,7 +1056,7 @@
 
 /* 手札：上下の余白とカード名を大きく */
 .battle__hand {
-  min-height: calc(var(--hand-card-h) + 38px);
+  min-height: calc(var(--hand-card-h) + 16px);
   padding: 9px 6px 6px;
 }
 
@@ -1143,26 +1143,18 @@
   animation: flip-cover 240ms linear var(--flip-delay, 0ms) both;
 }
 
-.battle__hand-card.is-dealt .battle__hand-name {
-  animation: flip-face 240ms linear var(--flip-delay, 0ms) both;
-}
-
 @keyframes hand-flip {
   0% { transform: scaleX(1); }
   50% { transform: scaleX(0.04); }
   100% { transform: scaleX(1); }
 }
 
-/* 返す途中（半分）で裏面を消す・名前を出す */
+/* 返す途中（半分）で裏面を消す */
 @keyframes flip-cover {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
 
-@keyframes flip-face {
-  0%, 49% { opacity: 0; }
-  50%, 100% { opacity: 1; }
-}
 
 /* 相手が使ったカード：裏向きのまま、大きなカードの場所へ大きくなりながら飛ぶ（--dx・--dy・--sx・--sy は flyOpponentCard が決める） */
 .battle__opp-fly {
@@ -1224,8 +1216,53 @@
   }
 }
 
-/* 重なっているときは、カードの名前を見えている所（次のカードに隠れていない左側）に収める */
-.battle__hand-card:not(:last-child) .battle__hand-name {
-  align-self: flex-start;
-  width: calc(100% + var(--hand-overlap, 0px));
+/* ===== 2026-10-26 ユーザー指示（2回目）：手札の緑の枠をやめる・名前を消して絵を大きく・相手の情報の欄は右に ===== */
+
+/* 使える手札の緑の枠は安っぽく見えるのでやめる（使えないカードは今までどおり灰色のくもり） */
+.battle__hand-card.is-usable {
+  border-color: transparent;
+}
+
+/* 相手の列は向かい合わせ：モンスター3体の右に情報の欄（自分の列は左） */
+.battle-row--opponent {
+  flex-direction: row-reverse;
+}
+
+/* 相手が使ったカード：相手の場所（相手の手札と列の上）に重ねて大きく見せる。カードを左・説明を右に（PS版の 2P 側と同じ向かい合わせ） */
+.battle-opp-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.battle-opp-spot {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid rgb(168 102 74 / 0.6);
+  background: linear-gradient(180deg, rgb(30 12 14 / 0.96), rgb(12 10 18 / 0.95));
+}
+
+.battle-opp-spot .battle-spot__body {
+  flex-direction: row-reverse;
+}
+
+.battle-opp-spot .battle-spot__card {
+  align-items: center;
+}
+
+.battle-opp-spot .battle-spot__line {
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  padding: 3px 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.battle-opp-spot .battle-spot__info {
+  padding: 6px 8px;
 }

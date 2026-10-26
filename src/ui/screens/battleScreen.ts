@@ -134,9 +134,11 @@ const OFFICIAL_CARD_DETAIL_W = 250;
  * 2026-10-26 ユーザー指示「手札もう少し大きく」で 70→82（入りきらないときは少し重ねる：handRow の --hand-overlap）。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
-const HAND_CARD_W = 82;
+const HAND_CARD_W = 80;
 /** 幅の狭い画面では手札を少し小さくする（下限）。それでも入りきらない分は重ねる */
-const HAND_CARD_MIN_W = 72;
+const HAND_CARD_MIN_W = 70;
+/** 相手の手札（裏向き）の高さを決める幅（2026-10-26 自分の手札を縦長にしたが、相手の裏向きの列は高さを増やさないよう前の大きさのまま） */
+const OPP_HAND_BASE_W = 82;
 /** 小さくするのは、5枚がこの幅だけ重なってもまだ入らないとき（論理px） */
 const HAND_SOFT_OVERLAP = 8;
 /** 手札の列の左右の余白とカードの間（論理px。battlePs.css の .battle__hand と同じ値） */
@@ -146,11 +148,11 @@ const HAND_GAP = 3;
  * フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：名前・絵・効果文の入る大きなカード（battleCard.ts）で 132。
  * 2026-10-26 ユーザー指示「説明の欄はスペースがあるので縮めて」で一度 108 にしたが、同じ日に情報を列の左へ移して欄に余裕ができたので 132 に戻した（演出・守備のカードも 112）
  */
-const DETAIL_CARD_W = 132;
+const DETAIL_CARD_W = 176;
 /**
  * 技の演出で大きく見せるカードの幅。2026-10-26 ユーザー指示「大きく見せて」で 112→150（欄に入りきらないときは fitFocusCards が縮める）
  */
-const SPOT_CARD_W = 150;
+const SPOT_CARD_W = 176;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
 const DEFENSE_ATTACK_W = 112;
 const DEFENSE_CARD_W = 60;
@@ -292,7 +294,8 @@ export const battleScreen: ScreenDefinition = {
     }
     // 手札のカードの大きさ（自分の手札＝表・相手の手札＝裏で同じ値。CSS の --hand-card-w / --hand-card-h）
     element.style.setProperty('--hand-card-w', `${HAND_CARD_W}px`);
-    element.style.setProperty('--hand-card-h', `${battleCardHeight(HAND_CARD_W, 'hand').toFixed(2)}px`);
+    element.style.setProperty('--hand-card-h', `${battleCardHeight(HAND_CARD_W, 'tall').toFixed(2)}px`);
+    element.style.setProperty('--opp-card-h', `${battleCardHeight(OPP_HAND_BASE_W, 'hand').toFixed(2)}px`);
     const save = ctx.store.save;
     const seed = randomSeed();
 
@@ -379,6 +382,8 @@ export const battleScreen: ScreenDefinition = {
     /** カメラを寄せる側：相手が動く・守る＝上、自分が動く・守る＝下、終わったら寄せない */
     const cameraFocus = (s: BattleState): 'top' | 'bottom' | 'none' => {
       if (s.phase === 'ended') return 'none';
+      // 相手の使ったカードを相手の場所で見せている間は上のまま（守備の場面になっても、見せ終わってから下へ）
+      if (spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until) return 'top';
       const side = s.phase === 'defense' && s.pending ? otherSide(s.pending.attacker) : s.active;
       return side === 'opponent' ? 'top' : 'bottom';
     };
@@ -660,20 +665,26 @@ export const battleScreen: ScreenDefinition = {
               : kind;
       // 相手のカード：着くまで隠し、着いたら裏から表へ返す。文字は表に替わってから出す（描き直したときは途中から）
       const arriving = sp.arriveAt !== null && Date.now() < sp.arriveAt + OPP_CARD_FLIP_MS;
+      // 相手のカードは相手の場所（上。相手の手札と列の上に重ねる）で、カードを左・説明を右に（PS版の 2P 側と同じ向かい合わせ）
+      const where = sp.side === 'opponent' ? 'battle-opp-spot' : 'battle-detail';
+      // 「誰が誰に」の1行：自分のカードは上に横長で、相手のカードは説明の列の頭に（カードを場所の高さいっぱいに出すため）
+      const line = h('p', { class: 'battle-spot__line', text: spotlightLine(s, sp) });
+      const inInfo = sp.side === 'opponent';
       const panel = h(
         'div',
         {
-          class: `battle-detail battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}`,
+          class: `${where} battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}`,
           attrs: { role: 'button', 'aria-label': t('battle.spot.skip') },
           on: { click: skipSpotlight },
         },
-        h('p', { class: 'battle-spot__line', text: spotlightLine(s, sp) }),
+        inInfo ? null : line,
         h(
           'div',
           { class: 'battle-spot__body' },
           h(
             'div',
             { class: 'battle-spot__info' },
+            inInfo ? line : null,
             h('p', { class: 'battle-spot__name', text: cardName(card) }),
             h('p', { class: 'battle-spot__power', text: power }),
             h('p', { class: 'battle-spot__desc', text: describePlayCard(card) }),
@@ -1294,6 +1305,8 @@ export const battleScreen: ScreenDefinition = {
             // 新しく引いたカード：山札の方から1枚ずつ来る
             back.classList.add('is-dealt');
             back.style.animationDelay = `${newIndex * DEAL_MS}ms`;
+            // 相手が引くときも同じ音（2026-10-26 ユーザー指示「本当の人間と戦ってるようなイメージ」）
+            sound.deal(newIndex * DEAL_MS);
             newIndex++;
             shownOppHand.add(c.uid);
           }
@@ -1363,8 +1376,10 @@ export const battleScreen: ScreenDefinition = {
 
     const detailPanel = (s: BattleState): HTMLElement => {
       // 技を使った演出の間は、そのカードを大きく（パートC）。相手の攻撃に守れるときは、攻撃のカードの下に守備の選択
-      if (spotlight && Date.now() < spotlight.until) return spotlightPanel(s, spotlight);
-      const defense = defensePanel(s);
+      // 自分の使ったカードだけここで大きく見せる（相手のカードは相手の場所＝上で見せる：opponentSpot）
+      if (spotlight && spotlight.side === 'player' && Date.now() < spotlight.until) return spotlightPanel(s, spotlight);
+      // 守備の選択は、相手のカードを上で見せ終わってから出す（それまでは説明の欄に攻撃の文だけ）
+      const defense = spotlight && Date.now() < spotlight.until ? null : defensePanel(s);
       if (defense) return defense;
       const hand = selectedUid ? s.sides.player.hand.find((c) => c.uid === selectedUid) : undefined;
       const card = hand ? getPlayCard(hand.cardId) : undefined;
@@ -1450,7 +1465,7 @@ export const battleScreen: ScreenDefinition = {
       const slots = Math.max(5, s.sides.player.hand.length);
       const cardW = Math.max(HAND_CARD_MIN_W, Math.min(HAND_CARD_W, Math.floor((room - (slots - 1) * (HAND_GAP - HAND_SOFT_OVERLAP)) / slots) - 4));
       element.style.setProperty('--hand-card-w', `${cardW}px`);
-      element.style.setProperty('--hand-card-h', `${battleCardHeight(cardW, 'hand').toFixed(2)}px`);
+      element.style.setProperty('--hand-card-h', `${battleCardHeight(cardW, 'tall').toFixed(2)}px`);
       // 新しく来たカード：1枚ずつ裏向きで配り、配り終えたら左から1枚ずつ表に返す（時刻を決めて handDeal に覚える）
       const now = Date.now();
       const fresh = s.sides.player.hand.filter((c) => !shownHand.has(c.uid));
@@ -1459,7 +1474,7 @@ export const battleScreen: ScreenDefinition = {
         const deal = { slide: now + i * DEAL_MS, flip: flipFrom + i * HAND_FLIP_STAGGER_MS };
         handDeal.set(c.uid, deal);
         shownHand.add(c.uid);
-        sound.play('cardDraw', deal.slide - now);
+        sound.deal(deal.slide - now);
         sound.play('cardFlip', deal.flip - now + HAND_FLIP_MS / 2);
       }
       if (fresh.length > 0) {
@@ -1510,9 +1525,8 @@ export const battleScreen: ScreenDefinition = {
               },
             },
             isNew
-              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'hand' }), h('span', { class: 'battle__hand-cover' }))
-              : createBattleCard(card, { width: cardW, size: 'hand' }),
-            h('span', { class: 'battle__hand-name', text: cardName(card) }),
+              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'tall' }), h('span', { class: 'battle__hand-cover' }))
+              : createBattleCard(card, { width: cardW, size: 'tall' }),
             picked ? h('span', { class: 'battle__hand-mana' }, h('span', { class: 'battle__hand-mana-text', text: t('card.detail.mana') })) : null,
           );
           if (deal && isNew) {
@@ -1969,8 +1983,15 @@ export const battleScreen: ScreenDefinition = {
       // 2026-10-25 リデザイン（PS版にならう）：上から 手番の帯 → 相手の情報1行 → 相手3体 → 経過1行 → 自分3体 → 自分の情報1行
       // → フォーカスエリア（説明と大きなカード。残りの高さに広がる）→ 手札 → 操作のボタン（横一列）
       camera.dataset.focus = cameraFocus(s);
+      // 相手の手札と列をひとまとめにして、相手が使ったカードはその上に大きく見せる（2026-10-26 ユーザー指示「相手は相手の場所で大きく見せる」）
+      const oppSpot = spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until ? spotlightPanel(s, spotlight) : null;
       lens.replaceChildren(
-        h('div', { class: 'battle-board' }, opponentHand(s), monsterRow(s, 'opponent'), monsterRow(s, 'player')),
+        h(
+          'div',
+          { class: 'battle-board' },
+          h('div', { class: 'battle-opp-zone' }, opponentHand(s), monsterRow(s, 'opponent'), oppSpot),
+          monsterRow(s, 'player'),
+        ),
       );
       replaceView(header(s), qaBar() ?? '', camera, detailPanel(s), hand, commandPanel(s, blocked));
       fitFocusCards();
