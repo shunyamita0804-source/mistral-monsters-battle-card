@@ -1,4 +1,5 @@
 import cardBackUrl from '@assets/images/ui/card_back.webp';
+import deckIconUrl from '@assets/images/ui/battle/icon_deck.webp';
 import { cardCatalog, getMonster, MONSTERS, skillsOf, SUPPORTS } from '../../data/cards.ts';
 import { DECK_RULES } from '../../data/rules.ts';
 import { describePlayCard, effectLabel, categoryLabel, skillCategory, type MonsterCard, type PlayCard } from '../../game/cards/cardTypes.ts';
@@ -189,7 +190,12 @@ export const deckScreen: ScreenDefinition = {
       const team = h(
         'div',
         { class: 'deck-table__row deck-table__row--team' },
-        h('span', { class: 'deck-table__name', text: t('deck.table.team') }),
+        h(
+          'span',
+          { class: 'deck-table__name' },
+          h('img', { class: 'deck-table__icon', attrs: { src: deckIconUrl, alt: '', draggable: 'false' } }),
+          h('span', { class: 'deck-table__label', text: t('deck.table.team') }),
+        ),
         num(all.atk),
         num(all.guard),
         h('span', { class: 'deck-table__num', text: `${all.total}/${DECK_RULES.skillCount}` }),
@@ -265,7 +271,7 @@ export const deckScreen: ScreenDefinition = {
       const preview = h(
         'div',
         { class: 'deck-preview' },
-        monster ? createMonsterCard(monster, { width: 104 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        monster ? createMonsterCard(monster, { width: 88 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
         monster ? info(monster) : h('div', { class: 'deck-preview__info' }, h('p', { class: 'deck-preview__text', text: t('deck.previewEmpty') })),
       );
       const slots = h(
@@ -344,7 +350,7 @@ export const deckScreen: ScreenDefinition = {
       const preview = h(
         'div',
         { class: 'deck-preview' },
-        card && known ? createPlayCard(card, { width: 104 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        card && known ? createPlayCard(card, { width: 92 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
         card && known
           ? h(
               'div',

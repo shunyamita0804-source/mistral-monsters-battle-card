@@ -40,7 +40,7 @@ export const shopMenuScreen: ScreenDefinition = {
     const render = (): void => {
       const save = store.save;
       const fragments = fragmentCount(save);
-      const sell = button(t('shop.sell'), () => undefined, 'shop-menu__item');
+      const sell = button(t('shop.sell'), () => undefined, 'shop-menu__item shop-menu__item--sell');
       sell.disabled = true;
       element.replaceChildren(
         createScreenHeader({ title: t('shop.title'), back: { label: t('common.back'), onTap: () => ctx.back('world') } }),
@@ -54,9 +54,9 @@ export const shopMenuScreen: ScreenDefinition = {
         h(
           'nav',
           { class: 'shop-menu__items' },
-          button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item'),
+          button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item shop-menu__item--browse'),
           h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
-          button(t('shop.gacha'), () => ctx.navigate('gacha'), 'shop-menu__item'),
+          button(t('shop.gacha'), () => ctx.navigate('gacha'), 'shop-menu__item shop-menu__item--gacha'),
           fragments > 0 || save.hiddenRestored ? button(t('shop.restore', { n: fragments, total: FRAGMENT_TOTAL }), () => openRestore(), 'shop-menu__item shop-menu__item--special') : null,
         ),
       );

@@ -106,12 +106,23 @@ import signExitArt from '@assets/images/maps/dungeon/sign_exit.webp';
 import { t, type Params } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName } from '../../i18n/content.ts';
-import { rewardGlow } from '../components/rewardGlow.ts';
+import { itemGetWindow } from '../components/rewardGlow.ts';
+import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
+import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
+import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
+import shardArt from '@assets/images/ui/reward/shard.webp';
+import cardBundleArt from '@assets/images/ui/reward/card_bundle.webp';
+import prizePouchArt from '@assets/images/icons/prize_pouch.webp';
 import { sound, type AmbientId, type StepSurface } from '../sound.ts';
 import type { ScreenContext, ScreenDefinition } from './types.ts';
 
 /** 仮マップ（ダンジョン）の1マスの大きさ（論理px） */
 const TILE = 40;
+/** ダンジョンの帯（階に入った・クリア・ボスの階）を出しておく時間 */
+const BANNER_MS = 2200;
+/** 敵とぶつかったときの光：1コマの時間と、最後に白く光る時間 */
+const ENCOUNTER_FRAME_MS = 110;
+const ENCOUNTER_WHITE_MS = 260;
 /** ダンジョンの床・壁の絵を1回敷く大きさ（論理px。4マス分） */
 const DUNGEON_TEX = 160;
 /** 正式な絵の街：設計図の 1 単位 → 論理px（主人公 108×144 が 61×81 になる） */
@@ -588,12 +599,41 @@ export class WorldView {
     // 確認画面では会話・お知らせを出さない（歩きだけを見る）
     const flash = dev ? null : this.#store.flashMessage;
     const scene = dev ? null : this.#sceneOnLoad();
+    // ダンジョンの帯（2026-10-26 デザイン第10弾）：クリアして街に戻ったとき・階に入ったとき（対戦から戻ったときは出さない）
+    const banner = dev ? null : this.#store.flashBanner;
+    if (banner) {
+      this.#store.flashBanner = null;
+      this.#banner('clear', t('world.bannerClear'));
+    } else if (!dev && !flash && map.area === 'dungeon') {
+      const save = this.#store.save;
+      const dungeon = save.activeDungeon ? getDungeon(save.activeDungeon.dungeonId) : undefined;
+      const boss = map.objects.some((o) => o.type === 'enemy' && o.boss && !save.activeDungeon?.defeatedEnemies.includes(o.id));
+      if (dungeon) this.#banner(boss ? 'boss' : 'floor', t('world.placeDungeon', { dungeon: dungeonName(dungeon), floor: mapName(map) }));
+    }
     if (flash) {
       this.#store.flashMessage = null;
       this.#message(flash, scene ? () => this.#playScene(scene) : undefined);
     } else if (scene) {
       this.#playScene(scene);
     }
+  }
+
+  /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階）。タップの邪魔をしない */
+  #banner(kind: 'floor' | 'clear' | 'boss', text: string): void {
+    const el = h('div', { class: `world__banner world__banner--${kind}`, attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'world__banner-text', text }));
+    this.#root.append(el);
+    setTimeout(() => el.remove(), BANNER_MS);
+  }
+
+  /** 敵とぶつかったときの光（3コマ。光を足す重ね方）。終わったら next */
+  #encounterFlash(next: () => void): void {
+    const img = h('img', { class: 'world__encounter-fx-img', attrs: { src: encounterFx1, alt: '', draggable: 'false' } });
+    const el = h('div', { class: 'world__encounter-fx', attrs: { 'aria-hidden': 'true' } }, img);
+    this.#root.append(el);
+    const frames = [encounterFx2, encounterFx3];
+    frames.forEach((src, i) => setTimeout(() => (img.src = src), (i + 1) * ENCOUNTER_FRAME_MS));
+    setTimeout(() => el.classList.add('is-white'), frames.length * ENCOUNTER_FRAME_MS + ENCOUNTER_FRAME_MS / 2);
+    setTimeout(next, (frames.length + 1) * ENCOUNTER_FRAME_MS + ENCOUNTER_WHITE_MS);
   }
 
   /** 正式な絵の表示倍率。部屋は画面の高さに合わせて大きくする（街の ROOM_ZOOM_MAX 倍まで） */
@@ -1523,7 +1563,11 @@ export class WorldView {
         if (r.collected) {
           this.#store.update(() => r.save);
           sound.play('fragment');
-          this.#message(t('world.fragmentFound', { n: fragmentCount(r.save), total: FRAGMENT_TOTAL }));
+          this.#message(
+            t('world.fragmentFound', { n: fragmentCount(r.save), total: FRAGMENT_TOTAL }),
+            undefined,
+            itemGetWindow(shardArt, t('world.fragmentItem', { n: fragmentCount(r.save), total: FRAGMENT_TOTAL })),
+          );
           return;
         }
       }
@@ -1667,7 +1711,9 @@ export class WorldView {
     sound.play(chest.look === 'wood' ? 'chestOpenWood' : 'chestOpenIron', 280);
     sound.play('reward', 750);
     if (chest.reward.coins > 0) sound.play('coins', 950);
-    this.#message(t('world.chestOpened', { items: parts.join(t('world.rewardSeparator')) }), undefined, rewardGlow(CHEST_ART[chest.look].opening.at(-1) ?? CHEST_ART[chest.look].closed));
+    // 手に入れたときの小窓（2026-10-26 デザイン第10弾）：カードが入っていればカードの束、お金だけなら袋の絵を台座に
+    const icon = chest.reward.cards.length > 0 ? cardBundleArt : prizePouchArt;
+    this.#message(t('world.chestOpened', { items: parts.join(t('world.rewardSeparator')) }), undefined, itemGetWindow(icon, parts.join(t('world.rewardSeparator'))));
   }
 
   #encounter(enemy: EnemyObject): void {
@@ -1696,6 +1742,7 @@ export class WorldView {
           store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesWon: s.stats.battlesWon + 1 } }));
           if (r.cleared) {
             store.update((s) => leaveDungeon(s));
+            store.flashBanner = 'clear';
             store.flashMessage = t(r.firstClear ? 'world.dungeonClearedFirst' : 'world.dungeonCleared', { coins: coins(r.coins) });
           } else {
             store.flashMessage = t('world.victory', { coins: coins(r.coins) });
@@ -1707,7 +1754,10 @@ export class WorldView {
         ctx.reset('world');
       },
     };
-    this.#message(t('world.encounter', { name: opponentName(opponent), monsters: names }), () => ctx.navigate('battle'));
+    this.#message(t('world.encounter', { name: opponentName(opponent), monsters: names }), () => {
+      this.#busy = true;
+      this.#encounterFlash(() => ctx.navigate('battle'));
+    });
   }
 
   /** いまのダンジョンの足音・環境音 */

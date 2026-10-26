@@ -1,0 +1,564 @@
+/*
+ * デザイン第10弾（2026-10-26 納品。原本 design-parts/ui-quality10-20261026/、切り出し tools/design/ui10_build.py）。
+ * 対戦の操作のボタン・対戦の窓の枠・説明の欄の枠・敵とぶつかったときの光・ダンジョンの帯・歩く画面の小物・
+ * 手に入れたときの小窓・カードショップのメニューの札・冒険の記録の板・デッキ編集の部品。絵に文字は入っていない（文字はゲームが重ねる）
+ */
+
+/* ===== 1 対戦の操作のボタン（青＝行う・えんじ＝やめる／終える。ふつう・押した・使えない） ===== */
+.command-btn,
+.battle .command-btn {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/battle/cmd_blue_normal.webp') 44 70 fill / 13px 20px / 0 stretch;
+  background: none;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.45));
+}
+
+.command-btn--cancel,
+.battle .command-btn--cancel {
+  border-image-source: url('@assets/images/ui/battle/cmd_wine_normal.webp');
+  background: none;
+}
+
+.command-btn:not(:disabled):active,
+.battle .command-btn:not(:disabled):active {
+  border-image-source: url('@assets/images/ui/battle/cmd_blue_pressed.webp');
+  transform: none;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.45));
+}
+
+.command-btn--cancel:not(:disabled):active,
+.battle .command-btn--cancel:not(:disabled):active {
+  border-image-source: url('@assets/images/ui/battle/cmd_wine_pressed.webp');
+}
+
+.command-btn:disabled,
+.battle .command-btn:disabled {
+  border-image-source: url('@assets/images/ui/battle/cmd_blue_disabled.webp');
+  filter: none;
+}
+
+.command-btn--cancel:disabled,
+.battle .command-btn--cancel:disabled {
+  border-image-source: url('@assets/images/ui/battle/cmd_wine_disabled.webp');
+}
+
+.command-btn:disabled .command-btn__label {
+  color: rgb(230 226 214 / 0.55);
+}
+
+.command-btn__img,
+.battle .command-btn__img {
+  display: none;
+}
+
+/* ===== 2 対戦の窓の枠（確認・コマンドの一覧・結果） ===== */
+.command-confirm__panel {
+  padding: 32px 24px 26px;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/window_confirm.webp') center / 100% 100% no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.55));
+}
+
+/* コマンドの一覧：下の左寄りの三角（「コマンド」から開いた印）は左下の角に入れて伸ばさない */
+.battle__cmd-list,
+.battle .battle__cmd-list {
+  padding: 4px 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/battle/window_cmdlist.webp') 44 44 58 110 fill / 16px 16px 21px 40px / 0 stretch;
+  background: none;
+  padding-left: 22px;
+}
+
+.battle__result-panel {
+  padding: 18px 20px 22px;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/battle/window_result.webp') center / 100% 100% no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 10px 24px rgb(0 0 0 / 0.6));
+}
+
+/* ===== 3 対戦の説明の欄の枠 ===== */
+.battle-text,
+.battle .battle-text {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/battle/focus_frame.webp') 46 fill / 15px / 0 stretch;
+  background: none;
+  padding: 14px 16px;
+}
+
+/* ===== 4 敵とぶつかったときの光（3コマ。光を足す重ね方。最後に白く光ってから対戦へ） ===== */
+.world__encounter-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.world__encounter-fx-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
+
+.world__encounter-fx::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff8e6;
+  opacity: 0;
+  transition: opacity 240ms ease-in;
+}
+
+.world__encounter-fx.is-white::after {
+  opacity: 1;
+}
+
+/* ===== 5 ダンジョンの帯（階に入った・クリア・ボスの階） ===== */
+.world__banner {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  z-index: 50;
+  width: min(360px, 92%);
+  aspect-ratio: 900 / 191;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16%;
+  background: url('@assets/images/ui/banners/dungeon_floor.webp') center / 100% 100% no-repeat;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: world-banner 2200ms ease-out both;
+}
+
+.world__banner--clear {
+  aspect-ratio: 900 / 163;
+  background-image: url('@assets/images/ui/banners/dungeon_clear.webp');
+}
+
+.world__banner--boss {
+  aspect-ratio: 900 / 180;
+  background-image: url('@assets/images/ui/banners/dungeon_boss.webp');
+}
+
+.world__banner-text {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: #f3ead2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 3px rgb(0 0 0 / 0.95);
+}
+
+.world__banner--clear .world__banner-text {
+  font-size: 18px;
+  color: #f6e2a8;
+}
+
+.world__banner--boss .world__banner-text {
+  color: #ffd9cf;
+}
+
+@keyframes world-banner {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ===== 6 歩く画面の小物（名札・出口の印・操作の案内の札・次への印） ===== */
+.world__label-text {
+  min-width: 56px;
+  padding: 3px 14px 9px;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/hud/label_plate.webp') center / 100% 100% no-repeat;
+  box-shadow: none;
+  color: #fbf3da;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.45));
+}
+
+.world__map--art .world__label--warp .world__label-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 14px 9px;
+  background: url('@assets/images/ui/hud/label_plate.webp') center top / 100% 22px no-repeat;
+}
+
+/* 出口の印：金の矢じりと床の光の輪（名札の下でゆっくり上下） */
+.world__map--art .world__label--warp .world__label-text::after {
+  width: 30px;
+  height: 28px;
+  margin: 2px 0 0;
+  border: 0;
+  background: url('@assets/images/ui/hud/exit_marker.webp') center / contain no-repeat;
+}
+
+.world__hint {
+  max-width: 228px;
+  padding: 9px 16px 9px 60px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/hud/hint_plate.webp') 30 50 30 150 fill / 9px 15px 9px 46px / 0 stretch;
+  background: none;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+/* 会話の「次へ」の印（2コマで上下にはねる） */
+.talk__next,
+.battle__talk-more {
+  width: 18px;
+  height: 13px;
+  font-size: 0;
+  color: transparent;
+  background: url('@assets/images/ui/hud/next_1.webp') center / contain no-repeat;
+}
+
+.talk.is-ready:not(.is-choice) .talk__next,
+.battle__talk-more.is-shown {
+  animation: next-mark 0.8s steps(1, end) infinite;
+}
+
+@keyframes next-mark {
+  0% { background-image: url('@assets/images/ui/hud/next_1.webp'); transform: translateY(0); opacity: 1; }
+  50% { background-image: url('@assets/images/ui/hud/next_2.webp'); transform: translateY(2px); opacity: 1; }
+}
+
+/* ===== 7 手に入れたときの小窓（左の台座に物の絵、後ろに金の光の輪） ===== */
+.item-get {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 600 / 242;
+  margin: 0 auto 4px;
+  background: url('@assets/images/ui/reward/item_window.webp') center / 100% 100% no-repeat;
+}
+
+/* 台座（窓の絵の x 5〜37%）の上 */
+.item-get__pedestal {
+  position: absolute;
+  left: 6%;
+  top: 6%;
+  width: 30%;
+  height: 74%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-get__ring {
+  position: absolute;
+  inset: -12%;
+  background: center / contain no-repeat;
+  animation: item-ring 9s linear infinite;
+}
+
+.item-get__icon {
+  position: relative;
+  max-width: 76%;
+  max-height: 86%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.6));
+}
+
+.item-get__label {
+  position: absolute;
+  left: 41%;
+  right: 6%;
+  top: 18%;
+  bottom: 18%;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+@keyframes item-ring {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-get__ring,
+  .world__banner {
+    animation: none;
+  }
+}
+
+/* ===== 8 カードショップのメニューの札（左に絵、右に文字） ===== */
+.shop-menu__item--browse,
+.shop-menu__item--sell,
+.shop-menu__item--gacha {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 900 / 179;
+  padding: 0 4% 0 31%;
+  border: 0;
+  border-radius: 0;
+  border-image: none;
+  text-align: center;
+  background: url('@assets/images/ui/shop/menu_browse.webp') center / 100% 100% no-repeat;
+  color: #f3ead2;
+  font-size: 17px;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.shop-menu__item--sell {
+  background-image: url('@assets/images/ui/shop/menu_sell.webp');
+}
+
+.shop-menu__item--gacha {
+  background-image: url('@assets/images/ui/shop/menu_gacha.webp');
+}
+
+.shop-menu__item--sell:disabled {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
+/* ===== 9 ベッドの画面の冒険の記録の板 ===== */
+.record-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 900 / 440;
+  background: url('@assets/images/ui/record_board.webp') center / 100% 100% no-repeat;
+  color: #3a2a18;
+}
+
+/* 顔の丸い窓（板の絵の x 10〜33%・y 22〜62%） */
+.record-board__face {
+  position: absolute;
+  left: 10%;
+  top: 21.5%;
+  width: 23%;
+  height: 41%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #2a2f3a;
+}
+
+.record-board__face > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ランクの紋章の小さな丸い台（x 18〜24.5%・y 67〜83%） */
+.record-board__rank {
+  position: absolute;
+  left: 21.3%;
+  top: 75%;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+
+/* 右の5行（丸い台 x 40.5〜44.5%、行の中心 y 24・37・51・64.5・78%） */
+.record-board__rows {
+  position: absolute;
+  left: 40%;
+  right: 7%;
+  top: 17.5%;
+  bottom: 15%;
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  margin: 0;
+}
+
+.record-board__row {
+  display: grid;
+  grid-template-columns: 6.5% 42% 1fr;
+  align-items: center;
+  gap: 0 4%;
+  min-width: 0;
+}
+
+.record-board__icon {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.record-board__row dt {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  color: #6a5236;
+  white-space: nowrap;
+}
+
+.record-board__row dd {
+  margin: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ===== 10 デッキ編集の部品（表の行・見出し・大きなカードの台・モンスターの枠） ===== */
+.deck-table {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+}
+
+/* 行の板（x 1.5〜11.5% に丸い窓、x 65〜74.5・76〜85.5・87〜97% に数字のくぼみ） */
+.deck-table__head,
+.deck-table__row {
+  grid-template-columns: 64% 11% 11% 11%;
+  gap: 0;
+  padding: 0 3% 0 1.5%;
+}
+
+.deck-table__head {
+  height: auto;
+  aspect-ratio: 900 / 63;
+  background: url('@assets/images/ui/deck/head.webp') center / 100% 100% no-repeat;
+  color: #e9dcbf;
+}
+
+.deck-table__row {
+  min-height: 0;
+  aspect-ratio: 900 / 108;
+  border: 0;
+  background: url('@assets/images/ui/deck/row.webp') center / 100% 100% no-repeat;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.deck-table__row--team,
+button.deck-table__row:active {
+  background-image: url('@assets/images/ui/deck/row_selected.webp');
+}
+
+.deck-table__name {
+  gap: 10px;
+}
+
+.deck-table__name .battle-portrait,
+.deck-table__name .deck__support-icon,
+.deck-table__icon {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.deck-table__icon {
+  flex: none;
+  padding: 4px;
+  object-fit: contain;
+}
+
+.deck-table__row--team .deck-table__num:last-child {
+  font-size: 12px;
+}
+
+/* 大きなカードの台（左の 5〜31% にカード、右の 34〜96% の紙に説明） */
+.deck-preview {
+  position: relative;
+  display: block;
+  min-height: 0;
+  aspect-ratio: 720 / 351;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/deck/stand.webp') center / 100% 100% no-repeat;
+}
+
+.deck-preview > .monster-card,
+.deck-preview > .skill-card,
+.deck-preview > .support-card,
+.deck-preview > .deck-preview__back,
+.deck-preview > :first-child {
+  position: absolute;
+  left: 18%;
+  top: 51%;
+  transform: translate(-50%, -50%);
+}
+
+.deck-preview__back {
+  width: 84px;
+  opacity: 0.85;
+}
+
+.deck-preview__info {
+  position: absolute;
+  left: 36%;
+  right: 6%;
+  top: 11%;
+  bottom: 11%;
+  max-height: none;
+  color: #3a2a18;
+}
+
+.deck-preview__name {
+  color: #2a1d10;
+}
+
+.deck-preview__meta {
+  color: #7a4f1c;
+}
+
+.deck-preview__text {
+  color: #4a3a28;
+}
+
+/* モンスターの3つの枠（上の縁の真ん中の札に番号） */
+.deck__slots {
+  justify-items: center;
+}
+
+.deck__slot {
+  position: relative;
+  width: 100%;
+  max-width: 96px;
+  aspect-ratio: 200 / 273;
+  justify-content: center;
+  padding: 12% 6% 6%;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/deck/slot.webp') center / 100% 100% no-repeat;
+}
+
+.deck__slot.is-selected {
+  background: url('@assets/images/ui/deck/slot_selected.webp') center / 100% 100% no-repeat;
+}
+
+.deck__slot-no {
+  position: absolute;
+  left: 50%;
+  top: 1%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #f3ead2;
+  white-space: nowrap;
+}
+
+.deck__slot-name {
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}

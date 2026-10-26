@@ -35,6 +35,8 @@ export const WORLD = {
 
   // しらべる・宝箱・欠片
   'world.nothingHere': { ja: '特に何もない。', en: 'Nothing special here.' },
+  'world.fragmentItem': { ja: '不思議な欠片 {n}/{total}', en: 'Mysterious Shard {n}/{total}' },
+  'world.bannerClear': { ja: 'ダンジョン クリア！', en: 'Dungeon Cleared!' },
   'world.fragmentFound': {
     ja: '不思議な欠片を見つけた！（{n}/{total}）\n10個集めるとショップで特別な復元ができるらしい。',
     en: 'Found a Mysterious Shard! ({n}/{total})\nThey say collecting 10 lets the shop do a special restoration.',

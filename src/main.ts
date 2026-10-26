@@ -12,6 +12,7 @@ import './ui/styles/walkLab.css';
 import './ui/styles/battlePs.css';
 import './ui/styles/uiParts8.css';
 import './ui/styles/uiParts9.css';
+import './ui/styles/uiParts10.css';
 import { startApp } from './ui/app.ts';
 
 const root = document.querySelector<HTMLElement>('#app');
