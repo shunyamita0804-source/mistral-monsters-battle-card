@@ -1,35 +1,37 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
-import officialSkills from './official/gauul_cards_OFFICIAL_20261024.json';
+import gaul14 from './official/gaul14_skills_OFFICIAL_20261026.json';
 import themeColors from './official/monster_theme_colors.json';
-import { evadeFromCriteria, officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
-import { evasionUpdatesOf } from './soramo.ts';
+import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
- * 【正式データ】ガウルの技カード16種（2026-10-24 ユーザー承認。Seimon_Claude_Gaul16_RazukSoramoPatch_20261024_CONTROL）。
+ * 【正式データ】ガウルの技カード14種（2026-10-26 ユーザー確定。Gaul_Implementation_Ver2_Claude「ガウル全14技・最終実装パック」）。
  *
- * 正本は src/data/official/gauul_cards_OFFICIAL_20261024.json（届いた 02_GAUL_FINAL.json を無改変で置いた）。
- * 技名・マナ・ダメージ・種別・効果テキスト・初期/収集の区分は、ここで書き換えずに JSON からそのまま読む。
- * 回避（14〜16）の条件は evasion_LATEST_20261024.json から。
+ * 正本は届いた 02_SKILL_DATA/Gaul_14Skills_UTF8.json（無改変で src/data/official/gaul14_skills_OFFICIAL_20261026.json に置いた。
+ * CSV も同じフォルダに無改変）。ZIP の中身はすべて design-parts/cards-original/gaul14-20261026/ に無改変で保管。
+ * 技名・分類・マナ・ダメージ・効果の文は、ここで書き換えずに JSON からそのまま読む（tests/gauul.test.ts で CSV とも照合）。
  *
- * ゲーム内 ID とデザイン ID の対応（docs/card-data-policy.md にも記録）：
- *   mon-gauul＝ガウル（キー gauul はそれまで登録のみにしていたモンスターカード・枠色のもの）、skl-gauul-01〜16＝GAU-SK-01〜16（番号は同じ）
- * 絵：技 gau_sk_01〜16.webp（原本 PNG は design-parts/cards-original/gauul/ に無改変。縦横比を変えずに幅 827 へ縮めただけ。
- *   原本は 1178×1335 がほとんどで 07・11・13 は 1182×1330、10 は 1179×1334 のため、高さは 931〜937）
+ * ゲーム内 ID：skl-gauul14-01〜14（JSON の id gaul_skill_01〜14 はデザイン ID として持つ）。モンスターは mon-gauul のまま。
+ * 旧16技（skl-gauul-01〜16。2026-10-24）とは番号を流用しない。旧16技はゲームから外し、古いセーブからも外す（saveData.ts の version 10）
+ * 絵：gau14_sk_01〜14.png（届いた 827×937 の PNG を1バイトも変えずに置いた。名前だけ素材の命名規則に合わせた）
+ * 枠：技カード新UI（v5）のガウルの色（オレンジ。monster_theme_colors.json の gauul）
  *
  * まだ決まっていないこと（独断で決めない）：
- * - レアリティ・正式英語・配る枚数・パック・敵の編成（スターター・相手の編成にもまだ入れていない）
- * - 09 熱風の威嚇の「次回」の細かい裁定（下の SPECIAL_EFFECTS）
+ * - 初期配布の枚数（JSON の starter_copies は null＝未確定。0枚と決めたわけではない）。スターター・パック・相手の編成にもまだ入れていない
+ * - レアリティ・正式英語
  */
 export const GAUUL_MONSTER_ID = 'mon-gauul';
-export const gauulSkillId = (no: number): string => `skl-gauul-${twoDigits(no)}`;
+export const gauulSkillId = (no: number): string => `skl-gauul14-${twoDigits(no)}`;
 
-/** ガウルのモンスターカード（それまで src/data/registeredMonsters.ts に登録のみにしていた正式カード）。ライフ 6・内部ランク C（画面に出さない） */
+/** 旧16技のゲーム内 ID（2026-10-26 に新しい14技へ置き換え。古いセーブから外すのに使う） */
+export const GAUUL_OLD_SKILL_IDS: readonly string[] = Array.from({ length: 16 }, (_, i) => `skl-gauul-${twoDigits(i + 1)}`);
+
+/** ガウルのモンスターカード。ライフ 6 は正式カードの絵に書かれた値（2026-10-24 の正式データと同じ）・内部ランク C（画面に出さない） */
 export const GAUUL_MONSTER: MonsterCard = {
   kind: 'monster',
   id: GAUUL_MONSTER_ID,
-  name: officialSkills.name_ja,
+  name: 'ガウル',
   rarity: null,
-  life: officialSkills.monster_life,
+  life: 6,
   themeColor: themeColors.monsters.gauul.hex,
   description: 'ガウル（モンスターランクC）。',
   isPlaceholder: false,
@@ -38,35 +40,72 @@ export const GAUUL_MONSTER: MonsterCard = {
   pendingSpec: ['rarity'],
 };
 
+/** 届いた JSON の1行 */
+export interface Gaul14Row {
+  readonly id: string;
+  readonly number: number;
+  readonly monster: string;
+  readonly name: string;
+  readonly category: string;
+  readonly mana: number;
+  readonly damage: number | null;
+  readonly effect: string;
+  readonly image: string;
+  /** null＝未確定（0枚ではない） */
+  readonly starter_copies: number | null;
+  readonly sha256: string;
+}
+
+export const GAUL14_ROWS: readonly Gaul14Row[] = gaul14;
+
+/** JSON の分類 → ゲームの種別 */
+const CATEGORY: Readonly<Record<string, string>> = { strength: 'force', intelligence: 'wisdom', special: 'special', defense: 'defense', dodge: 'evade' };
+
 /**
- * 効果テキストのある技の、ゲームでの動き（効果テキストの文は書き換えず、動きだけをここで表す）。
- * - GAU-SK-09 熱風の威嚇「次回のかしこさ技ダメージ−1」：その相手が次にかしこさの技を使うときに1減らして消える。
- *   使わなくても、相手の次のターンが終われば消える（2026-10-24 ユーザー決定「次のターンまで」）。
- *   【要仕様確定】重ねがけはしない（2回目も −1 のまま、期限だけ新しく）
+ * 効果の文のある技の、ゲームでの動き（効果の文は書き換えず、動きだけをここで表す）。
+ * - 09 聖なる炎「回避されない」：どの回避でも避けられない（条件の合う回避でも不可）。防御は使える（いままでの「回避されない」と同じ）
+ * - 10 威嚇「相手モンスター1体は、次の攻撃を行えない」：ソラモのすなかけと同じ動き（選んだ1体は、持ち主の次の手番に攻撃の技を使えない）
+ * - 11 翼の盾：ちから技−3。12 炎の壁：ちから技・かしこさ技−3（0未満にならない）
+ * - 13 上に飛ぶ：攻撃カードの必要マナが2以上のちから・かしこさ技を回避。14 高速飛行：ちから・かしこさ技を回避（条件なし）
  */
 const SPECIAL_EFFECTS: Readonly<Record<string, SkillEffect>> = {
-  'GAU-SK-03': { type: 'attack', undodgeable: true },
-  'GAU-SK-08': { type: 'attack', undodgeable: true },
-  'GAU-SK-09': { type: 'weaken', stat: 'wisdom', amount: 1, duration: 'nextUseByNextTurn' },
-  'GAU-SK-11': { type: 'defense', reduce: 3, against: 'force' },
-  'GAU-SK-12': { type: 'defense', reduce: 3, against: 'wisdom' },
-  'GAU-SK-13': { type: 'defense', reduce: 3, against: 'all' },
+  gaul_skill_09: { type: 'attack', undodgeable: true },
+  gaul_skill_10: { type: 'seal' },
+  gaul_skill_11: { type: 'defense', reduce: 3, against: 'force' },
+  gaul_skill_12: { type: 'defense', reduce: 3, against: 'all' },
+  gaul_skill_13: { type: 'evade', against: 'all', minCost: 2 },
+  gaul_skill_14: { type: 'evade', against: 'all' },
 };
 
-export const GAUUL_SKILLS: readonly SkillCard[] = (officialSkills.skill_cards as readonly OfficialSkill[]).map((o) => {
-  const u = evasionUpdatesOf('gauul').find((x) => x.skill_number === o.number);
-  if (u && (u.name_ja !== o.name_ja || u.mana !== o.mana || u.effect_text_ja !== o.effect_text_ja)) {
-    throw new Error(`ガウルの回避の条件が技のデータと合いません: ${o.design_id}`);
-  }
-  return officialSkill(
-    o,
-    {
-      label: 'ガウル',
-      monsterId: GAUUL_MONSTER_ID,
-      skillId: gauulSkillId,
-      artFile: (no) => `gau_sk_${twoDigits(no)}.webp`,
-      specialEffects: SPECIAL_EFFECTS,
-    },
-    u ? { effect: evadeFromCriteria(u.against, u.min_incoming_attack_required_mana) } : {},
-  );
-});
+function toOfficial(row: Gaul14Row): OfficialSkill {
+  const category = CATEGORY[row.category];
+  if (!category) throw new Error(`ガウルの技の分類が不明です: ${row.id} ${row.category}`);
+  return {
+    design_id: row.id,
+    number: row.number,
+    name_ja: row.name,
+    mana: row.mana,
+    damage: row.damage,
+    category,
+    effect_text_ja: row.effect === '' ? null : row.effect,
+    // 初期配布が未確定（null）のあいだは区分を出さない（ミュロルと同じ）
+    ...(row.starter_copies !== null ? { availability: row.starter_copies > 0 ? 'initial' : 'collect' } : {}),
+  };
+}
+
+/** 技の絵のファイル名（assets/images/cards/skills/）。JSON の image（01_SKILL_IMAGES/Gaul_Skill_NN.png）の番号どおり */
+export function gaulArtFile(row: Gaul14Row): string {
+  const no = /Gaul_Skill_(\d{2})\.png$/.exec(row.image)?.[1];
+  if (!no || Number(no) !== row.number) throw new Error(`ガウルの技の絵の番号が合いません: ${row.id} ${row.image}`);
+  return `gau14_sk_${no}.png`;
+}
+
+export const GAUUL_SKILLS: readonly SkillCard[] = GAUL14_ROWS.map((row) =>
+  officialSkill(toOfficial(row), {
+    label: 'ガウル',
+    monsterId: GAUUL_MONSTER_ID,
+    skillId: gauulSkillId,
+    artFile: () => gaulArtFile(row),
+    specialEffects: SPECIAL_EFFECTS,
+  }),
+);

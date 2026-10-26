@@ -56,7 +56,7 @@
 | LAZ-SK-01〜16 | `skl-lazuck-01`〜`skl-lazuck-16`（番号は同じ） | ひっかき〜ミラージュダッシュ |
 | （なし） | `skl-lazuck-itazura` | いたずら（2026-10-24 新規。番号の ID と取り違えないよう名前の ID） |
 | （モンスター） | `mon-gauul` | ガウル（ライフ6。2026-10-24 に技が届き、登録のみから正式へ） |
-| GAU-SK-01〜16 | `skl-gauul-01`〜`skl-gauul-16`（番号は同じ） | つつく〜灼熱の飛翔 |
+| gaul_skill_01〜14 | `skl-gauul14-01`〜`skl-gauul14-14`（番号は同じ） | つつく〜高速飛行（2026-10-26。旧16技 `skl-gauul-01〜16` はゲームから外した） |
 | （モンスター） | `mon-nobiton` | ノビトン（ライフ8。2026-10-25 に技16種と一緒に届き、正式へ） |
 | NOB-SK-01〜16 | `skl-nobiton-01`〜`skl-nobiton-16`（番号は同じ） | はなビンタ〜必死によける |
 | （モンスター） | `mon-myurol` | ミュロル（ライフ7。2026-10-25 に技16種が届き、正式へ。モンスターカードの絵はまだ無い） |
@@ -98,6 +98,17 @@
   配る枚数・パック・価格・敵の編成（ガウルと同じく、スターター・パック・相手の編成には入れていない。QA の「全カード」で手に入る）
 - 効果の裁定（要仕様確定）は `docs/battle-rules.md`「正式カード（ノビトン）」
 
+### 2026-10-26：ガウル14技（Gaul_Implementation_Ver2_Claude「ガウル全14技・最終実装パック」）
+
+- ZIP の中身はすべて `design-parts/cards-original/gaul14-20261026/` に無改変で保管（参考用の2枚 `05_REFERENCE/` もそのまま。ゲームでは読まない）
+- JSON・CSV は無改変で `src/data/official/gaul14_skills_OFFICIAL_20261026.{json,csv}`。ゲームはこの JSON を読む（`src/data/gauul.ts`）
+- 絵は届いた 827×937 の PNG を1バイトも変えずに `assets/images/cards/skills/gau14_sk_01〜14.png`
+- 技カード新UI（v5）の枠はガウルの色（オレンジ `#E68A46`）を新しく作った（`frame_{normal,hand}_{分類}_gauul.png`。`tools/art/skillcard_v5_monster_color.py … soramo=#E4D2AC gauul=#E68A46`。ソラモ・分類の色の枠は1バイトも変わらない）
+- 旧16技はゲームから外した：カードの一覧・絵（`gau_sk_NN.webp`）・原本（`design-parts/cards-original/gauul/`）・`gauul_cards_OFFICIAL_20261024.json` を削除（git の履歴にある）。
+  セーブは version 10 で所持・デッキから外す（`migrateGaul14V10`。代わりのカードは配らない。デッキの抜けた分は持っているカードで埋め、足りなければ足りないまま）。古いバックアップも読める（`REMOVED_CARD_IDS`）
+- 初期配布（`starter_copies`）は null＝**未確定**。0枚とは扱わず、区分（初期・収集）を持たせない。スターター・パック・相手の編成には入れていない（QA の「全カード」で手に入る）
+- 英語：ガウル14技の技名・効果は Claude の仮訳
+
 ### 2026-10-24 の改訂（Seimon_Claude_Gaul16_RazukSoramoPatch_20261024_CONTROL）
 
 - 届いた JSON は無改変で `src/data/official/` に置いた：`gauul_cards_OFFICIAL_20261024.json`（ガウル16技）・`lazuck_cards_LATEST_20261024.json`（ラズックの新しい並びと性能）・
@@ -107,7 +118,7 @@
 - **旧13 クロスガード（`skl-lazuck-13`）はゲームから削除**（2026-10-24 ユーザー決定）。カードの一覧から外し、セーブは version 8 で所持・デッキから外す
   （`migrateRemoveCrossGuardV8`。デッキの抜けた分は持っているカードで埋め、足りなければ足りないまま＝デッキ編集で直す。代わりのカードは配らない）。
   古いバックアップに入っていても止めずに読み込む（`REMOVED_CARD_IDS`）。元の JSON と絵 `laz_sk_13.webp` は記録として残す
-- ガウルの技の絵：原本 PNG 16枚を `design-parts/cards-original/gauul/` に無改変で保管（SHA-256 の照合表も）。ゲーム用は `tools/art/card_art_webp.py` で縦横比を変えずに幅 827 に縮めた WebP（`gau_sk_NN.webp`）。
+- （2026-10-26 にガウル14技へ置き換え、以下の旧16技の絵・原本は削除）ガウルの技の絵：原本 PNG 16枚を `design-parts/cards-original/gauul/` に無改変で保管（SHA-256 の照合表も）。ゲーム用は `tools/art/card_art_webp.py` で縦横比を変えずに幅 827 に縮めた WebP（`gau_sk_NN.webp`）。
   ラズックのいたずらは原本 JPEG（`design-parts/cards-original/lazuck/`。PNG ではない）から `laz_sk_itazura.webp`
 - 技の絵は `object-fit: contain` で全体を入れる（ガウルの原本は縦横比がわずかに違うものがあるため）
 - ガウルはパック・スターター・相手の編成に入れていない（配る枚数・敵の編成は未定）。QA の「全カード」で手に入り、デッキに組める

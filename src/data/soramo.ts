@@ -1,7 +1,6 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 import soramo14 from './official/soramo14_skills_OFFICIAL_20261025.json';
-import evasionLatest from './official/evasion_LATEST_20261024.json';
 import themeColors from './official/monster_theme_colors.json';
 
 /**
@@ -121,16 +120,3 @@ export const SORAMO_STARTER: readonly { readonly id: string; readonly copies: nu
  * 正式な相手の編成は未定
  */
 export const SORAMO_TEAM: readonly string[] = [SORAMO_MONSTER_ID, SORAMO_MONSTER_ID, SORAMO_MONSTER_ID];
-
-/** 承認された回避の改訂（2026-10-24。正本 evasion_LATEST_20261024.json を無改変で置いた）。そのモンスターの分（いまはガウルが使う） */
-export interface EvasionUpdate {
-  readonly monster: string;
-  readonly skill_number: number;
-  readonly name_ja: string;
-  readonly mana: number;
-  readonly effect_text_ja: string;
-  readonly against: readonly string[];
-  readonly min_incoming_attack_required_mana: number | null;
-}
-export const evasionUpdatesOf = (monster: string): readonly EvasionUpdate[] =>
-  (evasionLatest.updates as readonly EvasionUpdate[]).filter((u) => u.monster === monster);
