@@ -51,7 +51,11 @@ export function startApp(root: HTMLElement, store: GameStore = GameStore.fromBro
   const show = (id: ScreenId): void => {
     current?.destroy?.();
     // セーブがない状態で遊ぶ画面に来たらタイトルへ（設定はセーブがなくても開ける）
-    const target: ScreenId = !store.hasSave && !NO_SAVE_SCREENS.includes(id) ? 'title' : id;
+    let target: ScreenId = !store.hasSave && !NO_SAVE_SCREENS.includes(id) ? 'title' : id;
+    // ランダム生成のダンジョンの挑戦中（中断して再開したときも）は、歩行画面の代わりにダンジョンの画面（同じ階・同じ位置から）
+    if (target === 'world' && store.hasSave && store.save.dungeonRun) target = 'dungeonRun';
+    // 挑戦が終わっていれば（クリア・戻された）歩行画面へ
+    if (target === 'dungeonRun' && (!store.hasSave || !store.save.dungeonRun)) target = store.hasSave ? 'world' : 'title';
     const screen = SCREENS[target];
     current = screen.create(context);
     stage.element.dataset.screen = target;

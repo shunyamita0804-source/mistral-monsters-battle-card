@@ -2,6 +2,7 @@ import type { ScreenId } from '../../config/screens.ts';
 import { battleScreen } from './battleScreen.ts';
 import { cardListScreen, collectionScreen } from './collectionScreens.ts';
 import { deckScreen } from './deckScreen.ts';
+import { dungeonRunScreen } from './dungeonRunScreen.ts';
 import { dungeonSelectScreen } from './dungeonSelectScreen.ts';
 import { newGameScreen } from './newGameScreen.ts';
 import { optionsScreen } from './optionsScreen.ts';
@@ -27,6 +28,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   cardList: cardListScreen,
   gacha: gachaScreen,
   dungeonSelect: dungeonSelectScreen,
+  dungeonRun: dungeonRunScreen,
   tournament: tournamentScreen,
   battle: battleScreen,
   settings: settingsScreen,

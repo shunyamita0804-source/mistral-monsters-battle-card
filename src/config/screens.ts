@@ -14,6 +14,8 @@ export const SCREEN_IDS = [
   'cardList',
   'gacha',
   'dungeonSelect',
+  /** ランダム生成のダンジョン（2026-10-26 試作。挑戦中は 'world' の代わりにこの画面を開く） */
+  'dungeonRun',
   'tournament',
   'battle',
   'settings',

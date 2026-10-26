@@ -1,0 +1,387 @@
+/*
+ * ランダム生成のダンジョンの画面（2026-10-26 試作。src/ui/screens/dungeonRunScreen.ts）。
+ * 1マス 48px。床・壁・階段・しるしの絵は歩行画面のダンジョンと同じ（assets/images/maps/dungeon/）。
+ * 見ていないマスは真っ黒、見たマスは暗め、いま見えているマス（自分と隣）は明るい
+ */
+.screen.drun {
+  display: block;
+  background: #000;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 画面の下の操作の欄の高さ */
+.drun {
+  --drun-controls-h: 224px;
+}
+
+.drun__view {
+  position: absolute;
+  inset: 0 0 var(--drun-controls-h) 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.drun__world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.drun__tile {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: #000;
+}
+
+.drun__tile--floor.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)),
+    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun__tile--floor.is-lit {
+  background:
+    linear-gradient(rgb(255 236 200 / 0.1), rgb(255 236 200 / 0.1)),
+    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun__tile--wall.is-seen {
+  background:
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun__tile--wall.is-lit {
+  background:
+    linear-gradient(rgb(6 7 10 / 0.55), rgb(6 7 10 / 0.55)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+/* 下が床の壁：壁の正面の帯を下の方に重ねる */
+.drun__tile--face.is-seen {
+  z-index: 1;
+  background:
+    linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.55)),
+    url('@assets/images/maps/dungeon/dungeon_wall_face.webp') var(--tx, 0) 100% / 210px 38px repeat-x,
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun__tile--face.is-lit {
+  background:
+    url('@assets/images/maps/dungeon/dungeon_wall_face.webp') var(--tx, 0) 100% / 210px 38px repeat-x,
+    linear-gradient(rgb(6 7 10 / 0.55), rgb(6 7 10 / 0.55)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun__tile--stairs.is-seen::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: url('@assets/images/maps/dungeon/stairs_down.webp') center / contain no-repeat;
+  opacity: 0.55;
+}
+
+.drun__tile--stairs.is-lit::after {
+  opacity: 1;
+}
+
+/* 置いてあるもの（バトラー・ボス・宝箱）。見たマスにあれば暗めに、見えていれば明るく */
+.drun__entity {
+  position: absolute;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  filter: brightness(0.5);
+}
+
+.drun__entity.is-lit {
+  filter: none;
+}
+
+.drun__entity--npc {
+  background: url('@assets/images/maps/dungeon/enemy_symbol.webp') center bottom / contain no-repeat;
+  scale: 1.15;
+}
+
+.drun__entity--boss {
+  background: url('@assets/images/maps/dungeon/boss_symbol.webp') center bottom / contain no-repeat;
+  scale: 1.7;
+}
+
+.drun__entity--chest {
+  background: url('@assets/images/maps/dungeon/chest_01_base.webp') center 70% / 82% auto no-repeat;
+}
+
+.drun__entity--chest.is-open {
+  background-image: url('@assets/images/maps/dungeon/chest_01_anim_04.webp');
+}
+
+/* 自分のまわりだけ明るい（たいまつの明かり） */
+.drun__light {
+  position: absolute;
+  inset: 0 0 var(--drun-controls-h) 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgb(0 0 0 / 0) 70px, rgb(0 0 0 / 0.3) 140px, rgb(0 0 0 / 0.72) 280px);
+}
+
+.drun__player {
+  position: absolute;
+  z-index: 4;
+  width: 60px;
+  height: 70px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+}
+
+/* 見えない番人の気配：画面の端が紫に脈打って揺れる */
+.drun__omen-edge {
+  position: absolute;
+  inset: -6px -6px calc(var(--drun-controls-h) - 6px) -6px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: inset 0 0 70px 18px rgb(120 30 170 / 0.85);
+  transition: opacity 300ms ease-out;
+}
+
+.drun.is-omen .drun__omen-edge {
+  opacity: 1;
+  animation:
+    drun-omen-pulse 1100ms ease-in-out infinite,
+    drun-omen-shake 380ms steps(2) infinite;
+}
+
+@keyframes drun-omen-pulse {
+  0%, 100% { box-shadow: inset 0 0 50px 10px rgb(120 30 170 / 0.6); }
+  50% { box-shadow: inset 0 0 90px 26px rgb(150 40 200 / 0.95); }
+}
+
+@keyframes drun-omen-shake {
+  0% { transform: translate(-3px, 1px); }
+  25% { transform: translate(3px, -2px); }
+  50% { transform: translate(-2px, -1px); }
+  75% { transform: translate(2px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.drun__omen-mark {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -100%);
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffe14a;
+  text-shadow: 0 0 2px #000, 0 2px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 -2px 0 #000;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.drun__omen-mark.is-on {
+  animation: drun-mark 900ms ease-out both;
+}
+
+@keyframes drun-mark {
+  0% { opacity: 0; transform: translate(-50%, -60%) scale(0.4); }
+  18% { opacity: 1; transform: translate(-50%, -110%) scale(1.25); }
+  32% { transform: translate(-50%, -100%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 上の札（場所・負けた回数・手に入れた枚数） */
+.drun__hud {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 124px;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.drun__place {
+  margin: 0;
+  max-width: 100%;
+  padding: 6px 22px 7px;
+  overflow: hidden;
+  background: url('@assets/images/ui/hud/place_plate.webp') center / 100% 100% no-repeat;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: #f3ead2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.drun__chips {
+  display: flex;
+  gap: 6px;
+}
+
+.drun__chip {
+  padding: 3px 10px;
+  border: 1px solid rgb(216 184 106 / 0.6);
+  border-radius: 999px;
+  background: rgb(10 8 6 / 0.72);
+  font-size: 12px;
+  font-weight: 700;
+  color: #f3ead2;
+}
+
+/* 右上の地図（35×35 マス × 3px） */
+.drun__minimap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 7;
+  width: 105px;
+  height: 105px;
+  padding: 3px;
+  border: 1px solid rgb(216 184 106 / 0.7);
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.6);
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* 下の操作の欄：十字キー（左）と A・B（右） */
+.drun__controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  height: var(--drun-controls-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px 18px;
+  border-top: 2px solid #5a4a30;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.04), rgb(0 0 0 / 0.25)),
+    #1d1a16;
+  box-shadow: 0 -4px 12px rgb(0 0 0 / 0.6);
+}
+
+.drun__pad {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.drun__pad-cross {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(#34302a, #2a2722) center / 54px 100% no-repeat,
+    linear-gradient(#34302a, #2a2722) center / 100% 54px no-repeat;
+  filter: drop-shadow(0 3px 0 #0c0b09) drop-shadow(0 0 1px #6d6150);
+  border-radius: 8px;
+}
+
+.drun__pad-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 11px solid transparent;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.drun__pad-arrow--up { left: 69px; top: 12px; border-bottom: 15px solid #cfc4ad; border-top-width: 0; }
+.drun__pad-arrow--down { left: 69px; bottom: 12px; border-top: 15px solid #cfc4ad; border-bottom-width: 0; }
+.drun__pad-arrow--left { top: 69px; left: 12px; border-right: 15px solid #cfc4ad; border-left-width: 0; }
+.drun__pad-arrow--right { top: 69px; right: 12px; border-left: 15px solid #cfc4ad; border-right-width: 0; }
+
+.drun__pad-arrow.is-on {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px #ffd76a);
+}
+
+.drun__pad-arrow--up.is-on { border-bottom-color: #ffd76a; }
+.drun__pad-arrow--down.is-on { border-top-color: #ffd76a; }
+.drun__pad-arrow--left.is-on { border-right-color: #ffd76a; }
+.drun__pad-arrow--right.is-on { border-left-color: #ffd76a; }
+
+.drun__ab {
+  position: relative;
+  width: 160px;
+  height: 150px;
+}
+
+.drun__btn {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border: 0;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #fff3dc;
+  text-shadow: 0 2px 2px rgb(0 0 0 / 0.7);
+  box-shadow: 0 5px 0 #0c0b09, inset 0 2px 3px rgb(255 255 255 / 0.25);
+  touch-action: manipulation;
+}
+
+.drun__btn:active {
+  translate: 0 3px;
+  box-shadow: 0 2px 0 #0c0b09, inset 0 2px 3px rgb(255 255 255 / 0.25);
+}
+
+.drun__btn--a {
+  right: 0;
+  top: 8px;
+  background: radial-gradient(circle at 40% 35%, #c2443b, #7d2019);
+}
+
+.drun__btn--b {
+  left: 4px;
+  bottom: 14px;
+  background: radial-gradient(circle at 40% 35%, #4f6f9a, #263a58);
+}
+
+.drun__menu-head {
+  margin-top: 10px;
+  font-weight: 800;
+}
+
+.drun__menu-cards {
+  margin: 4px 0 0;
+  padding-left: 1.2em;
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.drun__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun.is-omen .drun__omen-edge {
+    animation: none;
+  }
+}
