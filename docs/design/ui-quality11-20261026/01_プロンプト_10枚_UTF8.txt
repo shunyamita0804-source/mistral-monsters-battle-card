@@ -1,0 +1,240 @@
+【プロンプト】まだ足りないデザイン10枚・第11弾（2026-10-26）
+
+使い方：1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼る。日本語でうまくいかないときは English version
+1〜4（挿絵・場面・背景）は、番号の文の中に専用のルールを書いた（共通ルールは付けない）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（部品用。5〜10 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品（窓の枠・勝ちの帯・金のボタン）にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】画面を真正面から見た平らな部品（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【伸ばして使う】ゲームで横や縦に伸ばして使う。四隅の飾りは角に寄せ、真ん中は無地（模様は伸ばしても目立たない細かさに）
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること
+▲ここまで
+▼English
+Draw a UI part for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts (window frame, win banner, gold button).
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] Flat parts seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Stretching] The game stretches these parts. Keep ornaments in the corners; keep the middle plain (any texture fine enough to stretch unnoticed).
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　遊び方の挿絵（5場面）→ how_to_play.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/主人公_男.png、見本/主人公_女.png、見本/街の地図.png、見本/ダンジョンの床と壁.png、見本/大会の対戦の背景.png、今の画面/設定_遊び方.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の「遊び方」に入れる、小さな挿絵を5つ描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+横長 1536×1024 に、上に3つ・下に2つ、同じ大きさの横長の絵（横:縦＝4:3）を間を空けて並べる。絵の外は透明（できなければマゼンタ一色 #FF00FF）。1つずつ、くすんだ金の細い縁で囲む。
+・1 街を歩く：石畳の街を、添付の主人公（青い帽子の少年）が歩いている。後ろに赤い屋根の家とお店
+・2 デッキを組む：家の木の机の上に、カードが扇のように並んでいる。主人公の手がカードを1枚選んでいる
+・3 カードを買う：カードショップのカウンターで、主人公がカードの包み（パック）を受け取る
+・4 ダンジョン：石の通路を、ランタンを持った主人公が進む。奥に影のような敵の気配
+・5 大会：明るい大会会場で、主人公がカードを構えて相手と向き合う。まわりに旗
+・画風は添付の画風見本と同じ、筆で塗り重ねた手描きの質感。明るすぎず、落ち着いた色
+・文字・数字・矢印の記号・吹き出しは描かない（絵だけで伝える）。ロゴ・透かしも描かない
+▲ここまで
+▼English
+Draw five small illustrations for the "How to Play" section of the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+On a 1536x1024 canvas, three on top and two below, all the same size (landscape 4:3), with space between. Outside the pictures: transparent (or solid magenta #FF00FF). Frame each with a thin muted-gold border.
+1 Walking around town: the attached hero (a boy in a blue cap) walks on a cobblestone street; red-roofed houses and a shop behind him.
+2 Building a deck: cards fanned out on a wooden desk at home; the hero's hand picks one card.
+3 Buying cards: at the counter of a card shop, the hero receives a card pack.
+4 Dungeon: the hero walks down a stone corridor holding a lantern; a shadowy enemy presence in the depths.
+5 Tournament: in a bright arena, the hero holds up a card facing an opponent; banners around.
+- Same hand-painted brush style as the attached style sample. Not too bright, calm colors.
+- No text, numbers, arrow symbols or speech balloons (the pictures must speak for themselves). No logos or watermarks.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　対戦のルールの図（4コマ）→ battle_rules_art.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/ソラモ.png、見本/ラズック.png、見本/対戦の窓の枠.png、今の画面/対戦_ルール.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の「対戦のルール」の窓に入れる、小さな図を4つ描いてください。
+横長 1536×1024 に、2列×2行で、同じ大きさの横長の絵（横:縦＝16:10）を間を空けて並べる。絵の外は透明（できなければマゼンタ一色 #FF00FF）。1つずつ、暗い紺の地に、くすんだ金の細い縁。
+・1 マナにする：机の上の1枚のカードが、青い光の結晶にほどけていく（カードをマナに変える）
+・2 攻撃と守り：左のモンスター（添付のラズック）が爪で攻撃し、右のモンスター（添付のソラモ）の前に青く光る半透明の盾が出て受け止める
+・3 サポート：机の上に置いた1枚のカードから、やわらかい金の光が広がり、3体の小さなモンスターのシルエットを包む（場全体に効く）
+・4 勝ち負け：相手側の3体のモンスターのシルエットが灰色に沈み、手前に金の小さな優勝の旗が立つ（相手3体を倒すと勝ち）
+・カードゲームの説明の図なので、形は分かりやすく、余計なものは描かない。暗い紺の地に、主役だけ明るく
+・文字・数字・矢印の記号・吹き出しは描かない。モンスターは添付の絵と同じ見た目で、かわいらしく小さめに
+▲ここまで
+▼English
+Draw four small diagrams for the "Battle Rules" window of the commercial smartphone 2D card game "Mistral Monsters Battle Card".
+On a 1536x1024 canvas, 2 columns x 2 rows, all the same size (landscape 16:10), with space between. Outside the pictures: transparent (or solid magenta #FF00FF). Each has a dark navy base and a thin muted-gold border.
+1 Turning a card into mana: a single card on a table unravels into glowing blue crystals.
+2 Attack and defense: the monster on the left (the attached Lazuck) attacks with its claws, and a translucent glowing blue shield appears in front of the monster on the right (the attached Soramo) to block it.
+3 Support: soft golden light spreads from a card placed on the table, wrapping the silhouettes of three small monsters (it affects the whole field).
+4 Winning: the silhouettes of the opponent's three monsters sink into grey, and a small gold victory pennant stands in front (defeat all three to win).
+- These explain a card game: clear shapes, nothing extra. Dark navy base, only the main subject bright.
+- No text, numbers, arrow symbols or speech balloons. Monsters look like the attached art, cute and small.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　特別復元の場面（欠片の祭壇と復元の光）→ restore_scene.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/不思議な欠片.png、見本/ガウル.png、今の画面/ショップ.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」で、「不思議な欠片」を10個集めて、眠っていたモンスターのカードを復元する場面の絵を描いてください。
+横長 1536×1024 に、次の2つを左右に並べる（重ならないように）。
+・左：縦長（横:縦＝3:4）の場面の絵（不透明）。古い石の小さな祭壇の上に、添付の「不思議な欠片」10個が輪になって浮かび、青く淡く光る模様の線でつながっている。輪の真ん中に、裏向きのカード1枚が浮かび、内側から金色の光があふれ出している。まわりは暗いお店の奥の部屋（木の棚・ランプの暖かい光が少し）
+・右：光の効果（背景は真っ黒 #000000。ゲームで「光を足す」重ね方をするため）。正方形のマスの中に、真ん中から放射状に広がる金と青白の光の筋と、舞い上がる光の粒
+・モンスターそのものは描かない（どのモンスターが出るかは画面で見せる）
+・文字・数字・ロゴは描かない。画風は添付の画風見本と同じ、筆で塗り重ねた手描きの質感
+▲ここまで
+▼English
+Draw the scene where ten "Mysterious Shards" restore a sleeping monster card, for the commercial smartphone 2D card game "Mistral Monsters Battle Card".
+On a 1536x1024 canvas, two items side by side, no overlap.
+- Left: a portrait (3:4) scene, opaque. Above a small old stone altar, ten of the attached "Mysterious Shards" float in a ring, linked by faintly glowing blue pattern lines. In the center of the ring floats one face-down card with golden light pouring out from inside. Around it, a dim back room of a shop (wooden shelves, a little warm lamp light).
+- Right: a light effect on solid black #000000 (the game uses additive blending): inside a square cell, gold and pale-blue rays bursting radially from the center, with rising particles of light.
+- Do not draw the monster itself (the screen shows which monster appears).
+- No text, numbers or logos. Same hand-painted brush style as the attached style sample.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　ボス戦の背景 → battle_bg_boss.png　※共通ルールは付けない
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/ダンジョンの対戦の背景.png、見本/ダンジョンの床と壁.png、今の画面/ダンジョンの対戦.png
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の、ダンジョンの最奥でボスと戦うときの対戦画面の背景を1枚描いてください。縦長 1024×1536、不透明（画面いっぱいに敷く）。
+・場所：添付のダンジョンと同じ石の地下。いちばん奥の広い部屋。古い石の柱が左右に並び、奥に崩れかけた大きな扉。床に、えんじ色に淡く光る古い円の模様
+・添付の「ダンジョンの対戦の背景」と同じ見下ろし方と明るさで、少しだけ不気味に（えんじの光と、漂う黒い霧）
+・人・モンスター・カードは描かない（ゲームがその上にカードやモンスターを並べる）
+・全体を暗めに（上に文字やカードを重ねても読みやすいように）。真ん中が少し明るく、まわりはやわらかく暗く
+・画風は添付の画風見本と同じ、筆で塗り重ねた手描きの質感。文字・ロゴは描かない
+▲ここまで
+▼English
+Draw the background for the boss battle at the deepest part of the dungeon, for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Portrait 1024x1536, opaque (fills the screen).
+- Place: the same underground stone dungeon as attached, the large innermost chamber. Old stone pillars on both sides, a huge half-collapsed door at the back, and an old circular pattern on the floor glowing faintly wine-red.
+- Same viewing angle and brightness as the attached "dungeon battle background", just a little more ominous (wine-red glow and drifting black mist).
+- No people, monsters or cards (the game places them).
+- Keep it dark overall so text and cards on top stay readable: slightly brighter in the center, soft darkness around the edges.
+- Same hand-painted brush style as the attached style sample. No text or logos.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　対戦の待ちの印（相手の番の札・考え中の砂時計・空の手札の台）→ battle_wait_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/対戦の窓の枠.png、見本/対戦のボタン.png、今の画面/対戦_相手の番.png（下の「相手の番」・手札の欄の「手札なし」）
+▼ここからコピー
+カードゲームの対戦で、相手の番のあいだに出す部品を描いてください。横長 1536×1024 に、重ならないように並べる。
+・1 相手の番の札：横:縦＝3:1 の角の丸い札。暗いえんじの地に、くすんだ金の細い縁。左に小さな丸い窓（中は透明）。中は文字を置くので無地
+・2 考え中の砂時計：小さな砂時計（くすんだ金の枠・青白い砂）。同じ形で、砂の量が違う4コマ（上から下へ落ちていく。ゲームで順に切り替えて回す）
+・3 空の手札の台：横にとても長い（横:縦＝7:1）浅いくぼみ。暗い紺の地に、カードを置く5つのうすい長方形のくぼみの跡（カードがないときに見せる）
+・対戦の画面は「細い枠」の方針。添付の対戦の窓の枠・ボタンと同じ細さと色
+▲ここまで
+▼English
+Draw parts shown during the opponent's turn in a card battle, on a 1536x1024 canvas, no overlap.
+1 "Opponent's turn" plate: a rounded plate (3:1), dark wine base, thin muted-gold rim, a small round window on the left (transparent inside). Plain inside for text.
+2 Thinking hourglass: a small hourglass (muted-gold frame, pale-blue sand). Four frames of the same shape with different amounts of sand (falling from top to bottom; the game cycles them).
+3 Empty hand tray: a very long (7:1) shallow recess, dark navy base, with five faint rectangular card-shaped dents (shown when there are no cards).
+- The battle screen uses thin frames; match the slimness and colors of the attached battle window frame and buttons.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　収録カードと提供割合の表の部品 → gacha_rates_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/レア度の印.png、今の画面/ガチャ_提供割合.png
+▼ここからコピー
+カードパックの「収録カードと提供割合」の表の部品を描いてください。横長 1536×1024 に、重ならないように並べる。中は文字を置くので無地。
+・1 表の見出しの帯：とても横に長い（横:縦＝10:1）帯。濃い紺の地に、くすんだ金の細い縁
+・2〜4 表の行の帯（3色）：1 と同じ横幅で少し細い（横:縦＝14:1）、角の丸いうすい帯。左端に、レア度を示す色の小さな宝石を1つ
+　2＝コモン（銀灰色の宝石・灰色がかった地）、3＝アンコモン（青緑の宝石・青みの地）、4＝レア（金の宝石・少し金色がかった地）
+・5 割合の円グラフの台：丸い台（くすんだ金の縁、中は暗い紺の無地。ゲームが割合の色を重ねる）
+・帯の地はとても暗く（上に白い文字を置く）。宝石の色は添付のレア度の印にそろえる
+▲ここまで
+▼English
+Draw parts for the "cards in this pack and drop rates" table, on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Table header bar: a very long (10:1) bar, dark navy base, thin muted-gold rim.
+2-4 Table row bars (three colors): as wide as 1 but slimmer (14:1), faint rounded bars with a small gem at the left end showing the rarity:
+  2 = Common (silver-grey gem, greyish base), 3 = Uncommon (teal gem, bluish base), 4 = Rare (gold gem, slightly golden base).
+5 Pie-chart base: a round base (muted-gold rim, plain dark navy inside; the game draws the rate colors on it).
+- Keep the bar bases very dark (white text goes on top). Match the gem colors to the attached rarity marks.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　図鑑の集めた割合（メダル4種と進み具合の帯）→ collection_progress.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/勝ちの帯.png、見本/レア度の印.png、今の画面/図鑑.png（上の「登録 153/153 種類」）
+▼ここからコピー
+カードの図鑑で、集めた割合を示す部品を描いてください。横長 1536×1024 に、重ならないように並べる。
+・1〜4 集めた割合のメダル（同じ大きさ・同じ形の丸いメダル4種）：1＝銅（25%）、2＝銀（50%）、3＝金（75%）、4＝完成（100%。金に紺の宝石と、小さな月桂樹の枝）。メダルの真ん中は、開いた本の浮き彫り（文字なし）
+・5 進み具合の帯の枠：横に長い（横:縦＝10:1）くぼんだ溝。くすんだ金の細い縁、中は暗い紺（空っぽ）
+・6 進み具合の帯の中身：5 の溝に入る、金色のつやのある棒（左右の端が丸い。横に伸ばして使う）
+・メダルは、小さく（32px くらい）表示しても違いが分かるように、色の差をはっきりと
+▲ここまで
+▼English
+Draw parts that show how much of the card collection has been gathered, on a 1536x1024 canvas, no overlap.
+1-4 Completion medals (four round medals of the same size and shape): 1 = bronze (25%), 2 = silver (50%), 3 = gold (75%), 4 = complete (100%: gold with a navy gem and small laurel branches). The center of each medal is a relief of an open book (no text).
+5 Progress bar frame: a long (10:1) recessed groove, thin muted-gold rim, dark navy inside (empty).
+6 Progress bar fill: a glossy gold bar that fits the groove of 5 (rounded ends; stretched horizontally).
+- Make the medal colors clearly different so they can be told apart at about 32 px.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 8　世界地図の地方の名札と場所の説明の窓 → worldmap_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/世界地図.png、見本/地図の名札.png、今の画面/世界地図.png（地方の名前が白い文字だけ・下の説明の窓）
+▼ここからコピー
+古い世界地図の画面で使う部品を描いてください。横長 1536×1024 に、重ならないように並べる。中は文字を置くので無地。
+・1 地方の名札：地図の上に置く、横長（横:縦＝4:1）の古い羊皮紙のリボン。両端が少し巻いている。生成りの紙に、こげ茶の細い縁（上に濃い文字を置く）
+・2 地方の名札（いまいる地方）：1 と同じ形で、縁がくすんだ金、リボンの真ん中の上に小さな星の飾り
+・3 場所の説明の窓：横:縦＝2:1 の角の丸い窓。古い羊皮紙の地図を貼った板のような見た目（うすい地図の線の模様をごく淡く。中に文字を置くので、模様はほとんど見えないくらい）。こげ茶の木の縁と、四隅に小さな金具
+・4 方角の印：小さな羅針盤（くすんだ金と紺。文字の「N」などは描かない）
+・添付の世界地図と同じ、古い手描きの地図の雰囲気
+▲ここまで
+▼English
+Draw parts for the old world-map screen, on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Region label: a horizontal (4:1) old parchment ribbon placed on the map, both ends slightly curled. Off-white paper with a thin dark-brown edge (dark text goes on top).
+2 Region label (current region): same shape as 1, with a muted-gold edge and a small star ornament above the middle of the ribbon.
+3 Place info window: a rounded window (2:1) that looks like a board with an old parchment map pasted on it (map-line pattern extremely faint, as text goes on top). Dark brown wooden edge with small metal fittings at the corners.
+4 Compass mark: a small compass rose (muted gold and navy; no letters such as "N").
+- Same old hand-drawn map mood as the attached world map.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 9　設定の画面の部品（見出しの帯・欄の板・小さなアイコン）→ settings_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/金のボタン.png、今の画面/設定.png、今の画面/設定_遊び方.png
+▼ここからコピー
+ゲームの「設定」の画面の部品を描いてください。横長 1536×1024 に、重ならないように並べる。中は文字を置くので無地。
+・1 見出しの帯：横に長い（横:縦＝8:1）細い帯。左端に小さな丸いアイコンの台（くすんだ金の縁）、右へ向かって金の細い線が消えていく
+・2 欄の板：横:縦＝3:1 の角の丸い板。暗い紺の地に、くすんだ金のごく細い縁。四隅に小さな飾り（音量や言語の項目を中に置く）
+・3〜6 小さなアイコン（1 の丸い台に入れる。同じ大きさ）：3＝言語（地球儀）、4＝音量（小さなラッパ型のスピーカー）、5＝セーブのバックアップ（巻物と封蝋）、6＝遊び方（開いた本）
+・アイコンはくすんだ金の線画に紺の影。小さく（24px くらい）表示しても形が分かるように
+▲ここまで
+▼English
+Draw parts for the game's "Settings" screen, on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Section header bar: a long thin (8:1) bar with a small round icon base (muted-gold rim) at the left end and a thin gold line fading out to the right.
+2 Section panel: a rounded panel (3:1), dark navy base, very thin muted-gold rim, small corner ornaments (volume and language items go inside).
+3-6 Small icons (same size; they sit in the round base of 1): 3 = language (globe), 4 = sound (a small horn-shaped speaker), 5 = save backup (a scroll with a wax seal), 6 = how to play (an open book).
+- Icons are muted-gold line art with navy shading, readable at about 24 px.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 10　タイトルのボタン（3種）→ title_buttons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/タイトルの背景.png、見本/タイトルロゴ.png、見本/金のボタン.png、今の画面/タイトル.png（いまは「続きから・最初から・設定」がふつうのボタン）
+▼ここからコピー
+ゲームのタイトル画面に並べるボタンを描いてください。横長 1536×1024 に、上下に並べる（重ならないように）。中は文字を置くので無地。
+・1 大きなボタン（続きから）：横:縦＝4.5:1 の、少し立派な札。くすんだ金の地に、紺の細い縁取り。左右の端に、添付のタイトルロゴと同じ形の小さなカード3枚の飾り。上の縁の真ん中に小さな星
+・2 大きなボタン（最初から）：1 と同じ形と大きさで、地は深い紺、縁と飾りはくすんだ金
+・3 小さなボタン（設定）：横:縦＝3.5:1、2 より小さく飾りも控えめ。深い紺の地にくすんだ金の縁
+・4 押したとき：1 と同じ形で、全体が少し暗く沈んだもの
+・添付のタイトルの背景（明るい昼の空と浮かぶ島の街）の上に置いても浮きすぎず、ロゴの金とそろえる
+▲ここまで
+▼English
+Draw the buttons for the game's title screen, stacked vertically on a 1536x1024 canvas, no overlap. Interiors are plain (for text).
+1 Large button (Continue): a slightly grand plate (4.5:1), muted-gold base with a thin navy outline; at both ends, a small ornament of three cards shaped like the attached title logo; a small star at the top center of the rim.
+2 Large button (New Game): same shape and size as 1, deep navy base with muted-gold rim and ornaments.
+3 Small button (Settings): 3.5:1, smaller than 2 with simpler ornaments; deep navy base, muted-gold rim.
+4 Pressed: same shape as 1, slightly darker and sunken overall.
+- They sit on the attached title background (a bright daytime sky with floating island towns): don't let them stand out too much, and match the gold of the logo.
+▲
