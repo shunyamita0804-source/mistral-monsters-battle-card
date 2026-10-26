@@ -200,7 +200,7 @@ npx vite preview --port 4173 --host 127.0.0.1   # 画面の確認（ビルド後
 **2026-10-26：デザイン第8弾10枚の組み込み・カードショップの新しい絵（作業ブランチ `claude/ui-quality8-20261026`。未公開・ユーザー確認待ち）**
 - 10枚すべて使った（`docs/design/ui-quality8-20261026/10_受け取り結果_UTF8.txt`）。見た目は `src/ui/styles/uiParts8.css`、切り出しは `tools/design/ui8_build.py`
 - カードショップをユーザー提供の絵に（`design-parts/seimon-world/README.md`）
-- **ユーザーに確認中**：街全体が古びて見えるので色の調子を変えたい（見本：弱め・強めをチャットで送付。まだ街には入れていない）
+- 街の色の調子：ユーザー指示「弱めで全体にかけて」で、街の部品に明るさ・あざやかさを少し足した（ショップ・大会会場・部屋の中は除く。`design-parts/seimon-world/README.md`）
 
 **2026-10-26：ガウル14技（作業ブランチ `claude/gaul14-20261026`。未公開・ユーザー確認待ち）**
 - 「ガウル全14技・最終実装パック」を取り込み（`src/data/gauul.ts`・`docs/card-data-policy.md`・`docs/battle-rules.md`）。旧16技はゲームから外した（セーブ version 10）

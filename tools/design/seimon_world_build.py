@@ -18,7 +18,9 @@ from __future__ import annotations
 import json
 import os
 import random
+import shutil
 import sys
+import tempfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -710,12 +712,53 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
     )
 
 
+# ───────────── 街の色の調子 ─────────────
+# 2026-10-26 ユーザー指示「街全体が古びて見える。（見本の）弱めで全体にかけて」。街の部品（建物・地面・小物・草花・噴水）だけに、
+# 明るさ×1.08・あざやかさ×1.18・コントラスト×1.04（灰色 128 を中心に）・少し暖かく（赤+2%・青−2%）。透明度は変えない。
+# 新しく届いたカードショップ・大会会場（ユーザーが調子を変えて描いた絵）と、部屋の中（room_shell_・furn_）にはかけない。
+# 原本（design-parts/seimon-world/）は変えず、組み立てるときに写しへかける
+TOWN_TONE = {'brightness': 1.08, 'saturation': 1.18, 'contrast': 1.04, 'warm': 0.02}
+TOWN_TONE_SKIP = {'town_shop', 'town_arena'}
+
+
+def tone(im: Image.Image) -> Image.Image:
+    a = np.array(im.convert('RGBA')).astype(np.float32)
+    rgb = a[..., :3] * TOWN_TONE['brightness']
+    lum = (rgb * np.array([0.299, 0.587, 0.114], np.float32)).sum(axis=2, keepdims=True)
+    rgb = lum + (rgb - lum) * TOWN_TONE['saturation']
+    rgb = 128 + (rgb - 128) * TOWN_TONE['contrast']
+    rgb[..., 0] *= 1 + TOWN_TONE['warm']
+    rgb[..., 2] *= 1 - TOWN_TONE['warm']
+    a[..., :3] = np.clip(rgb, 0, 255)
+    out = Image.fromarray(a.astype(np.uint8), 'RGBA')
+    # 透明度のない絵（地面の模様など）は、元と同じ形式のまま
+    return out if im.mode in ('RGBA', 'LA', 'P') else out.convert(im.mode)
+
+
+def toned_town_parts(parts: str) -> str:
+    """街の部品に色の調子をかけた写しを、作業用のフォルダに作る（部屋の部品は写さない）"""
+    out = tempfile.mkdtemp(prefix='town_tone_')
+    for f in os.listdir(parts):
+        name, ext = os.path.splitext(f)
+        if ext != '.png' or name.startswith(('room_shell_', 'furn_')):
+            continue
+        if name in TOWN_TONE_SKIP:
+            shutil.copy(f'{parts}/{f}', f'{out}/{f}')
+        else:
+            tone(Image.open(f'{parts}/{f}')).save(f'{out}/{f}')
+    return out
+
+
 def main() -> None:
     parts = sys.argv[1]
     check = sys.argv[2] if len(sys.argv) > 2 else None
     if check:
         os.makedirs(check, exist_ok=True)
-    town = build_town(parts, check)
+    toned = toned_town_parts(parts)
+    try:
+        town = build_town(toned, check)
+    finally:
+        shutil.rmtree(toned, ignore_errors=True)
     furn = load_furniture(parts)
     rooms = [build_room(parts, r, furn, check) for r in pack.ROOMS]
     with open(OUT_TS, 'w', encoding='utf-8') as f:
