@@ -1082,3 +1082,150 @@
   font-size: 13px;
   line-height: 1.4;
 }
+
+/* ===== 2026-10-26 ユーザー指示（iPhone の試遊から）：手札の絵・大きさ・選んだ手札・配る動き・相手のカードを大きく裏から表へ ===== */
+
+/* 手札の絵：横長の窓いっぱいに（左右のすき間をぼかした絵で埋めていたのが「右の方が黒い」と見えたため。上下を少し切る） */
+.skill-card--hand .skill-card__art-fill {
+  display: none;
+}
+
+.skill-card--hand .skill-card__art {
+  object-fit: cover;
+  object-position: 50% 38%;
+}
+
+/* 手札の列：横に送らず全部見せる（入りきらないときは handRow が --hand-overlap で少し重ねる）。選んだカードが上の欄へはみ出して見えるように */
+.battle__hand {
+  overflow: visible;
+  gap: 3px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.battle__hand-card + .battle__hand-card {
+  margin-left: var(--hand-overlap, 0px);
+}
+
+/* 選んだ手札：はっきり持ち上げて少し大きく（重なっていても上に出す） */
+.battle__hand-card {
+  transition: transform 170ms cubic-bezier(0.2, 0.8, 0.3, 1.25);
+}
+
+.battle__hand-card.is-selected {
+  z-index: 2;
+  transform: translateY(-20px) scale(1.07);
+}
+
+.battle__hand-card.is-touching {
+  z-index: 2;
+  transform: translateY(-12px) scale(1.04);
+}
+
+/* 配る：裏向きのまま1枚ずつ届き（--deal-delay）、配り終えたら左から1枚ずつ表に返す（--flip-delay） */
+.battle__hand-card.is-dealt {
+  animation: deal-in 260ms cubic-bezier(0.2, 0.8, 0.3, 1.1) var(--deal-delay, 0ms) both;
+}
+
+.battle__hand-face {
+  position: relative;
+  display: block;
+  animation: hand-flip 240ms ease-in-out var(--flip-delay, 0ms) both;
+}
+
+.battle__hand-cover {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #c9a24a;
+  border-radius: 6px;
+  background: url('@assets/images/ui/card_back.webp') center / cover no-repeat;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.55);
+  animation: flip-cover 240ms linear var(--flip-delay, 0ms) both;
+}
+
+.battle__hand-card.is-dealt .battle__hand-name {
+  animation: flip-face 240ms linear var(--flip-delay, 0ms) both;
+}
+
+@keyframes hand-flip {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0.04); }
+  100% { transform: scaleX(1); }
+}
+
+/* 返す途中（半分）で裏面を消す・名前を出す */
+@keyframes flip-cover {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes flip-face {
+  0%, 49% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+/* 相手が使ったカード：裏向きのまま、大きなカードの場所へ大きくなりながら飛ぶ（--dx・--dy・--sx・--sy は flyOpponentCard が決める） */
+.battle__opp-fly {
+  transform-origin: 0 0;
+  animation: opp-fly-in 480ms cubic-bezier(0.35, 0, 0.25, 1) forwards;
+}
+
+@keyframes opp-fly-in {
+  0% { transform: none; filter: none; }
+  22% { transform: translateY(-10px) scale(1.08); filter: brightness(1.3) drop-shadow(0 0 8px rgb(255 214 120 / 0.95)); }
+  100% { transform: translate(var(--dx), var(--dy)) scale(var(--sx), var(--sy)); filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.6)); }
+}
+
+/* 着いたら、その場所で裏から表へ返す（着くまで隠す）。文字は表に替わってから出す */
+.battle-spot__flip {
+  position: relative;
+  animation:
+    spot-appear 1ms linear var(--arrive-delay, 0ms) both,
+    spot-flip 420ms ease-in-out var(--arrive-delay, 0ms) both;
+}
+
+.battle-spot__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: url('@assets/images/ui/card_back.webp') center / 100% 100% no-repeat;
+  animation: flip-cover 420ms linear var(--arrive-delay, 0ms) both;
+}
+
+.battle-spot.is-arriving .battle-spot__line,
+.battle-spot.is-arriving .battle-spot__info {
+  animation: spot-text-in 240ms ease-out calc(var(--arrive-delay, 0ms) + 210ms) both;
+}
+
+@keyframes spot-appear {
+  from { visibility: hidden; }
+  to { visibility: visible; }
+}
+
+@keyframes spot-flip {
+  0% { transform: scale(1); filter: none; }
+  50% { transform: scale(0.04, 1.06); filter: brightness(1.15); }
+  75% { transform: scale(1.06); filter: brightness(1.35) drop-shadow(0 0 12px rgb(255 214 120 / 0.9)); }
+  100% { transform: scale(1); filter: none; }
+}
+
+@keyframes spot-text-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle__hand-face,
+  .battle__hand-cover,
+  .battle__opp-fly,
+  .battle-spot__flip,
+  .battle-spot__back {
+    animation-duration: 1ms;
+  }
+}
+
+/* 重なっているときは、カードの名前を見えている所（次のカードに隠れていない左側）に収める */
+.battle__hand-card:not(:last-child) .battle__hand-name {
+  align-self: flex-start;
+  width: calc(100% + var(--hand-overlap, 0px));
+}

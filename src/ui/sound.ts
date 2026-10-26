@@ -1,4 +1,7 @@
 import cardDealMp3 from '@assets/audio/se/card_deal.mp3';
+import cardFlipMp3 from '@assets/audio/se/card_flip.mp3';
+import cardSlideMp3 from '@assets/audio/se/card_slide.mp3';
+import cardRevealMp3 from '@assets/audio/se/card_reveal.mp3';
 import turnOrderOgg from '@assets/audio/se/turn_order_select.ogg';
 import turnOrderM4a from '@assets/audio/se/turn_order_select.m4a';
 import manaGainOgg from '@assets/audio/se/mana_gain.ogg';
@@ -51,6 +54,9 @@ import underwaterLoopMp3 from '@assets/audio/se/underwater_loop.mp3';
  */
 export type SoundId =
   | 'cardDraw'
+  | 'cardFlip'
+  | 'cardSlide'
+  | 'cardReveal'
   | 'turnOrderSelect'
   | 'manaGain'
   | 'manaVanish'
@@ -118,6 +124,13 @@ type SoundEntry = (
 export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
   // カードを引く・手札に配る（1枚ごと）：効果音ラボ「カードを配る」から1枚ぶんを切り出した音（2026-10-24 ユーザー指示「カードとかトランプのSEに」）
   cardDraw: { mp3: cardDealMp3, gain: 1.4 },
+  // 2026-10-26 ユーザー指示「SEも適切なもの探して」：Kenney「Casino Audio」（CC0・クレジット不要）から切り出した音
+  // 配った手札が1枚ずつ表になる（パラパラ）：card-place-1
+  cardFlip: { mp3: cardFlipMp3, gain: 0.8 },
+  // 相手の使ったカードが裏向きのまま真ん中へ飛んでくる：card-shove-3
+  cardSlide: { mp3: cardSlideMp3, gain: 0.9 },
+  // 真ん中に来た相手のカードが表に返る：card-slide-3
+  cardReveal: { mp3: cardRevealMp3, gain: 1.0 },
   // 先攻・後攻のカードを選んだ瞬間：ミストラルモンスターズ正式素材「分かれ道の選択」（15_branch_select）
   turnOrderSelect: { ogg: turnOrderOgg, m4a: turnOrderM4a, gain: 1.0 },
   // 山札からマナが増えた（手札5枚のときのドロー・カードの効果）：ミストラルモンスターズの GOLD_GET と同じ音（Mix of SFX by Ivokard「bell」・CC0）
