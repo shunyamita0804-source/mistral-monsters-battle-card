@@ -135,6 +135,33 @@ def shadow(base: Image.Image, part: Image.Image, xy: tuple[int, int], dx=18, dy=
     base.paste(Image.new('RGBA', part.size, (40, 50, 30, 255)), (xy[0] + dx, xy[1] + dy), sh)
 
 
+# ───────────── 建物を立体的に（2026-10-26 ユーザー指示「案B」） ─────────────
+# 光は左上から。①右下へ長くのびるやわらかい落ち影、②建物の下の端にそった接地の影、③建物の左上を少し明るく・右と下を少し暗く。
+# 絵は描き直さない（影を地面に描くのと、明るさを位置で少し変えるだけ）
+def building_shadow(base: Image.Image, part: Image.Image, xy: tuple[int, int]) -> None:
+    al = part.getchannel('A')
+    sh = al.point(lambda v: 130 if v > 0 else 0).filter(ImageFilter.GaussianBlur(22))
+    base.paste(Image.new('RGBA', part.size, (28, 34, 20, 255)), (xy[0] + 46, xy[1] + 30), sh)
+    a = np.array(al) > 0
+    foot = np.zeros_like(a)
+    for x in np.where(a.any(axis=0))[0]:
+        y = np.where(a[:, x])[0].max()
+        foot[max(0, y - 6):min(a.shape[0], y + 22), x] = True
+    fm = Image.fromarray((foot * 150).astype(np.uint8)).filter(ImageFilter.GaussianBlur(10))
+    base.paste(Image.new('RGBA', part.size, (20, 24, 14, 255)), xy, fm)
+
+
+def shade_building(part: Image.Image) -> Image.Image:
+    """建物に光と陰：左上 ×1.06 → 右 ×0.90、下の45%はさらに最大 ×0.90（形にそって）"""
+    arr = np.array(part).astype(np.float32)
+    h, w = arr.shape[:2]
+    xs = np.linspace(0, 1, w)[None, :]
+    ys = np.linspace(0, 1, h)[:, None]
+    k = 1.06 - 0.16 * xs - 0.10 * np.clip((ys - 0.55) / 0.45, 0, 1)
+    arr[..., :3] = np.clip(arr[..., :3] * k[..., None], 0, 255)
+    return Image.fromarray(arr.astype(np.uint8), 'RGBA')
+
+
 # 噴水広場の輪・会場前の飾り石を使うか（納品された絵が平たい図形で、街の画風に合わないため、いまは使わない）
 USE_PLAZA_DECOR = os.environ.get('SEIMON_PLAZA_DECOR') == '1'
 
@@ -412,7 +439,8 @@ def build_town(parts: str, check_dir: str | None):
     buildings = []
     for b in sorted(pack.TOWN['buildings'], key=lambda b: b['rect'][3]):
         part, xy = place_building(parts, b)
-        shadow(base, part, xy)
+        part = shade_building(part)
+        building_shadow(base, part, xy)
         base.alpha_composite(part, xy)
         buildings.append((b, part, xy))
 

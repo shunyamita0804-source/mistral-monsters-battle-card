@@ -730,22 +730,39 @@
 }
 
 /*
- * 立っている人の、呼吸のような小さな動き（2026-10-23）。足元を軸にわずかに伸び縮みする。
- * 位置は transform で動かしているので、別の指定（scale）で重ねる。人ごとに少しずらして、そろって動かないように
+ * NPC の呼吸のような小さな動き（2026-10-26 ユーザー「入れていいが、足が地面にしっかり着地している状態に」）。
+ * 2026-10-23 の版は「プカプカ浮いて見える」でやめた（位置の transform と scale が重なり、足元が軸になっていなかった）。
+ * 今回は中の「体」の層（.world__npc-body）だけを、足の裏を軸（transform-origin を足元に。worldScreen.ts）に縦へだけ伸び縮みさせる。
+ * 横には変えないので、足の裏の線と足の幅はまったく動かない。頭のあたりが 1px ほど上下するだけ
  */
-/*
- * 立っている人の呼吸のような動きは、2026-10-23 ユーザー「プカプカ浮いて見える。地面に足が着いているように」でやめた。
- * （下の figure-breathe は使っていない）
- */
+.world__npc-body {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  animation: npc-breathe 3.2s ease-in-out infinite;
+}
 
-@keyframes figure-breathe {
-  0%, 100% { scale: 1 1; }
-  50% { scale: 1.006 1.016; }
+@keyframes npc-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1, 1.012); }
+}
+
+/*
+ * NPC を部屋・街になじませる（2026-10-26 ユーザー「貼り付けた感じ」）：絵の色を少し落ち着かせ、縁にごく薄い暗い線。
+ * 足元の影も主人公より少し大きく濃く（.world__shadow--npc）
+ */
+.world__npc {
+  filter: brightness(0.9) saturate(0.86) sepia(0.1) drop-shadow(0 0 1px rgb(30 18 8 / 0.55));
+}
+
+.world__shadow--npc {
+  background:
+    radial-gradient(closest-side, rgb(12 8 4 / 0.92), rgb(12 8 4 / 0.62) 55%, rgb(12 8 4 / 0)) center / 66% 66% no-repeat,
+    radial-gradient(closest-side, rgb(14 9 4 / 0.58), rgb(14 9 4 / 0.3) 60%, rgb(14 9 4 / 0));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .world__npc,
-  .world__player.is-idle {
+  .world__npc-body {
     animation: none;
   }
 }
