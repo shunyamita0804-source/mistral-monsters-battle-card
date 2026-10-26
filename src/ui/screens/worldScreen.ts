@@ -1045,13 +1045,13 @@ export class WorldView {
       this.#held = null;
       const target = warp.target;
       if (target.kind === 'map') {
-        // 建物に入る・出る：ドアの音（大会会場は鉄の扉、カードショップは自動ドア。2026-10-26 ユーザー指示）
+        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）
         const to = getMap(target.mapId);
         if (to && to.area !== this.#map.area) {
           const building = to.area === 'interior' ? to.id : this.#map.id;
           const entering = to.area === 'interior';
           sound.play(
-            building === 'hall' ? (entering ? 'ironDoorOpen' : 'gateClose') : building === 'shop' ? 'autoDoor' : entering ? 'doorOpen' : 'doorClose',
+            building === 'hall' ? 'ironDoorOpen' : building === 'shop' ? 'autoDoor' : entering ? 'doorOpen' : 'doorClose',
           );
         }
         this.#store.update((s) => ({ ...s, location: { mapId: target.mapId, x: target.x, y: target.y, dir: target.dir } }));

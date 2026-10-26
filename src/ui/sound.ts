@@ -167,7 +167,7 @@ export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
   register: { mp3: registerMp3, gain: 0.7 },
   coins: { mp3: coinsMp3, gain: 0.9 },
   drip: { mp3: dripMp3, gain: 1.6 },
-  // 2026-10-26 ユーザー提供（利用確認済み）。大会会場に入る＝鉄の扉を開ける（宝箱の鉄の箱と同じファイル。出るときは gateClose）、
+  // 2026-10-26 ユーザー提供（利用確認済み）。大会会場に出入りする＝鉄の扉を開ける（宝箱の鉄の箱と同じファイル）、
   // カードショップに出入りする＝自動ドア（録音が小さいので gain で大きく）
   ironDoorOpen: { mp3: chestOpenIronMp3, gain: 0.8 },
   autoDoor: { mp3: autoDoorMp3, gain: 4.0 },
