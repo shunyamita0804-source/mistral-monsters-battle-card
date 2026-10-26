@@ -416,3 +416,24 @@
     opacity: 0.85;
   }
 }
+
+/* 2026-10-26 ユーザー指示：1回目に押すと光って選んだ状態、もう1回で決定。iPhone ではなぞった後も :hover が残るので、光るのは選んだ札だけにする */
+.new-game__choice:hover .new-game__panel {
+  background-image: url('@assets/images/ui/newgame/choice_normal.webp');
+}
+
+.new-game__choice.is-selected .new-game__panel {
+  background-image: url('@assets/images/ui/newgame/choice_selected.webp');
+  filter: drop-shadow(0 0 10px rgb(255 214 120 / 0.85));
+  transform: translateY(-4px) scale(1.03);
+}
+
+.new-game__hint {
+  min-height: 1.6em;
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1d58a;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.8);
+}

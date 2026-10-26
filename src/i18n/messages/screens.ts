@@ -26,10 +26,7 @@ export const SCREENS = {
   'newGame.maleNote': { ja: '黒髪・青い帽子と服', en: 'Black hair, blue cap and clothes' },
   'newGame.femaleNote': { ja: '赤い帽子と服', en: 'Red cap and clothes' },
   'newGame.back': { ja: 'タイトルへ戻る', en: 'Back to Title' },
-  'newGame.welcome': {
-    ja: 'ようこそ！\n家の机でデッキ、壁の地図でダンジョン、本棚で図鑑、ベッドで設定を確認できます。\nショップでカードパック、大会会場で大会に参加できます。',
-    en: 'Welcome!\nAt home: the desk is your deck, the wall map leads to dungeons, the bookshelf is your card album, and the bed has records and settings.\nBuy card packs at the shop and join cups at the tournament hall.',
-  },
+  'newGame.confirmHint': { ja: 'もう一度押すと、この主人公で始めます', en: 'Tap again to start with this character' },
 
   // ベッド
   'bed.title': { ja: 'ベッド', en: 'Bed' },
