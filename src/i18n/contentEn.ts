@@ -73,10 +73,10 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:d-3:name': 'Temp opponent (D, Final)',
 
   // ダンジョン（仮）
-  'dungeon:dungeon-01:name': 'Moonshadow Ruins (Temp name)',
-  'dungeon:dungeon-01:description': 'Ruins with 3 basement floors. Defeat the boss at the bottom to clear it. (Name and enemies are temporary)',
-  'dungeon:dungeon-02:name': 'Spirit Forest (Temp name)',
-  'dungeon:dungeon-02:description': 'A forest with 3 basement floors. Defeat the boss at the bottom to clear it. (Name and enemies are temporary; same layout as the ruins for now)',
+  'dungeon:dungeon-01:name': 'Ancient Ruins',
+  'dungeon:dungeon-01:description': 'Ruins overgrown with grass and trees, with crumbling buildings. Defeat the boss at the bottom to clear it. (Enemies and map are temporary)',
+  'dungeon:dungeon-02:name': 'Spirit Forest',
+  'dungeon:dungeon-02:description': 'A forest of pink flowers and butterflies. Defeat the boss at the bottom to clear it. (Enemies and map are temporary; same layout as the ruins for now)',
   'opponent:enc-b1-a:name': 'Wild monster pack (Temp)',
   'opponent:enc-b1-b:name': 'Wild monster pack (Temp)',
   'opponent:enc-b2-a:name': 'Treasure guards (Temp)',

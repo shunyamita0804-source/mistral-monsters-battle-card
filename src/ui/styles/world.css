@@ -767,71 +767,48 @@
   }
 }
 
-/* ===== ダンジョンに入ったときの札（2026-10-26 ユーザー指示「挿絵とダンジョン名」）：挿絵・地方・名前・階。押すと先に消える ===== */
+/* ===== ダンジョンに入ったときの挿絵とダンジョン名（2026-10-26 ユーザー指示：画面の横も縦もいっぱいに。フェードアウトしてダンジョンの画面へ。押すと先に消える） ===== */
 .world__dungeon-intro {
   position: absolute;
   inset: 0;
   z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgb(0 0 0 / 0.55);
+  overflow: hidden;
+  background: #000;
   cursor: pointer;
-  animation: dungeon-intro-in 420ms ease-out both;
+  animation: dungeon-intro-in 500ms ease-out both;
 }
 
 .world__dungeon-intro.is-closing {
-  animation: dungeon-intro-out 380ms ease-in both;
-}
-
-.world__dungeon-intro-card {
-  width: min(340px, 88%);
-  overflow: hidden;
-  border: 2px solid #c9a24a;
-  border-radius: 8px;
-  background: #11141c;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(255 230 170 / 0.25);
-  animation: dungeon-intro-card 520ms cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
+  animation: dungeon-intro-out var(--intro-fade, 900ms) ease-in both;
 }
 
 .world__dungeon-intro-art {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 100%;
   object-fit: cover;
-  border-bottom: 1px solid rgb(201 162 74 / 0.7);
+  animation: dungeon-intro-zoom 3400ms ease-out both;
 }
 
-.world__dungeon-intro-text {
-  padding: 10px 14px 14px;
-  text-align: center;
-}
-
-.world__dungeon-intro-text p {
-  margin: 0;
-}
-
-.world__dungeon-intro-region {
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  color: var(--color-sub);
-}
-
+/* ダンジョン名（【仮】名前の絵が届くまでは明朝体の文字）：画面の真ん中より少し上 */
 .world__dungeon-intro-name {
-  margin-top: 2px !important;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40%;
+  margin: 0;
+  padding: 14px 16px;
+  text-align: center;
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 38px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #f1d58a;
-  text-shadow: 0 2px 6px rgb(0 0 0 / 0.7);
-}
-
-.world__dungeon-intro-floor {
-  margin-top: 4px !important;
-  font-family: var(--font-display);
-  font-size: 15px;
-  color: #e8e0cc;
+  letter-spacing: 0.12em;
+  color: #fbeec4;
+  text-shadow: 0 0 10px rgb(255 214 120 / 0.85), 0 2px 6px rgb(0 0 0 / 0.9), 0 0 24px rgb(0 0 0 / 0.7);
+  background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.45) 20%, rgb(0 0 0 / 0.45) 80%, transparent);
+  transform: translateY(-50%);
+  animation: dungeon-intro-name 900ms 200ms ease-out both;
 }
 
 @keyframes dungeon-intro-in {
@@ -844,14 +821,21 @@
   to { opacity: 0; }
 }
 
-@keyframes dungeon-intro-card {
-  from { opacity: 0; transform: translateY(10px) scale(0.96); }
-  to { opacity: 1; transform: none; }
+/* 挿絵はゆっくり少しだけ寄る */
+@keyframes dungeon-intro-zoom {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+
+@keyframes dungeon-intro-name {
+  from { opacity: 0; letter-spacing: 0.3em; }
+  to { opacity: 1; letter-spacing: 0.12em; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .world__dungeon-intro,
-  .world__dungeon-intro-card {
+  .world__dungeon-intro-art,
+  .world__dungeon-intro-name {
     animation-duration: 1ms;
   }
 }

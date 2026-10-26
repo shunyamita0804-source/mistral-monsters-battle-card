@@ -31,21 +31,22 @@ const bossCards = (monsterId: string, key: string): CardReward[] => [
  * 2026-10-26 ユーザー指示：最初からあるダンジョンは「遺跡」と「森」の2つ。遺跡のボスはジオル、森のボスはフルーネを使い、
  * 勝つとそのモンスターのモンスターカードと技カードが少しもらえる。ジオル・フルーネの正式データはまだ無いので、仮のジオル・フルーネ（cards.ts）で、
  * 初めて倒したときに1回だけもらえる（ユーザー「今は仮で適当でいい」）。
- * 細かい設計はこれから。いまは森も遺跡（dungeon-01）の写しで、名前は仮
+ * 細かい設計はこれから。いまは森も遺跡（dungeon-01）の写し。
+ * 2026-10-26 名前が決まった（ユーザー）：太古の遺跡（ジオルのボス。遺跡に少し草や木、壊れた遺跡の建物）・精霊の森（フルーネのボス。ピンクの花や蝶）
  */
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
     id: 'dungeon-01',
-    name: '月影の遺跡（仮名）',
-    description: '地下3階の遺跡。最奥のボスを倒すとクリア。（名称・敵編成は仮）',
+    name: '太古の遺跡',
+    description: '草や木に覆われ、壊れた建物が残る遺跡。最奥のボスを倒すとクリア。（敵編成・マップは仮）',
     floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
     firstClearCards: bossCards(TMP_GEOL_ID, 'tmp-geol'),
     isPlaceholder: true,
   },
   {
     id: 'dungeon-02',
-    name: '精霊の森（仮名）',
-    description: '地下3階の森。最奥のボスを倒すとクリア。（名称・敵編成は仮。いまは遺跡と同じ作り）',
+    name: '精霊の森',
+    description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成・マップは仮。いまは遺跡と同じ作り）',
     floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
     firstClearCards: bossCards(TMP_FLUNE_ID, 'tmp-flune'),
     isPlaceholder: true,
