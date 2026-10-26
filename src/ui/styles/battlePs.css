@@ -844,3 +844,99 @@
     transition: none;
   }
 }
+
+/* ---------- 2026-10-26 ユーザー指示：情報の帯と手札の上下を広く、説明の欄（フォーカスエリア）を詰める ---------- */
+/* 情報の帯：2段（上＝誰か・マナ、下＝状態・山札・手札・捨札）で高さ 28→40px。マナ・山札・手札・捨札にアイコン（文字も残す） */
+.battle-line {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  height: 40px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.battle-line__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  height: 18px;
+}
+
+.battle-line__tag {
+  font-size: 12px;
+}
+
+.battle-line__counts {
+  gap: 10px;
+}
+
+.battle-line .battle-info__mana {
+  align-items: center;
+  flex: none;
+}
+
+.battle-line .battle-info__mana-value {
+  font-size: 18px;
+}
+
+.battle-line .battle-info__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.battle-info__icon {
+  flex: none;
+  width: auto;
+  height: 16px;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.6));
+}
+
+.battle-info__mana .battle-info__icon {
+  height: 18px;
+}
+
+/* 自分のモンスターのライフの数字と、自分の情報の帯の間を空ける（iPhone で数字が帯に隠れていた） */
+.battle-line--player {
+  margin-top: 6px;
+}
+
+/* 説明の欄：残りの高さだけ使う（最低 250px をやめる）。上下の余白も少し詰める */
+.battle-detail {
+  min-height: 0;
+  padding: 6px 10px 4px;
+}
+
+/* 手札：上下の余白とカード名を大きく */
+.battle__hand {
+  min-height: calc(var(--hand-card-h) + 38px);
+  padding: 9px 6px 6px;
+}
+
+.battle__hand-name {
+  font-size: 11px;
+}
+
+/* 技の演出・守備の説明：欄を詰めたので、効果の文が欠けないよう間隔と文字を少し小さく（2026-10-26） */
+.battle-spot__info {
+  gap: 3px;
+  padding: 6px 8px;
+}
+
+.battle-spot__name {
+  font-size: 16px;
+}
+
+.battle-spot__power {
+  font-size: 14px;
+}
+
+.battle-spot__desc {
+  font-size: 13px;
+  line-height: 1.4;
+}

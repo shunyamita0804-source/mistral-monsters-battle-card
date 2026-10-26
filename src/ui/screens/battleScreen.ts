@@ -48,6 +48,10 @@ import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../co
 import { battleDigits } from '../components/battleDigits.ts';
 import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
 import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
+import iconMana from '@assets/images/ui/battle/icon_mana.webp';
+import iconDeck from '@assets/images/ui/battle/icon_deck.webp';
+import iconHand from '@assets/images/ui/battle/icon_hand.webp';
+import iconDiscard from '@assets/images/ui/battle/icon_discard.webp';
 import fxForce from '@assets/images/effects/fx_force.webp';
 import fxWisdom from '@assets/images/effects/fx_wisdom.webp';
 import fxDefense from '@assets/images/effects/fx_defense.webp';
@@ -110,12 +114,15 @@ const OFFICIAL_CARD_DETAIL_W = 250;
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
 const HAND_CARD_W = 70;
-/** フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：欄を画面の約1/3に広げ、名前・絵・効果文の入る大きなカード（battleCard.ts）で 132（QA の帯があっても欄に収まる大きさ） */
-const DETAIL_CARD_W = 132;
+/**
+ * フォーカスエリア（説明の欄）の大きなカードの幅（論理px）。2026-10-25 リデザイン：名前・絵・効果文の入る大きなカード（battleCard.ts）で 132。
+ * 2026-10-26 ユーザー指示「説明の欄はスペースがあるので縮めて」で欄を詰めたので 108（演出・守備のカードも 112→88。上に1行あるので欄からはみ出さない大きさ）
+ */
+const DETAIL_CARD_W = 108;
 /** 技の演出で大きく見せるカードの幅（上に1行あるので、説明の欄のカードより少し小さく） */
-const SPOT_CARD_W = 112;
+const SPOT_CARD_W = 88;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
-const DEFENSE_ATTACK_W = 112;
+const DEFENSE_ATTACK_W = 88;
 const DEFENSE_CARD_W = 60;
 /** 相手の手札の裏向きのカードが、フォーカスエリアへ動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる） */
 const OPP_CARD_FLY_MS = 520;
@@ -1038,30 +1045,42 @@ export const battleScreen: ScreenDefinition = {
     const infoLine = (s: BattleState, side: Side): HTMLElement => {
       const st = s.sides[side];
       const active = s.active === side && s.phase !== 'ended';
-      const count = (text: string): HTMLElement => h('span', { class: 'battle-info__count', text });
+      // 2026-10-26 ユーザー指示「マナなどの表記はアイコンに。テキストも削除はせずに」：アイコン＋文字
+      const icon = (src: string): HTMLElement => h('img', { class: 'battle-info__icon', attrs: { src, alt: '', 'aria-hidden': 'true', draggable: 'false' } });
+      const count = (src: string, text: string): HTMLElement => h('span', { class: 'battle-info__count' }, icon(src), h('span', { text }));
+      // 2段：上＝誰か（相手は顔の絵と名前）とマナ、下＝いまの状態と山札・手札・捨札（2026-10-26 アイコンを付けて1行に入りきらなくなったため）
       return h(
         'div',
         { class: `battle-line battle-line--${side}${active ? ' is-active' : ''}` },
         h(
-          'span',
-          { class: 'battle-line__who' },
-          h('span', { class: 'battle-line__tag', text: t(`battle.side.${side}`) }),
-          side === 'opponent' && req.opponent.id ? opponentFace(req.opponent.id, 18) : null,
-          side === 'opponent' ? h('span', { class: 'battle-line__name', text: st.name }) : null,
-          h('span', { class: 'battle-line__state', text: sideState(s, side) }),
-        ),
-        h(
-          'span',
-          { class: 'battle-line__counts' },
+          'div',
+          { class: 'battle-line__row' },
+          h(
+            'span',
+            { class: 'battle-line__who' },
+            h('span', { class: 'battle-line__tag', text: t(`battle.side.${side}`) }),
+            side === 'opponent' && req.opponent.id ? opponentFace(req.opponent.id, 18) : null,
+            side === 'opponent' ? h('span', { class: 'battle-line__name', text: st.name }) : null,
+          ),
           h(
             'span',
             { class: 'battle-info__mana', attrs: { 'aria-label': t('battle.info.manaAria', { n: manaOf(st) }) } },
+            icon(iconMana),
             h('span', { class: 'battle-info__mana-label', text: t('card.detail.mana') }),
             h('span', { class: 'battle-info__mana-value', text: String(manaOf(st)) }),
           ),
-          count(t('battle.info.deck', { n: st.deck.length })),
-          count(t('battle.info.hand', { n: st.hand.length })),
-          count(t('battle.info.discard', { n: st.discard.length })),
+        ),
+        h(
+          'div',
+          { class: 'battle-line__row' },
+          h('span', { class: 'battle-line__state', text: sideState(s, side) }),
+          h(
+            'span',
+            { class: 'battle-line__counts' },
+            count(iconDeck, t('battle.info.deck', { n: st.deck.length })),
+            count(iconHand, t('battle.info.hand', { n: st.hand.length })),
+            count(iconDiscard, t('battle.info.discard', { n: st.discard.length })),
+          ),
         ),
       );
     };
