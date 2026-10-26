@@ -14,6 +14,7 @@ import {
 } from '../deck/deck.ts';
 import { GAUUL_OLD_SKILL_IDS } from '../../data/gauul.ts';
 import { LAZUCK_REMOVED_14_IDS } from '../../data/lazuck.ts';
+import { NOBITON_REMOVED_14_IDS } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
@@ -25,7 +26,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -245,7 +246,13 @@ function migrateLazuckTestV7(raw: RawObject): RawObject {
  */
 const CROSS_GUARD_IDS: readonly string[] = ['skl-lazuck-13'];
 /** ゲームから削除したカードすべて（クロスガード・旧ソラモの16技・旧ガウルの16技）。バックアップの読み込みでは止めない */
-export const REMOVED_CARD_IDS: readonly string[] = [...CROSS_GUARD_IDS, ...SORAMO_OLD_SKILL_IDS, ...GAUUL_OLD_SKILL_IDS, ...LAZUCK_REMOVED_14_IDS];
+export const REMOVED_CARD_IDS: readonly string[] = [
+  ...CROSS_GUARD_IDS,
+  ...SORAMO_OLD_SKILL_IDS,
+  ...GAUUL_OLD_SKILL_IDS,
+  ...LAZUCK_REMOVED_14_IDS,
+  ...NOBITON_REMOVED_14_IDS,
+];
 
 /**
  * version 7 → 8（2026-10-24）：クロスガード（skl-lazuck-13）をゲームから削除した。
@@ -317,7 +324,12 @@ function migrateGaul14V10(raw: RawObject): RawObject {
  * 代わりのカードは配らない（依頼に指定がないため）。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
  */
 function migrateLazuck14V11(raw: RawObject): RawObject {
-  const removed = new Set(LAZUCK_REMOVED_14_IDS);
+  return removeCardsFromSave(raw, LAZUCK_REMOVED_14_IDS);
+}
+
+/** 所持カードとデッキから、ゲームから外したカードを除く。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま） */
+function removeCardsFromSave(raw: RawObject, ids: readonly string[]): RawObject {
+  const removed = new Set(ids);
   const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
   for (const id of removed) delete collection[id];
   const deck = raw.deck;
@@ -327,6 +339,15 @@ function migrateLazuck14V11(raw: RawObject): RawObject {
   const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
   const filled = topUpDeck({ monsters: deck.monsters as string[], skills: skills as string[] }, counts);
   return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
+}
+
+/**
+ * version 11 → 12（2026-10-26）：ノビトンの技を正式14技にした。正式14技の外になった旧11 サイコガード（skl-nobiton-11）・
+ * 旧14 ねばりガード（skl-nobiton-14）は所持カードとデッキから外す。ほかの12技は ID が同じなので、持っている枚数はそのまま。
+ * 初期配布16枚は新しく始めたときだけ（ユーザー指示「既存ユーザーへの再配布や所持カードの上書きは、明示的な移行仕様がない限り行わない」）
+ */
+function migrateNobiton14V12(raw: RawObject): RawObject {
+  return removeCardsFromSave(raw, NOBITON_REMOVED_14_IDS);
 }
 
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
@@ -341,6 +362,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   8: migrateSoramo14V9,
   9: migrateGaul14V10,
   10: migrateLazuck14V11,
+  11: migrateNobiton14V12,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

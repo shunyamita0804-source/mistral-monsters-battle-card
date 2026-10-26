@@ -527,6 +527,8 @@
   top: calc((1 - var(--art-scale, 1)) * 50% + var(--art-offset, 0) * 100%);
   width: calc(var(--art-scale, 1) * 100%);
   height: calc(var(--art-scale, 1) * 100%);
+  /* 800×920 と違う縦横比の絵（ノビトン 2026-10-26）も、引き伸ばさずに収める（800×920 の絵は今までと同じ） */
+  object-fit: contain;
   pointer-events: none;
   user-select: none;
 }
