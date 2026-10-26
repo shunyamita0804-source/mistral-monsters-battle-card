@@ -103,6 +103,21 @@ ZIP の並び順と「順番に」の並びが合わないため、**曲のフ�
 
 - いままでのダンジョンの曲 `dungeon`（Spirits Forest / HydroGene）は、曲の決まっていないダンジョン用に残した（いまは鳴る場所なし）
 
+### 2026-10-26 これから作るダンジョン用の5曲（保存だけ・まだ鳴らさない）
+
+ユーザー指示「先に今後使う予定のダンジョンのBGMを送ります。保存しておいてください。名前つけてます」（2026-10-26。利用確認済み）。
+ZIP 5つ（ユーフルカ〔Wingless Seraph〕）。**ユーザーが付けた日本語のファイル名は文字化けで読めなかった**（どのダンジョン用かはユーザーに確認する）。
+`make_bgm_loops_wingless.py` でループ用 MP3 を作って `assets/audio/bgm/` に置いた。まだ `BGM_REGISTRY` に入れていない（使うダンジョンができたら足す）。
+gain は約 -18.5 LUFS にそろえるための値（入れるときにそのまま使う）。
+
+| ファイル | 曲名 / 作者 | 届いた ZIP の中の名前 | gain |
+| --- | --- | --- | --- |
+| bgm_dungeon_tower.mp3 | Tower of Despair / ユーフルカ | Tower-of-despair_loop | 0.33 |
+| bgm_dungeon_dimension.mp3 | Another Dimension / ユーフルカ | Es-STAGE4_loop | 0.35 |
+| bgm_dungeon_sacred.mp3 | The Sacred Place / ユーフルカ | The-sacred-place_loop | 0.46 |
+| bgm_dungeon_snow.mp3 | 永遠の雪原 / ユーフルカ | Everlasting-Snow_loop | 0.50 |
+| bgm_dungeon_undersea.mp3 | Undersea Palace ～海底神殿～ / ユーフルカ | Undersea-palace_loop | 0.35 |
+
 ### 2026-10-26 追加の3曲（家の中）
 
 ユーザー指示「主人公の部屋BGM、住人共通の家の中のBGM、案内人の家の中のBGM」（2026-10-26。利用確認済み）。MP3 3つ。曲名・作者はファイルに書かれていない（ファイル名も文字化け）。

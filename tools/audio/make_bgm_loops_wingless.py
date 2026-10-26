@@ -28,6 +28,12 @@ TRACKS = {
     'dungeon_ruins': 'Moon-ruins',  # 遺跡のダンジョン：月の廃墟
     'dungeon_forest': 'Elven-Sanctuary',  # 森のダンジョン：古代エルフの聖域
     'lab': 'sealed_room',  # カード研究所：開かれし封印の扉
+    # 2026-10-26 追加：これから作るダンジョン用（ユーザー提供・利用確認済み。まだゲームでは鳴らさない）
+    'dungeon_tower': 'Tower-of-despair',  # Tower of Despair
+    'dungeon_dimension': 'Es-STAGE4',  # Another Dimension
+    'dungeon_sacred': 'The-sacred-place',  # The Sacred Place
+    'dungeon_snow': 'Everlasting-Snow',  # 永遠の雪原
+    'dungeon_undersea': 'Undersea-palace',  # Undersea Palace ～海底神殿～
 }
 
 
