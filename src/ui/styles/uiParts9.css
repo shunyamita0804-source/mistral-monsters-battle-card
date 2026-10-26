@@ -18,8 +18,9 @@
   filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.65));
 }
 
+/* ロゴの上の余白（2026-10-26 ユーザー指示「もう少し下に」で 40→100px） */
 .title.screen {
-  padding-top: 40px;
+  padding-top: 100px;
 }
 
 /* ===== 2 技の対象を示す矢印（自分の技＝青・相手の技＝赤） ===== */
