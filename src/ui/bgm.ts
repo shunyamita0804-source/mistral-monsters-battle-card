@@ -91,7 +91,17 @@ const FADE_IN_S = 0.8;
 interface Track {
   readonly el: HTMLAudioElement;
   readonly gain: GainNode | null;
+  /** 止めている途中（小さくし終えたら片付ける）のタイマー。使い回すときは取り消す */
+  stopTimer: ReturnType<typeof setTimeout> | null;
 }
+
+/**
+ * 使い回す audio の数（鳴っている曲・小さくしている途中の曲・予備）。
+ * 2026-10-26 ユーザー報告「建物に入ると、一歩動かないと音が鳴らない」：iPhone は、タップの処理の中で一度 play() した audio しか
+ * あとから鳴らせない。曲を替えるたびに新しい audio を作っていたため、建物に入った（タップの外）ときの新しい曲は次のタップまで鳴らなかった。
+ * 最初のタップでこの数だけ audio を作って鳴らせる状態にし、曲を替えるときは src だけ入れ替えて使い回す
+ */
+const POOL_SIZE = 3;
 
 class BgmPlayer {
   #wanted: BgmId | null = null;
@@ -99,6 +109,8 @@ class BgmPlayer {
   #volume = 1;
   #unlocked = false;
   #installed = false;
+  /** 最初のタップで鳴らせる状態にした audio（Web Audio につないだまま使い回す） */
+  readonly #pool: Track[] = [];
 
   setVolume(volume: number): void {
     this.#volume = Number.isFinite(volume) ? Math.min(1, Math.max(0, volume)) : 1;
@@ -127,12 +139,14 @@ class BgmPlayer {
     if (this.#installed || typeof window === 'undefined') return;
     this.#installed = true;
     const unlock = (): void => {
+      // タップの処理の中で play() を呼ぶ（iPhone はここでないと鳴らせない）。使い回す audio もここで鳴らせる状態に
+      this.#fillPool();
       this.#unlocked = true;
-      // タップの処理の中で play() を呼ぶ（iPhone はここでないと鳴らせない）
       if (this.#playing) void this.#playing.track.el.play().catch(() => undefined);
       else this.#start();
     };
     window.addEventListener('pointerdown', unlock, { passive: true });
+    window.addEventListener('touchend', unlock, { passive: true });
     window.addEventListener('keydown', unlock);
     document.addEventListener('visibilitychange', () => {
       const el = this.#playing?.track.el;
@@ -142,10 +156,34 @@ class BgmPlayer {
     });
   }
 
+  /** 使い回す audio をタップの処理の中で作り、一度 play() して鳴らせる状態にする（音源がないので音は出ない） */
+  #fillPool(): void {
+    while (this.#pool.length < POOL_SIZE) {
+      const track = this.#createTrack();
+      void track.el.play().catch(() => undefined);
+      track.el.pause();
+      this.#pool.push(track);
+    }
+  }
+
+  /** 次に使う audio：いま鳴らしている曲以外。小さくしている途中のものしかなければ、それを取り消して使う */
+  #takeTrack(): Track {
+    const free = this.#pool.filter((t) => t !== this.#playing?.track);
+    const track = free.find((t) => !t.stopTimer && !t.el.getAttribute('src')) ?? free[0] ?? this.#createTrack();
+    if (track.stopTimer) {
+      clearTimeout(track.stopTimer);
+      track.stopTimer = null;
+      track.el.pause();
+    }
+    return track;
+  }
+
   #start(): void {
     const id = this.#wanted;
     if (!id || !this.#unlocked || this.#volume <= 0 || this.#playing) return;
-    const track = this.#createTrack(BGM_REGISTRY[id].src);
+    const track = this.#takeTrack();
+    track.el.src = BGM_REGISTRY[id].src;
+    track.el.currentTime = 0;
     this.#playing = { id, track };
     this.#setLevel(track, 0, 0);
     void track.el.play().catch(() => undefined);
@@ -156,28 +194,29 @@ class BgmPlayer {
     const p = this.#playing;
     if (!p) return;
     this.#playing = null;
-    this.#setLevel(p.track, 0, fadeS);
-    setTimeout(() => {
-      p.track.el.pause();
-      p.track.el.removeAttribute('src');
-      p.track.el.load();
-      p.track.gain?.disconnect();
+    const track = p.track;
+    this.#setLevel(track, 0, fadeS);
+    track.stopTimer = setTimeout(() => {
+      track.stopTimer = null;
+      track.el.pause();
+      track.el.removeAttribute('src');
+      track.el.load();
     }, fadeS * 1000 + 50);
   }
 
-  #createTrack(src: string): Track {
-    const el = new Audio(src);
+  #createTrack(): Track {
+    const el = new Audio();
     el.loop = true;
     el.preload = 'auto';
     const ctx = sound.audioContext();
-    if (!ctx) return { el, gain: null };
+    if (!ctx) return { el, gain: null, stopTimer: null };
     try {
       if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
       const gain = ctx.createGain();
       ctx.createMediaElementSource(el).connect(gain).connect(ctx.destination);
-      return { el, gain };
+      return { el, gain, stopTimer: null };
     } catch {
-      return { el, gain: null };
+      return { el, gain: null, stopTimer: null };
     }
   }
 
