@@ -60,15 +60,31 @@
 | 場面（BGM_REGISTRY） | ファイル | 曲名 / 作者 | 出典 | 本編のファイル |
 | --- | --- | --- | --- | --- |
 | `title`：タイトル | bgm_title.mp3 | Bon Voyage! / HarumachiMusic | Pixabay | licensed_20261007/06_prologue_departure.ogg |
-| `town`：街・部屋（ショップなどの画面も続けて） | bgm_town.mp3 | 冒険への誘い / のる | OpenTracks（旧 DOVA-SYNDROME） | licensed_20261008/town_bouken_e_no_izanai.ogg |
 | `tournament`：大会の受付 | bgm_tournament.mp3 | Battle - スタンバイフェイズ / lei | DOVA-SYNDROME | licensed_20261007/08_tournament_table_start17s.ogg（17秒から） |
-| `tournamentBattle`：大会の対戦 | bgm_tournament_battle.mp3 | 戦いの旅路を征く / MATSU | DOVA-SYNDROME | licensed_20261007/14_official_rank_battle.ogg |
 | `dungeon`：ダンジョンの探索 | bgm_dungeon.mp3 | Spirits Forest / HydroGene（CC0） | itch.io | hydrogene_16bit_rpg/07_spirits_forest_full.ogg（前奏を除いたループ部） |
-| `battle`：ダンジョン・練習の対戦 | bgm_battle.mp3 | 通常戦闘曲 - α / lei | DOVA-SYNDROME | licensed_20261007/12_wild_battle.ogg |
-| `bossBattle`：ダンジョンのボス | bgm_boss_battle.mp3 | 中ボスくらいの戦闘風 / Motoyuki | DOVA-SYNDROME | licensed_20261007/13_rare_monster_battle.ogg |
 
 - 本編の作品固有の曲（タイトル曲・本編の正式 BGM・作者不明の「公式ランク」）は使っていない
 - 切れ目：MP3 は頭と終わりにごく短い無音が入るため、ループの継ぎ目でほんの一瞬切れることがある（気になれば形式を変える）
+- 2026-10-26 まで使っていたミスモンの曲（街「冒険への誘い」のる・対戦「通常戦闘曲 - α」lei・大会の対戦「戦いの旅路を征く」MATSU・ボス「中ボスくらいの戦闘風」Motoyuki）は、
+  下のユーフルカの曲に替えた（ゲームでは鳴らさない。ファイルは同じ名前で上書き）
+
+## BGM（2026-10-26 差し替え・ユーフルカの4曲）
+
+ユーザー指示「順番に野生モンスターバトルBGM、Boss戦BGM、公式ランク戦BGM、街のBGM。使用確認は取れていてOK」（2026-10-26）。
+ユーザーが ZIP 4つ（Battle-HolyBeast_loop・Wanderers-City_loop・Battle-Conflict_loop・Boss-battle_loop）で届けた。
+ZIP の並び順と「順番に」の並びが合わないため、**曲のファイル名で割り当てた**（Boss-battle＝ボス戦・Wanderers-City＝街）。
+`tools/audio/make_bgm_loops_wingless.py` が ZIP の「ツクール用」OGG と .txt のループ位置（LOOPSTART・LOOPLENGTH）から、
+前奏を外したループ部だけの MP3（128kbps）を作る。音量は測って、いままでの曲と同じくらい（約 -18.5 LUFS）になるよう `BGM_REGISTRY` の gain で合わせた。
+元の ZIP はリポジトリに入れていない（素材の再配布にならないよう。作り直すときはユーザーから受け取った ZIP を展開して使う）。
+
+| 場面（BGM_REGISTRY） | ファイル | 曲名 / 作者 | 出典 | 届いた ZIP |
+| --- | --- | --- | --- | --- |
+| `town`：街・部屋（ショップなどの画面も続けて） | bgm_town.mp3 | 放浪者の街 / ユーフルカ | Wingless Seraph（http://wingless-seraph.net/） | Wanderers-City_loop.zip |
+| `battle`：ダンジョン・練習の対戦（野生モンスター） | bgm_battle.mp3 | 神獣の試練 / ユーフルカ | 同上 | Battle-HolyBeast_loop.zip |
+| `bossBattle`：ダンジョンのボス | bgm_boss_battle.mp3 | 己と仲間を信じて / ユーフルカ | 同上 | Boss-battle_loop.zip |
+| `tournamentBattle`：大会の対戦（公式ランク戦） | bgm_tournament_battle.mp3 | Conflict / ユーフルカ | 同上 | Battle-Conflict_loop.zip |
+
+- 英語の曲名はローマ字の仮表記（Hourousha no Machi・Shinju no Shiren・Onore to Nakama wo Shinjite）
 
 ## ミスモンの画像（2026-10-22 追加）
 

@@ -7,6 +7,8 @@
   そのまま頭から繰り返せば、切れ目なく続く（ブラウザの audio の loop で鳴らせる）
 - MP3（128kbps・ステレオ）。どのブラウザでも鳴る
 - 音量はファイルでは変えない（ゲームの BGM_REGISTRY の gain で合わせる）
+- 2026-10-26 から town・tournament_battle・battle・boss_battle はユーフルカの曲（make_bgm_loops_wingless.py）。
+  このスクリプトをそのまま流すとミスモンの曲で上書きするので、残りの3曲（title・tournament・dungeon）だけを作るときは TRACKS を絞る
 """
 import os
 import subprocess
