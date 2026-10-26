@@ -13,13 +13,6 @@
   text-align: center;
 }
 
-.title__icon {
-  width: 220px;
-  height: 220px;
-  border-radius: 40px;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
-}
-
 .title__series {
   margin-top: 20px;
   font-size: 16px;

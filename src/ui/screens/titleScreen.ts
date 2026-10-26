@@ -1,5 +1,4 @@
 import { APP_INFO } from '../../config/app.ts';
-import { resolvePublicPath } from '../../core/assetPath.ts';
 import { getLanguage, t } from '../../i18n/i18n.ts';
 import { confirmModal } from '../components/modal.ts';
 import { bgm } from '../bgm.ts';
@@ -34,8 +33,7 @@ export const titleScreen: ScreenDefinition = {
       h(
         'div',
         { class: 'title__logo' },
-        // ユーザー承認の正式アイコン（2026-10-23 新しい版。原本を縮小し、外側の黒い角を透明にしただけで描き換えていない）
-        h('img', { class: 'title__icon', attrs: { src: resolvePublicPath('icons/icon-512.png'), alt: '', draggable: 'false' } }),
+        // 2026-10-26 ユーザー指示「アイコンは消して、ロゴをその分上に」（アプリのアイコンとしてはそのまま使う）
         // タイトルロゴ（2026-10-26 デザイン第9弾。英字の「MISTRAL MONSTERS / BATTLE CARD」）。日本語の正式名称は下に文字で添える（英語表示でも日本語）
         h('h1', { class: 'title__name title__name--logo' }, h('img', { class: 'title__logo-art', attrs: { src: titleLogo, alt: en ? APP_INFO.gameNameEn : APP_INFO.gameName, draggable: 'false' } })),
         h('p', { class: 'title__en', text: APP_INFO.gameName }),

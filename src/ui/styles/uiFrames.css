@@ -122,15 +122,6 @@
     var(--color-stage);
 }
 
-.title .title__icon {
-  width: 170px;
-  height: 170px;
-  /* 2026-10-23 新しいアイコン：金の角丸の枠が絵に入っている（外は透明）ので、角を切らず、影は絵の形に付ける */
-  border-radius: 0;
-  box-shadow: none;
-  filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.5));
-}
-
 .title .title__series,
 .title .title__en {
   color: #d8d2c4;
