@@ -521,13 +521,15 @@ export class WorldView {
 
   /** 人物の足元の影（地面に置く。家具・人物より奥） */
   #addShadow(el: HTMLElement): void {
-    const cls = el === this.#player ? 'world__shadow world__shadow--player' : 'world__shadow';
+    const cls = el === this.#player ? 'world__shadow world__shadow--player' : 'world__shadow world__shadow--npc';
     const shadow = h('div', { class: cls, attrs: { 'aria-hidden': 'true' } });
     // 2026-10-23：人物が地面に立って見えるよう、影を大きく濃く（背景の絵の影の強さに合わせる）
     // 2026-10-25 ユーザー「まだ背景に浮いているように見える。NPC も」：影の真ん中が足の裏より下にあり、影の上に立って（浮いて）見えた。
     // 影の真ん中を足の裏の線に合わせ、平たい楕円に（濃い所は靴のまわりだけ。CSS の .world__shadow）。絵の縁取り・足元の暗さは tools/art/ground_figures.py
-    const w = this.#figureH * 0.71;
-    const sh = this.#figureH * 0.19;
+    // NPC は少し大きく（2026-10-26 ユーザー「貼り付けた感じ」。主人公の影はそのまま）
+    const big = el === this.#player ? 1 : 1.18;
+    const w = this.#figureH * 0.71 * big;
+    const sh = this.#figureH * 0.19 * big;
     Object.assign(shadow.style, { width: `${w}px`, height: `${sh}px`, marginLeft: `${-w / 2}px`, marginTop: `${-sh / 2}px` });
     this.#shadows.set(el, shadow);
     this.#mapLayer.append(shadow);
@@ -851,11 +853,17 @@ export class WorldView {
     }
     if (obj.type === 'npc') {
       if (!this.#isVisible(obj)) return null;
-      // 人物の歩行の絵（待機の向き）。足元のマスに立つ
-      const el = h('div', { class: 'world__npc', dataset: { npc: obj.npcId }, attrs: { 'aria-label': t(NPC_NAME[obj.npcId]) } });
+      // 人物の歩行の絵（待機の向き）。足元のマスに立つ。
+      // 絵は中の「体」の層に描き、体だけを足の裏を中心に縦へわずかに伸び縮みさせる（呼吸。2026-10-26 ユーザー「足は地面にしっかり着地」）。
+      // 位置を決める transform（外側）と分けるので、伸び縮みしても足元は動かない
+      const body = h('div', { class: 'world__npc-body' });
+      const el = h('div', { class: 'world__npc', dataset: { npc: obj.npcId }, attrs: { 'aria-label': t(NPC_NAME[obj.npcId]) } }, body);
       this.#sizeFigure(el);
       this.#addShadow(el);
-      el.style.backgroundImage = `url("${NPC_SHEET[obj.npcId]}")`;
+      body.style.backgroundImage = `url("${NPC_SHEET[obj.npcId]}")`;
+      body.style.transformOrigin = el.style.transformOrigin;
+      // 人ごとに呼吸の始まりをずらす（そろって動かないように）
+      body.style.animationDelay = `${-((obj.x * 7 + obj.y * 13) % 32) / 10}s`;
       this.#faceNpc(el, 'down');
       this.#placeFigure(el, obj);
       return el;
@@ -874,8 +882,9 @@ export class WorldView {
   #faceNpc(el: HTMLElement, dir: Direction): void {
     const w = parseFloat(el.style.width);
     const hgt = parseFloat(el.style.height);
-    el.style.backgroundSize = `${w * 4}px ${hgt * 4}px`;
-    el.style.backgroundPosition = `${-NPC_IDLE_COL * w}px ${-DIR_ROW[dir] * hgt}px`;
+    const body = (el.querySelector('.world__npc-body') as HTMLElement | null) ?? el;
+    body.style.backgroundSize = `${w * 4}px ${hgt * 4}px`;
+    body.style.backgroundPosition = `${-NPC_IDLE_COL * w}px ${-DIR_ROW[dir] * hgt}px`;
     el.dataset.face = dir;
   }
 
@@ -1045,12 +1054,14 @@ export class WorldView {
       this.#held = null;
       const target = warp.target;
       if (target.kind === 'map') {
-        // 建物に入る・出る：ドアの音（大会会場は鉄の扉の音）
+        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）
         const to = getMap(target.mapId);
         if (to && to.area !== this.#map.area) {
-          const iron = to.id === 'hall' || this.#map.id === 'hall';
+          const building = to.area === 'interior' ? to.id : this.#map.id;
           const entering = to.area === 'interior';
-          sound.play(iron ? (entering ? 'ironDoorOpen' : 'ironDoorClose') : entering ? 'doorOpen' : 'doorClose');
+          sound.play(
+            building === 'hall' ? 'ironDoorOpen' : building === 'shop' ? 'autoDoor' : entering ? 'doorOpen' : 'doorClose',
+          );
         }
         this.#store.update((s) => ({ ...s, location: { mapId: target.mapId, x: target.x, y: target.y, dir: target.dir } }));
         this.#goTo(() => this.load());
