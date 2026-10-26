@@ -844,3 +844,241 @@
     transition: none;
   }
 }
+
+/* ---------- 2026-10-26 ユーザー指示：対戦画面の配分 ----------
+ * ①情報（あなた・相手・状態・マナ・山札・手札・捨札）はモンスターの列の左に縦に（.battle-stats。アイコン＋文字）
+ * ②真ん中の経過の1行は上の帯へ移し、手番・対戦の名前・先攻後攻と1行にして右から左へ流す（.battle__ticker）
+ * ③手札の上下を広く、説明の欄（フォーカスエリア）は残りの高さだけ
+ */
+
+/* 上の帯：左右のボタンの間に流れる文字（押すと経過をすべて見る） */
+.battle__heading {
+  flex-direction: row;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.battle__ticker {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--panel-line);
+  border-radius: 15px;
+  background: rgb(6 10 20 / 0.7);
+  cursor: pointer;
+  /* 両端は文字がふわっと消える */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%);
+}
+
+.battle__ticker-text {
+  flex: none;
+  display: inline-block;
+  padding-left: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #f0e4c8;
+  white-space: nowrap;
+  animation: battle-ticker linear infinite;
+}
+
+.battle__header--player .battle__ticker-text {
+  color: #cfe2ff;
+}
+
+.battle__header--opponent .battle__ticker-text {
+  color: #ffd2c2;
+}
+
+.battle__ticker.is-changed {
+  animation: ticker-flash 900ms ease-out;
+}
+
+@keyframes battle-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes ticker-flash {
+  0% { box-shadow: 0 0 0 2px rgb(240 210 140 / 0.9); }
+  100% { box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle__ticker-text {
+    padding-left: 8px;
+    animation: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* 場の全体カード（あるときだけ、流れる文字の左） */
+.battle__heading .battle-turn__field {
+  flex: none;
+  max-width: 76px;
+}
+
+/* モンスターの列：左＝情報の欄、右＝モンスター3体。相手と自分の列の間は少し空ける（場面の札が出る所） */
+.battle-board {
+  gap: 6px;
+}
+
+.battle-row--player {
+  margin-top: 10px;
+}
+
+.battle-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.battle-row .battle-side {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
+}
+
+/* 場面の札（あなたのターンなど）：相手の列と自分の列の間 */
+.battle-row--player .battle__phase-chip {
+  top: -6px;
+}
+
+.battle-stats {
+  flex: none;
+  width: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  background: rgb(10 14 24 / 0.55);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.battle-stats--opponent {
+  --line-color: rgb(168 102 74 / 0.75);
+}
+
+.battle-stats--player {
+  --line-color: rgb(91 143 208 / 0.75);
+}
+
+.battle-stats__who {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.battle-stats--opponent .battle-line__tag {
+  background: var(--side-opponent);
+  color: #fff4ec;
+}
+
+.battle-stats--player .battle-line__tag {
+  background: var(--side-player);
+  color: #f2f7ff;
+}
+
+.battle-stats__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  color: #f0e4c8;
+}
+
+.battle-stats__state {
+  font-weight: 700;
+  color: var(--color-sub);
+  white-space: nowrap;
+}
+
+.battle-stats.is-active .battle-stats__state {
+  color: var(--color-accent);
+}
+
+.battle-stats .battle-info__mana {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.battle-stats .battle-info__mana-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9cc8ff;
+}
+
+.battle-stats .battle-info__mana-value {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  color: #e6f2ff;
+}
+
+.battle-stats .battle-info__count {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--color-sub);
+  white-space: nowrap;
+}
+
+.battle-info__icon {
+  flex: none;
+  width: 20px;
+  height: 15px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.6));
+}
+
+.battle-info__mana .battle-info__icon {
+  height: 18px;
+}
+
+/* 説明の欄：残りの高さだけ使う（最低 250px をやめる）。上下の余白も少し詰める */
+.battle-detail {
+  min-height: 0;
+  padding: 6px 10px 4px;
+}
+
+/* 手札：上下の余白とカード名を大きく */
+.battle__hand {
+  min-height: calc(var(--hand-card-h) + 38px);
+  padding: 9px 6px 6px;
+}
+
+.battle__hand-name {
+  font-size: 11px;
+}
+
+/* 技の演出・守備の説明：欄を詰めたので、効果の文が欠けないよう間隔と文字を少し小さく（2026-10-26） */
+.battle-spot__info {
+  gap: 3px;
+  padding: 6px 8px;
+}
+
+.battle-spot__name {
+  font-size: 16px;
+}
+
+.battle-spot__power {
+  font-size: 14px;
+}
+
+.battle-spot__desc {
+  font-size: 13px;
+  line-height: 1.4;
+}

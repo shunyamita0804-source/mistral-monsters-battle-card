@@ -1,0 +1,116 @@
+[
+  {
+    "skill_number": 1,
+    "asset": "Soramo_Skill_01.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_01.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 2,
+    "asset": "Soramo_Skill_02.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_02.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 3,
+    "asset": "Soramo_Skill_03.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_03.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 4,
+    "asset": "Soramo_Skill_04.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_04.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 5,
+    "asset": "Soramo_Skill_05.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_05.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 6,
+    "asset": "Soramo_Skill_06.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_06.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 7,
+    "asset": "Soramo_Skill_07.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_07.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 8,
+    "asset": "Soramo_Skill_08.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_08.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 9,
+    "asset": "Soramo_Skill_09.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_09.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 10,
+    "asset": "Soramo_Skill_10.png",
+    "original": "Soramo_ArtV2_Skills_01-10_Revised_04_07_09.zip::Soramo_ArtV2_Skill_10.png",
+    "transformation": "original PNG copied byte-for-byte",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 11,
+    "asset": "Soramo_Skill_11.png",
+    "original": "F3E74959-4A7F-456A-BE76-D8952A3C0EC7(1).jpeg",
+    "source_dimensions": [
+      1178,
+      1335
+    ],
+    "transformation": "lossless PNG output after proportional near-identical-aspect resize (no crop, no composition change)",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 12,
+    "asset": "Soramo_Skill_12.png",
+    "original": "359822F1-B292-489A-BEC5-F5E360D41E83(1).jpeg",
+    "source_dimensions": [
+      1178,
+      1335
+    ],
+    "transformation": "lossless PNG output after proportional near-identical-aspect resize (no crop, no composition change)",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 13,
+    "asset": "Soramo_Skill_13.png",
+    "original": "21036E88-3D30-4255-9D13-A6A5295A98F7(1).jpeg",
+    "source_dimensions": [
+      1178,
+      1335
+    ],
+    "transformation": "lossless PNG output after proportional near-identical-aspect resize (no crop, no composition change)",
+    "size": "827x937"
+  },
+  {
+    "skill_number": 14,
+    "asset": "Soramo_Skill_14.png",
+    "original": "DA662115-1AB8-446E-83B3-6CF077D69FBC.jpeg",
+    "source_dimensions": [
+      1178,
+      1335
+    ],
+    "transformation": "lossless PNG output after proportional near-identical-aspect resize (no crop, no composition change)",
+    "size": "827x937"
+  }
+]

@@ -1,18 +1,21 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
-import soramo14 from './official/soramo14_skills_OFFICIAL_20261025.json';
+import soramo14 from './official/soramo14_artv2_skills_OFFICIAL_20261026.json';
 import themeColors from './official/monster_theme_colors.json';
 
 /**
  * 【正式データ】ソラモの技カード14種（2026-10-25 ユーザー確定。MistralBC_Soramo14_Claude_NewUI_Implementation_20261025）。
  *
- * 正本は届いた 02_SKILL_DATA/Soramo_14Skills_UTF8.json（無改変で src/data/official/soramo14_skills_OFFICIAL_20261025.json に置いた。
- * CSV も同じフォルダに無改変）。ZIP の中身はすべて design-parts/cards-original/soramo14-20261025/ に無改変で保管。
+ * 正本は 2026-10-26 に届いた 02_SKILL_DATA/Soramo_14Skills_ArtV2_Starter16_UTF8.json（Soramo_ArtV2_14Skills_Claude_Implementation_Starter16。
+ * 無改変で src/data/official/soramo14_artv2_skills_OFFICIAL_20261026.json に置いた。CSV も同じフォルダに無改変）。
+ * ZIP の中身はすべて design-parts/cards-original/soramo14-artv2-20261026/ に無改変で保管。
+ * 技名・分類・マナ・ダメージ・効果・初期配布は 2026-10-25 の版と同じ（違いは絵の版 art_version: "2" の欄が増えたことだけ）
  * 技名・分類・マナ・ダメージ・効果の文・初期配布の枚数は、ここで書き換えずに JSON からそのまま読む（tests/soramo.test.ts で CSV とも照合）。
  *
  * ゲーム内 ID：skl-soramo14-01〜14（JSON の id soramo_skill_01〜14 はデザイン ID として持つ）。
  * 旧16技（skl-soramo-01〜16）とは番号を流用しない。旧16技はゲームから削除し、古いセーブからも外す（2026-10-25 ユーザー決定「削除」。saveData.ts の version 9）
- * 絵：sor14_sk_01〜14.png（届いた 827×937 の PNG を1バイトも変えずに置いた。名前だけ素材の命名規則に合わせた）
+ * 絵：sor14v2_sk_01〜14.png＝技イラスト Art Ver.2（2026-10-26。届いた 827×937 の PNG を1バイトも変えずに置いた。名前だけ素材の命名規則に合わせた）。
+ *   それまでの絵（sor14_sk_01〜14.png）と原本（design-parts/cards-original/soramo14-20261025/）は外した（git の履歴にある）
  *
  * 初期配布（JSON の starter_copies）：02・03・04・07・09・10・11・13 を2枚ずつ＝16枚（ユーザー確定）。
  * 01・05・06・08・12・14 は初期配布0枚（登録はする。入手方法・排出率は未定なので、パックなどには入れていない）
@@ -53,6 +56,8 @@ export interface Soramo14Row {
   readonly effect: string;
   readonly image: string;
   readonly starter_copies: number;
+  /** 技イラストの版（2026-10-26 の Art Ver.2 は "2"） */
+  readonly art_version?: string;
 }
 
 export const SORAMO14_ROWS: readonly Soramo14Row[] = soramo14;
@@ -92,11 +97,11 @@ function toOfficial(row: Soramo14Row): OfficialSkill {
   };
 }
 
-/** 技の絵のファイル名（assets/images/cards/skills/）。JSON の image（01_SKILL_IMAGES/Soramo_Skill_NN.png）の番号どおり */
+/** 技の絵のファイル名（assets/images/cards/skills/。Art Ver.2）。JSON の image（01_SKILL_IMAGES/Soramo_Skill_NN.png）の番号どおり */
 export function soramoArtFile(row: Soramo14Row): string {
   const no = /Soramo_Skill_(\d{2})\.png$/.exec(row.image)?.[1];
   if (!no || Number(no) !== row.number) throw new Error(`ソラモの技の絵の番号が合いません: ${row.id} ${row.image}`);
-  return `sor14_sk_${no}.png`;
+  return `sor14v2_sk_${no}.png`;
 }
 
 export const SORAMO_SKILLS: readonly SkillCard[] = SORAMO14_ROWS.map((row) =>

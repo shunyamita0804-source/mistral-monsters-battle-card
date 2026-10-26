@@ -97,7 +97,8 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 
 | パス | 内容 | 状態 |
 | --- | --- | --- |
-| `images/cards/skills/sor14_sk_01〜14.png` | ソラモ14技の絵（ZIP「MistralBC_Soramo14_Claude_NewUI_Implementation_20261025」の 01_SKILL_IMAGES） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/soramo14-20261025/` |
+| `images/cards/skills/sor14v2_sk_01〜14.png` | ソラモ14技の絵・技イラスト Art Ver.2（ZIP「Soramo_ArtV2_14Skills_Claude_Implementation_Starter16」の 01_SKILL_IMAGES。2026-10-26） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/soramo14-artv2-20261026/` |
+| （削除）`images/cards/skills/sor14_sk_01〜14.png` | それまでのソラモ14技の絵（2026-10-25）。2026-10-26 に Art Ver.2 へ替えたので削除（git の履歴にある） | 削除 |
 | `images/cards/skills/gau14_sk_01〜14.png` | ガウル14技の絵（ZIP「Gaul_Implementation_Ver2_Claude」の 01_SKILL_IMAGES。2026-10-26） | ユーザー承認の正式画像。827×937 の PNG を1バイトも変えずに置いた（名前だけ命名規則に合わせた）。原本は `design-parts/cards-original/gaul14-20261026/` |
 | （削除）`images/cards/skills/gau_sk_01〜16.webp` | 旧ガウルの技16種の絵。2026-10-26 にガウル14技へ替えたので削除（git の履歴にある） | 削除 |
 | `images/ui/{order,vs,newgame,badges,tournament}/`・`images/ui/packs/pack_locked.webp`・`images/ui/banners/banner_rankup.webp`・`images/effects/fx_*.webp`・`images/characters/{hero,face_hero}_{male,female}.webp` | デザイン第8弾（2026-10-26）：先攻・後攻のカードの表・VS の部品・主人公を選ぶ札・主人公の立ち絵と顔・技の光・レア度と NEW の印・鍵つきパック・勝ち抜き表・ランクアップの帯 | 原本 `design-parts/ui-quality8-20261026/` から `tools/design/ui8_build.py` で切り出し・縮小（描き直しなし）。記録は `docs/design/ui-quality8-20261026/10_受け取り結果_UTF8.txt` |

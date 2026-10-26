@@ -1,0 +1,170 @@
+[
+  {
+    "skill_number": 1,
+    "name": "ひっかき",
+    "filename": "Soramo_Skill_01.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1056360,
+    "sha256": "ee5e646e1dd6446bd47c11a042d29dc97a1f8f3396299b1f38d1f2e7af7fecfc"
+  },
+  {
+    "skill_number": 2,
+    "name": "連続ひっかき",
+    "filename": "Soramo_Skill_02.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 977239,
+    "sha256": "493e99a11d5501aedc9e4f0daca26d218da4f11057c5d9674abeabac0063b848"
+  },
+  {
+    "skill_number": 3,
+    "name": "たいあたり",
+    "filename": "Soramo_Skill_03.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1069219,
+    "sha256": "eba137bbc5d8464ca5c7c133128f761a91e8fe1e85e2447e691824d1476020fb"
+  },
+  {
+    "skill_number": 4,
+    "name": "しっぽアタック",
+    "filename": "Soramo_Skill_04.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1138444,
+    "sha256": "944d99be771968b35a3ec87f6d904d2f5edfc32c8c0cf35769757c786b3cc813"
+  },
+  {
+    "skill_number": 5,
+    "name": "スターダイブ",
+    "filename": "Soramo_Skill_05.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1331050,
+    "sha256": "0ba95cfae4194c08cf70caa83b502da2b6a329289103e76817e8fe6163774ca3"
+  },
+  {
+    "skill_number": 6,
+    "name": "ソラモビーム",
+    "filename": "Soramo_Skill_06.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1044777,
+    "sha256": "ed2eb3eb96bca958f25bd8147370645da9e3b17e14d8ddea0ca20f2705667dc2"
+  },
+  {
+    "skill_number": 7,
+    "name": "スターダストレイ",
+    "filename": "Soramo_Skill_07.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1015355,
+    "sha256": "711fb02f2ea79dddbf1b0f68d356e4f6b31bafe2eeb1f2089268f8c5a6d7f216"
+  },
+  {
+    "skill_number": 8,
+    "name": "スターフォール",
+    "filename": "Soramo_Skill_08.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1432650,
+    "sha256": "141071e2a33b5a1785371cd7fa006a4b3c46271ce8e026bdc507998e2e987c92"
+  },
+  {
+    "skill_number": 9,
+    "name": "すなかけ",
+    "filename": "Soramo_Skill_09.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1088100,
+    "sha256": "ee5bc376a745e92482085436f181dbd3464119fa7dfa7dac19ebda7b537327d4"
+  },
+  {
+    "skill_number": 10,
+    "name": "吠える",
+    "filename": "Soramo_Skill_10.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1136462,
+    "sha256": "d89941bd8ca64835a5289b5429fc869f7e0fe132eea6c79e6f936a7577fb2023"
+  },
+  {
+    "skill_number": 11,
+    "name": "まるまる",
+    "filename": "Soramo_Skill_11.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1144827,
+    "sha256": "2bc9368edb978429da49807e91ce61ad7e00cff954d3adcf3c3362b05fd0c2a7"
+  },
+  {
+    "skill_number": 12,
+    "name": "星のまもり",
+    "filename": "Soramo_Skill_12.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1102926,
+    "sha256": "3916b43f5095efe8263530fbb9854863dd28a27faf243faa502c8e7a7d85c972"
+  },
+  {
+    "skill_number": 13,
+    "name": "ひらりジャンプ",
+    "filename": "Soramo_Skill_13.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1125686,
+    "sha256": "695df2597caa90651020fd2a87b9660105d5962b0583f2b6d4471ab23530d079"
+  },
+  {
+    "skill_number": 14,
+    "name": "星影ステップ",
+    "filename": "Soramo_Skill_14.png",
+    "size": [
+      827,
+      937
+    ],
+    "mode": "RGB",
+    "bytes": 1189353,
+    "sha256": "e6867bbc061875c562b8d97bfd0fadbdb1b21e0ebf235275fb4ee352037f3f9c"
+  }
+]

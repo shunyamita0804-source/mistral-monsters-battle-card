@@ -1,0 +1,15 @@
+﻿number,id,monster,name,category,mana,damage,effect,starter_copies,image,art_version
+1,soramo_skill_01,ソラモ,ひっかき,strength,0,1,,0,01_SKILL_IMAGES/Soramo_Skill_01.png,2
+2,soramo_skill_02,ソラモ,連続ひっかき,strength,1,1,,2,01_SKILL_IMAGES/Soramo_Skill_02.png,2
+3,soramo_skill_03,ソラモ,たいあたり,strength,2,2,,2,01_SKILL_IMAGES/Soramo_Skill_03.png,2
+4,soramo_skill_04,ソラモ,しっぽアタック,strength,3,3,,2,01_SKILL_IMAGES/Soramo_Skill_04.png,2
+5,soramo_skill_05,ソラモ,スターダイブ,strength,4,4,,0,01_SKILL_IMAGES/Soramo_Skill_05.png,2
+6,soramo_skill_06,ソラモ,ソラモビーム,intelligence,2,3,,0,01_SKILL_IMAGES/Soramo_Skill_06.png,2
+7,soramo_skill_07,ソラモ,スターダストレイ,intelligence,4,4,,2,01_SKILL_IMAGES/Soramo_Skill_07.png,2
+8,soramo_skill_08,ソラモ,スターフォール,intelligence,5,5,,0,01_SKILL_IMAGES/Soramo_Skill_08.png,2
+9,soramo_skill_09,ソラモ,すなかけ,special,2,,相手は次の攻撃を行えなくなる,2,01_SKILL_IMAGES/Soramo_Skill_09.png,2
+10,soramo_skill_10,ソラモ,吠える,special,2,,相手の手札からランダムに1枚を捨てさせる,2,01_SKILL_IMAGES/Soramo_Skill_10.png,2
+11,soramo_skill_11,ソラモ,まるまる,defense,1,,相手のちから技によるダメージを3軽減する,2,01_SKILL_IMAGES/Soramo_Skill_11.png,2
+12,soramo_skill_12,ソラモ,星のまもり,defense,1,,相手のかしこさ技によるダメージを3軽減する,0,01_SKILL_IMAGES/Soramo_Skill_12.png,2
+13,soramo_skill_13,ソラモ,ひらりジャンプ,dodge,2,,消費マナ2以上の相手のちから技・かしこさ技を回避する,2,01_SKILL_IMAGES/Soramo_Skill_13.png,2
+14,soramo_skill_14,ソラモ,星影ステップ,dodge,2,,相手のちから技・かしこさ技を消費マナに関係なく回避する,0,01_SKILL_IMAGES/Soramo_Skill_14.png,2
