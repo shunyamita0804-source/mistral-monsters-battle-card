@@ -197,6 +197,10 @@ npx vite preview --port 4173 --host 127.0.0.1   # 画面の確認（ビルド後
 
 ## 6. 未完了・気になっている点
 
+**2026-10-26：デザイン第11弾10枚の組み込み（作業ブランチ `claude/ui-quality11-20261026`。未公開）**
+- 10枚とも使った（`docs/design/ui-quality11-20261026/10_受け取り結果_UTF8.txt`）。マゼンタの背景を `tools/design/magenta_key.py` で透明に、切り出しは `tools/design/ui11_build.py`、見た目は `src/ui/styles/uiParts11.css`
+- ボス戦の背景は `worldScreen.ts`、特別復元の演出は `shopScreens.ts`、図鑑の割合は `collectionScreens.ts`、ルールの図は `battleScreen.ts`
+
 **2026-10-26：ラズック正式14技・初期配布16枚・紫の枠・バトル用カード（`4d28f6e` で公開・iPhone 確認待ち）**
 - ZIP「Razuk_Claude_Official14_Starter16_COMPLETE_20261026」。中身は `design-parts/cards-original/lazuck14-20261026/` に無改変、データは `src/data/lazuck.ts`
 - ID は同じ名前の技のまま（しっぷうタックル＝`skl-lazuck-06`、シャドウスリップ＝`skl-lazuck-15` など）。旧05 しっぽアタック・旧16 ミラージュダッシュは削除（セーブ version 11 で所持・デッキから外す。代わりは配らない）

@@ -1,0 +1,430 @@
+/*
+ * デザイン第11弾（2026-10-26 納品。原本 design-parts/ui-quality11-20261026/、切り出し tools/design/ui11_build.py）。
+ * 遊び方の挿絵・対戦のルールの図・特別復元の場面・ボス戦の背景・相手の番の札と砂時計・空の手札の台・提供割合の表・
+ * 図鑑の集めた割合・世界地図の部品・設定の部品・タイトルのボタン。届いた絵はマゼンタの背景だったので、背景を透明にしてから使う
+ */
+
+/* ===== 1 遊び方の挿絵（設定の「遊び方」の5行に、左に絵） ===== */
+.options__help--art {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  list-style: none;
+}
+
+.options__help-item {
+  display: grid;
+  grid-template-columns: 120px 22px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.options__help-art {
+  width: 120px;
+  height: auto;
+  aspect-ratio: 480 / 384;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5));
+}
+
+.options__help-no {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgb(201 162 74 / 0.8);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: #f3d58a;
+}
+
+.options__help-text {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ===== 2 対戦のルールの図（ルールの窓の上に 2×2） ===== */
+.rules-art {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.rules-art__item {
+  margin: 0;
+  text-align: center;
+}
+
+.rules-art__item > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5));
+}
+
+.rules-art__item > figcaption {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e9dcbf;
+}
+
+/* ===== 3 特別復元の場面（確認の窓の絵・復元したときの光） ===== */
+.restore-scene {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  margin: 0 auto 8px;
+  border: 1px solid rgb(201 162 74 / 0.7);
+  border-radius: 6px;
+}
+
+.restore-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(4 6 10 / 0.75);
+  animation: fade-in 200ms ease-out both;
+}
+
+.restore-fx .restore-scene {
+  max-width: 300px;
+  margin: 0;
+}
+
+.restore-fx__light {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 360px;
+  height: 360px;
+  mix-blend-mode: screen;
+  /* 光の絵の四角いふちが見えないよう、外側をぼかして消す */
+  -webkit-mask-image: radial-gradient(circle, #000 45%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 45%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: restore-light 1600ms ease-out both;
+  pointer-events: none;
+}
+
+@keyframes restore-light {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(0deg); }
+  35% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(20deg); }
+  100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.6) rotate(45deg); }
+}
+
+/* ===== 5 相手の番の札（えんじ。左の丸い窓に砂時計が4コマで落ちる）・空の手札の台 ===== */
+.battle-cmds__status--wait {
+  position: relative;
+  min-width: 132px;
+  min-height: 46px;
+  padding: 0 14px 0 50px;
+  border: 1px solid transparent;
+  border-image: url('@assets/images/ui/battle/wait_plate.webp') 30 50 30 125 fill / 11px 18px 11px 46px / 0 stretch;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.battle-cmds__sand {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 30px;
+  transform: translateY(-50%);
+  background: url('@assets/images/ui/battle/wait_sand_1.webp') center / contain no-repeat;
+  animation: wait-sand 2.4s steps(1, end) infinite;
+}
+
+@keyframes wait-sand {
+  0% { background-image: url('@assets/images/ui/battle/wait_sand_1.webp'); }
+  25% { background-image: url('@assets/images/ui/battle/wait_sand_2.webp'); }
+  50% { background-image: url('@assets/images/ui/battle/wait_sand_3.webp'); }
+  75% { background-image: url('@assets/images/ui/battle/wait_sand_4.webp'); }
+}
+
+.battle-hand__empty--tray {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 370px;
+  aspect-ratio: 900 / 133;
+  margin: auto;
+  background: url('@assets/images/ui/battle/hand_tray.webp') center / 100% 100% no-repeat;
+  color: #c9bfa8;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* ===== 6 提供割合の表（見出しの帯・レア度の色の行・円グラフ） ===== */
+.gacha-rates {
+  --rate-c: #b9bec6;
+  --rate-u: #3fb3a6;
+  --rate-r: #e2b64a;
+}
+
+.rates-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rates-pie {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  background: url('@assets/images/ui/gacha/rates_pie.webp') center / 100% 100% no-repeat;
+}
+
+.rates-pie__chart {
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+.gacha-rates__table thead,
+.gacha-rates__table tbody,
+.gacha-rates__table tfoot {
+  display: block;
+}
+
+.gacha-rates__table tr {
+  display: grid;
+  grid-template-columns: 1fr 44px 34px 64px;
+  align-items: center;
+  margin-bottom: 2px;
+  padding: 0 8px 0 18px;
+  background: url('@assets/images/ui/gacha/rates_c.webp') center / 100% 100% no-repeat;
+}
+
+.gacha-rates__table thead tr,
+.gacha-rates__table tfoot tr {
+  padding-left: 10px;
+  background-image: url('@assets/images/ui/gacha/rates_head.webp');
+}
+
+.gacha-rates__table tr.is-u {
+  background-image: url('@assets/images/ui/gacha/rates_u.webp');
+}
+
+.gacha-rates__table tr.is-r {
+  background-image: url('@assets/images/ui/gacha/rates_r.webp');
+}
+
+.gacha-rates__table th,
+.gacha-rates__table td {
+  border: 0;
+  background: none;
+}
+
+.gacha-rates__table tfoot td:first-child {
+  grid-column: 1 / 4;
+}
+
+/* ===== 7 図鑑の集めた割合（メダル・帯の枠と金の中身） ===== */
+.collection-progress {
+  flex: none;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 12px 0;
+}
+
+.collection-progress__medal {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6));
+}
+
+.collection-progress__medal.is-empty {
+  border: 1px dashed rgb(201 162 74 / 0.5);
+  border-radius: 50%;
+}
+
+/* 帯の溝（枠の絵の x 4〜96%・y 30〜70%）に金の中身 */
+.collection-progress__bar {
+  position: relative;
+  height: 18px;
+  background: url('@assets/images/ui/collection/progress_frame.webp') center / 100% 100% no-repeat;
+}
+
+.collection-progress__fill {
+  position: absolute;
+  left: 4.5%;
+  top: 30%;
+  bottom: 30%;
+  max-width: 91%;
+  background: url('@assets/images/ui/collection/progress_fill.webp') left center / 100% 100% no-repeat;
+}
+
+.collection-progress__text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f3d58a;
+  white-space: nowrap;
+}
+
+/* ===== 8 世界地図（地方の名札・いまいる地方の名札・場所の説明の窓・方角の印） ===== */
+.world-map__region {
+  padding: 4px 18px 5px;
+  background: url('@assets/images/ui/worldmap/region_label.webp') center / 100% 100% no-repeat;
+  color: #3a2614;
+  font-size: 10px;
+  text-shadow: none;
+  opacity: 1;
+}
+
+.world-map__region.is-home {
+  padding: 6px 18px 5px;
+  background-image: url('@assets/images/ui/worldmap/region_label_current.webp');
+  color: #3a2614;
+  font-size: 11px;
+}
+
+.dungeon-select__info .dungeon-select__item {
+  border: 0;
+  border-image: none;
+  border-radius: 0;
+  background: url('@assets/images/ui/worldmap/info_window.webp') center / 100% 100% no-repeat;
+  padding: 18px 24px 24px;
+  color: #3a2614;
+}
+
+.dungeon-select__info .dungeon-select__region {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6a4a22;
+}
+
+.dungeon-select__info .dungeon-select__region::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('@assets/images/ui/worldmap/compass.webp') center / contain no-repeat;
+}
+
+.dungeon-select__info .dungeon-select__name {
+  color: #2a1a0c;
+}
+
+.dungeon-select__info .dungeon-select__desc,
+.dungeon-select__info .dungeon-select__progress,
+.dungeon-select__info .dungeon-select__view-only {
+  color: #4a3420;
+}
+
+/* ===== 9 設定（見出しの帯の丸い台にアイコン・項目の板） ===== */
+.settings__heading--icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 0 16px 0 74px;
+  border: 1px solid transparent;
+  border-image: url('@assets/images/ui/settings/heading.webp') 30 40 30 170 fill / 13px 16px 13px 70px / 0 stretch;
+  color: #f3ead2;
+  font-size: 13px;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* 見出しの帯の左の丸い台（帯の絵の x 0〜13%）にアイコン */
+.settings__heading-icon {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  transform: translateY(-50%);
+}
+
+.options__slider {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/settings/panel.webp') 40 fill / 12px / 0 stretch;
+  background: none;
+  padding: 12px 16px;
+}
+
+.options__help--art {
+  border: 1px solid transparent;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/settings/panel.webp') 40 fill / 12px / 0 stretch;
+  background: none;
+  padding: 12px;
+}
+
+/* ===== 10 タイトルのボタン（続きから＝金・最初から＝紺・設定＝小さな紺） ===== */
+.title__buttons {
+  align-items: center;
+  width: 300px;
+}
+
+.title .title__btn {
+  width: 300px;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 900 / 148;
+  padding: 0 70px;
+  border: 0;
+  border-image: none;
+  border-radius: 0;
+  background: url('@assets/images/ui/title/btn_continue.webp') center / 100% 100% no-repeat;
+  color: #2a1a06;
+  font-size: 17px;
+  text-shadow: 0 1px 0 rgb(255 240 200 / 0.5);
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.5));
+}
+
+.title .title__btn--new {
+  background-image: url('@assets/images/ui/title/btn_new.webp');
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.title .title__btn--settings {
+  width: 240px;
+  aspect-ratio: 600 / 104;
+  padding: 0 40px;
+  background-image: url('@assets/images/ui/title/btn_settings.webp');
+  color: #f3ead2;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.title .title__btn--continue:not(:disabled):active {
+  background-image: url('@assets/images/ui/title/btn_pressed.webp');
+  transform: none;
+}
+
+.title .title__btn--new:not(:disabled):active,
+.title .title__btn--settings:not(:disabled):active {
+  transform: none;
+  filter: brightness(0.82) drop-shadow(0 1px 2px rgb(0 0 0 / 0.5));
+}
+
+.title .title__btn:disabled {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-cmds__sand,
+  .restore-fx__light {
+    animation: none;
+  }
+}

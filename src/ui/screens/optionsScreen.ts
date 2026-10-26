@@ -8,6 +8,19 @@ import { pickTextFile, saveTextFile } from '../fileTransfer.ts';
 import { sound } from '../sound.ts';
 import { formatDateTime } from './settingsScreen.ts';
 import type { ScreenDefinition } from './types.ts';
+import iconLanguage from '@assets/images/ui/settings/icon_language.webp';
+import iconSound from '@assets/images/ui/settings/icon_sound.webp';
+import iconBackup from '@assets/images/ui/settings/icon_backup.webp';
+import iconHowto from '@assets/images/ui/settings/icon_howto.webp';
+
+/** 遊び方の挿絵（2026-10-26 デザイン第11弾。街・デッキ・ショップ・ダンジョン・大会の順。遊び方の5行と同じ順） */
+const HOWTO_ART = Object.values(
+  import.meta.glob<string>('/assets/images/ui/howto/howto_*.webp', { eager: true, query: '?url', import: 'default' }),
+);
+
+/** 見出しの帯（左の丸い台にアイコン。2026-10-26 デザイン第11弾） */
+const heading = (text: string, icon: string): HTMLElement =>
+  h('h2', { class: 'settings__heading settings__heading--icon' }, h('img', { class: 'settings__heading-icon', attrs: { src: icon, alt: '', draggable: 'false' } }), h('span', { text }));
 
 /**
  * 設定：言語・音量（効果音／BGM〔将来用〕／ミュート）・セーブのバックアップ（書き出し・復元）・遊び方。
@@ -145,10 +158,10 @@ export const optionsScreen: ScreenDefinition = {
         h(
           'div',
           { class: 'options__body' },
-          h('h2', { class: 'settings__heading', text: t('options.language') }),
+          heading(t('options.language'), iconLanguage),
           h('div', { class: 'options__choices' }, languageButton('ja', t('options.languageJa')), languageButton('en', t('options.languageEn'))),
 
-          h('h2', { class: 'settings__heading', text: t('options.sound') }),
+          heading(t('options.sound'), iconSound),
           slider('opt-se', t('options.se'), s.seVolume, (v) => {
             change({ seVolume: v });
             sound.play('cardDraw'); // 新しい音量で試しに鳴らす
@@ -157,13 +170,27 @@ export const optionsScreen: ScreenDefinition = {
           muteBtn,
           settings.lastSaveOk ? null : h('p', { class: 'notice notice--warn', text: t('options.notSaved') }),
 
-          h('h2', { class: 'settings__heading', text: t('options.backup') }),
+          heading(t('options.backup'), iconBackup),
           h('p', { class: 'settings__note', text: t('options.backupNote') }),
           exportBtn,
           button(t('options.import'), () => void importSave(), 'btn'),
 
-          h('h2', { class: 'settings__heading', text: t('options.help') }),
-          h('ol', { class: 'options__help' }, ...t('options.helpSteps').split('\n').map((line) => h('li', { text: line.replace(/^\d+\.\s*/, '') }))),
+          heading(t('options.help'), iconHowto),
+          h(
+            'ol',
+            { class: 'options__help options__help--art' },
+            ...t('options.helpSteps')
+              .split('\n')
+              .map((line, i) =>
+                h(
+                  'li',
+                  { class: 'options__help-item' },
+                  HOWTO_ART[i] ? h('img', { class: 'options__help-art', attrs: { src: HOWTO_ART[i], alt: '', draggable: 'false' } }) : null,
+                  h('span', { class: 'options__help-no', text: String(i + 1) }),
+                  h('span', { class: 'options__help-text', text: line.replace(/^\d+\.\s*/, '') }),
+                ),
+              ),
+          ),
           h('p', { class: 'settings__note', text: t('options.helpNote') }),
 
           h('h2', { class: 'settings__heading', text: t('options.credits') }),

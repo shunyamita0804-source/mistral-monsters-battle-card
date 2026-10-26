@@ -170,6 +170,7 @@ export const SCREENS = {
 
   // 図鑑・カード一覧
   'collection.title': { ja: '図鑑', en: 'Card Album' },
+  'collection.progress': { ja: '集めた割合 {n}%', en: 'Collected {n}%' },
   'collection.count': {
     ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル。ほかは仮データ）',
     en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton and Myurol cards are official; others are temporary)',
