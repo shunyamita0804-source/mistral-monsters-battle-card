@@ -1,5 +1,5 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
-import { LAZUCK_SKILLS, lazuckSkillId } from '../../data/lazuck.ts';
+import { LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
@@ -173,7 +173,7 @@ export function createSoramoTestDeck(): Deck {
  */
 const TEST_EXTRA_COPY_UPTO = 8;
 export function createMixedTestDeck(): Deck {
-  const both = [SORAMO_OLD_SKILL_IDS, LAZUCK_SKILLS.map((s) => s.id)];
+  const both = [SORAMO_OLD_SKILL_IDS, LAZUCK_OLD16_IDS];
   const skills: string[] = both.flat();
   // もう1枚ずつ入れるのは、元の番号 01〜08 の技（2026-10-24 にラズックの表示の順が変わっても、ID で同じカードを選ぶ）
   const extra = new Set(Array.from({ length: TEST_EXTRA_COPY_UPTO }, (_, i) => [SORAMO_OLD_SKILL_IDS[i] as string, lazuckSkillId(i + 1)]).flat());
@@ -184,25 +184,36 @@ export function createMixedTestDeck(): Deck {
   return { monsters: [...TEST_TEAM], skills };
 }
 
-/** 初期デッキの残り2体分の技の枚数・サポートの枚数（2026-10-25 ユーザー指示：3体分の技45枚＋サポート15枚＝60枚。ソラモ枠は16枚） */
-export const STARTER_OTHER_SKILLS = 29;
+/** 初期デッキの3体目の技の枚数・サポートの枚数（2026-10-25 ユーザー指示：3体分の技45枚＋サポート15枚＝60枚。ソラモ16枚・ラズック16枚） */
+export const STARTER_THIRD_SKILLS = 13;
 export const STARTER_SUPPORT_COUNT = 15;
 
 /**
- * 新しく始めたときのデッキ（2026-10-25）。
- * - ソラモ枠16枚：正式（02・03・04・07・09・10・11・13 を2枚ずつ。src/data/soramo.ts の SORAMO_STARTER）
- * - 残り2体の技29枚・サポート15枚：**未確定**。3体の組み合わせも未決定なので、それまでの仮の編成（ソラモ・ラズック・ソラモ）のまま、
- *   ラズックの技16種を1枚ずつ＋表示の順で先頭13種をもう1枚（29枚）、仮サポート1〜6を順に3枚まで（15枚）を【仮】で入れる
+ * 新しく始めたときのデッキ（2026-10-26 改訂）。
+ * - ソラモ16枚：正式（02・03・04・07・09・10・11・13 を2枚ずつ。src/data/soramo.ts の SORAMO_STARTER）
+ * - ラズック16枚：正式（2026-10-26。src/data/lazuck.ts の LAZUCK_STARTER）
+ * - 3体目の技13枚・サポート15枚：**未確定**。3体目は決まっていないので、それまでの仮の編成（ソラモ・ラズック・ソラモ）の3体目（ソラモ）の技を【仮】で入れる：
+ *   初期配布に入っていないソラモの技を1枚ずつ → 足りない分は初期配布の技をもう1枚ずつ（同じカード3枚まで）。サポートは仮サポート1〜6を順に3枚まで（15枚）
  */
 export function createStarterDeck(): Deck {
-  const skills: string[] = SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  const lazuck = LAZUCK_SKILLS.map((s) => s.id);
-  skills.push(...lazuck, ...lazuck.slice(0, STARTER_OTHER_SKILLS - lazuck.length));
+  const soramo = SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  const lazuck = LAZUCK_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  const third = TEST_TEAM[2] as string;
+  const used = countCards([...soramo, ...lazuck]);
+  const pool = skillsOf(third).map((s) => s.id);
+  const extra: string[] = [];
+  for (const id of [...pool.filter((id) => !used[id]), ...pool.filter((id) => used[id])]) {
+    if (extra.length >= STARTER_THIRD_SKILLS) break;
+    if ((used[id] ?? 0) < DECK_RULES.maxCopies) {
+      used[id] = (used[id] ?? 0) + 1;
+      extra.push(id);
+    }
+  }
   const supports: string[] = [];
   for (let round = 0; round < DECK_RULES.maxCopies && supports.length < STARTER_SUPPORT_COUNT; round++) {
     for (const card of SUPPORTS) if (supports.length < STARTER_SUPPORT_COUNT) supports.push(card.id);
   }
-  return { monsters: [...TEST_TEAM], skills: [...skills, ...supports] };
+  return { monsters: [...TEST_TEAM], skills: [...soramo, ...lazuck, ...extra, ...supports] };
 }
 
 /** 旧スターター（仮モンスターA〜C）と同じ内容の所持カード（テスト用） */

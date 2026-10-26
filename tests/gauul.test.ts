@@ -212,10 +212,10 @@ describe('ガウルの技の効果', () => {
   it('09 聖なる炎：マナ4・ダメージ4。どの回避でも避けられない（条件の合う回避でも不可）が、防御はできる', () => {
     const atk = gau(9);
     expect(lifeAfter(atk, 'o-m3', [])).toBe(3); // ソラモ 7 − 4
-    // 回避：ガウル13（マナ2以上）・ガウル14（条件なし）・ラズック16（条件なし）・ソラモ13・14
+    // 回避：ガウル13（マナ2以上）・ガウル14（条件なし）・ラズック14 フェイントステップ（条件なし）・ソラモ13・14
     expect(guardUsable(atk, 'o-m1', gau(13))).toEqual({ usable: false, reason: 'この攻撃は回避できません' });
     expect(guardUsable(atk, 'o-m1', gau(14))).toEqual({ usable: false, reason: 'この攻撃は回避できません' });
-    expect(guardUsable(atk, 'o-m2', laz(16)).usable).toBe(false);
+    expect(guardUsable(atk, 'o-m2', laz(14)).usable).toBe(false);
     expect(guardUsable(atk, 'o-m3', sor(13)).usable).toBe(false);
     expect(guardUsable(atk, 'o-m3', sor(14)).usable).toBe(false);
     // 防御は使える：炎の壁（ちから・かしこさ−3）。翼の盾（ちから−3）はかしこさ技なので使えない
@@ -290,17 +290,12 @@ describe('ガウルの技の効果', () => {
 
 describe('回避の改訂（2026-10-24）', () => {
   // ソラモの2件は 2026-10-25 のソラモ14技、ガウルの3件は 2026-10-26 のガウル14技（13 上に飛ぶ・14 高速飛行）に置き換わった
-  it('ラズックの回避3件の動きは承認 JSON（evasion_LATEST）の条件と同じ', () => {
-    const updates = evasionJson.updates.filter((u) => u.monster === 'lazuck');
-    expect(updates).toHaveLength(3);
-    for (const u of updates) {
-      const s = getSkill(laz(u.skill_number));
-      expect(s.name).toBe(u.name_ja);
-      expect(s.cost).toBe(u.mana);
-      expect(s.effectTextJa).toBe(u.effect_text_ja);
-      const against = u.against.length === 2 ? 'all' : u.against[0];
-      expect(s.effect).toEqual(u.min_incoming_attack_required_mana ? { type: 'evade', against, minCost: u.min_incoming_attack_required_mana } : { type: 'evade', against });
-    }
+  it('ラズックの回避は 2026-10-26 の正式14技に置き換わった（evasion_LATEST の3件は記録として残す）', () => {
+    expect(evasionJson.updates.filter((u) => u.monster === 'lazuck')).toHaveLength(3);
+    // 13 シャドウスリップ（旧15 の ID）：マナ2・必要マナ2以上のちから/かしこさ。14 フェイントステップ：マナ2・条件なし。旧16 ミラージュダッシュは削除
+    expect(getSkill(laz(15)).effect).toEqual({ type: 'evade', against: 'all', minCost: 2 });
+    expect(getSkill(laz(14)).effect).toEqual({ type: 'evade', against: 'all' });
+    expect(SKILLS.some((s) => s.id === laz(16))).toBe(false);
   });
 
   it('ソラモの回避（13 ひらりジャンプ・14 星影ステップ）も同じきまりで動く', () => {
@@ -313,10 +308,10 @@ describe('回避の改訂（2026-10-24）', () => {
 describe('ラズックのいたずら（2026-10-24）', () => {
   const itazura = getSkill(LAZUCK_ITAZURA_ID);
 
-  it('特殊・マナ2・相手を選ばない。表示は 11', () => {
+  it('特殊・マナ2・相手を選ばない。表示は 10（2026-10-26 の正式14技）', () => {
     expect(itazura.category).toBe('special');
     expect(itazura.cost).toBe(2);
-    expect(itazura.displayNo).toBe(11);
+    expect(itazura.displayNo).toBe(10);
     expect(itazura.effect).toEqual({ type: 'handToDeck' });
     expect(itazura.availability).toBe('collect');
   });
@@ -365,24 +360,23 @@ describe('ラズックのいたずら（2026-10-24）', () => {
 });
 
 describe('クロスガードの削除と旧セーブ（version 8）', () => {
-  /** version 7 のセーブ（新しいデッキのいたずら〔2枚〕をクロスガードに替え、クロスガードを2枚持っている） */
+  /** version 7 のセーブ（新しいデッキのかみつき〔3枚〕のうち2枚をクロスガードに替え、クロスガードを2枚持っている） */
   const oldSave = () => {
     const save = createNewSave();
-    const deckSkills = save.deck.skills.map((id) => (id === LAZUCK_ITAZURA_ID ? LAZUCK_CROSS_GUARD_ID : id));
-    const collection: Record<string, number> = { ...save.collection, [LAZUCK_CROSS_GUARD_ID]: 2 };
-    delete collection[LAZUCK_ITAZURA_ID];
+    let swapped = 0;
+    const deckSkills = save.deck.skills.map((id) => (id === laz(2) && swapped < 2 ? (swapped++, LAZUCK_CROSS_GUARD_ID) : id));
+    const collection: Record<string, number> = { ...save.collection, [laz(2)]: 1, [LAZUCK_CROSS_GUARD_ID]: 2 };
     return { ...save, version: 7, deck: { ...save.deck, skills: deckSkills }, collection };
   };
 
   it('所持・デッキからクロスガードが消え、デッキの抜けた分は持っているカードで埋まる（代わりのカードは配らない）', () => {
-    // デッキに入れていない予備のカード（連続ひっかき・たいあたりをもう1枚ずつ）を持っている
+    // デッキに入れていない予備のカード（かみつきをもう2枚）を持っている
     const save = oldSave();
     expect(save.deck.skills.filter((id) => id === LAZUCK_CROSS_GUARD_ID)).toHaveLength(2);
-    const loaded = normalizeSave(JSON.parse(JSON.stringify({ ...save, collection: { ...save.collection, [sor(2)]: 3, [sor(3)]: 3 } })));
+    const loaded = normalizeSave(JSON.parse(JSON.stringify({ ...save, collection: { ...save.collection, [laz(2)]: 3 } })));
     if (!loaded) throw new Error('読み込めない');
     expect(loaded.version).toBe(SAVE_VERSION);
     expect(loaded.collection[LAZUCK_CROSS_GUARD_ID]).toBeUndefined();
-    expect(loaded.collection[LAZUCK_ITAZURA_ID]).toBeUndefined();
     expect(loaded.deck.skills).not.toContain(LAZUCK_CROSS_GUARD_ID);
     expect(loaded.deck.skills).toHaveLength(60);
     expect(validateDeck(loaded.deck, loaded.collection)).toEqual([]);
@@ -405,24 +399,25 @@ describe('クロスガードの削除と旧セーブ（version 8）', () => {
 
   it('クロスガードはカードの一覧にない', () => {
     expect(SKILLS.some((s) => s.id === LAZUCK_CROSS_GUARD_ID)).toBe(false);
-    expect(skillsOf('mon-lazuck')).toHaveLength(16);
+    expect(skillsOf('mon-lazuck')).toHaveLength(14);
   });
 });
 
 describe('旧ガウル16技の削除と旧セーブ（version 10）', () => {
-  /** version 9 のセーブ：旧ガウルの技を持ち、デッキにも入れている（ガウル・ラズック・ソラモのデッキ） */
-  const oldSave = (spare: Record<string, number> = {}) => {
+  /** version 9 のセーブ：旧ガウルの技を持ち、デッキにも入れている。spare＝デッキから外した4枚もまだ持っている */
+  const oldSave = (spare = false) => {
     const save = createNewSave();
     const oldGaul = ['skl-gauul-01', 'skl-gauul-02'];
     const kept = save.deck.skills.slice(0, 56);
     const skills = [...kept, ...oldGaul, ...oldGaul];
-    // 持っているのはデッキに入っている分だけ（予備なし）＋旧ガウル＋ spare
-    const collection: Record<string, number> = { ...countCards([...save.deck.monsters, ...kept]), 'skl-gauul-01': 2, 'skl-gauul-02': 2, 'skl-gauul-16': 3, ...spare };
+    // 持っているのはデッキに入っている分だけ（予備なし）＋旧ガウル（spare のときは外した4枚も）
+    const own = countCards([...save.deck.monsters, ...(spare ? save.deck.skills : kept)]);
+    const collection: Record<string, number> = { ...own, 'skl-gauul-01': 2, 'skl-gauul-02': 2, 'skl-gauul-16': 3 };
     return { ...save, version: 9, deck: { ...save.deck, skills }, collection };
   };
 
   it('所持・デッキから旧16技が消え、デッキの抜けた分は持っているカードで埋まる（代わりのカードは配らない）', () => {
-    const loaded = normalizeSave(JSON.parse(JSON.stringify(oldSave({ [sor(1)]: 1, [sor(5)]: 1, [sor(6)]: 1, [sor(8)]: 1 }))));
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(oldSave(true))));
     if (!loaded) throw new Error('読み込めない');
     expect(loaded.version).toBe(SAVE_VERSION);
     for (const id of GAUUL_OLD_SKILL_IDS) expect(loaded.collection[id]).toBeUndefined();

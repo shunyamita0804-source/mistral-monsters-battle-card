@@ -1,11 +1,14 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
 import officialSkills from './official/lazuck_cards_OFFICIAL.json';
 import latestSkills from './official/lazuck_cards_LATEST_20261024.json';
+import lazuck14 from './official/lazuck14_skills_OFFICIAL_20261026.json';
 import themeColors from './official/monster_theme_colors.json';
-import { evadeFromCriteria, officialSkill, twoDigits, type OfficialSkill, type OfficialSkillSource } from './officialSkills.ts';
+import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
- * 【正式データ】ラズックの技カード16種（2026-10-23 ユーザー確定。Seimon_Razukku_ALL16_Claude_ImplementationPack_20261023）。
+ * ラズック。2026-10-26 から技は正式14種（下の LAZUCK_SKILLS の説明）。ここから下の段落は、それまでの経緯の記録。
+ *
+ * 【それまでの正式データ】ラズックの技カード16種（2026-10-23 ユーザー確定。Seimon_Razukku_ALL16_Claude_ImplementationPack_20261023）。
  *
  * 正本は src/data/official/lazuck_cards_OFFICIAL.json（届いたファイルを無改変で置いている）。
  * 技名・マナ・ダメージ・種別・効果テキスト・初期/収集の区分は、ここで書き換えずに JSON からそのまま読む。
@@ -50,69 +53,118 @@ export const LAZUCK_MONSTER: MonsterCard = {
   pendingSpec: ['rarity'],
 };
 
-/**
- * 効果テキストのある技の、ゲームでの動き（効果テキストの文は書き換えず、動きだけをここで表す）。
- * JSON の effect_logic_spec と同じ意味（テストで照らし合わせる）。
- * 【要仕様確定】
- * - LAZ-SK-07 ちょうはつ：限るのは攻撃の技だけ。相手の場にラズックが1体もいなければ制限なし。ラズックが複数いればどれでもよい
- * - LAZ-SK-08 ダストキック：重ねがけはしない（2回目も −1 のまま、期限だけ次の手番に）
- */
-const SPECIAL_EFFECTS: Readonly<Record<string, SkillEffect>> = {
-  'LAZ-SK-04': { type: 'attack', undodgeable: true },
-  'LAZ-SK-07': { type: 'taunt' },
-  'LAZ-SK-08': { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' },
-  'LAZ-SK-11': { type: 'defense', reduce: 3, against: 'force' },
-  'LAZ-SK-12': { type: 'defense', reduce: 4, against: 'wisdom' },
-};
-
 /** 新しい技「いたずら」のゲーム内 ID（2026-10-24。番号の ID ではない） */
 export const LAZUCK_ITAZURA_ID = 'skl-lazuck-itazura';
+
+/**
+ * 【古いデータ・2026-10-24 の16技】の ID（表示の順）。2026-10-26 に正式14技へ置き換えた。
+ * 古いセーブの変換（version 7 の見分け：src/game/deck/deck.ts の createMixedTestDeck）にだけ使う
+ */
+export const LAZUCK_OLD16_IDS: readonly string[] = (latestSkills.skill_cards as readonly { readonly game_id: string }[]).map((l) =>
+  l.game_id.startsWith('skl-lazuck-') ? l.game_id : LAZUCK_ITAZURA_ID,
+);
+
 /** ゲームから削除した旧13「クロスガード」の ID（セーブの変換・バックアップの読み込みで使う） */
 export const LAZUCK_CROSS_GUARD_ID = lazuckSkillId(13);
+/**
+ * 2026-10-26 の正式14技で外れた技（旧05 しっぽアタック・旧16 ミラージュダッシュ）。古いセーブは version 11 で所持・デッキから外す
+ * （src/game/save/saveData.ts の migrateLazuck14V11）。絵（laz_sk_05・16.webp）と元の JSON は記録として残す
+ */
+export const LAZUCK_REMOVED_14_IDS: readonly string[] = [lazuckSkillId(5), lazuckSkillId(16)];
 
-const SOURCE: OfficialSkillSource = {
-  label: 'ラズック',
-  monsterId: LAZUCK_MONSTER_ID,
-  skillId: lazuckSkillId,
-  artFile: (no) => `laz_sk_${twoDigits(no)}.webp`,
-  specialEffects: SPECIAL_EFFECTS,
-};
-
-interface LatestSkill {
-  readonly ordinal: number;
+/**
+ * 【正式データ・2026-10-26】ラズックの技14種と初期配布16枚（Razuk_Claude_Official14_Starter16_COMPLETE_20261026）。
+ * 正本は src/data/official/lazuck14_skills_OFFICIAL_20261026.json（届いた 01_RAZUK_FINAL_14_SKILLS_STARTER16.json を無改変）。
+ * ZIP の中身はすべて design-parts/cards-original/lazuck14-20261026/ に無改変で保管。
+ * 技名・分類・マナ・ダメージ・効果の文・初期配布の枚数は、ここで書き換えずに JSON からそのまま読む。
+ *
+ * ゲーム内 ID（依頼文「名前・役割に基づき維持する。表示番号の変更だけを理由に入れ替えない」）：
+ *   それまでの同じ名前の技の ID をそのまま使う（例：しっぷうタックル＝skl-lazuck-06、シャドウスリップ＝skl-lazuck-15、いたずら＝skl-lazuck-itazura）。
+ *   旧05 しっぽアタック（skl-lazuck-05）の ID は流用しない。旧16 ミラージュダッシュ（skl-lazuck-16）は正式14技の外なので外した
+ * 性能が変わった技（同じ ID のまま）：しっぽいなし（マナ1→2）・シャドウガード（−4→−3）・フェイントステップ（ちから技だけ→ちから・かしこさ両方）
+ * 絵：laz14_sk_01〜14.png（届いた 827×937 の PNG を1バイトも変えずに置いた。番号は正式の番号）
+ * 枠：紫（#844DC5。届いた 06_Razuk_PurpleAccent の色替えの所の色。tools/art/skillcard_v5_monster_color.py・battle_card_frame.py で作った）
+ *
+ * まだ決まっていないこと（独断で決めない）：レアリティ・正式英語・ちょうはつ／ダストキックの細かい裁定（下の SPECIAL_EFFECTS）
+ */
+export interface Lazuck14Row {
+  readonly number: number;
   readonly name_ja: string;
   readonly category: string;
   readonly mana: number;
   readonly damage: number | null;
-  readonly effect_text_ja: string | null;
-  readonly availability: string;
-  readonly game_id: string;
-  readonly evasion_criteria?: { readonly against: readonly string[]; readonly min_incoming_attack_required_mana: number | null };
+  readonly effect_ja: string | null;
+  readonly initial_copies: number;
+  readonly asset_path: string;
 }
 
-const ORIGINAL = officialSkills.skill_cards as readonly (OfficialSkill & { readonly game_id: string })[];
+export const LAZUCK14_ROWS: readonly Lazuck14Row[] = lazuck14.skill_cards;
 
-function latestSkill(l: LatestSkill): SkillCard {
-  const itazura = !l.game_id.startsWith('skl-lazuck-');
-  const original = ORIGINAL.find((o) => o.game_id === l.game_id);
-  if (!itazura && !original) throw new Error(`ラズックの技の ID が元のデータにありません: ${l.game_id}`);
+/** 正式の番号 → ゲーム内 ID（それまでの同じ名前の技の ID。tests/lazuck.test.ts で名前の一致を確かめる） */
+const LAZUCK14_IDS: Readonly<Record<number, string>> = {
+  1: lazuckSkillId(1), // ひっかき
+  2: lazuckSkillId(2), // かみつき
+  3: lazuckSkillId(3), // とびかかり
+  4: lazuckSkillId(4), // みだれづめ
+  5: lazuckSkillId(6), // しっぷうタックル（旧06）
+  6: lazuckSkillId(9), // トリックショット
+  7: lazuckSkillId(10), // シャドウバースト
+  8: lazuckSkillId(7), // ちょうはつ
+  9: lazuckSkillId(8), // ダストキック
+  10: LAZUCK_ITAZURA_ID, // いたずら
+  11: lazuckSkillId(11), // しっぽいなし
+  12: lazuckSkillId(12), // シャドウガード
+  13: lazuckSkillId(15), // シャドウスリップ（旧15）
+  14: lazuckSkillId(14), // フェイントステップ
+};
+
+/**
+ * 効果の文のある技の、ゲームでの動き（効果の文は書き換えず、動きだけをここで表す。キーは正式の番号）。
+ * 【要仕様確定】08 ちょうはつ：限るのは攻撃の技だけ。相手の場にラズックが1体もいなければ制限なし。09 ダストキック：重ねがけはしない
+ */
+const SPECIAL_EFFECTS: Readonly<Record<number, SkillEffect>> = {
+  4: { type: 'attack', undodgeable: true },
+  8: { type: 'taunt' },
+  9: { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' },
+  10: { type: 'handToDeck' },
+  11: { type: 'defense', reduce: 3, against: 'force' },
+  12: { type: 'defense', reduce: 3, against: 'wisdom' },
+  13: { type: 'evade', against: 'all', minCost: 2 },
+  14: { type: 'evade', against: 'all' },
+};
+
+/** 技の絵のファイル名。JSON の asset_path（Razuk_ArtV2_Skill_NN.png）の番号どおり */
+export function lazuckArtFile(row: Lazuck14Row): string {
+  const no = /Razuk_ArtV2_Skill_(\d{2})\.png$/.exec(row.asset_path)?.[1];
+  if (!no || Number(no) !== row.number) throw new Error(`ラズックの技の絵の番号が合いません: ${row.number} ${row.asset_path}`);
+  return `laz14_sk_${no}.png`;
+}
+
+function toSkill(row: Lazuck14Row): SkillCard {
+  const id = LAZUCK14_IDS[row.number];
+  if (!id) throw new Error(`ラズックの技の ID がありません: ${row.number}`);
   const o: OfficialSkill = {
-    design_id: original?.design_id ?? LAZUCK_ITAZURA_ID,
-    number: original?.number ?? l.ordinal,
-    name_ja: l.name_ja,
-    mana: l.mana,
-    damage: l.damage,
-    category: l.category,
-    effect_text_ja: l.effect_text_ja,
-    availability: l.availability,
+    design_id: `LAZ14-SK-${twoDigits(row.number)}`,
+    number: row.number,
+    name_ja: row.name_ja,
+    mana: row.mana,
+    damage: row.damage,
+    category: row.category,
+    effect_text_ja: row.effect_ja,
+    availability: row.initial_copies > 0 ? 'initial' : 'collect',
   };
-  const c = l.evasion_criteria;
-  return officialSkill(o, SOURCE, {
-    displayNo: l.ordinal,
-    ...(itazura ? { id: LAZUCK_ITAZURA_ID, artFile: 'laz_sk_itazura.webp', designId: null, effect: { type: 'handToDeck' } } : {}),
-    ...(c ? { effect: evadeFromCriteria(c.against, c.min_incoming_attack_required_mana) } : {}),
-  });
+  return officialSkill(
+    o,
+    { label: 'ラズック', monsterId: LAZUCK_MONSTER_ID, skillId: () => id, artFile: () => lazuckArtFile(row), specialEffects: {} },
+    { id, displayNo: row.number, ...(SPECIAL_EFFECTS[row.number] ? { effect: SPECIAL_EFFECTS[row.number] } : {}) },
+  );
 }
 
-/** ラズックの技16種（新しい表示の番号の順。2026-10-24 改訂） */
-export const LAZUCK_SKILLS: readonly SkillCard[] = (latestSkills.skill_cards as readonly LatestSkill[]).map(latestSkill);
+/** ラズックの技14種（正式の番号の順。2026-10-26） */
+export const LAZUCK_SKILLS: readonly SkillCard[] = LAZUCK14_ROWS.map(toSkill);
+
+/** 初期配布16枚（技の ID と枚数。JSON の initial_copies のまま。0枚の技は入れない） */
+export const LAZUCK_STARTER: readonly { readonly id: string; readonly copies: number }[] = LAZUCK14_ROWS.filter((r) => r.initial_copies > 0).map((r) => ({
+  id: LAZUCK14_IDS[r.number] as string,
+  copies: r.initial_copies,
+}));

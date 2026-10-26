@@ -1,0 +1,16 @@
+﻿正式技番号,技名,分類,消費マナ,初期配布枚数,画像ファイル
+01,ひっかき,force,0,3,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_01.png
+02,かみつき,force,1,3,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_02.png
+03,とびかかり,force,2,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_03.png
+04,みだれづめ,force,3,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_04.png
+05,しっぷうタックル,force,4,3,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_05.png
+06,トリックショット,wisdom,2,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_06.png
+07,シャドウバースト,wisdom,4,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_07.png
+08,ちょうはつ,special,2,2,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_08.png
+09,ダストキック,special,0,2,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_09.png
+10,いたずら,special,2,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_10.png
+11,しっぽいなし,defense,2,1,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_11.png
+12,シャドウガード,defense,2,1,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_12.png
+13,シャドウスリップ,evade,2,1,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_13.png
+14,フェイントステップ,evade,2,0,02_FINAL_ART_01-14/Razuk_ArtV2_Skill_14.png
+,合計,,,16,

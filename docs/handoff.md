@@ -197,6 +197,13 @@ npx vite preview --port 4173 --host 127.0.0.1   # 画面の確認（ビルド後
 
 ## 6. 未完了・気になっている点
 
+**2026-10-26：ラズック正式14技・初期配布16枚・紫の枠・バトル用カード（作業ブランチ `claude/ui-quality10-20261026`）**
+- ZIP「Razuk_Claude_Official14_Starter16_COMPLETE_20261026」。中身は `design-parts/cards-original/lazuck14-20261026/` に無改変、データは `src/data/lazuck.ts`
+- ID は同じ名前の技のまま（しっぷうタックル＝`skl-lazuck-06`、シャドウスリップ＝`skl-lazuck-15` など）。旧05 しっぽアタック・旧16 ミラージュダッシュは削除（セーブ version 11 で所持・デッキから外す。代わりは配らない）
+- 枠は紫（#844DC5）：技カード `frame_*_lazuck.png`・バトル用カード `frame_lazuck.png`。バトル用カードの絵 `lazuck_battlecard.png`
+- 初期デッキ＝ソラモ16（正式）＋ラズック16（正式）＋3体目13（**未確定・仮**。いまの3体目はソラモなのでソラモの技）＋サポート15（仮）
+- 未確定：3体目のモンスターと13枚・レアリティ・正式英語・ちょうはつ／ダストキックの細かい裁定。iPhone での確認は未
+
 **2026-10-26：デザイン第10弾10枚の組み込み・第11弾の依頼文（作業ブランチ `claude/ui-quality10-20261026`）**
 - 10枚とも使った（`docs/design/ui-quality10-20261026/10_受け取り結果_UTF8.txt`）。見た目は `src/ui/styles/uiParts10.css`、切り出しは `tools/design/ui10_build.py`
 - ダンジョンの帯・敵とぶつかったときの光・手に入れたときの小窓は `worldScreen.ts`（クリアの帯は `GameStore.flashBanner`）

@@ -24,8 +24,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
     const official = [...MONSTERS, ...SKILLS, ...SUPPORTS].filter((c) => !c.isPlaceholder).map((c) => c.id);
     const skillIds = (key: string, nos: readonly number[]): string[] => nos.map((n) => `skl-${key}-${String(n).padStart(2, '0')}`);
     const all = Array.from({ length: 16 }, (_, i) => i + 1);
-    // ラズックは表示の番号の順（07・08＝旧09・10、09・10＝旧07・08、11＝いたずら、12・13＝旧11・12）。旧13 クロスガードは削除
-    const lazuck = [...skillIds('lazuck', [1, 2, 3, 4, 5, 6, 9, 10, 7, 8]), 'skl-lazuck-itazura', ...skillIds('lazuck', [11, 12, 14, 15, 16])];
+    // ラズックは正式14技の番号の順（2026-10-26）。ID は同じ名前の技のまま（05＝旧06・13＝旧15 など）。旧05・旧13・旧16 は削除
+    const lazuck = [...skillIds('lazuck', [1, 2, 3, 4, 6, 9, 10, 7, 8]), 'skl-lazuck-itazura', ...skillIds('lazuck', [11, 12, 15, 14])];
     expect(official).toEqual([
       'mon-soramo',
       'mon-lazuck',
