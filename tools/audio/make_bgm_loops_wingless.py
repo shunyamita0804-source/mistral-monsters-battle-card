@@ -28,12 +28,14 @@ TRACKS = {
     'dungeon_ruins': 'Moon-ruins',  # 遺跡のダンジョン：月の廃墟
     'dungeon_forest': 'Elven-Sanctuary',  # 森のダンジョン：古代エルフの聖域
     'lab': 'sealed_room',  # カード研究所：開かれし封印の扉
-    # 2026-10-26 追加：これから作るダンジョン用（ユーザー提供・利用確認済み。まだゲームでは鳴らさない）
-    'dungeon_tower': 'Tower-of-despair',  # Tower of Despair
-    'dungeon_dimension': 'Es-STAGE4',  # Another Dimension
-    'dungeon_sacred': 'The-sacred-place',  # The Sacred Place
-    'dungeon_snow': 'Everlasting-Snow',  # 永遠の雪原
-    'dungeon_undersea': 'Undersea-palace',  # Undersea Palace ～海底神殿～
+    # 2026-10-26 追加：これから作るダンジョン用（ユーザー提供・利用確認済み。まだゲームでは鳴らさない）。
+    # ユーザー「水、火、氷、神、機械」と「普通」。水・氷・神は曲名から、火・機械は Claude の推測（ユーザーに確認中）
+    'dungeon_water': 'Undersea-palace',  # 水：Undersea Palace ～海底神殿～
+    'dungeon_fire': 'Tower-of-despair',  # 火（推測）：Tower of Despair
+    'dungeon_ice': 'Everlasting-Snow',  # 氷：永遠の雪原
+    'dungeon_holy': 'The-sacred-place',  # 神：The Sacred Place
+    'dungeon_machine': 'Es-STAGE4',  # 機械（推測）：Another Dimension
+    'dungeon_normal': 'Dungeon-Cave',  # 普通：暗黒の古代洞窟
 }
 
 

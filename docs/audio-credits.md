@@ -103,20 +103,22 @@ ZIP の並び順と「順番に」の並びが合わないため、**曲のフ�
 
 - いままでのダンジョンの曲 `dungeon`（Spirits Forest / HydroGene）は、曲の決まっていないダンジョン用に残した（いまは鳴る場所なし）
 
-### 2026-10-26 これから作るダンジョン用の5曲（保存だけ・まだ鳴らさない）
+### 2026-10-26 これから作るダンジョン用の6曲（保存だけ・まだ鳴らさない）
 
-ユーザー指示「先に今後使う予定のダンジョンのBGMを送ります。保存しておいてください。名前つけてます」（2026-10-26。利用確認済み）。
-ZIP 5つ（ユーフルカ〔Wingless Seraph〕）。**ユーザーが付けた日本語のファイル名は文字化けで読めなかった**（どのダンジョン用かはユーザーに確認する）。
+ユーザー指示「先に今後使う予定のダンジョンのBGMを送ります。保存しておいてください」「1から、水、火、氷、神、機械。後追加で、普通」（2026-10-26。利用確認済み）。
+ZIP 6つ（ユーフルカ〔Wingless Seraph〕）。ユーザーが付けた日本語のファイル名は文字化けで読めなかったので、**水・氷・神・普通は曲名から割り当て、
+火・機械は Claude の推測**（ユーザーの「1から」を届いた順に当てると「海底神殿＝機械」「永遠の雪原＝神」になって曲名と合わないため。ユーザーに確認中）。
 `make_bgm_loops_wingless.py` でループ用 MP3 を作って `assets/audio/bgm/` に置いた。まだ `BGM_REGISTRY` に入れていない（使うダンジョンができたら足す）。
 gain は約 -18.5 LUFS にそろえるための値（入れるときにそのまま使う）。
 
-| ファイル | 曲名 / 作者 | 届いた ZIP の中の名前 | gain |
-| --- | --- | --- | --- |
-| bgm_dungeon_tower.mp3 | Tower of Despair / ユーフルカ | Tower-of-despair_loop | 0.33 |
-| bgm_dungeon_dimension.mp3 | Another Dimension / ユーフルカ | Es-STAGE4_loop | 0.35 |
-| bgm_dungeon_sacred.mp3 | The Sacred Place / ユーフルカ | The-sacred-place_loop | 0.46 |
-| bgm_dungeon_snow.mp3 | 永遠の雪原 / ユーフルカ | Everlasting-Snow_loop | 0.50 |
-| bgm_dungeon_undersea.mp3 | Undersea Palace ～海底神殿～ / ユーフルカ | Undersea-palace_loop | 0.35 |
+| ダンジョン | ファイル | 曲名 / 作者 | 届いた ZIP の中の名前 | gain |
+| --- | --- | --- | --- | --- |
+| 水 | bgm_dungeon_water.mp3 | Undersea Palace ～海底神殿～ / ユーフルカ | Undersea-palace_loop | 0.35 |
+| 火（推測） | bgm_dungeon_fire.mp3 | Tower of Despair / ユーフルカ | Tower-of-despair_loop | 0.33 |
+| 氷 | bgm_dungeon_ice.mp3 | 永遠の雪原 / ユーフルカ | Everlasting-Snow_loop | 0.50 |
+| 神 | bgm_dungeon_holy.mp3 | The Sacred Place / ユーフルカ | The-sacred-place_loop | 0.46 |
+| 機械（推測） | bgm_dungeon_machine.mp3 | Another Dimension / ユーフルカ | Es-STAGE4_loop | 0.35 |
+| 普通 | bgm_dungeon_normal.mp3 | 暗黒の古代洞窟 / ユーフルカ | Dungeon-Cave_loop | 0.55 |
 
 ### 2026-10-26 追加の3曲（家の中）
 
