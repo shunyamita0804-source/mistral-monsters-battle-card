@@ -8,9 +8,10 @@ import bossBattleMp3 from '@assets/audio/bgm/bgm_boss_battle.mp3';
 import { sound } from './sound.ts';
 
 /**
- * BGM。曲はミストラルモンスターズで使っている曲（ユーザー指示 2026-10-22。規約はユーザー確認済み。出どころは docs/audio-credits.md）。
+ * BGM。曲はミストラルモンスターズで使っている曲（ユーザー指示 2026-10-22）と、2026-10-26 にユーザーが届けたユーフルカの4曲（街・対戦・ボス・大会の対戦）。
+ * 規約はどちらもユーザー確認済み。出どころは docs/audio-credits.md。
  *
- * - ファイルは「ループする範囲だけを切り出し、終わりを頭へつないだ」MP3（tools/audio/make_bgm_loops.py）。audio の loop で繰り返す
+ * - ファイルは「ループする範囲だけを切り出し、終わりを頭へつないだ」MP3（tools/audio/make_bgm_loops.py・make_bgm_loops_wingless.py）。audio の loop で繰り返す
  * - 音量は Web Audio のゲイン（iPhone は audio の volume を変えられないため）。効果音と同じ AudioContext を使う
  * - ブラウザは最初のタップまで音を出せないので、それまでは「鳴らしたい曲」だけ覚えておき、最初のタップで鳴らし始める
  * - 曲を替えるときは前の曲を少しずつ小さくして止め、新しい曲を少しずつ大きくする
@@ -21,25 +22,25 @@ export type BgmId = 'title' | 'town' | 'tournament' | 'tournamentBattle' | 'dung
 
 interface BgmEntry {
   readonly src: string;
-  /** 曲ごとの音量合わせ（ミスモンの audio-registry.js と同じ値。約 -18 LUFS にそろう） */
+  /** 曲ごとの音量合わせ（ミスモンの曲は audio-registry.js と同じ値。ユーフルカの曲は測って合わせた。約 -18.5 LUFS にそろう） */
   readonly gain: number;
 }
 
 export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   // タイトル：Bon Voyage! / HarumachiMusic（Pixabay）
   title: { src: titleMp3, gain: 0.68 },
-  // 街・部屋：冒険への誘い / のる（OpenTracks〔旧 DOVA-SYNDROME〕）
-  town: { src: townMp3, gain: 0.7 },
+  // 街・部屋：放浪者の街 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
+  town: { src: townMp3, gain: 0.39 },
   // 大会の受付：Battle - スタンバイフェイズ / lei（DOVA-SYNDROME）
   tournament: { src: tournamentMp3, gain: 0.69 },
-  // 大会の対戦：戦いの旅路を征く / MATSU（DOVA-SYNDROME）
-  tournamentBattle: { src: tournamentBattleMp3, gain: 0.61 },
+  // 大会の対戦（公式ランク戦）：Conflict / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
+  tournamentBattle: { src: tournamentBattleMp3, gain: 0.37 },
   // ダンジョンの探索：Spirits Forest / HydroGene（CC0）
   dungeon: { src: dungeonMp3, gain: 1.1 },
-  // ダンジョン・練習の対戦：通常戦闘曲 - α / lei（DOVA-SYNDROME）
-  battle: { src: battleMp3, gain: 0.43 },
-  // ダンジョンのボス：中ボスくらいの戦闘風 / Motoyuki（DOVA-SYNDROME）
-  bossBattle: { src: bossBattleMp3, gain: 0.29 },
+  // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
+  battle: { src: battleMp3, gain: 0.36 },
+  // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
+  bossBattle: { src: bossBattleMp3, gain: 0.31 },
 };
 
 /** 曲を替えるときの、小さくする／大きくする時間（秒） */
