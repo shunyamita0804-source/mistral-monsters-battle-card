@@ -124,7 +124,36 @@ const HIDDEN_SKILLS: SkillCard[] = makeSkills('hidden', 'wisdom', [
   { no: 3, cost: 4, stat: 'main', value: 7, effect: { type: 'attack', unblockable: true, undodgeable: true }, rarity: 'R' },
 ]).map((s) => ({ ...s, name: s.name.replace('仮技HIDDEN', '隠し技（未確定）') }));
 
-export const MONSTERS: readonly MonsterCard[] = [...MONSTER_SEEDS.map(makeMonster), HIDDEN_MONSTER, SORAMO_MONSTER, LAZUCK_MONSTER, GAUUL_MONSTER, NOBITON_MONSTER, MYUROL_MONSTER];
+/**
+ * 【仮】ダンジョンのボスのモンスター（2026-10-26 ユーザー指示：遺跡のボスはジオル、森のボスはフルーネを使い、勝つとそのカードが少しもらえる。
+ * 「ジオルとフルーネの情報は後々送ります。今は仮で適当でいいです」）。名前・ライフ・技はすべて仮。
+ * 正式データが届いたら新しい ID で足し、この仮カードは残す（docs/card-data-policy.md 2章）
+ */
+const TMP_BOSS_SEEDS: readonly (MonsterSeed & { readonly name: string })[] = [
+  { key: 'tmp-geol', name: 'ジオル', life: 9, color: '#8a6d4b', main: 'force' },
+  { key: 'tmp-flune', name: 'フルーネ', life: 8, color: '#5fa86a', main: 'wisdom' },
+];
+export const TMP_GEOL_ID = monsterId('tmp-geol');
+export const TMP_FLUNE_ID = monsterId('tmp-flune');
+const TMP_BOSS_MONSTERS: MonsterCard[] = TMP_BOSS_SEEDS.map((seed) => ({
+  ...makeMonster(seed),
+  name: `仮${seed.name}`,
+  description: `ダンジョンのボスが使う仮の${seed.name}です。正式なモンスターデータではありません。`,
+}));
+const TMP_BOSS_SKILLS: SkillCard[] = TMP_BOSS_SEEDS.flatMap((seed, i) =>
+  makeSkills(seed.key, seed.main, skillSeeds(i)).map((s, n) => ({ ...s, name: `仮${seed.name}の技${n + 1}` })),
+);
+
+export const MONSTERS: readonly MonsterCard[] = [
+  ...MONSTER_SEEDS.map(makeMonster),
+  HIDDEN_MONSTER,
+  SORAMO_MONSTER,
+  LAZUCK_MONSTER,
+  GAUUL_MONSTER,
+  NOBITON_MONSTER,
+  MYUROL_MONSTER,
+  ...TMP_BOSS_MONSTERS,
+];
 
 export const SKILLS: readonly SkillCard[] = [
   ...MONSTER_SEEDS.flatMap((seed, i) => makeSkills(seed.key, seed.main, skillSeeds(i))),
@@ -134,6 +163,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...GAUUL_SKILLS,
   ...NOBITON_SKILLS,
   ...MYUROL_SKILLS,
+  ...TMP_BOSS_SKILLS,
 ];
 
 /**

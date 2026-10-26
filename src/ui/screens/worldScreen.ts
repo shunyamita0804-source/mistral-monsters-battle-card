@@ -250,7 +250,18 @@ const DUNGEON_INTRO_MS = 2800;
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
-const ROOM_BGM: Readonly<Record<string, BgmId>> = { shop: 'shop', practice: 'practice', lab: 'lab' };
+const ROOM_BGM: Readonly<Record<string, BgmId>> = {
+  shop: 'shop',
+  practice: 'practice',
+  lab: 'lab',
+  home: 'home',
+  neighbor: 'neighbor',
+  'house-a': 'house',
+  'house-b': 'house',
+  'house-c': 'house',
+  'house-d': 'house',
+  'house-e': 'house',
+};
 /**
  * ダンジョンごとの足音の地面と環境音（2026-10-23）。新しいダンジョンを足すときはここに1行
  * （例：水のダンジョンなら { ground: 'wet', ambient: 'underwater' }、雪なら 'snow'、砂漠なら 'sand'）。無いダンジョンは洞窟と同じ
@@ -1804,6 +1815,11 @@ export class WorldView {
             store.update((s) => leaveDungeon(s));
             store.flashBanner = 'clear';
             store.flashMessage = t(r.firstClear ? 'world.dungeonClearedFirst' : 'world.dungeonCleared', { coins: coins(r.coins) });
+            // ボスを初めて倒したときのカード（2026-10-26：仮のジオル・フルーネ）
+            if (r.cards.length > 0) {
+              const names = r.cards.map((c) => t('tournament.prizeCard', { name: cardName(c.cardId), n: c.count })).join(t('common.listSeparator'));
+              store.flashMessage += `\n${t('world.bossCards', { cards: names })}`;
+            }
           } else {
             store.flashMessage = t('world.victory', { coins: coins(r.coins) });
           }

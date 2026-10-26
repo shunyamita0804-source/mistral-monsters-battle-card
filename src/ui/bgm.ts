@@ -10,6 +10,9 @@ import dungeonForestMp3 from '@assets/audio/bgm/bgm_dungeon_forest.mp3';
 import shopMp3 from '@assets/audio/bgm/bgm_shop.mp3';
 import practiceMp3 from '@assets/audio/bgm/bgm_practice.mp3';
 import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
+import homeMp3 from '@assets/audio/bgm/bgm_home.mp3';
+import houseMp3 from '@assets/audio/bgm/bgm_house.mp3';
+import neighborMp3 from '@assets/audio/bgm/bgm_neighbor.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -34,6 +37,9 @@ export type BgmId =
   | 'shop'
   | 'practice'
   | 'lab'
+  | 'home'
+  | 'house'
+  | 'neighbor'
   | 'battle'
   | 'bossBattle';
 
@@ -65,6 +71,13 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   practice: { src: practiceMp3, gain: 0.56 },
   // カード研究所（研究所の中と図鑑）：開かれし封印の扉 / ユーフルカ（Wingless Seraph）
   lab: { src: labMp3, gain: 0.76 },
+  // 2026-10-26 ユーザー提供（利用確認済み。曲名・作者はファイルに書かれていない）
+  // 主人公の部屋（家の中）
+  home: { src: homeMp3, gain: 0.44 },
+  // 住人の家（民家A〜E 共通）
+  house: { src: houseMp3, gain: 0.72 },
+  // 案内人（となりの家の女性）の家
+  neighbor: { src: neighborMp3, gain: 1.07 },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）

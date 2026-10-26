@@ -56,23 +56,28 @@ export interface VictoryResult {
   readonly coins: number;
   readonly cleared: boolean;
   readonly firstClear: boolean;
+  /** もらったカード（ボスを初めて倒したとき） */
+  readonly cards: readonly { cardId: string; count: number }[];
 }
 
 /** 敵に勝った。ボスならダンジョンクリア */
 export function defeatEnemy(save: SaveData, enemyId: string, boss: boolean): VictoryResult {
   const active = save.activeDungeon;
-  if (!active || active.defeatedEnemies.includes(enemyId)) return { save, coins: 0, cleared: false, firstClear: false };
+  if (!active || active.defeatedEnemies.includes(enemyId)) return { save, coins: 0, cleared: false, firstClear: false, cards: [] };
   let next: SaveData = {
     ...save,
     activeDungeon: { ...active, defeatedEnemies: [...active.defeatedEnemies, enemyId] },
   };
   if (!boss) {
-    return { save: addCoins(next, REWARDS.dungeonBattleWin), coins: REWARDS.dungeonBattleWin, cleared: false, firstClear: false };
+    return { save: addCoins(next, REWARDS.dungeonBattleWin), coins: REWARDS.dungeonBattleWin, cleared: false, firstClear: false, cards: [] };
   }
   const record = dungeonRecord(save, active.dungeonId);
   const firstClear = !record.bossDefeated;
   const coins = firstClear ? REWARDS.dungeonBossFirstClear : REWARDS.dungeonBossRepeat;
   next = addCoins(next, coins);
+  // 初めて倒したときだけ、そのダンジョンのボスのカード（bossDefeated で1回だけ）
+  const cards = firstClear ? (getDungeon(active.dungeonId)?.firstClearCards ?? []) : [];
+  next = addCards(next, cards);
   next = {
     ...next,
     dungeons: {
@@ -80,7 +85,7 @@ export function defeatEnemy(save: SaveData, enemyId: string, boss: boolean): Vic
       [active.dungeonId]: { ...record, bossDefeated: true, clears: record.clears + 1 },
     },
   };
-  return { save: next, coins, cleared: true, firstClear };
+  return { save: next, coins, cleared: true, firstClear, cards };
 }
 
 export function isChestOpened(save: SaveData, dungeonId: string, chestId: string): boolean {

@@ -64,6 +64,7 @@ export const WORLD = {
     ja: 'ボスを倒した！ダンジョンクリア！\n{coins} を手に入れた。（初回クリア報酬）\n家に帰ってきた。',
     en: 'You beat the boss! Dungeon cleared!\nGot {coins}. (First-clear reward)\nYou returned home.',
   },
+  'world.bossCards': { ja: 'ボスのカードを手に入れた！\n{cards}', en: 'Got the boss\'s cards!\n{cards}' },
   'world.defeat': {
     ja: '敗北した。\n家に戻ってきた。（ダンジョンには何度でも挑戦できます）',
     en: 'You lost...\nYou returned home. (You can retry the dungeon any time.)',
