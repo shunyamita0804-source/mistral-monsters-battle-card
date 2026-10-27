@@ -1,0 +1,51 @@
+[
+  {
+    "file": "card_back.png",
+    "width": 1024,
+    "height": 1536,
+    "alpha_min": 0,
+    "alpha_max": 254
+  },
+  {
+    "file": "card_unknown.png",
+    "width": 1024,
+    "height": 1536,
+    "alpha_min": 0,
+    "alpha_max": 254
+  },
+  {
+    "file": "card_icons.png",
+    "width": 1536,
+    "height": 512,
+    "alpha_min": 0,
+    "alpha_max": 255
+  },
+  {
+    "file": "menu_browse.png",
+    "width": 1800,
+    "height": 358,
+    "alpha_min": 0,
+    "alpha_max": 255
+  },
+  {
+    "file": "card_bundle.png",
+    "width": 1024,
+    "height": 1024,
+    "alpha_min": 0,
+    "alpha_max": 255
+  },
+  {
+    "file": "rules_1.png",
+    "width": 1536,
+    "height": 900,
+    "alpha_min": 255,
+    "alpha_max": 255
+  },
+  {
+    "file": "restore_scene.png",
+    "width": 1024,
+    "height": 1334,
+    "alpha_min": 255,
+    "alpha_max": 255
+  }
+]

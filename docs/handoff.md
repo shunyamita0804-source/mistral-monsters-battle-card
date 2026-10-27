@@ -6,6 +6,9 @@
 
 ### まず読む：いまの状態（2026-10-27 の終わり）
 
+- **2026-10-27 装飾なしのカードの裏面を組み込んだ（このブランチ・未公開）**：デザイン担当の「MistralBC_CardBack_Plain」（原本 `design-parts/card-back-plain-20261027/`）。
+  ユーザー「寂しすぎるので、アイコン1つ入れて」→ 前の裏面の「星とまわりの円」だけを真ん中に重ねた（`tools/design/card_back_build.py`。未所持の暗い版は星も暗く）。
+  裏面は 400×600（2:3）になったので、相手の手札の幅の計算を 400/600 に。山札などのアイコン・ショップの札・カードの束・遊び方の図1・特別復元の場面も差し替え。iPhone 確認待ち
 - **2026-10-27 ユーザー「カードの裏面の装飾が不要。色は良いので装飾なしに」**：使っている所の洗い出しとデザインのプロンプトを作った（`docs/design/card-back-plain-20261027/`。
   ブランチ `claude/card-back-plain-20261027`・資料だけ）。絵が届いたら同じファイル名で差し替える（`card_back`・`card_unknown`・対戦の山札／手札／捨て札のアイコン・
   `shop/menu_browse`・`reward/card_bundle`・`rules/rules_1`・`restore/restore_scene`、任意で `howto_2/3`・`title_logo`）。パックの袋の柄は対象外

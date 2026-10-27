@@ -84,7 +84,7 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | （削除）`images/cards/skills/sor_sk_01〜16.webp` | 旧ソラモの技16種の絵。2026-10-25 にソラモ14技へ替えたので削除（原本は design-parts に残る） | 削除 |
 | `images/cards/monsters/{soramo,gauul,lazuck}_{official,battle}.webp` | モンスターカード（正式カード＝名前・LIFE 入り／バトル用＝文字なし）（ZIP「Mismon_MonsterCards_Official_and_Battle_20261023」） | ユーザー提供。WebP（品質90）。ガウル・ラズックは登録のみ（ゲームで未使用） |
 | `images/backgrounds/title_bg.webp`・`battle_arena.webp` | タイトルの背景・大会の対戦の背景（ZIP「UI画像10種」） | ユーザー提供（画像生成）。WebP |
-| `images/ui/frame/*.webp`・`images/ui/card_back.webp`・`images/ui/packs/pack_0N.webp` | 共通背景・見出しの帯・窓の枠・一覧のパネル・カードの裏面・パック3種（同） | 切り抜きと 1/2 縮小（枠・帯・パネル）、背景は 512px、裏面は幅400、パックは幅240。描き換えなし |
+| `images/ui/frame/*.webp`・`images/ui/card_back.webp`（2026-10-27 装飾なしの裏面に差し替え：`tools/design/card_back_build.py`。400×600）・`images/ui/packs/pack_0N.webp` | 共通背景・見出しの帯・窓の枠・一覧のパネル・カードの裏面・パック3種（同） | 切り抜きと 1/2 縮小（枠・帯・パネル）、背景は 512px、裏面は幅400、パックは幅240。描き換えなし |
 | `images/characters/face_{clerk,receptionist}.webp` | 店員・受付の顔（ショップ・大会受付の画面） | 384px に縮小 |
 | `images/maps/dungeon/dungeon_{floor,wall_top,wall_face}.webp`・`stairs_{down,up}.webp`・`enemy_symbol.webp` | ダンジョンの床・壁の上面・壁の正面・階段・魔物のしるし（ZIP「Seimon_UI_Quality2_20261023」） | ユーザー提供（画像生成）。床・上面は 512px、正面は上下の端を切り落として幅768、部品は切り抜きと縮小 |
 | `images/backgrounds/battle_dungeon.webp`・`pack_open_bg.webp` | ダンジョンの対戦の背景・パックを開けるときの光（同） | WebP |

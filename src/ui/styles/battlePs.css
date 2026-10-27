@@ -795,8 +795,8 @@
 }
 
 .battle-hand__back {
-  /* 裏面の絵（400×586）の縦横比のまま、自分の手札と同じ高さ（2026-10-25：手札が新UIのほぼ正方形になったので、幅は絵の比率で） */
-  --opp-card-w: calc(var(--opp-card-h, var(--hand-card-h)) * 400 / 586);
+  /* 裏面の絵（400×600。2026-10-27 装飾なしの裏面に）の縦横比のまま、自分の手札と同じ高さ（2026-10-25：手札が新UIのほぼ正方形になったので、幅は絵の比率で） */
+  --opp-card-w: calc(var(--opp-card-h, var(--hand-card-h)) * 400 / 600);
   flex: none;
   width: var(--opp-card-w);
   height: var(--opp-card-h, var(--hand-card-h));
