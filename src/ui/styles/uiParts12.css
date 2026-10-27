@@ -97,11 +97,11 @@
   background-image: url('@assets/images/maps/dungeon/forest_stairs_down.webp');
 }
 
-/* ===== 12-5 ダンジョンのバトラー3人（主人公と同じ大きさで、足元をマスの下の方に） ===== */
+/* ===== 12-5 ダンジョンのバトラー3人（主人公と同じ高さ 84 で、足元をマスの下の方〔上から 39px〕に） ===== */
 .drun__entity--npc {
   width: 48px;
-  height: 70px;
-  margin-top: -31px;
+  height: 84px;
+  margin-top: -45px;
   background: center bottom / auto 100% no-repeat;
   scale: 1;
 }

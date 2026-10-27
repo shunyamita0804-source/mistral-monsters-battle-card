@@ -1832,7 +1832,8 @@ export const battleScreen: ScreenDefinition = {
 
     /**
      * 操作のボタン（2026-10-25 リデザイン：手札の下に横一列。それまでは自分のモンスターの右に縦並び）。働きは同じ。
-     * 左に「コマンド」（攻撃終了・ターン終了・ルール・降参の一覧）、いちばん右はいつも場面の主なボタン（攻撃終了・ターン終了）か状態の札。
+     * 左に「コマンド」（攻撃終了・ターン終了・ルール・降参の一覧）、真ん中はいつも場面を終えるボタン（攻撃終了・ターン終了）か状態の札、
+     * 右はその時に使うボタン（2026-10-27 ユーザー指示で、右にあった「攻撃終了・ターン終了」を真ん中に、使うボタンを右に）。
      * - 攻撃：「攻撃終了」。カードを選ぶと「使う（使えるときだけ）」「やめる」。対象を選ぶ間は「やめる」
      * - マナ化：「ターン終了」、選んだカードがあれば「マナにする（N枚）」
      * - 相手の番・守備・オート中：いまの状態の札
@@ -1844,7 +1845,10 @@ export const battleScreen: ScreenDefinition = {
         lastCommandKey = '';
         return panel;
       }
-      const buttons: HTMLElement[] = [];
+      // 3つの場所（2026-10-27 ユーザー指示「その時に使うコマンドは触りやすい右に。ターン終了は真ん中に常に」）：
+      // 左＝「コマンド」、真ん中＝場面を終えるボタン（攻撃終了・ターン終了・守備しない）か状態の札、右＝その時に使うボタン（使う・やめる・マナにする）
+      let middle: HTMLElement | null = null;
+      const actions: HTMLElement[] = [];
       const mine = s.active === 'player' && !auto;
       const selected = selectedUid ? s.sides.player.hand.find((c) => c.uid === selectedUid) : undefined;
       const deselect = (): void => {
@@ -1858,29 +1862,29 @@ export const battleScreen: ScreenDefinition = {
           ? h('span', { class: 'battle-cmds__status battle-cmds__status--wait' }, h('span', { class: 'battle-cmds__sand', attrs: { 'aria-hidden': 'true' } }), h('span', { text }))
           : h('span', { class: 'battle-cmds__status', text });
       if (mine && s.phase === 'main') {
-        if (!targeting && selected && cardUsability(s, 'player', selected.uid).usable) buttons.push(commandButton(t('battle.cmd.use'), () => useCard(selected.uid)));
-        if (targeting || selected) buttons.push(commandButton(t('common.cancel'), deselect, 'cancel'));
-        buttons.push(commandButton(t('battle.cmd.endAttack'), () => requestEndAttack(s), 'cancel'));
+        if (!targeting && selected && cardUsability(s, 'player', selected.uid).usable) actions.push(commandButton(t('battle.cmd.use'), () => useCard(selected.uid)));
+        if (targeting || selected) actions.push(commandButton(t('common.cancel'), deselect, 'cancel'));
+        middle = commandButton(t('battle.cmd.endAttack'), () => requestEndAttack(s), 'cancel');
       } else if (mine && s.phase === 'mana') {
-        if (manaPicks.size > 0 && canConvertToMana(s, 'player')) buttons.push(commandButton(t('battle.cmd.makeMana', { n: manaPicks.size }), convertPicked));
-        buttons.push(commandButton(t('battle.cmd.endTurn'), () => requestEndTurn(), 'cancel'));
+        if (manaPicks.size > 0 && canConvertToMana(s, 'player')) actions.push(commandButton(t('battle.cmd.makeMana', { n: manaPicks.size }), convertPicked));
+        middle = commandButton(t('battle.cmd.endTurn'), () => requestEndTurn(), 'cancel');
       } else if (canChooseDefense(s) && s.pending) {
-        // 守備の選択はフォーカスエリア。「守備しない／守備を終える」はここ（いちばん右）
+        // 守備の選択はフォーカスエリア。「守備しない／守備を終える」は真ん中
         const pass = s.pending.responses.length === 0;
-        buttons.push(commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel'));
+        middle = commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel');
       } else if (s.phase === 'defense' && s.pending?.attacker === 'opponent' && !auto) {
-        buttons.push(statusTag(t('battle.dock.noDefense'), true));
+        middle = statusTag(t('battle.dock.noDefense'), true);
       } else {
-        buttons.push(statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting'), !auto));
+        middle = statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting'), !auto);
       }
-      // 手札の下に横一列（2026-10-25 リデザイン）：左に「コマンド」、いちばん右は場面の主なボタン（攻撃終了・ターン終了）か状態の札
-      buttons.unshift(commandMenuButton());
-      buttons[buttons.length - 1]?.classList.add('is-main');
+      middle.classList.add('is-main');
+      const buttons = [commandMenuButton(), middle, ...actions];
       if (blocked || swipe) for (const b of buttons) if (b instanceof HTMLButtonElement) b.disabled = true;
       const key = buttons.map((b) => b.getAttribute('aria-label') ?? b.textContent).join('|');
       if (key !== lastCommandKey) panel.classList.add('is-enter');
       lastCommandKey = key;
-      panel.append(...buttons);
+      panel.append(buttons[0] as HTMLElement, middle);
+      if (actions.length > 0) panel.append(h('div', { class: 'battle-cmds__actions' }, ...actions));
       return panel;
     };
 

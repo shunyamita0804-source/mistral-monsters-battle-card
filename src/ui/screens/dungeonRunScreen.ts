@@ -75,9 +75,9 @@ const MINI_MARK = 3.4;
 /** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
 const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
 /** 見えない番人が姿を現したときの絵の高さ（論理px。主人公と同じ） */
-const GUARDIAN_H = 70;
-/** 主人公の絵の高さ（論理px）と、1コマの縦横比（シート 310×360） */
-const PLAYER_H = 70;
+const GUARDIAN_H = 84;
+/** 主人公の絵の高さ（論理px）と、1コマの縦横比（シート 310×360）。2026-10-27 ユーザー「もう少し大きく」で 70→84（1マス 48 のまま） */
+const PLAYER_H = 84;
 const PLAYER_W = Math.round((PLAYER_H * 310) / 360);
 /** 主人公の足元（コマの中の位置の割合。シートの足元 (155, 338)） */
 const FOOT_Y_RATIO = 338 / 360;

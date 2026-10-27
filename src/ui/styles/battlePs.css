@@ -330,47 +330,63 @@
   flex: none;
 }
 
-/* 操作のボタン：手札の下に横一列。左に「コマンド」、いちばん右は場面の主なボタン（攻撃終了・ターン終了）か状態の札 */
+/* 操作のボタン：手札の下に横一列（2026-10-27 ユーザー指示で3つの場所に）。
+ * 左＝「コマンド」、真ん中（画面の真ん中に固定）＝攻撃終了・ターン終了・守備しないか状態の札、右＝その時に使うボタン（使う・やめる・マナにする）。
+ * 高さと文字を少し大きく（ボタン 46→52・文字 13→15） */
 .battle-cmds {
   flex: none;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 128px 1fr;
   align-items: center;
-  justify-content: flex-start;
   align-self: stretch;
   gap: 6px;
-  min-height: 56px;
-  padding: 5px 10px 5px;
+  min-height: 64px;
+  padding: 6px 10px;
 }
 
 .battle-cmds .command-btn {
   flex: none;
-  width: auto;
-  min-width: 84px;
-  height: 46px;
+  width: 100%;
+  min-width: 0;
+  height: 52px;
+}
+
+.battle-cmds > .battle__cmd-open {
+  justify-self: start;
+  width: 96px;
 }
 
 .battle-cmds .command-btn__label {
-  font-size: 13px;
-  padding: 0 10px;
+  font-size: 15px;
+  padding: 0 6px;
 }
 
 .battle-cmds .command-btn.is-long .command-btn__label {
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 13px;
+  letter-spacing: -0.02em;
 }
 
-.battle-cmds > .is-main {
-  margin-left: auto;
+/* 右の場所：1つなら幅いっぱい、2つ（使う・やめる）なら半分ずつ */
+.battle-cmds__actions {
+  display: flex;
+  gap: 5px;
+  min-width: 0;
 }
 
-.battle-cmds .command-btn.is-main {
-  min-width: 118px;
+.battle-cmds__actions .command-btn {
+  flex: 1 1 0;
 }
 
 .battle-cmds__status {
-  min-height: 46px;
+  min-height: 52px;
   padding: 0 6px;
+  font-size: 13px;
+}
+
+/* 状態の札（相手の番など）は真ん中と右をまとめて使う */
+.battle-cmds > .battle-cmds__status {
+  grid-column: 2 / 4;
 }
 
 /* コマンドの一覧：「コマンド」の上に開く */
@@ -378,7 +394,7 @@
   left: 10px;
   right: auto;
   top: auto;
-  bottom: 64px;
+  bottom: 72px;
 }
 
 /* ---------- パートB：技カードの表面 → 2026-10-25 から全画面共通の新UI（skillCard.ts・cards.css）に統一 ---------- */
