@@ -1,0 +1,54 @@
+{
+  "game": "ミストラルモンスターズ バトルカード",
+  "selection_event": "カードバトラー管理局／パック選択",
+  "source": "01_添付デザイン/3箱集合_正式デザイン_原本.jpeg",
+  "source_resolution": [
+    1536,
+    768
+  ],
+  "tap_behavior": "firstTap=preview+guide+pointer; secondSameTap=claim; differentTap=changePreview",
+  "pack_map": [
+    {
+      "position": "left",
+      "key": "booster-1",
+      "file": "booster_tabidachi.png",
+      "name": "旅立ちのきらめき",
+      "category": "バランス",
+      "monsters": [
+        "ソラモ",
+        "ガウル",
+        "ミュロル"
+      ]
+    },
+    {
+      "position": "center",
+      "key": "booster-2",
+      "file": "booster_rekka.png",
+      "name": "烈火の猛攻",
+      "category": "攻撃",
+      "monsters": [
+        "ガウル",
+        "ラズック",
+        "ノビトン"
+      ]
+    },
+    {
+      "position": "right",
+      "key": "booster-3",
+      "file": "booster_soukai.png",
+      "name": "蒼海の守り",
+      "category": "防御",
+      "monsters": [
+        "カルシェル",
+        "ミュロル",
+        "ノビトン"
+      ]
+    }
+  ],
+  "not_authorized_to_invent": [
+    "収録カードと排出率",
+    "販売価格",
+    "カード配布枚数",
+    "モンスター原画の再描画"
+  ]
+}

@@ -417,6 +417,8 @@ export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラ�
   interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
   interactAt('bureau-shelves', itemOf(BUREAU_ART, 'SHELVES'), '書類棚', 'message', '登録の書類がきちんと並んでいる。'),
   npc('bureau-clerk', spotOf(BUREAU_ART, 'CLERK_SPOT').x, spotOf(BUREAU_ART, 'CLERK_SPOT').y, 'bureau_clerk', 'bureauDesk', BUREAU_CLERK_DRAW_DY),
+  // 幼馴染（ミレイユ）：導入イベントでパックを選ぶ間だけ、受付の前の主人公の右に立つ（2026-10-27 パック選びで幼馴染が説明する）
+  npc('guide-bureau', itemOf(BUREAU_ART, 'PLAYER_SPOT').x + 4, itemOf(BUREAU_ART, 'PLAYER_SPOT').y, 'neighbor_guide'),
   roomExit('bureau-exit', BUREAU_ART, 'BUREAU'),
 ], entryOf(BUREAU_ART));
 

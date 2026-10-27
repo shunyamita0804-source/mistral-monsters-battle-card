@@ -67,18 +67,31 @@ export const INTRO_V2 = {
   'introV2.s07.5': { ja: 'それじゃ、私は帰るね。困ったらまた話しかけて！', en: "Well, I'm heading home. Talk to me if you need anything!" },
   'introV2.s07.sys': { ja: 'チュートリアル完了。自由行動ができるようになりました。', en: 'Tutorial complete. You can now move around freely.' },
 
-  // パックを選ぶ窓（パックの名前・絵・中身は未定なので【仮】）
+  // パックを選ぶ画面（2026-10-27 正式の箱3種・2回タップで決定。台本「02_Dialogue_And_TapRules」）
   'introV2.pack.title': { ja: 'ブースターパックを選ぶ', en: 'Choose a Booster Pack' },
-  'introV2.pack.temp': { ja: '【仮】パックの名前・絵・中身は準備中です。いまは選んだ記録だけを残し、正式なパックが届いたら一度だけお渡しします。', en: '[Temp] Pack names, art and contents are in progress. Only your choice is recorded for now; the official pack will be given once when ready.' },
-  'introV2.pack.name.1': { ja: '仮のパックA', en: 'Temp Pack A' },
-  'introV2.pack.name.2': { ja: '仮のパックB', en: 'Temp Pack B' },
-  'introV2.pack.name.3': { ja: '仮のパックC', en: 'Temp Pack C' },
-  'introV2.pack.artTemp': { ja: '仮', en: 'Temp' },
-  'introV2.pack.choose': { ja: 'これにする', en: 'Choose' },
-  'introV2.pack.confirmTitle': { ja: 'このパックでよろしいですか？', en: 'Is this pack okay?' },
-  'introV2.pack.confirmText': { ja: '「{pack}」を受け取ります。受け取ったあとは選び直せません。', en: 'You will receive "{pack}". You cannot change it after receiving.' },
-  'introV2.pack.decide': { ja: '決定', en: 'Confirm' },
-  'introV2.pack.rechoose': { ja: '選び直す', en: 'Choose again' },
+  'introV2.pack.hint': { ja: '気になる箱をタップしてください。', en: 'Tap a box that catches your eye.' },
+  'introV2.pack.again': { ja: '同じ箱をもう一度タップすると決定します。', en: 'Tap the same box again to decide.' },
+  'introV2.pack.temp': { ja: '【仮】パックの中身は準備中です。受け取った記録を残し、中身が決まったら一度だけお渡しします。', en: '[Temp] Pack contents are in progress. Your choice is recorded and the pack will be given once when ready.' },
+  'introV2.pack.name.1': { ja: '旅立ちのきらめき', en: 'Sparkle of Departure' },
+  'introV2.pack.name.2': { ja: '烈火の猛攻', en: 'Blazing Onslaught' },
+  'introV2.pack.name.3': { ja: '蒼海の守り', en: 'Guard of the Azure Sea' },
+  'introV2.pack.guide.1': {
+    ja: 'これは『旅立ちのきらめき』！ ソラモたちのパックで、バランスよく戦いたい人におすすめだよ！',
+    en: "This is \"Sparkle of Departure\"! It's Soramo's pack, great if you want a balanced fight!",
+  },
+  'introV2.pack.guide.2': {
+    ja: 'これは『烈火の猛攻』！ ガウルたちのパックで、どんどん攻めたい人にぴったりだよ！',
+    en: "This is \"Blazing Onslaught\"! It's Gauul's pack, perfect if you love to attack!",
+  },
+  'introV2.pack.guide.3': {
+    ja: 'これは『蒼海の守り』！ カルシェルたちのパックで、守りを大切にしたい人におすすめだよ！',
+    en: "This is \"Guard of the Azure Sea\"! It's Kalshell's pack, great if you value defense!",
+  },
+
+  // カードショップ：管理局で選ばなかった2箱（値段・中身は未定なので買えない）
+  'introV2.shop.title': { ja: 'ブースターパック', en: 'Booster Packs' },
+  'introV2.shop.note': { ja: '管理局で選ばなかったパックです。値段と中身は準備中のため、まだ買えません。', en: "These are the packs you didn't choose at the Bureau. Price and contents are in progress, so they can't be bought yet." },
+  'introV2.shop.buy': { ja: '準備中', en: 'Coming soon' },
 
   // 街の目的地・管理局
   'introV2.goal.school': { ja: '目的地：カードバトル教習所（カード練習場）', en: 'Destination: Card Battle School (Practice Hall)' },

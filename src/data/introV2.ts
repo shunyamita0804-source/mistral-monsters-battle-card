@@ -45,21 +45,30 @@ export type BoosterKey = 'booster-1' | 'booster-2' | 'booster-3';
 
 export interface BoosterDefinition {
   readonly key: BoosterKey;
-  /** 【仮】表示名（正式名称は未定） */
+  /** 商品名（2026-10-27 正式デザインの箱の名前。英語は i18n の introV2.pack.name.*） */
   readonly name: string;
+  /** 箱の絵（assets/images/ui/booster/。正式デザインの3箱集合から切り出し。src/ui/components/boosterArt.ts） */
+  readonly art: 'booster_tabidachi' | 'booster_rekka' | 'booster_soukai';
+  /** 種類（バランス・攻撃・防御）と、箱に描かれたモンスター（商品のイメージ。封入の保証・排出率ではない） */
+  readonly category: StarterDeckKey;
+  readonly monsters: readonly [string, string, string];
   /** 中身（正式なカードの一覧が届くまで null。null のあいだは受け取りの記録だけで、カードは配らない） */
   readonly cards: readonly string[] | null;
 }
 
 /**
- * 【仮】管理局で選ぶブースターパック3種。名前・絵・中身・枚数・排出率は未定（ユーザー制作）。
- * いまある仮パック（pack-01〜03）とは別物（混同しない）
+ * 管理局で選ぶブースターパック3種（2026-10-27 ユーザー承認の箱デザイン「BoosterPack_Claude_Request」）。並び・名前・種類・箱のモンスターは確定。
+ * 中身・枚数・排出率・ショップの値段は未定（cards: null のあいだは受け取りの記録だけ。正式な中身が届いたら1回だけ配る）。
+ * いまある仮パック（pack-01〜03）とは別物（混同しない。ショップでも同じ booster-* の ID で扱う）
  */
 export const BOOSTERS: readonly BoosterDefinition[] = [
-  { key: 'booster-1', name: '仮のパックA', cards: null },
-  { key: 'booster-2', name: '仮のパックB', cards: null },
-  { key: 'booster-3', name: '仮のパックC', cards: null },
+  { key: 'booster-1', name: '旅立ちのきらめき', art: 'booster_tabidachi', category: 'balance', monsters: [SORAMO_MONSTER_ID, GAUUL_MONSTER_ID, MYUROL_MONSTER_ID], cards: null },
+  { key: 'booster-2', name: '烈火の猛攻', art: 'booster_rekka', category: 'attack', monsters: [GAUUL_MONSTER_ID, LAZUCK_MONSTER_ID, NOBITON_MONSTER_ID], cards: null },
+  { key: 'booster-3', name: '蒼海の守り', art: 'booster_soukai', category: 'defense', monsters: [KALSHELL_MONSTER_ID, MYUROL_MONSTER_ID, NOBITON_MONSTER_ID], cards: null },
 ];
+
+/** 【仮】ショップでの値段（未定。決まるまで購入・コインを減らす処理は動かさない） */
+export const BOOSTER_SHOP_PRICE: number | null = null;
 
 export const isBoosterKey = (v: unknown): v is BoosterKey => BOOSTERS.some((b) => b.key === v);
 
