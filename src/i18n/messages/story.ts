@@ -18,7 +18,6 @@ export const STORY = {
   'story.speaker.teacher': { ja: '練習場の先生', en: 'Instructor' },
   'story.speaker.residentA': { ja: '花かごの婦人', en: 'Flower Lady' },
   'story.speaker.residentB': { ja: 'カード好きの青年', en: 'Card Fan' },
-  'story.speaker.residentC': { ja: '大工', en: 'Carpenter' },
   'story.speaker.residentD': { ja: '赤い服の女性', en: 'Woman in Red' },
   'story.speaker.residentE': { ja: '新聞を読む紳士', en: 'Gentleman' },
 
@@ -161,10 +160,6 @@ export const STORY = {
   'story.residentB.1b': { ja: 'ショップの販売機、たまにすごいのが出るんだよな。', en: 'The pack machine at the shop gives you something amazing once in a while.' },
   'story.residentB.2a': { ja: '大会で勝ち上がるには、デッキの組み方が大事らしい。', en: 'They say deck building is the key to winning tournaments.' },
   'story.residentB.2b': { ja: '出かける前に、家の机でデッキを見直すといいよ。', en: 'Check your deck at the desk at home before you head out.' },
-  'story.residentC.1a': { ja: 'この街の家は、ほとんどが祖父の代に建てたものさ。', en: 'Most houses in this town were built back in my grandfather\'s day.' },
-  'story.residentC.1b': { ja: '屋根の修理の頼みが多くて、休む暇もないよ。', en: 'So many roofs to fix, I hardly get a day off.' },
-  'story.residentC.2a': { ja: '南の道を抜けると草原に出る。その先にダンジョンがあるって話だ。', en: 'Take the south road and you\'ll reach the meadow. They say there\'s a dungeon past it.' },
-  'story.residentC.2b': { ja: '行くなら、準備はしっかりな。', en: 'If you go, make sure you\'re well prepared.' },
   'story.residentD.1a': { ja: '今度の大会、友だちと見に行く約束をしているの。', en: 'My friends and I are going to watch the next tournament.' },
   'story.residentD.1b': { ja: '会場の丸い天井、近くで見るととてもきれいなのよ。', en: 'The dome of the hall is beautiful up close.' },
   'story.residentD.2a': { ja: '研究所って、いつも遅くまで明かりがついているわね。', en: 'The lights at the lab are always on until late.' },

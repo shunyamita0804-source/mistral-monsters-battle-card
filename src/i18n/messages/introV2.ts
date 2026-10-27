@@ -80,10 +80,9 @@ export const INTRO_V2 = {
   'introV2.pack.decide': { ja: '決定', en: 'Confirm' },
   'introV2.pack.rechoose': { ja: '選び直す', en: 'Choose again' },
 
-  // 街の目的地・管理局（仮）
+  // 街の目的地・管理局
   'introV2.goal.school': { ja: '目的地：カードバトル教習所（カード練習場）', en: 'Destination: Card Battle School (Practice Hall)' },
   'introV2.goal.bureau': { ja: '目的地：カードバトラー管理局', en: 'Destination: Card Battler Bureau' },
-  'introV2.bureau.label': { ja: '管理局（仮）', en: 'Bureau (Temp)' },
   'introV2.bureau.after': {
     ja: '（カードバトラー管理局の受付。いまはプロのカードバトラーの登録だけを受け付けている）【仮】',
     en: '(The Card Battler Bureau reception. For now it only handles pro card battler registration.) [Temp]',

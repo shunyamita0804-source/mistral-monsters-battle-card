@@ -1,7 +1,7 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
-import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpObject, type WarpTarget } from '../../data/maps.ts';
+import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { getMonster } from '../../data/cards.ts';
@@ -95,7 +95,6 @@ import receptionistSheet from '@assets/images/characters/npc_receptionist_walk.w
 import teacherSheet from '@assets/images/characters/npc_teacher_walk.webp';
 import residentASheet from '@assets/images/characters/npc_resident_a_walk.webp';
 import residentBSheet from '@assets/images/characters/npc_resident_b_walk.webp';
-import residentCSheet from '@assets/images/characters/npc_resident_c_walk.webp';
 import residentDSheet from '@assets/images/characters/npc_resident_d_walk.webp';
 import residentESheet from '@assets/images/characters/npc_resident_e_walk.webp';
 import chestWood from '@assets/images/maps/dungeon/chest_01_base.webp';
@@ -274,7 +273,6 @@ const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   neighbor: 'neighbor',
   'house-a': 'house',
   'house-b': 'house',
-  'house-c': 'house',
   'house-d': 'house',
   'house-e': 'house',
 };
@@ -320,7 +318,6 @@ const NPC_SHEET: Readonly<Record<NpcId, string>> = {
   bureau_clerk: receptionistSheet,
   resident_a: residentASheet,
   resident_b: residentBSheet,
-  resident_c: residentCSheet,
   resident_d: residentDSheet,
   resident_e: residentESheet,
 };
@@ -342,7 +339,6 @@ const NPC_NAME: Readonly<Record<NpcId, MessageKey>> = {
   bureau_clerk: 'introV2.speaker.bureau',
   resident_a: 'story.speaker.residentA',
   resident_b: 'story.speaker.residentB',
-  resident_c: 'story.speaker.residentC',
   resident_d: 'story.speaker.residentD',
   resident_e: 'story.speaker.residentE',
 };
@@ -1058,8 +1054,9 @@ export class WorldView {
     if (map.id === 'town') {
       // 施設の名前（建物の絵の上端）
       for (const sign of TOWN_SIGNS) {
+        const v2Goal = this.#dev ? null : this.#introV2Goal(save.story.introV2, map.id);
         const goal =
-          (sign.label === 'practice' && showsPracticeGoal(save, map.id)) || (sign.label === 'practice' && this.#introV2Goal(save.story.introV2, map.id) === 'introV2.goal.school');
+          (sign.label === 'practice' && (showsPracticeGoal(save, map.id) || v2Goal === 'introV2.goal.school')) || (sign.label === 'bureau' && v2Goal === 'introV2.goal.bureau');
         const el = h('div', { class: `world__sign${goal ? ' is-goal' : ''}`, text: t(`world.building.${sign.label}` as MessageKey) });
         Object.assign(el.style, { left: `${sign.x * this.#scale}px`, top: `${sign.y * this.#scale}px` });
         const door = map.art?.doors?.[sign.building];
@@ -1068,7 +1065,6 @@ export class WorldView {
         this.#signs.push({ el, top, maxShift, shift: 0 });
         this.#mapLayer.append(el);
       }
-      this.#addBureauMarker();
       return;
     }
     for (const obj of map.objects) {
@@ -2228,19 +2224,6 @@ export class WorldView {
         this.#busy = wasBusy;
       },
     );
-  }
-
-  /** 街の【仮】管理局の印（建物の絵が無いので、入口の場所に札と枠を出す） */
-  #addBureauMarker(): void {
-    const door = this.#map.objects.find((o): o is WarpObject => o.id === 'door-bureau' && o.type === 'warp');
-    if (!door) return;
-    const cell = this.#cell;
-    const goal = this.#v2.state === 'escortToBureau';
-    const box = h('div', { class: `world__bureau${goal ? ' is-goal' : ''}`, attrs: { 'aria-hidden': 'true' } });
-    Object.assign(box.style, { left: `${(door.x - 1) * cell}px`, top: `${(door.y - 2) * cell}px`, width: `${(door.w + 2) * cell}px`, height: `${3 * cell}px` });
-    const sign = h('div', { class: `world__sign world__sign--temp${goal ? ' is-goal' : ''}`, text: t('introV2.bureau.label') });
-    Object.assign(sign.style, { left: `${(door.x + door.w / 2) * cell}px`, top: `${(door.y - 2) * cell}px` });
-    this.#mapLayer.append(box, sign);
   }
 
   /* ---------- 一緒に歩く幼馴染 ---------- */

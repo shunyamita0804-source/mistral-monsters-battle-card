@@ -226,10 +226,11 @@ describe('街の人', () => {
     });
   });
 
-  it('民家A〜E にそれぞれ住人A〜E がいて、話しかけるたびに2つの話を交互にする', () => {
+  it('民家A・B・D・E にそれぞれ住人がいて、話しかけるたびに2つの話を交互にする（住宅C は管理局に置き換えた）', () => {
     const residents = HOUSES.map((m) => m.objects.find((o): o is NpcObject => o.type === 'npc'));
-    expect(residents.map((r) => r?.npcId)).toEqual(['resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e']);
-    expect([0, 1, 2].map((n) => residentScene('resident_c', n))).toEqual(['resident_c_1', 'resident_c_2', 'resident_c_1']);
+    expect(residents.map((r) => r?.npcId)).toEqual(['resident_a', 'resident_b', 'resident_d', 'resident_e']);
+    expect(getMap('house-c')).toBeUndefined();
+    expect([0, 1, 2].map((n) => residentScene('resident_d', n))).toEqual(['resident_d_1', 'resident_d_2', 'resident_d_1']);
     for (const r of residents) {
       for (const n of [0, 1]) {
         const scene = SCENES[residentScene(r!.npcId as 'resident_a', n)];

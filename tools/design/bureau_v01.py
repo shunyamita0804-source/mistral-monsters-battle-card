@@ -2,7 +2,8 @@
 """カードバトラー管理局の内装（2026-10-27 ZIP「管理局_制作素材_v01」。原本 design-parts/bureau-v01-20261027/ は無改変）。
 
 使い方：python3 -I tools/design/bureau_v01.py
-書き出し：assets/images/maps/rooms/bureau_*.webp と src/data/bureauArt.generated.ts（街の絵・ほかの部屋は触らない）
+書き出し：assets/images/maps/rooms/bureau_*.webp と src/data/bureauArt.generated.ts（ほかの部屋は触らない）。
+街の外観は seimon_world_build.py が town_exterior() を使って街の絵に焼き込む（住宅C の所。2026-10-27 ユーザー指示）
 
 - 素材は 1536×1024 の同じキャンバス（原点をそろえたまま使う。家具だけを切り抜いても位置は変えない）。
   1px ＝ 部屋の単位 ROOM_UNIT（カードショップと同じ。人の背が絵の中で約178px）
@@ -48,6 +49,11 @@ PLAYER_FOOT = (768, 605)
 # 入ったときに立つ所・出口の行
 SPAWN_FOOT = (768, 865)
 EXIT_BOTTOM = 955
+
+
+def town_exterior() -> Image.Image:
+    """街の外観（seimon_world_build.py が街の絵に焼き込む。扉は閉じた絵。左右に開く扉の部品は v01 に無い）"""
+    return _load('EXTERIOR')
 
 
 def _load(name: str) -> Image.Image:

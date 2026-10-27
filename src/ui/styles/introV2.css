@@ -73,31 +73,6 @@
   opacity: 0;
 }
 
-/* ===== 【仮】カードバトラー管理局の印（建物の絵が届くまで） ===== */
-.world__bureau {
-  position: absolute;
-  z-index: 2;
-  border: 3px dashed rgb(255 236 170 / 0.9);
-  border-radius: 8px;
-  background: rgb(60 90 160 / 0.35);
-  pointer-events: none;
-}
-
-.world__bureau.is-goal {
-  animation: bureau-goal 1.2s ease-in-out infinite;
-}
-
-@keyframes bureau-goal {
-  0%, 100% { box-shadow: 0 0 0 2px rgb(255 220 120 / 0.9), 0 0 16px rgb(255 210 90 / 0.9); }
-  50% { box-shadow: 0 0 0 2px rgb(255 220 120 / 0.2), 0 0 4px rgb(255 210 90 / 0.2); }
-}
-
-.world__sign--temp {
-  /* 人物より手前（入口の前に立つと札が隠れるので） */
-  z-index: 5000;
-  border-style: dashed;
-}
-
 /* ===== 【仮】チュートリアルスキップ（販売前に消す予定） ===== */
 .world__skip-intro {
   border: 1px dashed #f1c45a;

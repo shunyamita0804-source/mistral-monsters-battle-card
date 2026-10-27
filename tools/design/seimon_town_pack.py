@@ -70,8 +70,10 @@ TOWN = {
              color='#B5866E', canvas='1024x1024'),
         dict(id='HOUSE_B', name='住宅B', zone='北西', rect=[16, 1152, 592, 1632], door_w=80,
              color='#B5866E', canvas='1024x1024'),
-        dict(id='HOUSE_C', name='住宅C', zone='北東', rect=[2912, 288, 3488, 768], door_w=80,
-             color='#79A584', canvas='1024x1024'),
+        # 2026-10-27 ユーザー指示：住宅C の所をカードバトラー管理局に置き換えた（住宅C と住人C はなくした）。
+        # 枠・玄関（下の辺の真ん中 x=3200）・道は住宅C と同じ（枠を変えると、草むら・小物の並びが街じゅうずれるため）
+        dict(id='BUREAU', name='カードバトラー管理局', zone='北東', rect=[2912, 288, 3488, 768], door_w=96,
+             color='#3E5A8C', canvas='1536x1024'),
         dict(id='HOUSE_D', name='住宅D', zone='北東', rect=[2528, 1152, 3104, 1632], door_w=80,
              color='#79A584', canvas='1024x1024'),
         dict(id='HOUSE_E', name='住宅E', zone='北東', rect=[3296, 1152, 3872, 1632], door_w=80,
@@ -97,7 +99,7 @@ TOWN = {
         dict(id='P_TRAINING', name='練習場への道', rect=vpath(704, 888, SY, W_DOOR)),
         dict(id='P_HOUSE_B', name='住宅Bへの道', rect=vpath(304, 1632, SY, W_DOOR)),
         dict(id='P_HOUSE_A', name='住宅Aへの道', rect=vpath(1136, 1632, SY, W_DOOR)),
-        dict(id='P_HOUSE_C', name='住宅Cへの道', rect=vpath(3200, 768, SY, W_DOOR)),
+        dict(id='P_BUREAU', name='管理局への道（もとの住宅Cへの道）', rect=vpath(3200, 768, SY, W_DOOR)),
         dict(id='P_HOUSE_D', name='住宅Dへの道', rect=vpath(2816, 1632, SY, W_DOOR)),
         dict(id='P_HOUSE_E', name='住宅Eへの道', rect=vpath(3584, 1632, SY, W_DOOR)),
         dict(id='P_SHOP', name='ショップの玄関前', rect=vpath(464, 3120, LANE, W_DOOR)),
