@@ -5,10 +5,13 @@ import {
   claimTournamentRewards,
   enterTournament,
   entryCheck,
+  nextOpponent,
   recordMatch,
   tournamentRecord,
   withdraw,
 } from '../../game/progress/tournament.ts';
+import { TOURNAMENT_ROUNDS } from '../../game/progress/tournamentDraw.ts';
+import { randomSeed } from '../../game/rng.ts';
 import { cardName, opponentName, packName, tournamentDescription, tournamentName } from '../../i18n/content.ts';
 import { t as tr } from '../../i18n/i18n.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
@@ -20,7 +23,7 @@ import { createScreenHeader } from '../components/screenHeader.ts';
 import { button, h } from '../dom.ts';
 import { newId, once } from '../gameStore.ts';
 import type { ScreenDefinition } from './types.ts';
-import { opponentFace } from '../components/opponentFace.ts';
+import { bracketView, leagueTable, openEntrant, playerPlace, standingsTable } from '../components/tournamentBoards.ts';
 import { rewardGlow } from '../components/rewardGlow.ts';
 import { celebrationBanner } from '../components/celebrationBanner.ts';
 import type { RankId } from '../../data/economy.ts';
@@ -29,21 +32,35 @@ import faceReceptionist from '@assets/images/characters/face_receptionist.webp';
 import arenaBg from '@assets/images/backgrounds/battle_arena.webp';
 import arenaDBg from '@assets/images/backgrounds/battle_arena_d.webp';
 import trophyArt from '@assets/images/ui/tournament/trophy.webp';
-import medalWinArt from '@assets/images/ui/tournament/medal_win.webp';
 import medalLoseArt from '@assets/images/ui/tournament/medal_lose.webp';
 
 /** 大会の対戦の背景（2026-10-23 納品「UI画像10種」の対戦背景：中央が空の紺のテーブル） */
 export const TOURNAMENT_BATTLE_BG = arenaBg;
 
-/** 大会ごとの対戦の背景（2026-10-27 デザイン第13弾：D ランクは大理石の縁の一段格の高い台）。無い大会は TOURNAMENT_BATTLE_BG */
-const TOURNAMENT_BG: Readonly<Record<string, string>> = { 'tournament-d': arenaDBg };
+/**
+ * 大会ごとの対戦の背景（2026-10-27 デザイン第13弾：D ランクは大理石の縁の一段格の高い台）。無い大会は TOURNAMENT_BATTLE_BG。
+ * C〜S は当面 D と同じ（2026-10-27 指示書「大会の新しい形」）
+ */
+const TOURNAMENT_BG: Readonly<Record<string, string>> = {
+  'tournament-d': arenaDBg,
+  'tournament-c': arenaDBg,
+  'tournament-b': arenaDBg,
+  'tournament-a': arenaDBg,
+  'tournament-s': arenaDBg,
+};
 
+/** 何試合目か（総当たりは「第n試合」、トーナメントは「1回戦・準決勝・決勝」） */
 function roundLabel(t: TournamentDefinition, i: number): string {
-  const left = t.rounds.length - i;
+  if (t.format === 'league') return tr('tournament.matchN', { n: i + 1 });
+  const left = TOURNAMENT_ROUNDS - i;
   if (left === 1) return tr('tournament.roundFinal');
   if (left === 2) return tr('tournament.roundSemi');
   return tr('tournament.roundN', { n: i + 1 });
 }
+
+/** 参加のきまり（総当たり・トーナメント） */
+const ruleText = (t: TournamentDefinition): string =>
+  tr(t.format === 'league' ? 'tournament.enterRuleLeague' : 'tournament.enterRuleBracket', { n: TOURNAMENT_ROUNDS, players: t.participants });
 
 const packLabel = (id: string): string => {
   const pack = getPack(id);
@@ -84,7 +101,8 @@ export const tournamentScreen: ScreenDefinition = {
     bgm.play('tournament');
 
     const startMatch = once((t: TournamentDefinition, round: number) => {
-      const opponent = t.rounds[round];
+      const active = store.save.activeTournament;
+      const opponent = active ? nextOpponent(t, active) : undefined;
       if (!opponent) return;
       store.pendingBattle = {
         title: tr('tournament.battleTitle', { name: tournamentName(t), round: roundLabel(t, round) }),
@@ -92,10 +110,11 @@ export const tournamentScreen: ScreenDefinition = {
         allowSurrender: true,
         bgm: 'tournamentBattle',
         background: TOURNAMENT_BG[t.id] ?? TOURNAMENT_BATTLE_BG,
-        onFinish: (winner) => {
+        onFinish: (winner, summary) => {
           const won = winner === 'player';
+          // 残ったモンスター・与えたダメージは総当たりの順位に使う。同じ回のほかの人の試合はここで自動で決まる
           store.update((s) => ({
-            ...recordMatch(s, round, won),
+            ...recordMatch(s, round, { won, ...summary }),
             stats: { ...s.stats, battlesWon: s.stats.battlesWon + (won ? 1 : 0), battlesLost: s.stats.battlesLost + (won ? 0 : 1) },
           }));
           ctx.back('tournament');
@@ -140,12 +159,12 @@ export const tournamentScreen: ScreenDefinition = {
           element,
           tr('tournament.enterConfirm', { name: tournamentName(t) }),
           [
-            h('p', { class: 'modal__text', text: tr('tournament.enterRule', { n: t.rounds.length, players: t.participants }) }),
+            h('p', { class: 'modal__text', text: ruleText(t) }),
             ...prizeLines(t).map((l) => h('p', { class: 'modal__text', text: l.text })),
             h('p', { class: 'modal__text modal__text--sub', text: tr('tournament.resumeNote') }),
           ],
           () => {
-            store.update((s) => enterTournament(s, t.id, newId('entry')));
+            store.update((s) => enterTournament(s, t.id, newId('entry'), randomSeed()));
             render();
           },
         );
@@ -156,7 +175,7 @@ export const tournamentScreen: ScreenDefinition = {
         { class: `tournament__item${check.ok ? '' : ' is-locked'}`, dataset: { id: t.id } },
         h('h2', { class: 'tournament__name', text: tr('tournament.nameTemp', { name: tournamentName(t) }) }),
         h('p', { class: 'tournament__desc', text: tournamentDescription(t) }),
-        h('p', { class: 'tournament__cond', text: tr('tournament.condition', { rank: t.requiredRank, n: t.rounds.length }) }),
+        h('p', { class: 'tournament__cond', text: tr('tournament.condition', { rank: t.requiredRank, n: TOURNAMENT_ROUNDS, players: t.participants }) }),
         h(
           'ul',
           { class: 'tournament__prizes' },
@@ -173,6 +192,16 @@ export const tournamentScreen: ScreenDefinition = {
       );
     };
 
+    const board = (t: TournamentDefinition, active: NonNullable<typeof store.save.activeTournament>): HTMLElement => {
+      const gender = store.save.player.gender;
+      return h(
+        'div',
+        { class: 'tournament__board' },
+        t.format === 'league' ? leagueTable(t, active, gender) : bracketView(t, active, gender, (id) => openEntrant(element, t, id, gender)),
+        t.format === 'bracket' ? h('p', { class: 'tournament__hint', text: tr('tournament.cardHint') }) : null,
+      );
+    };
+
     const render = (): void => {
       const save = store.save;
       const active = save.activeTournament;
@@ -184,30 +213,18 @@ export const tournamentScreen: ScreenDefinition = {
           ...TOURNAMENTS.map(tournamentCard),
         );
       } else if (active.status === 'inProgress') {
-        const opponent = t.rounds[active.round];
+        // 対戦表（総当たり）・トーナメント表（2026-10-27 指示書「大会の新しい形」）。札を押すと出場者をくわしく
+        const opponent = nextOpponent(t, active);
         body.push(
           h('h2', { class: 'tournament__name', text: tr('tournament.inProgress', { name: tournamentName(t) }) }),
-          // 勝ち抜き表（2026-10-26 デザイン第8弾）：下の1回戦から上の優勝杯へ登っていく。勝った回戦は金のメダル
-          h('img', { class: 'tournament__trophy', attrs: { src: trophyArt, alt: '', draggable: 'false' } }),
-          h(
-            'ol',
-            { class: 'tournament__bracket' },
-            ...t.rounds.map((r, i) =>
-              h(
-                'li',
-                { class: `tournament__round${i < active.round ? ' is-won' : i === active.round ? ' is-next' : ''}` },
-                h('span', { class: 'tournament__round-label', text: roundLabel(t, i) }),
-                h('span', { class: 'tournament__round-name' }, opponentFace(r.id, 34), h('span', { text: opponentName(r) })),
-                i < active.round
-                  ? h('img', { class: 'tournament__medal', attrs: { src: medalWinArt, alt: tr('tournament.stateWon'), draggable: 'false' } })
-                  : h('span', { class: 'tournament__round-state', text: i === active.round ? tr('tournament.stateNext') : tr('common.none') }),
-              ),
-            ),
-          ),
+          board(t, active),
+          opponent
+            ? h('p', { class: 'tournament__next', text: tr('tournament.nextVs', { round: roundLabel(t, active.round), name: opponentName(opponent) }) })
+            : null,
           opponent
             ? h('p', { class: 'tournament__opponent', text: tr('tournament.opponents', { names: opponent.monsters.map((m) => cardName(getMonster(m))).join(tr('common.listSeparator')) }) })
             : null,
-          button(tr('tournament.fight', { round: roundLabel(t, active.round) }), () => startMatch(t, active.round), 'btn btn--primary btn--large'),
+          button(tr('tournament.fightNow'), () => startMatch(t, active.round), 'btn btn--primary btn--large'),
           h('p', { class: 'notice', text: tr('tournament.leaveNote') }),
           button(tr('tournament.withdraw'), () => {
             confirmModal(element, tr('tournament.withdrawConfirm'), [h('p', { class: 'modal__text', text: tr('tournament.withdrawText') })], () => {
@@ -218,14 +235,19 @@ export const tournamentScreen: ScreenDefinition = {
         );
       } else {
         const won = active.status === 'won';
+        // 負けたとき：総当たりは順位、トーナメントは負けた回戦
+        const lostRound = active.matches.find((m) => (m.a === 'player' || m.b === 'player') && m.winner !== 'player')?.round ?? active.round;
+        const lostSub = t.format === 'league' ? tr('tournament.lostLeague', { n: playerPlace(active) }) : tr('tournament.lostSub', { round: roundLabel(t, lostRound) });
         body.push(
           h('div', { class: `tournament__result${won ? ' is-won' : ''}` },
             // 優勝＝優勝杯、負け＝ひびの入った盾のメダル（2026-10-26 デザイン第8弾）。
             // 優勝のときは後ろに優勝の場面の絵（2026-10-27 デザイン第13弾。絵の中に優勝杯があるので小さな優勝杯は uiParts12.css で隠す）
             h('img', { class: `tournament__result-art${won ? ' is-trophy' : ''}`, attrs: { src: won ? trophyArt : medalLoseArt, alt: '', draggable: 'false' } }),
             h('p', { class: 'tournament__result-title', text: tr(won ? 'tournament.won' : 'tournament.lost', { name: tournamentName(t) }) }),
-            h('p', { class: 'tournament__result-sub', text: won ? tr('tournament.wonSub') : tr('tournament.lostSub', { round: roundLabel(t, active.round) }) }),
+            h('p', { class: 'tournament__result-sub', text: won ? tr('tournament.wonSub') : lostSub }),
           ),
+          // 3試合が終わったら順位表（総当たり）・埋まったトーナメント表
+          t.format === 'league' ? standingsTable(t, active, save.player.gender) : board(t, active),
           button(tr('tournament.claim'), claim, 'btn btn--primary btn--large'),
         );
       }

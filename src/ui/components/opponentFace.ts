@@ -9,6 +9,14 @@ import faceBattler2 from '@assets/images/characters/face_battler_2.webp';
 import faceBattler3 from '@assets/images/characters/face_battler_3.webp';
 import faceGuardian from '@assets/images/characters/face_guardian.webp';
 import faceTeacher from '@assets/images/characters/face_teacher.webp';
+import faceTobias from '@assets/images/characters/face_entrant_tobias.webp';
+import faceMarie from '@assets/images/characters/face_entrant_marie.webp';
+import faceJean from '@assets/images/characters/face_entrant_jean.webp';
+import faceHelena from '@assets/images/characters/face_entrant_helena.webp';
+import faceClaude from '@assets/images/characters/face_entrant_claude.webp';
+import faceBeatrice from '@assets/images/characters/face_entrant_beatrice.webp';
+import faceZara from '@assets/images/characters/face_entrant_zara.webp';
+import faceWalter from '@assets/images/characters/face_entrant_walter.webp';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { h } from '../dom.ts';
 
@@ -29,6 +37,17 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'battler-2': faceBattler2,
   'battler-3': faceBattler3,
   guardian: faceGuardian,
+  // C ランクのトーナメントのシエナ（E ランクと同じ顔）
+  'reg-sienna': faceE3,
+  // 一般の出場者8人（2026-10-27 指示書「大会の新しい形」の絵。tools/design/tournament_parts.py）。常連6人の顔はまだ無い（人影）
+  'gen-tobias': faceTobias,
+  'gen-marie': faceMarie,
+  'gen-jean': faceJean,
+  'gen-helena': faceHelena,
+  'gen-claude': faceClaude,
+  'gen-beatrice': faceBeatrice,
+  'gen-zara': faceZara,
+  'gen-walter': faceWalter,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
 };

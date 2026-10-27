@@ -8,7 +8,7 @@ import type { OpponentDefinition } from './tournaments.ts';
  *
  * - town：街の人（会話・対戦成績はなし）。初めて話したとき（会話の名前の札が出たとき）に名刺を登録する
  * - opponent：対戦する人。初めて対戦したとき（勝ち負けは問わない）に登録する
- * - inGame：いまゲームに出てくるか。false の人（管理局の職員・C〜S ランクの常連・書庫・再戦）はデータだけ（登場は別の指示書）
+ * - inGame：いまゲームに出てくるか。false の人（管理局の職員・書庫・もと住人C）はデータだけ（登場は別の指示書）
  */
 
 export interface LocalText {
@@ -81,7 +81,7 @@ export const PEOPLE: readonly Person[] = [
   // ---------- 大会の相手（E・D） ----------
   p(12, 'noel', 'tournament', ['ノエル', 'Noel'], ['駆け出しのカードバトラー', 'Rookie card battler'], ['わたしも、今日が初めての大会なんです。', "Today's my first tournament, too."], { opponentIds: ['e-1'] }),
   p(13, 'viktor', 'tournament', ['ヴィクトル', 'Viktor'], ['ベルモント商会の跡取り', 'Heir to the Belmont Trading Company'], ['カードは、いちばん高いのを集めているよ。', 'I only collect the most expensive cards.'], { opponentIds: ['e-2'] }),
-  p(14, 'sienna', 'tournament', ['シエナ', 'Sienna'], ['旅のカード使い・ノルディス地方出身', 'Traveling card user from Nordis'], ['次の街でも、また会えるといいわね。', 'I hope we meet again in the next town.'], { opponentIds: ['e-3'] }),
+  p(14, 'sienna', 'tournament', ['シエナ', 'Sienna'], ['旅のカード使い・ノルディス地方出身', 'Traveling card user from Nordis'], ['次の街でも、また会えるといいわね。', 'I hope we meet again in the next town.'], { opponentIds: ['e-3', 'reg-sienna'] }),
   p(15, 'dario', 'tournament', ['ダリオ', 'Dario'], ['港町の漁師・港町カードクラブ', 'Port town fisherman, Port Town Card Club'], ['網もカードも、引きが大事だ！', "Nets or cards, it's all about the draw!"], { opponentIds: ['d-1'] }),
   p(16, 'isabella', 'tournament', ['イザベラ', 'Isabella'], ['ローゼンベルク家の夫人', 'Lady of the House of Rosenberg'], ['優雅に勝つのが、わたくしの流儀ですの。', 'Winning gracefully is my way.'], { opponentIds: ['d-2'] }),
   p(17, 'gordon', 'tournament', ['ゴードン', 'Gordon'], ['かつての大会の常連', 'Former tournament regular'], ['昔はもっと上で戦っていたものだ。', 'I used to fight at a much higher level.'], { opponentIds: ['d-3'] }),
@@ -90,14 +90,14 @@ export const PEOPLE: readonly Person[] = [
   p(19, 'oscar', 'dungeon', ['オスカー', 'Oscar'], ['古代史の学者', 'Scholar of ancient history'], ['遺跡の石は、百年前の言葉を語っている。', 'The stones of the ruins speak words from a century ago.'], { opponentFaces: ['battler-2'] }),
   p(20, 'kyle', 'dungeon', ['カイル', 'Kyle'], ['腕試しの旅人', 'Traveler testing his skill'], ['強いやつを探して、ここまで来た。', 'I came all this way looking for strong opponents.'], { opponentFaces: ['battler-3'] }),
   p(21, 'guardian', 'dungeon', ['？？？', '???'], ['ダンジョンを見回る者', 'One who patrols the dungeon'], ['……。', '...'], { hideName: true, opponentFaces: ['guardian'] }),
-  // ---------- 大会の常連（C〜S）・イベント（データだけ） ----------
-  p(22, 'dolf', 'regular', ['ドルフ', 'Dolf'], ['鍛冶屋', 'Blacksmith'], ['細かいことは考えねえ。叩いて勝つ！', "I don't think about details. I smash and win!"], { epithet: ep('ごり押しの剛腕', 'The Brute Force'), inGame: false }),
-  p(23, 'leonard', 'regular', ['レナード', 'Leonard'], ['自称カード評論家', 'Self-proclaimed card critic'], ['力だけで勝てると思っているのかね？', 'Do you think strength alone will win?'], { epithet: ep('からめ手の策士', 'The Trickster'), inGame: false }),
-  p(24, 'greta', 'regular', ['グレタ', 'Greta'], ['元衛兵', 'Former guard'], ['守りきれば、勝ちは向こうからやってくる。', 'Hold your defense, and victory will come to you.'], { epithet: ep('鉄壁の守り手', 'The Iron Wall'), inGame: false }),
-  p(25, 'julius', 'regular', ['ユリウス', 'Julius'], ['人気No.1の若手', 'Most popular young player'], ['みんなが見てる。最高の試合にしよう！', "Everyone's watching. Let's make it the best match ever!"], { epithet: ep('若き天才', 'The Young Prodigy'), inGame: false }),
-  p(26, 'camilla', 'regular', ['カミラ', 'Camilla'], ['各地の大会を制した実力者', 'Champion of tournaments far and wide'], ['あなたの次の一手、もう見えているわ。', 'I can already see your next move.'], { epithet: ep('勝率9割の女王', 'The 90% Queen'), inGame: false }),
+  // ---------- 大会の常連（C〜S のトーナメントに出る。2026-10-27 指示書「大会の新しい形」）。エルンスト（書庫）はデータだけ ----------
+  p(22, 'dolf', 'regular', ['ドルフ', 'Dolf'], ['鍛冶屋', 'Blacksmith'], ['細かいことは考えねえ。叩いて勝つ！', "I don't think about details. I smash and win!"], { epithet: ep('ごり押しの剛腕', 'The Brute Force'), opponentIds: ['reg-dolf'] }),
+  p(23, 'leonard', 'regular', ['レナード', 'Leonard'], ['自称カード評論家', 'Self-proclaimed card critic'], ['力だけで勝てると思っているのかね？', 'Do you think strength alone will win?'], { epithet: ep('からめ手の策士', 'The Trickster'), opponentIds: ['reg-leonard'] }),
+  p(24, 'greta', 'regular', ['グレタ', 'Greta'], ['元衛兵', 'Former guard'], ['守りきれば、勝ちは向こうからやってくる。', 'Hold your defense, and victory will come to you.'], { epithet: ep('鉄壁の守り手', 'The Iron Wall'), opponentIds: ['reg-greta'] }),
+  p(25, 'julius', 'regular', ['ユリウス', 'Julius'], ['人気No.1の若手', 'Most popular young player'], ['みんなが見てる。最高の試合にしよう！', "Everyone's watching. Let's make it the best match ever!"], { epithet: ep('若き天才', 'The Young Prodigy'), opponentIds: ['reg-julius'] }),
+  p(26, 'camilla', 'regular', ['カミラ', 'Camilla'], ['各地の大会を制した実力者', 'Champion of tournaments far and wide'], ['あなたの次の一手、もう見えているわ。', 'I can already see your next move.'], { epithet: ep('勝率9割の女王', 'The 90% Queen'), opponentIds: ['reg-camilla'] }),
   p(27, 'ernst', 'regular', ['エルンスト', 'Ernst'], ['書庫守の一族の末裔', 'Descendant of the archive keepers'], ['書庫の記録を求めるなら、腕を示せ。', 'If you seek the archive records, show me your skill.'], { inGame: false }),
-  p(28, 'alvin', 'regular', ['アルヴィン', 'Alvin'], ['現チャンピオン', 'Reigning champion'], ['ここまで来た者は久しぶりだ。', "It's been a long time since anyone made it this far."], { epithet: ep('無敗の王者', 'The Undefeated King'), inGame: false }),
+  p(28, 'alvin', 'regular', ['アルヴィン', 'Alvin'], ['現チャンピオン', 'Reigning champion'], ['ここまで来た者は久しぶりだ。', "It's been a long time since anyone made it this far."], { epithet: ep('無敗の王者', 'The Undefeated King'), opponentIds: ['reg-alvin'] }),
 ];
 
 export const PEOPLE_TOTAL = PEOPLE.length;

@@ -1,0 +1,396 @@
+/*
+ * 大会の対戦表（E・D の総当たり）とトーナメント表（C〜S）（2026-10-27 指示書「大会の新しい形」）。
+ * 部品の絵は tools/design/tournament_parts.py で切り出したもの。名前・印は上に重ねる
+ */
+
+.tournament__board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.tournament__next {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.tournament__hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-sub);
+  text-align: center;
+}
+
+/* ===== 総当たりの対戦表（表の絵 1032×939 の上にマスごとに重ねる） ===== */
+.league {
+  position: relative;
+  width: 100%;
+  max-width: 370px;
+  aspect-ratio: 1032 / 939;
+}
+
+.league__grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.league__band,
+.league__head,
+.league__cell {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 自分の行のうすい帯 */
+.league__band {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.league__band-img {
+  width: 100%;
+  height: 70%;
+}
+
+.league__head {
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px;
+}
+
+.league__face {
+  position: relative;
+  flex: none;
+  height: 58%;
+  aspect-ratio: 1;
+}
+
+.league__face .person-face {
+  position: absolute;
+  inset: 12%;
+  width: auto;
+  height: auto;
+  border-radius: 2px;
+}
+
+.league__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.league__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #f3ead2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.league__head.is-player .league__name {
+  color: #ffe08a;
+}
+
+.league__self {
+  width: 92%;
+  height: 92%;
+}
+
+.league__mark {
+  width: 74%;
+  height: auto;
+  max-height: 86%;
+  object-fit: contain;
+}
+
+.league__next {
+  width: 92%;
+  height: 92%;
+  animation: league-next 1.2s ease-in-out infinite;
+}
+
+@keyframes league-next {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* ===== 順位表 ===== */
+.standings {
+  width: 100%;
+  max-width: 370px;
+  padding: 8px 10px;
+  border: 2px solid #c9a24a;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1c2a4c, #121b33);
+}
+
+.standings__title {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.standings__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.standings__table th {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-sub);
+}
+
+.standings__table td {
+  padding: 3px 2px;
+  border-top: 1px solid rgb(201 162 74 / 0.3);
+  text-align: center;
+}
+
+.standings__table tr.is-player td {
+  background: rgb(255 224 138 / 0.12);
+}
+
+.standings__table tr.is-first .standings__rank {
+  color: #ffe08a;
+  font-weight: 800;
+}
+
+.standings__who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left !important;
+}
+
+.standings__face {
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+
+.standings__note {
+  margin: 6px 0 0;
+  font-size: 10px;
+  color: var(--color-sub);
+}
+
+/* ===== 8人のトーナメント表（論理 px。tournamentBoards.ts の配置） ===== */
+.bracket {
+  position: relative;
+  flex: none;
+  width: 370px;
+  height: 344px;
+}
+
+.bracket__trophy {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px;
+  transform: translateX(-50%);
+}
+
+.bracket__cup {
+  position: relative;
+  z-index: 1;
+  width: 62px;
+  height: auto;
+  margin-bottom: -14px;
+}
+
+.bracket__pedestal {
+  width: 104px;
+  height: auto;
+}
+
+.bracket__champion {
+  margin-top: 2px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffe08a;
+}
+
+.bracket__join {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.bracket__join.is-mirror {
+  transform: scaleX(-1);
+}
+
+.bracket__join-fixed {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: auto;
+}
+
+/* 縦の棒だけを伸ばす（飾りはゆがめない） */
+.bracket__join-bar {
+  flex: 1;
+  min-height: 0;
+  background-size: 100% 100%;
+}
+
+.bracket__final {
+  position: absolute;
+  height: auto;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.bracket__card {
+  position: absolute;
+  z-index: 2;
+  width: 108px;
+  height: 41px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bracket__card-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 顔の窓（札の絵の 52〜209 / 55〜202 px） */
+.bracket__card-face {
+  position: absolute;
+  left: 8%;
+  top: 22%;
+  width: 23.8%;
+  height: 58.8%;
+}
+
+.bracket__card-face .person-face {
+  border-radius: 1px;
+}
+
+.bracket__card-name {
+  position: absolute;
+  left: 37%;
+  right: 9%;
+  top: 34%;
+  height: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 700;
+  color: #f3ead2;
+  white-space: nowrap;
+}
+
+.bracket__card.is-player .bracket__card-name {
+  color: #ffe08a;
+}
+
+.bracket__card.is-out .bracket__card-face,
+.bracket__card.is-out .bracket__card-name {
+  filter: grayscale(1) brightness(0.7);
+}
+
+/* 常連の二つ名：名前の上に小さく */
+.bracket__epithet {
+  position: absolute;
+  left: 30%;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: -3px;
+  overflow: hidden;
+  font-size: 8px;
+  line-height: 1.1;
+  color: #f1d58a;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.bracket__swords {
+  position: absolute;
+  z-index: 3;
+  width: 26px;
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: bracket-swords 1.1s ease-in-out infinite;
+}
+
+@keyframes bracket-swords {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* ===== 出場者の札を押したとき ===== */
+.entrant-detail__face {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 6px;
+}
+
+.entrant-detail__epithet,
+.entrant-detail__kind,
+.entrant-detail__rate,
+.entrant-detail__monsters {
+  margin: 2px 0;
+  text-align: center;
+}
+
+.entrant-detail__epithet {
+  font-size: 12px;
+  color: #f1d58a;
+}
+
+.entrant-detail__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-align: center;
+}
+
+.entrant-detail__kind {
+  font-size: 12px;
+  color: var(--color-sub);
+}
+
+.entrant-detail__rate {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffe08a;
+}
+
+.entrant-detail__monsters {
+  font-size: 13px;
+}

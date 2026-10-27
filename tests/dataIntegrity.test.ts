@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { MAPS } from '../src/data/maps.ts';
-import { TOURNAMENTS } from '../src/data/tournaments.ts';
+import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
 import { isValidAssetFileName } from '../src/core/assetCategories.ts';
 import { checkCardData } from '../src/game/cards/dataChecks.ts';
 import type { CardDefinition, MonsterCard, SkillCard } from '../src/game/cards/cardTypes.ts';
@@ -86,7 +86,7 @@ describe('カードの参照先', () => {
   const known = (id: string): boolean => cardCatalog.get(id) !== undefined;
 
   it('大会・ダンジョンの相手のモンスターがすべて実在するモンスター', () => {
-    const opponents = [...TOURNAMENTS.flatMap((t) => t.rounds), ...Object.values(ENCOUNTERS)];
+    const opponents = [...TOURNAMENTS.flatMap(tournamentOpponents), ...Object.values(ENCOUNTERS)];
     const bad = opponents.flatMap((o) => o.monsters.filter((m) => cardCatalog.get(m)?.kind !== 'monster').map((m) => `${o.id}:${m}`));
     expect(bad).toEqual([]);
   });

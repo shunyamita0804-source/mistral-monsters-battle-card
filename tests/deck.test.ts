@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { cardCatalog, monsterId, SKILLS, skillId, supportId } from '../src/data/cards.ts';
 import { skillCategory } from '../src/game/cards/cardTypes.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
-import { TOURNAMENTS } from '../src/data/tournaments.ts';
+import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
 import { DECK_RULES } from '../src/data/rules.ts';
 import {
   buildAutoDeck,
@@ -28,7 +28,7 @@ describe('デッキ構成チェック（仮ルール）', () => {
   });
 
   it('ダンジョン・大会のすべての相手のデッキが正しい構成になる', () => {
-    const teams = [...Object.values(ENCOUNTERS).map((e) => e.monsters), ...TOURNAMENTS.flatMap((t) => t.rounds.map((o) => o.monsters))];
+    const teams = [...Object.values(ENCOUNTERS).map((e) => e.monsters), ...TOURNAMENTS.flatMap((t) => tournamentOpponents(t).map((o) => o.monsters))];
     expect(teams.length).toBeGreaterThan(0);
     for (const monsters of teams) expect(validateDeck(buildAutoDeck(monsters))).toEqual([]);
   });

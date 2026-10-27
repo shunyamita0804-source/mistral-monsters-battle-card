@@ -6,7 +6,7 @@ import { PACKS } from '../src/data/economy.ts';
 import { EXAM_OPPONENT } from '../src/data/introV2.ts';
 import { ITEMS } from '../src/data/items.ts';
 import { MAPS } from '../src/data/maps.ts';
-import { TOURNAMENTS } from '../src/data/tournaments.ts';
+import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
 import { describeSkill, describeSupport, statLabel, supportShortText } from '../src/game/cards/cardTypes.ts';
 import { validateDeck } from '../src/game/deck/deck.ts';
 import { cardName, contentText, packName } from '../src/i18n/content.ts';
@@ -146,7 +146,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
     const keys: string[] = [
       ...cardCatalog.all().map((c) => `card:${c.id}:name`),
       ...PACKS.flatMap((p) => ['name', 'description', 'unlockHint'].map((f) => `pack:${p.id}:${f}`)),
-      ...TOURNAMENTS.flatMap((t) => [`tournament:${t.id}:name`, `tournament:${t.id}:description`, ...t.rounds.map((r) => `opponent:${r.id}:name`)]),
+      ...TOURNAMENTS.flatMap((t) => [`tournament:${t.id}:name`, `tournament:${t.id}:description`, ...tournamentOpponents(t).map((r) => `opponent:${r.id}:name`)]),
       ...DUNGEONS.flatMap((d) => [`dungeon:${d.id}:name`, `dungeon:${d.id}:description`]),
       ...Object.values(ENCOUNTERS).map((e) => `opponent:${e.id}:name`),
       `opponent:${EXAM_OPPONENT.id}:name`,
@@ -173,7 +173,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
       ...PACKS.map((p) => `pack:${p.id}`),
       ...ITEMS.map((i) => `item:${i.id}`),
       ...TOURNAMENTS.map((t) => `tournament:${t.id}`),
-      ...TOURNAMENTS.flatMap((t) => t.rounds.map((r) => `opponent:${r.id}`)),
+      ...TOURNAMENTS.flatMap((t) => tournamentOpponents(t).map((r) => `opponent:${r.id}`)),
       ...DUNGEONS.map((d) => `dungeon:${d.id}`),
       ...Object.values(ENCOUNTERS).map((e) => `opponent:${e.id}`),
       `opponent:${EXAM_OPPONENT.id}`,

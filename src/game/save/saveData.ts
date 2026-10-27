@@ -1,7 +1,8 @@
 import { cardCatalog } from '../../data/cards.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
-import { TOURNAMENTS } from '../../data/tournaments.ts';
+import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
+import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
   buildDeckFromCollection,
   countCards,
@@ -33,7 +34,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 17;
+export const SAVE_VERSION = 18;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -53,7 +54,25 @@ export interface TournamentRecord {
   readonly firstWinClaimed: boolean;
 }
 
-/** 進行中（または景品受け取り前）の大会 */
+/** 大会の1試合の結果（出場者の ID。主人公は 'player'） */
+export interface TournamentMatch {
+  /** 何回目の試合か（0始まり。総当たりは何試合目、トーナメントは回戦） */
+  readonly round: number;
+  readonly a: string;
+  readonly b: string;
+  readonly winner: string;
+  /** 残った自分のモンスターの数 */
+  readonly aLeft: number;
+  readonly bLeft: number;
+  /** 相手に与えたダメージ */
+  readonly aDamage: number;
+  readonly bDamage: number;
+}
+
+/**
+ * 進行中（または景品受け取り前）の大会（2026-10-27 指示書「大会の新しい形」で組み合わせと結果を入れた。セーブ version 18）。
+ * 途中でアプリを閉じても次の試合から続けられる（試合の途中なら、その試合はやり直し）
+ */
 export interface ActiveTournament {
   readonly tournamentId: string;
   /** 参加ごとに一意のID。景品の二重受け取り防止に使う */
@@ -61,7 +80,16 @@ export interface ActiveTournament {
   /** 次に戦う回戦（0始まり） */
   readonly round: number;
   readonly status: 'inProgress' | 'won' | 'lost';
+  /** 組み合わせ・ほかの人の試合・抽選に使う seed */
+  readonly seed: number;
+  /** 出場者（src/game/progress/tournamentDraw.ts。総当たりは4人、トーナメントは山の順に8人） */
+  readonly entrants: readonly string[];
+  /** 終わった試合（主人公の試合もほかの人の試合も） */
+  readonly matches: readonly TournamentMatch[];
 }
+
+/** 「シエナがいなくなった」の記録（C ランク大会を終えたとき。あとで作るイベントダンジョン「霧の廃坑」の条件） */
+export const FLAG_SIENNA_LEFT = 'siennaLeft';
 
 export interface DungeonRecord {
   /** 開けた宝箱（恒久的に1回だけ） */
@@ -179,6 +207,8 @@ export interface SaveData {
   readonly peopleBook: PeopleBook;
   /** カード図鑑の詳しい画面で見たカード（持っていてここに無いカードに NEW の印） */
   readonly cardsSeen: readonly string[];
+  /** 物語の記録（一度立てたら消えない。FLAG_SIENNA_LEFT など） */
+  readonly storyFlags: readonly string[];
   /** 物語の進み具合（序盤イベント。src/game/story/intro.ts） */
   readonly story: {
     readonly intro: IntroState;
@@ -227,6 +257,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
     peopleBook: EMPTY_PEOPLE_BOOK,
+    storyFlags: [],
     // 初めから持っているカードは NEW にしない
     cardsSeen: ownedCardIds(createStarterCollection(deck)),
     story: { intro: 'completed', introV2: newIntroV2(starter) },
@@ -489,6 +520,14 @@ function migrateItemsV17(raw: RawObject): RawObject {
   return { ...raw, items: {}, unlockedItems: [], seenItems: [], dungeonRun: run };
 }
 
+/**
+ * v17 → v18：大会の新しい形（2026-10-27 指示書「大会の新しい形」）。物語の記録を足す。
+ * 途中の大会は出場者が無いので、読み込むときにその大会の1試合目からやり直す（normalizeActiveTournament）
+ */
+function migrateTournamentV18(raw: RawObject): RawObject {
+  return { ...raw, storyFlags: [] };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -507,6 +546,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   14: migrateIntroV2V15,
   15: migratePeopleBookV16,
   16: migrateItemsV17,
+  17: migrateTournamentV18,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -578,10 +618,40 @@ function normalizeTournaments(v: unknown): Record<string, TournamentRecord> {
   return result;
 }
 
+/**
+ * 大会の途中の状態。出場者が読めない（前の形式・壊れた値）ときは、その大会の1試合目からやり直す（参加の回数はそのまま）。
+ * 終わった試合も同じく、読めない試合があれば組み合わせごとやり直す
+ */
 function normalizeActiveTournament(v: unknown): ActiveTournament | null {
   if (!isObject(v) || typeof v.tournamentId !== 'string' || typeof v.entryId !== 'string') return null;
+  const tour = getTournament(v.tournamentId);
+  if (!tour) return null;
   const status = v.status === 'won' || v.status === 'lost' ? v.status : 'inProgress';
-  return { tournamentId: v.tournamentId, entryId: v.entryId, round: asCount(v.round), status };
+  const seed = typeof v.seed === 'number' && Number.isInteger(v.seed) && v.seed >= 0 ? v.seed : seedFromId(v.entryId);
+  const known = new Set([PLAYER_ENTRANT, ...tournamentOpponents(tour).map((o) => o.id)]);
+  const entrants = asStringArray(v.entrants);
+  const size = tour.format === 'league' ? 4 : 8;
+  const entrantsOk = entrants.length === size && new Set(entrants).size === size && entrants.every((id) => known.has(id)) && entrants.includes(PLAYER_ENTRANT);
+  const matches = Array.isArray(v.matches) ? v.matches.map(normalizeMatch) : [];
+  const matchesOk = matches.every((m): m is TournamentMatch => m !== null && entrants.includes(m.a) && entrants.includes(m.b));
+  if (!entrantsOk || !matchesOk) {
+    return { tournamentId: v.tournamentId, entryId: v.entryId, round: 0, status, seed, entrants: drawEntrants(tour, seed), matches: [] };
+  }
+  return { tournamentId: v.tournamentId, entryId: v.entryId, round: Math.min(asCount(v.round), TOURNAMENT_ROUNDS), status, seed, entrants, matches };
+}
+
+function normalizeMatch(v: unknown): TournamentMatch | null {
+  if (!isObject(v) || typeof v.a !== 'string' || typeof v.b !== 'string' || (v.winner !== v.a && v.winner !== v.b)) return null;
+  return {
+    round: asCount(v.round),
+    a: v.a,
+    b: v.b,
+    winner: v.winner,
+    aLeft: asCount(v.aLeft),
+    bLeft: asCount(v.bLeft),
+    aDamage: asCount(v.aDamage),
+    bDamage: asCount(v.bDamage),
+  };
 }
 
 function normalizeDungeons(v: unknown): Record<string, DungeonRecord> {
@@ -703,6 +773,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     },
     peopleBook: normalizePeopleBook(migrated.peopleBook),
     cardsSeen: unique(asStringArray(migrated.cardsSeen)),
+    storyFlags: unique(asStringArray(migrated.storyFlags)),
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
     story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };

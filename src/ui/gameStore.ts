@@ -1,4 +1,5 @@
 import type { OpponentDefinition } from '../data/tournaments.ts';
+import type { BattleSummary } from '../game/battle/simulate.ts';
 import type { BattleWinner } from '../game/battle/engine.ts';
 import { sanitizeLocation } from '../game/progress/dungeon.ts';
 import type { PracticeResult } from '../game/story/intro.ts';
@@ -26,8 +27,8 @@ export interface BattleRequest {
   readonly background?: string;
   /** 背景の絵を濃いめに見せる（練習試合の机の絵。ふだんはうっすら） */
   readonly backgroundVivid?: boolean;
-  /** 対戦後に1回だけ呼ばれる */
-  readonly onFinish: (winner: BattleWinner) => void;
+  /** 対戦後に1回だけ呼ばれる（summary：残ったモンスター・与えたダメージ。対戦が始まる前に終わったときは無い） */
+  readonly onFinish: (winner: BattleWinner, summary?: BattleSummary) => void;
 }
 
 /**

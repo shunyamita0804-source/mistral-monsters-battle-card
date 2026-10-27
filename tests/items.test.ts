@@ -66,7 +66,7 @@ describe('道具のデータ（仮）', () => {
     const snake = (id: string): string => id.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
     for (const i of ITEMS) expect(existsSync(`assets/images/ui/items/item_${snake(i.id)}.webp`)).toBe(true);
     for (const id of ['incense', 'torch', 'guardianCharm', 'luckyCoin', 'sealed']) expect(existsSync(`assets/images/ui/items/mark_${snake(id)}.webp`)).toBe(true);
-    const unlock = Object.fromEntries(TOURNAMENTS.map((t) => [t.id, t.rewards.firstWin.unlockItems]));
+    const unlock = Object.fromEntries(TOURNAMENTS.filter((t) => t.rewards.firstWin.unlockItems.length > 0).map((t) => [t.id, t.rewards.firstWin.unlockItems]));
     expect(unlock).toEqual({ 'tournament-e': ['ruinsMap', 'luckyCoin'], 'tournament-d': ['sealBox', 'guardianCharm'] });
   });
 });

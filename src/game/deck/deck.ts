@@ -8,7 +8,8 @@ import { NOBITON_STARTER } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
-import { skillCategory } from '../cards/cardTypes.ts';
+import { skillCategory, skillValue, type SkillCard } from '../cards/cardTypes.ts';
+import type { DeckStyle, OpponentDefinition } from '../../data/tournaments.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 
@@ -299,6 +300,67 @@ export function buildAutoDeck(monsters: readonly string[]): Deck {
     }
   }
   return { monsters, skills };
+}
+
+/** 妨害の技（ちょうはつ・すなかけ・ダストキック・いたずら・吠える など） */
+const DISRUPT_EFFECTS = ['seal', 'weaken', 'taunt', 'handToDeck', 'discardRandom'];
+/** 守りの技（防御・回避・しめったはだ・すなをほる・みずあび） */
+const GUARD_EFFECTS = ['defense', 'evade', 'shield', 'hide', 'healSelf'];
+
+/**
+ * デッキの組み方ごとの技の点数（高い技から3枚ずつ入れる。0 以下は入れない）。2026-10-27 指示書「大会の新しい形」の常連の性格（仮）
+ * - power（ドルフ）：必要マナの多い強い攻撃ばかり。守りは入れない
+ * - disrupt（レナード）：妨害が中心
+ * - guard（グレタ）：防御・回避が多い
+ * - flashy（ユリウス）：華やかな大技（必要マナ4以上の攻撃）
+ * - strong（カミラ・アルヴィン）：強い攻撃と守りをバランスよく
+ */
+function styleScore(style: Exclude<DeckStyle, 'balanced'>, skill: SkillCard): number {
+  const type = skill.effect.type;
+  const attack = type === 'attack';
+  const power = attack ? skillValue(skill) : 0;
+  switch (style) {
+    case 'power':
+      return attack ? (skill.cost >= 3 ? 20 + power : 5 + power) : GUARD_EFFECTS.includes(type) ? 0 : 2;
+    case 'disrupt':
+      return DISRUPT_EFFECTS.includes(type) ? 20 : attack ? 5 + power : GUARD_EFFECTS.includes(type) ? 4 : 1;
+    case 'guard':
+      return GUARD_EFFECTS.includes(type) ? 20 : attack ? 5 + power - skill.cost : 1;
+    case 'flashy':
+      return attack ? (skill.cost >= 4 ? 20 + skill.cost : 4 + power) : GUARD_EFFECTS.includes(type) ? 3 : 1;
+    case 'strong':
+      return attack ? 8 + power * 2 - Math.max(0, skill.cost - 3) : ['defense', 'evade'].includes(type) ? 10 : 2;
+  }
+}
+
+/**
+ * 大会の相手のデッキ（組み方 deckStyle が無い・balanced なら今までの buildAutoDeck）。
+ * 組み方があれば、仮サポートを少し入れ、適合技を点数の高い順に上限枚数まで入れて60枚にする。足りなければ点数の低い技・サポートで埋める
+ */
+export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle'>): Deck {
+  const style = opponent.deckStyle;
+  if (!style || style === 'balanced') return buildAutoDeck(opponent.monsters);
+  const pool = [...new Map(opponent.monsters.flatMap((m) => skillsOf(m)).map((k) => [k.id, k])).values()];
+  const ranked = pool
+    .map((k, i) => ({ id: k.id, score: styleScore(style, k), i }))
+    .sort((a, b) => b.score - a.score || a.i - b.i);
+  const skills: string[] = NPC_SUPPORTS.flatMap((id) => Array<string>(NPC_SUPPORT_COPIES).fill(id));
+  const counts: Record<string, number> = countCards(skills);
+  // 妨害の組み方は、妨害の技を2枚ずつ（妨害ばかりで攻撃できなくならないように）
+  const copiesOf = (id: string): number => (style === 'disrupt' && DISRUPT_EFFECTS.includes(cardCatalog.get(id)?.kind === 'skill' ? (cardCatalog.get(id) as SkillCard).effect.type : '') ? 2 : DECK_RULES.maxCopies);
+  const fill = (ids: readonly string[], all = false): void => {
+    for (const id of ids) {
+      while (skills.length < DECK_RULES.skillCount && (counts[id] ?? 0) < (all ? DECK_RULES.maxCopies : copiesOf(id))) {
+        counts[id] = (counts[id] ?? 0) + 1;
+        skills.push(id);
+      }
+    }
+  };
+  fill(ranked.filter((r) => r.score > 0).map((r) => r.id));
+  fill(ranked.filter((r) => r.score <= 0).map((r) => r.id));
+  fill(ranked.map((r) => r.id), true);
+  fill(SUPPORTS.map((c) => c.id), true);
+  return { monsters: opponent.monsters, skills };
 }
 
 /**
