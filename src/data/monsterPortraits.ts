@@ -20,6 +20,7 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-lazuck': { x: 0.56, y: 0.36, zoom: 1.5 },
   'mon-gauul': { x: 0.64, y: 0.38, zoom: 1.4 },
   'mon-nobiton': { x: 0.52, y: 0.36, zoom: 1.3 },
+  'mon-myurol': { x: 0.5, y: 0.3, zoom: 1.6 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

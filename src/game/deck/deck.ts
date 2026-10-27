@@ -1,5 +1,6 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
 import { LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
+import { MYUROL_STARTER } from '../../data/myurol.ts';
 import { NOBITON_STARTER } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
@@ -228,7 +229,9 @@ export function createStarterCollection(): Record<string, number> {
   const deck = createStarterDeck();
   // ノビトンの初期配布16枚（2026-10-26 ユーザー指示）：所持カードにだけ入れる（初期デッキ60枚には入れない・モンスターカード本体は配らない）
   const nobiton = NOBITON_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  return countCards([...deck.monsters, ...deck.skills, ...nobiton]);
+  // ミュロルの初期配布16枚（2026-10-26 ユーザー正式確定・2026-10-27 実装）：ノビトンと同じく所持カードにだけ入れる
+  const myurol = MYUROL_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  return countCards([...deck.monsters, ...deck.skills, ...nobiton, ...myurol]);
 }
 
 /** NPC のデッキに入れる仮サポート（各2枚） */

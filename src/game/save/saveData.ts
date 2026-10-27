@@ -14,6 +14,7 @@ import {
 } from '../deck/deck.ts';
 import { GAUUL_OLD_SKILL_IDS } from '../../data/gauul.ts';
 import { LAZUCK_REMOVED_14_IDS } from '../../data/lazuck.ts';
+import { MYUROL_REMOVED_14_IDS } from '../../data/myurol.ts';
 import { NOBITON_REMOVED_14_IDS } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
@@ -26,7 +27,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -285,6 +286,7 @@ export const REMOVED_CARD_IDS: readonly string[] = [
   ...GAUUL_OLD_SKILL_IDS,
   ...LAZUCK_REMOVED_14_IDS,
   ...NOBITON_REMOVED_14_IDS,
+  ...MYUROL_REMOVED_14_IDS,
 ];
 
 /**
@@ -388,6 +390,15 @@ function migrateDungeonRunV13(raw: RawObject): RawObject {
   return { ...raw, dungeonRun: null };
 }
 
+/**
+ * version 13 → 14（2026-10-27）：ミュロルの技を正式14技にした。正式14技の外になった旧12 ぬるぬるガード（skl-myurol-12）・
+ * 旧13 ぷるぷるガード（skl-myurol-13）は所持カードとデッキから外す（ノビトン・ラズックと同じ方針）。ほかの12技は ID が同じなので、持っている枚数はそのまま。
+ * 初期配布16枚は新しく始めたときだけ（いまのセーブには配らない）
+ */
+function migrateMyurol14V14(raw: RawObject): RawObject {
+  return removeCardsFromSave(raw, MYUROL_REMOVED_14_IDS);
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -402,6 +413,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   10: migrateLazuck14V11,
   11: migrateNobiton14V12,
   12: migrateDungeonRunV13,
+  13: migrateMyurol14V14,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
