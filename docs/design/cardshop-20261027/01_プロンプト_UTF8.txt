@@ -6,7 +6,7 @@
 （ゲームの回す画面はもうできているので、その画面に合う形で頼む）。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-■ 共通ルール（A〜F の最初に付ける）
+■ 共通ルール（A〜G の最初に付ける）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ▼ここからコピー
 スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」のカードショップの素材を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
@@ -118,7 +118,7 @@ A layered version of the attached CardShop_Interior_Official.jpeg so the player 
 ▲
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-E　自動ドアの部品（内装の入口に合わせる）　【必須】
+E　自動ドアの部品（店の中から見た入口）　【必須】
 ファイル：shop_door_frame.png・shop_door_left.png・shop_door_right.png・shop_door_pocket_left.png・shop_door_pocket_right.png（すべて 1536×1024）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ▼ここからコピー
@@ -128,6 +128,7 @@ E　自動ドアの部品（内装の入口に合わせる）　【必須】
 ・shop_door_left.png・shop_door_right.png：閉じた位置の左右の戸（ガラスと金の枠）。ゲームがそれぞれ左右へ水平に動かす
 ・shop_door_pocket_left.png・shop_door_pocket_right.png：左右の壁の前の面（戸袋）。開いた戸がこの後ろに隠れる。戸1枚がまるごと隠れる幅
 ・全部開くと入口のまん中に何も残らない（主人公が通れる幅）
+・戸は F（店の外観）の戸と同じ戸を、店の中から見たもの（ガラス・枠の色・飾りをそろえる）
 ・確認用に、閉・半分・全開の3枚を重ねた絵
 ▲ここまで
 ▼English
@@ -137,11 +138,59 @@ Parts to make the glass entrance at the bottom center of the attached CardShop_I
 - shop_door_left.png / shop_door_right.png: the left and right leaves in the closed position (glass with gold frame). The game slides each horizontally.
 - shop_door_pocket_left.png / shop_door_pocket_right.png: the front faces of the walls (door pockets) that hide the opened leaves. Wide enough to hide a whole leaf.
 - Fully open leaves nothing in the middle of the entrance (wide enough for the player).
+- The leaves are the same doors as in F (shop exterior), seen from inside (same glass, frame color and ornaments).
 - Previews: closed, half open and fully open.
 ▲
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-F　回す画面の背景　【あると良い】
+F　店の外観（街の中の建物）と外の自動ドア　【必須】
+ファイル：town_shop.png・town_shop_door_left.png・town_shop_door_right.png・town_shop_door_pocket.png・town_shop_door_inside.png（すべて 1536×1024）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+街の中に建っているカードショップの建物を、新しい内装（添付の CardShop_Interior_Official.jpeg）に合う外観に描き直してください。入口は左右に開く自動ドアにします。
+添付の town_shop.png がいまの外観、21_いまの外観_街の中.webp がゲームの街に置いたところ（まわりの建物・道・草）。
+【描き方】
+・画角と描き方は、いまの外観と同じ（街の建物は、正面を少し上から見た絵。まわりの建物と並んで違和感のないこと）。街のほかの建物にない現代風・近未来の材料（大きな一枚ガラスの壁・金属パネル・ネオン）は使わない
+・色と材料は内装にそろえる：木・紺・真鍮・落ち着いた金・白い石。カードを売るお店だと一目で分かる（ショーウインドウにカードやパックが並ぶ。カードの表に絵柄は描かない）
+・いまの外観の良い所（丸い屋根・日よけ・植木の箱・ランプ・つり看板）は残しても変えてもよい。看板に文字は入れない
+・モンスター・生き物のポスターや絵は描かない
+【大きさと位置（ゲームの都合で必ず守る）】
+・キャンバスは 1536×1024 の透明。建物は、いまの外観と同じくらいの大きさ（横 1420px 前後・縦 950px 前後）で、建物の下の端をキャンバスの下から 50px 前後に
+・入口は建物の下の端のまん中（左右の中心）。入口の開いた所は幅 190〜230px・高さ 310〜350px（いまの入口と同じくらい）。入口の前に低い段を1段描いてよい
+・地面・道・草・建物の落ち影は描かない（ゲームが付ける）
+【分けるファイル（すべて 1536×1024 の同じ位置）】
+・town_shop.png：建物。入口の戸の所は透明に抜く（戸は別のファイル）
+・town_shop_door_inside.png：戸が開いたときに見える店の中（床と、奥の明かり。暗くしすぎない）。入口の開いた所だけ、ほかは透明
+・town_shop_door_left.png・town_shop_door_right.png：閉じた位置の左右のガラスの戸（金の枠）。ゲームがそれぞれ左右へ水平に動かす
+・town_shop_door_pocket.png：入口の左右の壁の前の面だけ（戸袋）。開いた戸がこの後ろに隠れる。戸1枚がまるごと隠れる幅
+・全部開くと入口のまん中に何も残らない
+・確認用に、閉・半分・全開の3枚と、街の絵（添付）に置いた合成を1枚
+【内装とそろえる】戸は E（店の中から見た入口）と同じ戸。ガラス・枠の色・飾りをそろえる
+▲ここまで
+▼English
+Redraw the card shop building that stands in the town so its exterior matches the new interior (attached CardShop_Interior_Official.jpeg). The entrance becomes a sliding automatic door (two leaves sliding left and right).
+The attached town_shop.png is the current exterior; 21_いまの外観_街の中.webp shows it placed in the game town (neighbor buildings, road, grass).
+[Style]
+- Same camera angle and painting style as the current exterior (front view seen slightly from above), so it sits naturally next to the other town buildings. No modern or sci-fi materials (curtain-wall glass, metal panels, neon).
+- Colors and materials match the interior: wood, navy, brass, muted gold, white stone. It must read as a card shop at a glance (cards and packs displayed in the show windows; no artwork on card faces).
+- The good parts of the current exterior (rounded roof, awning, planter boxes, lamps, hanging sign) may be kept or changed. No text on signs.
+- No monster or creature posters or pictures.
+[Size and position - required by the game]
+- Transparent 1536x1024 canvas. The building is about as large as the current one (about 1420 px wide, 950 px tall), its bottom edge about 50 px above the canvas bottom.
+- The entrance is at the horizontal center of the building's bottom edge. The door opening is 190-230 px wide and 310-350 px tall (about the same as now). One low step in front is OK.
+- Do not draw ground, road, grass or the building's cast shadow (the game adds them).
+[Separate files, all 1536x1024 at the same position]
+- town_shop.png: the building, with the door leaves area cut out transparent (leaves are separate files)
+- town_shop_door_inside.png: what is visible through the opened entrance (floor and warm light inside, not too dark). Only the opening; everything else transparent
+- town_shop_door_left.png / town_shop_door_right.png: left and right glass leaves (gold frames) in the closed position. The game slides each horizontally
+- town_shop_door_pocket.png: only the front faces of the walls beside the entrance (door pockets) that hide the opened leaves. Wide enough to hide a whole leaf
+- Fully open leaves nothing in the middle of the entrance
+- Previews: closed, half open and fully open, plus one composite placed on the attached town image
+[Match the interior] The leaves are the same doors as E (entrance seen from inside): same glass, frame color and ornaments.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+G　回す画面の背景　【あると良い】
 ファイル：gacha_turn_bg.png（1170×2532）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ▼ここからコピー
