@@ -1,0 +1,158 @@
+【プロンプト】カードショップの足りない素材（2026-10-27）
+
+使い方：1点ごとに新しい会話で、「共通ルール」とその記号の文を貼る。00_最初に読む の「添付するもの」も一緒に渡す。
+日本語でうまくいかないときは English を貼る。
+デザイン担当向けの統合依頼（design-parts/cardshop-20261027/EXTRA_…_統合正式プロンプト_UTF8.txt）と矛盾するときは、こちらを優先
+（ゲームの回す画面はもうできているので、その画面に合う形で頼む）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（A〜F の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」のカードショップの素材を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【基準】添付の CardShop_Interior_Official.jpeg（店の内装）がすべての基準。画風・光・色・線・塗りをこれにそろえる。カードパック販売機は承認済みの青・金・白の意匠（添付の参考シートの機械の色と形）
+【ハンドル】正式のハンドルは添付の Handle_Official_Reference.jpeg だけ。ハンドルは描かない（ゲームが正式の絵を上に重ねて回す）。参考シートに描かれた別のハンドルは使用禁止
+【背景】実際に透明な PNG（白・黒・市松模様を焼き込まない。白い縁・黒い縁を作らない）
+【分け方】動く物・前に重なる物は別の PNG に分ける。同じ場所に重ねる部品は、同じ大きさのキャンバスに元の位置のまま描く（ずらさない・切り詰めない）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。人物・店員・主人公・モンスターを描き込むこと。カードの表の絵柄（カードとパックは無地か、ゲームの絵を後から入れる場所だけ）。実在のガチャ機・カードダスの意匠に似せること。ネオン・近未来
+▲ここまで
+▼English
+Create assets for the card shop of the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Reference] The attached CardShop_Interior_Official.jpeg is the master reference: match its painting style, lighting, colors, lines and rendering. The card pack vending machine keeps the approved blue / gold / white design (shape and colors of the machine in the attached reference sheet).
+[Handle] The ONLY official handle is the attached Handle_Official_Reference.jpeg. Do NOT draw any handle; the game overlays and rotates the official one. The different handle drawn on the reference sheet is forbidden.
+[Background] Real transparent PNG. No baked white/black/checkerboard background, no white or black fringes.
+[Layers] Moving parts and foreground parts are separate PNGs. Parts that stack in the same place are drawn on canvases of the same size, at their original position (no shifting, no trimming).
+[Forbidden] Any text, letters, numbers, logos, watermarks, signatures. People, clerks, the protagonist, monsters. Card face artwork (cards and packs stay blank or leave an empty area for game art). Resemblance to real gacha / Carddass machines. Neon or sci-fi.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A　販売機の「回す画面」用の正面図（ハンドルなし）　【必須】
+ファイル：gacha_machine_front.png・gacha_machine_glass.png・gacha_machine_handle_seat.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+カードパック販売機を真正面から見た、全身の絵（縦長、幅 900px 前後・高さ 1300px 前後）。添付の 20_ガチャの流れ.webp のいまの画面の、機械と下の台を1台の機械にしたもの。
+・上：ガラスの展示窓。中は空（パックはゲームが入れる）。窓の奥は暗めの紺で、パックが映えるように
+・下の右：正式ハンドルを取り付ける丸い真鍮の座（くぼみ）。ハンドルの円盤（添付の正式ハンドルの金の円盤）がぴったり収まる大きさ＝機械の幅の約 3分の1。軸はまん中。ハンドルの取っ手が1周回っても機械の外や窓にぶつからない空き
+・下の左：横長の取り出し口（パックを取り出す口。中は暗い）。口の大きさはパック1つ（縦長のパック：幅 1 に対して高さ 1.8）が楽に通る大きさ
+・小窓から歯車が少しだけ見えるとよい（全部は見せない）
+・別の PNG に分ける：
+　1 gacha_machine_front.png：機械の本体（ガラス窓の部分は透明に抜く）
+　2 gacha_machine_glass.png：ガラスの映り込み・ハイライトだけ（半分透明。パックの上に重ねる）
+　3 gacha_machine_handle_seat.png：ハンドルの座だけ（本体と同じキャンバス・同じ位置）
+　3枚とも同じ大きさのキャンバスで、重ねると1台になるように
+・添付 Handle_Official_Reference.jpeg の金・青の色と質感にそろえる
+▲ここまで
+▼English
+A full front view of the card pack vending machine, straight-on (portrait, about 900 x 1300 px). It merges the machine top and the control panel of the attached game screenshot (20_ガチャの流れ.webp) into one machine.
+- Top: glass display window, EMPTY inside (the game inserts packs). Dark navy behind the glass so packs stand out.
+- Lower right: a round recessed brass seat where the official handle is mounted. Its size fits the official handle's gold disc exactly = about 1/3 of the machine width, axis at its center. Leave clear space so the crank arm can turn 360° without hitting the window or leaving the machine.
+- Lower left: a wide outlet slot (dark inside), large enough for one portrait pack (width 1 : height 1.8).
+- Optionally a small window showing part of the gears (not fully exposed).
+- Separate PNGs on identical canvases that stack into one machine: 1) gacha_machine_front.png body with the glass area cut out transparent, 2) gacha_machine_glass.png reflections/highlights only (semi-transparent, laid over the packs), 3) gacha_machine_handle_seat.png the handle seat only.
+- Match the gold and blue of the attached official handle.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B　取り出し口の閉・開と、出てくるパック　【必須】
+ファイル：gacha_outlet_closed.png・gacha_outlet_open.png・gacha_outlet_front.png・gacha_pack_sealed.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+A の機械の取り出し口の部品。A と同じキャンバスの大きさ・同じ位置で描く（A に重ねるとぴったり合う）。
+・gacha_outlet_closed.png：ふた（フラップ）が閉じた取り出し口
+・gacha_outlet_open.png：ふたが手前に開いた取り出し口（中が見える。受け皿の底がある＝パックは受け皿で止まり、床には落ちない）
+・gacha_outlet_front.png：受け皿の手前のふちだけ（パックの手前に重ねて、パックが受け皿の中にあるように見せる）
+・gacha_pack_sealed.png：封をしたカードパック1つ（縦長 幅 1：高さ 1.8・幅 240px 前後・真正面）。表は無地の紺と金（ゲームの第1〜3弾のパックの絵を上に入れる場合もある）。生き物・モンスターの絵は入れない
+▲ここまで
+▼English
+Outlet parts of machine A, on the same canvas size and position as A (they align exactly when stacked).
+- gacha_outlet_closed.png: outlet with the flap closed
+- gacha_outlet_open.png: flap opened toward the viewer, inside visible, with a tray bottom (the pack stops in the tray and never falls on the floor)
+- gacha_outlet_front.png: only the front lip of the tray (laid over the pack so it looks inside the tray)
+- gacha_pack_sealed.png: one sealed card pack, portrait (width 1 : height 1.8, about 240 px wide), straight-on, plain navy and gold front. No creatures or monsters.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+C　店の中に置く販売機（内装と同じ画角）　【必須】
+ファイル：shop_gacha_machine.png（1536×1024 の透明キャンバス）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+添付の CardShop_Interior_Official.jpeg の右側にある「赤い丸いガチャ機」の代わりに置く、A と同じ青・金・白のカードパック販売機。
+・内装の絵とまったく同じ見下ろしの画角・同じ光（左上から）・同じ縮尺
+・置く場所は赤いガチャ機と同じ（1536×1024 の絵で、だいたい横 1100〜1280・縦 200〜490 の範囲）。大きさも赤いガチャ機と同じくらい
+・1536×1024 の透明なキャンバスに、その位置のまま描く（内装に重ねるとそのまま置かれて見える）
+・正面（ガラス窓・ハンドル・取り出し口）が手前（主人公が来る方）を向く。ハンドルは小さく描いてよい（ここは回さない）
+・機械の足元の床の影は機械の PNG に含めてよい
+▲ここまで
+▼English
+The blue / gold / white card pack vending machine (same design as A) that replaces the red round gumball machine on the right side of the attached CardShop_Interior_Official.jpeg.
+- Exactly the same top-down camera angle, lighting (from the upper left) and scale as the interior.
+- Same position as the red machine (in the 1536x1024 image roughly x 1100-1280, y 200-490), about the same size.
+- Draw it on a transparent 1536x1024 canvas at that position, so it fits when laid over the interior.
+- The front (glass window, handle, outlet) faces the viewer (where the player approaches). A small handle is fine here (it does not rotate).
+- The contact shadow on the floor may be included.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+D　内装の差し替え版（赤いガチャ機を消す・床と壁と家具を分ける）　【必須】
+ファイル：shop_interior_shell.png・shop_interior_front.png・shop_furniture_*.png（すべて 1536×1024）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+添付の CardShop_Interior_Official.jpeg を、ゲームで主人公が歩けるように分けた版。絵の中身は変えない（赤い丸いガチャ機を消すことだけ）。
+・すべて 1536×1024・元の絵と同じ位置のまま
+・shop_interior_shell.png：床と奥の壁と左右の壁だけ（家具・棚・カウンター・ショーケース・植木・赤いガチャ機をすべて取り除き、その後ろの床と壁を自然に描き足す。透明にしない）
+・shop_interior_front.png：画面の手前の壁と入口の柱・植木（主人公がこの後ろを通るもの）。ほかは透明
+・shop_furniture_*.png：家具を1つずつ（カウンター・奥の棚・左の壁の棚・まん中の展示台2つ・手前左の展示台・右の壁の棚・植木など）。それぞれ別のファイル、ほかは透明
+・人物・店員は描かない（店員はゲームがカウンターの後ろに置く）
+・確認用に、全部を重ねた絵（赤いガチャ機の代わりに C の販売機を置いたもの）を1枚
+・家具の名前と、床に接している所（足元の線）を一覧にした文書（UTF-8）
+▲ここまで
+▼English
+A layered version of the attached CardShop_Interior_Official.jpeg so the player can walk around in the game. Do not change the content, except removing the red round gumball machine.
+- All files 1536x1024, everything at its original position.
+- shop_interior_shell.png: only the floor, back wall and side walls. Remove all furniture, shelves, counter, showcases, plants and the red gumball machine, and naturally paint in the floor and walls behind them (opaque).
+- shop_interior_front.png: the near (bottom) wall, entrance pillars and plants the player walks behind. Everything else transparent.
+- shop_furniture_*.png: each furniture piece in its own file (counter, back shelves, left wall shelves, the two center display tables, front-left display, right wall shelves, plants...), everything else transparent.
+- No people or clerks (the game places the clerk behind the counter).
+- One preview with all layers stacked and machine C placed instead of the red machine.
+- A UTF-8 text listing each piece and where it touches the floor.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+E　自動ドアの部品（内装の入口に合わせる）　【必須】
+ファイル：shop_door_frame.png・shop_door_left.png・shop_door_right.png・shop_door_pocket_left.png・shop_door_pocket_right.png（すべて 1536×1024）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+添付の CardShop_Interior_Official.jpeg の、下のまん中にある入口（ガラスの戸）を、左右に開く自動ドアにする部品。添付の AutoDoor_Opening_Closing_Reference.png は形の参考（正面図なので、画角は内装に合わせ直す）。
+・内装と同じ見下ろしの画角・同じ縮尺。すべて 1536×1024 の透明キャンバスに元の位置のまま
+・shop_door_frame.png：戸枠と敷居（動かない）
+・shop_door_left.png・shop_door_right.png：閉じた位置の左右の戸（ガラスと金の枠）。ゲームがそれぞれ左右へ水平に動かす
+・shop_door_pocket_left.png・shop_door_pocket_right.png：左右の壁の前の面（戸袋）。開いた戸がこの後ろに隠れる。戸1枚がまるごと隠れる幅
+・全部開くと入口のまん中に何も残らない（主人公が通れる幅）
+・確認用に、閉・半分・全開の3枚を重ねた絵
+▲ここまで
+▼English
+Parts to make the glass entrance at the bottom center of the attached CardShop_Interior_Official.jpeg a sliding automatic door. The attached AutoDoor_Opening_Closing_Reference.png is only a shape reference (it is a front view; redraw in the interior's camera angle).
+- Same top-down angle and scale as the interior. All on transparent 1536x1024 canvases at the original position.
+- shop_door_frame.png: fixed frame and threshold
+- shop_door_left.png / shop_door_right.png: the left and right leaves in the closed position (glass with gold frame). The game slides each horizontally.
+- shop_door_pocket_left.png / shop_door_pocket_right.png: the front faces of the walls (door pockets) that hide the opened leaves. Wide enough to hide a whole leaf.
+- Fully open leaves nothing in the middle of the entrance (wide enough for the player).
+- Previews: closed, half open and fully open.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F　回す画面の背景　【あると良い】
+ファイル：gacha_turn_bg.png（1170×2532）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+販売機の前に立って見ている、縦長の背景（スマホの画面いっぱい）。添付の内装の右奥あたりを、機械の目線の高さから見た店の中。
+・まん中に A の機械が乗るので、まん中は機械の後ろの壁と床だけ（機械は描かない）。上の 3分の2 は暗めでよい
+・ぼかしたように柔らかく、明るすぎない（機械とパックが目立つように）
+・人物・文字なし。この背景だけは透明にしない（共通ルールの【背景】は無視）
+▲ここまで
+▼English
+A portrait background (full phone screen, 1170x2532): the shop interior seen from eye level in front of the vending machine, around the back-right of the attached interior.
+- Machine A sits in the center, so the center shows only the wall and floor behind it (do not draw the machine). Upper two thirds can be darker.
+- Soft, slightly blurred, not too bright so the machine and pack stand out.
+- No people, no text. This one is opaque (ignore [Background] of the common rules).
+▲
