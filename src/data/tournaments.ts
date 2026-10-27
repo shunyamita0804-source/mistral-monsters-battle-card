@@ -55,10 +55,11 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     requiredRank: 'E',
     description: 'はじめての公式大会（内容は仮）。3連勝で優勝。',
     participants: 8,
+    // 相手の名前は人物（src/data/people.ts。2026-10-27 決定）。編成・強さは仮のまま
     rounds: [
-      { id: 'e-1', name: '仮の対戦相手（E-1回戦）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
-      { id: 'e-2', name: '仮の対戦相手（E-準決勝）', monsters: TEST_TEAM, lifeScale: 0.65 },
-      { id: 'e-3', name: '仮の対戦相手（E-決勝）', monsters: TEST_TEAM_ALT, lifeScale: 0.7 },
+      { id: 'e-1', name: 'ノエル', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
+      { id: 'e-2', name: 'ヴィクトル', monsters: TEST_TEAM, lifeScale: 0.65 },
+      { id: 'e-3', name: 'シエナ', monsters: TEST_TEAM_ALT, lifeScale: 0.7 },
     ],
     rewards: {
       participationCoins: 20,
@@ -79,9 +80,9 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     description: 'Eランク優勝者向けの大会（内容は仮）。',
     participants: 8,
     rounds: [
-      { id: 'd-1', name: '仮の対戦相手（D-1回戦）', monsters: TEST_TEAM, lifeScale: 1 },
-      { id: 'd-2', name: '仮の対戦相手（D-準決勝）', monsters: TEST_TEAM_ALT, lifeScale: 1.05 },
-      { id: 'd-3', name: '仮の対戦相手（D-決勝）', monsters: TEST_TEAM, lifeScale: 1.1 },
+      { id: 'd-1', name: 'ダリオ', monsters: TEST_TEAM, lifeScale: 1 },
+      { id: 'd-2', name: 'イザベラ', monsters: TEST_TEAM_ALT, lifeScale: 1.05 },
+      { id: 'd-3', name: 'ゴードン', monsters: TEST_TEAM, lifeScale: 1.1 },
     ],
     rewards: {
       participationCoins: 30,

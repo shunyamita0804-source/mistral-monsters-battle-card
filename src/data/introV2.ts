@@ -64,10 +64,10 @@ export const BOOSTERS: readonly BoosterDefinition[] = [
 export const isBoosterKey = (v: unknown): v is BoosterKey => BOOSTERS.some((b) => b.key === v);
 
 /**
- * 【仮】試験の対戦相手：練習場の先生（Claude が設計した「必ず勝てる」テスト用。正式採用前にユーザー確認）。
+ * 【仮】試験の対戦相手：練習場の先生ガレス（Claude が設計した「必ず勝てる」テスト用。正式採用前にユーザー確認）。
  * 編成は練習相手と同じ（ソラモ・ラズック・ソラモ）で、ライフをとても少なくする。負けて再挑戦するたびにさらに少なく（救済）
  */
-export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: '練習場の先生', monsters: [SORAMO_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: 0.35, face: 'teacher' };
+export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: 'ガレス', monsters: [SORAMO_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: 0.35, face: 'teacher' };
 
 /** 何回目の挑戦かで、先生のモンスターのライフの割合（1回目 0.35 → 2回目 0.25 → 3回目以降 0.15。最低でもライフ1） */
 export function examLifeScale(attempt: number): number {

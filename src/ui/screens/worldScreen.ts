@@ -124,7 +124,9 @@ import signUpArt from '@assets/images/maps/dungeon/sign_up.webp';
 import signExitArt from '@assets/images/maps/dungeon/sign_exit.webp';
 import { t, type Params } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
-import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName } from '../../i18n/content.ts';
+import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName, personName } from '../../i18n/content.ts';
+import { personOfSpeaker } from '../../data/people.ts';
+import { meetSpeaker } from '../../game/people/peopleBook.ts';
 import { itemGetWindow } from '../components/rewardGlow.ts';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
@@ -330,19 +332,11 @@ const STAFF_GREETING: Readonly<Partial<Record<NpcId, SceneId>>> = {
   researcher: 'greetResearcher',
 };
 
-/** 人の呼び名（読み上げ用） */
-const NPC_NAME: Readonly<Record<NpcId, MessageKey>> = {
-  neighbor_guide: 'story.speaker.neighborGuide',
-  clerk: 'story.speaker.clerk',
-  researcher: 'story.speaker.researcher',
-  receptionist: 'story.speaker.receptionist',
-  teacher: 'story.speaker.teacher',
-  resident_a: 'story.speaker.residentA',
-  resident_b: 'story.speaker.residentB',
-  resident_c: 'story.speaker.residentC',
-  resident_d: 'story.speaker.residentD',
-  resident_e: 'story.speaker.residentE',
-};
+/** 人の呼び名（読み上げ用）。人物の名前（src/data/people.ts） */
+function npcName(npcId: NpcId): string {
+  const person = personOfSpeaker(npcId);
+  return person ? personName(person) : t('introV2.speaker.bureau');
+}
 
 const TILE_CLASS: Readonly<Record<string, string>> = {
   '#': 'wall', '.': 'floor', ',': 'grass', '=': 'road', T: 'tree', '~': 'water', H: 'bld-hall', A: 'bld-home',
@@ -1112,7 +1106,7 @@ export class WorldView {
       // 絵は中の「体」の層に描き、体だけを足の裏を中心に縦へわずかに伸び縮みさせる（呼吸。2026-10-26 ユーザー「足は地面にしっかり着地」）。
       // 位置を決める transform（外側）と分けるので、伸び縮みしても足元は動かない
       const body = h('div', { class: 'world__npc-body' });
-      const el = h('div', { class: 'world__npc', dataset: { npc: obj.npcId }, attrs: { 'aria-label': t(NPC_NAME[obj.npcId]) } }, body);
+      const el = h('div', { class: 'world__npc', dataset: { npc: obj.npcId }, attrs: { 'aria-label': npcName(obj.npcId) } }, body);
       this.#sizeFigure(el);
       this.#addShadow(el);
       body.style.backgroundImage = `url("${NPC_SHEET[obj.npcId]}")`;
@@ -1850,6 +1844,8 @@ export class WorldView {
     const store = this.#store;
     playScene(this.#root, id, {
       onEffects: (effects) => store.update((s) => applySceneEffects(s, effects)),
+      // 名刺図鑑：話した人を登録（2026-10-27）
+      onSpeaker: (speaker) => store.update((s) => meetSpeaker(s, speaker)),
       onClose: (practice) => {
         if (this.#destroyed) return;
         // 案内役の場所・目的地の表示が変わることがあるので描き直す
@@ -2246,7 +2242,7 @@ export class WorldView {
 
   #makeFollower(tile: Point, dir: Direction): Follower {
     const body = h('div', { class: 'world__npc-body' });
-    const el = h('div', { class: 'world__npc world__follower', dataset: { npc: 'neighbor_guide' }, attrs: { 'aria-label': t(NPC_NAME.neighbor_guide) } }, body);
+    const el = h('div', { class: 'world__npc world__follower', dataset: { npc: 'neighbor_guide' }, attrs: { 'aria-label': npcName('neighbor_guide') } }, body);
     this.#sizeFigure(el);
     this.#addShadow(el);
     body.style.backgroundImage = `url("${NPC_SHEET.neighbor_guide}")`;
@@ -2346,6 +2342,7 @@ export class WorldView {
       case 'deck': return nav('deck');
       case 'dungeonSelect': return nav('dungeonSelect');
       case 'collection': return nav('collection');
+      case 'peopleBook': return nav('peopleBook');
       case 'settings': return nav('settings');
       case 'shopClerk': return nav('shopMenu');
       case 'gacha': return nav('gacha');

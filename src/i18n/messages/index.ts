@@ -5,6 +5,7 @@ import { DUNGEON_RUN_MESSAGES } from './dungeonRun.ts';
 import { SCREENS } from './screens.ts';
 import { STORY } from './story.ts';
 import { INTRO_V2 } from './introV2.ts';
+import { BOOK } from './book.ts';
 import { WALK_LAB } from './walkLab.ts';
 import { WORLD } from './world.ts';
 
@@ -21,6 +22,7 @@ export const MESSAGE_GROUPS = {
   battle: BATTLE,
   story: STORY,
   introV2: INTRO_V2,
+  book: BOOK,
   walkLab: WALK_LAB,
 } as const;
 
@@ -33,6 +35,7 @@ export const MESSAGES = {
   ...BATTLE,
   ...STORY,
   ...INTRO_V2,
+  ...BOOK,
   ...WALK_LAB,
 };
 

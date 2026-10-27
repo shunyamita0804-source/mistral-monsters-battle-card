@@ -20,6 +20,7 @@ import { NOBITON_REMOVED_14_IDS } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
+import { EMPTY_PEOPLE_BOOK, normalizePeopleBook, ownedCardIds, rescuePeopleBook, type PeopleBook } from '../people/peopleBook.ts';
 import { LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
 import type { StarterDeckKey } from '../../data/introV2.ts';
 
@@ -30,7 +31,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -134,6 +135,10 @@ export interface SaveData {
     readonly battlesLost: number;
     readonly packsOpened: number;
   };
+  /** 名刺図鑑（会った人・対戦成績・もらったカード。src/game/people/peopleBook.ts） */
+  readonly peopleBook: PeopleBook;
+  /** カード図鑑の詳しい画面で見たカード（持っていてここに無いカードに NEW の印） */
+  readonly cardsSeen: readonly string[];
   /** 物語の進み具合（序盤イベント。src/game/story/intro.ts） */
   readonly story: {
     readonly intro: IntroState;
@@ -178,6 +183,9 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     location: NEW_GAME_LOCATION,
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
+    peopleBook: EMPTY_PEOPLE_BOOK,
+    // 初めから持っているカードは NEW にしない
+    cardsSeen: ownedCardIds(createStarterCollection(deck)),
     story: { intro: 'completed', introV2: newIntroV2(starter) },
   };
 }
@@ -420,6 +428,15 @@ function migrateIntroV2V15(raw: RawObject): RawObject {
   return { ...raw, story: { ...story, introV2: LEGACY_INTRO_V2 } };
 }
 
+/**
+ * version 15 → 16（2026-10-27）：名刺図鑑とカード図鑑の NEW を足した。
+ * 大会の記録から、対戦したはずの相手の名刺を登録する（街の人は話したか分からないので未登録）。いま持っているカードは見たことにする（NEW にしない）
+ */
+function migratePeopleBookV16(raw: RawObject): RawObject {
+  const collection = isObject(raw.collection) ? (raw.collection as Record<string, number>) : {};
+  return { ...raw, peopleBook: rescuePeopleBook(raw), cardsSeen: ownedCardIds(collection) };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -436,6 +453,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   12: migrateDungeonRunV13,
   13: migrateMyurol14V14,
   14: migrateIntroV2V15,
+  15: migratePeopleBookV16,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -590,6 +608,8 @@ export function normalizeSave(raw: unknown): SaveData | null {
       battlesLost: asCount(stats.battlesLost),
       packsOpened: asCount(stats.packsOpened),
     },
+    peopleBook: normalizePeopleBook(migrated.peopleBook),
+    cardsSeen: unique(asStringArray(migrated.cardsSeen)),
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
     story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };

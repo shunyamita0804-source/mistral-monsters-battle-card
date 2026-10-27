@@ -1,5 +1,6 @@
 import { getMonster, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
+import { recordPersonCard } from '../../game/people/peopleBook.ts';
 import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
@@ -718,6 +719,8 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
   const card = candidates.length > 0 ? (candidates[Math.floor(Math.random() * candidates.length)] as string) : null;
   const r = winRunBattle(store.save, { kind, id }, card);
   store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesWon: s.stats.battlesWon + 1 } }));
+  // 名刺図鑑：その人から手に入れた技カードを覚える
+  if (card) store.update((s) => recordPersonCard(s, opponent, card));
   const got = card ? t('dungeonRun.win', { card: cardName(card) }) : t('dungeonRun.winNoCard');
   if (!r.cleared) {
     store.flashMessage = got;
