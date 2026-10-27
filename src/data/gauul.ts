@@ -15,9 +15,11 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * 絵：gau14_sk_01〜14.png（届いた 827×937 の PNG を1バイトも変えずに置いた。名前だけ素材の命名規則に合わせた）
  * 枠：技カード新UI（v5）のガウルの色（オレンジ。monster_theme_colors.json の gauul）
  *
- * まだ決まっていないこと（独断で決めない）：
- * - 初期配布の枚数（JSON の starter_copies は null＝未確定。0枚と決めたわけではない）。スターター・パック・相手の編成にもまだ入れていない
- * - レアリティ・正式英語
+ * 初期配布16枚（2026-10-26 ユーザー正式確定。2026-10-27 の検収で指示）：届いた JSON の starter_copies は null のままなので
+ *   （JSON は無改変）、枚数はこのファイルの INITIAL_COPIES に持つ（ノビトンと同じ）。新しく始めたときの所持カードに入れる
+ *   （初期デッキ60枚には入れない・モンスターカード本体は配らない・いまのセーブには配らない）。0枚の技は収集用（後から手に入る）
+ *
+ * まだ決まっていないこと（独断で決めない）：レアリティ・正式英語・パック・相手の編成
  */
 export const GAUUL_MONSTER_ID = 'mon-gauul';
 export const gauulSkillId = (no: number): string => `skl-gauul14-${twoDigits(no)}`;
@@ -51,12 +53,18 @@ export interface Gaul14Row {
   readonly damage: number | null;
   readonly effect: string;
   readonly image: string;
-  /** null＝未確定（0枚ではない） */
+  /** 届いた JSON では null（初期配布の枚数は INITIAL_COPIES） */
   readonly starter_copies: number | null;
   readonly sha256: string;
 }
 
 export const GAUL14_ROWS: readonly Gaul14Row[] = gaul14;
+
+/**
+ * 初期配布16枚（2026-10-26 ユーザー正式確定。正式の番号 → 枚数。0枚の技は書かない）。
+ * 01・06 が3枚、02・07・10 が2枚、03・11・12・13 が1枚（04・05・08・09・14 は0枚）
+ */
+const INITIAL_COPIES: Readonly<Record<number, number>> = { 1: 3, 2: 2, 3: 1, 6: 3, 7: 2, 10: 2, 11: 1, 12: 1, 13: 1 };
 
 /** JSON の分類 → ゲームの種別 */
 const CATEGORY: Readonly<Record<string, string>> = { strength: 'force', intelligence: 'wisdom', special: 'special', defense: 'defense', dodge: 'evade' };
@@ -88,8 +96,7 @@ function toOfficial(row: Gaul14Row): OfficialSkill {
     damage: row.damage,
     category,
     effect_text_ja: row.effect === '' ? null : row.effect,
-    // 初期配布が未確定（null）のあいだは区分を出さない（ミュロルと同じ）
-    ...(row.starter_copies !== null ? { availability: row.starter_copies > 0 ? 'initial' : 'collect' } : {}),
+    availability: (INITIAL_COPIES[row.number] ?? 0) > 0 ? 'initial' : 'collect',
   };
 }
 
@@ -109,3 +116,8 @@ export const GAUUL_SKILLS: readonly SkillCard[] = GAUL14_ROWS.map((row) =>
     specialEffects: SPECIAL_EFFECTS,
   }),
 );
+
+/** 初期配布16枚（技の ID と枚数。0枚の技は入れない） */
+export const GAUUL_STARTER: readonly { readonly id: string; readonly copies: number }[] = GAUL14_ROWS.filter(
+  (r) => (INITIAL_COPIES[r.number] ?? 0) > 0,
+).map((r) => ({ id: gauulSkillId(r.number), copies: INITIAL_COPIES[r.number] as number }));

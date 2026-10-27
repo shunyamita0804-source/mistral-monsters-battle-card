@@ -1,4 +1,5 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
+import { GAUUL_STARTER } from '../../data/gauul.ts';
 import { LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
 import { KALSHELL_STARTER } from '../../data/kalshell.ts';
 import { MYUROL_STARTER } from '../../data/myurol.ts';
@@ -225,16 +226,31 @@ export function createPlaceholderStarterCollection(): Record<string, number> {
   return countCards([...deck.monsters, ...deck.skills]);
 }
 
-/** 新しく始めたときの所持カード（スターターデッキと同じ内容） */
+/**
+ * 初期配布96枚（全6体×16枚。すべて正式確定）。初期デッキ60枚（createStarterDeck）とは別の仕様として持つ。
+ * ソラモ・ラズック・ノビトン・ミュロル・ガウルは 2026-10-26 ユーザー正式確定、カルシェルは 2026-10-27 統合管理パックで確定。
+ * 技カードだけを配る（モンスターカード本体は配らない）。新しく始めたときだけで、いまのセーブには配らない
+ */
+export const INITIAL_DISTRIBUTION: readonly { readonly monsterId: string; readonly cards: readonly { readonly id: string; readonly copies: number }[] }[] = [
+  { monsterId: 'mon-soramo', cards: SORAMO_STARTER },
+  { monsterId: 'mon-lazuck', cards: LAZUCK_STARTER },
+  { monsterId: 'mon-nobiton', cards: NOBITON_STARTER },
+  { monsterId: 'mon-myurol', cards: MYUROL_STARTER },
+  { monsterId: 'mon-kalshell', cards: KALSHELL_STARTER },
+  { monsterId: 'mon-gauul', cards: GAUUL_STARTER },
+];
+
+/**
+ * 新しく始めたときの所持カード：初期デッキ60枚と初期配布96枚の両方がそろう枚数（カードごとに多いほう）。
+ * ソラモ・ラズックの初期配布は初期デッキにも入っているので二重には数えない（2026-10-27 までと同じ枚数。ガウルの16枚が増えただけ）
+ */
 export function createStarterCollection(): Record<string, number> {
   const deck = createStarterDeck();
-  // ノビトンの初期配布16枚（2026-10-26 ユーザー指示）：所持カードにだけ入れる（初期デッキ60枚には入れない・モンスターカード本体は配らない）
-  const nobiton = NOBITON_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  // ミュロルの初期配布16枚（2026-10-26 ユーザー正式確定・2026-10-27 実装）：ノビトンと同じく所持カードにだけ入れる
-  const myurol = MYUROL_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  // カルシェルの初期配布16枚（2026-10-27 統合管理パックで確定）：ノビトン・ミュロルと同じく所持カードにだけ入れる
-  const kalshell = KALSHELL_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  return countCards([...deck.monsters, ...deck.skills, ...nobiton, ...myurol, ...kalshell]);
+  const owned = countCards([...deck.monsters, ...deck.skills]);
+  for (const { cards } of INITIAL_DISTRIBUTION) {
+    for (const { id, copies } of cards) owned[id] = Math.max(owned[id] ?? 0, copies);
+  }
+  return owned;
 }
 
 /** NPC のデッキに入れる仮サポート（各2枚） */
