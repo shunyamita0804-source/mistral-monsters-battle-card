@@ -1,4 +1,5 @@
 import type { Direction } from '../game/save/saveData.ts';
+import { BUREAU_MAP_ID } from './introV2.ts';
 import type { CardReward } from './tournaments.ts';
 import { WORLD_ART, type ArtMap, type CellRect } from './worldArt.generated.ts';
 
@@ -59,6 +60,8 @@ export type InteractAction =
   | 'tournamentDesk'
   /** カード練習場の練習テーブル（練習試合） */
   | 'practiceTable'
+  /** 【仮】カードバトラー管理局の受付（導入イベントV2。src/game/story/introV2.ts） */
+  | 'bureauDesk'
   | 'message';
 
 export type WarpTarget =
@@ -291,6 +294,16 @@ const artMap = (
 ): MapDefinition => ({ id, name, area, tiles: art.grid, objects, spawn, art });
 
 /**
+ * 【仮】カードバトラー管理局の入口（街のマス）。位置は候補の中から Claude が仮に選んだもの（ユーザー承認待ち。docs/intro-v2.md）。
+ * 街の中央の通りの西の行き止まり（住宅Bの南）。ほかの建物の入口・道をふさがない
+ */
+export const BUREAU_TOWN_DOOR = { x: 5, y: 57, w: 1 } as const;
+/** 管理局から出たときに立つ所（入口のすぐ下。ほかの建物と同じく手前を向く） */
+const BUREAU_TOWN_FRONT = { x: 5, y: 58, dir: 'down' } as const satisfies { x: number; y: number; dir: Direction };
+/** 管理局に入ったときに立つ所（仮の部屋の入口の手前。奥を向く） */
+const BUREAU_ENTRY = { x: 4, y: 7, dir: 'up' } as const satisfies { x: number; y: number; dir: Direction };
+
+/**
  * 街。ユーザー承認済みの正式な絵（建物11棟・噴水・地面・小物）を、設計図（docs/design/seimon-town/）どおりに並べたもの。
  * 北中央＝大会会場、北西＝カード練習場・住宅A/B、北東＝住宅C/D/E、中央＝噴水広場、南西＝カードショップ・カード研究所、
  * 南東＝主人公の家ととなりの家（案内役の家）、南＝草原への出口（ダンジョン方面）。
@@ -311,6 +324,8 @@ export const TOWN: MapDefinition = artMap(
     interactAt('sign-fountain', TOWN_ART.fountain as CellRect, '噴水', 'message', '街の中央の噴水。水の音が心地よい。'),
     // となりの家の女性（案内役）。物語の進み具合で、街か練習場のどちらかにいる。街では自分の家の前の通り
     npc('guide-town', doorOf(TOWN_ART, 'GUIDE_HOME').back.x - 4, doorOf(TOWN_ART, 'GUIDE_HOME').back.y + 6, 'neighbor_guide'),
+    // 【仮】カードバトラー管理局の入口（建物の絵・位置は未定。承認までは仮の印。worldScreen.ts が札と印を描く）
+    warp('door-bureau', BUREAU_TOWN_DOOR.x, BUREAU_TOWN_DOOR.y, BUREAU_TOWN_DOOR.w, 'カードバトラー管理局（仮）', { kind: 'map', mapId: BUREAU_MAP_ID, ...BUREAU_ENTRY }),
   ],
   { ...townDoorFront('PLAYER_HOME'), y: TOWN_ART.spawn.y, dir: 'down' },
 );
@@ -393,6 +408,34 @@ export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 
   npc('guide-practice', spotOf(PRACTICE_ART, 'TEACHER_SPOT', 5).x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y + 1, 'neighbor_guide'),
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
+
+/**
+ * 【仮】カードバトラー管理局の中（仮の部屋。正式な内装・受付の人物の絵が届くまで、記号のマスで描く）。
+ * 奥に受付のカウンター。入口は手前の真ん中
+ */
+export const BUREAU: MapDefinition = {
+  id: BUREAU_MAP_ID,
+  name: 'カードバトラー管理局（仮）',
+  area: 'interior',
+  tiles: [
+    '#########',
+    '#h.....h#',
+    '#.ccccc.#',
+    '#.......#',
+    '#.......#',
+    '#r.....r#',
+    '#.......#',
+    '#.......#',
+    '####d####',
+  ],
+  objects: [
+    interact('bureau-desk', 2, 2, 5, 1, '受付（仮）', 'bureauDesk'),
+    interact('bureau-shelf-l', 1, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
+    interact('bureau-shelf-r', 7, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
+    warp('bureau-exit', 4, 8, 1, '外へ', { kind: 'map', mapId: 'town', ...BUREAU_TOWN_FRONT }),
+  ],
+  spawn: BUREAU_ENTRY,
+};
 
 const HOUSE_ART = artOf('house');
 /** 民家（住宅A〜E。部屋の絵は共通）。住宅A〜E にそれぞれ住人A〜E がいる */
@@ -537,6 +580,7 @@ export const MAPS: readonly MapDefinition[] = [
   HALL,
   PRACTICE,
   ...HOUSES,
+  BUREAU,
   DUNGEON_B1,
   DUNGEON_B2,
   DUNGEON_B3,

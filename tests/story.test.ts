@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getMap, HALL, HOUSES, LAB, NEIGHBOR, PRACTICE, SHOP, TOWN, type MapDefinition, type NpcObject } from '../src/data/maps.ts';
 import { INTRO_STATES, residentScene, SCENES, type IntroState, type Scene, type SceneId, type SceneStep } from '../src/data/storyScenes.ts';
+import { LEGACY_INTRO_V2 } from '../src/game/story/introV2.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
 import {
   applySceneEffects,
@@ -16,7 +17,9 @@ import {
 import { findPath, isBlocked, objectsAt } from '../src/game/world/world.ts';
 import { sanitizeLocation } from '../src/game/progress/dungeon.ts';
 
-const withIntro = (intro: IntroState): SaveData => ({ ...createNewSave(), story: { intro } });
+// 前の序盤イベント（となりの家の女性）の確かめ。新しいセーブは導入イベントV2になったので、前の進み具合を直接入れて試す
+/** 前の導入の進み具合のセーブ（導入イベントV2より前のセーブ＝ legacySkipped） */
+const withIntro = (intro: IntroState): SaveData => ({ ...createNewSave(), story: { intro, introV2: LEGACY_INTRO_V2 } });
 
 /** 選択肢で選んだ順に場面をたどり、最後の場面の effects をセーブに当てる（onStart も当てる） */
 function play(save: SaveData, start: SceneId, picks: number[] = []): { save: SaveData; ended: SceneId | null; practice: boolean | null } {
@@ -47,9 +50,11 @@ function play(save: SaveData, start: SceneId, picks: number[] = []): { save: Sav
 }
 
 describe('序盤イベント：セーブ', () => {
-  it('新しく始めると「まだ会っていない」で、自分の家の中から始まる', () => {
+  it('新しく始めると自分の家の中から始まる。前の序盤イベントは使わず（completed）、導入イベントV2を始める前の状態', () => {
     const save = createNewSave();
-    expect(save.story.intro).toBe('notSeen');
+    expect(save.story.intro).toBe('completed');
+    expect(save.story.introV2.state).toBe('notStarted');
+    expect(sceneOnEnter(save, 'town')).toBeNull();
     expect(save.location.mapId).toBe('home');
     expect(isBlocked(getMap('home') as MapDefinition, save.location.x, save.location.y, () => true)).toBe(false);
   });

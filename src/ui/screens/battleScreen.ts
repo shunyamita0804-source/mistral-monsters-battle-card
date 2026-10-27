@@ -78,6 +78,16 @@ import rulesArt4 from '@assets/images/ui/rules/rules_4.webp';
 
 /** ルールの窓の図（2026-10-26 デザイン第11弾）：マナにする・攻撃と守り・サポート・勝ち負け */
 const RULES_ART = [rulesArt1, rulesArt2, rulesArt3, rulesArt4];
+
+/** 導入イベントV2の試験のヒント（先生の台詞。03_全台詞 の S04） */
+const V2_HINT: Readonly<Record<BattleHintId, MessageKey>> = {
+  monsters: 'introV2.hint.monsters',
+  firstMana: 'introV2.hint.mana',
+  attack: 'introV2.hint.attack',
+  mana: 'introV2.hint.mana',
+  defense: 'introV2.hint.defense',
+  result: 'introV2.hint.monsters',
+};
 import { battleCardHeight, createBattleCard } from '../components/battleCard.ts';
 import { skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { bgm } from '../bgm.ts';
@@ -1660,6 +1670,7 @@ export const battleScreen: ScreenDefinition = {
       );
     };
 
+    const v2Hints = req.hintSet === 'introV2';
     /** 練習試合のヒント（「わかった」で閉じる。常設のボタンは増やさない） */
     const hintOverlay = (s: BattleState): HTMLElement | null => {
       if (!req.tutorial || auto) return null;
@@ -1668,6 +1679,9 @@ export const battleScreen: ScreenDefinition = {
         if (next) {
           hintOpen = next;
           seenHints.add(next);
+          // 導入イベントV2の試験：マナの説明は1回だけ（先攻1ターン目でも同じ文）。勝敗のヒントは無い（勝ったあとは先生が話す）
+          if (v2Hints && (next === 'firstMana' || next === 'mana')) seenHints.add('firstMana').add('mana');
+          if (v2Hints && next === 'result') hintOpen = null;
         }
       }
       if (!hintOpen) return null;
@@ -1682,8 +1696,8 @@ export const battleScreen: ScreenDefinition = {
         h(
           'div',
           { class: 'battle__hint-panel' },
-          h('p', { class: 'battle__hint-title', text: t('story.hint.title') }),
-          h('p', { class: 'battle__hint-text', text: t(`story.hint.${hintOpen}`) }),
+          h('p', { class: 'battle__hint-title', text: t(v2Hints ? 'introV2.hint.title' : 'story.hint.title') }),
+          h('p', { class: 'battle__hint-text', text: t(v2Hints ? V2_HINT[hintOpen] : (`story.hint.${hintOpen}` as const)) }),
           ok,
         ),
       );
@@ -1746,6 +1760,12 @@ export const battleScreen: ScreenDefinition = {
             button(t('battle.qa.win'), () => {
               if (!state) return;
               state = { ...state, phase: 'ended', winner: 'player', endReason: 'knockout' };
+              render();
+            }, 'btn btn--small'),
+            // 負けたときの流れ（導入イベントV2の試験の再挑戦など）を確かめる
+            button(t('battle.qa.lose'), () => {
+              if (!state) return;
+              state = { ...state, phase: 'ended', winner: 'opponent', endReason: 'knockout' };
               render();
             }, 'btn btn--small'),
           )

@@ -8,6 +8,7 @@ import faceBattler1 from '@assets/images/characters/face_battler_1.webp';
 import faceBattler2 from '@assets/images/characters/face_battler_2.webp';
 import faceBattler3 from '@assets/images/characters/face_battler_3.webp';
 import faceGuardian from '@assets/images/characters/face_guardian.webp';
+import faceTeacher from '@assets/images/characters/face_teacher.webp';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { h } from '../dom.ts';
 
@@ -28,6 +29,8 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'battler-2': faceBattler2,
   'battler-3': faceBattler3,
   guardian: faceGuardian,
+  // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
+  teacher: faceTeacher,
 };
 
 /** 相手の顔の絵を探すときのキー（face があればそれ、無ければ ID） */

@@ -1,3 +1,4 @@
+import type { IntroV2State } from '../game/story/introV2.ts';
 import type { MessageKey } from '../i18n/messages/index.ts';
 import { RESIDENT_IDS, type ResidentId } from './maps.ts';
 
@@ -40,7 +41,7 @@ export const INTRO_STATES: readonly IntroState[] = [
 export type Expression = 'normal' | 'smile' | 'explain' | 'surprised' | 'troubled' | 'happy';
 
 /** 話している人。system は地の文（名前の札なし）。住人は会話の絵が無いので名前の札だけ */
-export type Speaker = 'neighbor_guide' | ResidentId | 'teacher' | 'clerk' | 'receptionist' | 'researcher' | 'system';
+export type Speaker = 'neighbor_guide' | ResidentId | 'teacher' | 'clerk' | 'receptionist' | 'researcher' | 'bureau_clerk' | 'system';
 
 /** 住人の会話の場面（話しかけるたびに 1・2 を交互に） */
 export type ResidentSceneId = `${ResidentId}_${1 | 2}`;
@@ -66,11 +67,24 @@ export type SceneId =
   | 'greetClerk'
   | 'greetReceptionist'
   | 'greetResearcher'
+  // 導入イベントV2「プロのカードバトラーになる試験」（台詞は src/i18n/messages/introV2.ts）
+  | 'v2Greeting'
+  | 'v2Walk'
+  | 'v2School'
+  | 'v2Resume'
+  | 'v2Retry'
+  | 'v2Pass'
+  | 'v2Reception'
+  | 'v2Thanks'
+  | 'v2Briefing'
+  | 'v2BureauAfter'
   | ResidentSceneId;
 
 /** 場面の終わり（またはスキップ）にすること */
 export type SceneEffect =
   | { readonly kind: 'intro'; readonly value: IntroState }
+  /** 導入イベントV2の進み具合（src/game/story/introV2.ts の setIntroV2State。勝つ前に試験より先へは進まない） */
+  | { readonly kind: 'introV2'; readonly value: IntroV2State }
   /** 練習試合を始める。tutorial＝最初の練習（バトル画面にヒントを出す） */
   | { readonly kind: 'practice'; readonly tutorial: boolean };
 
@@ -92,12 +106,17 @@ export interface Scene {
   readonly effects?: readonly SceneEffect[];
   /** スキップしたときにすること（指定がなければ effects と同じ） */
   readonly skipEffects?: readonly SceneEffect[];
+  /** 会話のスキップのボタンを出さない（導入イベントV2：断る・飛ばすはない。文字を一気に出すのはタップでできる） */
+  readonly noSkip?: boolean;
 }
 
 const guide = (text: MessageKey, expression: Expression): SceneStep => ({ kind: 'line', text, speaker: 'neighbor_guide', expression });
 const system = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'system' });
 const intro = (value: IntroState): SceneEffect => ({ kind: 'intro', value });
 const SKIP_INVITE = [intro('skipped')];
+const v2 = (value: IntroV2State): SceneEffect => ({ kind: 'introV2', value });
+const teacher = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'teacher' });
+const bureau = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'bureau_clerk' });
 
 export const SCENES: Readonly<Record<SceneId, Scene>> = {
   // E01 家から街に出た直後（1回だけ）
@@ -203,6 +222,61 @@ export const SCENES: Readonly<Record<SceneId, Scene>> = {
   greetClerk: { id: 'greetClerk', steps: [{ kind: 'line', text: 'story.greet.clerk', speaker: 'clerk' }], skipEffects: [] },
   greetReceptionist: { id: 'greetReceptionist', steps: [{ kind: 'line', text: 'story.greet.receptionist', speaker: 'receptionist' }], skipEffects: [] },
   greetResearcher: { id: 'greetResearcher', steps: [{ kind: 'line', text: 'story.greet.researcher', speaker: 'researcher' }], skipEffects: [] },
+  // ---------- 導入イベントV2（2026-10-27 正式依頼。台本は 03_全台詞 のまま） ----------
+  // S01 家の外：幼馴染が声をかける → 教習所へ一緒に歩く
+  v2Greeting: {
+    id: 'v2Greeting',
+    onStart: [v2('introGreeting')],
+    steps: [guide('introV2.s01.1', 'surprised'), guide('introV2.s01.2', 'troubled'), guide('introV2.s01.3', 'smile'), system('introV2.s01.sys')],
+    effects: [v2('escortToSchool')],
+    noSkip: true,
+  },
+  // S02 町の徒歩イベント（歩いている途中で1回）
+  v2Walk: { id: 'v2Walk', steps: [guide('introV2.s02.1', 'explain'), guide('introV2.s02.2', 'smile')], noSkip: true },
+  // S03 教習所に到着 → 試験の対戦（画面側で始める）
+  v2School: {
+    id: 'v2School',
+    onStart: [v2('schoolArrival')],
+    steps: [teacher('introV2.s03.1'), teacher('introV2.s03.2'), guide('introV2.s03.3', 'happy'), teacher('introV2.s03.4')],
+    noSkip: true,
+  },
+  // 試験の対戦の途中でアプリを閉じたあと（先生の前から再開）
+  v2Resume: { id: 'v2Resume', steps: [teacher('introV2.s03.4')], noSkip: true },
+  // S05b 負け・再開
+  v2Retry: { id: 'v2Retry', steps: [teacher('introV2.s05b.1'), system('introV2.s05b.sys')], noSkip: true },
+  // S05 勝利 → 管理局へ一緒に歩く
+  v2Pass: {
+    id: 'v2Pass',
+    steps: [teacher('introV2.s05.1'), teacher('introV2.s05.2'), guide('introV2.s05.3', 'happy')],
+    effects: [v2('escortToBureau')],
+    noSkip: true,
+  },
+  // S06 管理局の受付 → パックを選ぶ（画面側で窓を出す）
+  v2Reception: {
+    id: 'v2Reception',
+    onStart: [v2('bureauReception')],
+    steps: [bureau('introV2.s06.1'), bureau('introV2.s06.2'), bureau('introV2.s06.3'), system('introV2.s06.sys')],
+    effects: [v2('packSelection')],
+    noSkip: true,
+  },
+  v2Thanks: { id: 'v2Thanks', steps: [bureau('introV2.s06.thanks')], noSkip: true },
+  // S07 外に出て、幼馴染が案内 → 自由行動
+  v2Briefing: {
+    id: 'v2Briefing',
+    onStart: [v2('worldBriefing')],
+    steps: [
+      guide('introV2.s07.1', 'happy'),
+      guide('introV2.s07.2', 'explain'),
+      guide('introV2.s07.3', 'explain'),
+      guide('introV2.s07.4', 'normal'),
+      guide('introV2.s07.5', 'smile'),
+      system('introV2.s07.sys'),
+    ],
+    effects: [v2('completed')],
+    noSkip: true,
+  },
+  // 【仮】導入イベントのあとに受付を調べたとき（地の文）
+  v2BureauAfter: { id: 'v2BureauAfter', steps: [system('introV2.bureau.after')], skipEffects: [] },
   ...residentScenes(),
 };
 

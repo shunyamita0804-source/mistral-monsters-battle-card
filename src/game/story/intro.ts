@@ -1,6 +1,7 @@
 import type { NpcObject } from '../../data/maps.ts';
 import { INTRO_STATES, type IntroState, type SceneEffect, type SceneId } from '../../data/storyScenes.ts';
 import type { SaveData } from '../save/saveData.ts';
+import { isIntroV2Done, setIntroV2State, type IntroV2State } from './introV2.ts';
 
 /**
  * 序盤イベント（となりの家の女性との出会い → カード練習場 → 最初の練習試合 → 自由行動）の進行。DOM 非依存。
@@ -44,9 +45,17 @@ const GUIDE_AT: Readonly<Record<ReturnType<typeof guidePlace>, string>> = {
   home: 'guide-home',
 };
 
-/** マップ上の人を表示するか（案内役だけ、進み具合で1か所にいる。ほかの人はいつもいる） */
+/** 導入イベントV2の間、案内役（幼馴染）が教習所の中にいる進み具合（街では一緒に歩く絵を画面側で出す） */
+const V2_GUIDE_IN_PRACTICE: readonly IntroV2State[] = ['escortToSchool', 'schoolArrival', 'examBattleActive', 'examPassed', 'escortToBureau'];
+
+/**
+ * マップ上の人を表示するか（案内役だけ、進み具合で1か所にいる。ほかの人はいつもいる）。
+ * 導入イベントV2の最中（と始まる前）は、教習所の中の案内役だけ（進み具合による）。終わったら家に帰る（前の導入と同じ）
+ */
 export function isNpcPresent(save: SaveData, npc: NpcObject): boolean {
   if (npc.npcId !== 'neighbor_guide') return true;
+  const v2 = save.story.introV2;
+  if (!isIntroV2Done(v2)) return npc.id === 'guide-practice' && V2_GUIDE_IN_PRACTICE.includes(v2.state);
   return npc.id === GUIDE_AT[guidePlace(save.story.intro)];
 }
 
@@ -99,7 +108,10 @@ export function sceneAfterPractice(_save: SaveData, result: PracticeResult): Sce
 /** 場面の効果のうち、セーブを変えるもの（進み具合）を当てる。練習試合の開始は画面側で行う */
 export function applySceneEffects(save: SaveData, effects: readonly SceneEffect[]): SaveData {
   let next = save;
-  for (const e of effects) if (e.kind === 'intro') next = setIntro(next, e.value);
+  for (const e of effects) {
+    if (e.kind === 'intro') next = setIntro(next, e.value);
+    else if (e.kind === 'introV2') next = setIntroV2State(next, e.value);
+  }
   return next;
 }
 

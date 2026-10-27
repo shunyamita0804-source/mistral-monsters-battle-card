@@ -3,6 +3,7 @@ import type { BattleWinner } from '../game/battle/engine.ts';
 import { sanitizeLocation } from '../game/progress/dungeon.ts';
 import type { PracticeResult } from '../game/story/intro.ts';
 import { createNewSave, type SaveData } from '../game/save/saveData.ts';
+import type { StarterDeckKey } from '../data/introV2.ts';
 import { MemoryStorage, SaveRepository, type KeyValueStorage, type LoadResult } from '../game/save/saveRepository.ts';
 import type { BgmId } from './bgm.ts';
 import { SettingsStore } from './settingsStore.ts';
@@ -15,6 +16,10 @@ export interface BattleRequest {
   readonly allowSurrender: boolean;
   /** 最初の練習試合：場面に合わせてヒントを出す（バトルのルールは変えない） */
   readonly tutorial?: boolean;
+  /** ヒントの文（無ければ前の導入の練習試合の文。introV2＝導入イベントV2の試験：先生の台詞） */
+  readonly hintSet?: 'story' | 'introV2';
+  /** イベントの対戦の ID（導入イベントV2の試験は 'introV2-exam'。ふつうの練習試合と分ける） */
+  readonly eventBattleId?: string;
   /** 対戦中の BGM（無ければダンジョン・練習と同じ通常の対戦の曲） */
   readonly bgm?: BgmId;
   /** 対戦の背景の絵（無ければ従来の色の背景） */
@@ -45,6 +50,8 @@ export class GameStore {
   openingIntro = false;
   /** 練習試合の結果（歩行画面に戻ったとき、対戦後の会話に使う） */
   practiceResult: PracticeResult | null = null;
+  /** 導入イベントV2の試験の対戦の結果（歩行画面に戻ったとき、合格・再挑戦の会話に使う） */
+  introV2Result: 'won' | 'lost' | null = null;
   /** QA用の機能を出すか（URL に ?qa=1） */
   readonly qa: boolean;
   /** 最後に保存できたか */
@@ -82,8 +89,8 @@ export class GameStore {
     return this.#save;
   }
 
-  newGame(gender: 'male' | 'female'): void {
-    this.#save = { ...createNewSave(), player: { gender } };
+  newGame(gender: 'male' | 'female', starter: StarterDeckKey | null = null): void {
+    this.#save = { ...createNewSave(new Date(), starter), player: { gender } };
     this.persist();
   }
 
@@ -113,6 +120,7 @@ export class GameStore {
     this.flashMessage = null;
     this.flashBanner = null;
     this.practiceResult = null;
+    this.introV2Result = null;
     this.lastSaveOk = true;
     return true;
   }

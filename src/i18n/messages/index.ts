@@ -4,6 +4,7 @@ import { COMMON } from './common.ts';
 import { DUNGEON_RUN_MESSAGES } from './dungeonRun.ts';
 import { SCREENS } from './screens.ts';
 import { STORY } from './story.ts';
+import { INTRO_V2 } from './introV2.ts';
 import { WALK_LAB } from './walkLab.ts';
 import { WORLD } from './world.ts';
 
@@ -19,6 +20,7 @@ export const MESSAGE_GROUPS = {
   dungeonRun: DUNGEON_RUN_MESSAGES,
   battle: BATTLE,
   story: STORY,
+  introV2: INTRO_V2,
   walkLab: WALK_LAB,
 } as const;
 
@@ -30,6 +32,7 @@ export const MESSAGES = {
   ...DUNGEON_RUN_MESSAGES,
   ...BATTLE,
   ...STORY,
+  ...INTRO_V2,
   ...WALK_LAB,
 };
 
