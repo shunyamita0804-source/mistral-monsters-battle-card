@@ -41,6 +41,8 @@ export class GameStore {
   flashBanner: 'clear' | 'retreat' | null = null;
   /** ダンジョンに入った直後に出す、挿絵とダンジョン名の札（ダンジョンの ID。2026-10-26 ユーザー指示） */
   dungeonIntro: string | null = null;
+  /** 新しく始めた直後に、物語の始まりの挿絵を出す（2026-10-27 ユーザー指示。主人公を選んだあとに1回だけ） */
+  openingIntro = false;
   /** 練習試合の結果（歩行画面に戻ったとき、対戦後の会話に使う） */
   practiceResult: PracticeResult | null = null;
   /** QA用の機能を出すか（URL に ?qa=1） */

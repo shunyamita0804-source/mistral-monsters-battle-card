@@ -18,6 +18,8 @@ export const newGameScreen: ScreenDefinition = {
     const element = h('main', { class: 'screen new-game' });
     const start = once((gender: Gender) => {
       ctx.store.newGame(gender);
+      // 家の中の画面の上に、物語の始まりの挿絵を1回だけ（2026-10-27 デザイン第13弾。src/ui/components/openingIntro.ts）
+      ctx.store.openingIntro = true;
       ctx.reset('world');
     });
     let selected: Gender | null = null;
