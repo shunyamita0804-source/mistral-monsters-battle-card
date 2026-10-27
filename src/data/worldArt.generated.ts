@@ -286,7 +286,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 3200,
-     "y": 243
+     "y": 190
     }
    },
    "TRAINING": {
@@ -300,7 +300,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 704,
-     "y": 302
+     "y": 243
     }
    },
    "ARENA": {
@@ -314,7 +314,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 2016,
-     "y": -6
+     "y": -118
     }
    },
    "HOUSE_A": {
@@ -328,7 +328,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 1136,
-     "y": 1169
+     "y": 1122
     }
    },
    "HOUSE_B": {
@@ -342,7 +342,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 304,
-     "y": 1109
+     "y": 1057
     }
    },
    "HOUSE_D": {
@@ -356,7 +356,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 2816,
-     "y": 1159
+     "y": 1112
     }
    },
    "HOUSE_E": {
@@ -370,7 +370,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 3584,
-     "y": 1161
+     "y": 1114
     }
    },
    "SHOP": {
@@ -384,7 +384,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 464,
-     "y": 2561
+     "y": 2506
     }
    },
    "LAB": {
@@ -398,7 +398,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 1380,
-     "y": 2382
+     "y": 2308
     }
    },
    "PLAYER_HOME": {
@@ -412,7 +412,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 2568,
-     "y": 2557
+     "y": 2501
     }
    },
    "GUIDE_HOME": {
@@ -426,7 +426,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     },
     "label": {
      "x": 3384,
-     "y": 2590
+     "y": 2537
     }
    }
   },

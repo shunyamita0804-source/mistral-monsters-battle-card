@@ -146,52 +146,7 @@
   100% { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 0 8px rgb(150 190 255 / 0.55)); }
 }
 
-/* ===== 12-9 十字キーと A・B（ふつう・押したとき） ===== */
-.drun__pad-cross {
-  border-radius: 0;
-  background: url('@assets/images/ui/dungeon/dpad.webp') center / contain no-repeat;
-  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.6));
-}
-
-.drun__pad.is-pressed .drun__pad-cross {
-  background-image: url('@assets/images/ui/dungeon/dpad_pressed.webp');
-}
-
-/* 矢印は絵にあるので、押している向きだけ金色に光らせる */
-.drun__pad-arrow {
-  opacity: 0;
-}
-
-.drun__pad-arrow.is-on {
-  opacity: 0.85;
-}
-
-.drun__btn {
-  border-radius: 50%;
-  box-shadow: none;
-  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.6));
-}
-
-.drun__btn:active {
-  translate: 0 2px;
-  box-shadow: none;
-}
-
-.drun__btn--a {
-  background: url('@assets/images/ui/dungeon/btn_a.webp') center / contain no-repeat;
-}
-
-.drun__btn--a:active {
-  background-image: url('@assets/images/ui/dungeon/btn_a_pressed.webp');
-}
-
-.drun__btn--b {
-  background: url('@assets/images/ui/dungeon/btn_b.webp') center / contain no-repeat;
-}
-
-.drun__btn--b:active {
-  background-image: url('@assets/images/ui/dungeon/btn_b_pressed.webp');
-}
+/* ===== 12-9 十字キーと A・B：2026-10-27 ユーザー指示でスティック（街と同じ）にしたので使っていない（絵は assets/images/ui/dungeon/ に残す） ===== */
 
 /* ===== 12-10 ミニマップの枠（地図は枠の中に縦横の比を保って描く） ===== */
 .drun__hud {
