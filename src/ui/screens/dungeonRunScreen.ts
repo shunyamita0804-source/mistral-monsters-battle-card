@@ -1,6 +1,6 @@
 import { getMonster, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
-import { DUNGEON_RUN, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import type { DungeonFloor, FloorEntity } from '../../game/dungeon/generate.ts';
@@ -37,11 +37,19 @@ import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
+import guardianArt from '@assets/images/characters/guardian.webp';
+import miniYou from '@assets/images/ui/dungeon/mini_you.webp';
+import miniStairs from '@assets/images/ui/dungeon/mini_stairs.webp';
+import miniChest from '@assets/images/ui/dungeon/mini_chest.webp';
+import miniBattler from '@assets/images/ui/dungeon/mini_battler.webp';
+import miniBoss from '@assets/images/ui/dungeon/mini_boss.webp';
 
 /**
  * ランダム生成のダンジョンの画面（2026-10-26 試作「ミスモンBC ダンジョン試作（たたき台）」。GB 版のダンジョンを参考に）。
  * - 見下ろしで1マスずつ歩く。最初は真っ暗で、自分と隣のマスだけ見える。見たマスは暗めに残り、右上の地図（ミニマップ）にも残る
- * - 画面の下に十字キー（押しっぱなしで歩き続ける）・A ボタン（向いている方に話す・宝箱を開ける）・B ボタン（メニュー。仮）
+ * - 歩く：画面のどこでも指でなぞると、指を置いた所にスティック（街と同じ。上下左右の4方向・倒している間は歩き続ける）。
+ *   2026-10-27 ユーザー指示「片手でできるように」で、それまでの十字キー・A・B の欄をやめた
+ * - 右下の「調べる」か画面をタップ：向いている方に話す・宝箱を開ける（それまでの A）。その左の小さな「メニュー」（それまでの B。仮）
  * - バトラー・ボスに A で対戦。見えない番人は近づくと画面の端が揺れて「！」、1歩ごとの抽選で対戦
  * ルールは src/game/dungeon/（DOM に依存しない）。数値は src/data/dungeonRun.ts
  */
@@ -62,10 +70,22 @@ const TILE = 48;
 const TEXTURE_TILES = 4;
 /** 1歩の動きの長さ（ミリ秒。押しっぱなしの1歩の間隔より少し短く） */
 const STEP_MS = 150;
-/** ミニマップの1マスの大きさ（px） */
-const MINI_CELL = 3;
-/** 主人公の絵の高さ（論理px）と、1コマの縦横比（シート 310×360） */
-const PLAYER_H = 70;
+/** ミニマップの1マスの大きさ（ミニマップの絵の中の px。画面では枠に合わせて縮める。印の絵がつぶれないよう細かめに描く） */
+const MINI_CELL = 8;
+/** ミニマップの印の大きさ（マスの何倍か。2026-10-27 デザイン第12弾の印） */
+const MINI_MARK = 3.4;
+/** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
+const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
+/** スティック（街と同じ大きさ・働き。worldScreen.ts の STICK_*）：動かし始める距離・向きを決めない真ん中・輪の半径・輪を出さない上の帯 */
+const STICK_START = 12;
+const STICK_DEAD = 16;
+const STICK_RADIUS = 84;
+const STICK_RING_R = 104;
+const STICK_TOP = 64;
+/** 見えない番人が姿を現したときの絵の高さ（論理px。主人公と同じ） */
+const GUARDIAN_H = 84;
+/** 主人公の絵の高さ（論理px）と、1コマの縦横比（シート 310×360）。2026-10-27 ユーザー「もう少し大きく」で 70→84（1マス 48 のまま） */
+const PLAYER_H = 84;
 const PLAYER_W = Math.round((PLAYER_H * 310) / 360);
 /** 主人公の足元（コマの中の位置の割合。シートの足元 (155, 338)） */
 const FOOT_Y_RATIO = 338 / 360;
@@ -79,7 +99,6 @@ const BANNER_MS = 2200;
 /** ダンジョンごとの BGM（歩行画面の DUNGEON_BGM と同じ） */
 const RUN_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 
-const DIRS: readonly Direction[] = ['up', 'down', 'left', 'right'];
 const KEY_DIR: Readonly<Record<string, Direction>> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
 
 class DungeonRunView {
@@ -97,6 +116,16 @@ class DungeonRunView {
   readonly #gained = h('span', { class: 'drun__chip' });
   readonly #mini = h('canvas', { class: 'drun__minimap', attrs: { role: 'img', 'aria-label': t('dungeonRun.minimap') } });
   readonly #live = h('p', { class: 'drun__live', attrs: { 'aria-live': 'polite' } });
+  /** スティック（指を置いた所に出る）と、右下の「調べる」 */
+  readonly #stick = h('div', { class: 'world__stick drun__stick', attrs: { 'aria-hidden': 'true' } }, h('div', { class: 'world__stick-knob' }));
+  readonly #actBtn = h(
+    'button',
+    { class: 'world__action drun__act', attrs: { type: 'button', 'aria-label': t('dungeonRun.buttonA') }, on: { click: () => this.#actA() } },
+    h('span', { class: 'world__action-icon', attrs: { 'aria-hidden': 'true' } }),
+    h('span', { class: 'world__action-label', text: t('world.examine') }),
+  );
+  /** 指を置いた所（なぞり始めたらスティック） */
+  #touch: { id: number; x: number; y: number; dragging: boolean } | null = null;
   #tiles: HTMLElement[] = [];
   readonly #entityEls = new Map<string, HTMLElement>();
   #floor: DungeonFloor | null = null;
@@ -104,7 +133,7 @@ class DungeonRunView {
   #lit: number[] = [];
   /** 会話・確認・対戦への切り替えの間は歩かない */
   #busy = false;
-  /** 押している十字キーの向き */
+  /** 倒しているスティック（キーボードの矢印）の向き */
   #held: Direction | null = null;
   #holdTimer = 0;
   #raf = 0;
@@ -138,6 +167,8 @@ class DungeonRunView {
       return;
     }
     const dungeon = getDungeon(run.dungeonId);
+    // ダンジョンごとの見た目（床・壁・ボスのしるし。dungeonRun.css・uiParts12.css）
+    this.#root.classList.add(`drun--${run.dungeonId}`);
     bgm.play(RUN_BGM[run.dungeonId] ?? 'dungeon');
     sound.ambient(run.dungeonId === 'dungeon-02' ? null : 'drip');
     this.#player.style.backgroundImage = `url("${PLAYER_SHEET[this.#store.save.player.gender === 'female' ? 'female' : 'male']}")`;
@@ -150,9 +181,15 @@ class DungeonRunView {
       this.#omenMark,
       h('header', { class: 'drun__hud' }, this.#place, h('div', { class: 'drun__chips' }, this.#losses, this.#gained)),
       this.#mini,
-      this.#controls(),
+      this.#stick,
+      this.#actBtn,
+      h('button', { class: 'drun__menu-btn', text: t('dungeonRun.buttonB'), attrs: { type: 'button' }, on: { click: () => this.#openMenu() } }),
       this.#live,
     );
+    this.#root.addEventListener('pointerdown', (e) => this.#pointerDown(e));
+    this.#root.addEventListener('pointermove', (e) => this.#pointerMove(e));
+    this.#root.addEventListener('pointerup', (e) => this.#pointerUp(e, true));
+    this.#root.addEventListener('pointercancel', (e) => this.#pointerUp(e, false));
     this.#buildFloor();
     this.#setOmen(nearGuardian(run, runFloor(run)));
     window.addEventListener('keydown', this.#onKeyDown);
@@ -192,46 +229,83 @@ class DungeonRunView {
 
   // ===== 組み立て =====
 
-  /** 十字キー・A・B */
-  #controls(): HTMLElement {
-    const arrows = DIRS.map((d) => h('span', { class: `drun__pad-arrow drun__pad-arrow--${d}` }));
-    const pad = h('div', { class: 'drun__pad', attrs: { role: 'group', 'aria-label': t('dungeonRun.padLabel') } }, h('span', { class: 'drun__pad-cross' }), ...arrows);
-    // 押した位置で向きを決める（指を滑らせると向きが変わる）。真ん中の小さな範囲は向きなし
-    const dirAt = (e: PointerEvent): Direction | null => {
-      const r = pad.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      if (Math.hypot(dx, dy) < r.width * 0.1) return null;
-      return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
-    };
-    const showPressed = (d: Direction | null): void => {
-      for (const [i, a] of arrows.entries()) a.classList.toggle('is-on', DIRS[i] === d);
-    };
-    pad.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      pad.setPointerCapture?.(e.pointerId);
-      const d = dirAt(e);
-      showPressed(d);
-      if (d) this.#press(d);
-    });
-    pad.addEventListener('pointermove', (e) => {
-      if (!pad.hasPointerCapture?.(e.pointerId)) return;
-      const d = dirAt(e);
-      showPressed(d);
-      if (d && d !== this.#held) this.#press(d);
-      else if (!d) this.#release();
-    });
-    const up = (): void => {
-      showPressed(null);
-      this.#release();
-    };
-    pad.addEventListener('pointerup', up);
-    pad.addEventListener('pointercancel', up);
-    pad.addEventListener('lostpointercapture', up);
+  /* ---------- スティック（2026-10-27 ユーザー指示「ダンジョンもバーチャルパッドに。片手でできるように」。街と同じ形） ---------- */
 
-    const a = h('button', { class: 'drun__btn drun__btn--a', text: 'A', attrs: { type: 'button', 'aria-label': t('dungeonRun.buttonA') }, on: { click: () => this.#actA() } });
-    const b = h('button', { class: 'drun__btn drun__btn--b', text: 'B', attrs: { type: 'button', 'aria-label': t('dungeonRun.buttonB') }, on: { click: () => this.#openMenu() } });
-    return h('div', { class: 'drun__controls' }, pad, h('div', { class: 'drun__ab' }, b, a));
+  #pointerDown(e: PointerEvent): void {
+    if (this.#touch || (e.target instanceof Element && e.target.closest('button, .modal'))) return;
+    this.#touch = { id: e.pointerId, x: e.clientX, y: e.clientY, dragging: false };
+    try {
+      this.#root.setPointerCapture(e.pointerId);
+    } catch {
+      // 取れなくても動く
+    }
+  }
+
+  #pointerMove(e: PointerEvent): void {
+    const touch = this.#touch;
+    if (!touch || touch.id !== e.pointerId) return;
+    const scale = this.#stageScale();
+    const dx = (e.clientX - touch.x) / scale;
+    const dy = (e.clientY - touch.y) / scale;
+    const dist = Math.hypot(dx, dy);
+    if (!touch.dragging) {
+      if (dist < STICK_START) return;
+      touch.dragging = true;
+      this.#placeStick(touch.x, touch.y, scale);
+      this.#stick.classList.add('is-on');
+    }
+    const k = Math.min(1, STICK_RADIUS / Math.max(dist, 1));
+    const knob = this.#stick.firstElementChild as HTMLElement | null;
+    if (knob) knob.style.transform = `translate(${dx * k}px, ${dy * k}px)`;
+    if (dist < STICK_DEAD) {
+      this.#release();
+      return;
+    }
+    // 上下左右の4方向。境目では少しこえるまで前の向きのまま（指のふるえで向きが行ったり来たりしないように。街と同じ）
+    const d: Direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+    const held = this.#held;
+    if (held && held !== d) {
+      const along = held === 'left' || held === 'right' ? Math.abs(dx) : Math.abs(dy);
+      const across = held === 'left' || held === 'right' ? Math.abs(dy) : Math.abs(dx);
+      const sameSide = held === 'right' ? dx > 0 : held === 'left' ? dx < 0 : held === 'down' ? dy > 0 : dy < 0;
+      if (sameSide && across < along * 1.3) return;
+    }
+    if (d !== held) this.#press(d);
+  }
+
+  #pointerUp(e: PointerEvent, tap: boolean): void {
+    const touch = this.#touch;
+    if (!touch || touch.id !== e.pointerId) return;
+    this.#touch = null;
+    this.#stick.classList.remove('is-on');
+    if (touch.dragging) {
+      this.#release();
+      return;
+    }
+    // なぞらずに離した：調べる・話す（右下のボタンと同じ）
+    if (tap) this.#actA();
+  }
+
+  /** スティックの輪を出す位置（指を置いた所）。輪が画面の端で欠けたり、右下の「調べる」に重なったりしないよう内側へずらす */
+  #placeStick(clientX: number, clientY: number, scale: number): void {
+    const v = this.#root.getBoundingClientRect();
+    const vw = this.#root.clientWidth;
+    const vh = this.#root.clientHeight;
+    const r = STICK_RING_R + 4;
+    let x = Math.min(Math.max((clientX - v.left) / scale, r), vw - r);
+    const y = Math.min(Math.max((clientY - v.top) / scale, STICK_TOP + r), vh - r);
+    const btn = this.#actBtn.getBoundingClientRect();
+    const bl = (btn.left - v.left) / scale;
+    const bt = (btn.top - v.top) / scale;
+    if (x + r > bl && y + r > bt) x = Math.max(r, bl - r);
+    this.#stick.style.left = `${x}px`;
+    this.#stick.style.top = `${y}px`;
+  }
+
+  /** ステージの拡大縮小（画面の px ÷ 論理 px） */
+  #stageScale(): number {
+    const w = this.#root.clientWidth;
+    return w > 0 ? this.#root.getBoundingClientRect().width / w : 1;
   }
 
   /** いまの階のマスと、置いてあるものを作り直す */
@@ -260,7 +334,9 @@ class DungeonRunView {
     }
     for (const e of f.entities) {
       if (e.kind === 'guardian') continue;
-      const el = h('div', { class: `drun__entity drun__entity--${e.kind}`, attrs: { 'aria-hidden': 'true' } });
+      // バトラーは3人の見た目のどれか（対戦の顔の絵と同じ人。src/data/dungeonRun.ts の runBattlerLook）
+      const look = e.kind === 'npc' ? ` drun__entity--b${runBattlerLook(Number(e.id.split('-').pop() ?? 0))}` : '';
+      const el = h('div', { class: `drun__entity drun__entity--${e.kind}${look}`, attrs: { 'aria-hidden': 'true' } });
       el.style.left = `${e.x * TILE}px`;
       el.style.top = `${e.y * TILE}px`;
       this.#entityEls.set(e.id, el);
@@ -319,12 +395,23 @@ class DungeonRunView {
     // 上の札
     const dungeon = getDungeon(run.dungeonId);
     this.#place.textContent = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) });
-    this.#losses.textContent = t('dungeonRun.losses', { n: run.losses, max: DUNGEON_RUN.maxLosses });
+    // 負けた回数：灯りが負けるたびに1つずつ消える（2026-10-27 デザイン第13弾。文字は読み上げ用）
+    this.#losses.setAttribute('aria-label', t('dungeonRun.losses', { n: run.losses, max: DUNGEON_RUN.maxLosses }));
+    this.#losses.replaceChildren(
+      ...Array.from({ length: DUNGEON_RUN.maxLosses }, (_, i) =>
+        h('span', { class: `drun__lantern${i < DUNGEON_RUN.maxLosses - run.losses ? '' : ' is-out'}`, attrs: { 'aria-hidden': 'true' } }),
+      ),
+    );
     this.#gained.textContent = t('dungeonRun.gained', { n: run.gained.length });
     this.#drawMinimap();
+    // 向いている先にバトラー・ボス・宝箱がある、または階段の上：「調べる」が金色に光る（街と同じ）
+    const p = facingPoint(run);
+    const ahead = entityAt(run, f, p.x, p.y);
+    const onStairs = !!f.stairs && f.stairs.x === run.x && f.stairs.y === run.y && !isLastFloor(run);
+    this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian') || onStairs);
   }
 
-  /** 右上の地図：見たマスだけ。自分（赤）・階段（青）・見たバトラー（橙）・宝箱（黄）・ボス（紫） */
+  /** 右上の地図：見たマスだけ。自分・階段・見たバトラー・宝箱・ボスは印の絵（2026-10-27 デザイン第12弾） */
   #drawMinimap(): void {
     const f = this.#floor;
     const g = this.#mini.getContext?.('2d');
@@ -338,19 +425,21 @@ class DungeonRunView {
         g.fillRect(x * MINI_CELL, y * MINI_CELL, MINI_CELL, MINI_CELL);
       }
     }
-    const dot = (x: number, y: number, color: string): void => {
-      g.fillStyle = color;
-      g.fillRect(x * MINI_CELL - 1, y * MINI_CELL - 1, MINI_CELL + 2, MINI_CELL + 2);
+    // 印はマスの真ん中に、足元（下の端）をマスの下の方に合わせて置く。絵の読み込み前は描かない（読み込んだら描き直す）
+    const mark = (x: number, y: number, kind: keyof typeof MINI_ICONS): void => {
+      const img = miniIcon(kind, () => !this.#destroyed && this.#drawMinimap());
+      if (!img) return;
+      const hgt = MINI_CELL * MINI_MARK;
+      const w = (hgt * img.naturalWidth) / img.naturalHeight;
+      g.drawImage(img, (x + 0.5) * MINI_CELL - w / 2, (y + 0.85) * MINI_CELL - hgt, w, hgt);
     };
-    if (f.stairs && run.explored[f.stairs.y * f.width + f.stairs.x] === '1') dot(f.stairs.x, f.stairs.y, '#4aa8ff');
-    const color: Readonly<Record<string, string>> = { npc: '#ff8a3d', chest: '#ffd84a', boss: '#c86bff' };
+    if (f.stairs && run.explored[f.stairs.y * f.width + f.stairs.x] === '1') mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
-      const c = color[e.kind];
-      if (!c || run.explored[e.y * f.width + e.x] !== '1') continue;
+      if (e.kind === 'guardian' || run.explored[e.y * f.width + e.x] !== '1') continue;
       if (e.kind === 'chest' && run.opened.includes(e.id)) continue;
-      dot(e.x, e.y, c);
+      mark(e.x, e.y, e.kind);
     }
-    dot(run.x, run.y, '#ff3b3b');
+    mark(run.x, run.y, 'you');
   }
 
   /** 主人公のコマ送り（歩いている間は歩きの8コマ、止まったら立ち止まりのコマ） */
@@ -475,7 +564,30 @@ class DungeonRunView {
 
   #guardianAppears(g: FloorEntity): void {
     this.#showMark();
+    this.#showGuardian();
     this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor), 'dungeonRun.guardianAppear');
+  }
+
+  /**
+   * 見えない番人が姿を現す（2026-10-27 デザイン第12弾の立ち姿）。主人公のとなりの通れるマス（前・左右・後ろの順）に、
+   * 煙のように浮かび上がる。番人の本当の位置は見せない（いつも主人公のとなりに出る）
+   */
+  #showGuardian(): void {
+    const f = this.#floor;
+    if (!f) return;
+    const run = this.#run;
+    const front = facingPoint(run);
+    const dx = front.x - run.x;
+    const dy = front.y - run.y;
+    const spots = [front, { x: run.x + dy, y: run.y - dx }, { x: run.x - dy, y: run.y + dx }, { x: run.x - dx, y: run.y - dy }];
+    const spot = spots.find((p) => f.tiles[p.y]?.[p.x] === '.') ?? front;
+    const w = Math.round((GUARDIAN_H * 244) / 360);
+    const el = h('img', { class: 'drun__guardian', attrs: { src: guardianArt, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
+    el.style.width = `${w}px`;
+    el.style.height = `${GUARDIAN_H}px`;
+    el.style.left = `${Math.round((spot.x + 0.5) * TILE - w / 2)}px`;
+    el.style.top = `${Math.round(spot.y * TILE + TILE * 0.82 - GUARDIAN_H)}px`;
+    this.#world.append(el);
   }
 
   #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear'): void {
@@ -581,6 +693,20 @@ class DungeonRunView {
   }
 }
 
+/** ミニマップの印の絵（一度だけ読み込んで使い回す。読み込み中は null を返し、読み込めたら onLoad） */
+const miniIcons = new Map<string, HTMLImageElement>();
+function miniIcon(kind: keyof typeof MINI_ICONS, onLoad: () => void): HTMLImageElement | null {
+  let img = miniIcons.get(kind);
+  if (!img) {
+    img = new Image();
+    img.src = MINI_ICONS[kind];
+    miniIcons.set(kind, img);
+  }
+  if (img.complete && img.naturalWidth > 0) return img;
+  img.addEventListener('load', onLoad, { once: true });
+  return null;
+}
+
 /** ダンジョンの足音（森は芝生、ほかは砂利） */
 function groundOf(dungeonId: string): 'grass' | 'gravel' {
   return dungeonId === 'dungeon-02' ? 'grass' : 'gravel';
@@ -611,4 +737,6 @@ function onRunLoss(store: GameStore, kind: BattleTargetKind, id: string): void {
   const r = loseRunBattle(store.save, { kind, id });
   store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesLost: s.stats.battlesLost + 1 } }));
   store.flashMessage = r.expelled ? t('dungeonRun.expelled', { n: r.lostCards.length }) : t('dungeonRun.lose', { n: r.lossesLeft });
+  // 3回負けて入り口へ戻されたときの帯（2026-10-27 デザイン第13弾）
+  if (r.expelled) store.flashBanner = 'retreat';
 }

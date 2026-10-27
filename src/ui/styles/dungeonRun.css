@@ -11,9 +11,9 @@
   -webkit-user-select: none;
 }
 
-/* 画面の下の操作の欄の高さ */
+/* 画面の下の操作の欄の高さ（2026-10-27 に十字キー・A・B の欄をやめ、街と同じスティックにしたので 0。地図は画面いっぱい） */
 .drun {
-  --drun-controls-h: 224px;
+  --drun-controls-h: 0px;
 }
 
 .drun__view {
@@ -135,8 +135,9 @@
 .drun__player {
   position: absolute;
   z-index: 4;
-  width: 60px;
-  height: 70px;
+  /* dungeonRunScreen.ts の PLAYER_W・PLAYER_H と同じ（2026-10-27 に 60×70 から 1.2 倍） */
+  width: 72px;
+  height: 84px;
   background-repeat: no-repeat;
   pointer-events: none;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
@@ -259,103 +260,39 @@
   pointer-events: none;
 }
 
-/* 下の操作の欄：十字キー（左）と A・B（右） */
-.drun__controls {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* 歩くスティック（街と同じ .world__stick。指を置いた所に出る）と、右下の「調べる」（街と同じ .world__action）・その左の「メニュー」 */
+.drun__stick {
   z-index: 8;
-  height: var(--drun-controls-h);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 22px 18px;
-  border-top: 2px solid #5a4a30;
-  background:
-    linear-gradient(rgb(255 255 255 / 0.04), rgb(0 0 0 / 0.25)),
-    #1d1a16;
-  box-shadow: 0 -4px 12px rgb(0 0 0 / 0.6);
 }
 
-.drun__pad {
-  position: relative;
-  width: 160px;
-  height: 160px;
-  touch-action: none;
-  cursor: pointer;
+.drun__act {
+  z-index: 8;
 }
 
-.drun__pad-cross {
+.drun__menu-btn {
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(#34302a, #2a2722) center / 54px 100% no-repeat,
-    linear-gradient(#34302a, #2a2722) center / 100% 54px no-repeat;
-  filter: drop-shadow(0 3px 0 #0c0b09) drop-shadow(0 0 1px #6d6150);
-  border-radius: 8px;
-}
-
-.drun__pad-arrow {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 11px solid transparent;
-  pointer-events: none;
-  opacity: 0.75;
-}
-
-.drun__pad-arrow--up { left: 69px; top: 12px; border-bottom: 15px solid #cfc4ad; border-top-width: 0; }
-.drun__pad-arrow--down { left: 69px; bottom: 12px; border-top: 15px solid #cfc4ad; border-bottom-width: 0; }
-.drun__pad-arrow--left { top: 69px; left: 12px; border-right: 15px solid #cfc4ad; border-left-width: 0; }
-.drun__pad-arrow--right { top: 69px; right: 12px; border-left: 15px solid #cfc4ad; border-right-width: 0; }
-
-.drun__pad-arrow.is-on {
-  opacity: 1;
-  filter: drop-shadow(0 0 6px #ffd76a);
-}
-
-.drun__pad-arrow--up.is-on { border-bottom-color: #ffd76a; }
-.drun__pad-arrow--down.is-on { border-top-color: #ffd76a; }
-.drun__pad-arrow--left.is-on { border-right-color: #ffd76a; }
-.drun__pad-arrow--right.is-on { border-left-color: #ffd76a; }
-
-.drun__ab {
-  position: relative;
-  width: 160px;
-  height: 150px;
-}
-
-.drun__btn {
-  position: absolute;
-  width: 70px;
-  height: 70px;
+  right: 166px;
+  bottom: 22px;
+  z-index: 8;
+  width: 76px;
+  height: 76px;
+  padding: 0;
   border: 0;
   border-radius: 50%;
+  background: url('@assets/images/ui/hud/round_button.webp') center / 100% 100% no-repeat;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.35);
   font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 900;
-  color: #fff3dc;
-  text-shadow: 0 2px 2px rgb(0 0 0 / 0.7);
-  box-shadow: 0 5px 0 #0c0b09, inset 0 2px 3px rgb(255 255 255 / 0.25);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
   touch-action: manipulation;
 }
 
-.drun__btn:active {
-  translate: 0 3px;
-  box-shadow: 0 2px 0 #0c0b09, inset 0 2px 3px rgb(255 255 255 / 0.25);
-}
-
-.drun__btn--a {
-  right: 0;
-  top: 8px;
-  background: radial-gradient(circle at 40% 35%, #c2443b, #7d2019);
-}
-
-.drun__btn--b {
-  left: 4px;
-  bottom: 14px;
-  background: radial-gradient(circle at 40% 35%, #4f6f9a, #263a58);
+.drun__menu-btn:active {
+  transform: scale(0.95);
+  filter: brightness(1.2);
 }
 
 .drun__menu-head {

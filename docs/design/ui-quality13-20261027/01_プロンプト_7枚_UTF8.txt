@@ -1,0 +1,187 @@
+【プロンプト】対戦・大会・物語の仕上げ7枚・第13弾（2026-10-27）
+
+使い方：1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼る。日本語でうまくいかないときは English version
+1・2 は人物なので「共通ルール（人物用）」を使う。それ以外は「共通ルール（絵・部品用）」
+5〜7 は背景のある絵なので、共通ルールの【背景】の行は無視してよい（番号の文の方を優先）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（絵・部品用。3〜7 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の絵と画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】部品は画面を真正面から見た平らな形（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること。人物・モンスター（番号の文で頼んだときを除く）
+▲ここまで
+▼English
+Draw art and UI parts for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts.
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] UI parts are flat, seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP. People or monsters (unless the numbered prompt asks for them).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（人物用。1・2 の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の主人公を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の「主人公の立ち絵」「案内役の会話の絵」と同じ描き方（アニメ調の手描き、やわらかい塗り、細い濃い茶色の線）。ベクター風・3DCG風にしない
+【人物】服・髪・色・小物は、添付の「主人公の立ち絵」とまったく同じにする（変えない・足さない）。頭身は大人（7頭身くらい）。主人公は22歳
+【光】左上から。床に影を落とさない
+【背景】透明（できなければマゼンタ一色 #FF00FF）。人物の外側に少し余白
+【禁止】文字・数字・ロゴ・透かし・サイン。カードの表に読める文字・絵柄を入れない（カードは裏向き）。実在の作品のキャラクターに似せること。人物のほかの物（背景・床・枠・動物・モンスター）
+▲ここまで
+▼English
+Draw the protagonist for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Exactly like the attached protagonist standing art and guide character portrait: hand-drawn anime style, soft shading, thin dark-brown lines. NO vector look, NO 3D render look.
+[Character] Clothes, hair, colors and accessories must match the attached protagonist standing art exactly (do not change or add anything). Adult proportions (about 7 heads tall). The protagonist is 22 years old.
+[Light] From the upper left. No cast shadow on a floor.
+[Background] Transparent (or solid magenta #FF00FF), with a small margin around the figure.
+[Forbidden] Any text, numbers, logos, watermarks, signatures. No readable marks on card faces (cards are face down). Resemblance to existing IP characters. Anything other than the person (background, floor, frame, animals, monsters).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　主人公（男性）の勝ち・負けの姿 → hero_male_result.png　※「共通ルール（人物用）」を使う
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：見本/主人公の立ち絵_男.png、見本/案内役の会話の絵.png、見本/結果の窓.png、今の画面/対戦_負けの結果.png
+▼ここからコピー
+主人公（男性・22歳）の、カードの対戦が終わったときの姿を2つ描いてください。横長 1536×1024 に、左右に並べる（重ならないように間を空ける）。
+2つとも全身ではなく、ひざから上。2つの大きさ・頭の高さをそろえる。
+・左：勝ったとき。右手で裏向きのカードを1枚かかげ、左手は小さくガッツポーズ。目を細めて明るく笑う。体は少しだけ斜め
+・右：負けたとき。少しうつむき、右手で帽子のつばを下げて目元を隠す。左手は握りこぶしを体の横に。口は悔しそうに結ぶ（泣かない・大げさにしない）
+・服・髪・色は添付の「主人公の立ち絵（男）」とまったく同じ（青い帽子の小さな金の紋章、青い袖なしの長いベスト、白いシャツ、茶色の革のベルトとかばん、指なしの革手袋）
+・この絵は対戦の結果の窓の横に重ねる。顔がはっきり見えるように（左の勝ちの絵は特に）
+▲ここまで
+▼English
+Draw the male protagonist (22) in two poses at the end of a card battle. Side by side on a 1536x1024 canvas with space between.
+Both from the knees up (not full body), with the same size and head height.
+- Left: victory. His right hand holds up one face-down card; his left hand makes a small fist pump. Eyes narrowed in a bright smile. Body turned slightly.
+- Right: defeat. Head slightly bowed, his right hand pulls the cap's brim down to hide his eyes; his left hand is a fist at his side. Mouth pressed shut in frustration (no tears, not overdramatic).
+- Clothes, hair and colors exactly as in the attached male protagonist standing art (blue cap with a small gold emblem, long sleeveless blue vest, white shirt, brown leather straps and satchel, fingerless leather gloves).
+- Shown beside the battle result window, so keep the face clearly visible (especially the victory pose).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　主人公（女性）の勝ち・負けの姿 → hero_female_result.png　※「共通ルール（人物用）」を使う
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：見本/主人公の立ち絵_女.png、見本/案内役の会話の絵.png、見本/結果の窓.png、今の画面/対戦_負けの結果.png
+▼ここからコピー
+主人公（女性・22歳）の、カードの対戦が終わったときの姿を2つ描いてください。横長 1536×1024 に、左右に並べる（重ならないように間を空ける）。
+2つとも全身ではなく、ひざから上。2つの大きさ・頭の高さをそろえる。
+・左：勝ったとき。右手で裏向きのカードを1枚、顔の横にかかげてウインク気味に明るく笑う。左手は腰に。体は少しだけ斜め
+・右：負けたとき。少しうつむき、左手を胸の前で軽く握る。右手は帽子に軽く添える。目を伏せ、悔しそうに唇を結ぶ（泣かない・大げさにしない）
+・服・髪・色・リボンの位置は添付の「主人公の立ち絵（女）」とまったく同じ
+・この絵は対戦の結果の窓の横に重ねる。顔がはっきり見えるように（左の勝ちの絵は特に）
+▲ここまで
+▼English
+Draw the female protagonist (22) in two poses at the end of a card battle. Side by side on a 1536x1024 canvas with space between.
+Both from the knees up (not full body), with the same size and head height.
+- Left: victory. Her right hand holds one face-down card up beside her face; a bright smile, almost a wink. Left hand on her hip. Body turned slightly.
+- Right: defeat. Head slightly bowed, her left hand loosely clenched in front of her chest, her right hand lightly touching her hat. Eyes lowered, lips pressed in frustration (no tears, not overdramatic).
+- Clothes, hair, colors and ribbon position exactly as in the attached female protagonist standing art.
+- Shown beside the battle result window, so keep the face clearly visible (especially the victory pose).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　相手のひと言の吹き出しと顔の枠 → talk_bubble.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/窓の枠.png、見本/対戦相手の顔_1.png、今の画面/対戦_相手のひと言.png（いまは角の丸い暗い箱だけ）
+▼ここからコピー
+カードの対戦中に、相手がひと言しゃべるときの部品を2つ描いてください。横長 1536×1024 に、左右に並べる（重ならないように）。
+・左：顔の枠。正方形。くすんだ金の細い縁に、えんじの細い内側の線（相手の色）。四隅に小さな飾り。中は透明（ゲームが相手の顔の絵を入れる）
+・右：吹き出し。横長（横:縦＝4:1）の角の丸い板。地は深い紺に近い暗い色（白い文字を重ねる）、くすんだ金の細い縁。左の辺の真ん中より少し上に、左を指す小さな三角のとがり（顔の枠の方を指す）。
+　右下の角に、小さな「次へ」の印（下を向いた小さな金の矢じり）
+・吹き出しの中は無地。ゲームが横に伸ばして使うので、飾りは角とふちに寄せる
+・対戦の画面の部品なので、飾りは控えめ・縁は細く（添付の窓の枠と同じくらいの細さ）
+▲ここまで
+▼English
+Draw two parts for when the opponent says a line during a card battle. Side by side on a 1536x1024 canvas, no overlap.
+- Left: portrait frame. A square with a thin muted-gold rim and a thin wine inner line (the opponent's color), small ornaments in the four corners. Transparent inside (the game places the opponent's portrait).
+- Right: speech bubble. A wide rounded plate (4:1). A dark base close to deep navy (white text goes on top), thin muted-gold rim. On the left side, slightly above the middle, a small triangular point pointing left (toward the portrait frame). In the bottom-right corner, a small "next" mark (a small gold arrowhead pointing down).
+- Plain interior. The game stretches it horizontally, so keep ornaments at the corners and edges.
+- Battle-screen part: subtle ornaments and a thin rim (about as slim as the attached window frame).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　ダンジョンから戻されるときの帯と「負け」の灯り → dungeon_retreat.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/ダンジョンの帯_クリア.png、見本/ダンジョンの帯_階.png、見本/ダンジョンの帯_ボス.png、今の画面/ダンジョン試作_入った直後.png（左上の「負け 0/3」）
+▼ここからコピー
+ダンジョンの画面の部品を描いてください。横長 1536×1024 に、上と下に分けて並べる（重ならないように）。
+・上：帯。3回負けてダンジョンの入り口へ戻されるとき、画面の真ん中に少しの間だけ出す。横:縦＝5:1。添付の3本の帯（クリア・階・ボス）と同じ大きさ・同じ描き方で、
+　色あせた灰色がかった紺の布に、くすんだ銀の縁。左右の端に、火の消えた小さなたいまつの飾り（細い煙がひとすじ）。沈んだ雰囲気だが暗すぎない。中は無地（ゲームが文字を重ねる）
+・下：小さな灯りの印を2つ、横に並べる。どれも正方形に収まる大きさ
+　1 灯った灯り（小さな古いランタン。中にあたたかい火）　2 消えた灯り（同じランタンで火が消え、ガラスが曇っている）
+　ゲームが画面の左上に3つ並べ、負けるたびに1つずつ消えた灯りに替える。画面では 24px くらいに縮めるので、形をはっきり・飾りを少なく
+▲ここまで
+▼English
+Draw parts for the dungeon screen. On a 1536x1024 canvas, one on top and one below, no overlap.
+- Top: a banner shown briefly in the middle of the screen when the player loses three times and is sent back to the dungeon entrance. 5:1, the same size and drawing style as the three attached banners (cleared, floor, boss):
+  a faded greyish-navy cloth with a muted-silver rim, and small extinguished torch ornaments at both ends (a single thin wisp of smoke). Subdued but not too dark. Plain interior (the game writes the text).
+- Bottom: two small lantern markers in a row, each fitting a square:
+  1 lit (a small old lantern with a warm flame inside)  2 out (the same lantern, flame out, glass clouded).
+  The game shows three at the top left and switches one to "out" with each loss. They are shown at about 24 px, so keep clear silhouettes and few ornaments.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　大会の優勝の場面 → tournament_champion.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/大会会場の中の絵.png、見本/優勝杯.png、見本/ランクアップの帯.png、見本/大会の対戦の背景.png
+▼ここからコピー
+カードの大会で優勝したときの結果の画面の後ろに置く絵を1枚描いてください。縦長 1024×1536。
+・場所は添付の「大会会場の中の絵」と同じ会場（白い大理石と紺の床、くすんだ金の縁取り、丸い舞台）。決勝が終わった直後を、少し斜め上から見下ろす
+・舞台の真ん中の台の上に優勝杯（添付の優勝杯と同じ形）。上から何本かの光が差し、紙吹雪（くすんだ金と紺）がゆっくり舞う
+・観客席は暗くぼかし、人の形ははっきり描かない。人物・モンスター・旗の文字は描かない
+・この上に「優勝」の帯・景品・ボタンを重ねるので、真ん中より下はやや暗く落ち着かせる。優勝杯は画面の上の3分の1あたり
+▲ここまで
+▼English
+Draw one illustration placed behind the result screen when the player wins a card tournament. Portrait 1024x1536.
+- The same venue as the attached tournament hall interior (white marble and navy floor, muted-gold trim, a round stage), just after the final, seen slightly from above.
+- A trophy (the same shape as the attached trophy) on a pedestal at the center of the stage, several beams of light from above, confetti (muted gold and navy) drifting slowly.
+- The audience stands are dark and blurred; no clearly drawn people. No people, no monsters, no text on flags.
+- A "Champion" banner, prizes and buttons go on top, so keep the area below the middle somewhat darker and calm. Place the trophy around the upper third.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　D ランク大会の対戦の背景 → battle_bg_arena_d.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/大会の対戦の背景.png、見本/大会会場の中の絵.png、今の画面/対戦_VSの画面.png
+▼ここからコピー
+カードの大会（D ランク）で対戦するときの背景を1枚描いてください。縦長 1024×1536。
+・形は添付の「大会の対戦の背景」（E ランク）とまったく同じ構図：少し斜め上から見下ろした、四角い対戦台が画面の大部分を占める。台の外側は少しだけ見える
+・E ランクより一段格の高い台にする：木の枠の代わりに、白い大理石の厚い縁にくすんだ金の細い象眼。台の面は深い紺のビロード、四隅に小さな金の金具。台の外側の床は「大会会場の中の絵」と同じ白い大理石と紺の模様
+・この上にカード・モンスター・数字・ボタンを全部重ねる。だから台の面は模様を入れず平らに、全体を落ち着いた明るさに（添付の大会の対戦の背景と同じくらいの暗さ）
+・人物・モンスター・文字・紋章は描かない
+▲ここまで
+▼English
+Draw the battle background for a D-rank card tournament. Portrait 1024x1536.
+- Exactly the same composition as the attached E-rank tournament background: seen slightly from above, a rectangular battle table fills most of the image, with only a little of the surroundings visible.
+- A grander table than E rank: instead of the wooden frame, a thick white-marble rim with thin muted-gold inlay. The table surface is deep navy velvet with small gold fittings at the four corners. The floor around it uses the same white marble and navy pattern as the attached tournament hall interior.
+- Cards, monsters, numbers and buttons all go on top, so keep the table surface flat with no pattern and the overall brightness calm (about as dark as the attached tournament background).
+- No people, no monsters, no text, no emblems.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　物語の始まりの挿絵 → opening_art.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：style_master.png、見本/タイトルの背景.png、見本/太古の遺跡の挿絵.png、見本/街の絵.png
+▼ここからコピー
+カードゲームの物語が始まるときに、画面いっぱいに出す挿絵を1枚描いてください。縦長 1024×1536。
+・朝。主人公の住む街（添付の「街の絵」と同じ、石畳と赤茶の屋根・青緑の丸屋根の落ち着いた街。真ん中に噴水の広場、大会会場の大きな建物）を、少し高い丘から見下ろす
+・空はやわらかい朝焼けから青へ。遠くに山なみと、世界の広がりを感じる地平線
+・手前の下の方に、裏向きのカードが1枚、風に乗ってふわりと舞う（カードの裏は紺に金の模様。読める文字・紋章は入れない）
+・この絵の下の方にゲームが短い文字を重ねることがあるので、下の5分の1は少し暗め
+・人物・モンスター・文字は描かない
+▲ここまで
+▼English
+Draw one illustration shown full-screen when the card game's story begins. Portrait 1024x1536.
+- Morning. The protagonist's town (the same calm town of cobblestones, red-brown roofs and teal domes as the attached town art, with a fountain square in the middle and the large tournament hall) seen from a small hill above.
+- The sky shifts from a soft sunrise to blue; distant mountains and a horizon that suggests a wide world.
+- In the lower foreground, one face-down card floats gently on the wind (navy back with gold patterns; no readable text or emblems).
+- The game may place a short line of text near the bottom, so keep the bottom fifth slightly darker.
+- No people, no monsters, no text.
+▲

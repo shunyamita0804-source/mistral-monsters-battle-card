@@ -15,6 +15,7 @@ import './ui/styles/uiParts8.css';
 import './ui/styles/uiParts9.css';
 import './ui/styles/uiParts10.css';
 import './ui/styles/uiParts11.css';
+import './ui/styles/uiParts12.css';
 import { startApp } from './ui/app.ts';
 
 const root = document.querySelector<HTMLElement>('#app');

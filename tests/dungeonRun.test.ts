@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { skillsOf, TMP_GEOL_ID } from '../src/data/cards.ts';
-import { DUNGEON_RUN, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../src/data/dungeonRun.ts';
+import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../src/data/dungeonRun.ts';
 import { REWARDS } from '../src/data/economy.ts';
 import { bfs, blocksWay, generateFloor, isFloorReachable, type DungeonFloor } from '../src/game/dungeon/generate.ts';
 import {
@@ -283,5 +283,19 @@ describe('道の確かめ（bfs）', () => {
     expect(f.entities.filter((e) => !blocksWay(e)).every((e) => e.kind === 'guardian')).toBe(true);
     const all = bfs(f.tiles, f.start, () => false);
     expect(all.get(`${f.start.x},${f.start.y}`)).toBe(0);
+  });
+});
+
+describe('バトラー・番人の見た目（2026-10-27 デザイン第12弾）', () => {
+  it('バトラーは番号で3人のどれか。地図の絵と対戦の顔の絵が同じ人になる', () => {
+    expect([0, 1, 2, 3, 4, 5].map(runBattlerLook)).toEqual([1, 2, 3, 1, 2, 3]);
+    for (const n of [0, 1, 2, 7]) expect(runNpcOpponent(0, n).face).toBe(`battler-${runBattlerLook(n)}`);
+  });
+
+  it('番人は番人の顔。ボスには顔の絵がない（名前の ID は変えない＝英語名はそのまま）', () => {
+    expect(runGuardianOpponent(1).face).toBe('guardian');
+    expect(runGuardianOpponent(1).id).toBe('enc-run-guardian');
+    expect(runNpcOpponent(1, 4).id).toBe('enc-run-npc');
+    expect(runBossOpponent().face).toBeUndefined();
   });
 });

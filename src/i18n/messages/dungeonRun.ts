@@ -10,7 +10,6 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.losses': { ja: '負け {n}/{max}', en: 'Losses {n}/{max}' },
   'dungeonRun.gained': { ja: '獲得 {n}枚', en: 'Cards {n}' },
   'dungeonRun.minimap': { ja: '地図', en: 'Map' },
-  'dungeonRun.padLabel': { ja: '十字キー', en: 'D-pad' },
   'dungeonRun.buttonA': { ja: 'しらべる・話す', en: 'Check / Talk' },
   'dungeonRun.buttonB': { ja: 'メニュー', en: 'Menu' },
   'dungeonRun.omen': { ja: 'なにかの気配がする…', en: 'You sense something nearby...' },

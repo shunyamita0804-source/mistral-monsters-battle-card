@@ -54,16 +54,21 @@ export function isRunDungeon(dungeonId: string): boolean {
 /** 階ごとの相手の強さ（ライフの割合。それまでの固定のダンジョン B1〜B3 と同じくらい） */
 const FLOOR_LIFE_SCALE: readonly number[] = [0.6, 0.75, 0.85];
 
+/** バトラーの見た目（2026-10-27 デザイン第12弾の3人：1＝探検家・2＝学者・3＝剣士）。階の中の番号で決める（地図の絵と対戦の顔をそろえる） */
+export function runBattlerLook(index: number): 1 | 2 | 3 {
+  return ((((index % 3) + 3) % 3) + 1) as 1 | 2 | 3;
+}
+
 /** 【仮】通常のバトラー（話しかけると対戦）。編成は仮のテスト用（ソラモ・ラズック） */
 export function runNpcOpponent(floor: number, index: number): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-npc'] as OpponentDefinition;
-  return { ...base, monsters: index % 2 === 0 ? TEST_TEAM : TEST_TEAM_ALT, lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85 };
+  return { ...base, monsters: index % 2 === 0 ? TEST_TEAM : TEST_TEAM_ALT, lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85, face: `battler-${runBattlerLook(index)}` };
 }
 
 /** 【仮】見えない番人。編成は仮 */
 export function runGuardianOpponent(floor: number): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-guardian'] as OpponentDefinition;
-  return { ...base, monsters: [LAZUCK_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85 };
+  return { ...base, monsters: [LAZUCK_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85, face: 'guardian' };
 }
 
 /** ボス：遺跡の主（仮のジオル。src/data/dungeons.ts の enc-b3-boss） */

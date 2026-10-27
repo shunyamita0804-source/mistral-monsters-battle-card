@@ -122,11 +122,17 @@ def place_fountain(parts: str) -> tuple[Image.Image, tuple[int, int]]:
     return part, (cx - part.width // 2, cy - part.height // 2)
 
 
+# 建物の絵を縦にだけ伸ばす倍率（2026-10-27 ユーザー指示「主人公の背を高くしたので、建物も 1.1 倍くらい縦に。ドアが背より低い」）。
+# 下の端（玄関）の位置は変えず、上へ伸ばす。どの建物も伸ばした分が歩ける所にかからないことを確かめた。
+# 大会会場は街の絵の上の端にあるので、屋根のてっぺんの飾りの先が少し切れる
+BUILDING_STRETCH_Y = 1.1
+
+
 def place_building(parts: str, b: dict) -> tuple[Image.Image, tuple[int, int]]:
     x1, y1, x2, y2 = b['rect']
     part = load_part(parts, BUILDING_FILE[b['id']])
     s = (x2 - x1) / part.width
-    part = part.resize((round(part.width * s), round(part.height * s)), Image.LANCZOS)
+    part = part.resize((round(part.width * s), round(part.height * s * BUILDING_STRETCH_Y)), Image.LANCZOS)
     return part, ((x1 + x2) // 2 - part.width // 2, y2 - part.height)
 
 
