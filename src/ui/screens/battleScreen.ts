@@ -1284,6 +1284,8 @@ export const battleScreen: ScreenDefinition = {
       if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) items.push(textBadge(statusSealedArt, t('battle.status.sealed')));
       // まきつく：次の手番は技を使えない（2026-10-26 から印を出す）
       if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) items.push(textBadge(statusStunnedArt, t('battle.status.stunned')));
+      // すなをほる：攻撃の対象にならない（使った手番と相手の次の手番の間だけ出す。絵は守りの印を使う）
+      if (m.hiddenTurn !== undefined && m.hiddenTurn !== null && m.hiddenTurn >= s.turn) items.push(textBadge(statusShieldArt, t('battle.status.hidden')));
       if (m.taunt && m.taunt.turn >= s.turn) items.push(textBadge(statusTauntArt, t('battle.status.taunted', { only: cardName(m.taunt.monsterId) })));
       // しめったはだ：受けるダメージ−（使った手番と相手の次の手番の間だけ出す）
       if (m.shield && m.shield.untilTurn >= s.turn) {

@@ -124,8 +124,8 @@ describe('ソラモのバトル用カード（2026-10-25 正式素材）', () =>
     expect(covered / body).toBeLessThan(0.005);
   }, 30000);
 
-  it('バトル用カードは、いまはソラモ・ラズック・ノビトン・ミュロル（2026-10-27。ほかのモンスターは素材が届いてから）', () => {
-    expect(Object.keys(BATTLE_CARDS)).toEqual([SORAMO_MONSTER_ID, 'mon-lazuck', 'mon-nobiton', 'mon-myurol']);
+  it('バトル用カードは、いまはソラモ・ラズック・ノビトン・ミュロル・カルシェル（2026-10-27。ほかのモンスターは素材が届いてから）', () => {
+    expect(Object.keys(BATTLE_CARDS)).toEqual([SORAMO_MONSTER_ID, 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell']);
     expect(MONSTERS.some((m) => m.id === SORAMO_MONSTER_ID)).toBe(true);
   });
 });

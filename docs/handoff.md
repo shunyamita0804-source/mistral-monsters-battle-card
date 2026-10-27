@@ -4,6 +4,8 @@
 
 ## 0. 次のセッションへ（2026-10-26 の終わりに書いた要点）
 
+- **2026-10-27 カルシェル（ライフ8・技14・初期配布16枚）を入れた（作業ブランチ `claude/kalshell-20261027`・未マージ・未公開）**。記録 `docs/card-data-policy.md`「2026-10-27 カルシェル」。
+  色は淡い氷色 `#DFF2F6`。新しい動き「すなをほる」（`hide`・`hiddenTurn`）。正式モンスターカードの1枚絵は資料の注意どおり貼らない。テスト `tests/kalshell.test.ts`
 - **2026-10-27 カードショップ改修：ガチャの流れ（作業ブランチ `claude/cardshop-gacha-20261027`・main に取り込み `c6786df` で公開）**。ZIP「MistralBC_CardShop_Handoff_FIXED」は `design-parts/cardshop-20261027/` に無改変。
   ユーザー指示どおり、販売機を調べる → パックを買う → 販売機の画面でハンドルを指で時計まわりに1周（「自動でまわす」もあり）→ 取り出し口が開いてパックが出る → 押すと開封（`src/ui/components/gachaTurn.ts`・`src/ui/styles/gacha.css`）。
   ハンドルは正式の絵を円盤と取っ手に分けた。機械の上半分・取り出し口は参考シートの【仮】切り出し（`tools/design/gacha_build.py`）。

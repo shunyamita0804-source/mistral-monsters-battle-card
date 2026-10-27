@@ -20,7 +20,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
     expect(checkCardData(cardCatalog.all(), options)).toEqual([]);
   });
 
-  it('正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル（技14種ずつ）とそのモンスターだけで、ほかはすべて仮', () => {
+  it('正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル（技14種ずつ）とそのモンスターだけで、ほかはすべて仮', () => {
     const official = [...MONSTERS, ...SKILLS, ...SUPPORTS].filter((c) => !c.isPlaceholder).map((c) => c.id);
     const skillIds = (key: string, nos: readonly number[]): string[] => nos.map((n) => `skl-${key}-${String(n).padStart(2, '0')}`);
     const all = Array.from({ length: 16 }, (_, i) => i + 1);
@@ -32,6 +32,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-gauul',
       'mon-nobiton',
       'mon-myurol',
+      'mon-kalshell',
       ...skillIds('soramo14', all.slice(0, 14)),
       ...lazuck,
       ...skillIds('gauul14', all.slice(0, 14)),
@@ -39,6 +40,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...skillIds('nobiton', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 16]),
       // ミュロルは正式14技の番号の順（2026-10-27）。ID は同じ名前の技のまま（12＝旧14・13＝旧15・14＝旧16）。旧12・旧13 は削除
       ...skillIds('myurol', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16]),
+      // カルシェル（2026-10-27）：正式の番号どおり 01〜14
+      ...skillIds('kalshell', all.slice(0, 14)),
     ]);
   });
 

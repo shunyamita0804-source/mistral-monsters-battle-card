@@ -48,6 +48,7 @@ export const BATTLE = {
     en: "{name}'s next {stat} skill deals {n} less damage.",
   },
   'battle.log.seal': { ja: '{name}は次のターン攻撃できない。', en: "{name} can't attack next turn." },
+  'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',
     en: "{name}'s {stat} skills deal {n} less damage next turn.",
@@ -105,6 +106,7 @@ export const BATTLE = {
   'battle.status.weaken': { ja: '{stat}−{n}', en: '{stat} -{n}' },
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
   'battle.status.stunned': { ja: '行動不可', en: "Can't act" },
+  'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
   'battle.cmd.menu': { ja: 'コマンド', en: 'Command' },
   // 対戦相手のひと言（【仮】台詞。正式な台詞・人物ごとの言い回しは未定）
@@ -117,6 +119,7 @@ export const BATTLE = {
   'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
+  'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
 
   // 先攻・後攻を決める
   'battle.order.faceFirst': { ja: '先攻', en: '1st' },
