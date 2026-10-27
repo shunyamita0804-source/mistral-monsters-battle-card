@@ -1,4 +1,5 @@
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
+import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -38,6 +39,9 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [NOBITON_MONSTER_ID]: { art: 'nobiton_battlecard.png', frame: 'nobiton', scale: 0.8, offsetY: -0.025 },
   // ミュロル（2026-10-27）：枠は水色（#84E5FA。ユーザー確定「水色」・src/data/myurol.ts の MYUROL_COLOR）。絵は届いた MONSTER/Myurol_Battle_800x920_RGBA.png を無改変
   [MYUROL_MONSTER_ID]: { art: 'myurol_battlecard.png', frame: 'myurol', scale: 0.86, offsetY: 0.0 },
+  // カルシェル（2026-10-27）：枠は淡い氷色（#DFF2F6。src/data/kalshell.ts の KALSHELL_COLOR）。絵は届いた BattleArt/Kalshell_BattleArt_Transparent_Approved.png（1169×1345）を無改変
+  // 0.8・少し上へ：絵がキャンバスいっぱいに描かれている（ノビトンと同じくらい）ので、ハサミ・脚が枠の飾りと名前の札に隠れない大きさ
+  [KALSHELL_MONSTER_ID]: { art: 'kalshell_battlecard.png', frame: 'kalshell', scale: 0.8, offsetY: -0.02 },
 };
 
 export function battleCardOf(monsterId: string): BattleCardSpec | undefined {

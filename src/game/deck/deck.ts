@@ -1,5 +1,6 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
 import { LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
+import { KALSHELL_STARTER } from '../../data/kalshell.ts';
 import { MYUROL_STARTER } from '../../data/myurol.ts';
 import { NOBITON_STARTER } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
@@ -231,7 +232,9 @@ export function createStarterCollection(): Record<string, number> {
   const nobiton = NOBITON_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
   // ミュロルの初期配布16枚（2026-10-26 ユーザー正式確定・2026-10-27 実装）：ノビトンと同じく所持カードにだけ入れる
   const myurol = MYUROL_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  return countCards([...deck.monsters, ...deck.skills, ...nobiton, ...myurol]);
+  // カルシェルの初期配布16枚（2026-10-27 統合管理パックで確定）：ノビトン・ミュロルと同じく所持カードにだけ入れる
+  const kalshell = KALSHELL_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  return countCards([...deck.monsters, ...deck.skills, ...nobiton, ...myurol, ...kalshell]);
 }
 
 /** NPC のデッキに入れる仮サポート（各2枚） */

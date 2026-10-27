@@ -136,6 +136,11 @@ export type SkillEffect =
    * 使った手番を含めて turns 手番のあいだ続く。重ねがけはしない（もう一度使っても reduce は同じまま、期限だけ新しく）
    */
   | { readonly type: 'shield'; readonly against: StatType | 'all'; readonly reduce: number; readonly turns: number }
+  /**
+   * 特殊（正式：カルシェルのすなをほる 2026-10-27）：使ったモンスターは、相手の次の手番のあいだ攻撃の技の対象にならない。
+   * 相手を選ばずに使う（自分にかかる）
+   */
+  | { readonly type: 'hide' }
   /** 特殊（正式：ミュロルのみずあび 2026-10-25）：使ったモンスターのライフを amount 回復する（最大ライフまで） */
   | { readonly type: 'healSelf'; readonly amount: number }
   | { readonly type: 'heal' }
@@ -304,8 +309,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

@@ -4,6 +4,8 @@
 
 ## 0. 次のセッションへ（2026-10-26 の終わりに書いた要点）
 
+- **2026-10-27 カルシェル（ライフ8・技14・初期配布16枚）を入れた（作業ブランチ `claude/kalshell-20261027`・未マージ・未公開）**。記録 `docs/card-data-policy.md`「2026-10-27 カルシェル」。
+  色は淡い氷色 `#DFF2F6`。新しい動き「すなをほる」（`hide`・`hiddenTurn`）。正式モンスターカードの1枚絵は資料の注意どおり貼らない。テスト `tests/kalshell.test.ts`
 - **2026-10-27 カードショップ素材一式（A〜G）を組み込んだ（作業ブランチ `claude/cardshop-assets-20261027`・未マージ・未公開）**。原本 `design-parts/cardshop-assets-20261027/`、記録 `docs/design/cardshop-20261027/11_素材一式の受け取り_UTF8.txt`。
   街の外観を新しく（`tools/design/cardshop_v2.py` を `seimon_world_build.py` が呼ぶ。変わった街の絵はショップのある2枚だけ）、外と中の自動ドア（`worldScreen.ts` の `#buildDoors`。近づくと開く）、
   新しい内装（赤いガチャ機なし・家具ごとに前後・店の中に青い販売機。部屋は 1920×1280 単位・`fitHeight` 1024 で人の大きさをほかの部屋とそろえる）、店員は見た目だけ奥（`NpcObject.drawDy`）、

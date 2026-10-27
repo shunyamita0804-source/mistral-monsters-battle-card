@@ -120,6 +120,10 @@ export function chooseAction(state: BattleState, side: Side): BattleAction | nul
     const covered = user !== undefined && shieldOf(state, user, against === 'all' ? 'force' : against) > 0;
     if (user && !covered && attackersWith(state, otherSide(side), against) > 0) return { type: 'useCard', side, cardUid: shield.card.uid, userUid: user.uid };
   }
+  // すなをほる：使えるモンスターのライフが半分以下で、まだ隠れておらず、相手に攻撃の技を持つモンスターがいるときに使う（仮の思考）
+  const hide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'hide');
+  const hider = hide ? availableUsers(state, side, hide.def).find((m) => m.life <= m.maxLife / 2 && m.hiddenTurn !== state.turn + 1) : undefined;
+  if (hide && hider && attackersWith(state, otherSide(side), 'all') > 0) return { type: 'useCard', side, cardUid: hide.card.uid, userUid: hider.uid };
   // いたずら：相手の手札が2枚以上あるときに使う（仮の思考）
   const prank = options.filter(isSkillOption).find((o) => o.def.effect.type === 'handToDeck' || o.def.effect.type === 'discardRandom');
   if (prank && state.sides[otherSide(side)].hand.length >= 2) return { type: 'useCard', side, cardUid: prank.card.uid };

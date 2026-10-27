@@ -60,6 +60,8 @@ export interface BattleMonster {
    * 使った手番を含む2手番＝相手の次の手番まで）。重ねがけはしない
    */
   readonly shield?: { readonly against: StatType | 'all'; readonly reduce: number; readonly untilTurn: number } | null;
+  /** この手番（turn）の間は攻撃の技の対象にならない（正式：カルシェルのすなをほる「次のターン攻撃対象にならない」2026-10-27） */
+  readonly hiddenTurn?: number | null;
 }
 
 export interface HandCard {
@@ -364,6 +366,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (targetsEnemy(skill) && aliveMonsters(state.sides[otherSide(side)]).length === 0) {
     return NO(t('battle.ng.noAttackTarget'));
   }
+  // すなをほる：相手が全員隠れていれば攻撃の技は使えない
+  if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
   return YES;
 }
 
@@ -375,7 +379,13 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
 export function tauntRestriction(state: BattleState, side: Side, user: BattleMonster): string | null {
   const taunt = user.taunt;
   if (!taunt || taunt.turn !== state.turn) return null;
-  return aliveMonsters(state.sides[otherSide(side)]).some((m) => m.cardId === taunt.monsterId) ? taunt.monsterId : null;
+  // すなをほるで隠れているラズックは数えない（攻撃できるラズックがいなければ制限なし）
+  return attackableMonsters(state, otherSide(side)).some((m) => m.cardId === taunt.monsterId) ? taunt.monsterId : null;
+}
+
+/** 攻撃の技の対象にできるモンスター（生きていて、すなをほるで隠れていない） */
+export function attackableMonsters(state: BattleState, side: Side): BattleMonster[] {
+  return aliveMonsters(state.sides[side]).filter((m) => m.hiddenTurn !== state.turn);
 }
 
 /**
@@ -385,8 +395,9 @@ export function tauntRestriction(state: BattleState, side: Side, user: BattleMon
  */
 export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?: BattleMonster): BattleMonster[] {
   if (card.kind === 'skill' && targetsEnemy(card)) {
-    const enemies = aliveMonsters(state.sides[otherSide(side)]);
-    if (card.effect.type !== 'attack') return enemies;
+    if (card.effect.type !== 'attack') return aliveMonsters(state.sides[otherSide(side)]);
+    // 攻撃の技は、すなをほるで隠れている相手を選べない
+    const enemies = attackableMonsters(state, otherSide(side));
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -739,6 +750,11 @@ function useCard(
       if (!target) return state;
       next = updateMonster(next, target.uid, { taunt: { monsterId: user.cardId, turn: state.turn + 1 } });
       return addLog(next, t('battle.log.taunt', { name: nameOf(target.cardId), only: nameOf(user.cardId) }));
+    }
+    case 'hide': {
+      // すなをほる：相手の次の手番（turn + 1）の間、使ったモンスターは攻撃の技の対象にならない
+      next = updateMonster(next, user.uid, { hiddenTurn: state.turn + 1 });
+      return addLog(next, t('battle.log.hide', { name: nameOf(user.cardId) }));
     }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));

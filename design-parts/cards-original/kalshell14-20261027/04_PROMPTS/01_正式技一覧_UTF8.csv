@@ -1,0 +1,15 @@
+﻿技番号,技名,分類,消費マナ,ダメージ,特殊効果,保存ファイル名
+1,はさむ,ちから技,1,1,なし,Kalshell_SK01_Hasamu_ArtV2.png
+2,シェルタックル,ちから技,2,2,なし,Kalshell_SK02_ShellTackle_ArtV2.png
+3,クラッシュクロー,ちから技,4,3,なし,Kalshell_SK03_CrashClaw_ArtV2.png
+4,コーラルスピア,ちから技,3,2,回避されない,Kalshell_SK04_CoralSpear_ArtV2.png
+5,シェルブレイカー,ちから技,5,5,なし,Kalshell_SK05_ShellBreaker_ArtV2.png
+6,あわだま,かしこさ技,2,2,なし,Kalshell_SK06_Awadama_ArtV2.png
+7,アクアバースト,かしこさ技,3,3,なし,Kalshell_SK07_AquaBurst_ArtV2.png
+8,タイダルクラッシュ,かしこさ技,5,5,なし,Kalshell_SK08_TidalCrash_ArtV2.png
+9,いかくのハサミ,特殊技,2,なし,指定した相手モンスター1体は次のターン攻撃技を使えない,Kalshell_SK09_IkakuNoHasami_ArtV2.png
+10,すなをほる,特殊技,2,なし,次のターン攻撃対象にならない,Kalshell_SK10_SunaWoHoru_ArtV2.png
+11,からにこもる,防御技,1,なし,ちから技のダメージを3軽減,Kalshell_SK11_KaraNiKomoru_ArtV2.png
+12,あわのまく,防御技,1,なし,かしこさ技のダメージを3軽減,Kalshell_SK12_AwaNoMaku_ArtV2.png
+13,てっぺきシェル,防御技,2,なし,ちから技・かしこさ技のダメージを5軽減,Kalshell_SK13_TeppekiShell_ArtV2.png
+14,しおのステップ,回避技,2,なし,消費マナ2以上のちから技を回避,Kalshell_SK14_ShioNoStep_ArtV2.png

@@ -1,0 +1,198 @@
+{
+  "monster": "カルシェル",
+  "life": 8,
+  "frame_color_name": "ペールアイスブルー",
+  "frame_color_hex": "#DFF2F6",
+  "body_structure": {
+    "claws": 2,
+    "walking_legs": 6,
+    "shell": 1,
+    "shell_decoration": false
+  },
+  "skills": [
+    {
+      "no": 1,
+      "name": "はさむ",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし"
+    },
+    {
+      "no": 2,
+      "name": "シェルタックル",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし"
+    },
+    {
+      "no": 3,
+      "name": "クラッシュクロー",
+      "category": "ちから技",
+      "mana": 4,
+      "damage": "3",
+      "effect": "なし"
+    },
+    {
+      "no": 4,
+      "name": "コーラルスピア",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "2",
+      "effect": "回避されない"
+    },
+    {
+      "no": 5,
+      "name": "シェルブレイカー",
+      "category": "ちから技",
+      "mana": 5,
+      "damage": "5",
+      "effect": "なし"
+    },
+    {
+      "no": 6,
+      "name": "あわだま",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし"
+    },
+    {
+      "no": 7,
+      "name": "アクアバースト",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "なし"
+    },
+    {
+      "no": 8,
+      "name": "タイダルクラッシュ",
+      "category": "かしこさ技",
+      "mana": 5,
+      "damage": "5",
+      "effect": "なし"
+    },
+    {
+      "no": 9,
+      "name": "いかくのハサミ",
+      "category": "特殊技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "指定した相手モンスター1体は次のターン攻撃技を使えない"
+    },
+    {
+      "no": 10,
+      "name": "すなをほる",
+      "category": "特殊技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "次のターン攻撃対象にならない"
+    },
+    {
+      "no": 11,
+      "name": "からにこもる",
+      "category": "防御技",
+      "mana": 1,
+      "damage": "なし",
+      "effect": "ちから技のダメージを3軽減"
+    },
+    {
+      "no": 12,
+      "name": "あわのまく",
+      "category": "防御技",
+      "mana": 1,
+      "damage": "なし",
+      "effect": "かしこさ技のダメージを3軽減"
+    },
+    {
+      "no": 13,
+      "name": "てっぺきシェル",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "ちから技・かしこさ技のダメージを5軽減"
+    },
+    {
+      "no": 14,
+      "name": "しおのステップ",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "消費マナ2以上のちから技を回避"
+    }
+  ],
+  "initial_distribution": [
+    {
+      "no": 1,
+      "name": "はさむ",
+      "count": 2
+    },
+    {
+      "no": 2,
+      "name": "シェルタックル",
+      "count": 2
+    },
+    {
+      "no": 3,
+      "name": "クラッシュクロー",
+      "count": 2
+    },
+    {
+      "no": 4,
+      "name": "コーラルスピア",
+      "count": 0
+    },
+    {
+      "no": 5,
+      "name": "シェルブレイカー",
+      "count": 0
+    },
+    {
+      "no": 6,
+      "name": "あわだま",
+      "count": 2
+    },
+    {
+      "no": 7,
+      "name": "アクアバースト",
+      "count": 2
+    },
+    {
+      "no": 8,
+      "name": "タイダルクラッシュ",
+      "count": 0
+    },
+    {
+      "no": 9,
+      "name": "いかくのハサミ",
+      "count": 2
+    },
+    {
+      "no": 10,
+      "name": "すなをほる",
+      "count": 2
+    },
+    {
+      "no": 11,
+      "name": "からにこもる",
+      "count": 1
+    },
+    {
+      "no": 12,
+      "name": "あわのまく",
+      "count": 1
+    },
+    {
+      "no": 13,
+      "name": "てっぺきシェル",
+      "count": 0
+    },
+    {
+      "no": 14,
+      "name": "しおのステップ",
+      "count": 0
+    }
+  ]
+}
