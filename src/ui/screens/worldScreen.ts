@@ -1,7 +1,7 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
-import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpObject, type WarpTarget } from '../../data/maps.ts';
+import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { getMonster } from '../../data/cards.ts';
@@ -291,7 +291,7 @@ const DEFAULT_DUNGEON_SOUND = { ground: 'gravel', ambient: 'drip' } as const;
 /** 街の南の出口へ続く土の道（この行から下）。ほかの道は石畳 */
 const TOWN_DIRT_FROM_Y = 117;
 /** 建物の中の床（無い部屋は板）。大会会場は石 */
-const ROOM_GROUND: Readonly<Record<string, StepSurface>> = { hall: 'stone' };
+const ROOM_GROUND: Readonly<Record<string, StepSurface>> = { hall: 'stone', bureau: 'stone' };
 /** 施設の看板を上の帯の下に保つ位置（論理px） */
 const SIGN_MIN_BOTTOM = 98;
 /**
@@ -316,6 +316,8 @@ const NPC_SHEET: Readonly<Record<NpcId, string>> = {
   researcher: researcherSheet,
   receptionist: receptionistSheet,
   teacher: teacherSheet,
+  // カードバトラー管理局の受付：大会会場の受付の絵を流用（暫定。正式な絵が届いたらここを差し替える）
+  bureau_clerk: receptionistSheet,
   resident_a: residentASheet,
   resident_b: residentBSheet,
   resident_c: residentCSheet,
@@ -337,6 +339,7 @@ const NPC_NAME: Readonly<Record<NpcId, MessageKey>> = {
   researcher: 'story.speaker.researcher',
   receptionist: 'story.speaker.receptionist',
   teacher: 'story.speaker.teacher',
+  bureau_clerk: 'introV2.speaker.bureau',
   resident_a: 'story.speaker.residentA',
   resident_b: 'story.speaker.residentB',
   resident_c: 'story.speaker.residentC',
@@ -396,8 +399,6 @@ interface Follower {
 /** 導入イベントV2：幼馴染が主人公の何マス先を歩くか（1マスだと縦に歩くとき主人公に隠れる） */
 const FOLLOW_LEAD = 3;
 
-/** 【仮】管理局の受付の前のマス（src/data/maps.ts の BUREAU：カウンターの真ん中の手前） */
-const BUREAU_DESK_FRONT: Point = { x: 4, y: 3 };
 
 /** 導入イベントV2で、続きの場面が無い場所にいたときに戻す所（ふつうは起きない） */
 function introV2Anchor(v: IntroV2): Location {
@@ -792,7 +793,7 @@ export class WorldView {
     WorldView.#preloaded = true;
     setTimeout(() => {
       const urls = new Set<string>();
-      for (const id of ['town', 'home', 'neighbor', 'shop', 'lab', 'hall', 'practice', 'house-a']) {
+      for (const id of ['town', 'home', 'neighbor', 'shop', 'lab', 'hall', 'practice', 'house-a', 'bureau']) {
         const art = getMap(id)?.art;
         for (const img of [...(art?.tiles ?? []), ...(art?.sprites ?? [])]) urls.add(img.file);
       }

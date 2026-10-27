@@ -1,4 +1,5 @@
 import type { Direction } from '../game/save/saveData.ts';
+import { BUREAU_ART as BUREAU_WORLD_ART, BUREAU_CLERK_DRAW_DY } from './bureauArt.generated.ts';
 import { BUREAU_MAP_ID } from './introV2.ts';
 import type { CardReward } from './tournaments.ts';
 import { WORLD_ART, type ArtMap, type CellRect } from './worldArt.generated.ts';
@@ -118,7 +119,8 @@ export const RESIDENT_IDS: readonly ResidentId[] = ['resident_a', 'resident_b', 
 export const isResidentId = (id: string): id is ResidentId => (RESIDENT_IDS as readonly string[]).includes(id);
 
 /** 人物（会話の名前・歩行の絵の参照に使う） */
-export type NpcId = 'neighbor_guide' | 'clerk' | 'researcher' | 'receptionist' | 'teacher' | ResidentId;
+/** bureau_clerk：カードバトラー管理局の受付（絵は大会会場の受付の流用。暫定） */
+export type NpcId = 'neighbor_guide' | 'clerk' | 'researcher' | 'receptionist' | 'teacher' | 'bureau_clerk' | ResidentId;
 
 /**
  * 人（NPC）。足元の1マスが歩けない。絵は人物ごとの歩行の絵（worldScreen.ts）。
@@ -300,8 +302,8 @@ const artMap = (
 export const BUREAU_TOWN_DOOR = { x: 5, y: 57, w: 1 } as const;
 /** 管理局から出たときに立つ所（入口のすぐ下。ほかの建物と同じく手前を向く） */
 const BUREAU_TOWN_FRONT = { x: 5, y: 58, dir: 'down' } as const satisfies { x: number; y: number; dir: Direction };
-/** 管理局に入ったときに立つ所（仮の部屋の入口の手前。奥を向く） */
-const BUREAU_ENTRY = { x: 4, y: 7, dir: 'up' } as const satisfies { x: number; y: number; dir: Direction };
+/** 管理局に入ったときに立つ所（入口の通り道。奥を向く） */
+const BUREAU_ENTRY = { x: BUREAU_WORLD_ART.spawn.x, y: BUREAU_WORLD_ART.spawn.y, dir: 'up' } as const satisfies { x: number; y: number; dir: Direction };
 
 /**
  * 街。ユーザー承認済みの正式な絵（建物11棟・噴水・地面・小物）を、設計図（docs/design/seimon-town/）どおりに並べたもの。
@@ -409,33 +411,20 @@ export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
 
+const BUREAU_ART = BUREAU_WORLD_ART;
+/** 管理局の受付の前（主人公が受付と話すために止まる所。tools/design/bureau_v01.py の PLAYER_SPOT） */
+export const BUREAU_DESK_FRONT: { readonly x: number; readonly y: number } = itemOf(BUREAU_ART, 'PLAYER_SPOT');
 /**
- * 【仮】カードバトラー管理局の中（仮の部屋。正式な内装・受付の人物の絵が届くまで、記号のマスで描く）。
- * 奥に受付のカウンター。入口は手前の真ん中
+ * カードバトラー管理局の中（2026-10-27 素材 v01：床と壁・奥の書類棚・受付のカウンター。tools/design/bureau_v01.py）。
+ * 入口は扉のない開いた通り道（v01 の提案）。受付の人は大会会場の受付の絵を流用（暫定。正式な受付の絵は未納品）。
+ * 街の入口の場所は承認待ちなので、街の側はいまも【仮】の印（BUREAU_TOWN_DOOR）
  */
-export const BUREAU: MapDefinition = {
-  id: BUREAU_MAP_ID,
-  name: 'カードバトラー管理局（仮）',
-  area: 'interior',
-  tiles: [
-    '#########',
-    '#h.....h#',
-    '#.ccccc.#',
-    '#.......#',
-    '#.......#',
-    '#r.....r#',
-    '#.......#',
-    '#.......#',
-    '####d####',
-  ],
-  objects: [
-    interact('bureau-desk', 2, 2, 5, 1, '受付（仮）', 'bureauDesk'),
-    interact('bureau-shelf-l', 1, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
-    interact('bureau-shelf-r', 7, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
-    warp('bureau-exit', 4, 8, 1, '外へ', { kind: 'map', mapId: 'town', ...BUREAU_TOWN_FRONT }),
-  ],
-  spawn: BUREAU_ENTRY,
-};
+export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラー管理局', 'interior', BUREAU_ART, [
+  interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
+  interactAt('bureau-shelves', itemOf(BUREAU_ART, 'SHELVES'), '書類棚', 'message', '登録の書類がきちんと並んでいる。'),
+  npc('bureau-clerk', spotOf(BUREAU_ART, 'CLERK_SPOT').x, spotOf(BUREAU_ART, 'CLERK_SPOT').y, 'bureau_clerk', 'bureauDesk', BUREAU_CLERK_DRAW_DY),
+  warp('bureau-exit', BUREAU_ART.exit.x, BUREAU_ART.exit.y, BUREAU_ART.exit.w, '外へ', { kind: 'map', mapId: 'town', ...BUREAU_TOWN_FRONT }),
+], entryOf(BUREAU_ART));
 
 const HOUSE_ART = artOf('house');
 /** 民家（住宅A〜E。部屋の絵は共通）。住宅A〜E にそれぞれ住人A〜E がいる */

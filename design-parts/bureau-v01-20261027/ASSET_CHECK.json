@@ -1,0 +1,122 @@
+{
+  "BACK_SHELVES.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "transparent_pixel_count": 1527012,
+    "solid_bbox_alpha128": [
+      561,
+      166,
+      976,
+      283
+    ],
+    "visible_bbox_alpha16": [
+      560,
+      165,
+      976,
+      283
+    ]
+  },
+  "COUNTER.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "transparent_pixel_count": 1477567,
+    "solid_bbox_alpha128": [
+      471,
+      376,
+      1066,
+      553
+    ],
+    "visible_bbox_alpha16": [
+      470,
+      375,
+      1066,
+      553
+    ]
+  },
+  "DESIGN_PREVIEW.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "transparent_pixel_count": 328788,
+    "solid_bbox_alpha128": [
+      0,
+      6,
+      1536,
+      977
+    ],
+    "visible_bbox_alpha16": [
+      0,
+      5,
+      1536,
+      978
+    ]
+  },
+  "EXTERIOR.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      254
+    ],
+    "transparent_pixel_count": 704017,
+    "solid_bbox_alpha128": [
+      20,
+      194,
+      1514,
+      871
+    ],
+    "visible_bbox_alpha16": [
+      19,
+      193,
+      1514,
+      874
+    ]
+  },
+  "ROOM_SHELL.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      254
+    ],
+    "transparent_pixel_count": 328788,
+    "solid_bbox_alpha128": [
+      0,
+      6,
+      1536,
+      977
+    ],
+    "visible_bbox_alpha16": [
+      0,
+      5,
+      1536,
+      978
+    ]
+  }
+}

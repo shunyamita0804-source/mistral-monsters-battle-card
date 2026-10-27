@@ -52,10 +52,12 @@ const PORTRAITS: Readonly<Partial<Record<Exclude<Speaker, 'system'>, Partial<Rec
   clerk: { normal: clerkFace },
   receptionist: { normal: receptionistFace },
   researcher: { normal: researcherFace },
+  // カードバトラー管理局の受付：大会会場の受付の顔の絵を流用（暫定。正式な絵が届いたらここを差し替える）
+  bureau_clerk: { normal: receptionistFace },
 };
 
 /** 正方形の「顔の絵の形」で描かれた人（案内役の会話の絵より小さく、正方形の枠で出す） */
-const FACE_FORMAT: ReadonlySet<Speaker> = new Set<Speaker>(['resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e', 'teacher', 'clerk', 'receptionist', 'researcher']);
+const FACE_FORMAT: ReadonlySet<Speaker> = new Set<Speaker>(['resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e', 'teacher', 'clerk', 'receptionist', 'researcher', 'bureau_clerk']);
 
 /** 会話の絵を先に読み込む（表情を切り替えた瞬間に白く抜けないように） */
 const preloaded = new Set<string>();
