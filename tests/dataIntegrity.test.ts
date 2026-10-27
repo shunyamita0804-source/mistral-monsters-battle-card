@@ -20,7 +20,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
     expect(checkCardData(cardCatalog.all(), options)).toEqual([]);
   });
 
-  it('正式カードはソラモ・ラズック・ガウル・ノビトン（技14種ずつ）・ミュロル（技16種）とそのモンスターだけで、ほかはすべて仮', () => {
+  it('正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル（技14種ずつ）とそのモンスターだけで、ほかはすべて仮', () => {
     const official = [...MONSTERS, ...SKILLS, ...SUPPORTS].filter((c) => !c.isPlaceholder).map((c) => c.id);
     const skillIds = (key: string, nos: readonly number[]): string[] => nos.map((n) => `skl-${key}-${String(n).padStart(2, '0')}`);
     const all = Array.from({ length: 16 }, (_, i) => i + 1);
@@ -37,7 +37,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...skillIds('gauul14', all.slice(0, 14)),
       // ノビトンは正式14技の番号の順（2026-10-26）。ID は同じ名前の技のまま（11＝旧12・12＝旧13・13＝旧15・14＝旧16）。旧11・旧14 は削除
       ...skillIds('nobiton', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 16]),
-      ...skillIds('myurol', all),
+      // ミュロルは正式14技の番号の順（2026-10-27）。ID は同じ名前の技のまま（12＝旧14・13＝旧15・14＝旧16）。旧12・旧13 は削除
+      ...skillIds('myurol', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16]),
     ]);
   });
 
@@ -65,7 +66,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
     ]);
   });
 
-  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン、ミュロルは技だけ）だけ', () => {
+  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン。ミュロルのモンスターはバトル用の絵を重ねて描く）だけ', () => {
     expect(cardCatalog.all().filter((c) => c.art && c.isPlaceholder)).toEqual([]);
     expect(cardCatalog.all().filter((c) => c.art).map((c) => c.id)).toEqual([
       'mon-soramo',

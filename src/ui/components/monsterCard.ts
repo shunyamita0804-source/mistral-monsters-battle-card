@@ -3,6 +3,7 @@ import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
+import { createBattleMonsterCard, hasBattleCard } from './battleMonsterCard.ts';
 
 /**
  * モンスターカードの表示。
@@ -59,6 +60,9 @@ export function createMonsterCard(monster: MonsterCard, options: MonsterCardOpti
   if (battleUrl) return createArtMonsterCard(monster, options, battleUrl, true);
   const officialUrl = monster.art?.layout === 'full' ? resolveCardArt(monster.art) : undefined;
   if (officialUrl) return createArtMonsterCard(monster, options, officialUrl, false);
+  // 名前・LIFE 入りの正式カードの1枚絵が無く、バトル用カードの素材があるモンスター（2026-10-27 ミュロル）：
+  // 背景・モンスター・色の枠・名前・LIFE をゲームが重ねて描く（ユーザー指示「カード全体を1枚画像として貼り付けない。レイヤー合成」）
+  if (!options.life && hasBattleCard(monster.id)) return createBattleMonsterCard(monster, options.width);
   const name = cardName(monster);
   const artUrl = resolveCardArt(monster.art);
   const height = Math.round(options.width * 1.4);

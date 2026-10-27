@@ -16,7 +16,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-23：初めての正式カード（ソラモの技16種）を src/data/soramo.ts から足した。仮カードは消さずに残す（セーブの所持カードを守るため）。
  * 2026-10-23：ラズックと技16種を src/data/lazuck.ts から足した（用途は未定）。
  * 2026-10-25：ノビトンと技16種を src/data/nobiton.ts から足した。
- * 2026-10-25：ミュロルと技16種を src/data/myurol.ts から足した（モンスターカードの絵はまだ無い）。
+ * 2026-10-25：ミュロルと技16種を src/data/myurol.ts から足した。2026-10-27 に正式14技・バトル用カード（水色の枠）に。
  */
 
 interface MonsterSeed {

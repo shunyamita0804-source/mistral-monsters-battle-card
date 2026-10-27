@@ -1,0 +1,160 @@
+{
+  "monster": "ミュロル",
+  "version": "Art Ver.2 / skills 01-14 / 2026-10-27",
+  "skills": [
+    {
+      "number": 1,
+      "name": "たいあたり",
+      "category": "ちから",
+      "mana": 1,
+      "damage": 1,
+      "effect": "なし",
+      "image": "Myurol_SK01_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 2,
+      "name": "しっぽたたき",
+      "category": "ちから",
+      "mana": 2,
+      "damage": 2,
+      "effect": "なし",
+      "image": "Myurol_SK02_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 3,
+      "name": "連続ひっかき",
+      "category": "ちから",
+      "mana": 3,
+      "damage": 3,
+      "effect": "なし",
+      "image": "Myurol_SK03_ArtV2.png",
+      "initial_count": 1
+    },
+    {
+      "number": 4,
+      "name": "アクアテール",
+      "category": "ちから",
+      "mana": 4,
+      "damage": 4,
+      "effect": "なし",
+      "image": "Myurol_SK04_ArtV2.png",
+      "initial_count": 0
+    },
+    {
+      "number": 5,
+      "name": "みずでっぽう",
+      "category": "かしこさ",
+      "mana": 1,
+      "damage": 1,
+      "effect": "なし",
+      "image": "Myurol_SK05_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 6,
+      "name": "バブルショット",
+      "category": "かしこさ",
+      "mana": 2,
+      "damage": 2,
+      "effect": "なし",
+      "image": "Myurol_SK06_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 7,
+      "name": "アクアボール",
+      "category": "かしこさ",
+      "mana": 3,
+      "damage": 3,
+      "effect": "なし",
+      "image": "Myurol_SK07_ArtV2.png",
+      "initial_count": 1
+    },
+    {
+      "number": 8,
+      "name": "しめったはだ",
+      "category": "特殊",
+      "mana": 2,
+      "damage": null,
+      "effect": "発動ターンを含む2ターン、受けるちから技のダメージを1軽減。重複不可",
+      "image": "Myurol_SK08_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 9,
+      "name": "みずあび",
+      "category": "特殊",
+      "mana": 3,
+      "damage": null,
+      "effect": "自分のライフを1回復（上限7）",
+      "image": "Myurol_SK09_ArtV2.png",
+      "initial_count": 0
+    },
+    {
+      "number": 10,
+      "name": "しっぽガード",
+      "category": "防御",
+      "mana": 1,
+      "damage": null,
+      "effect": "相手のちから技のダメージを2軽減",
+      "image": "Myurol_SK10_ArtV2.png",
+      "initial_count": 0
+    },
+    {
+      "number": 11,
+      "name": "みずのまく",
+      "category": "防御",
+      "mana": 1,
+      "damage": null,
+      "effect": "相手のかしこさ技のダメージを2軽減",
+      "image": "Myurol_SK11_ArtV2.png",
+      "initial_count": 0
+    },
+    {
+      "number": 12,
+      "name": "スリップガード",
+      "category": "防御",
+      "mana": 2,
+      "damage": null,
+      "effect": "相手のちから技・かしこさ技（攻撃カードの消費マナ3以上）のダメージを4軽減",
+      "image": "Myurol_SK12_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 13,
+      "name": "ひらりよける",
+      "category": "回避",
+      "mana": 2,
+      "damage": null,
+      "effect": "相手のちから技を回避",
+      "image": "Myurol_SK13_ArtV2.png",
+      "initial_count": 2
+    },
+    {
+      "number": 14,
+      "name": "すべってよける",
+      "category": "回避",
+      "mana": 3,
+      "damage": null,
+      "effect": "相手のちから技・かしこさ技（攻撃カードの消費マナ2以下）を回避",
+      "image": "Myurol_SK14_ArtV2.png",
+      "initial_count": 0
+    }
+  ],
+  "initial_distribution_confirmed": true,
+  "initial_distribution_confirmed_on": "2026-10-26",
+  "total_initial_skill_cards": 16,
+  "number_of_initial_skill_types": 9,
+  "deleted_old_skill_numbers": [
+    12,
+    13
+  ],
+  "old_to_new_number_mapping": {
+    "14": 12,
+    "15": 13,
+    "16": 14
+  },
+  "note": "画像にはUI・マナ・数字を焼き込まない。旧16技データから正式14技への置換が必要。"
+}

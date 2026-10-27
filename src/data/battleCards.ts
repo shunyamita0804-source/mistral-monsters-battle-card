@@ -1,4 +1,5 @@
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
+import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 
@@ -14,7 +15,7 @@ import { SORAMO_MONSTER_ID } from './soramo.ts';
  * - scale：モンスターの絵（800×920 の配置用）をカードに対して縮める割合。耳・しっぽ・足先が枠に隠れない大きさ。
  *   モンスターごとに決め、体の大小の差はこの値で残す（全部を同じ大きさにそろえない）
  * - offsetY：上下のずらし（カードの高さに対する割合。＋で下へ）
- * ソラモ（2026-10-25）・ラズック（2026-10-26）・ノビトン（2026-10-26）。ほかのモンスターは素材が届いてから
+ * ソラモ（2026-10-25）・ラズック（2026-10-26）・ノビトン（2026-10-26）・ミュロル（2026-10-27）。ほかのモンスターは素材が届いてから
  * - モンスターの絵が 800×920 と違う縦横比のとき（ノビトン）は、縦横比を保ったままカードの中に収める（引き伸ばさない。cards.css の object-fit）
  */
 export interface BattleCardSpec {
@@ -35,6 +36,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // ノビトン（2026-10-26）：枠は黄色（#FFD400。ユーザー指示「外枠は黄色」）。絵はチャットで届いた正式原画（1179×1334・透明つき）を無改変。
   // 0.8・少し上へ：鼻先・しっぽ・足先が枠の飾りと名前の札に隠れない大きさ
   [NOBITON_MONSTER_ID]: { art: 'nobiton_battlecard.png', frame: 'nobiton', scale: 0.8, offsetY: -0.025 },
+  // ミュロル（2026-10-27）：枠は水色（#84E5FA。ユーザー確定「水色」・src/data/myurol.ts の MYUROL_COLOR）。絵は届いた MONSTER/Myurol_Battle_800x920_RGBA.png を無改変
+  [MYUROL_MONSTER_ID]: { art: 'myurol_battlecard.png', frame: 'myurol', scale: 0.86, offsetY: 0.0 },
 };
 
 export function battleCardOf(monsterId: string): BattleCardSpec | undefined {

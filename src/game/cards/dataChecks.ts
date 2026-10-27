@@ -46,8 +46,10 @@ export function checkCardData(cards: readonly CardDefinition[], options: CardDat
       if (!PLACEHOLDER_NAME.test(card.name)) add('placeholderName');
     } else {
       if (card.name.startsWith('仮')) add('officialNamedAsPlaceholder');
-      // 絵がまだ決まっていない正式カード（pendingSpec に 'art'）は、絵なしでよい（仮の絵で表示）
-      if (!card.art && !card.pendingSpec?.includes('art')) add('officialWithoutArt');
+      // 絵がまだ決まっていない正式カード（pendingSpec に 'art'）は、絵なしでよい（仮の絵で表示）。
+      // 名前・LIFE 入りの1枚絵を持たず、バトル用の絵を重ねて描くモンスター（2026-10-27 ミュロル）も絵ありとする
+      const layered = card.kind === 'monster' && !!card.battleArt;
+      if (!card.art && !layered && !card.pendingSpec?.includes('art')) add('officialWithoutArt');
       if (!options.hasEnglishName(card.id)) add('missingEnglishName');
     }
     if (card.art) {
