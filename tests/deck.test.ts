@@ -11,6 +11,9 @@ import {
   countRoles,
   createPlaceholderStarterCollection,
   createPlaceholderStarterDeck,
+  createStarterCollection,
+  createStarterDeck,
+  INITIAL_DISTRIBUTION,
   validateDeck,
 } from '../src/game/deck/deck.ts';
 
@@ -93,5 +96,30 @@ describe('デッキ編集の表の枚数（攻撃・守り・計）', () => {
     const ids = [pick(['force']), pick(['wisdom']), pick(['defense']), pick(['evade']), pick(['special']), supportId(1)];
     expect(countRoles(ids)).toEqual({ atk: 2, guard: 2, total: 6 });
     expect(countRoles([])).toEqual({ atk: 0, guard: 0, total: 0 });
+  });
+});
+
+describe('初期配布96枚と初期デッキ60枚（別の仕様）', () => {
+  it('初期配布は全6体×16枚＝96枚。どれも正式の技カードで、そのモンスターの技だけ', () => {
+    expect(INITIAL_DISTRIBUTION.map((d) => d.monsterId)).toEqual(['mon-soramo', 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-gauul']);
+    for (const d of INITIAL_DISTRIBUTION) {
+      expect(d.cards.reduce((n, c) => n + c.copies, 0)).toBe(16);
+      for (const c of d.cards) {
+        const s = SKILLS.find((k) => k.id === c.id);
+        expect(s?.monsterId).toBe(d.monsterId);
+        expect(s?.isPlaceholder).toBe(false);
+        expect(s?.availability).toBe('initial');
+      }
+    }
+    expect(INITIAL_DISTRIBUTION.flatMap((d) => d.cards).reduce((n, c) => n + c.copies, 0)).toBe(96);
+  });
+
+  it('新しく始めたときの所持カードは、初期配布96枚と初期デッキ60枚の両方がそろう（モンスターカード本体は初期デッキの3体だけ）', () => {
+    const owned = createStarterCollection();
+    for (const c of INITIAL_DISTRIBUTION.flatMap((d) => d.cards)) expect(owned[c.id] ?? 0).toBeGreaterThanOrEqual(c.copies);
+    const deck = createStarterDeck();
+    expect(deck.skills).toHaveLength(60);
+    expect(validateDeck(deck, owned)).toEqual([]);
+    expect(Object.keys(owned).filter((id) => id.startsWith('mon-')).sort()).toEqual([...new Set(deck.monsters)].sort());
   });
 });

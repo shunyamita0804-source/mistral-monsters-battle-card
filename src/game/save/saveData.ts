@@ -338,7 +338,7 @@ function migrateSoramo14V9(raw: RawObject): RawObject {
 
 /**
  * version 9 → 10（2026-10-26）：ガウルの技を新しい14技に替えた。旧16技（skl-gauul-01〜16）は所持カードとデッキから外す。
- * ガウルは初期配布が未確定なので、代わりのカードは配らない。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
+ * 代わりのカードは配らない（当時はガウルの初期配布をゲームに入れていなかった。2026-10-26 確定の16枚は新しく始めたときだけ）。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
  */
 function migrateGaul14V10(raw: RawObject): RawObject {
   const removed = new Set(GAUUL_OLD_SKILL_IDS);
