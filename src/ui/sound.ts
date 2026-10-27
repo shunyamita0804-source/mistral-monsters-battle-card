@@ -330,6 +330,29 @@ class SoundPlayer {
     osc.stop(now + 0.09);
   }
 
+  /**
+   * ガチャのハンドルを回すときの歯車の「カチッ」（2026-10-27）。tap() と同じく素材ファイルを使わずその場で作る。
+   * 金属の小さな爪が歯車にかかるような、高めで短い音。効果音の音量・ミュートに従う
+   */
+  ratchet(): void {
+    if (this.#volume <= 0) return;
+    const ctx = this.#context();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1900, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.025);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.06 * this.#volume, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.04);
+  }
+
   play(id: SoundId, delayMs = 0): void {
     this.#playUrl(this.#source(SE_REGISTRY[id]), SE_REGISTRY[id].gain, delayMs);
   }

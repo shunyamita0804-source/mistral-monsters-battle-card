@@ -1,0 +1,9 @@
+カードショップ改修の引き継ぎ資料（2026-10-27 ユーザーから ZIP「MistralBC_CardShop_Handoff_FIXED」）
+
+ZIP の中身を無改変で保管した。ZIP の中で文字化けしていたファイル名2つだけ、中身の文から読める名前に付け直した：
+  …_001_README_送信方法_UTF8.txt・…_002_00_デザイン担当へ最初に送る_統合正式プロンプト_UTF8.txt
+ZIP の中のフォルダ分け（01_APPROVED・02_WORKING）は展開時に無くなっていた。README の記述から：
+  01_APPROVED＝CardShop_Interior_Official.jpeg・Handle_Official_Reference.jpeg
+  02_WORKING＝Gacha_Tray_8Frame_Reference.png・AutoDoor_Opening_Closing_Reference.png（参考候補。正式完成品ではない）
+  EXTRA_＝デザイン担当向けの依頼資料・トレー候補（下書き）
+ゲームでの使い方は docs/design/cardshop-20261027/10_受け取りと実装_UTF8.txt

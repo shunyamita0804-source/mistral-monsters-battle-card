@@ -12,6 +12,7 @@ import { cardName, packDescription, packName, packUnlockHint } from '../../i18n/
 import { t } from '../../i18n/i18n.ts';
 import { openCardDetail } from '../components/cardDetail.ts';
 import { createCardView } from '../components/cardView.ts';
+import { showGachaTurn } from '../components/gachaTurn.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import { rarityBadge } from '../components/rarityBadge.ts';
@@ -193,11 +194,11 @@ export const gachaScreen: ScreenDefinition = {
           // 先に画面を描き直してから演出を重ねる（描き直しで演出が消えないように）
           render();
           if (r.status === 'ok') {
-            // お金を払う（レジ）→ パックを開ける
+            // お金を払う（レジ）→ 販売機のハンドルを1周まわす → 出てきたパックを開ける
             sound.play('register');
             store.update(() => r.save);
             render();
-            openPack(pack, r.cards, before);
+            showGachaTurn(element, PACK_ART[pack.id], packName(pack), () => openPack(pack, r.cards, before));
           } else if (r.status === 'error') {
             messageModal(element, r.message);
           }
