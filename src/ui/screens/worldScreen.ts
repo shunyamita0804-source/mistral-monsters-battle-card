@@ -950,6 +950,8 @@ export class WorldView {
       door.at = time;
       const target = this.#nearDoor(door.anim) ? 1 : 0;
       if (door.t === target) continue;
+      // 閉じていた戸が開き始めるとき：自動ドアの音（2026-10-26 ユーザー提供の auto_door.mp3。それまでは店に出入りする瞬間に鳴らしていた）
+      if (target === 1 && door.t === 0) sound.play('autoDoor');
       const step = dt / (target > door.t ? DOOR_OPEN_MS : DOOR_CLOSE_MS);
       door.t = target > door.t ? Math.min(1, door.t + step) : Math.max(0, door.t - step);
       this.#placeDoor(door);
@@ -1226,13 +1228,15 @@ export class WorldView {
       this.#held = null;
       const target = warp.target;
       if (target.kind === 'map') {
-        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）
+        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）。
+        // カードショップは 2026-10-27 から、自動ドアが開き始めるときに鳴らす（#updateDoors）ので、ここでは鳴らさない
         const to = getMap(target.mapId);
-        if (to && to.area !== this.#map.area) {
+        const shop = to?.id === 'shop' || this.#map.id === 'shop';
+        if (to && to.area !== this.#map.area && !shop) {
           const building = to.area === 'interior' ? to.id : this.#map.id;
           const entering = to.area === 'interior';
           sound.play(
-            building === 'hall' ? 'ironDoorOpen' : building === 'shop' ? 'autoDoor' : entering ? 'doorOpen' : 'doorClose',
+            building === 'hall' ? 'ironDoorOpen' : entering ? 'doorOpen' : 'doorClose',
           );
         }
         this.#store.update((s) => ({ ...s, location: { mapId: target.mapId, x: target.x, y: target.y, dir: target.dir } }));
