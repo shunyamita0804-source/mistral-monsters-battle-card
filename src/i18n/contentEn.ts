@@ -65,12 +65,12 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'tournament:tournament-e:description': 'Your first official cup (details are temporary). Win 3 in a row to take the title.',
   'tournament:tournament-d:name': 'Rank D Cup',
   'tournament:tournament-d:description': 'A cup for Rank E champions (details are temporary).',
-  'opponent:e-1:name': 'Temp opponent (E, Round 1)',
-  'opponent:e-2:name': 'Temp opponent (E, Semifinal)',
-  'opponent:e-3:name': 'Temp opponent (E, Final)',
-  'opponent:d-1:name': 'Temp opponent (D, Round 1)',
-  'opponent:d-2:name': 'Temp opponent (D, Semifinal)',
-  'opponent:d-3:name': 'Temp opponent (D, Final)',
+  'opponent:e-1:name': 'Noel',
+  'opponent:e-2:name': 'Viktor',
+  'opponent:e-3:name': 'Sienna',
+  'opponent:d-1:name': 'Dario',
+  'opponent:d-2:name': 'Isabella',
+  'opponent:d-3:name': 'Gordon',
 
   // ダンジョン（仮）
   'dungeon:dungeon-01:name': 'Ancient Ruins',
@@ -89,7 +89,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:enc-run-npc:name': 'Dungeon Duelist (Temp)',
   'opponent:enc-run-guardian:name': 'Unseen Guardian (Temp)',
   'opponent:enc-practice:name': 'Practice partner (Temp)',
-  'opponent:exam-teacher:name': 'Practice Hall Instructor',
+  'opponent:exam-teacher:name': 'Gareth',
 
   // ---------- マップ・扉・家具（仮マップ。src/data/maps.ts） ----------
   'map:town:name': 'Town',

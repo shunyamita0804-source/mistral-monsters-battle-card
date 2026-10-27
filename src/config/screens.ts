@@ -10,6 +10,8 @@ export const SCREEN_IDS = [
   'world',
   'deck',
   'collection',
+  /** 名刺図鑑（家の本棚。2026-10-27） */
+  'peopleBook',
   'shopMenu',
   'cardList',
   'gacha',

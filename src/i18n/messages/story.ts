@@ -5,21 +5,10 @@ import type { MessageEntry } from '../i18n.ts';
  *
  * - 台詞は「セイモン序盤会話台本 V1」（Seimon_Opening_Tutorial_DesignPack_20261022）の【仮】。ユーザー承認前は正式シナリオではない
  * - 英語は同じ資料の仮訳（正式な英文は未承認）
- * - 女性の正式な名前は未定。名前の札には仮の呼び名「となりの家の女性」を出す
+ * - 名前の札は人物の名前（src/data/people.ts。2026-10-27 決定）
  */
 export const STORY = {
-  // 名前の札（話している人）
-  // 2026-10-27 導入イベントV2：となりの家の女性は主人公の幼馴染（名前は未定なので「幼馴染」）
-  'story.speaker.neighborGuide': { ja: '幼馴染', en: 'Childhood Friend' },
-  // 【仮】街の人の呼び名（正式な名前は未定。2026-10-23）
-  'story.speaker.clerk': { ja: '店員', en: 'Clerk' },
-  'story.speaker.researcher': { ja: '研究員', en: 'Researcher' },
-  'story.speaker.receptionist': { ja: '受付', en: 'Receptionist' },
-  'story.speaker.teacher': { ja: '練習場の先生', en: 'Instructor' },
-  'story.speaker.residentA': { ja: '花かごの婦人', en: 'Flower Lady' },
-  'story.speaker.residentB': { ja: 'カード好きの青年', en: 'Card Fan' },
-  'story.speaker.residentD': { ja: '赤い服の女性', en: 'Woman in Red' },
-  'story.speaker.residentE': { ja: '新聞を読む紳士', en: 'Gentleman' },
+  // 名前の札（話している人）は 2026-10-27 から人物の名前（src/data/people.ts。となりの家の女性＝ミレイユ）
 
   // 会話の操作
   'story.ui.skip': { ja: 'スキップ', en: 'Skip' },

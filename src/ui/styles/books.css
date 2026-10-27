@@ -1,0 +1,392 @@
+/*
+ * 名刺図鑑（家の本棚）とカード図鑑（研究所）（2026-10-27 指示書「人物の名前・名刺図鑑・カード図鑑」）。
+ * 名刺の台紙・ファイル・図鑑の部品の絵はデザイン担当に依頼中。届くまでは仮の見た目（色だけ分ける）
+ */
+
+/* ===== 顔の絵（無い人は仮の人影） ===== */
+.person-face {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #1b2130;
+}
+
+.person-face__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* ミレイユは会話の絵（胸から上）を顔の所で切り抜く */
+.person-face--portrait .person-face__img {
+  object-position: 50% 8%;
+  transform: scale(1.35);
+  transform-origin: 50% 0;
+}
+
+.person-face--none {
+  background: linear-gradient(180deg, #3a4150, #252a34);
+}
+
+.person-face__head {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 34%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(10 12 18 / 0.7);
+  transform: translateX(-50%);
+}
+
+.person-face__body {
+  position: absolute;
+  left: 50%;
+  bottom: -14%;
+  width: 72%;
+  height: 46%;
+  border-radius: 50% 50% 0 0;
+  background: rgb(10 12 18 / 0.7);
+  transform: translateX(-50%);
+}
+
+/* ===== 名刺図鑑 ===== */
+.people-book__count {
+  flex: none;
+  margin: 8px 12px 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.people-book__note {
+  flex: none;
+  margin: 4px 12px 6px;
+  font-size: 11px;
+  color: var(--color-sub);
+  text-align: center;
+}
+
+.people-book__list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-content: start;
+  gap: 8px;
+  padding: 4px 10px 24px;
+  overflow-y: auto;
+}
+
+/* 名刺：街の人は紺、対戦する人はえんじ（台紙の絵が届くまでの仮） */
+.name-card {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 84px;
+  padding: 6px;
+  border: 2px solid #c9a24a;
+  border-radius: 8px;
+  background: linear-gradient(160deg, #24345e, #18233f);
+  color: #f3ead2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.name-card--opponent {
+  background: linear-gradient(160deg, #6e2433, #4a1622);
+}
+
+.name-card.is-unmet {
+  border-color: rgb(201 162 74 / 0.4);
+  filter: saturate(0.4) brightness(0.75);
+  cursor: default;
+}
+
+.name-card__face {
+  flex: none;
+  width: 64px;
+  height: 72px;
+}
+
+.name-card__text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name-card__no {
+  font-size: 11px;
+  color: #e8cf8a;
+}
+
+.name-card__epithet {
+  font-size: 10px;
+  color: #f1d58a;
+}
+
+.name-card__name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 1.2em;
+}
+
+.name-card__title {
+  font-size: 10px;
+  line-height: 1.35;
+  color: rgb(243 234 210 / 0.85);
+}
+
+/* 名刺を押したとき：大きく表示 */
+.name-card-detail {
+  border: 3px solid #c9a24a;
+  background: linear-gradient(160deg, #24345e, #18233f);
+  color: #f3ead2;
+}
+
+.name-card-detail--opponent {
+  background: linear-gradient(160deg, #6e2433, #4a1622);
+}
+
+.name-card-detail__face {
+  width: 180px;
+  height: 200px;
+  margin: 0 auto 8px;
+}
+
+.name-card-detail__no,
+.name-card-detail__epithet,
+.name-card-detail__title,
+.name-card-detail__line {
+  margin: 2px 0;
+  text-align: center;
+}
+
+.name-card-detail__no {
+  font-size: 12px;
+  color: #e8cf8a;
+}
+
+.name-card-detail__epithet {
+  font-size: 12px;
+  color: #f1d58a;
+}
+
+.name-card-detail__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-align: center;
+}
+
+.name-card-detail__title {
+  font-size: 13px;
+}
+
+.name-card-detail__line {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.name-card-detail__rows {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid rgb(201 162 74 / 0.5);
+}
+
+.name-card-detail__row {
+  display: grid;
+  grid-template-columns: 7.5em 1fr;
+  gap: 6px;
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.name-card-detail__row dt {
+  color: #e8cf8a;
+}
+
+.name-card-detail__row dd {
+  margin: 0;
+}
+
+.name-card-detail__monsters,
+.name-card-detail__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.name-card-detail__monster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+}
+
+/* ===== カード図鑑 ===== */
+.card-book {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
+.card-book .card-grid__tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-stage, #14161b);
+}
+
+.card-book__items {
+  flex: none;
+  overflow: visible;
+}
+
+.card-book__section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 10px 4px;
+  padding: 4px 10px;
+  border-left: 4px solid #c9a24a;
+  background: rgb(255 255 255 / 0.06);
+  font-family: var(--font-display);
+  font-size: 15px;
+}
+
+.card-book__section--temp {
+  border-left-color: #8a8f99;
+  color: var(--color-sub);
+}
+
+.card-book__complete {
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f6d77c, #c9952f);
+  color: #3b2508;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.card-book__item {
+  position: relative;
+}
+
+/* 未入手：番号は薄くしない（「？？？」の枠だけ） */
+.card-book__item.is-unowned > :first-child {
+  opacity: 1;
+}
+
+/* 区切りの見出しへ飛んだとき、上のタブに隠れない */
+.card-book__section {
+  scroll-margin-top: 56px;
+}
+
+.card-book__no {
+  min-height: 1.2em;
+  font-size: 11px;
+  color: #e8cf8a;
+}
+
+.card-book__new {
+  position: absolute;
+  top: 14px;
+  right: 2px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  background: #e0453a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+/* 詳しい画面：上半分にカード、下半分に文 */
+.card-book-detail {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: rgb(10 11 14 / 0.96);
+  touch-action: pan-y;
+}
+
+.card-book-detail__top {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 0;
+  padding-top: 12px;
+}
+
+.card-book-detail__no {
+  margin: 0;
+  font-size: 14px;
+  color: #e8cf8a;
+}
+
+.card-book-detail__bottom {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 10px 16px 16px;
+  overflow-y: auto;
+  border-top: 1px solid rgb(201 162 74 / 0.5);
+}
+
+.card-book-detail__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-align: center;
+}
+
+.card-book-detail__rows {
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  gap: 6px 8px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.card-book-detail__rows dt {
+  color: #e8cf8a;
+}
+
+.card-book-detail__rows dd {
+  margin: 0;
+}
+
+.card-book-detail__text {
+  margin: 0;
+  text-align: center;
+  color: var(--color-sub);
+}
+
+.card-book-detail__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.card-book-detail__nav .btn {
+  min-height: 44px;
+}

@@ -16,6 +16,8 @@ import residentB from '@assets/images/characters/face_resident_b.webp';
 import residentD from '@assets/images/characters/face_resident_d.webp';
 import residentE from '@assets/images/characters/face_resident_e.webp';
 import { SCENES, type Expression, type SceneEffect, type SceneId, type SceneStep, type Speaker } from '../../data/storyScenes.ts';
+import { personOfSpeaker } from '../../data/people.ts';
+import { personName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { button, h } from '../dom.ts';
@@ -72,18 +74,14 @@ function preloadPortraits(): void {
   }
 }
 
-const SPEAKER_NAME: Readonly<Record<Exclude<Speaker, 'system'>, MessageKey>> = {
-  neighbor_guide: 'story.speaker.neighborGuide',
-  resident_a: 'story.speaker.residentA',
-  resident_b: 'story.speaker.residentB',
-  resident_d: 'story.speaker.residentD',
-  resident_e: 'story.speaker.residentE',
-  teacher: 'story.speaker.teacher',
-  clerk: 'story.speaker.clerk',
-  receptionist: 'story.speaker.receptionist',
-  researcher: 'story.speaker.researcher',
-  bureau_clerk: 'introV2.speaker.bureau',
-};
+/**
+ * 名前の札。人物（src/data/people.ts。2026-10-27 名前が決まった）はその名前。
+ * 管理局の受付は、職員（エレノア）がまだゲームに出てこない（データだけ）ので仮の呼び名のまま
+ */
+function speakerName(speaker: Exclude<Speaker, 'system'>): string {
+  const person = personOfSpeaker(speaker);
+  return person ? personName(person) : t('introV2.speaker.bureau');
+}
 
 /** 1文字を出す間隔（ミリ秒） */
 const CHAR_MS = 28;
@@ -91,6 +89,8 @@ const CHAR_MS = 28;
 export interface DialogueOptions {
   /** 場面の始め・終わり・スキップで、進み具合を変えるとき（すぐに保存する） */
   readonly onEffects: (effects: readonly SceneEffect[]) => void;
+  /** 話し手の名前の札を出したとき（名刺図鑑の登録に使う） */
+  readonly onSpeaker?: (speaker: Exclude<Speaker, 'system'>) => void;
   /** 会話が閉じたとき。練習試合を始める場面なら practice が入る */
   readonly onClose: (practice: { readonly tutorial: boolean } | null) => void;
 }
@@ -151,7 +151,8 @@ export function playScene(parent: HTMLElement, start: SceneId, options: Dialogue
       return;
     }
     name.hidden = false;
-    name.textContent = t(SPEAKER_NAME[speaker]);
+    name.textContent = speakerName(speaker);
+    options.onSpeaker?.(speaker);
     const set = PORTRAITS[speaker];
     portrait.hidden = !set;
     if (!set) return;

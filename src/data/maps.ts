@@ -59,6 +59,8 @@ export type InteractAction =
   | 'shopClerk'
   | 'gacha'
   | 'tournamentDesk'
+  /** 名刺図鑑（家の本棚。2026-10-27） */
+  | 'peopleBook'
   /** カード練習場の練習テーブル（練習試合） */
   | 'practiceTable'
   /** 【仮】カードバトラー管理局の受付（導入イベントV2。src/game/story/introV2.ts） */
@@ -327,7 +329,8 @@ const HOME_ART = artOf('player');
 export const HOME: MapDefinition = artMap('home', '家', 'interior', HOME_ART, [
   interactAt('home-bed', itemOf(HOME_ART, 'BED'), 'ベッド', 'settings'),
   interactAt('home-map', itemOf(HOME_ART, 'WALL_MAP'), '壁の地図', 'dungeonSelect'),
-  interactAt('home-shelf', itemOf(HOME_ART, 'BOOKSHELF'), '本棚', 'collection'),
+  // 本棚：名刺図鑑（2026-10-27 指示書。カード図鑑は研究所）
+  interactAt('home-shelf', itemOf(HOME_ART, 'BOOKSHELF'), '本棚', 'peopleBook'),
   interactAt('home-desk', itemOf(HOME_ART, 'DESK'), '机', 'deck'),
   interactAt('home-plant', itemOf(HOME_ART, 'PLANT'), '植木鉢', 'message', '元気に育っている。'),
   roomExit('home-exit', HOME_ART, 'PLAYER_HOME'),

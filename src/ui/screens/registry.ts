@@ -4,6 +4,7 @@ import { cardListScreen, collectionScreen } from './collectionScreens.ts';
 import { deckScreen } from './deckScreen.ts';
 import { dungeonRunScreen } from './dungeonRunScreen.ts';
 import { dungeonSelectScreen } from './dungeonSelectScreen.ts';
+import { peopleBookScreen } from './peopleBookScreen.ts';
 import { newGameScreen } from './newGameScreen.ts';
 import { optionsScreen } from './optionsScreen.ts';
 import { settingsScreen } from './settingsScreen.ts';
@@ -24,6 +25,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   world: worldScreen,
   deck: deckScreen,
   collection: collectionScreen,
+  peopleBook: peopleBookScreen,
   shopMenu: shopMenuScreen,
   cardList: cardListScreen,
   gacha: gachaScreen,

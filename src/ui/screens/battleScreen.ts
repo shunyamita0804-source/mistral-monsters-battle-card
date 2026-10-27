@@ -34,6 +34,7 @@ import {
 } from '../../game/cards/cardTypes.ts';
 import { buildAutoDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
+import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, opponentName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -427,7 +428,11 @@ export const battleScreen: ScreenDefinition = {
     let swipe: HandSwipe | null = null;
     let swipeGhost: HTMLElement | null = null;
     let swipeRaf = 0;
-    const finish = once((winner: BattleState['winner']) => req.onFinish(winner ?? 'draw'));
+    const finish = once((winner: BattleState['winner']) => {
+      // 名刺図鑑：相手が人物なら登録して勝ち負けを数える（2026-10-27）
+      ctx.store.update((s) => recordPersonBattle(s, req.opponent, winner ?? 'draw'));
+      req.onFinish(winner ?? 'draw');
+    });
     /** 最初の練習試合のヒント（出したものは2度出さない。出ている間は相手も待つ） */
     const seenHints = new Set<BattleHintId>();
     let hintOpen: BattleHintId | null = null;

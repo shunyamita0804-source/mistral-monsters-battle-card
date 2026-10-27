@@ -2,6 +2,7 @@ import { cardCatalog } from '../data/cards.ts';
 import type { DungeonDefinition } from '../data/dungeons.ts';
 import type { PackDefinition } from '../data/economy.ts';
 import type { MapDefinition, MapObject } from '../data/maps.ts';
+import { personOfOpponent, type LocalText, type Person } from '../data/people.ts';
 import type { OpponentDefinition, TournamentDefinition } from '../data/tournaments.ts';
 import type { CardDefinition } from '../game/cards/cardTypes.ts';
 import { CONTENT_EN } from './contentEn.ts';
@@ -46,7 +47,18 @@ export const packUnlockHint = (p: PackDefinition): string => contentText('pack',
 export const tournamentName = (t: TournamentDefinition): string => contentText('tournament', t.id, 'name', t.name);
 export const tournamentDescription = (t: TournamentDefinition): string =>
   contentText('tournament', t.id, 'description', t.description);
-export const opponentName = (o: OpponentDefinition): string => contentText('opponent', o.id, 'name', o.name);
+/** 相手の名前。人物（src/data/people.ts）なら人物の名前（見えない番人は「？？？」） */
+export function opponentName(o: OpponentDefinition): string {
+  const person = personOfOpponent(o);
+  return person ? personName(person) : contentText('opponent', o.id, 'name', o.name);
+}
+
+/** 人物の文（日本語・英語は people.ts にまとめて書いてある） */
+export const localText = (text: LocalText): string => (getLanguage() === 'en' ? text.en : text.ja);
+export const personName = (person: Person): string => localText(person.name);
+export const personTitle = (person: Person): string => localText(person.title);
+export const personLine = (person: Person): string => localText(person.line);
+export const personEpithet = (person: Person): string | null => (person.epithet ? localText(person.epithet) : null);
 export const dungeonName = (d: DungeonDefinition): string => contentText('dungeon', d.id, 'name', d.name);
 export const dungeonDescription = (d: DungeonDefinition): string => contentText('dungeon', d.id, 'description', d.description);
 export const mapName = (m: MapDefinition): string => contentText('map', m.id, 'name', m.name);
