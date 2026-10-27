@@ -28,6 +28,7 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import seimon_town_pack as pack  # noqa: E402
+import cardshop_v2 as shop2  # noqa: E402  2026-10-27 カードショップの新しい外観・内装・自動ドア
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 OUT_TOWN = os.path.join(ROOT, 'assets/images/maps/town')
@@ -128,12 +129,20 @@ def place_fountain(parts: str) -> tuple[Image.Image, tuple[int, int]]:
 BUILDING_STRETCH_Y = 1.1
 
 
-def place_building(parts: str, b: dict) -> tuple[Image.Image, tuple[int, int]]:
+def place_building(parts: str, b: dict) -> tuple[Image.Image, tuple[int, int], tuple[int, int, int, int] | None]:
+    """建物の絵を枠に合わせて置く。3つ目は切り抜いた範囲（カードショップだけ。戸の絵を同じに切り抜くため）"""
     x1, y1, x2, y2 = b['rect']
-    part = load_part(parts, BUILDING_FILE[b['id']])
+    bbox = None
+    if b['id'] == 'SHOP':
+        # 2026-10-27 新しい外観（cardshop_v2）。戸を開けたときに見える店の中を下に重ねたもの
+        im = clean_alpha(shop2.town_shop_part())
+        bbox = im.getbbox()
+        part = im.crop(bbox)
+    else:
+        part = load_part(parts, BUILDING_FILE[b['id']])
     s = (x2 - x1) / part.width
     part = part.resize((round(part.width * s), round(part.height * s * BUILDING_STRETCH_Y)), Image.LANCZOS)
-    return part, ((x1 + x2) // 2 - part.width // 2, y2 - part.height)
+    return part, ((x1 + x2) // 2 - part.width // 2, y2 - part.height), bbox
 
 
 def shadow(base: Image.Image, part: Image.Image, xy: tuple[int, int], dx=18, dy=10, blur=10, alpha=90) -> None:
@@ -443,12 +452,15 @@ def build_town(parts: str, check_dir: str | None):
 
     # 建物（奥から）
     buildings = []
+    shop_door = None
     for b in sorted(pack.TOWN['buildings'], key=lambda b: b['rect'][3]):
-        part, xy = place_building(parts, b)
+        part, xy, bbox = place_building(parts, b)
         part = shade_building(part)
         building_shadow(base, part, xy)
         base.alpha_composite(part, xy)
         buildings.append((b, part, xy))
+        if bbox:
+            shop_door = (bbox, part.size, xy)
 
     # 書き出し（3/4 に縮小して 3×3）
     os.makedirs(OUT_TOWN, exist_ok=True)
@@ -508,6 +520,9 @@ def build_town(parts: str, check_dir: str | None):
         doors=doors, exit=dict(x=exit_cols[0], y=exit_row, w=len(exit_cols), h=1),
         fountain=fountain_cells, spawn=dict(x=sx // CELL, y=sy // CELL),
     )
+    if shop_door:
+        # カードショップの外側の自動ドア（左右の戸だけ別の絵。ゲームが入口の枠の中で動かす）
+        town['doorAnims'] = [shop2.town_shop_doors(*shop_door, shade_building, doors['SHOP'])]
     if check_dir:
         chk = base.copy()
         d = ImageDraw.Draw(chk, 'RGBA')
@@ -721,6 +736,8 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
         m = dict(m)
         m['tiles'] = [ref(t) for t in m['tiles']]
         m['sprites'] = [ref(s) for s in m['sprites']]
+        if 'doorAnims' in m:
+            m['doorAnims'] = [{**d, 'left': ref(d['left']), 'right': ref(d['right'])} for d in m['doorAnims']]
         maps.append(m)
     body = json.dumps({m['id']: m for m in maps}, ensure_ascii=False, indent=1)
     for i, _ in enumerate(files):
@@ -732,6 +749,9 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
         f'{imports}\n\n'
         'export interface ArtImage { readonly file: string; readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z?: number }\n'
         'export interface CellRect { readonly x: number; readonly y: number; readonly w: number; readonly h: number }\n'
+        '/** 自動ドア：左右の戸を clip（設計図の単位）の中で travel だけ左右へ動かす。near（マス）に人がいる間は開く */\n'
+        'export interface ArtDoorAnim {\n  readonly id: string;\n  readonly clip: { readonly x: number; readonly y: number; readonly w: number; readonly h: number };\n'
+        '  readonly left: ArtImage;\n  readonly right: ArtImage;\n  readonly travel: number;\n  readonly z: number;\n  readonly near: CellRect;\n}\n'
         'export interface ArtMap {\n'
         '  readonly id: string;\n  readonly cols: number;\n  readonly rows: number;\n'
         '  /** 絵の大きさ（設計図の単位。表示は 0.5625 倍の論理px） */\n  readonly width: number;\n  readonly height: number;\n'
@@ -741,6 +761,8 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
         '  readonly exit: CellRect;\n  readonly spawn: { readonly x: number; readonly y: number };\n'
         '  readonly doors?: Readonly<Record<string, CellRect & { readonly back: { readonly x: number; readonly y: number }; readonly label: { readonly x: number; readonly y: number } }>>;\n'
         '  readonly items?: Readonly<Record<string, CellRect>>;\n  readonly fountain?: CellRect;\n'
+        '  /** 自動ドア */\n  readonly doorAnims?: readonly ArtDoorAnim[];\n'
+        '  /** 部屋を画面の高さに合わせるときの基準の高さ（無ければ絵の高さ） */\n  readonly fitHeight?: number;\n'
         '}\n\n'
         f'export const WORLD_ART: Readonly<Record<string, ArtMap>> = {body};\n'
     )
@@ -794,7 +816,8 @@ def main() -> None:
     finally:
         shutil.rmtree(toned, ignore_errors=True)
     furn = load_furniture(parts)
-    rooms = [build_room(parts, r, furn, check) for r in pack.ROOMS]
+    # カードショップは 2026-10-27 の新しい内装（cardshop_v2）
+    rooms = [shop2.build_shop_room() if r['id'] == 'ROOM_SHOP' else build_room(parts, r, furn, check) for r in pack.ROOMS]
     with open(OUT_TS, 'w', encoding='utf-8') as f:
         f.write(to_ts(town, rooms))
     print('ok', OUT_TS)

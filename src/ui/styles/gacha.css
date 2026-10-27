@@ -1,6 +1,8 @@
 /*
  * カードパック販売機のハンドルを回す場面（2026-10-27 カードショップ改修。src/ui/components/gachaTurn.ts）。
- * 部品は tools/design/gacha_build.py が切り出す（ハンドル＝正式、機械の上半分と取り出し口＝【仮】）。
+ * 部品は tools/design/gacha_build.py が作る（ハンドル＝正式の絵を分けたもの、機械・取り出し口・背景＝2026-10-27 の正式素材 A・B・G）。
+ * 機械の部品は 900×1300 の同じキャンバス。位置の % は素材の「家具と組み込み_UTF8.txt」の座標（ガラス x276 y309 w345 h408・
+ * ハンドルの座の中心 650,1000・パック x249 y892 w160 h288）を 900×1300 で割ったもの
  */
 .gacha-turn {
   position: absolute;
@@ -10,11 +12,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 16px;
+  gap: 8px;
+  padding: 12px 16px 20px;
   background:
-    radial-gradient(circle at 50% 38%, rgb(70 92 170 / 0.45), transparent 62%),
-    linear-gradient(rgb(6 7 12 / 0.92), rgb(6 7 12 / 0.96));
+    linear-gradient(rgb(6 7 12 / 0.35), rgb(6 7 12 / 0.55)),
+    url('@assets/images/ui/gacha/turn_bg.webp') center / cover no-repeat,
+    #0b0f1f;
   touch-action: none;
   user-select: none;
 }
@@ -22,6 +25,9 @@
 .gacha-turn__hint {
   min-height: 44px;
   margin: 0;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: rgb(8 12 30 / 0.55);
   color: #f6e7b8;
   font-size: 16px;
   font-weight: 800;
@@ -30,159 +36,104 @@
   text-shadow: 0 2px 4px rgb(0 0 0 / 0.8);
 }
 
-/* 機械の上半分（ガラス窓の中に、買ったパックが入っている） */
+/* 機械（重ねる部品はすべて同じ大きさ） */
 .gacha-turn__machine {
   position: relative;
-  width: 290px;
-  aspect-ratio: 480 / 408;
+  width: 350px;
+  aspect-ratio: 900 / 1300;
+  flex: none;
 }
 
-.gacha-turn__machine-art {
-  position: relative;
-  z-index: 1;
+.gacha-turn__layer {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
 }
 
-/* ガラスの内側。【仮】の機械の絵はガラスがほとんど透けないので、パックを絵の上に置き、上から薄い光沢をかけてガラス越しに見せる */
+/* ガラスの奥（暗い紺）と、中に入っているパック */
 .gacha-turn__window {
   position: absolute;
-  left: 20%;
-  top: 38%;
-  z-index: 2;
-  width: 54%;
-  height: 54%;
+  left: 30.667%;
+  top: 23.769%;
+  width: 38.333%;
+  height: 31.385%;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   overflow: hidden;
-  pointer-events: none;
-}
-
-.gacha-turn__window::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background: linear-gradient(115deg, rgb(255 255 255 / 0.28) 0 18%, rgb(255 255 255 / 0.06) 32% 60%, rgb(255 255 255 / 0.2) 75%);
+  background: radial-gradient(circle at 50% 75%, #24346b, #0f1731 70%);
 }
 
 .gacha-turn__stock {
-  width: 30%;
-  margin: 0 -9% -14%;
-  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.6));
+  width: 34%;
+  margin: 0 -7% -10%;
+  filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.6));
   transition:
     transform 420ms cubic-bezier(0.5, 0, 0.9, 0.5),
     opacity 420ms ease-in;
 }
 
 .gacha-turn__stock:nth-child(1) {
-  transform: rotate(-14deg);
+  transform: rotate(-12deg);
 }
 
 .gacha-turn__stock:nth-child(2) {
   z-index: 1;
-  transform: translateY(-14%) rotate(4deg);
+  transform: translateY(-10%) rotate(3deg);
 }
 
 .gacha-turn__stock:nth-child(3) {
-  transform: rotate(16deg);
+  transform: rotate(14deg);
 }
 
 /* 回し終えたら、まん中のパックが下へ落ちる */
 .gacha-turn.is-turned .gacha-turn__stock:nth-child(2) {
   opacity: 0;
-  transform: translateY(90%) rotate(4deg);
+  transform: translateY(90%) rotate(3deg);
 }
 
-.gacha-turn__stock.is-blank,
-.gacha-turn__out-art.is-blank {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 240 / 438;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #c8a45d, #e07a3a);
-  color: #3b2410;
-  font-size: 11px;
-  font-weight: 800;
-  text-align: center;
+/* 取り出し口（閉じたふた → 開いたふた） */
+.gacha-turn__outlet-closed,
+.gacha-turn__outlet-open {
+  transition: opacity 200ms ease;
 }
 
-/* 機械の下の台（取り出し口とハンドル）。紺の板に金の縁 */
-.gacha-turn__panel {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 330px;
-  height: 210px;
-  margin-top: -12px;
-  padding: 0 4px 0 14px;
-  border: 3px solid #d7a93e;
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 70% 50%, rgb(70 90 170 / 0.55), transparent 60%),
-    linear-gradient(#1c2a66, #0e1638);
-  box-shadow:
-    inset 0 0 0 2px rgb(255 230 160 / 0.25),
-    0 6px 16px rgb(0 0 0 / 0.6);
-}
-
-/* 取り出し口（閉じた絵と開いた絵を重ねて入れかえる） */
-.gacha-turn__tray {
-  position: relative;
-  flex: none;
-  width: 132px;
-  aspect-ratio: 260 / 210;
-}
-
-.gacha-turn__tray-closed,
-.gacha-turn__tray-open {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  transition: opacity 220ms ease;
-  pointer-events: none;
-}
-
-.gacha-turn__tray-open {
+.gacha-turn__outlet-open {
   opacity: 0;
 }
 
-.gacha-turn__tray.is-open .gacha-turn__tray-closed {
+.gacha-turn__machine.is-open .gacha-turn__outlet-closed {
   opacity: 0;
 }
 
-.gacha-turn__tray.is-open .gacha-turn__tray-open {
+.gacha-turn__machine.is-open .gacha-turn__outlet-open {
   opacity: 1;
 }
 
-/* 出てきたパック（押すと開封へ） */
+/* 出てきたパック（受け皿で止まる。押すと開封へ）。受け皿の手前のふちをこの上に重ねる */
 .gacha-turn__out {
   position: absolute;
-  left: 50%;
-  bottom: 22%;
-  z-index: 2;
-  width: 84px;
-  min-height: 40px;
+  left: 27.667%;
+  top: 68.615%;
+  width: 17.778%;
+  height: 22.154%;
   padding: 0;
   border: 0;
   background: none;
   opacity: 0;
-  transform: translate(-50%, 20%) scale(0.35);
+  transform: translateY(-18%) scale(0.86);
   transform-origin: 50% 100%;
   pointer-events: none;
   transition:
-    transform 520ms cubic-bezier(0.3, 1.5, 0.6, 1),
-    opacity 200ms ease;
+    transform 460ms cubic-bezier(0.3, 1.4, 0.6, 1),
+    opacity 160ms ease;
 }
 
 .gacha-turn__out.is-out {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: none;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -190,7 +141,9 @@
 .gacha-turn__out-art {
   display: block;
   width: 100%;
-  filter: drop-shadow(0 0 10px rgb(255 226 140 / 0.9));
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
 }
 
 .gacha-turn__out.is-out .gacha-turn__out-art {
@@ -198,20 +151,33 @@
 }
 
 @keyframes gacha-pack-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgb(255 226 140 / 0.6));
+  }
+
   50% {
-    filter: drop-shadow(0 0 18px rgb(255 236 170 / 1));
-    transform: translateY(-4px);
+    filter: drop-shadow(0 0 14px rgb(255 236 170 / 1));
   }
 }
 
-/* ハンドル（円盤は動かず、取っ手だけ真ん中を軸に回る） */
+/* ハンドル：取っ手の回る中心（軸受け）を座の中心に合わせる。取っ手の回る半径は座の中心から 175px（900 幅の中で）。
+   円盤は動かず、取っ手だけ真ん中を軸に回る。指でつかめる範囲は絵より広い（::before） */
 .gacha-turn__handle {
-  position: relative;
-  flex: none;
-  width: 200px;
-  height: 200px;
+  position: absolute;
+  left: calc(72.222% - 19.667%);
+  top: calc(76.923% - 13.615%);
+  width: 39.333%;
+  aspect-ratio: 1;
   cursor: grab;
   touch-action: none;
+}
+
+.gacha-turn__handle::before {
+  content: '';
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
 }
 
 .gacha-turn__handle.is-grabbed {
@@ -238,6 +204,10 @@
   min-height: 44px;
 }
 
+.gacha-turn__actions > [hidden] {
+  display: none;
+}
+
 .gacha-turn__auto,
 .gacha-turn__take {
   min-width: 180px;
@@ -253,8 +223,4 @@
   .gacha-turn__out.is-out .gacha-turn__out-art {
     animation: none;
   }
-}
-
-.gacha-turn__actions > [hidden] {
-  display: none;
 }

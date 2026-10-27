@@ -1,0 +1,643 @@
+{
+  "version": 1,
+  "date": "2026-10-27",
+  "origin": "top-left",
+  "pixelUnits": true,
+  "assetCount": 38,
+  "assets": [
+    {
+      "file": "gacha_machine_front.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        50,
+        30,
+        800,
+        1230
+      ],
+      "fullyTransparentPixels": 481846,
+      "partialAlphaPixels": 684531,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "gacha_machine_glass.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        276,
+        309,
+        345,
+        408
+      ],
+      "fullyTransparentPixels": 1142296,
+      "partialAlphaPixels": 27704,
+      "minAlpha": 0,
+      "maxAlpha": 24
+    },
+    {
+      "file": "gacha_machine_handle_seat.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        520,
+        870,
+        260,
+        260
+      ],
+      "fullyTransparentPixels": 1116565,
+      "partialAlphaPixels": 52656,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "gacha_outlet_closed.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        169,
+        981,
+        310,
+        211
+      ],
+      "fullyTransparentPixels": 1108168,
+      "partialAlphaPixels": 60968,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "gacha_outlet_front.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        169,
+        1157,
+        310,
+        35
+      ],
+      "fullyTransparentPixels": 1159150,
+      "partialAlphaPixels": 10850,
+      "minAlpha": 0,
+      "maxAlpha": 252
+    },
+    {
+      "file": "gacha_outlet_open.png",
+      "width": 900,
+      "height": 1300,
+      "alphaBounds": [
+        169,
+        981,
+        310,
+        211
+      ],
+      "fullyTransparentPixels": 1104590,
+      "partialAlphaPixels": 65410,
+      "minAlpha": 0,
+      "maxAlpha": 252
+    },
+    {
+      "file": "gacha_pack_sealed.png",
+      "width": 240,
+      "height": 432,
+      "alphaBounds": [
+        0,
+        0,
+        240,
+        432
+      ],
+      "fullyTransparentPixels": 6050,
+      "partialAlphaPixels": 96400,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "gacha_turn_bg.png",
+      "width": 1170,
+      "height": 2532,
+      "alphaBounds": [
+        0,
+        0,
+        1170,
+        2532
+      ],
+      "fullyTransparentPixels": 0,
+      "partialAlphaPixels": 0,
+      "minAlpha": 255,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_door_frame.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        505,
+        617,
+        540,
+        250
+      ],
+      "fullyTransparentPixels": 1508193,
+      "partialAlphaPixels": 64182,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_door_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        600,
+        680,
+        176,
+        141
+      ],
+      "fullyTransparentPixels": 1548543,
+      "partialAlphaPixels": 23528,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_door_pocket_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        424,
+        650,
+        176,
+        190
+      ],
+      "fullyTransparentPixels": 1540968,
+      "partialAlphaPixels": 31196,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_door_pocket_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        952,
+        650,
+        176,
+        190
+      ],
+      "fullyTransparentPixels": 1540968,
+      "partialAlphaPixels": 31197,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_door_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        776,
+        680,
+        176,
+        141
+      ],
+      "fullyTransparentPixels": 1548543,
+      "partialAlphaPixels": 23527,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_back_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        242,
+        150,
+        112,
+        115
+      ],
+      "fullyTransparentPixels": 1562756,
+      "partialAlphaPixels": 9722,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_back_left_shelf.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        293,
+        43,
+        116,
+        155
+      ],
+      "fullyTransparentPixels": 1559573,
+      "partialAlphaPixels": 12856,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_back_shelves.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        520,
+        0,
+        490,
+        245
+      ],
+      "fullyTransparentPixels": 1461925,
+      "partialAlphaPixels": 109965,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_center_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        245,
+        337,
+        170,
+        215
+      ],
+      "fullyTransparentPixels": 1540142,
+      "partialAlphaPixels": 32014,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_center_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        398,
+        380,
+        120,
+        172
+      ],
+      "fullyTransparentPixels": 1555569,
+      "partialAlphaPixels": 16800,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_counter.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        445,
+        94,
+        900,
+        296
+      ],
+      "fullyTransparentPixels": 1408149,
+      "partialAlphaPixels": 162851,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_easel.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1260,
+        344,
+        98,
+        159
+      ],
+      "fullyTransparentPixels": 1562332,
+      "partialAlphaPixels": 10025,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_front_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        50,
+        550,
+        385,
+        195
+      ],
+      "fullyTransparentPixels": 1518271,
+      "partialAlphaPixels": 53480,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_left_wall.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        40,
+        166,
+        198,
+        406
+      ],
+      "fullyTransparentPixels": 1529125,
+      "partialAlphaPixels": 42884,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_plant_back_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        180,
+        90,
+        45,
+        80
+      ],
+      "fullyTransparentPixels": 1570859,
+      "partialAlphaPixels": 1707,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_plant_counter_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        414,
+        83,
+        50,
+        129
+      ],
+      "fullyTransparentPixels": 1569328,
+      "partialAlphaPixels": 3085,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_plant_counter_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1005,
+        118,
+        50,
+        110
+      ],
+      "fullyTransparentPixels": 1569832,
+      "partialAlphaPixels": 2618,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_plant_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        28,
+        448,
+        70,
+        130
+      ],
+      "fullyTransparentPixels": 1567958,
+      "partialAlphaPixels": 4371,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_plant_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1265,
+        255,
+        60,
+        95
+      ],
+      "fullyTransparentPixels": 1569756,
+      "partialAlphaPixels": 2705,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_right_display.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1023,
+        307,
+        103,
+        196
+      ],
+      "fullyTransparentPixels": 1557769,
+      "partialAlphaPixels": 14613,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_right_wall.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1340,
+        175,
+        185,
+        560
+      ],
+      "fullyTransparentPixels": 1507062,
+      "partialAlphaPixels": 64698,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_furniture_stockroom.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1090,
+        0,
+        164,
+        190
+      ],
+      "fullyTransparentPixels": 1543918,
+      "partialAlphaPixels": 28252,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_gacha_machine.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        1100,
+        200,
+        180,
+        290
+      ],
+      "fullyTransparentPixels": 1533881,
+      "partialAlphaPixels": 38096,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_interior_front.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        0,
+        625,
+        1536,
+        359
+      ],
+      "fullyTransparentPixels": 1290320,
+      "partialAlphaPixels": 281301,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "shop_interior_shell.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        0,
+        0,
+        1536,
+        1024
+      ],
+      "fullyTransparentPixels": 0,
+      "partialAlphaPixels": 0,
+      "minAlpha": 255,
+      "maxAlpha": 255
+    },
+    {
+      "file": "town_shop.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        30,
+        8,
+        1439,
+        972
+      ],
+      "fullyTransparentPixels": 496314,
+      "partialAlphaPixels": 1076550,
+      "minAlpha": 0,
+      "maxAlpha": 252
+    },
+    {
+      "file": "town_shop_door_inside.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        663,
+        585,
+        210,
+        349
+      ],
+      "fullyTransparentPixels": 1499574,
+      "partialAlphaPixels": 72189,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "town_shop_door_left.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        663,
+        604,
+        105,
+        330
+      ],
+      "fullyTransparentPixels": 1539062,
+      "partialAlphaPixels": 32863,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "file": "town_shop_door_pocket.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        558,
+        604,
+        420,
+        330
+      ],
+      "fullyTransparentPixels": 1503564,
+      "partialAlphaPixels": 69300,
+      "minAlpha": 0,
+      "maxAlpha": 250
+    },
+    {
+      "file": "town_shop_door_right.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds": [
+        768,
+        604,
+        105,
+        330
+      ],
+      "fullyTransparentPixels": 1539062,
+      "partialAlphaPixels": 32863,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    }
+  ],
+  "machine": {
+    "canvas": [
+      900,
+      1300
+    ],
+    "window": [
+      276,
+      309,
+      345,
+      408
+    ],
+    "handlePivot": [
+      650,
+      1000
+    ],
+    "handleSeatDiameter": 260,
+    "outlet": [
+      169,
+      981,
+      310,
+      211
+    ],
+    "outletLip": [
+      169,
+      1157,
+      310,
+      35
+    ],
+    "sealedPack": [
+      240,
+      432
+    ]
+  },
+  "doors": {
+    "interior": {
+      "aperture": [
+        600,
+        680,
+        352,
+        141
+      ],
+      "leftFullOpenDx": -176,
+      "rightFullOpenDx": 176
+    },
+    "exterior": {
+      "aperture": [
+        663,
+        604,
+        210,
+        330
+      ],
+      "leftFullOpenDx": -105,
+      "rightFullOpenDx": 105
+    }
+  },
+  "checks": {
+    "allRequiredFilesPresent": true,
+    "allCanvasesMatch": true,
+    "alphaChannelsVerified": true,
+    "opaqueBackgroundsVerified": true,
+    "interiorOpenDoorResidualPixels": 0,
+    "exteriorOpenDoorResidualPixels": 0,
+    "exteriorApertureFullyTransparent": true
+  }
+}

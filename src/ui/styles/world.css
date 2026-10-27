@@ -877,3 +877,14 @@
     animation-duration: 1ms;
   }
 }
+
+/* 自動ドア（2026-10-27 カードショップの外と中）：入口の枠の中だけ見せ、左右の戸を動かす（worldScreen.ts の #buildDoors） */
+.world__door {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.world__door-leaf {
+  will-change: transform;
+}

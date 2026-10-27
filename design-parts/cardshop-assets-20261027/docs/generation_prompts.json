@@ -1,0 +1,122 @@
+{
+  "tool": "built-in image_gen",
+  "production": "各画像のアルファを保持して指定キャンバスへ配置・寸法調整。ガラスの透過率調整。左右戸は同一原画を鏡像利用。",
+  "prompts": [
+    {
+      "name": "town_shop_fixed",
+      "prompt": "Use case precise-object-edit. Edit attached building ONLY enlarge its central open entrance, all other architecture silhouette roof awning lamps planter windows colors unchanged. 1536x1024 transparent output same canvas. Current opening too short. REQUIRED transparent clear rectangular opening EXACT x663..873 and y634..964, width210 HEIGHT330. Extend opening DOWN through existing step until y964. Bottom low step may y964..976. Brass jamb can border aperture. No doors or interior painted in aperture. Both aperture and outside building genuinely transparent. No ground cast shadow. No text creatures people. Preserve composition."
+    },
+    {
+      "name": "gacha_machine_front_fixed",
+      "prompt": ""
+    },
+    {
+      "name": "shop_furniture_counter",
+      "prompt": "Commercial smartphone 2D RPG Mistral Monsters Battle Card game asset. Painterly polished rendering matching interior master warm upper-left illumination; navy, muted gold brass, warm wood, ivory stone. No people creatures monsters lettering numbers logos signatures watermarks or card face artwork; all cards/packs are plain navy and gold. True transparent background, no checkerboard. Use case background-extraction plus precise-object-edit. Extract ONLY exact original back cashier counter including all countertop objects and side return, from master at original position x445..1085 y130..390. Preserve silhouette location camera scale and wooden panels navy drape. Replace all illustrated cards and signs with blank navy/gold surfaces. No rear wall shelves, no floor, no red machine, no plants outside counter. 1536x1024 transparent canvas original coordinates, do not center or enlarge the object."
+    },
+    {
+      "name": "shop_furniture_back_shelves",
+      "prompt": "Use case: background-extraction and precise-object-edit. Commercial 2D RPG game sprite. Input image is master interior and exact position target. Preserve painterly finish, warm upper-left lighting, original camera and scale. Output 1536x1024 genuinely transparent canvas, at exact ORIGINAL position of this item in reference, everything else transparent, no floors/walls or extraneous furniture. Do not recenter or enlarge. Remove all writing logos creatures card artwork from extracted items; card faces and packs plain navy/gold. No people. Extract ONLY the central three connected tall back-wall wooden merchandise shelving units and top plants, original x520..1010 y0..245. Plain merchandise with no readable labels. Keep visible bottoms."
+    },
+    {
+      "name": "shop_furniture_left_wall",
+      "prompt": "Use case: background-extraction and precise-object-edit. Commercial 2D RPG game sprite. Input image is master interior and exact position target. Preserve painterly finish, warm upper-left lighting, original camera and scale. Output 1536x1024 genuinely transparent canvas, at exact ORIGINAL position of this item in reference, everything else transparent, no floors/walls or extraneous furniture. Do not recenter or enlarge. Remove all writing logos creatures card artwork from extracted items; card faces and packs plain navy/gold. No people. Extract ONLY the long left-wall wooden shelving/display unit, original x40..238 y166..572. Remove wall posters, retain merchandise blank navy/gold."
+    },
+    {
+      "name": "shop_furniture_center_left",
+      "prompt": "Use case: background-extraction and precise-object-edit. Commercial 2D RPG game sprite. Input image is master interior and exact position target. Preserve painterly finish, warm upper-left lighting, original camera and scale. Output 1536x1024 genuinely transparent canvas, at exact ORIGINAL position of this item in reference, everything else transparent, no floors/walls or extraneous furniture. Do not recenter or enlarge. Remove all writing logos creatures card artwork from extracted items; card faces and packs plain navy/gold. No people. Extract ONLY the larger left glass-topped central display cabinet, original x244..416 y336..550. No adjoining smaller table at right. All displayed cards blank navy/gold, glass reflections retained."
+    },
+    {
+      "name": "shop_furniture_center_right",
+      "prompt": "Use case: background-extraction and precise-object-edit. Commercial 2D RPG game sprite. Input image is master interior and exact position target. Preserve painterly finish, warm upper-left lighting, original camera and scale. Output 1536x1024 genuinely transparent canvas, at exact ORIGINAL position of this item in reference, everything else transparent, no floors/walls or extraneous furniture. Do not recenter or enlarge. Remove all writing logos creatures card artwork from extracted items; card faces and packs plain navy/gold. No people. Extract ONLY the smaller central right display cabinet original x398..518 y380..552, no adjacent larger glass cabinet. Blank navy/gold packs on top."
+    },
+    {
+      "name": "shop_interior_front",
+      "prompt": "Use case: precise-object-edit / game sprite. Match exact master interior camera, scale, original coordinates and warm upper left illumination; commercial painterly 2D RPG. Genuine transparent PNG 1536x1024. No lettering logos signatures people creatures or card illustrations. Navy wood ivory stone muted gold brass. No checkerboard. Extract ONLY bottom foreground wall from interior master, left and right segments, entrance columns and two large plants immediately beside entrance. Keep original full canvas positions bottom y625..984. Remove glass doors AND entire inner door frame spanning x600..952 y643..821, leave entrance x596..956 completely empty transparent from y625 to bottom. Keep entrance pillars at x465..595 and x956..1085 and original front walls out to both edges. No shelves display tables floor or other furniture. This is foreground occlusion layer ONLY."
+    },
+    {
+      "name": "shop_door_left",
+      "prompt": "Use case: precise-object-edit / game sprite. Match exact master interior camera, scale, original coordinates and warm upper left illumination; commercial painterly 2D RPG. Genuine transparent PNG 1536x1024. No lettering logos signatures people creatures or card illustrations. Navy wood ivory stone muted gold brass. No checkerboard. One LEFT sliding glass door leaf at closed position in interior original lower middle entrance. Draw ONLY one rectangular leaf x600..776 y680..821, slight top-down frame bevel matching interior entrance angle. Gold brass thin frame, lightly blue gray glass SEMI-TRANSPARENT with sparse diagonal reflection, NO opaque image painted behind glass. Other entire canvas clear. No handles (automatic), no fixed frame, no plants floor or walls. Leave this leaf in original coordinates, no enlarged view. Reference 2 shape/material only, adjust to master camera."
+    },
+    {
+      "name": "town_shop_door_left",
+      "prompt": "Use case: precise-object-edit / game sprite. Match exact master interior camera, scale, original coordinates and warm upper left illumination; commercial painterly 2D RPG. Genuine transparent PNG 1536x1024. No lettering logos signatures people creatures or card illustrations. Navy wood ivory stone muted gold brass. No checkerboard. One LEFT sliding automatic glass door leaf for exterior shop, seen slightly from above front, same material as interior door but taller outside view. Draw leaf ONLY on transparent full 1536x1024 canvas at x663..768 y634..964. Rectangular thin muted brass frame, translucent lightly blue glass, sparse diagonal reflection. No opaque painted backdrop. No handles, no hinges, no fixed arch, no plants floor or walls. Other canvas entirely transparent. Single leaf only."
+    },
+    {
+      "name": "gacha_machine_handle_seat",
+      "prompt": "Commercial painterly fantasy mobile RPG game sprite, polished navy ivory gold brass matching references. No text numbers logos creatures people card face artwork. Genuinely transparent PNG background. ONE asset only no contact sheet. ONLY round recessed brass mounting seat, no handle crank grip spindle or arm. Match official handle's gold disc material and machine blue trim. Straight on circular depression with small centered dark axle hole and subtle blue rivets. Draw seat isolated, diameter 240px at center (657,965) on 900x1300 transparent canvas. Outside seat fully transparent."
+    },
+    {
+      "name": "gacha_machine_glass",
+      "prompt": "Commercial painterly fantasy mobile RPG game sprite, polished navy ivory gold brass matching references. No text numbers logos creatures people card face artwork. Genuinely transparent PNG background. ONE asset only no contact sheet. ONLY semi-transparent glass reflections and thin translucent blue tint matching upper window of attached machine. No machine frame or objects. On 900x1300 transparent canvas rectangle x267..646 y274..680, empty elsewhere. Few soft diagonal pale highlights, mostly transparent so inserted pack remains visible. No opaque dark backdrop."
+    },
+    {
+      "name": "gacha_outlet_closed",
+      "prompt": "Commercial painterly fantasy mobile RPG game sprite, polished navy ivory gold brass matching references. No text numbers logos creatures people card face artwork. Genuinely transparent PNG background. ONE asset only no contact sheet. ONLY closed rectangular outlet flap assembly that fits attached machine lower LEFT outlet. Keep same gold rounded rivet frame blue panel with small gold geometric star as machine. Straight-on closed flap no tray protrusion. On portrait900x1300 transparent canvas original outlet x170..552 y864..1181, other pixels entirely transparent. Do not draw entire machine."
+    },
+    {
+      "name": "gacha_pack_sealed",
+      "prompt": "Commercial painterly fantasy mobile RPG game sprite, polished navy ivory gold brass matching references. No text numbers logos creatures people card face artwork. Genuinely transparent PNG background. ONE asset only no contact sheet. One sealed unopened card booster foil packet straight-on portrait width240 height432 (ratio 1:1.8). Plain navy center large completely blank area for later game illustration, gold restrained border, sealed crimped top and bottom. No star illustration, no creatures, no card art, no words. Isolated pack tightly framed with small transparent margin, reference gold/blue material."
+    },
+    {
+      "name": "shop_furniture_front_left",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Reference master original location scale camera upper-left warm lighting preserved. Genuine transparent 1536x1024 canvas. Other objects and floor walls completely transparent. No people lettering logos signatures creatures card illustrations. Cards packs plain navy/gold. Extract ONLY front-left horizontal display cabinet x50..435 y550..745 with four standing large blank cards on top and smaller plain packs beneath; no front wall pillars plants."
+    },
+    {
+      "name": "shop_furniture_right_wall",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Reference master original location scale camera upper-left warm lighting preserved. Genuine transparent 1536x1024 canvas. Other objects and floor walls completely transparent. No people lettering logos signatures creatures card illustrations. Cards packs plain navy/gold. Extract ONLY right-side wall shelving unit x1340..1525 y175..735. No plant red gumball machine or separate easel or wall posters."
+    },
+    {
+      "name": "shop_furniture_back_left",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Reference master original location scale camera upper-left warm lighting preserved. Genuine transparent 1536x1024 canvas. Other objects and floor walls completely transparent. No people lettering logos signatures creatures card illustrations. Cards packs plain navy/gold. Extract ONLY small rear-left freestanding glass display cabinet x242..354 y150..265, two large blank navy/gold cards on top. No left wall shelving other tables floor walls."
+    },
+    {
+      "name": "shop_furniture_right_display",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Reference master original location scale camera upper-left warm lighting preserved. Genuine transparent 1536x1024 canvas. Other objects and floor walls completely transparent. No people lettering logos signatures creatures card illustrations. Cards packs plain navy/gold. Extract ONLY small freestanding wooden display rack with bottom framed blank navy card x1023..1126 y307..503 directly LEFT of red round gumball machine; do NOT include red machine. No other furniture."
+    },
+    {
+      "name": "shop_gacha_machine",
+      "prompt": "Use case stylized-concept, commercial painterly game sprite. Master interior is style camera reference; machine reference is design only. ONE same blue ivory gold card-pack vending machine in exact top-down interior angle, front facing bottom of canvas, warm light upper left. No red gumball globe. Same crown columns blue jewel glass window lower-left tray right brass official handle small gold crank blue ball allowed ONLY in this interior sprite. Empty window dark navy, no packs art. At x1100..1280 y200..490 on 1536x1024 TRUE transparent canvas. Machine only no floor/walls, subtle contact shadow allowed. No text logo numbers creatures people."
+    },
+    {
+      "name": "gacha_turn_bg",
+      "prompt": "Use case stylized-concept. Commercial painterly portrait smartphone background 1170x2532. Master interior style palette materials reference. Eye level view facing back-right wall of this warm fantasy cardshop, NOT overhead. Center entirely unobstructed blank dark navy and wooden wall with warm ivory floor below; blurred wooden shelves only near edges. Soft slight blur, upper 2/3 dark muted navy, subdued golden wall lamps at side edges, warm floor lower1/3. NO MACHINE whatsoever no people lettering logos creatures illustrations. Opaque full background."
+    },
+    {
+      "name": "shop_door_frame",
+      "prompt": "Use case stylized-concept game architectural sprite. Exact master interior top-down perspective and commercial painterly style upper-left warm lighting. ONLY fixed automatic door frame for bottom center interior entrance. Genuine transparent1536x1024, no wall floor plants furniture or leaves. Outer frame boundary x584..968 y648..839, central opening x600..952 y680..821 ENTIRELY TRANSPARENT. Thin navy header with gold brass cap, ivory stone side jambs, gold sill. One frame only no center mullion, no glass, no text. Preserve original position, don't enlarge. Same navy ivory brass materials as master."
+    },
+    {
+      "name": "shop_door_pocket_left",
+      "prompt": "Use case stylized-concept. Game sprite fixed LEFT wall face hiding opened sliding door, matching original interior bottom entrance camera and ivory/navy stone foreground wall. ONLY one solid rectangular architectural wall face x424..600 y650..840, 176wide190tall on transparent1536x1024. Warm ivory stone upper face muted gold cap navy recessed lower panel, bevel top-down. It MUST be opaque across whole rectangle to hide 176wide door behind, edges clean. No plants glass doors furniture floor people text logos."
+    },
+    {
+      "name": "town_shop_door_inside",
+      "prompt": "Use case stylized-concept game sprite. Eye-level frontal slightly elevated view into warm wood navy ivory cardshop, same upper left warm lighting painterly RPG quality as master. ONLY view through doorway x663..873 y634..964, 210wide330high on transparent1536x1024 canvas; all other pixels clear. Warm ivory floor below, warm shelving with plain navy gold packs in distance, no people lettering card art or creatures. Rectangle no frame doors plants outside. Store interior brightly warm not black. Do not enlarge or recenter."
+    },
+    {
+      "name": "shop_furniture_stockroom",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Master interior original overhead camera upper-left warm lighting. Genuine transparent1536x1024, only requested object, no floor walls people lettering numbers creatures illustrated card faces. Blank navy/gold cards. Extract ONLY back right storage shelves original x1090..1250 y0..190, wood shelving with plain merchandise boxes; no counter white partition."
+    },
+    {
+      "name": "shop_furniture_back_left_shelf",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Master interior original overhead camera upper-left warm lighting. Genuine transparent1536x1024, only requested object, no floor walls people lettering numbers creatures illustrated card faces. Blank navy/gold cards. Extract ONLY tall narrow pack display rack original x293..409 y43..198 at rear left, several rows plain navy/gold packs. No wall posters or other furniture."
+    },
+    {
+      "name": "shop_furniture_plant",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Master interior original overhead camera upper-left warm lighting. Genuine transparent1536x1024, only requested object, no floor walls people lettering numbers creatures illustrated card faces. Blank navy/gold cards. Extract ONLY potted leafy plant next to left counter original x414..464 y83..212. Warm wooden barrel planter green leaves. No counter shelves floor."
+    },
+    {
+      "name": "shop_furniture_easel",
+      "prompt": "Use case background-extraction / precise-object-edit. Commercial polished painterly 2D RPG. Master interior original overhead camera upper-left warm lighting. Genuine transparent1536x1024, only requested object, no floor walls people lettering numbers creatures illustrated card faces. Blank navy/gold cards. Extract ONLY right small leaning wooden card display easel right of red machine original x1260..1358 y344..503. Replace all card illustrations with plain navy and muted gold empty faces. No red machine plant wall or floor."
+    },
+    {
+      "name": "door_leaf_clean",
+      "prompt": "Use case stylized-concept. ONE isolated automatic sliding GLASS DOOR LEAF, rectangular portrait, gold thin brass frame with navy accents, painterly warm fantasy RPG style, subtle upper-left illumination. Pure clear lightly blue glass. Glass reflects ONLY two soft pale diagonal bands, NO IMAGE, NO FLOOR TILES, NO ROOM, NO SHELVES, NO OBJECTS, NO PATTERN behind glass. Glass center should remain almost completely transparent, not opaque blue or white. No hinge, no handle, no central horizontal bar, no text or logo. Object centered with modest transparent margin, width1 height3. Entire surrounding canvas true alpha transparency. This single door will be used for inside and outside with perspective scaling; must have simple clean square frame."
+    },
+    {
+      "name": "gacha_machine_glass_final",
+      "prompt": "ONLY faint window glass reflections: two very soft diagonal white translucent streaks. Otherwise entirely transparent. No frame, panel, objects or background."
+    }
+  ]
+}

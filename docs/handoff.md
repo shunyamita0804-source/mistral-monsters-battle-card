@@ -4,6 +4,10 @@
 
 ## 0. 次のセッションへ（2026-10-26 の終わりに書いた要点）
 
+- **2026-10-27 カードショップ素材一式（A〜G）を組み込んだ（作業ブランチ `claude/cardshop-assets-20261027`・未マージ・未公開）**。原本 `design-parts/cardshop-assets-20261027/`、記録 `docs/design/cardshop-20261027/11_素材一式の受け取り_UTF8.txt`。
+  街の外観を新しく（`tools/design/cardshop_v2.py` を `seimon_world_build.py` が呼ぶ。変わった街の絵はショップのある2枚だけ）、外と中の自動ドア（`worldScreen.ts` の `#buildDoors`。近づくと開く）、
+  新しい内装（赤いガチャ機なし・家具ごとに前後・店の中に青い販売機。部屋は 1920×1280 単位・`fitHeight` 1024 で人の大きさをほかの部屋とそろえる）、店員は見た目だけ奥（`NpcObject.drawDy`）、
+  販売機の画面を正式素材に（【仮】の切り出しは消した）。**iPhone 確認待ち**。戸の音はなし
 - **2026-10-27 カードショップ改修：ガチャの流れ（作業ブランチ `claude/cardshop-gacha-20261027`・main に取り込み `c6786df` で公開）**。ZIP「MistralBC_CardShop_Handoff_FIXED」は `design-parts/cardshop-20261027/` に無改変。
   ユーザー指示どおり、販売機を調べる → パックを買う → 販売機の画面でハンドルを指で時計まわりに1周（「自動でまわす」もあり）→ 取り出し口が開いてパックが出る → 押すと開封（`src/ui/components/gachaTurn.ts`・`src/ui/styles/gacha.css`）。
   ハンドルは正式の絵を円盤と取っ手に分けた。機械の上半分・取り出し口は参考シートの【仮】切り出し（`tools/design/gacha_build.py`）。
