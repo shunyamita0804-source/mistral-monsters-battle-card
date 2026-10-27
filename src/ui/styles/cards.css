@@ -533,6 +533,18 @@
   user-select: none;
 }
 
+/* 背景つきの四角い絵をカードいっぱいに（背景を抜いた絵がまだ無いモンスターの仮：ガウル 2026-10-27） */
+.battle-card__art--fill {
+  inset: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% var(--art-pos, 30%);
+  transform: scale(var(--art-zoom, 1));
+}
+
 .battle-card__life {
   position: absolute;
   top: 6%;

@@ -34,7 +34,7 @@ export function createBattleMonsterCard(monster: MonsterCard, width: number, lif
       attrs: { role: 'img', 'aria-label': life ? t('card.aria.monsterLife', { name, life: life.current, max: life.max }) : t('card.aria.monster', { name }) },
     },
     h('img', { class: 'battle-card__bg', attrs: { src: backgroundUrl, alt: '', draggable: 'false' } }),
-    artUrl ? h('img', { class: 'battle-card__art', attrs: { src: artUrl, alt: '', draggable: 'false' } }) : null,
+    artUrl ? h('img', { class: `battle-card__art${spec?.fill ? ' battle-card__art--fill' : ''}`, attrs: { src: artUrl, alt: '', draggable: 'false' } }) : null,
     frameUrl ? h('img', { class: 'battle-card__frame', attrs: { src: frameUrl, alt: '', draggable: 'false' } }) : null,
     h('span', { class: 'battle-card__life' }, h('span', { class: 'battle-card__life-label', text: 'LIFE' }), h('b', { class: 'battle-card__life-value', text: lifeText })),
     h('span', { class: 'battle-card__name', text: name }),
@@ -48,6 +48,10 @@ export function createBattleMonsterCard(monster: MonsterCard, width: number, lif
   if (spec) {
     card.style.setProperty('--art-scale', String(spec.scale));
     card.style.setProperty('--art-offset', String(spec.offsetY));
+    if (spec.fill) {
+      card.style.setProperty('--art-pos', `${spec.fill.posY * 100}%`);
+      card.style.setProperty('--art-zoom', String(spec.fill.zoom));
+    }
   }
   return card;
 }
