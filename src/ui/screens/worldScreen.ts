@@ -1,5 +1,6 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
+import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
 import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { getMonster } from '../../data/cards.ts';
@@ -147,6 +148,17 @@ const FIGURE_ZOOM = 1.55;
 const FIGURE_WIDEN = 1.1;
 /** 部屋の絵が画面の高さのどれくらいを占めるか */
 const ROOM_FILL = 0.9;
+/** 自動ドア（2026-10-27 カードショップ）：全部開くまで・全部閉じるまでの時間（ミリ秒） */
+const DOOR_OPEN_MS = 380;
+const DOOR_CLOSE_MS = 520;
+/** 自動ドアの表示（左右の戸の絵・開き具合 0〜1・最後に動かした時刻） */
+interface DoorState {
+  readonly anim: ArtDoorAnim;
+  readonly left: HTMLElement;
+  readonly right: HTMLElement;
+  t: number;
+  at: number;
+}
 /** 場所を移るときの暗転（ミリ秒） */
 const FADE_OUT_MS = 170;
 /** 絵の読み込みを待つ上限（ミリ秒）。遅い回線でも操作できなくならないように */
@@ -440,6 +452,8 @@ export class WorldView {
   #busy = false;
   #raf = 0;
   #last = 0;
+  /** 自動ドア */
+  #doors: DoorState[] = [];
   /** 歩きの位相（歩数。1歩＝4コマ。コマ送り用。walkAnim.ts）・最後に歩いていた時刻 */
   #phase = 0;
   #lastMoving = 0;
@@ -679,7 +693,8 @@ export class WorldView {
   #artScale(map: MapDefinition): number {
     if (!map.art || map.area !== 'interior') return ART_SCALE;
     const vh = (this.#root.clientHeight || 844) - 8;
-    return Math.min(ART_SCALE * ROOM_ZOOM_MAX, Math.max(ART_SCALE, (vh * ROOM_FILL) / map.art.height));
+    // fitHeight：カードショップ（横長の新しい内装）は、ほかの部屋と同じ高さを基準にして人物の大きさをそろえる（部屋は縦にも少し動く）
+    return Math.min(ART_SCALE * ROOM_ZOOM_MAX, Math.max(ART_SCALE, (vh * ROOM_FILL) / (map.art.fitHeight ?? map.art.height)));
   }
 
   /** 絵を読み込み終えてから幕を開ける（入った瞬間に家具だけ・背景だけが見えないように） */
@@ -770,6 +785,7 @@ export class WorldView {
   #build(fade = false): void {
     this.#touch = null;
     this.#shadows.clear();
+    this.#doors = [];
     this.#held = null;
     this.#keys.clear();
     const map = this.#map;
@@ -791,6 +807,7 @@ export class WorldView {
         const z = img.z ? 10 + Math.round(img.z * this.#scale) : 1;
         this.#mapLayer.append(this.#artImage(img.file, img, 'world__furniture', z));
       }
+      this.#buildDoors(map.art.doorAnims ?? []);
     } else {
       const tiles = h('div', { class: 'world__tiles' });
       tiles.style.gridTemplateColumns = `repeat(${width}, ${TILE}px)`;
@@ -887,6 +904,60 @@ export class WorldView {
     if (fade) this.#reveal();
   }
 
+  /**
+   * 自動ドア（2026-10-27 カードショップの外と中）：入口の枠（clip）の中に左右の戸を置き、枠の外は見せない。
+   * 人が near のマスにいる間は開き、離れると閉じる（#updateDoors）。入ったとき・出てきたときは開いたところから
+   */
+  #buildDoors(anims: readonly ArtDoorAnim[]): void {
+    const sc = this.#scale;
+    this.#doors = anims.map((anim) => {
+      const box = h('div', { class: 'world__door', attrs: { 'aria-hidden': 'true' } });
+      const { clip } = anim;
+      Object.assign(box.style, {
+        left: `${clip.x * sc}px`,
+        top: `${clip.y * sc}px`,
+        width: `${clip.w * sc}px`,
+        height: `${clip.h * sc}px`,
+        zIndex: String(10 + Math.round(anim.z * sc)),
+      });
+      const leaf = (img: ArtDoorAnim['left']): HTMLElement => this.#artImage(img.file, { ...img, x: img.x - clip.x, y: img.y - clip.y }, 'world__furniture world__door-leaf', 0);
+      const left = leaf(anim.left);
+      const right = leaf(anim.right);
+      box.append(left, right);
+      this.#mapLayer.append(box);
+      const door = { anim, left, right, t: this.#nearDoor(anim) ? 1 : 0, at: performance.now() };
+      this.#placeDoor(door);
+      return door;
+    });
+  }
+
+  /** 人が戸の開く範囲にいるか（歩いている途中は行き先のマスも見る） */
+  #nearDoor(anim: ArtDoorAnim): boolean {
+    const { near } = anim;
+    const inside = (p: Point): boolean => p.x >= near.x && p.x < near.x + near.w && p.y >= near.y && p.y < near.y + near.h;
+    return inside(this.#tile) || (this.#move !== null && inside(this.#move.to));
+  }
+
+  #placeDoor(door: DoorState): void {
+    const dx = door.anim.travel * door.t * this.#scale;
+    door.left.style.transform = `translateX(${-dx}px)`;
+    door.right.style.transform = `translateX(${dx}px)`;
+  }
+
+  #updateDoors(time: number): void {
+    for (const door of this.#doors) {
+      const dt = Math.max(0, time - door.at);
+      door.at = time;
+      const target = this.#nearDoor(door.anim) ? 1 : 0;
+      if (door.t === target) continue;
+      // 閉じていた戸が開き始めるとき：自動ドアの音（2026-10-26 ユーザー提供の auto_door.mp3。それまでは店に出入りする瞬間に鳴らしていた）
+      if (target === 1 && door.t === 0) sound.play('autoDoor');
+      const step = dt / (target > door.t ? DOOR_OPEN_MS : DOOR_CLOSE_MS);
+      door.t = target > door.t ? Math.min(1, door.t + step) : Math.max(0, door.t - step);
+      this.#placeDoor(door);
+    }
+  }
+
   #artImage(src: string, r: { x: number; y: number; w: number; h: number }, cls: string, z: number): HTMLElement {
     const img = h('img', { class: cls, attrs: { src, alt: '', draggable: 'false', decoding: 'async' } });
     Object.assign(img.style, {
@@ -968,7 +1039,7 @@ export class WorldView {
       // 人ごとに呼吸の始まりをずらす（そろって動かないように）
       body.style.animationDelay = `${-((obj.x * 7 + obj.y * 13) % 32) / 10}s`;
       this.#faceNpc(el, 'down');
-      this.#placeFigure(el, obj);
+      this.#placeFigure(el, { x: obj.x, y: obj.y + (obj.drawDy ?? 0) });
       return el;
     }
     if (obj.type === 'chest') {
@@ -1157,13 +1228,15 @@ export class WorldView {
       this.#held = null;
       const target = warp.target;
       if (target.kind === 'map') {
-        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）
+        // 建物に入る・出る：ドアの音（大会会場は出入りとも鉄の扉、カードショップは出入りとも自動ドア。2026-10-26 ユーザー指示）。
+        // カードショップは 2026-10-27 から、自動ドアが開き始めるときに鳴らす（#updateDoors）ので、ここでは鳴らさない
         const to = getMap(target.mapId);
-        if (to && to.area !== this.#map.area) {
+        const shop = to?.id === 'shop' || this.#map.id === 'shop';
+        if (to && to.area !== this.#map.area && !shop) {
           const building = to.area === 'interior' ? to.id : this.#map.id;
           const entering = to.area === 'interior';
           sound.play(
-            building === 'hall' ? 'ironDoorOpen' : building === 'shop' ? 'autoDoor' : entering ? 'doorOpen' : 'doorClose',
+            building === 'hall' ? 'ironDoorOpen' : entering ? 'doorOpen' : 'doorClose',
           );
         }
         this.#store.update((s) => ({ ...s, location: { mapId: target.mapId, x: target.x, y: target.y, dir: target.dir } }));
@@ -1208,6 +1281,7 @@ export class WorldView {
 
   #render(time = performance.now()): void {
     const p = this.#pos;
+    this.#updateDoors(time);
     // 歩いている間（と、歩き続けている途中のマスの切り替わり）は歩行シート、止まったら待機の絵
     const walking = isWalking(time, this.#lastMoving, this.#move !== null || this.#treadmillMoving);
     const w = parseFloat(this.#player.style.width);
@@ -1568,7 +1642,7 @@ export class WorldView {
     const talk = obj.type === 'npc';
     marker.className = `world__marker ${talk ? 'is-talk' : 'is-examine'}`;
     if (talk) {
-      const f = this.#foot(obj);
+      const f = this.#foot({ x: obj.x, y: obj.y + (obj.drawDy ?? 0) });
       marker.style.transform = `translate(${f.x}px, ${f.y - this.#figureH * 0.84}px)`;
       return;
     }

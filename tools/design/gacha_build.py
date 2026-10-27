@@ -1,7 +1,7 @@
 """カードパック販売機（ガチャ）の専用画面の部品を作る（2026-10-27 カードショップ改修。ZIP「MistralBC_CardShop_Handoff_FIXED」）。
 
 使い方：
-  python3 -I tools/design/gacha_build.py design-parts/cardshop-20261027
+  python3 -I tools/design/gacha_build.py design-parts/cardshop-20261027 design-parts/cardshop-assets-20261027/assets
 
 1. 正式ハンドル（Handle_Official_Reference.jpeg。唯一の正式原画・描き直し禁止）を、白い背景を透明にして
    「動かない円盤（軸受けつき）」と「回る取っ手（軸・ひじ・青い玉）」に分ける（README の指示「固定円盤と回転クランクを切り分け、円盤中央を軸に回す」）。
@@ -9,12 +9,13 @@
    - 円盤：取っ手に隠れていた所は、絵を描き足さず、円盤の見えている所を同じ中心のまわりに回して写して埋める
      （軸受けの中は軸受けの中心 PIVOT のまわりに、ほかは円盤の中心 DISC のまわりに）
    - 2枚とも同じ大きさの正方形で、真ん中が回る中心（PIVOT）。ゲームは取っ手を真ん中を軸に回すだけ
-2. 参考シート（Gacha_Tray_8Frame_Reference.png。02_WORKING＝参考候補・正式完成品ではない）から、焼き込まれた市松模様を透明にして、
-   【仮】機械の上半分（ガラス窓と帯。シートの機械の正面図の下半分には別のハンドルが描かれていて使用禁止なので、その上で切る）と
-   【仮】排出トレー（閉・開）を切り出す。正式素材が届いたら差し替える
-絵は描き直さない（背景を透明にする・切り出す・縮小するだけ。円盤の隠れていた所だけは上のとおり絵の中から写す）。
+2. 販売機の正面図（2026-10-27 ZIP「MistralBC_CardShop_Assets_20261027」の A・B・G。原本 design-parts/cardshop-assets-20261027/assets/）を
+   WebP にする。重ねる部品は 900×1300 の同じキャンバスのまま（位置をずらさない・切り詰めない）。回す画面の背景だけ幅 780 に縮小
+   （それまでの【仮】の機械の上半分・取り出し口〔参考シートからの切り出し〕は使わなくなったので消した）
+絵は描き直さない（背景を透明にする・形式を変える・縮小するだけ。円盤の隠れていた所だけは上のとおり絵の中から写す）。
 
-書き出し先（assets/images/ui/gacha/）：handle_disc.webp・handle_crank.webp・machine_top.webp・tray_closed.webp・tray_open.webp
+使い方の2つ目の引数に販売機の素材のフォルダ（design-parts/cardshop-assets-20261027/assets）。
+書き出し先（assets/images/ui/gacha/）：handle_disc.webp・handle_crank.webp・machine_*.webp・outlet_*.webp・pack_sealed.webp・turn_bg.webp
 """
 
 import sys
@@ -33,11 +34,6 @@ COLLAR_R = 118  # 軸受けの半径
 CRANK_OVER_DISC = [(626, 322), (700, 315), (762, 325), (880, 349), (914, 420), (914, 710), (733, 710), (736, 516), (645, 494), (612, 470)]
 HANDLE_SIZE = 640  # 書き出す正方形の一辺（px）
 
-SHEET_SCALE = 1536 / 1200  # 参考シートの位置は 1200 幅で測ったので、原寸に直す倍率
-MACHINE_FRONT = (8, 33, 285, 400)  # 機械の正面図（1200 幅で測った位置）
-MACHINE_TOP_H = 288  # 機械の上半分の高さ（切り出した正面図の中。この下に別のハンドルがある）
-TRAY_CLOSED = (10, 460, 142, 566)
-TRAY_OPEN = (148, 460, 296, 566)
 
 
 def save(img: Image.Image, name: str, width: int | None = None) -> None:
@@ -106,32 +102,25 @@ def handle(src: Path) -> None:
     save(Image.fromarray(ck, 'RGBA').crop(box).resize((HANDLE_SIZE, HANDLE_SIZE), Image.LANCZOS), 'handle_crank.webp')
 
 
-def keyed(im: np.ndarray, box: tuple[int, int, int, int]) -> Image.Image:
-    """参考シートの一部を切り出し、外側につながる市松模様（明るい無彩色）を透明にする"""
-    x0, y0, x1, y1 = (round(v * SHEET_SCALE) for v in box)
-    sub = im[y0:y1, x0:x1]
-    mx, mn = sub.max(-1), sub.min(-1)
-    checker = (mn > 180) & ((mx - mn) <= 10)
-    lab, _ = ndimage.label(checker)
-    edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
-    alpha = np.where(np.isin(lab, list(edge)), 0, 255).astype(np.uint8)
-    alpha = np.array(Image.fromarray(alpha).filter(ImageFilter.MinFilter(3)))
-    img = Image.fromarray(np.dstack([sub.astype(np.uint8), alpha]), 'RGBA')
-    return img.crop(img.getbbox())
+# 販売機（A・B）：同じ 900×1300 のキャンバスで重ねる部品。ファイル名 → 書き出す名前
+MACHINE_PARTS = {
+    'gacha_machine_front': 'machine_front', 'gacha_machine_glass': 'machine_glass', 'gacha_machine_handle_seat': 'machine_seat',
+    'gacha_outlet_closed': 'outlet_closed', 'gacha_outlet_open': 'outlet_open', 'gacha_outlet_front': 'outlet_front',
+    'gacha_pack_sealed': 'pack_sealed',
+}
+TURN_BG_WIDTH = 780
 
 
-def sheet(src: Path) -> None:
-    im = np.array(Image.open(src).convert('RGB')).astype(int)
-    front = keyed(im, MACHINE_FRONT)
-    save(front.crop((0, 0, front.width, MACHINE_TOP_H)), 'machine_top.webp', width=480)
-    save(keyed(im, TRAY_CLOSED), 'tray_closed.webp', width=260)
-    save(keyed(im, TRAY_OPEN), 'tray_open.webp', width=260)
+def machine(src: Path) -> None:
+    for name, out in MACHINE_PARTS.items():
+        save(Image.open(src / f'{name}.png').convert('RGBA'), f'{out}.webp')
+    save(Image.open(src / 'gacha_turn_bg.png').convert('RGB'), 'turn_bg.webp', width=TURN_BG_WIDTH)
 
 
 def main() -> None:
     src = Path(sys.argv[1])
     handle(src / 'Handle_Official_Reference.jpeg')
-    sheet(src / 'Gacha_Tray_8Frame_Reference.png')
+    machine(Path(sys.argv[2]))
 
 
 if __name__ == '__main__':

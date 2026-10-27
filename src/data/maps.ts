@@ -127,6 +127,8 @@ export interface NpcObject extends Rect {
   readonly id: string;
   readonly npcId: NpcId;
   readonly action?: InteractAction;
+  /** 絵だけを縦にずらすマスの数（負＝奥へ）。カウンターの後ろに立つ店員のように、話しかけるマスと見た目の立ち位置が違うとき */
+  readonly drawDy?: number;
 }
 
 export type MapObject = InteractObject | WarpObject | EnemyObject | ChestObject | NpcObject;
@@ -176,7 +178,7 @@ const enemy = (id: string, x: number, y: number, encounterId: string, boss = fal
   boss,
 });
 
-const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAction): NpcObject => ({
+const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAction, drawDy?: number): NpcObject => ({
   type: 'npc',
   id,
   x,
@@ -185,6 +187,7 @@ const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAc
   h: 1,
   npcId,
   ...(action ? { action } : {}),
+  ...(drawDy ? { drawDy } : {}),
 });
 
 const chest = (
@@ -335,6 +338,11 @@ export const NEIGHBOR: MapDefinition = artMap('neighbor', 'となりの家', 'in
 ], entryOf(NEIGHBOR_ART));
 
 const SHOP_ART = artOf('shop');
+/**
+ * 店員は、話しかけるマス（カウンターの前の床の隣）より4マス奥に見せる（2026-10-27 新しい内装。カウンターの奥行きが深く、
+ * 話しかけるマスに立たせるとカウンターに隠れて頭しか見えない）
+ */
+const SHOP_CLERK_DRAW_DY = -4;
 /** カードショップ。主役はカードの購入（店員のカウンター）とカードパックの販売機（いまのガチャ。カプセルではない） */
 export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'interior', SHOP_ART, [
   interactAt('shop-counter', itemOf(SHOP_ART, 'COUNTER'), 'カウンター', 'shopClerk'),
@@ -342,7 +350,7 @@ export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'inte
   interactAt('shop-shelf', itemOf(SHOP_ART, 'SHELF_WALL'), '商品棚', 'message', 'カードとパックがきれいに並んでいる。'),
   interactAt('shop-case-l', itemOf(SHOP_ART, 'CASE_L'), 'ショーケース', 'message', '珍しいカードが飾ってある。'),
   interactAt('shop-case-r', itemOf(SHOP_ART, 'CASE_R'), 'ショーケース', 'message', '珍しいカードが飾ってある。'),
-  npc('shop-clerk', spotOf(SHOP_ART, 'CLERK_SPOT').x, spotOf(SHOP_ART, 'CLERK_SPOT').y, 'clerk', 'shopClerk'),
+  npc('shop-clerk', spotOf(SHOP_ART, 'CLERK_SPOT').x, spotOf(SHOP_ART, 'CLERK_SPOT').y, 'clerk', 'shopClerk', SHOP_CLERK_DRAW_DY),
   roomExit('shop-exit', SHOP_ART, 'SHOP'),
 ], entryOf(SHOP_ART));
 

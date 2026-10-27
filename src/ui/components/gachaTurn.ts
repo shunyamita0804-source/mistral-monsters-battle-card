@@ -4,9 +4,13 @@ import { once } from '../gameStore.ts';
 import { sound } from '../sound.ts';
 import handleDiscArt from '@assets/images/ui/gacha/handle_disc.webp';
 import handleCrankArt from '@assets/images/ui/gacha/handle_crank.webp';
-import machineTopArt from '@assets/images/ui/gacha/machine_top.webp';
-import trayClosedArt from '@assets/images/ui/gacha/tray_closed.webp';
-import trayOpenArt from '@assets/images/ui/gacha/tray_open.webp';
+import machineFrontArt from '@assets/images/ui/gacha/machine_front.webp';
+import machineGlassArt from '@assets/images/ui/gacha/machine_glass.webp';
+import machineSeatArt from '@assets/images/ui/gacha/machine_seat.webp';
+import outletClosedArt from '@assets/images/ui/gacha/outlet_closed.webp';
+import outletOpenArt from '@assets/images/ui/gacha/outlet_open.webp';
+import outletFrontArt from '@assets/images/ui/gacha/outlet_front.webp';
+import packSealedArt from '@assets/images/ui/gacha/pack_sealed.webp';
 
 /**
  * カードパック販売機のハンドルを回す場面（2026-10-27 カードショップ改修。ユーザー指示
@@ -15,7 +19,9 @@ import trayOpenArt from '@assets/images/ui/gacha/tray_open.webp';
  * パックを押すと onTake を呼ぶ（開封の画面へ）。お金はもう払っているので、途中でやめる手段は置かない。
  *
  * 絵：ハンドルは正式（Handle_Official_Reference.jpeg を円盤と取っ手に分けたもの）。
- *     機械の上半分と取り出し口は【仮】（参考シートからの切り出し。正式素材が届いたら差し替える）。tools/design/gacha_build.py
+ *     機械・取り出し口・背景は 2026-10-27 の正式素材（ZIP「MistralBC_CardShop_Assets_20261027」の A・B・G）。
+ *     機械の部品はすべて 900×1300 の同じキャンバスで、そのまま重ねる。位置は gacha.css（素材の「家具と組み込み」の座標）。tools/design/gacha_build.py
+ * ガラスの中・出てくるパックは、買ったパックのゲームの絵（無ければ素材の無地のパック）
  */
 const TURN_DEG = 360;
 const CLICK_EVERY_DEG = 30;
@@ -31,14 +37,17 @@ export function showGachaTurn(root: HTMLElement, packArt: string | undefined, pa
   let lastAngle: number | null = null;
 
   const crank = h('img', { class: 'gacha-turn__crank', attrs: { src: handleCrankArt, alt: '', draggable: 'false' } });
+  // 指でつかめる範囲はハンドルの絵より広く（取っ手が小さいので）
   const handle = h(
     'div',
     { class: 'gacha-turn__handle', attrs: { role: 'img', 'aria-label': t('gacha.handle') } },
     h('img', { class: 'gacha-turn__disc', attrs: { src: handleDiscArt, alt: '', draggable: 'false' } }),
     crank,
   );
+  const layer = (src: string, cls = ''): HTMLElement =>
+    h('img', { class: `gacha-turn__layer${cls ? ` ${cls}` : ''}`, attrs: { src, alt: '', draggable: 'false' } });
   const packImg = (cls: string): HTMLElement =>
-    packArt ? h('img', { class: cls, attrs: { src: packArt, alt: '', draggable: 'false' } }) : h('div', { class: `${cls} is-blank`, text: packLabel });
+    h('img', { class: cls, attrs: { src: packArt ?? packSealedArt, alt: packArt ? '' : packLabel, draggable: 'false' } });
   // ガラスの中に、買ったパックが入っている
   const windowPacks = h('div', { class: 'gacha-turn__window' }, packImg('gacha-turn__stock'), packImg('gacha-turn__stock'), packImg('gacha-turn__stock'));
   const take = once(() => {
@@ -50,12 +59,19 @@ export function showGachaTurn(root: HTMLElement, packArt: string | undefined, pa
     { class: 'gacha-turn__out', attrs: { type: 'button', 'aria-label': t('gacha.takePack'), disabled: '' }, on: { click: take } },
     packImg('gacha-turn__out-art'),
   ) as HTMLButtonElement;
-  const tray = h(
+  // 機械：ガラスの奥（紺とパック）→ 本体 → ガラスの光 → ハンドルの座 → 取り出し口（閉・開）→ 出てきたパック → 受け皿の手前のふち → ハンドル
+  const machine = h(
     'div',
-    { class: 'gacha-turn__tray' },
-    h('img', { class: 'gacha-turn__tray-closed', attrs: { src: trayClosedArt, alt: '', draggable: 'false' } }),
-    h('img', { class: 'gacha-turn__tray-open', attrs: { src: trayOpenArt, alt: '', draggable: 'false' } }),
+    { class: 'gacha-turn__machine' },
+    windowPacks,
+    layer(machineFrontArt),
+    layer(machineGlassArt),
+    layer(machineSeatArt),
+    layer(outletClosedArt, 'gacha-turn__outlet-closed'),
+    layer(outletOpenArt, 'gacha-turn__outlet-open'),
     outPack,
+    layer(outletFrontArt, 'gacha-turn__outlet-front'),
+    handle,
   );
   const hint = h('p', { class: 'gacha-turn__hint', text: t('gacha.turnHint') });
   const autoBtn = button(t('gacha.turnAuto'), () => autoTurn(), 'btn gacha-turn__auto');
@@ -65,8 +81,7 @@ export function showGachaTurn(root: HTMLElement, packArt: string | undefined, pa
     'div',
     { class: 'gacha-turn' },
     hint,
-    h('div', { class: 'gacha-turn__machine' }, h('img', { class: 'gacha-turn__machine-art', attrs: { src: machineTopArt, alt: t('gacha.machine'), draggable: 'false' } }), windowPacks),
-    h('div', { class: 'gacha-turn__panel' }, tray, handle),
+    machine,
     h('div', { class: 'gacha-turn__actions' }, autoBtn, takeBtn),
   );
 
@@ -91,7 +106,7 @@ export function showGachaTurn(root: HTMLElement, packArt: string | undefined, pa
     sound.play('chestUnlock');
     // ガラスの中のパックが1つ落ちて、取り出し口が開き、パックが出てくる
     setTimeout(() => {
-      tray.classList.add('is-open');
+      machine.classList.add('is-open');
       outPack.disabled = false;
       outPack.classList.add('is-out');
       sound.deal();
