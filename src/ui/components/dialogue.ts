@@ -10,7 +10,7 @@ import guideHappy from '@assets/images/characters/neighbor_guide_talk_happy.webp
 import teacherFace from '@assets/images/characters/face_teacher.webp';
 import clerkFace from '@assets/images/characters/face_clerk.webp';
 import receptionistFace from '@assets/images/characters/face_receptionist.webp';
-import eleanorFace from '@assets/images/characters/face_eleanor_temp.webp';
+import eleanorFace from '@assets/images/characters/face_eleanor.webp';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import residentA from '@assets/images/characters/face_resident_a.webp';
 import residentB from '@assets/images/characters/face_resident_b.webp';
@@ -53,7 +53,7 @@ const PORTRAITS: Readonly<Partial<Record<Exclude<Speaker, 'system'>, Partial<Rec
   clerk: { normal: clerkFace },
   receptionist: { normal: receptionistFace },
   researcher: { normal: researcherFace },
-  // カードバトラー管理局の受付：エレノア。顔の絵がまだ無いので、立ち姿の絵の胸から上を切り抜いた仮の顔（正式な顔が届いたら差し替える）
+  // カードバトラー管理局の受付：エレノア（2026-10-27 に届いた顔の絵）
   bureau_clerk: { normal: eleanorFace },
 };
 

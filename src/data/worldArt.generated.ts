@@ -60,16 +60,21 @@ import img56 from '@assets/images/maps/rooms/lab_specimen.webp';
 import img57 from '@assets/images/maps/rooms/lab_desk.webp';
 import img58 from '@assets/images/maps/rooms/lab_shelf2.webp';
 import img59 from '@assets/images/maps/rooms/lab_reading_table.webp';
-import img60 from '@assets/images/maps/rooms/training_shell.webp';
-import img61 from '@assets/images/maps/rooms/training_board.webp';
-import img62 from '@assets/images/maps/rooms/training_shelf.webp';
-import img63 from '@assets/images/maps/rooms/training_table.webp';
-import img64 from '@assets/images/maps/rooms/training_bench.webp';
-import img65 from '@assets/images/maps/rooms/arena_shell.webp';
-import img66 from '@assets/images/maps/rooms/arena_flags.webp';
-import img67 from '@assets/images/maps/rooms/arena_stage.webp';
-import img68 from '@assets/images/maps/rooms/arena_seats.webp';
-import img69 from '@assets/images/maps/rooms/arena_reception.webp';
+import img60 from '@assets/images/maps/rooms/lab_blackboard.webp';
+import img61 from '@assets/images/maps/rooms/lab_cabinet.webp';
+import img62 from '@assets/images/maps/rooms/lab_projector.webp';
+import img63 from '@assets/images/maps/rooms/lab_analysis.webp';
+import img64 from '@assets/images/maps/rooms/lab_chem.webp';
+import img65 from '@assets/images/maps/rooms/training_shell.webp';
+import img66 from '@assets/images/maps/rooms/training_board.webp';
+import img67 from '@assets/images/maps/rooms/training_shelf.webp';
+import img68 from '@assets/images/maps/rooms/training_table.webp';
+import img69 from '@assets/images/maps/rooms/training_bench.webp';
+import img70 from '@assets/images/maps/rooms/arena_shell.webp';
+import img71 from '@assets/images/maps/rooms/arena_flags.webp';
+import img72 from '@assets/images/maps/rooms/arena_stage.webp';
+import img73 from '@assets/images/maps/rooms/arena_seats.webp';
+import img74 from '@assets/images/maps/rooms/arena_reception.webp';
 
 export interface ArtImage { readonly file: string; readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z?: number }
 export interface CellRect { readonly x: number; readonly y: number; readonly w: number; readonly h: number }
@@ -1252,16 +1257,16 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    "##................#####...######",
    "##........................######",
    "##........................######",
-   "##......##############........##",
-   "##......##############........##",
+   "#######.##############........##",
+   "#######.##############........##",
    "##......##############........##",
    "##............................##",
    "########................########",
-   "########................########",
-   "########................########",
+   "########...........###..########",
+   "########...........###..########",
    "#..............................#",
-   "#..............................#",
-   "#..............................#",
+   "#.########...........#########.#",
+   "#.########...........#########.#",
    "#..............................#",
    "#..............................#",
    "#############......#############",
@@ -1326,6 +1331,46 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "w": 192,
     "h": 185,
     "z": 725
+   },
+   {
+    "file": img60,
+    "x": 448,
+    "y": 145,
+    "w": 192,
+    "h": 107,
+    "z": 0
+   },
+   {
+    "file": img61,
+    "x": 64,
+    "y": 433,
+    "w": 144,
+    "h": 151,
+    "z": 584
+   },
+   {
+    "file": img62,
+    "x": 608,
+    "y": 638,
+    "w": 96,
+    "h": 100,
+    "z": 738
+   },
+   {
+    "file": img63,
+    "x": 64,
+    "y": 686,
+    "w": 256,
+    "h": 155,
+    "z": 841
+   },
+   {
+    "file": img64,
+    "x": 672,
+    "y": 707,
+    "w": 288,
+    "h": 134,
+    "z": 841
    }
   ],
   "items": {
@@ -1369,6 +1414,36 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "x": 24,
     "y": 20,
     "w": 6,
+    "h": 3
+   },
+   "BLACKBOARD": {
+    "x": 14,
+    "y": 2,
+    "w": 6,
+    "h": 9
+   },
+   "CABINET": {
+    "x": 2,
+    "y": 16,
+    "w": 5,
+    "h": 3
+   },
+   "PROJECTOR": {
+    "x": 19,
+    "y": 21,
+    "w": 3,
+    "h": 3
+   },
+   "ANALYSIS": {
+    "x": 2,
+    "y": 24,
+    "w": 8,
+    "h": 3
+   },
+   "CHEM": {
+    "x": 21,
+    "y": 24,
+    "w": 9,
     "h": 3
    }
   },
@@ -1430,7 +1505,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img60,
+    "file": img65,
     "x": 0,
     "y": 0,
     "w": 1152,
@@ -1439,7 +1514,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img61,
+    "file": img66,
     "x": 384,
     "y": 82,
     "w": 384,
@@ -1447,7 +1522,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 0
    },
    {
-    "file": img62,
+    "file": img67,
     "x": 64,
     "y": 165,
     "w": 192,
@@ -1455,7 +1530,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 415
    },
    {
-    "file": img63,
+    "file": img68,
     "x": 128,
     "y": 483,
     "w": 320,
@@ -1463,7 +1538,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 703
    },
    {
-    "file": img63,
+    "file": img68,
     "x": 704,
     "y": 483,
     "w": 320,
@@ -1471,7 +1546,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 703
    },
    {
-    "file": img64,
+    "file": img69,
     "x": 128,
     "y": 716,
     "w": 256,
@@ -1479,7 +1554,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 905
    },
    {
-    "file": img64,
+    "file": img69,
     "x": 768,
     "y": 716,
     "w": 256,
@@ -1593,7 +1668,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img65,
+    "file": img70,
     "x": 0,
     "y": 0,
     "w": 1280,
@@ -1602,7 +1677,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img66,
+    "file": img71,
     "x": 401,
     "y": 103,
     "w": 477,
@@ -1610,7 +1685,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 0
    },
    {
-    "file": img67,
+    "file": img72,
     "x": 384,
     "y": 309,
     "w": 512,
@@ -1618,7 +1693,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 672
    },
    {
-    "file": img68,
+    "file": img73,
     "x": 64,
     "y": 614,
     "w": 256,
@@ -1626,7 +1701,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 802
    },
    {
-    "file": img68,
+    "file": img73,
     "x": 960,
     "y": 614,
     "w": 256,
@@ -1634,7 +1709,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 802
    },
    {
-    "file": img69,
+    "file": img74,
     "x": 448,
     "y": 696,
     "w": 384,

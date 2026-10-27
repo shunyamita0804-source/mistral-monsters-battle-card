@@ -169,6 +169,12 @@ ROOMS = [
         dict(id='DESK', name='研究机', kind='furniture', rect=[256, 416, 704, 512], use='研究員と話す'),
         dict(id='SHELF2', name='資料棚', kind='furniture', rect=[64, 576, 256, 672], use=''),
         dict(id='TABLE', name='閲覧テーブル', kind='furniture', rect=[768, 576, 960, 672], use=''),
+        # 2026-10-27 に届いた新しい家具5つ（置き場所は Claude が今の家具との並びを見て決めた）
+        dict(id='BLACKBOARD', name='黒板', kind='wall', rect=[448, 48, 640, 176], use=''),
+        dict(id='CABINET', name='標本棚', kind='furniture', rect=[64, 432, 208, 496], use=''),
+        dict(id='PROJECTOR', name='記録の投影機', kind='furniture', rect=[608, 608, 704, 688], use=''),
+        dict(id='ANALYSIS', name='解析台', kind='furniture', rect=[64, 736, 320, 816], use=''),
+        dict(id='CHEM', name='薬品の作業台', kind='furniture', rect=[672, 736, 960, 816], use=''),
     ]),
     dict(id='ROOM_TRAINING', name='カード練習場', size=[1152, 960], door=[512, 640], items=[
         dict(id='BOARD', name='黒板（カードの図だけ・文字なし）', kind='wall', rect=[384, 32, 768, 176], use='遊び方を見る（仮）'),

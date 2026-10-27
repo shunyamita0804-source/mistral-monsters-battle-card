@@ -374,6 +374,12 @@ export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior'
   interactAt('lab-desk', itemOf(LAB_ART, 'DESK'), '研究机', 'message', '研究の資料が広げてある。'),
   interactAt('lab-shelf2', itemOf(LAB_ART, 'SHELF2'), '資料棚', 'message', '資料がぎっしり詰まっている。'),
   interactAt('lab-table', itemOf(LAB_ART, 'TABLE'), '閲覧テーブル', 'message', '本を読むためのテーブル。'),
+  // 2026-10-27 に届いた新しい家具5つ（調べたときのひと言は仮）
+  interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '黒板', 'message', '星と円の図がびっしり描かれている。'),
+  interactAt('lab-cabinet', itemOf(LAB_ART, 'CABINET'), '標本棚', 'message', '結晶や羽根が、標本のように並んでいる。'),
+  interactAt('lab-projector', itemOf(LAB_ART, 'PROJECTOR'), '記録の投影機', 'message', '光の板に、昔の対戦の記録が映っている。'),
+  interactAt('lab-analysis', itemOf(LAB_ART, 'ANALYSIS'), '解析台', 'message', 'カードを調べるための大きなレンズがある。'),
+  interactAt('lab-chem', itemOf(LAB_ART, 'CHEM'), '薬品の作業台', 'message', '色とりどりの薬品が並んでいる。'),
   // 研究員：設計図の立ち位置（研究机の奥）では机の絵に全身が隠れるので、机の右どなり（天球儀と標本ケースの間）に立つ
   npc('lab-researcher', spotOf(LAB_ART, 'RESEARCHER_SPOT', 9).x, spotOf(LAB_ART, 'RESEARCHER_SPOT').y, 'researcher', 'collection'),
   roomExit('lab-exit', LAB_ART, 'LAB'),
