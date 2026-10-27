@@ -129,7 +129,7 @@ describe('道具が並ぶ時期（大会の初優勝）', () => {
     if (!entered.activeTournament) throw new Error('参加できない');
     const r = claimTournamentRewards({ ...entered, activeTournament: { ...entered.activeTournament, status: 'won' } });
     if (r.status !== 'ok') throw new Error('景品なし');
-    expect(Object.keys(r.summary).sort()).toEqual(['cards', 'coins', 'firstWin', 'rankUp', 'unlockedPacks', 'won']);
+    expect(Object.keys(r.summary).sort()).toEqual(['cards', 'coins', 'firstWin', 'rankUp', 'unlockedDungeons', 'unlockedPacks', 'won']);
   });
 
   it('前の形式（version 14）のセーブ：道具0個。Dランク以上なら読み込んだときに条件どおり並ぶ', () => {

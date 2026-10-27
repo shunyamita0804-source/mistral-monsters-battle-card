@@ -19,6 +19,8 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.bossTalk': { ja: '{name}が立ちはだかる！\n（{monsters}）', en: '{name} blocks your way!\n({monsters})' },
   'dungeonRun.stairsTitle': { ja: '階段を下りますか？', en: 'Go down the stairs?' },
   'dungeonRun.stairsBody': { ja: '下りると、この階には戻れません。', en: 'You cannot come back to this floor.' },
+  'dungeonRun.switchOpened': { ja: 'スイッチを入れた。\nどこかで扉の開く音がした。', en: 'You flipped the switch.\nSomewhere, a door creaked open.' },
+  'dungeonRun.switchAlready': { ja: 'スイッチはもう入っている。', en: 'The switch is already on.' },
   'dungeonRun.chestOpened': { ja: '宝箱を開けた。\n中身はまだ決まっていません（仮）。', en: 'You opened the chest.\nIts contents are not decided yet (Temp).' },
   'dungeonRun.win': { ja: '勝利！\n技カード「{card}」を手に入れた。', en: 'Victory!\nGot the skill card "{card}".' },
   'dungeonRun.winNoCard': { ja: '勝利！', en: 'Victory!' },

@@ -328,7 +328,7 @@ describe('報酬・記録・セーブ', () => {
     };
     const migrated = normalizeSave(old);
     expect(migrated?.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(18);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(18);
     expect(migrated?.storyFlags).toEqual([]);
     expect(migrated?.activeTournament).toMatchObject({ tournamentId: 'tournament-e', entryId: 'old-1', round: 0, status: 'inProgress', entrants: ['player', 'e-1', 'e-2', 'e-3'], matches: [] });
     expect(migrated?.tournaments['tournament-e']?.entries).toBe(2);

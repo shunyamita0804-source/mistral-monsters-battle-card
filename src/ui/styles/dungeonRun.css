@@ -322,3 +322,111 @@
     animation: none;
   }
 }
+
+/* ===== 2026-10-27 指示書「ダンジョン7つ」：新しい5つの仮の見た目（絵が届くまで） ===== */
+
+/* 床・壁：太古の遺跡の絵に色を重ねた色違い（--tint。水＝青・氷＝白い水色・火＝赤・機械＝灰色・聖域＝金） */
+.drun--dungeon-03 { --tint: rgb(40 120 190 / 0.32); }
+.drun--dungeon-04 { --tint: rgb(190 225 250 / 0.3); }
+.drun--dungeon-05 { --tint: rgb(210 70 20 / 0.3); }
+.drun--dungeon-06 { --tint: rgb(120 135 150 / 0.4); }
+.drun--dungeon-07 { --tint: rgb(255 228 150 / 0.3); }
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)),
+    linear-gradient(var(--tint), var(--tint)),
+    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-lit {
+  background:
+    linear-gradient(var(--tint), var(--tint)),
+    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-seen {
+  background:
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    linear-gradient(var(--tint), var(--tint)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-lit {
+  background:
+    linear-gradient(rgb(6 7 10 / 0.5), rgb(6 7 10 / 0.5)),
+    linear-gradient(var(--tint), var(--tint)),
+    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+/* 炎の火山：溶岩の明かりで、まわりの暗さを少し弱く */
+.drun--dungeon-05 .drun__light {
+  opacity: 0.6;
+}
+
+/* 水路（通れない） */
+.drun__tile--water.is-seen,
+.drun__tile--water.is-lit {
+  background:
+    radial-gradient(ellipse at 30% 35%, rgb(200 235 255 / 0.35) 0 12%, transparent 13%),
+    radial-gradient(ellipse at 70% 70%, rgb(200 235 255 / 0.25) 0 10%, transparent 11%),
+    linear-gradient(180deg, rgb(30 90 150), rgb(16 58 108));
+  box-shadow: inset 0 3px 0 rgb(0 0 0 / 0.35);
+}
+
+.drun__tile--water.is-seen:not(.is-lit) {
+  filter: brightness(0.45);
+}
+
+/* 氷（すべる） */
+.drun__tile--ice.is-seen,
+.drun__tile--ice.is-lit {
+  background:
+    linear-gradient(135deg, transparent 0 40%, rgb(255 255 255 / 0.55) 41% 44%, transparent 45% 100%),
+    linear-gradient(180deg, rgb(200 236 252 / 0.92), rgb(150 205 235 / 0.92));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
+.drun__tile--ice.is-seen:not(.is-lit) {
+  filter: brightness(0.45);
+}
+
+/* 扉（スイッチで開く）。開いた扉は床と同じで、ふちだけ残る */
+.drun__tile--door.is-seen::after,
+.drun__tile--door.is-lit::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 3px solid #8a6a3a;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(90deg, rgb(60 66 74) 0 6px, rgb(40 44 50) 6px 8px),
+    linear-gradient(rgb(70 76 84), rgb(46 50 56));
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.4);
+}
+
+.is-doors-open .drun__tile--door.is-seen::after,
+.is-doors-open .drun__tile--door.is-lit::after {
+  background: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.drun__tile--door.is-seen:not(.is-lit)::after {
+  filter: brightness(0.5);
+}
+
+/* スイッチ（調べると扉が開く）：台と取っ手。入れると緑に */
+.drun__entity--switch {
+  background:
+    radial-gradient(circle at 50% 78%, rgb(255 214 90) 0 7px, transparent 8px),
+    linear-gradient(60deg, transparent 0 46%, rgb(200 170 110) 46% 54%, transparent 54% 100%) 50% 30% / 60% 70% no-repeat,
+    radial-gradient(ellipse at 50% 82%, rgb(70 76 84) 0 16px, transparent 17px);
+}
+
+.drun__entity--switch.is-open {
+  background:
+    radial-gradient(circle at 50% 78%, rgb(120 210 120) 0 7px, transparent 8px),
+    linear-gradient(-60deg, transparent 0 46%, rgb(200 170 110) 46% 54%, transparent 54% 100%) 50% 30% / 60% 70% no-repeat,
+    radial-gradient(ellipse at 50% 82%, rgb(70 76 84) 0 16px, transparent 17px);
+}

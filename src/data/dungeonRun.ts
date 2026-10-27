@@ -1,9 +1,17 @@
 import { TMP_GEOL_ID } from './cards.ts';
 import { ENCOUNTERS } from './dungeons.ts';
+import type { RankId } from './economy.ts';
+import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
+import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
+import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
+import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { OpponentDefinition } from './tournaments.ts';
+
+const LAZ = LAZUCK_MONSTER_ID;
+const SOR = SORAMO_MONSTER_ID;
 
 /**
  * 【仮】ランダム生成・手探り探索のダンジョン（2026-10-26 ユーザー指示「ミスモンBC ダンジョン試作（たたき台）」。
@@ -44,34 +52,115 @@ export const DUNGEON_RUN = {
   stepRepeatMs: 170,
 } as const;
 
-/** ランダム生成のダンジョンにするダンジョン（いまは最初のダンジョン「太古の遺跡」だけ。精霊の森はそれまでの固定のマップのまま） */
-export const RUN_DUNGEON_IDS: readonly string[] = ['dungeon-01'];
+/**
+ * ダンジョンごとの仕掛け（2026-10-27 指示書「ダンジョン7つ」。ダンジョンごとに1つだけ）
+ * - water：水路（通れない水のマス。遠回りが要る）
+ * - ice：すべる床（乗ると、壁・氷でないマス・人や物にぶつかるまで進み続ける）
+ * - lava：溶岩の明かりで見える範囲が広いが、見えない番人が出やすい
+ * - switch：階段（最後の階はボスの間）の手前に閉じた扉。同じ階のスイッチを調べると開く
+ * - holy：見えない番人が強く、負けられる回数が少ない
+ */
+export type DungeonGimmick = 'none' | 'water' | 'ice' | 'lava' | 'switch' | 'holy';
+
+/** 【仮】ダンジョンごとの値（階・開放・強さ・相手）。名前・説明は src/data/dungeons.ts */
+export interface RunDungeonConfig {
+  readonly floors: number;
+  readonly gimmick: DungeonGimmick;
+  /** このランクに上がったら開放（null＝最初から） */
+  readonly unlockRank: RankId | null;
+  /** 階ごとの相手の強さ（ライフの割合。数＝階の数） */
+  readonly floorLife: readonly number[];
+  /** 見える範囲（たいまつを使うと +1） */
+  readonly viewRadius: number;
+  /** 見えない番人の抽選の確率（1歩ごと） */
+  readonly guardianRate: number;
+  /** 負けられる回数 */
+  readonly maxLosses: number;
+  /** 見えない番人の強さ（階の強さに足す） */
+  readonly guardianLifeBonus: number;
+  /** バトラーの編成（バトラーの番号で順に使う） */
+  readonly npcTeams: readonly (readonly string[])[];
+  readonly guardianTeam: readonly string[];
+  /** ボス（src/data/dungeons.ts の ENCOUNTERS の ID。真ん中のモンスターがボスのモンスター＝初回クリアの景品） */
+  readonly bossId: string;
+}
+
+/** 2026-10-27 指示書：ふつうのダンジョンは最大5階。強さは 遺跡・森 ＜ 水 ＜ 氷 ＜ 火 ＜ 機械 ＜ 聖域（すべて仮） */
+export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
+  // 太古の遺跡（最初から）：いまのまま
+  'dungeon-01': {
+    floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [TEST_TEAM, TEST_TEAM_ALT], guardianTeam: [LAZ, LAZ, SOR], bossId: 'enc-b3-boss',
+  },
+  // 精霊の森（最初から）：固定のマップをやめて、遺跡と同じランダム生成（2026-10-27）
+  'dungeon-02': {
+    floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [TEST_TEAM, TEST_TEAM_ALT], guardianTeam: [LAZ, LAZ, SOR], bossId: 'enc-forest-boss',
+  },
+  // 水の神殿（D ランク）：水路
+  'dungeon-03': {
+    floors: 4, gimmick: 'water', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, KAL], bossId: 'enc-water-boss',
+  },
+  // 氷の洞窟（C ランク）：すべる床
+  'dungeon-04': {
+    floors: 4, gimmick: 'ice', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, KAL], bossId: 'enc-ice-boss',
+  },
+  // 炎の火山（B ランク）：見える範囲が1マス広い（2マス）・見えない番人が出やすい（1.5倍）
+  'dungeon-05': {
+    floors: 5, gimmick: 'lava', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 2, guardianRate: 0.45, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[GAU, LAZ, NOB], [LAZ, GAU, SOR]], guardianTeam: [GAU, GAU, LAZ], bossId: 'enc-fire-boss',
+  },
+  // 機械の塔（A ランク）：スイッチで開く扉
+  'dungeon-06': {
+    floors: 5, gimmick: 'switch', unlockRank: 'A', floorLife: [1.1, 1.2, 1.3, 1.4, 1.5], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[NOB, LAZ, KAL], [LAZ, NOB, GAU]], guardianTeam: [LAZ, NOB, LAZ], bossId: 'enc-machine-boss',
+  },
+  // 天の聖域（S ランク）：見えない番人が強く、2回負けると戻される
+  'dungeon-07': {
+    floors: 5, gimmick: 'holy', unlockRank: 'S', floorLife: [1.2, 1.3, 1.4, 1.5, 1.6], viewRadius: 1, guardianRate: 0.3, maxLosses: 2,
+    guardianLifeBonus: 0.3, npcTeams: [[SOR, GAU, KAL], [GAU, SOR, MYU]], guardianTeam: [GAU, KAL, SOR], bossId: 'enc-holy-boss',
+  },
+};
+
+/** ランダム生成のダンジョン（2026-10-27 からは7つすべて） */
+export const RUN_DUNGEON_IDS: readonly string[] = Object.keys(RUN_DUNGEONS);
 
 export function isRunDungeon(dungeonId: string): boolean {
   return RUN_DUNGEON_IDS.includes(dungeonId);
 }
 
-/** 階ごとの相手の強さ（ライフの割合。それまでの固定のダンジョン B1〜B3 と同じくらい） */
-const FLOOR_LIFE_SCALE: readonly number[] = [0.6, 0.75, 0.85];
+/** ダンジョンの値（知らない ID は太古の遺跡と同じ） */
+export function runConfig(dungeonId: string | undefined): RunDungeonConfig {
+  return RUN_DUNGEONS[dungeonId ?? ''] ?? (RUN_DUNGEONS['dungeon-01'] as RunDungeonConfig);
+}
+
+const floorLife = (dungeonId: string | undefined, floor: number): number => {
+  const c = runConfig(dungeonId);
+  return c.floorLife[Math.min(floor, c.floorLife.length - 1)] ?? 0.85;
+};
 
 /** バトラーの見た目（2026-10-27 デザイン第12弾の3人：1＝探検家・2＝学者・3＝剣士）。階の中の番号で決める（地図の絵と対戦の顔をそろえる） */
 export function runBattlerLook(index: number): 1 | 2 | 3 {
   return ((((index % 3) + 3) % 3) + 1) as 1 | 2 | 3;
 }
 
-/** 【仮】通常のバトラー（話しかけると対戦）。編成は仮のテスト用（ソラモ・ラズック） */
-export function runNpcOpponent(floor: number, index: number): OpponentDefinition {
+/** 【仮】通常のバトラー（話しかけると対戦）。編成はダンジョンごとの仮の編成。顔ぶれはフローラ・オスカー・カイルを使い回す */
+export function runNpcOpponent(floor: number, index: number, dungeonId?: string): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-npc'] as OpponentDefinition;
-  return { ...base, monsters: index % 2 === 0 ? TEST_TEAM : TEST_TEAM_ALT, lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85, face: `battler-${runBattlerLook(index)}` };
+  const teams = runConfig(dungeonId).npcTeams;
+  return { ...base, monsters: teams[index % teams.length] ?? TEST_TEAM, lifeScale: floorLife(dungeonId, floor), face: `battler-${runBattlerLook(index)}` };
 }
 
-/** 【仮】見えない番人。編成は仮 */
-export function runGuardianOpponent(floor: number): OpponentDefinition {
+/** 【仮】見えない番人。編成はダンジョンごとの仮の編成（天の聖域は強い） */
+export function runGuardianOpponent(floor: number, dungeonId?: string): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-guardian'] as OpponentDefinition;
-  return { ...base, monsters: [LAZUCK_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: FLOOR_LIFE_SCALE[floor] ?? 0.85, face: 'guardian' };
+  const c = runConfig(dungeonId);
+  return { ...base, monsters: c.guardianTeam, lifeScale: Math.round((floorLife(dungeonId, floor) + c.guardianLifeBonus) * 100) / 100, face: 'guardian' };
 }
 
-/** ボス：遺跡の主（仮のジオル。src/data/dungeons.ts の enc-b3-boss） */
-export function runBossOpponent(): OpponentDefinition {
-  return ENCOUNTERS['enc-b3-boss'] ?? { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 };
+/** ボス（src/data/dungeons.ts の ENCOUNTERS。遺跡は仮のジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */
+export function runBossOpponent(dungeonId?: string): OpponentDefinition {
+  return ENCOUNTERS[runConfig(dungeonId).bossId] ?? { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 };
 }

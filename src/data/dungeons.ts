@@ -1,5 +1,9 @@
-import { skillId, TMP_FLUNE_ID, TMP_GEOL_ID } from './cards.ts';
+import { skillId, skillsOf, TMP_FLUNE_ID, TMP_GEOL_ID } from './cards.ts';
+import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
+import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
+import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
+import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
@@ -14,7 +18,7 @@ export interface DungeonDefinition {
   readonly id: string;
   readonly name: string;
   readonly description: string;
-  /** 階層ごとのマップID（B1F から順） */
+  /** 階層ごとのマップID（B1F から順。固定のマップのダンジョンだけ。2026-10-27 からはどれもランダム生成なので、遺跡・森の昔のマップが残っているだけ） */
   readonly floors: readonly string[];
   /** 最奥のボスを初めて倒したときにもらえるカード（2026-10-26。1回だけ） */
   readonly firstClearCards?: readonly CardReward[];
@@ -25,6 +29,12 @@ export interface DungeonDefinition {
 const bossCards = (monsterId: string, key: string): CardReward[] => [
   { cardId: monsterId, count: 1 },
   ...[1, 2, 3].map((no) => ({ cardId: skillId(key, no), count: 1 })),
+];
+
+/** 【仮】正式モンスターのボス：モンスターカード1枚と、そのモンスターの最初の技3種を1枚ずつ（遺跡・森と同じ量） */
+const officialBossCards = (monsterId: string): CardReward[] => [
+  { cardId: monsterId, count: 1 },
+  ...skillsOf(monsterId).slice(0, 3).map((k) => ({ cardId: k.id, count: 1 })),
 ];
 
 /**
@@ -46,11 +56,17 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
   {
     id: 'dungeon-02',
     name: '精霊の森',
-    description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成・マップは仮。いまは遺跡と同じ作り）',
+    description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成は仮）',
     floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
     firstClearCards: bossCards(TMP_FLUNE_ID, 'tmp-flune'),
     isPlaceholder: true,
   },
+  // 2026-10-27 指示書「ダンジョン7つ」：ランクで開放する5つ。名前・ボス・編成はすべて仮（仕掛け・階・開放は src/data/dungeonRun.ts の RUN_DUNGEONS）
+  { id: 'dungeon-03', name: '水の神殿', description: '水路が行く手をはばむ神殿。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(MYU), isPlaceholder: true },
+  { id: 'dungeon-04', name: '氷の洞窟', description: '足元がすべる氷の洞窟。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(KAL), isPlaceholder: true },
+  { id: 'dungeon-05', name: '炎の火山', description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(GAU), isPlaceholder: true },
+  { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
+  { id: 'dungeon-07', name: '天の聖域', description: '強い番人が守る最後の試練。2回負けると戻される。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(SORAMO_MONSTER_ID), isPlaceholder: true },
 ];
 
 export function getDungeon(id: string): DungeonDefinition | undefined {
@@ -69,6 +85,12 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-boss': { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 },
   // 森のボス：仮のフルーネを真ん中に
   'enc-forest-boss': { id: 'enc-forest-boss', name: '森の主（仮）', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
+  // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
+  'enc-water-boss': { id: 'enc-water-boss', name: '水の神殿の主（仮）', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
+  'enc-ice-boss': { id: 'enc-ice-boss', name: '氷の洞窟の主（仮）', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },
+  'enc-fire-boss': { id: 'enc-fire-boss', name: '炎の火山の主（仮）', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], lifeScale: 1.5 },
+  'enc-machine-boss': { id: 'enc-machine-boss', name: '機械の塔の主（仮）', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], lifeScale: 1.6 },
+  'enc-holy-boss': { id: 'enc-holy-boss', name: '天の聖域の主（仮）', monsters: [GAU, SORAMO_MONSTER_ID, KAL], lifeScale: 1.75 },
   // 【仮】ランダム生成のダンジョン（2026-10-26 試作。src/data/dungeonRun.ts）：通常のバトラー・見えない番人。編成とライフは階ごとに src/data/dungeonRun.ts で決める
   'enc-run-npc': { id: 'enc-run-npc', name: 'ダンジョンのバトラー（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
   'enc-run-guardian': { id: 'enc-run-guardian', name: '見えない番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },

@@ -1,11 +1,11 @@
 import { getDungeon } from '../../data/dungeons.ts';
-import { DUNGEON_RUN, isRunDungeon } from '../../data/dungeonRun.ts';
+import { DUNGEON_RUN, isRunDungeon, runConfig } from '../../data/dungeonRun.ts';
 import { REWARDS } from '../../data/economy.ts';
 import { ITEM_RULES, type ItemId } from '../../data/items.ts';
 import { consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
-import { blocksWay, generateFloor, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
+import { generateFloor, isWalkableTile, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 
 /**
  * ランダム生成のダンジョンの挑戦（2026-10-26 試作。GB 版のダンジョンを参考に）。DOM に依存しない純粋関数。
@@ -17,29 +17,51 @@ import { blocksWay, generateFloor, type DungeonFloor, type FloorEntity, type Poi
  * 中断して再開できるよう、状態はすべて save.dungeonRun に持つ
  * 道具（2026-10-27）の効き目：たいまつ（見える範囲）・魔除けの香（番人が出ない歩数）・遺跡の地図・身代わりのお守り（負けを1回なかったことに）・
  * 封印の小箱（追い出されても失わない1枚）・幸運のコイン（報酬を候補から選ぶ）・煙玉（番人から逃げる）。使うのは src/game/items/items.ts
+ * 2026-10-27 指示書「ダンジョン7つ」：階の数・見える範囲・番人の確率・負けられる回数はダンジョンごと（src/data/dungeonRun.ts の RUN_DUNGEONS）。
+ * 仕掛け：すべる床（move ですべる）・スイッチで開く扉（pressSwitch）
  */
+
+/** 階の形を決めるもの（dungeonId が無ければ太古の遺跡） */
+type FloorKey = Pick<DungeonRun, 'seed' | 'floor'> & { readonly dungeonId?: string };
+
+/** そのダンジョンの階の数 */
+export function floorsOf(dungeonId: string | undefined): number {
+  return runConfig(dungeonId).floors;
+}
+
+/** そのダンジョンで負けられる回数（天の聖域は2回） */
+export function maxLossesOf(dungeonId: string | undefined): number {
+  return runConfig(dungeonId).maxLosses;
+}
+
+/** 扉が開いているか（機械の塔：その階でスイッチを押した） */
+export function doorsOpen(run: Pick<DungeonRun, 'floor' | 'switchFloor'>): boolean {
+  return run.switchFloor === run.floor;
+}
 
 /** 階の形（同じシード・階なら同じ。作り直しを減らすため、直近に作った階を覚えておく） */
 const floorCache = new Map<string, DungeonFloor>();
 
-export function runFloor(run: Pick<DungeonRun, 'seed' | 'floor'>): DungeonFloor {
-  const key = `${run.seed}:${run.floor}`;
+export function runFloor(run: FloorKey): DungeonFloor {
+  const c = runConfig(run.dungeonId);
+  const key = `${run.dungeonId ?? ''}:${run.seed}:${run.floor}`;
   let f = floorCache.get(key);
   if (!f) {
-    f = generateFloor(run.seed, run.floor, run.floor >= DUNGEON_RUN.floors - 1);
+    f = generateFloor(run.seed, run.floor, run.floor >= c.floors - 1, DUNGEON_RUN, c.gimmick);
     if (floorCache.size > 8) floorCache.clear();
     floorCache.set(key, f);
   }
   return f;
 }
 
-/** いまの見える範囲（たいまつを使った階なら広がる） */
-export function viewRadiusOf(run: Pick<DungeonRun, 'floor' | 'torchFloor'>): number {
-  return run.torchFloor === run.floor ? ITEM_RULES.torchViewRadius : DUNGEON_RUN.viewRadius;
+/** いまの見える範囲（ダンジョンごと。たいまつを使った階なら +1：炎の火山は 2 → 3） */
+export function viewRadiusOf(run: Pick<DungeonRun, 'floor' | 'torchFloor'> & { readonly dungeonId?: string }): number {
+  const base = runConfig(run.dungeonId).viewRadius;
+  return run.torchFloor === run.floor ? base + (ITEM_RULES.torchViewRadius - DUNGEON_RUN.viewRadius) : base;
 }
 
-export function isLastFloor(run: Pick<DungeonRun, 'floor'>): boolean {
-  return run.floor >= DUNGEON_RUN.floors - 1;
+export function isLastFloor(run: Pick<DungeonRun, 'floor'> & { readonly dungeonId?: string }): boolean {
+  return run.floor >= floorsOf(run.dungeonId) - 1;
 }
 
 /** 見たマスに、いまの位置から見えるマスを足す */
@@ -64,7 +86,7 @@ export function isVisible(run: DungeonRun, x: number, y: number, radius: number 
 
 /** 新しく挑戦を始める（1階のスタート）。location は街の入り口のまま（戻されたときの場所） */
 export function startRun(save: SaveData, dungeonId: string, seed: number): SaveData {
-  const f = runFloor({ seed, floor: 0 });
+  const f = runFloor({ seed, floor: 0, dungeonId });
   const run: DungeonRun = {
     dungeonId,
     seed,
@@ -72,7 +94,7 @@ export function startRun(save: SaveData, dungeonId: string, seed: number): SaveD
     x: f.start.x,
     y: f.start.y,
     dir: 'down',
-    explored: reveal('', f, f.start),
+    explored: reveal('', f, f.start, runConfig(dungeonId).viewRadius),
     defeated: [],
     opened: [],
     losses: 0,
@@ -103,6 +125,8 @@ export function facingPoint(run: DungeonRun): Point {
 
 export interface MoveResult {
   readonly run: DungeonRun;
+  /** 通ったマス（すべる床では2マス以上。進めなかったときは空） */
+  readonly path: readonly Point[];
   /** 1マス進んだか（壁・バトラー・宝箱の前では向きだけ変わる） */
   readonly moved: boolean;
   /** 下り階段の上に来た */
@@ -123,31 +147,43 @@ export function nearestGuardian(run: DungeonRun, f: DungeonFloor): { guardian: F
   return best;
 }
 
-/** 十字キーの1歩：向きを変え、通れれば1マス進む。進んだら見たマスを広げ、見えない番人の抽選をする */
+/**
+ * 十字キーの1歩：向きを変え、通れれば1マス進む（氷の上ではぶつかるまですべる）。進んだら見たマスを広げ、見えない番人の抽選をする。
+ * 氷の上（すべり始め・すべっている途中・止まった所）では番人の抽選をしない
+ */
 export function move(run: DungeonRun, dir: Direction): MoveResult {
   const f = runFloor(run);
   const turned: DungeonRun = { ...run, dir };
   const d = STEP[dir];
-  const x = run.x + d.x;
-  const y = run.y + d.y;
-  if (f.tiles[y]?.[x] !== '.' || entityAt(run, f, x, y)) return { run: turned, moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
-  let next: DungeonRun = { ...turned, x, y, explored: reveal(run.explored, f, { x, y }, viewRadiusOf(run)) };
+  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y), doorsOpen(run));
+  const end = path?.[path.length - 1];
+  if (!path || !end) return { run: turned, path: [], moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
+  let explored = run.explored;
+  for (const p of path) explored = reveal(explored, f, p, viewRadiusOf(run));
+  let next: DungeonRun = { ...turned, x: end.x, y: end.y, explored };
+  const onIce = f.tiles[run.y]?.[run.x] === 'i' || path.some((p) => f.tiles[p.y]?.[p.x] === 'i');
   // 見えない番人：魔除けの香が効いている間・戦ったあとの残り歩数があれば出ない。近くにいれば1歩ごとに抽選
   let guardian: FloorEntity | null = null;
   const incense = next.incenseSteps > 0;
   if (incense) next = { ...next, incenseSteps: next.incenseSteps - 1 };
   if (next.cooldown > 0) {
     next = { ...next, cooldown: next.cooldown - 1 };
-  } else if (!incense) {
+  } else if (!incense && !onIce) {
     const near = nearestGuardian(next, f);
     if (near && near.distance <= DUNGEON_RUN.guardianEncounterRange) {
       const r = nextRandom(next.rng);
       next = { ...next, rng: r.seed };
-      if (r.value < DUNGEON_RUN.guardianRate) guardian = near.guardian;
+      if (r.value < runConfig(run.dungeonId).guardianRate) guardian = near.guardian;
     }
   }
-  const onStairs = !!f.stairs && f.stairs.x === x && f.stairs.y === y;
-  return { run: next, moved: true, onStairs, omen: nearGuardian(next, f), guardian };
+  const onStairs = !!f.stairs && f.stairs.x === end.x && f.stairs.y === end.y;
+  return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian };
+}
+
+/** スイッチを調べた（機械の塔）：その階の扉が開く。もう開いていれば何もしない（opened: false） */
+export function pressSwitch(run: DungeonRun): { run: DungeonRun; opened: boolean } {
+  if (doorsOpen(run)) return { run, opened: false };
+  return { run: { ...run, switchFloor: run.floor }, opened: true };
 }
 
 /** 見えない番人の予兆を出すか（近くにいて、戦ったあとの休みでなく、魔除けの香が効いていない） */
@@ -170,7 +206,7 @@ export function useDungeonItem(save: SaveData, id: ItemId, sealCard?: string): U
 export function descend(run: DungeonRun): DungeonRun {
   if (isLastFloor(run)) return run;
   const floor = run.floor + 1;
-  const f = runFloor({ seed: run.seed, floor });
+  const f = runFloor({ seed: run.seed, floor, dungeonId: run.dungeonId });
   // たいまつ・遺跡の地図は下りると切れる（使った階を覚えているので、別の階では効かない）
   return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start, viewRadiusOf({ ...run, floor })) };
 }
@@ -291,15 +327,15 @@ export function loseRunBattle(save: SaveData, target: { kind: BattleTargetKind; 
       save: { ...save, dungeonRun: { ...run, charm: false, cooldown } },
       expelled: false,
       lostCards: [],
-      lossesLeft: DUNGEON_RUN.maxLosses - run.losses,
+      lossesLeft: maxLossesOf(run.dungeonId) - run.losses,
       charmSaved: true,
       keptCard: null,
     };
   }
   const losses = run.losses + 1;
-  if (losses < DUNGEON_RUN.maxLosses) {
+  if (losses < maxLossesOf(run.dungeonId)) {
     const updated: DungeonRun = { ...run, losses, cooldown };
-    return { save: { ...save, dungeonRun: updated }, expelled: false, lostCards: [], lossesLeft: DUNGEON_RUN.maxLosses - losses, charmSaved: false, keptCard: null };
+    return { save: { ...save, dungeonRun: updated }, expelled: false, lostCards: [], lossesLeft: maxLossesOf(run.dungeonId) - losses, charmSaved: false, keptCard: null };
   }
   // 封印の小箱で守った1枚は失わない（同じカードを2枚以上手に入れていても、守るのは1枚）。道具は失わない（save.items はそのまま）
   const lost = [...run.gained];
@@ -321,7 +357,7 @@ export function rewardCandidates(monsterIds: readonly string[], skillsOf: (monst
 
 /** 対戦の相手が通れないもの（バトラー・ボス）か */
 export function isBattler(e: FloorEntity): boolean {
-  return blocksWay(e) && e.kind !== 'chest';
+  return e.kind === 'npc' || e.kind === 'boss';
 }
 
 /**
@@ -330,10 +366,10 @@ export function isBattler(e: FloorEntity): boolean {
  */
 export function sanitizeRun(run: DungeonRun): DungeonRun | null {
   if (!isRunDungeon(run.dungeonId)) return null;
-  const floor = Math.min(run.floor, DUNGEON_RUN.floors - 1);
-  const f = runFloor({ seed: run.seed, floor });
-  const fixed: DungeonRun = { ...run, floor, losses: Math.min(run.losses, DUNGEON_RUN.maxLosses - 1) };
-  const onFloor = f.tiles[fixed.y]?.[fixed.x] === '.' && !entityAt(fixed, f, fixed.x, fixed.y);
+  const floor = Math.min(run.floor, floorsOf(run.dungeonId) - 1);
+  const f = runFloor({ seed: run.seed, floor, dungeonId: run.dungeonId });
+  const fixed: DungeonRun = { ...run, floor, losses: Math.min(run.losses, maxLossesOf(run.dungeonId) - 1) };
+  const onFloor = isWalkableTile(f.tiles[fixed.y]?.[fixed.x], doorsOpen(fixed)) && !entityAt(fixed, f, fixed.x, fixed.y);
   const at = onFloor && floor === run.floor ? { x: fixed.x, y: fixed.y } : f.start;
   return { ...fixed, x: at.x, y: at.y, explored: reveal(floor === run.floor ? fixed.explored : '', f, at, viewRadiusOf(fixed)) };
 }

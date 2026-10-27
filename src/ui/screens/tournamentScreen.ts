@@ -12,7 +12,8 @@ import {
 } from '../../game/progress/tournament.ts';
 import { TOURNAMENT_ROUNDS } from '../../game/progress/tournamentDraw.ts';
 import { randomSeed } from '../../game/rng.ts';
-import { cardName, opponentName, packName, tournamentDescription, tournamentName } from '../../i18n/content.ts';
+import { cardName, dungeonName, opponentName, packName, tournamentDescription, tournamentName } from '../../i18n/content.ts';
+import { getDungeon } from '../../data/dungeons.ts';
 import { t as tr } from '../../i18n/i18n.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import coinIcon from '@assets/images/icons/coin.png';
@@ -138,6 +139,11 @@ export const tournamentScreen: ScreenDefinition = {
         ...s.unlockedPacks.map((p) => tr('tournament.packUnlocked', { pack: packLabel(p) })),
         ...(s.rankUp ? [tr('tournament.rankUp', { rank: s.rankUp })] : []),
         ...s.cards.map((c) => tr('tournament.cardGot', { name: cardName(c.cardId), n: c.count })),
+        // ランクが上がって開放したダンジョン（2026-10-27 指示書「ダンジョン7つ」）
+        ...s.unlockedDungeons.map((id) => {
+          const d = getDungeon(id);
+          return tr('tournament.dungeonFound', { name: d ? dungeonName(d) : id });
+        }),
       ];
       const handle = openModal(element, {
         title: tr(s.won ? (s.firstWin ? 'tournament.rewardFirst' : 'tournament.rewardWin') : 'tournament.rewardEntry'),

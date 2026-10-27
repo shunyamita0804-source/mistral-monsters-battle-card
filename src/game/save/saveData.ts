@@ -2,6 +2,7 @@ import { cardCatalog } from '../../data/cards.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
+import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
   buildDeckFromCollection,
@@ -34,7 +35,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 18;
+export const SAVE_VERSION = 19;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -152,6 +153,8 @@ export interface DungeonRun {
   readonly sealBoxUsed: boolean;
   /** 封印の小箱で守った技カード（追い出されても失わない1枚） */
   readonly sealedCard: string | null;
+  /** スイッチを押して扉を開けた階（機械の塔。その階にいる間だけ開いたまま。下りたら閉じた扉の新しい階） */
+  readonly switchFloor: number | null;
 }
 
 /** 挑戦を始めたときの道具の効き目（どれも効いていない） */
@@ -165,6 +168,7 @@ export const NO_RUN_EFFECTS = {
   rewardChoice: null,
   sealBoxUsed: false,
   sealedCard: null,
+  switchFloor: null,
 } as const satisfies Partial<DungeonRun>;
 
 export interface SaveData {
@@ -185,6 +189,8 @@ export interface SaveData {
   readonly activeDungeon: ActiveDungeon | null;
   /** ランダム生成のダンジョンの挑戦中の状態（挑戦していなければ null） */
   readonly dungeonRun: DungeonRun | null;
+  /** 開放したダンジョン（ランクが上がったときに開放。2026-10-27 指示書「ダンジョン7つ」。src/data/dungeonRun.ts の unlockRank） */
+  readonly unlockedDungeons: readonly string[];
   /** 集めた欠片ID */
   readonly fragments: readonly string[];
   /** 隠しモンスターを特別復元したか */
@@ -248,6 +254,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     dungeons: {},
     activeDungeon: null,
     dungeonRun: null,
+    unlockedDungeons: unlockedDungeonsFor('E', []),
     fragments: [],
     hiddenRestored: false,
     items: {},
@@ -528,6 +535,20 @@ function migrateTournamentV18(raw: RawObject): RawObject {
   return { ...raw, storyFlags: [] };
 }
 
+/**
+ * v18 → v19：ダンジョン7つ（2026-10-27 指示書「ダンジョン7つ」）。開放したダンジョンの記録を足す（ランクに合わせて normalizeSave で開放する）。
+ * 精霊の森は固定のマップをやめたので、森の固定のマップを探索中だったセーブは家に戻す（その探索の途中の記録はなし。宝箱・クリアの記録は残る）
+ */
+function migrateDungeonsV19(raw: RawObject): RawObject {
+  const inOldDungeon = isObject(raw.activeDungeon);
+  return {
+    ...raw,
+    unlockedDungeons: [],
+    activeDungeon: null,
+    ...(inOldDungeon ? { location: { ...NEW_GAME_LOCATION } } : {}),
+  };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -547,6 +568,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   15: migratePeopleBookV16,
   16: migrateItemsV17,
   17: migrateTournamentV18,
+  18: migrateDungeonsV19,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -698,6 +720,7 @@ function normalizeDungeonRun(v: unknown): DungeonRun | null {
     rewardChoice: Array.isArray(v.rewardChoice) ? asStringArray(v.rewardChoice).filter((id) => !!cardCatalog.get(id)) : null,
     sealBoxUsed: asBool(v.sealBoxUsed, false) || typeof v.sealedCard === 'string',
     sealedCard: typeof v.sealedCard === 'string' && cardCatalog.get(v.sealedCard) ? v.sealedCard : null,
+    switchFloor: asFloorOrNull(v.switchFloor),
   };
 }
 
@@ -725,6 +748,16 @@ export function unlockedItemsFor(save: Pick<SaveData, 'rank' | 'tournaments' | '
     if (won || (rankUp !== null && rankAtLeast(save.rank, rankUp))) for (const id of tour.rewards.firstWin.unlockItems) ids.add(id);
   }
   return ITEM_IDS.filter((id) => ids.has(id));
+}
+
+/**
+ * 開放したダンジョン：最初からのもの＋記録にあるもの＋いまのランクで開放できるもの（すでにランクが高いセーブは、読み込んだときに条件どおり開放）。
+ * 並びは src/data/dungeonRun.ts の順
+ */
+export function unlockedDungeonsFor(rank: RankId, saved: readonly string[]): string[] {
+  return Object.entries(RUN_DUNGEONS)
+    .filter(([id, c]) => saved.includes(id) || c.unlockRank === null || rankAtLeast(rank, c.unlockRank))
+    .map(([id]) => id);
 }
 
 /** 生データ（JSON.parse の結果）を検証してセーブデータにする。読めない場合は null */
@@ -759,6 +792,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     dungeons: normalizeDungeons(migrated.dungeons),
     activeDungeon: normalizeActiveDungeon(migrated.activeDungeon),
     dungeonRun: normalizeDungeonRun(migrated.dungeonRun),
+    unlockedDungeons: unlockedDungeonsFor(rank, asStringArray(migrated.unlockedDungeons)),
     fragments: unique(asStringArray(migrated.fragments)),
     hiddenRestored: asBool(migrated.hiddenRestored, false),
     items: normalizeItems(migrated.items),
