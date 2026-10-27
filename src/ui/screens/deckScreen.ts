@@ -144,7 +144,7 @@ export const deckScreen: ScreenDefinition = {
         ctx.back('world');
         return;
       }
-      confirmModal(element, t('deck.leaveConfirm'), [h('p', { class: 'modal__text', text: t('deck.leaveConfirmText') })], () => ctx.back('world'));
+      confirmModal(element, t('deck.leaveConfirm'), [h('p', { class: 'modal__text', text: t('deck.leaveConfirmText') })], () => ctx.back('world'), undefined, 'warn');
     };
 
     const groupsOf = (): string[] => [...new Set(draft.monsters), SUPPORT_GROUP];

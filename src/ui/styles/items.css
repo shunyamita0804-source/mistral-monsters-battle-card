@@ -4,70 +4,58 @@
  * 届くまでは【仮】の見た目（丸い札に1文字と「仮」の印）
  */
 
-/* ===== 道具のアイコン（仮） ===== */
+/* ===== 道具のアイコン（デザイン33点の 14） ===== */
 .item-icon {
-  position: relative;
   flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 52px;
   height: 52px;
-  border: 2px dashed rgb(216 184 106 / 0.75);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #5a4a30, #241b10);
-  color: #f3ead2;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.55));
 }
 
 .item-icon--small {
-  width: 20px;
-  height: 20px;
-  border-width: 1px;
-  font-size: 11px;
+  width: 22px;
+  height: 22px;
 }
 
-.item-icon__temp {
-  position: absolute;
-  right: -6px;
-  bottom: -4px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: #3a3f48;
-  color: #f3ead2;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 16px;
-}
-
-/* ===== ショップの4つ目の札「道具を買う」（札の絵は届くまで仮。ほかの札と同じ形） ===== */
+/* ===== ショップの4つ目の札「道具を買う」（デザイン33点の 15。ほかの札と同じ形・同じ置き方） ===== */
 .shop-menu__item--items {
   position: relative;
   width: 100%;
   min-height: 0;
   aspect-ratio: 900 / 179;
   padding: 0 4% 0 31%;
-  border: 2px dashed rgb(216 184 106 / 0.7);
-  border-radius: 10px;
-  background: linear-gradient(90deg, #2a2116 0 29%, #3a2e1e 29%);
+  border: 0;
+  border-radius: 0;
+  border-image: none;
+  background: url('@assets/images/ui/shop/menu_items.webp') center / 100% 100% no-repeat;
   color: #f3ead2;
   font-size: 17px;
   text-align: center;
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
 }
 
-.shop-menu__item-temp {
+/* 道具の絵の右下の「持っている数」の丸い札 */
+.item-shop__art {
+  position: relative;
+  flex: none;
+}
+
+.item-shop__owned-tag {
   position: absolute;
-  left: 4%;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #3a3f48;
+  right: -8px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: url('@assets/images/ui/items/owned_tag.webp') center / contain no-repeat;
   font-size: 12px;
+  font-weight: 800;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
 }
 
 .shop-menu__item-new,
@@ -236,7 +224,7 @@
   min-height: 44px;
 }
 
-/* ===== ダンジョン：効いている道具の印（左上。仮） ===== */
+/* ===== ダンジョン：効いている道具の印（左上。デザイン33点の 33） ===== */
 .drun__effects {
   display: flex;
   flex-wrap: wrap;
@@ -244,61 +232,70 @@
 }
 
 .drun__effect {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px 2px 3px;
-  border: 1px solid rgb(216 184 106 / 0.6);
+}
+
+.item-mark {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+/* 魔除けの香の残りの歩数 */
+.drun__effect-steps {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 18px;
+  padding: 0 4px;
+  border: 1px solid rgb(216 184 106 / 0.7);
   border-radius: 999px;
-  background: rgb(10 8 6 / 0.72);
-  font-size: 11px;
-  font-weight: 700;
+  background: rgb(10 8 6 / 0.85);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
   color: #f3ead2;
 }
 
-/* ===== 煙玉の演出（仮）：白い煙が広がって、番人が消える ===== */
-.drun__smoke {
-  position: absolute;
-  inset: 0;
-  z-index: 9;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 52%, rgb(240 240 240 / 0.95) 0 18%, rgb(220 220 220 / 0.6) 34%, transparent 62%);
-  animation: drun-smoke 0.9s ease-out forwards;
+/* メニューの「手に入れた技カード」の、封印の小箱で守ったカードの印 */
+.drun__menu-cards .item-mark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
-@keyframes drun-smoke {
-  0% { opacity: 0; transform: scale(0.4); }
-  35% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.4); }
-}
-
-.drun__guardian.is-gone {
-  transition: opacity 0.5s ease-out;
-  opacity: 0;
-}
-
-/* ===== お守りの演出（仮）：主人公の上でお守りが光って消える ===== */
+/* ===== 煙玉（4コマ）・お守り（3コマ）の演出：主人公の上に重ねる（デザイン33点の 31・32） ===== */
+.drun__smoke,
 .drun__charm-fx {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 46%;
   z-index: 9;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0 12px rgb(255 220 140 / 0.9));
-  animation: drun-charm 1.26s ease-out forwards;
+  transform: translate(-50%, -62%);
 }
 
-@keyframes drun-charm {
-  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
-  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
-  70% { opacity: 1; transform: translate(-50%, -60%) scale(1.1) rotate(8deg); }
-  100% { opacity: 0; transform: translate(-50%, -80%) scale(1.6) rotate(-12deg); }
+.drun__smoke img {
+  display: block;
+  width: 300px;
+  height: auto;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .drun__smoke,
-  .drun__charm-fx {
-    animation-duration: 0.01s;
-  }
+.drun__charm-fx img {
+  display: block;
+  width: 220px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgb(255 220 140 / 0.5));
+}
+
+.drun__guardian.is-gone {
+  transition: opacity 0.45s ease-out;
+  opacity: 0;
 }

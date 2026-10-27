@@ -66,11 +66,10 @@ export const shopMenuScreen: ScreenDefinition = {
           button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item shop-menu__item--browse'),
           h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
           button(t('shop.gacha'), () => ctx.navigate('gacha'), 'shop-menu__item shop-menu__item--gacha'),
-          // 4つ目の札「道具を買う」（2026-10-27。札の絵は届くまで仮。新しく並んだ道具があれば NEW）
+          // 4つ目の札「道具を買う」（2026-10-27。札の絵はデザイン33点の 15。新しく並んだ道具があれば NEW）
           h(
             'button',
             { class: 'shop-menu__item shop-menu__item--items', attrs: { type: 'button' }, on: { click: () => ctx.navigate('itemShop') } },
-            h('span', { class: 'shop-menu__item-temp', text: t('items.temp') }),
             t('items.shopButton'),
             ITEMS.some((i) => isNewItem(save, i.id)) ? h('span', { class: 'shop-menu__item-new', text: t('items.new') }) : null,
           ),

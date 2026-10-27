@@ -20,6 +20,8 @@ export const titleScreen: ScreenDefinition = {
           t('title.confirmNew'),
           [h('p', { class: 'modal__text', text: t('title.confirmNewText') })],
           () => ctx.navigate('newGame'),
+          undefined,
+          'warn',
         );
       } else {
         ctx.navigate('newGame');

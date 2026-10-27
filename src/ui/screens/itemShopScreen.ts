@@ -32,11 +32,11 @@ export const itemShopScreen: ScreenDefinition = {
       const save = store.save;
       const max = buyableCount(save, item.id);
       if (max <= 0) {
-        messageModal(element, t('items.atLimit', { max: ITEM_RULES.maxOwned }));
+        messageModal(element, t('items.atLimit', { max: ITEM_RULES.maxOwned }), undefined, undefined, undefined, 'ng');
         return;
       }
       if (save.coins < item.price) {
-        messageModal(element, t('items.notEnough'));
+        messageModal(element, t('items.notEnough'), undefined, undefined, undefined, 'ng');
         return;
       }
       // 買える数：上限までのうち、所持金で足りる数まで
@@ -97,10 +97,10 @@ export const itemShopScreen: ScreenDefinition = {
             store.update(() => r.save);
             sound.play('register');
             render();
-            messageModal(element, t('items.bought', { item: itemName(item), n }));
+            messageModal(element, t('items.bought', { item: itemName(item), n }), undefined, undefined, itemIcon(item), 'ok');
           } else if (r.status === 'error') {
             render();
-            messageModal(element, r.reason === 'coins' ? t('items.notEnough') : t('items.atLimit', { max: ITEM_RULES.maxOwned }));
+            messageModal(element, r.reason === 'coins' ? t('items.notEnough') : t('items.atLimit', { max: ITEM_RULES.maxOwned }), undefined, undefined, undefined, 'ng');
           }
         },
       );
@@ -116,7 +116,8 @@ export const itemShopScreen: ScreenDefinition = {
         return h(
           'div',
           { class: 'item-shop__row', dataset: { id: item.id } },
-          itemIcon(item),
+          // 道具の絵と、右下に持っている数の丸い札（デザイン33点の 15）
+          h('span', { class: 'item-shop__art' }, itemIcon(item), owned > 0 ? h('span', { class: 'item-shop__owned-tag', text: String(owned) }) : null),
           h(
             'div',
             { class: 'item-shop__info' },

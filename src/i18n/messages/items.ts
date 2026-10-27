@@ -10,7 +10,6 @@ export const ITEMS_MESSAGES = {
   'items.shopButton': { ja: '道具を買う', en: 'Buy Items' },
   'items.title': { ja: '道具を買う', en: 'Buy Items' },
   'items.greeting': { ja: 'ダンジョンで役に立つ道具です。（値段は仮）', en: 'Handy items for the dungeon. (Prices are temporary)' },
-  'items.temp': { ja: '仮', en: 'Temp' },
   'items.price': { ja: '{price}G', en: '{price}G' },
   'items.owned': { ja: '所持 {n}/{max}', en: 'Owned {n}/{max}' },
   'items.new': { ja: 'NEW', en: 'NEW' },

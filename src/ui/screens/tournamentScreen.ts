@@ -213,7 +213,7 @@ export const tournamentScreen: ScreenDefinition = {
             confirmModal(element, tr('tournament.withdrawConfirm'), [h('p', { class: 'modal__text', text: tr('tournament.withdrawText') })], () => {
               store.update(withdraw);
               render();
-            });
+            }, undefined, 'warn');
           }, 'btn btn--ghost'),
         );
       } else {

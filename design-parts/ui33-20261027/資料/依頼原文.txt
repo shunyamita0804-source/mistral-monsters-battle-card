@@ -1,0 +1,696 @@
+【プロンプト】ミストラルモンスターズ バトルカード　デザイン33枚（第14弾・第15弾＋道具まとめ・2026-10-27）
+作成：Claude（リポジトリの画面写真・素材・コードを見て洗い出し。最新の main〔e9f9ecd〕で確認）
+
+■ この依頼に入れていないもの
+・カードショップの機械・内装・自動ドア（A〜G・組み込み済み）と、ガチャ開封の演出（統合正式プロンプトの STEP 4：封を切る・めくる・結果一覧・高レアの光）：デザイン担当の別の流れで作る
+・モンスターカード・技カード・サポートカード：別に作っている
+・これから増やすダンジョン（水・火など）の床・壁・背景：場所・名前・ボスが決まってから
+
+■ なぜ頼むか：ダンジョンと道具（1〜15）
+・ダンジョン試作の暗闇：見えるマスと見えないマスが四角で切り替わるだけ。手探りの「明かりで照らしている」感じがない
+・見えない番人の気配：画面のふちが紫に揺れる（紫は色の方針で使わない色）
+・太古の遺跡：地下1〜3階がすべて同じ床と壁。下りても深くなった感じがない（第2弾で「次の候補」にしたまま）
+・勝った相手：その場から消えるだけ（2026-10-27 決定「勝った相手は消える」）
+・技カードを手に入れた／3回負けて失った：文字の知らせだけ。左上の「獲得 0枚」も文字だけ
+・メニュー（B）：「メニュー（仮）」の窓に文字の一覧だけ。決まった中身（デッキ確認・獲得したカード・残り負け回数・全体地図・道具・中断）の絵がない。全体地図の画面もない
+・クリアの報酬：初回はモンスターカード＋技カード、2回目からは技カード（2026-10-27 決定）。受け取る場面がない
+・ショップの道具：脱出・敵避けなどの道具を売る（2026-10-27 決定）。道具の絵と、店のメニューの札（いまは3つ）がない
+
+■ なぜ頼むか：道具（14・15・31〜33）
+・ショップで売るダンジョン用の道具8つが決まった（2026-10-27）：帰還の羽根・魔除けの香・たいまつ・煙玉・遺跡の地図・身代わりのお守り・封印の小箱・幸運のコイン
+・道具の絵、煙玉で逃げる・お守りが身代わりになるときの演出、効き目が続いている間の印がない
+
+■ なぜ頼むか：画面と販売の仕上げ（16〜30）
+・階段を下りる確認：「戻れません」の大事な確認なのに文字だけ
+・世界地図：これから増えるダンジョン（水・火など）の「まだ行けない」印がない
+・デッキ編集（家だけ）：画面の背景が共通の模様だけで、家の机で考えている感じがない
+・カードを売る：お金が増えるだけで、手ごたえの演出がない
+・確認の窓・お知らせ：文字だけの窓。「保存した」「新しいカード」などの短いお知らせの帯がない
+・街・森の右上の「脱出」「メニュー」：文字を四角で囲んだボタン（ほかの画面の金の部品と合っていない）
+・何も無いとき（獲得なし・カードなし）：「まだありません」の文字だけ
+・起動・読み込み：アプリを開いたときの起動画面・読み込みの印がない
+・販売の準備：ストアに出す画像（スクリーンショットの帯・Google Play の横長の絵・Android のアイコンの分け方）がない
+・素材のクレジット：設定の中に文字だけ（ストアで公開するときに必要な画面）
+
+■ 頼む33枚
+【ダンジョンと道具】
+ 1　暗闇の明かり（主人公のまわり）　　　　　　dungeon_light.png
+ 2　番人の気配の画面のふち　　　　　　　　　　omen_vignette.png
+ 3　太古の遺跡 地下2階の床と壁　　　　　　　　ruins_b2_tiles.png
+ 4　太古の遺跡 地下3階（ボスの階）の床と壁　　ruins_b3_tiles.png
+ 5　勝った相手が去るときの光の粒（3コマ）　　leave_fx.png
+ 6　技カードを手に入れたときの光と台　　　　　card_get.png
+ 7　獲得物の革袋（ふくらみ3段階）　　　　　　gain_pouch.png
+ 8　技カードを失うとき（4コマ）　　　　　　　card_lost.png
+ 9　ダンジョンのメニューの窓　　　　　　　　　drun_menu_window.png
+10　ダンジョンのメニューのアイコン6つ　　　　drun_menu_icons.png
+11　全体地図の画面の台　　　　　　　　　　　　full_map_parts.png
+12　クリア報酬を受け取る場面　　　　　　　　　clear_reward_scene.png
+13　「初回クリア」の封蝋とリボン　　　　　　　first_clear_seal.png
+14　ダンジョン用の道具のアイコン8つ　　　　dungeon_items.png
+15　ショップの「道具」の札と品物の行　　　　　shop_item_parts.png
+【画面と販売の仕上げ】
+16　起動画面の絵　　　　　　　　　　　　　　　splash_art.png
+17　読み込み・保存中の印（8コマ）　　　　　　loading_mark.png
+18　階段を下りる確認の挿絵　　　　　　　　　stairs_confirm.png
+19　世界地図の「まだ行けない場所」の印　　　worldmap_locked.png
+20　デッキ編集の画面の背景（家の机）　　　　deck_bg.png
+21　カードを売ったときのお金（4コマ）　　　　coin_burst.png
+22　短いお知らせの帯　　　　　　　　　　　　　toast_plate.png
+23　確認の窓の紋章（4つ）　　　　　　　　　　dialog_emblems.png
+24　上の小さなボタン（メニュー・脱出）　　　　hud_top_buttons.png
+25　初めての人への指さしと光の輪　　　　　　　tutorial_pointer.png
+26　何もないときの挿絵（2つ）　　　　　　　　empty_states.png
+27　クレジットの画面の巻物　　　　　　　　　　credits_scroll.png
+28　ストアのスクリーンショットの帯　　　　　　store_frame.png
+29　Google Play の横長の絵（背景）　　　　　　feature_graphic_bg.png
+30　Android のアイコンの前景と背景　　　　　　adaptive_icon.png
+【道具の演出】
+31　煙玉で逃げる演出（4コマ）　　　　　　　　smoke_escape.png
+32　身代わりのお守りが効いたときの演出　　　charm_break.png
+33　効き目の印と守ったカードの印　　　　　　item_status_marks.png
+
+■ 注意
+・12・29 はモンスターを描かない（カード・モンスターの絵はゲームが重ねる）。30 は、いまのアイコンの中のモンスターをそのまま2枚に分けて描き直す
+・28〜30 はストアに出すと決めてから頼んでもよい（ゲームの中では使わない）
+
+■ 使い方
+・1枚ごとに新しい会話で、「共通ルール」とその番号の文を貼り、「添付」の画像を付ける（画像は同じ ZIP の 共通・見本・今の画面 フォルダ）。日本語でうまくいかないときは English version
+・「今の画面」のダンジョン試作の下の十字キー・A・B は古い版（いまはスティック）。画面の雰囲気と左上・右上の表示の見本として使う
+・デッキ編集の今の画面は入れていない（作業環境で撮れなかった）。20 は部屋の机・デッキ編集の部品を見本にする
+・1・2・12・16・20・27・29 は背景のある絵なので、共通ルールの【背景】の行は無視してよい（番号の文の方を優先）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 共通ルール（全部の最初に付ける）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▼ここからコピー
+スマホ向け2Dカードゲーム「ミストラルモンスターズ バトルカード」の絵と画面の部品を描いてください。販売する商品なので、市販のスマホRPGと並べて見劣りしない品質で。
+【画風】添付の画風見本と同じ、筆で塗り重ねた手描きの質感。ベクター風・フラット・3DCG風にしない。金の線と飾りの描き方は、添付のゲームの部品にそろえる
+【雰囲気】大人向けの落ち着いた雰囲気。色は濃い灰色・こげ茶・くすんだ金・紺。紫・明るい黄色・ピンクは使わない。宝石やきらきらした光は控えめに
+【形】部品は画面を真正面から見た平らな形（斜めにしない・影を床に落とさない）。部品どうしは重ならないように間を空ける
+【背景】透明（できなければマゼンタ一色 #FF00FF）
+【禁止】文字・数字・ロゴ・透かし・サイン（日本語・英語とも）。実在の作品に似せること。人物・モンスター（番号の文で頼んだときを除く）
+▲ここまで
+▼English
+Draw art and UI parts for the commercial smartphone 2D card game "Mistral Monsters Battle Card". Quality must match commercial mobile RPGs.
+[Style] Hand-painted with layered brush strokes, like the attached style sample. NO flat vector art, NO 3D render look. Match the gold lines and ornaments of the attached game parts.
+[Mood] Calm, for adults. Dark charcoal grey, dark brown, muted gold, navy. No purple, no bright yellow, no pink. Keep gems and sparkles subtle.
+[Shape] UI parts are flat, seen straight from the front (no perspective, no cast shadow on a floor). Leave space between parts, no overlap.
+[Background] Transparent (or solid magenta #FF00FF).
+[Forbidden] Any text, letters or numbers (Japanese or English), logos, watermarks, signatures. Resemblance to existing IP. People or monsters (unless the numbered prompt asks for them).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 1　暗闇の明かり → dungeon_light.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/ダンジョン試作.png、見本/遺跡の床.png
+▼ここからコピー
+真っ暗な地下遺跡で、手に持ったランタンが周りを照らしている「光だけ」を描いてください。1024×1024 の正方形を横に3つ並べた 3072×1024（ゆらめきの3コマ）。
+・背景は黒一色。真ん中に、あたたかいくすんだ橙色の丸い光。中心ほど明るく、外へ向かって筆のむらを残しながら暗くなる（きれいな円のグラデーションにしない）
+・光の外側のふちに、ほこりの粒が少し浮かぶ。3コマで光の大きさとむらがほんの少し変わる（ろうそくのゆらぎ程度）
+・ゲームはこの絵を「加算」で重ね、黒い所は見えなくなる。床・壁・ランタン本体・人物は描かない
+▲ここまで
+▼English
+Paint only the light of a hand-held lantern in a pitch-dark underground ruin. Three 1024x1024 squares side by side on 3072x1024 (3 flicker frames).
+- Solid black background. A warm, muted orange round glow in the center, brightest in the middle and fading outward with visible brush texture (not a clean circular gradient).
+- A few floating dust motes at the edge of the light. Across the 3 frames the size and texture change only slightly (gentle candle flicker).
+- It will be overlaid in additive mode, so black disappears. No floor, walls, lantern or person.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 2　番人の気配の画面のふち → omen_vignette.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/ダンジョン試作.png（画面のふちの紫の揺れが今の気配の表示）、見本/番人の「！」の印.png
+▼ここからコピー
+見えない何者かが近くにいる気配を、スマホ画面のふちに出す「霧のふち」を描いてください。縦長 1170×2532。
+・背景は白一色。画面の四辺のふちから内側へ、黒に近いこげ茶の霧がにじみ出ている。四隅が一番濃く、辺の真ん中は薄い。中央の大部分は白のまま
+・霧の中に、くすんだ金の細い光の筋がところどころ（3〜5本）。ひっかき傷のような鋭さは控えめに
+・ゲームはこの絵を「乗算」で重ね、白い所は見えなくなる。紫・赤は使わない。目玉・顔・手の形は描かない
+▲ここまで
+▼English
+Paint a "creeping mist frame" around the edges of a phone screen, showing that something unseen is near. Portrait 1170x2532.
+- Solid white background. From all four edges, a near-black dark brown mist seeps inward; strongest in the corners, faint in the middle of each side. Most of the center stays white.
+- A few (3-5) thin muted-gold light streaks inside the mist; keep them subtle, not like sharp scratches.
+- It will be overlaid in multiply mode, so white disappears. No purple or red. No eyes, faces or hands.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 3　太古の遺跡 地下2階の床と壁 → ruins_b2_tiles.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/遺跡の床.png、見本/遺跡の壁の上面.png、見本/遺跡の壁の正面.png（3つともいまの地下1階）、見本/太古の遺跡の挿絵.png
+▼ここからコピー
+添付の「遺跡の床・壁の上面・壁の正面」と同じ大きさ・同じ使い方で、1つ深い階（地下2階）の版を描いてください。横に3つ並べる（左から床・壁の上面・壁の正面）。
+・形・石の大きさ・見下ろしの角度は添付と同じ。つなげて敷いたときに継ぎ目が出ないように（上下左右がつながる）
+・地下1階との違い：石が古く、ひびと苔がやや多い。色は少し青みの灰色で暗め。床のところどころに細い水の流れの跡
+・壊れた柱の根元や小石は床の絵に描き込まない（ゲームが別に置く）
+▲ここまで
+▼English
+Make a deeper-floor (B2) version of the attached ruin floor / wall top / wall face, with the same size and usage. Three tiles side by side (left to right: floor, wall top, wall face).
+- Same shapes, stone size and top-down angle. Seamless on all four sides when tiled.
+- Differences from B1: older stone with a few more cracks and moss, slightly bluish and darker grey, faint traces of thin water trickles here and there on the floor.
+- Do not paint broken pillars or loose rocks into the floor tile.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 4　太古の遺跡 地下3階（ボスの階）の床と壁 → ruins_b3_tiles.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/遺跡の床.png、見本/遺跡の壁の上面.png、見本/遺跡の壁の正面.png、見本/太古の遺跡の挿絵.png、見本/ボスの間のしるし_遺跡の門.png
+▼ここからコピー
+3 と同じ形・同じ大きさで、最下層（ボスのいる地下3階）の版を描いてください。横に3つ並べる（床・壁の上面・壁の正面）。
+・つなげて敷いたときに継ぎ目が出ないように
+・地下1・2階との違い：磨かれた大きな石板の床で、古い儀式の場所らしい。石板の継ぎ目に、くすんだ金の細い線の紋様がうっすら（光らせない）。壁は太い石積みで、根や蔦がからむ
+・全体に暗く重い。くすんだ金はほんの少しだけ
+▲ここまで
+▼English
+Same shapes and size as #3, for the deepest floor (B3, where the boss waits). Three tiles side by side (floor, wall top, wall face).
+- Seamless when tiled.
+- Differences: floor of large polished stone slabs, like an old ritual place, with faint thin muted-gold line patterns along the joints (not glowing). Walls of heavy stone blocks with roots and vines.
+- Overall dark and heavy; muted gold only a little.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 5　勝った相手が去るときの光の粒 → leave_fx.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/バトラーの歩く絵.png（大きさの見本）、見本/敵とぶつかったときの演出_1.png、見本/敵とぶつかったときの演出_2.png
+▼ここからコピー
+ダンジョンで負けた相手（人）がその場から去るときに、人の絵に重ねる「去り際の光の粒と土ぼこり」を描いてください。正方形 512×512 を横に3つ並べた 1536×512（3コマ）。
+・1コマ目：足元から土ぼこりが少し舞い、くすんだ金の小さな光の粒が足元に集まる
+・2コマ目：光の粒が人の背丈くらいまで立ちのぼり、土ぼこりが広がる
+・3コマ目：粒がまばらになって上へ消えていく、土ぼこりが薄れる
+・人物は描かない（ゲームが人の絵を薄くしながら重ねる）。真ん中に人が立つ空間（高さの7割ほど）を空ける
+▲ここまで
+▼English
+Effect overlaid on a defeated opponent (a person) as they leave the dungeon floor: rising light particles and dust. Three 512x512 squares side by side on 1536x512 (3 frames).
+- Frame 1: a little dust kicks up at the feet; small muted-gold light motes gather at the feet.
+- Frame 2: the motes rise to about a person's height; the dust spreads.
+- Frame 3: the motes thin out and vanish upward; the dust fades.
+- Do not draw the person. Leave a standing space in the center (about 70% of the height).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 6　技カードを手に入れたときの光と台 → card_get.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/手に入れたときの小窓.png、見本/景品の光の輪.png、見本/カードの裏面.png
+▼ここからコピー
+対戦に勝って技カードを1枚手に入れたときの部品を、横長 1536×1024 に左右に並べて描いてください。
+・左：カード1枚を立てて見せる小さな台座。くすんだ金の縁の石の台で、前に小さな紺の布。台の上は空ける（カードはゲームが置く。カードは縦長 2:3）
+・右：台座の後ろに重ねる光。上から差し込む光の筋と、台の周りに舞う小さな金の粒。光は白っぽい金で控えめに
+・2つとも、台座の幅は同じに合わせる
+▲ここまで
+▼English
+Parts for winning one skill card, side by side on 1536x1024.
+- Left: a small pedestal to display one upright card. Stone with a muted-gold rim and a small navy cloth in front. Leave the top empty (the game places the card; cards are portrait 2:3).
+- Right: light to put behind the pedestal: rays falling from above and small gold motes around it. Pale gold, subtle.
+- Both parts match the pedestal's width.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 7　獲得物の革袋 → gain_pouch.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/左上の負けと獲得の表示.png、見本/負けの灯り_灯った.png（同じ並びに置く）、見本/景品の袋.png
+▼ここからコピー
+ダンジョンで手に入れたカードを入れておく「革袋」のアイコンを、ふくらみ方の違う3つ、横に並べて描いてください。1536×512。
+・左：空に近い（くたっとしている）／真ん中：少し入っている／右：たくさん入っていて、口から裏向きのカードの角が2〜3枚のぞく
+・こげ茶の革、口を結ぶくすんだ金のひも。小さな紺の留め具
+・画面の左上に小さく（高さ40px ほど）出すので、形がはっきり分かるように。横に数字をゲームが重ねる
+▲ここまで
+▼English
+Icon of a leather pouch holding cards gained in the dungeon, in 3 fullness levels, side by side on 1536x512.
+- Left: nearly empty (limp). Middle: some inside. Right: full, with the corners of 2-3 face-down cards peeking out of the mouth.
+- Dark brown leather, muted-gold drawstring, small navy clasp.
+- Shown small (about 40px tall) at the top-left, so keep a clear silhouette. The game adds the number next to it.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 8　技カードを失うとき → card_lost.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/カードの裏面.png、見本/戻されるときの帯.png
+▼ここからコピー
+3回負けて、その挑戦で手に入れた技カードを失うときの演出を描いてください。縦長のカード（2:3）が崩れていく4コマを、横に並べる。2048×768。
+・1コマ目：裏向きのカード（添付のカードの裏面の色と形）。ふちに細いひびが入りはじめる
+・2コマ目：ひびが広がり、角から欠ける
+・3コマ目：大きく砕け、破片がこげ茶の砂になって下へこぼれる
+・4コマ目：砂とわずかな破片だけが落ちていく
+・悲しいが重すぎない雰囲気。火や血のような表現はしない
+▲ここまで
+▼English
+Effect for losing the skill cards gained on the run (after the 3rd defeat): a portrait card (2:3) crumbling in 4 frames, side by side on 2048x768.
+- Frame 1: a face-down card (same colors and shape as the attached card back), thin cracks starting at the edges.
+- Frame 2: cracks spread; a corner chips off.
+- Frame 3: it breaks apart; fragments turn into dark brown sand pouring down.
+- Frame 4: only sand and a few fragments falling.
+- Sad but not heavy. No fire or blood-like effects.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 9　ダンジョンのメニューの窓 → drun_menu_window.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/窓の枠.png、見本/デッキ編集の表の行.png、見本/設定の欄の板.png
+▼ここからコピー
+ダンジョンの中で開くメニューの部品を、横長 1536×1024 に描いてください。
+・左（大きく）：縦長の窓の枠（縦横比 3:4 くらい）。こげ茶の革を張った板に、くすんだ金の細い縁。上に見出しを置く細い帯。中は暗い紺で無地（項目をゲームが並べる）
+・右上：項目の行の板（横長 6:1）を2つ。ふつう・押したとき（押したときは少し明るい紺）。左はしにアイコンを置く丸いくぼみ
+・右下：窓を閉じる小さな丸いボタン（中の記号は描かない）
+・添付の窓の枠と同じ金の描き方。両端に大きな飾りは付けない（文字が読みにくくなるため）
+▲ここまで
+▼English
+Parts for the in-dungeon menu, on 1536x1024.
+- Left (large): a portrait window frame (about 3:4): a board covered in dark brown leather with a thin muted-gold rim, a narrow header strip on top, plain dark navy inside (the game lists the items).
+- Top right: two wide row plates (6:1): normal and pressed (pressed is a slightly brighter navy). A round recess at the left end for an icon.
+- Bottom right: a small round close button (no symbol inside).
+- Same gold style as the attached window frame. No big ornaments at the ends (they hurt readability).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 10　ダンジョンのメニューのアイコン6つ → drun_menu_icons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/設定の小さなアイコン_音.png、見本/設定の小さなアイコン_言語.png、見本/負けの灯り_灯った.png
+▼ここからコピー
+ダンジョンのメニューの項目に付けるアイコンを6つ、3×2 に並べて描いてください。1536×1024。同じ大きさの丸い金の縁の中に描く。
+・1 デッキの確認：重なった裏向きのカード3枚
+・2 手に入れたカード：口の開いた革袋（7 と同じ袋）
+・3 残りの負け回数：小さなランタン（添付の負けの灯りと同じ形）
+・4 全体地図：巻いた羊皮紙の地図と小さな方位の印
+・5 道具：小さな薬びんと羽根を並べたもの
+・6 中断する：閉じた記録帳と羽ペン
+・小さく（高さ40px ほど）出すので、形をはっきり・線を太めに
+▲ここまで
+▼English
+Six icons for the dungeon menu items in a 3x2 grid on 1536x1024, each inside the same round muted-gold rim.
+1 Check deck: three stacked face-down cards. 2 Gained cards: an open leather pouch (same as #7). 3 Losses left: a small lantern (same shape as the attached loss lantern). 4 Full map: a rolled parchment map with a small compass mark. 5 Items: a small potion bottle and a feather. 6 Suspend: a closed logbook and a quill pen.
+Shown small (about 40px tall): clear silhouettes, slightly thicker lines.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 11　全体地図の画面の台 → full_map_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/ミニマップの枠.png、見本/ミニマップの印_自分.png・宝箱.png・階段.png・バトラー.png・ボス.png、見本/世界地図の地名の札.png
+▼ここからコピー
+ダンジョンのいまの階の全体地図を大きく見せる画面の部品を、横長 1536×1024 に描いてください。
+・左（大きく）：机に広げた羊皮紙（ほぼ正方形）。紙の中は無地で、明るめの古い紙の色（ゲームが通った所を描き込む）。四隅を小さな金具で押さえる。紙の外側は暗い木の机
+・右上：「いまの階」を書く小さな札（横長。文字はゲームが重ねる）
+・右下：地図の上に置く小さな印の追加を2つ：「まだ行っていない所」の霧のかたまり（灰色の小さな雲）と、「ここにいる」の金の小さな針
+・添付のミニマップの印（自分・宝箱・階段・バトラー・ボス）とそろう描き方
+▲ここまで
+▼English
+Parts for a screen showing the full map of the current dungeon floor, on 1536x1024.
+- Left (large): a nearly square parchment spread on a desk; plain, light aged-paper inside (the game draws explored areas); small metal clips at the four corners; dark wooden desk around it.
+- Top right: a small wide label plate for the floor name (text added by the game).
+- Bottom right: two extra map marks: an "unexplored" fog patch (small grey cloud) and a small gold "you are here" pin.
+- Match the style of the attached minimap marks (you, chest, stairs, battler, boss).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 12　クリア報酬を受け取る場面 → clear_reward_scene.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/太古の遺跡の挿絵.png、見本/ボスの間のしるし_遺跡の門.png、見本/特別復元の場面.png
+▼ここからコピー
+ダンジョンのボスを倒したあと、報酬のカードを受け取る場面の背景を描いてください。縦長 1170×2532（スマホの画面いっぱい）。背景は透明にしない。
+・遺跡の最奥の祭壇の間。奥に開いた古い石の門、天井の割れ目から光が差し込み、祭壇を照らす
+・画面の真ん中より少し下に、横長の石の祭壇。祭壇の上に、縦長のカード（2:3）を2枚並べて立てられる空き（初回はモンスターカードと技カードの2枚、2回目からは真ん中に1枚。どちらでも不自然にならないように）
+・カード・モンスター・人物は描かない。上の1/4は文字の帯を重ねるので暗めで物を置かない
+▲ここまで
+▼English
+Background for receiving reward cards after defeating the dungeon boss. Portrait 1170x2532 (full phone screen). Not transparent.
+- The altar chamber deep in the ruins: an old stone gate open at the back, light falling through a crack in the ceiling onto the altar.
+- Slightly below the center, a wide stone altar with room for two upright portrait cards (2:3) side by side (first clear: a monster card and a skill card; later clears: one card in the middle; both must look natural).
+- No cards, monsters or people. Keep the top quarter darker and empty for a text banner.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 13　「初回クリア」の封蝋とリボン → first_clear_seal.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/レア度の印_R.png、見本/NEWの札.png、見本/ランクの紋章_S.png
+▼ここからコピー
+初めてダンジョンをクリアしたときだけカードに付ける印を、横長 1536×768 に左右に並べて描いてください。
+・左：紺のリボンを2本垂らした、えんじ色の封蝋。封蝋の中は無地のくぼみ（文字はゲームが重ねる）
+・右：同じ形の小さい版（世界地図のダンジョンの印の横に付ける。高さ32px ほどでも分かる形）
+・明るい赤にしない。落ち着いたえんじと、くすんだ金の縁
+▲ここまで
+▼English
+A seal shown only on the first clear of a dungeon, two versions side by side on 1536x768.
+- Left: a wine-red wax seal with two navy ribbons hanging below; a plain recess inside (text added by the game).
+- Right: a small version of the same shape (shown next to the dungeon pin on the world map; must read at about 32px tall).
+- Not bright red: calm wine red with a muted-gold rim.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 14　ダンジョン用の道具のアイコン8つ → dungeon_items.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/手に入れたときの小窓.png、見本/景品の袋.png、見本/不思議な欠片.png、見本/お金のアイコン.png
+▼ここからコピー
+ダンジョンで使う道具のアイコンを8つ、4×2 に並べて描いてください。2048×1024。それぞれ同じ大きさで、台や枠は付けない（道具だけ）。
+上の段（左から）
+・1 帰還の羽根（その場で街へ帰る）：白っぽい大きな羽根1本に、くすんだ金の細い飾りひも
+・2 魔除けの香（見えない番人が出なくなる）：小さな真ちゅうの香炉から、うすい煙が一筋のぼる
+・3 たいまつ（見える範囲が広がる）：短い木の柄のたいまつ。先にあたたかい橙の炎
+・4 煙玉（番人から逃げる）：こげ茶の紙で包んだ丸い玉。上に短い導火線、包みを紺のひもで結ぶ
+下の段（左から）
+・5 遺跡の地図（その階の形と階段が分かる）：紺のひもで結んだ羊皮紙の巻物
+・6 身代わりのお守り（次の1敗を数えない）：えんじの布の小さなお守り袋に、くすんだ金の糸で盾の形の刺しゅう
+・7 封印の小箱（カード1枚を失わないように守る）：カードが1枚入る薄い木の小箱。ふたに金の留め金と小さな錠前
+・8 幸運のコイン（次の報酬を2枚から選べる）：添付のお金とは違う、大きめの古い金貨。表に四つ葉の浮き彫り、紺のひもを通す穴
+・小さく（高さ48px ほど）出すので、形をはっきり。8つが同じ画風・同じ明るさにそろうように。光らせすぎない
+▲ここまで
+▼English
+Eight dungeon item icons in a 4x2 grid on 2048x1024, same size, items only (no base or frame).
+Top row (left to right):
+1 Return Feather (return to town on the spot): one large off-white feather with a thin muted-gold cord.
+2 Warding Incense (no unseen guardians for a while): a small brass censer with a thin thread of smoke.
+3 Torch (wider view): a short wooden torch with a warm orange flame.
+4 Smoke Ball (escape from a guardian): a round ball wrapped in dark brown paper, a short fuse on top, tied with navy string.
+Bottom row (left to right):
+5 Ruins Map (shows the floor layout and stairs): a parchment scroll tied with navy string.
+6 Guardian Charm (the next loss does not count): a small wine-red cloth charm pouch with a shield embroidered in muted-gold thread.
+7 Seal Box (keeps one card from being lost): a thin wooden box that holds one card, with a gold clasp and a small padlock on the lid.
+8 Lucky Coin (choose the next reward from two cards): a large old gold coin (different from the attached money icon) with a four-leaf relief and a hole for a navy string.
+Shown small (about 48px tall): clear silhouettes; all eight in the same style and brightness; not overly glowing.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 15　ショップの「道具」の札と品物の行 → shop_item_parts.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/ショップのメニューの札_カードを見る.png・売る.png・カードガチャ.png、見本/デッキ編集の表の行.png
+▼ここからコピー
+カードショップで道具を買う画面の部品を、横長 1536×1024 に描いてください。
+・上：ショップのメニューの4枚目の札。添付の3枚とまったく同じ形・大きさ・金の縁で、絵柄は「棚に並んだ小さな薬びんと羽根と巻物」
+・左下：品物の行の板（横長 5:1）。左に道具の絵を置く四角いくぼみ、右はしに値段を置く小さな金の札（数字はゲームが重ねる）。ふつう・選んだとき（選んだときは紺が少し明るく、縁の金が強い）の2つ
+・右下：「持っている数」を置く小さな丸い札（中は無地）
+▲ここまで
+▼English
+Parts for buying items at the card shop, on 1536x1024.
+- Top: a 4th shop menu plate, exactly the same shape, size and gold rim as the attached three, with the picture "small potion bottles, feathers and scrolls lined up on a shelf".
+- Bottom left: an item row plate (wide 5:1) with a square recess at the left for the item picture and a small gold price tag at the right end (numbers added by the game). Two states: normal and selected (selected: slightly brighter navy, stronger gold rim).
+- Bottom right: a small round tag for "number owned" (plain inside).
+▲
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 16　起動画面の絵 → splash_art.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/タイトルの背景.png、見本/タイトルロゴ.png、見本/カードの裏面.png
+▼ここからコピー
+アプリを開いた直後、1〜2秒だけ出す起動画面の絵を描いてください。縦長 1170×2532。背景は透明にしない。
+・暗い紺の夜空のような無地に近い背景。真ん中に、カードの裏面と同じ紋章（翼と星）を大きく、くすんだ金の線で静かに描く
+・紋章の下に、ロゴを置く横長の空き（ロゴはゲームが重ねる）。画面の下の1/5は読み込みの印を置くので何も描かない
+・タイトル画面より静かで地味に（タイトル画面の前に出るため、主役を食わない）
+▲ここまで
+▼English
+Splash screen shown for 1-2 seconds when the app opens. Portrait 1170x2532. Not transparent.
+- A nearly plain dark navy background like a night sky. In the center, the emblem from the card back (wings and star), large, drawn quietly in muted gold lines.
+- Under the emblem, a wide empty space for the logo (added by the game). Leave the bottom fifth empty for the loading mark.
+- Quieter and plainer than the title screen (it comes right before it).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 17　読み込み・保存中の印 → loading_mark.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/カードの裏面.png、見本/ランクの紋章_A.png
+▼ここからコピー
+読み込み中・保存中に画面のすみで回る印を、8コマで描いてください。正方形 256×256 を横に8つ並べた 2048×256。
+・小さな裏向きのカード1枚が、縦の軸でくるりと1回転する（1コマ目と8コマ目が自然につながる）
+・カードの周りを、くすんだ金の小さな光の粒が1つ、円を描いて回る
+・小さく（高さ40px ほど）出すので、形をはっきり
+▲ここまで
+▼English
+A small spinning mark shown in a corner while loading or saving, 8 frames: eight 256x256 squares side by side on 2048x256.
+- One small face-down card makes one full turn around its vertical axis (frame 8 loops smoothly into frame 1).
+- A single small muted-gold light mote circles around the card.
+- Shown small (about 40px tall): clear shapes.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 18　階段を下りる確認の挿絵 → stairs_confirm.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/遺跡の階段_下り.png、見本/ダンジョンの案内板_下り.png、見本/対戦の窓の枠_確認.png
+▼ここからコピー
+「階段を下りますか？ 下りると、この階には戻れません」の確認の窓の中に小さく出す挿絵を描いてください。横長 1024×640。背景は透明（絵の外側）。
+・暗い遺跡の中、下へ続く石段を少し上から見る。下の方は暗闇に消え、ほのかに青白い光が一筋のぼってくる
+・石段の上の入口の両わきの石が少し崩れかけていて、「戻れない」ことが静かに伝わる
+・人物・モンスター・文字は描かない。窓の中に置くので、ふちは自然にぼかして消す
+▲ここまで
+▼English
+A small illustration inside the confirmation window "Go down the stairs? You can't come back to this floor." Wide 1024x640, transparent outside the art.
+- Inside dark ruins, stone steps descending, seen slightly from above. The bottom fades into darkness with a faint pale-blue light rising.
+- The stones on both sides of the top entrance are slightly crumbling, quietly suggesting there is no way back.
+- No people, monsters or text. Soften the edges so they fade out naturally inside the window.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 19　世界地図の「まだ行けない場所」の印 → worldmap_locked.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/世界地図の印_街.png・ダンジョン.png・クリア.png、見本/まだ買えないパック_鍵つき.png
+▼ここからコピー
+世界地図で、これから増えるダンジョン（まだ行けない場所）に置く印を描いてください。横長 1536×768 に左右に並べる。
+・左：添付のダンジョンの印と同じ形・大きさで、灰色にくすみ、細い鎖と小さな錠前がかかった版
+・右：地図の上に重ねる「霧のかたまり」（場所の周りをおおう灰色の雲。印より一回り大きい）
+・添付の世界地図の印と描き方をそろえる。小さく（高さ48px ほど）出しても分かる形に
+▲ここまで
+▼English
+A world-map mark for dungeons that will be added later (not yet reachable), two parts side by side on 1536x768.
+- Left: the same shape and size as the attached dungeon pin, greyed out, with a thin chain and a small padlock.
+- Right: a "fog patch" to overlay on the map (grey cloud covering the place, a bit larger than the pin).
+- Match the drawing style of the attached map marks; readable at about 48px tall.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 20　デッキ編集の画面の背景（家の机） → deck_bg.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/主人公の部屋の机.png、見本/主人公の部屋の本棚.png、見本/デッキ編集の表の行.png・見出し.png・大きなカードの台.png
+▼ここからコピー
+デッキ編集（家の中だけでできる）の画面の背景を描いてください。縦長 1170×2532。背景は透明にしない。
+・主人公の部屋の木の机を真上から見た絵。机の上に、裏向きのカードの小さな山が3つ、革の小箱、ランプ、羽ペン。端に置き、真ん中は広く空ける（表・カードをゲームが重ねる）
+・ランプのあたたかい光が左上から当たり、四隅は暗く落ちる
+・カードの表は描かない（読める文字・絵柄を入れない）。人物・モンスターは描かない
+▲ここまで
+▼English
+Background for the deck editing screen (only available at home). Portrait 1170x2532. Not transparent.
+- The protagonist's wooden desk seen from directly above. Near the edges: three small piles of face-down cards, a small leather case, a lamp and a quill pen. Keep the center wide open (the game overlays tables and cards).
+- Warm lamp light from the upper left; the four corners fall into shadow.
+- No card faces (no readable text or pictures). No people or monsters.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 21　カードを売ったときのお金 → coin_burst.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/お金のアイコン.png、見本/景品の袋.png
+▼ここからコピー
+カードを売ってお金が入ったときの演出を4コマで描いてください。正方形 512×512 を横に4つ並べた 2048×512。
+・1コマ目：真ん中に小さな光。2コマ目：添付のお金と同じ金貨が5〜6枚、下から上へはじけ出る
+・3コマ目：金貨が弧を描いて広がる。4コマ目：金貨が少し落ちて、光が消えかける
+・金貨の形・色は添付のお金のアイコンとそろえる。数字は描かない
+▲ここまで
+▼English
+Effect when gold comes in from selling a card, 4 frames: four 512x512 squares side by side on 2048x512.
+- Frame 1: a small light in the center. Frame 2: 5-6 gold coins like the attached coin icon burst upward. Frame 3: the coins spread in an arc. Frame 4: the coins fall a little; the light fades.
+- Coin shape and color must match the attached coin icon. No numbers.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 22　短いお知らせの帯 → toast_plate.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/流れる文字の帯.png、見本/場所の札.png
+▼ここからコピー
+画面の上に1〜2秒だけ出る「短いお知らせ」（保存しました・新しいカード など）の帯を描いてください。1536×512 に上下2本。
+・上：ふつうのお知らせ。横長 8:1 の細い帯。暗い紺の地に、くすんだ金の細い縁。左はしに小さなアイコンを置く丸いくぼみ
+・下：うれしいお知らせ。同じ形で、縁の金が少し太く、両はしに小さな光の粒
+・文字はゲームが重ねるので、中は無地。大きな飾りは付けない
+▲ここまで
+▼English
+A short notification bar (e.g. "Saved", "New card") shown at the top for 1-2 seconds. Two bars stacked on 1536x512.
+- Top: normal notice. A thin wide bar (8:1), dark navy with a thin muted-gold rim, a round recess at the left end for a small icon.
+- Bottom: happy notice. Same shape with a slightly thicker gold rim and small light motes at both ends.
+- Plain inside for text. No large ornaments.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 23　確認の窓の紋章 → dialog_emblems.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/対戦の窓の枠_確認.png、見本/設定の小さなアイコン_音.png
+▼ここからコピー
+確認の窓の上に乗せる、窓の種類が一目で分かる紋章を4つ、横に並べて描いてください。2048×512。同じ大きさの丸い金の縁。
+・1 注意（もう戻れない・失うものがある）：えんじの地に、小さな砂時計
+・2 質問（〜しますか？）：紺の地に、ひらいた本
+・3 成功（できた・手に入れた）：紺の地に、金の月桂樹の小枝
+・4 失敗・できない：濃い灰色の地に、閉じた錠前
+・小さく（高さ56px ほど）出すので、形をはっきり。記号の「！」「？」は描かない（文字の扱いになるため）
+▲ここまで
+▼English
+Four emblems placed on top of confirmation windows to show the window type at a glance, side by side on 2048x512, same round gold rim.
+1 Warning (can't go back / you will lose something): wine-red ground with a small hourglass. 2 Question: navy ground with an open book. 3 Success: navy ground with a gold laurel sprig. 4 Failure / not allowed: dark grey ground with a closed padlock.
+Shown at about 56px: clear shapes. Do not draw "!" or "?" symbols.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 24　上の小さなボタン（メニュー・脱出） → hud_top_buttons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、今の画面/右上の脱出とメニュー.png、見本/丸いボタン.png、見本/場所の札.png、見本/名札.png
+▼ここからコピー
+歩く画面の右上に置く小さなボタンを、横長 1536×1024 に描いてください。
+・上の段：「メニュー」用のボタン。横長 2.5:1 の小さな板、暗い紺に金の縁、左に小さな本のアイコン（文字はゲームが右に重ねる）。ふつう・押したときの2つ
+・下の段：「脱出」用のボタン。同じ形で、えんじの地に金の縁、左に開いた扉のアイコン。ふつう・押したときの2つ
+・添付の場所の札・お金の札と高さと縁の太さをそろえる（並べて置くため）
+▲ここまで
+▼English
+Small buttons for the top right of the walking screens, on 1536x1024.
+- Top row: "Menu" button: a small wide plate (2.5:1), dark navy with a gold rim, a small book icon at the left (text added by the game on the right). Normal and pressed.
+- Bottom row: "Escape" button: same shape, wine-red with a gold rim, an open-door icon at the left. Normal and pressed.
+- Match the height and rim thickness of the attached place plate and gold plate (they sit side by side).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 25　初めての人への指さしと光の輪 → tutorial_pointer.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/操作の案内の札_指の絵.png、見本/調べられる物のきらめき.png
+▼ここからコピー
+初めての人に「ここを押す」を教える部品を、横長 1536×768 に描いてください。
+・左：上から指さす手（手袋をした手、手首から先だけ。人物は描かない）。ふつう・押し込んだとき（少し下へ・指先がつぶれる）の2つ
+・右：押す場所を囲む光の輪。くすんだ金の細い輪が2重。大・中・小の3つ（ゲームが広げて消えるように動かす）
+・添付の操作の案内の札の指の絵と描き方をそろえる
+▲ここまで
+▼English
+Parts that show first-time players "tap here", on 1536x768.
+- Left: a hand pointing down from above (gloved hand, wrist and below only; no person). Normal and pressing (slightly lower, fingertip squashed).
+- Right: rings around the tap spot: thin double muted-gold rings in large, medium and small (the game animates them).
+- Match the finger drawing on the attached control hint plate.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 26　何もないときの挿絵 → empty_states.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/窓の枠.png
+▼ここからコピー
+一覧に何も無いときに、窓の真ん中に小さく出す挿絵を2つ、横長 1536×768 に左右に並べて描いてください。背景は透明（絵の外側）。
+・左（手に入れたカードがまだない）：ふたの開いた小さな空の木箱。中に薄くほこり、そばに羽根が1本
+・右（持っているカードがない・道具がない）：何も載っていない木の棚板と、立てかけた空のカード立て
+・寂しすぎない、静かでやさしい雰囲気。小さく（高さ120px ほど）出す
+▲ここまで
+▼English
+Two small illustrations shown in the middle of a window when a list is empty, side by side on 1536x768, transparent outside the art.
+- Left (no cards gained yet): a small empty wooden box with its lid open, a little dust inside, one feather beside it.
+- Right (no cards / no items owned): an empty wooden shelf board with an empty card stand leaning on it.
+- Quiet and gentle, not too lonely. Shown at about 120px tall.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 27　クレジットの画面の巻物 → credits_scroll.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/設定の見出しの帯.png、見本/設定の欄の板.png、見本/世界地図の地名の札.png
+▼ここからコピー
+素材のクレジット（作った人・使った音の一覧）を流す画面の背景を描いてください。縦長 1170×2532。背景は透明にしない。
+・暗い紺の背景の真ん中に、縦に長くひらいた羊皮紙の巻物。上と下に木の軸、軸の両はしにくすんだ金の飾り
+・巻物の紙の中は無地で、少し明るい古い紙の色（文字はゲームが下から上へ流す）。紙の幅は画面の8割
+・飾りは軸だけ。紙の上に模様を描かない
+▲ここまで
+▼English
+Background for the credits screen (creators and sound list). Portrait 1170x2532. Not transparent.
+- A long vertically unrolled parchment scroll in the middle of a dark navy background; wooden rods at the top and bottom with muted-gold finials.
+- Plain, slightly light aged paper inside (the game scrolls the text upward); paper width about 80% of the screen.
+- Ornaments only on the rods; no patterns on the paper.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 28　ストアのスクリーンショットの帯 → store_frame.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/タイトルの背景.png、見本/見出しの帯.png
+▼ここからコピー
+アプリストアに載せるスクリーンショットの「台紙」を描いてください。縦長 1290×2796。
+・上の1/5：短いうたい文句を置く横長の帯。暗い紺の地に、くすんだ金の細い縁と、両はしに小さなカードの紋章
+・その下：ゲームの画面写真を置く、角の丸い縦長の空き（縁にくすんだ金の細い線）。空きの中は無地のマゼンタ #FF00FF
+・空きの外側の背景は、暗い紺から下へこげ茶に変わる筆の質感
+・文字・ロゴは描かない（うたい文句とロゴはゲームの担当が入れる）
+▲ここまで
+▼English
+A backing frame for app store screenshots. Portrait 1290x2796.
+- Top fifth: a wide band for a short tagline, dark navy with a thin muted-gold rim and a small card emblem at each end.
+- Below: a tall rounded-corner empty slot for an in-game screenshot (thin muted-gold edge); fill the slot with solid magenta #FF00FF.
+- Outside the slot: brush-textured background shifting from dark navy to dark brown downward.
+- No text or logos (added later).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 29　Google Play の横長の絵（背景） → feature_graphic_bg.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/タイトルの背景.png、見本/街の絵.png、見本/太古の遺跡の挿絵.png
+▼ここからコピー
+Google Play のアプリの頁の一番上に出る横長の絵の「背景」を描いてください。2048×1000（あとで 1024×500 に縮める）。背景は透明にしない。
+・夕暮れの空の下、手前に石畳の街のはずれ、遠くに森と古い遺跡のシルエット。空はくすんだ金から紺へ
+・左半分は、あとでロゴを置くので空を広く・物を置かない。右半分の手前に、カードを並べた古い木の対戦台（カードは裏向きで3枚）
+・人物・モンスターは描かない（モンスターの絵はゲームの担当が重ねる）。端の上下左右 1割には大事な物を置かない（切れるため）
+▲ここまで
+▼English
+Background for the Google Play feature graphic (the wide image at the top of the store page). 2048x1000 (to be scaled to 1024x500). Not transparent.
+- Under a dusk sky, the edge of a cobblestone town in front, silhouettes of a forest and old ruins far away; sky from muted gold to navy.
+- Keep the left half open sky with nothing in it (for the logo). In the right-half foreground, an old wooden battle table with three face-down cards.
+- No people or monsters (monster art will be overlaid later). Keep important things out of the outer 10% on every side (may be cropped).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 30　Android のアイコンの前景と背景 → adaptive_icon.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/いまのアプリのアイコン.png
+▼ここからコピー
+添付のアプリのアイコンを、Android の「アダプティブアイコン」用に2枚に分けて描き直してください。それぞれ 1024×1024 の正方形を、左右に並べる（2048×1024）。
+・左（背景）：アイコンの後ろの光と空だけ（青い光の渦と金の光）。モンスター・カード・枠は描かない。四隅まで塗る
+・右（前景）：アイコンの中のモンスターたちとカードだけ。背景は透明（できなければマゼンタ #FF00FF）。
+　大事な部分（顔・カード）は、真ん中の直径6割の円の中に収める（Android が丸や角丸に切り抜くため）
+・アイコンの絵柄・色・モンスターの姿は変えない（分けるだけ）。金の四角い枠は付けない
+▲ここまで
+▼English
+Redraw the attached app icon as two layers for an Android adaptive icon: two 1024x1024 squares side by side (2048x1024).
+- Left (background): only the light and sky behind the icon (blue light swirls and gold light). No monsters, cards or frame. Fill to all four corners.
+- Right (foreground): only the monsters and the card from the icon, on a transparent background (or magenta #FF00FF). Keep the important parts (faces, card) inside a central circle 60% of the width (Android crops to circles or rounded squares).
+- Do not change the design, colors or monsters (just split them). No square gold frame.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 31　煙玉で逃げる演出（4コマ） → smoke_escape.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/敵とぶつかったときの演出_1.png、見本/敵とぶつかったときの演出_2.png、見本/バトラーの歩く絵.png（大きさの見本）
+▼ここからコピー
+見えない番人が現れたときに煙玉を使って逃げる演出を、4コマで描いてください。正方形 512×512 を横に4つ並べた 2048×512。
+・1コマ目：画面の真ん中の足元に、こげ茶の玉が落ちて小さくはねる
+・2コマ目：玉がはじけ、灰色の煙が丸くふくらむ
+・3コマ目：煙が人の背丈より高く広がり、真ん中が見えなくなる
+・4コマ目：煙が薄れて散っていく（もやだけが残る）
+・人物・番人は描かない（ゲームが重ねる）。白すぎない、くすんだ灰色の煙
+▲ここまで
+▼English
+Effect of using a smoke ball to escape when the unseen guardian appears, 4 frames: four 512x512 squares side by side on 2048x512.
+- Frame 1: a dark brown ball drops at the feet in the center and bounces slightly. Frame 2: it bursts; grey smoke puffs out round. Frame 3: the smoke spreads taller than a person and hides the center. Frame 4: the smoke thins and drifts away (only haze left).
+- Do not draw people or the guardian (the game overlays them). Muted grey smoke, not too white.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 32　身代わりのお守りが効いたときの演出（3コマ） → charm_break.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/負けの灯り_灯った.png、見本/負けの灯り_消えた.png、見本/戻されるときの帯.png
+▼ここからコピー
+身代わりのお守りが負けを1回肩代わりしたときの演出を、3コマで描いてください。正方形 512×512 を横に3つ並べた 1536×512。
+・お守りは 14 番の 6（えんじの布の小さなお守り袋、金の糸で盾の刺しゅう）と同じ見た目
+・1コマ目：お守りが真ん中に浮かび、くすんだ金の光にふちどられる
+・2コマ目：お守りの布が真ん中から裂け、金の糸がほどけて光の粒が散る
+・3コマ目：お守りは消え、金の粒だけが上へ舞い上がって消えていく
+・ゲームはこの演出のあと、負けの灯りが消えずに灯ったままになるところを見せる
+▲ここまで
+▼English
+Effect when the Guardian Charm absorbs one defeat, 3 frames: three 512x512 squares side by side on 1536x512.
+- The charm looks the same as item 6 of #14 (small wine-red cloth pouch with a gold-thread shield).
+- Frame 1: the charm floats in the center, outlined with muted-gold light. Frame 2: the cloth tears from the middle; the gold thread unravels and light motes scatter. Frame 3: the charm is gone; only gold motes rise and fade.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ 33　効き目の印と守ったカードの印 → item_status_marks.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：共通/style_master.png、見本/負けの灯り_灯った.png、見本/設定の小さなアイコン_音.png、見本/カードの裏面.png
+▼ここからコピー
+道具の効き目が続いている間に画面の左上に出す小さな印と、封印の小箱で守ったカードに付ける印を、横長 2048×512 に5つ並べて描いてください。
+・1〜4：効き目の印。同じ大きさの丸い札（暗い紺の地、くすんだ金の細い縁）の中に、14 番の道具を小さく描く。1 魔除けの香／2 たいまつ／3 身代わりのお守り／4 幸運のコイン。
+　札のふちに、残りの量を示す細い金の輪（4分の3ほど残っている状態）を描く（ゲームが輪の長さを変える）
+・5：守ったカードの印。カードの角に重ねる小さな金の錠前と、えんじの封のしるし
+・小さく（高さ32〜40px ほど）出すので、形をはっきり
+▲ここまで
+▼English
+Five small marks side by side on 2048x512: four "effect active" marks shown at the top left while an item's effect lasts, and one mark for a card protected by the Seal Box.
+- 1-4: the same round tag (dark navy ground, thin muted-gold rim) with a small drawing of the item from #14 inside: 1 Warding Incense, 2 Torch, 3 Guardian Charm, 4 Lucky Coin. Draw a thin gold ring along the rim showing the remaining amount (about three quarters left; the game changes its length).
+- 5: protected-card mark: a small gold padlock with a wine-red seal, placed over a card's corner.
+- Shown small (about 32-40px tall): clear shapes.
+▲

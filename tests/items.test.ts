@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
 import { DUNGEON_RUN } from '../src/data/dungeonRun.ts';
@@ -61,6 +62,10 @@ describe('道具のデータ（仮）', () => {
       ['guardianCharm', '身代わりのお守り', 200, false],
     ]);
     expect(ITEM_RULES).toMatchObject({ maxOwned: 9, incenseSteps: 30, torchViewRadius: 2 });
+    // 絵（2026-10-27 デザイン33点。ファイル名は小文字と _）：道具のアイコン8つと、効き目の印4つ・守ったカードの印
+    const snake = (id: string): string => id.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+    for (const i of ITEMS) expect(existsSync(`assets/images/ui/items/item_${snake(i.id)}.webp`)).toBe(true);
+    for (const id of ['incense', 'torch', 'guardianCharm', 'luckyCoin', 'sealed']) expect(existsSync(`assets/images/ui/items/mark_${snake(id)}.webp`)).toBe(true);
     const unlock = Object.fromEntries(TOURNAMENTS.map((t) => [t.id, t.rewards.firstWin.unlockItems]));
     expect(unlock).toEqual({ 'tournament-e': ['ruinsMap', 'luckyCoin'], 'tournament-d': ['sealBox', 'guardianCharm'] });
   });

@@ -3,7 +3,8 @@ import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
 import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
-import { getMonster } from '../../data/cards.ts';
+import { cardCatalog, getMonster } from '../../data/cards.ts';
+import { createCardView } from '../components/cardView.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import {
   changeFloor,
@@ -118,6 +119,8 @@ import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
 import shardArt from '@assets/images/ui/reward/shard.webp';
 import cardBundleArt from '@assets/images/ui/reward/card_bundle.webp';
 import prizePouchArt from '@assets/images/icons/prize_pouch.webp';
+import clearSceneArt from '@assets/images/ui/reward/clear_scene.webp';
+import firstClearSealArt from '@assets/images/ui/reward/first_clear_seal.webp';
 import { sound, type AmbientId, type StepSurface } from '../sound.ts';
 import type { ScreenContext, ScreenDefinition } from './types.ts';
 
@@ -657,10 +660,17 @@ export class WorldView {
       const boss = map.objects.some((o) => o.type === 'enemy' && o.boss && !save.activeDungeon?.defeatedEnemies.includes(o.id));
       if (dungeon) this.#banner(boss ? 'boss' : 'floor', t('world.placeDungeon', { dungeon: dungeonName(dungeon), floor: mapName(map) }));
     }
+    // ダンジョン（ランダム生成）をクリアして戻ったとき：報酬を受け取る場面（祭壇の上にカード）の上にお知らせ
+    const clear = dev ? null : this.#store.flashClear;
+    this.#store.flashClear = null;
     const afterOpening = (): void => {
       if (flash) {
         this.#store.flashMessage = null;
-        this.#message(flash, scene ? () => this.#playScene(scene) : undefined);
+        const stage = clear ? this.#clearScene(clear) : null;
+        this.#message(flash, () => {
+          stage?.remove();
+          if (scene) this.#playScene(scene);
+        });
       } else if (scene) {
         this.#playScene(scene);
       }
@@ -871,8 +881,9 @@ export class WorldView {
         map.art ? null : h('span', { class: 'world__place-note', text: t('world.placeNote') }),
       ),
       h('span', { class: 'world__coins' }, coinIcon(), coins(save.coins)),
-      map.area === 'dungeon' ? button(t('world.escape'), () => this.#confirmLeave(), 'btn btn--small') : null,
-      button(t('world.menu'), () => this.#menu(), 'btn btn--small'),
+      // 右上の小さなボタン（2026-10-27 デザイン33点の 24：脱出＝えんじに扉、メニュー＝紺に本。ui33.css）
+      map.area === 'dungeon' ? button(t('world.escape'), () => this.#confirmLeave(), 'btn btn--small world__hud-btn world__hud-btn--escape') : null,
+      button(t('world.menu'), () => this.#menu(), 'btn btn--small world__hud-btn world__hud-btn--menu'),
     );
 
     // 移動：画面のどこでも指を置いてすべらせると、その方向へ歩く（指を置いた所に半透明のスティックが出る。上下左右の4方向）。
@@ -1910,7 +1921,34 @@ export class WorldView {
       () => {
         this.#busy = false;
       },
+      'warn',
     );
+  }
+
+  /**
+   * クリアの報酬を受け取る場面（2026-10-27 デザイン33点の 12・13）：遺跡の最奥の祭壇の絵を画面いっぱいに出し、祭壇の上にカードを立てる
+   * （2枚なら左右、1枚なら真ん中）。初めてのクリアは、ボスのカードに「初回クリア」の封蝋を付ける。お知らせを閉じると消す
+   */
+  #clearScene(clear: { readonly cards: readonly string[]; readonly firstClear: boolean }): HTMLElement {
+    const cards = clear.cards.map((id, i) => {
+      const def = cardCatalog.get(id);
+      return def
+        ? h(
+            'div',
+            { class: 'world__clear-card' },
+            createCardView(def, 104, false),
+            clear.firstClear && i === 0 && clear.cards.length > 1 ? h('img', { class: 'world__clear-seal', attrs: { src: firstClearSealArt, alt: '', draggable: 'false' } }) : null,
+          )
+        : null;
+    });
+    const el = h(
+      'div',
+      { class: 'world__clear-scene', attrs: { 'aria-hidden': 'true' } },
+      h('img', { class: 'world__clear-bg', attrs: { src: clearSceneArt, alt: '', draggable: 'false' } }),
+      h('div', { class: 'world__clear-altar' }, ...cards),
+    );
+    this.#root.append(el);
+    return el;
   }
 
   #message(text: string, onClose?: () => void, visual?: HTMLElement): void {
