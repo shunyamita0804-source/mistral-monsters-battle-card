@@ -27,11 +27,6 @@ export interface BattleCardSpec {
   readonly frame: string;
   readonly scale: number;
   readonly offsetY: number;
-  /**
-   * 背景つきの四角い絵をカードいっぱいに敷く（背景を抜いた絵がまだ届いていないモンスターの仮。共通の背景の代わりに絵の背景が出る）。
-   * posY：上下のどこを見せるか（0＝上・1＝下）、zoom：絵に描かれた枠が新しい枠の外に出ないよう少し大きく
-   */
-  readonly fill?: { readonly posY: number; readonly zoom: number };
 }
 
 export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
@@ -48,10 +43,9 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // カルシェル（2026-10-27）：枠は淡い氷色（#DFF2F6。src/data/kalshell.ts の KALSHELL_COLOR）。絵は届いた BattleArt/Kalshell_BattleArt_Transparent_Approved.png（1169×1345）を無改変
   // 0.8・少し上へ：絵がキャンバスいっぱいに描かれている（ノビトンと同じくらい）ので、ハサミ・脚が枠の飾りと名前の札に隠れない大きさ
   [KALSHELL_MONSTER_ID]: { art: 'kalshell_battlecard.png', frame: 'kalshell', scale: 0.8, offsetY: -0.02 },
-  // ガウル（2026-10-27 試遊で「バトル時のモンスターカードが違う」）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。
-  // 【仮】背景を抜いたバトル用の絵（800×920・透明）がまだ届いていないので、いまあるバトル用の絵（gauul_battle.webp・背景つき）を枠の中いっぱいに敷く。
-  // 透明の絵が届いたら、ほかのモンスターと同じ形（fill なし）に差し替える
-  [GAUUL_MONSTER_ID]: { art: 'gauul_battle.webp', frame: 'gauul', scale: 1, offsetY: 0, fill: { posY: 0.3, zoom: 1.06 } },
+  // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
+  // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
+  [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },
 };
 
 export function battleCardOf(monsterId: string): BattleCardSpec | undefined {

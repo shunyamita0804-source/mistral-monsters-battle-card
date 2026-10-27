@@ -1,0 +1,53 @@
+【依頼】カードバトラー管理局の外観（街の建物の絵）を作り直す　2026-10-27
+
+■ なぜ作り直すか（ユーザー「建物がチープなので改修したい」）
+・いまの外観（v01。03_current_exterior_v01.jpg）は横に長く低い（見える所がおよそ 横1495×縦681px＝2.2：1）。
+  街では、もとの住宅C と同じ幅（設計図 576 単位）に縮めて置くので、高さが住宅の半分ほどしかなく、まわりより小さく平たく見える（02_compare_neighbors.jpg の左）。
+・壁・屋根の面が平らで、奥行き（屋根の面・壁の厚み・階段）や細かい飾りが、となりの住宅・研究所・大会会場より少ない。
+・扉はふつうの扉のまま（ユーザー決定。自動ドア・左右に開く部品は作らない）。
+
+■ 置く場所・大きさ（変えない）
+・街の北東、もとの住宅C の所（01_current_bureau_in_town.jpg）。左に大会会場、下は住宅D・住宅E。
+・建物の幅は住宅と同じ（576 単位）に縮めて置く。絵の横幅いっぱいが建物の幅になる。高さは絵の縦横比のまま（ゲームが縦だけ 1.1 倍する）。
+・玄関は絵の下の辺の真ん中。玄関から下へまっすぐ石畳の道が出る（道はゲームが描くので絵には入れない）。
+
+■ 作ってほしい絵（1枚）
+・ファイル：Bureau_Exterior_v02.png
+・キャンバス：1254×1254px（住宅・研究所と同じ）、背景は完全に透明（RGBA）。建物だけ（地面・草・道・影は入れない。影と陰影はゲームが付ける）
+・建物の見える所：横いっぱい（左右の余白は 0〜20px）、縦はキャンバスの 85〜95% くらい（住宅・研究所と同じくらいの縦横比＝ほぼ正方形）
+・建物の下の辺はまっすぐ水平（地面に接する線。ここがゲームの地面になる）
+・扉：正面の真ん中の下にふつうの木の両開き扉（閉じた絵）。扉の幅は建物の幅の 14〜18%、扉の高さは建物の幅の 20〜24%（主人公の背と同じくらい）。
+  扉の前に2〜3段の石の階段（下の辺までに収める）
+・文字は描かない（施設の名前・看板の文字はゲームが重ねる）。看板の板・紋章の形だけなら可
+
+■ 見た目
+・いまの v01 の色と素材を引き継ぐ：クリーム色の石灰岩の壁・紺のスレート屋根・控えめな金の飾り・こげ茶の木の扉・あたたかい色のランタン
+・格の高い公の役所。大会会場（青と金）と仲間に見えるが、大会会場・研究所より大きく派手にはしない
+・2階建てくらいの高さ。正面の真ん中に、三角の破風と時計か鐘の小さな塔（カードとコンパスの星の紋章）
+・屋根の面が見える「少し上から見た正面」（街のほかの建物と同じ見下ろし。斜め45度のアイソメトリックにはしない）
+・窓は縦長のアーチ窓。中の明かりが少しもれる
+・左右の小さな旗（紺に金の星）・花のプランター・ランタンなどで、住宅・研究所と同じくらい細かく描き込む
+・絵柄：街のほかの建物と同じ、手描き風の 2D ファンタジー RPG の絵（写真のような絵・3D 風にしない）。光は左上から
+
+■ 入れないもの
+・地面・草・道・人物・影・文字
+・自動ドア・左右に開く扉の部品・中の見える開いた扉
+
+■ 添付する参考画像（このフォルダ）
+・01_current_bureau_in_town.jpg：いまの街での見え方（北東）
+・02_compare_neighbors.jpg：いまの管理局と、住宅D・研究所・大会会場の比べ
+・03_current_exterior_v01.jpg：いまの外観（色と素材はこれを引き継ぐ）
+
+■ 画像生成AIへの英語のプロンプト（そのまま使える）
+Use case: production game asset. A building sprite for a 2D fantasy RPG town map (hand-painted stylized game illustration, same style as the attached neighboring buildings).
+Draw ONE building only: the "Card Battler Bureau", a dignified small civic registration office. Isolated on a fully transparent RGBA background, canvas 1254x1254 px.
+The building fills the full canvas width (left/right margin 0-20 px) and about 85-95% of the canvas height; nearly square proportions, two stories tall. The bottom edge of the building is a straight horizontal line (ground contact). No ground, grass, road, people, cast shadows or text.
+View: front-facing with a slight top-down angle so the roof surfaces are visible, matching the attached town buildings (not 45-degree isometric).
+Materials and colors (keep from the attached current design): cream limestone walls with beveled stonework, deep navy slate roof, restrained gold trim, dark walnut wood, warm amber lanterns and softly lit tall arched windows.
+Center front: a classical pediment with a small clock or bell tower crowned by an emblem of a card and a compass star; a normal closed wooden double door at the bottom center (door width 14-18% of the building width, door height 20-24% of the building width) with 2-3 stone steps in front, all within the canvas.
+Details as dense as the attached lab and houses: small navy banners with gold stars on both sides, flower planters, lanterns, subtle weathering. Light from the upper left. No letters or numbers anywhere (a blank plaque shape is fine).
+It should look like a sibling of the navy-and-gold tournament hall but smaller and less ornate than the tournament hall and the card lab.
+
+■ 届いたら（Claude の作業）
+・design-parts/ に無改変で保存し、tools/design/bureau_v01.py の town_exterior() を新しい絵に差し替えて街の絵を作り直す（変わるのは管理局の所だけ）
+・扉の位置から玄関のマスを合わせ、街→中→外の出入りを確かめて比較画像で報告
