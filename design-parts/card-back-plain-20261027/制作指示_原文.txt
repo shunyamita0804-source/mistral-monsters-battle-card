@@ -1,0 +1,167 @@
+ミストラルモンスターズ バトルカード　カードの裏面（装飾なし）と関係する絵のプロンプト（2026-10-27）
+日本語か English のどちらか一方をコピーして使う。添付は refs フォルダの絵。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ A1　カードの裏面（装飾なし）→ card_back.png　【必須・最初に】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1_card_back_今.png
+▼ここからコピー
+添付のトレーディングカードの裏面を、色はそのままに、飾りをなくした版に描き直してください。縦長 1024×1536 の中に、カード1枚（縦:横＝3:2）を真っすぐ正面から、ほぼいっぱいに。
+・地の色は添付と同じ深い紺。ごくうっすらとした大理石のような濃淡だけ（模様に見えないくらい控えめに）
+・ふちに、細くてくすんだ金の線を1本だけ（添付の金と同じ色味）。四隅の飾りはなし
+・真ん中の紋章・翼・星・光の粒・曲線の模様は、すべてなし。中央に何も置かない
+・上下左右対称。小さく表示しても、ただの「落ち着いた紺のカードの裏」に見えること
+・カードの角は少し丸い。カードの外は透明（できなければマゼンタ一色 #FF00FF）。影なし、斜めにしない、文字なし
+▲ここまで
+▼English
+Redraw the attached trading card back as a plain version: same colors, no decorations. One card (3:2 tall) seen straight from the front, almost filling a portrait 1024x1536 canvas.
+- Same deep navy base as the attachment, with only a very faint marble-like tone variation (so subtle it does not read as a pattern).
+- A single thin muted-gold line along the edge (same gold tone as the attachment). No corner ornaments.
+- No emblem, no wings, no stars, no sparkles, no curved patterns. Nothing in the center.
+- Symmetrical. At small sizes it should read simply as a calm navy card back.
+- Slightly rounded corners. Outside the card is transparent (if impossible, solid magenta #FF00FF). No shadow, no tilt, no text.
+▲
+
+（案B　金の線もいらない場合は、上の2つ目の・を次に差し替え）
+・ふちは地の紺より少しだけ暗い紺で、細く縁どるだけ（金は使わない）
+/ The edge is just a thin border in a slightly darker navy (no gold at all).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ A2　図鑑の「まだ持っていないカード」→ card_unknown.png　【必須】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、A2_card_unknown_今.png
+▼ここからコピー
+1枚目の添付（カードの裏面）とまったく同じ形・大きさ・ふちで、色だけを暗い灰色（炭のような、くすんだ灰色）にした版を描いてください。縦長 1024×1536。
+・2枚目の添付（いまの絵）と同じくらいの暗さ。金の線は暗くくすませる
+・飾り・紋章・文字・「？」はなし
+・カードの外は透明（できなければマゼンタ一色 #FF00FF）。影なし、斜めにしない
+▲ここまで
+▼English
+Draw exactly the same card back as the first attachment (same shape, size and edge), but recolored to a dark charcoal gray. Portrait 1024x1536.
+- About as dark as the second attachment (the current one). Dim the gold line so it looks dull.
+- No ornaments, no emblem, no text, no question mark.
+- Outside the card is transparent (if impossible, solid magenta #FF00FF). No shadow, no tilt.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ B1　対戦の山札・手札・捨て札のアイコン（3つを1枚に）→ card_icons.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、B1_icon_deck_今.png、B1_icon_hand_今.png、B1_icon_discard_今.png
+▼ここからコピー
+対戦画面で使う小さなアイコンを3つ、横に並べて1枚に描いてください。横長 1536×512。いまのアイコン（2〜4枚目の添付）と同じ構図・角度・大きさのまま、カードの裏面だけを1枚目の添付（飾りのない紺の裏面）に描き替えます。
+・左＝山札：裏向きのカードがきちんと重なった束を、少し上から斜めに
+・真ん中＝手札：裏向きのカード3枚を扇のように広げて、正面から
+・右＝捨て札：裏向きのカード数枚が少しずれて重なり、斜めに置かれている
+・カードの裏はどれも、紺の地と細いくすんだ金のふちだけ。紋章・翼・星はなし
+・3つは重ならず、間をあける。外は透明（できなければマゼンタ一色 #FF00FF）。文字なし
+▲ここまで
+▼English
+Draw three small game icons side by side on one image, landscape 1536x512. Keep the same composition, angle and size as the current icons (attachments 2-4); only replace the card backs with the plain navy back from attachment 1.
+- Left = draw pile: a neat stack of face-down cards, seen slightly from above at an angle.
+- Middle = hand: three face-down cards fanned out, seen from the front.
+- Right = discard pile: a few face-down cards loosely overlapping, lying at an angle.
+- Every card back is just navy with a thin muted-gold edge. No emblem, no wings, no stars.
+- Keep the three icons apart. Transparent outside (if impossible, solid magenta #FF00FF). No text.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ B2　カードショップの「カードを見る」の札 → menu_browse.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、B2_menu_browse_今.png
+▼ここからコピー
+2枚目の添付（ショップのメニューの札）を、まったく同じ構図・大きさ・色・明かりのまま描き直してください。横長 1800×358（添付の2倍）。
+・変えるのは、左の絵の中で台に並んでいるカードの裏面だけ。1枚目の添付と同じ、飾りのない紺の裏面（細いくすんだ金のふち）にする
+・ランプ・台・木の板・右側の空いた部分（文字を乗せる所）・角の丸い形は、そのまま
+・文字は描かない。札の外は透明（できなければマゼンタ一色 #FF00FF）
+▲ここまで
+▼English
+Redraw the second attachment (a shop menu plate) with exactly the same composition, size, colors and lighting. Landscape 1800x358 (2x the attachment).
+- Change only the card backs lying on the display stand in the left picture: make them the plain navy back from attachment 1 (thin muted-gold edge).
+- Keep the lamp, the stand, the wooden plank, the empty area on the right (for text) and the rounded shape as they are.
+- No text. Transparent outside the plate (if impossible, solid magenta #FF00FF).
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ B3　宝箱から出るカードの束 → card_bundle.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、B3_card_bundle_今.png
+▼ここからコピー
+2枚目の添付（裏向きのカードが数枚、扇のように重なった絵）を、同じ構図・角度のまま描き直してください。正方形 1024×1024。
+・カードの裏面を、1枚目の添付と同じ飾りのない紺の裏面（細いくすんだ金のふち）にする。真ん中の模様・四隅の飾りはなし
+・外は透明（できなければマゼンタ一色 #FF00FF）。影なし、文字なし
+▲ここまで
+▼English
+Redraw the second attachment (a few face-down cards fanned and overlapping) with the same composition and angle. Square 1024x1024.
+- Make every card back the plain navy back from attachment 1 (thin muted-gold edge). No center pattern, no corner ornaments.
+- Transparent outside (if impossible, solid magenta #FF00FF). No shadow, no text.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ B4　遊び方の図（カードをマナにする）→ rules_1.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、B4_rules_1_今.png
+▼ここからコピー
+2枚目の添付（机の上の裏向きのカードが、青い結晶の粒になって流れていく図）を、同じ構図・色・光のまま描き直してください。横長 1536×900。
+・変えるのは机の上のカードの裏面だけ。1枚目の添付と同じ、飾りのない紺の裏面（細いくすんだ金のふち）にする
+・青い結晶の粒、暗い背景、金の枠はそのまま
+・文字は描かない
+▲ここまで
+▼English
+Redraw the second attachment (a face-down card on a table dissolving into a stream of blue crystal shards) with the same composition, colors and lighting. Landscape 1536x900.
+- Change only the card back on the table: make it the plain navy back from attachment 1 (thin muted-gold edge).
+- Keep the blue crystal shards, the dark background and the gold frame as they are.
+- No text.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ B5　特別復元の場面 → restore_scene.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+添付：A1 でできた card_back.png、B5_restore_scene_今.png
+▼ここからコピー
+2枚目の添付（祭壇の上で、欠片に囲まれたカードが光っている場面）を、同じ構図・色・光のまま描き直してください。縦長 1024×1334。
+・変えるのは真ん中に浮かぶカードの裏面だけ。1枚目の添付と同じ、飾りのない紺の裏面（細いくすんだ金のふち）にする。光に包まれていてよい
+・欠片の輪・祭壇・部屋・ランプはそのまま
+・文字は描かない
+▲ここまで
+▼English
+Redraw the second attachment (a card glowing above an altar, surrounded by a ring of shards) with the same composition, colors and lighting. Portrait 1024x1334.
+- Change only the card back floating in the center: make it the plain navy back from attachment 1 (thin muted-gold edge). It may still be wrapped in light.
+- Keep the ring of shards, the altar, the room and the lamps as they are.
+- No text.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ C1（任意）遊び方の挿絵2枚 → howto_2.png・howto_3.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+小さく写っているだけなので、そのままでもよい。そろえるときは1枚ずつ頼む。
+添付：A1 でできた card_back.png、C1_howto_2_今.png（または C1_howto_3_今.png）
+▼ここからコピー
+2枚目の添付の挿絵を、人物・構図・色・光・枠をまったく同じまま描き直してください。横長 1536×1203（howto_3 は 1536×1216）。
+・変えるのは、絵の中に写っている「カードの裏面」と「カードの箱のふた」の飾りだけ。1枚目の添付と同じ、飾りのない紺（細いくすんだ金のふち）にする
+・カードの表（モンスターの絵）・パックの袋はそのまま
+・文字は描かない
+▲ここまで
+▼English
+Redraw the second attachment illustration keeping the characters, composition, colors, lighting and frame exactly the same. Landscape 1536x1203 (howto_3: 1536x1216).
+- Change only the ornaments on card backs and on the card box lid shown in the picture: make them plain navy with a thin muted-gold edge, like attachment 1.
+- Keep card fronts (monster art) and card packs as they are.
+- No text.
+▲
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+■ C2（任意）タイトルのロゴ → title_logo.png
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ロゴは作品の顔なので、そのままを勧めます。そろえるときだけ。
+添付：A1 でできた card_back.png、C2_title_logo_今.png
+▼ここからコピー
+2枚目の添付（タイトルのロゴ）を、文字の形・色・飾り・大きさをまったく同じまま描き直してください。横長 1440×776。
+・変えるのは、ロゴの後ろに並ぶ3枚のカードの裏面だけ。1枚目の添付と同じ、飾りのない紺の裏面（細いくすんだ金のふち）にする
+・ロゴの文字「MISTRAL MONSTERS」「BATTLE CARD」は一字も変えない
+・外は透明（できなければマゼンタ一色 #FF00FF）
+▲ここまで
+▼English
+Redraw the second attachment (the title logo) keeping the lettering shape, colors, ornaments and size exactly the same. Landscape 1440x776.
+- Change only the three card backs behind the logo: make them the plain navy back from attachment 1 (thin muted-gold edge).
+- Do not change a single letter of "MISTRAL MONSTERS" / "BATTLE CARD".
+- Transparent outside (if impossible, solid magenta #FF00FF).
+▲
