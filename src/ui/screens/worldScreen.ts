@@ -68,6 +68,7 @@ import {
 } from '../../game/story/intro.ts';
 import { playScene } from '../components/dialogue.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
+import { showOpeningIntro } from '../components/openingIntro.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { button, h } from '../dom.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
@@ -641,12 +642,19 @@ export class WorldView {
       const boss = map.objects.some((o) => o.type === 'enemy' && o.boss && !save.activeDungeon?.defeatedEnemies.includes(o.id));
       if (dungeon) this.#banner(boss ? 'boss' : 'floor', t('world.placeDungeon', { dungeon: dungeonName(dungeon), floor: mapName(map) }));
     }
-    if (flash) {
-      this.#store.flashMessage = null;
-      this.#message(flash, scene ? () => this.#playScene(scene) : undefined);
-    } else if (scene) {
-      this.#playScene(scene);
-    }
+    const afterOpening = (): void => {
+      if (flash) {
+        this.#store.flashMessage = null;
+        this.#message(flash, scene ? () => this.#playScene(scene) : undefined);
+      } else if (scene) {
+        this.#playScene(scene);
+      }
+    };
+    // 新しく始めた直後：物語の始まりの挿絵（2026-10-27）。消えてからお知らせ・場面を出す
+    const opening = !dev && this.#store.openingIntro;
+    this.#store.openingIntro = false;
+    if (opening) showOpeningIntro(this.#root, afterOpening);
+    else afterOpening();
   }
 
   /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階・戻された）。タップの邪魔をしない */

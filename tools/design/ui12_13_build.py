@@ -17,7 +17,7 @@
   ui/dungeon/banner_retreat.webp・lantern_{on,off}.webp   戻されるときの帯・負けの灯り
   characters/hero_{male,female}_{win,lose}.webp   主人公の勝ち・負けの姿
   ui/battle/talk_face_frame.webp・talk_bubble.webp   相手のひと言の顔の枠と吹き出し
-物語の始まりの挿絵（opening_art.png）は、入れるかをユーザーに聞いてから（いまは原本だけ）。
+  backgrounds/opening_art.webp   物語の始まりの挿絵（2026-10-27 ユーザー指示で、主人公を選んだあとに1回だけ出す）
 """
 
 import sys
@@ -136,6 +136,9 @@ def main() -> None:
     # 13-5・6 優勝の場面・D ランク大会の対戦の背景
     save(Image.open(q13 / 'tournament_champion.png').convert('RGB'), 'backgrounds/tournament_champion.webp', width=768)
     save(Image.open(q13 / 'battle_bg_arena_d.png').convert('RGB'), 'backgrounds/battle_arena_d.webp', width=1024)
+
+    # 13-7 物語の始まりの挿絵（画面いっぱいに出す縦長の絵）
+    save(Image.open(q13 / 'opening_art.png').convert('RGB'), 'backgrounds/opening_art.webp', width=1024)
 
 
 if __name__ == '__main__':
