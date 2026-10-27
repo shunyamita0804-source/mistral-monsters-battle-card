@@ -3,6 +3,7 @@ import { APP_INFO, localizedGameName } from '../src/config/app.ts';
 import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
+import { EXAM_OPPONENT } from '../src/data/introV2.ts';
 import { MAPS } from '../src/data/maps.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { describeSkill, describeSupport, statLabel, supportShortText } from '../src/game/cards/cardTypes.ts';
@@ -43,7 +44,7 @@ describe('辞書（固定キー → ja/en）', () => {
   });
 
   it('キーは分野の名前で始まる', () => {
-    const bad = entries.map(([k]) => k).filter((k) => !/^[a-z][A-Za-z]*\.[A-Za-z0-9.]+$/.test(k));
+    const bad = entries.map(([k]) => k).filter((k) => !/^[a-z][A-Za-z0-9]*\.[A-Za-z0-9.]+$/.test(k));
     expect(bad).toEqual([]);
   });
 
@@ -147,6 +148,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
       ...TOURNAMENTS.flatMap((t) => [`tournament:${t.id}:name`, `tournament:${t.id}:description`, ...t.rounds.map((r) => `opponent:${r.id}:name`)]),
       ...DUNGEONS.flatMap((d) => [`dungeon:${d.id}:name`, `dungeon:${d.id}:description`]),
       ...Object.values(ENCOUNTERS).map((e) => `opponent:${e.id}:name`),
+      `opponent:${EXAM_OPPONENT.id}:name`,
       ...MAPS.map((m) => `map:${m.id}:name`),
       ...MAPS.flatMap((m) =>
         m.objects.flatMap((o) =>
@@ -172,6 +174,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
       ...TOURNAMENTS.flatMap((t) => t.rounds.map((r) => `opponent:${r.id}`)),
       ...DUNGEONS.map((d) => `dungeon:${d.id}`),
       ...Object.values(ENCOUNTERS).map((e) => `opponent:${e.id}`),
+      `opponent:${EXAM_OPPONENT.id}`,
       ...MAPS.map((m) => `map:${m.id}`),
       ...MAPS.flatMap((m) => m.objects.map((o) => `object:${o.id}`)),
     ]);

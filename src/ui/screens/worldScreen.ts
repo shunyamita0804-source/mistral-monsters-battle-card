@@ -1,8 +1,9 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
-import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
+import { getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
+import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { getMonster } from '../../data/cards.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import {
@@ -19,11 +20,13 @@ import {
   adjacentCellOf,
   canStep,
   DIR_DELTA,
+  findPathWhere,
   isBlocked,
   isNearNpc,
   mapSize,
   nearestNpc,
   objectsAt,
+  STEPS_4,
   type Point,
 } from '../../game/world/world.ts';
 import {
@@ -67,6 +70,17 @@ import {
   showsPracticeGoal,
   startPractice,
 } from '../../game/story/intro.ts';
+import {
+  beginExam,
+  claimBooster,
+  finishExam,
+  isIntroV2Active,
+  isIntroV2Done,
+  skipIntroV2,
+  startIntroV2OnTown,
+  type IntroV2,
+} from '../../game/story/introV2.ts';
+import { newId, once } from '../gameStore.ts';
 import { playScene } from '../components/dialogue.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { showOpeningIntro } from '../components/openingIntro.ts';
@@ -370,6 +384,45 @@ interface Move {
   t: number;
 }
 
+/** 導入イベントV2で一緒に歩く幼馴染（from → to へ、主人公の1歩と同じ進み具合で動く。to が null なら入口に入って消える） */
+interface Follower {
+  readonly el: HTMLElement;
+  tile: Point;
+  from: Point;
+  to: Point | null;
+  dir: Direction;
+}
+
+/** 導入イベントV2：幼馴染が主人公の何マス先を歩くか（1マスだと縦に歩くとき主人公に隠れる） */
+const FOLLOW_LEAD = 3;
+
+/** 【仮】管理局の受付の前のマス（src/data/maps.ts の BUREAU：カウンターの真ん中の手前） */
+const BUREAU_DESK_FRONT: Point = { x: 4, y: 3 };
+
+/** 導入イベントV2で、続きの場面が無い場所にいたときに戻す所（ふつうは起きない） */
+function introV2Anchor(v: IntroV2): Location {
+  const town = getMap('town')?.spawn ?? { x: 0, y: 0, dir: 'down' as const };
+  const practice = getMap('practice')?.spawn ?? town;
+  const bureau = getMap('bureau')?.spawn ?? town;
+  switch (v.state) {
+    case 'schoolArrival':
+    case 'examBattleActive':
+    case 'examPassed':
+      return { mapId: 'practice', ...practice };
+    case 'escortToBureau':
+    case 'bureauReception':
+    case 'packSelection':
+      return v.state === 'escortToBureau' ? { mapId: 'practice', ...practice } : { mapId: 'bureau', ...bureau };
+    default:
+      return { mapId: 'town', ...town };
+  }
+}
+
+/** 【仮】ブースターパックの表示名 */
+function boosterName(key: BoosterKey): string {
+  return t(`introV2.pack.name.${key.slice(-1)}` as MessageKey);
+}
+
 /**
  * 歩きの確認画面（walkLabScreen.ts）が本体と同じ WorldView を使うための調整項目（2026-10-24）。
  * 本編では使わない（undefined）。値はセーブ・設定に保存しない
@@ -502,6 +555,14 @@ export class WorldView {
   static #talkCount = new Map<string, number>();
   /** 一度スティックを使ったら操作の説明を出さない（アプリを開いている間） */
   static #stickUsed = false;
+  /** 導入イベントV2：一緒に歩く幼馴染（街だけ。主人公の1マス先を歩く。to が null なら建物に入って消える） */
+  #follower: Follower | null = null;
+  /** 自動で歩く道（導入イベントV2）が終わった・進めなくなったときにすること */
+  #pathDone: (() => void) | null = null;
+  /** 自動で歩いている途中の会話（残りのマスがこの数以下になったら1回。S02） */
+  #walkTalk: { readonly at: number; readonly resume: () => void } | null = null;
+  /** 幼馴染が主人公の何マス先を歩くか（いまの道で） */
+  #followLead = 1;
   readonly #onKeyDown = (e: KeyboardEvent): void => this.#key(e, true);
   readonly #onKeyUp = (e: KeyboardEvent): void => this.#key(e, false);
 
@@ -625,8 +686,13 @@ export class WorldView {
     this.#path = [];
     this.#afterPath = null;
     this.#busy = false;
+    this.#pathDone = null;
+    this.#walkTalk = null;
+    this.#follower = null;
     this.#scale = this.#artScale(map);
     this.#phase = 0;
+    // 導入イベントV2：家から初めて街に出たら始める（上の帯にメニューを出さないよう、描く前に）
+    if (!dev && map.id === 'town') this.#store.update(startIntroV2OnTown);
     if (!dev) {
       const dungeonId = this.#store.save.activeDungeon?.dungeonId ?? '';
       bgm.play(map.area === 'dungeon' ? (DUNGEON_BGM[dungeonId] ?? 'dungeon') : (ROOM_BGM[map.id] ?? 'town'));
@@ -638,7 +704,9 @@ export class WorldView {
     this.#raf = requestAnimationFrame((t) => this.#frame(t));
     // 確認画面では会話・お知らせを出さない（歩きだけを見る）
     const flash = dev ? null : this.#store.flashMessage;
-    const scene = dev ? null : this.#sceneOnLoad();
+    // 導入イベントV2の最中は、その続き（前の導入の場面は出さない）
+    const v2Run = dev ? null : this.#introV2OnLoad();
+    const scene = dev || v2Run ? null : this.#sceneOnLoad();
     // ダンジョンの帯（2026-10-26 デザイン第10弾）：クリアして街に戻ったとき・階に入ったとき（対戦から戻ったときは出さない）
     const banner = dev ? null : this.#store.flashBanner;
     const intro = dev ? null : this.#store.dungeonIntro;
@@ -657,12 +725,11 @@ export class WorldView {
       if (dungeon) this.#banner(boss ? 'boss' : 'floor', t('world.placeDungeon', { dungeon: dungeonName(dungeon), floor: mapName(map) }));
     }
     const afterOpening = (): void => {
+      const next = v2Run ?? (scene ? () => this.#playScene(scene) : undefined);
       if (flash) {
         this.#store.flashMessage = null;
-        this.#message(flash, scene ? () => this.#playScene(scene) : undefined);
-      } else if (scene) {
-        this.#playScene(scene);
-      }
+        this.#message(flash, next);
+      } else next?.();
     };
     // 新しく始めた直後：物語の始まりの挿絵（2026-10-27）。消えてからお知らせ・場面を出す
     const opening = !dev && this.#store.openingIntro;
@@ -871,7 +938,10 @@ export class WorldView {
       ),
       h('span', { class: 'world__coins' }, coinIcon(), coins(save.coins)),
       map.area === 'dungeon' ? button(t('world.escape'), () => this.#confirmLeave(), 'btn btn--small') : null,
-      button(t('world.menu'), () => this.#menu(), 'btn btn--small'),
+      // 【仮】チュートリアルスキップ（2026-10-27 ユーザー指示。販売前に消す予定）。導入イベントV2の最中と始まる前だけ
+      this.#showsSkip ? button(t('introV2.skip.button'), () => this.#confirmSkipIntroV2(), 'btn btn--small world__skip-intro') : null,
+      // 導入イベントV2の最中はメニューを出さない（自由に動けるようになってから）
+      this.#eventLock ? null : button(t('world.menu'), () => this.#menu(), 'btn btn--small'),
     );
 
     // 移動：画面のどこでも指を置いてすべらせると、その方向へ歩く（指を置いた所に半透明のスティックが出る。上下左右の4方向）。
@@ -889,9 +959,15 @@ export class WorldView {
       h('span', { class: 'world__action-icon', attrs: { 'aria-hidden': 'true' } }),
       h('span', { class: 'world__action-label', text: t('world.examine') }),
     ));
-    const hint = WorldView.#stickUsed ? null : h('div', { class: 'world__hint', text: t('world.hint') });
+    if (this.#eventLock) examine.style.display = 'none';
+    const hint = WorldView.#stickUsed || this.#eventLock ? null : h('div', { class: 'world__hint', text: t('world.hint') });
 
-    const goal = showsPracticeGoal(save, map.id) ? h('div', { class: 'world__goal', text: t('story.goal.practice') }) : null;
+    const v2Goal = this.#dev ? null : this.#introV2Goal(save.story.introV2, map.id);
+    const goal = v2Goal
+      ? h('div', { class: 'world__goal', text: t(v2Goal) })
+      : showsPracticeGoal(save, map.id)
+        ? h('div', { class: 'world__goal', text: t('story.goal.practice') })
+        : null;
     // 暗転の幕：場所に入ったときは閉じた状態から、絵を読み込み終えたら開ける
     const keepClosed = !fade && this.#fade?.classList.contains('is-on');
     this.#fade = h('div', { class: `world__fade${fade || keepClosed ? ' is-on' : ''}`, attrs: { 'aria-hidden': 'true' } });
@@ -899,6 +975,9 @@ export class WorldView {
     this.#root.replaceChildren(this.#viewport, hud, examine, hint ?? '', goal ?? '', this.#fade);
     this.#root.dataset.map = map.id;
     this.#root.dataset.intro = save.story.intro;
+    this.#root.dataset.introV2 = save.story.introV2.state;
+    // 一緒に歩く幼馴染（会話のあとに描き直したときも、同じマスに出す）
+    if (this.#follower) this.#follower = this.#makeFollower(this.#follower.tile, this.#follower.dir);
     this.#cam = null;
     this.#render();
     if (fade) this.#reveal();
@@ -978,7 +1057,8 @@ export class WorldView {
     if (map.id === 'town') {
       // 施設の名前（建物の絵の上端）
       for (const sign of TOWN_SIGNS) {
-        const goal = sign.label === 'practice' && showsPracticeGoal(save, map.id);
+        const goal =
+          (sign.label === 'practice' && showsPracticeGoal(save, map.id)) || (sign.label === 'practice' && this.#introV2Goal(save.story.introV2, map.id) === 'introV2.goal.school');
         const el = h('div', { class: `world__sign${goal ? ' is-goal' : ''}`, text: t(`world.building.${sign.label}` as MessageKey) });
         Object.assign(el.style, { left: `${sign.x * this.#scale}px`, top: `${sign.y * this.#scale}px` });
         const door = map.art?.doors?.[sign.building];
@@ -987,6 +1067,7 @@ export class WorldView {
         this.#signs.push({ el, top, maxShift, shift: 0 });
         this.#mapLayer.append(el);
       }
+      this.#addBureauMarker();
       return;
     }
     for (const obj of map.objects) {
@@ -1138,6 +1219,7 @@ export class WorldView {
       this.#tile = this.#move.to;
       this.#pos = { ...this.#tile };
       this.#move = null;
+      this.#followerArrive();
       this.#arrive();
       if (r.rest > 0 && !this.#busy) this.#step(r.rest);
       return;
@@ -1159,11 +1241,31 @@ export class WorldView {
 
   /** 止まっているとき：道順・調べる予約・押している向きから、次の1歩を始める */
   #startNext(): void {
+    // 導入イベントV2：歩いている途中の会話（S02）。残りの道は会話のあとに歩き直す
+    const talk = this.#walkTalk;
+    if (talk && this.#path.length > 0 && this.#path.length <= talk.at) {
+      this.#walkTalk = null;
+      this.#path = [];
+      this.#pathDone = null;
+      talk.resume();
+      return;
+    }
     const next = this.#path.shift();
     if (next) {
       const dx = next.x - this.#tile.x;
       const dy = next.y - this.#tile.y;
       if (!this.#tryStep(dx, dy, false)) this.#path = [];
+      else if (this.#follower) {
+        // 幼馴染は1マス先を歩く（道の終わり＝建物の入口では、先に入って消える）
+        const f = this.#follower;
+        f.from = f.tile;
+        f.to = this.#path[this.#followLead - 1] ?? null;
+      }
+      if (this.#path.length === 0 && !this.#move) this.#finishPath();
+      return;
+    }
+    if (this.#pathDone) {
+      this.#finishPath();
       return;
     }
     if (this.#afterPath) {
@@ -1307,6 +1409,7 @@ export class WorldView {
     const v2 = PLAYER_V2_ROWS[this.#gender].has(row);
     const runArt = PLAYER_RUN_ART_ROWS[this.#gender].has(row);
     this.#placeFigure(this.#player, p, walking && step % FRAMES_PER_STEP === 2 ? this.#figureH * (this.#running ? RUN_BOB : WALK_BOB) : 0, this.#bodyPose(time, walking, v2, runArt));
+    this.#renderFollower();
     const { width, height } = mapSize(this.#map);
     const cell = this.#cell;
     const z = this.#zoom;
@@ -1425,7 +1528,7 @@ export class WorldView {
   /* ---------- スティック（指を置いた所に出る） ---------- */
 
   #pointerDown(e: PointerEvent): void {
-    if (this.#busy || this.#touch) return;
+    if (this.#busy || this.#eventLock || this.#touch) return;
     this.#touch = { id: e.pointerId, x: e.clientX, y: e.clientY, dragging: false };
     try {
       this.#viewport.setPointerCapture(e.pointerId);
@@ -1529,7 +1632,7 @@ export class WorldView {
   }
 
   #key(e: KeyboardEvent, down: boolean): void {
-    if (this.#busy || this.#root.querySelector('.modal')) return;
+    if (this.#busy || this.#eventLock || this.#root.querySelector('.modal')) return;
     const dir = ({ ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' } as const)[e.key as 'ArrowUp'];
     if (dir) {
       e.preventDefault();
@@ -1550,7 +1653,7 @@ export class WorldView {
   }
 
   #tap(e: MouseEvent): void {
-    if (this.#busy) return;
+    if (this.#busy || this.#eventLock) return;
     const rect = this.#mapLayer.getBoundingClientRect();
     const cell = this.#cell;
     const { width } = mapSize(this.#map);
@@ -1655,7 +1758,7 @@ export class WorldView {
 
   /** 正面（なければ、となり）と足元を調べる */
   #examine(): void {
-    if (this.#busy || this.#move) return;
+    if (this.#busy || this.#eventLock || this.#move) return;
     const d = DIR_DELTA[this.#dir];
     const front = { x: this.#tile.x + d.x, y: this.#tile.y + d.y };
     const npc = this.#nearNpc();
@@ -1758,6 +1861,455 @@ export class WorldView {
     });
   }
 
+  /* ---------- 導入イベントV2「プロのカードバトラーになる試験」（進み具合は src/game/story/introV2.ts） ---------- */
+
+  get #v2(): IntroV2 {
+    return this.#store.save.story.introV2;
+  }
+
+  /** 導入イベントV2の最中：自由に歩けない（スティック・調べる・メニューを出さない） */
+  get #eventLock(): boolean {
+    return !this.#dev && isIntroV2Active(this.#v2);
+  }
+
+  /** 【仮】チュートリアルスキップのボタンを出すか */
+  get #showsSkip(): boolean {
+    return !this.#dev && !isIntroV2Done(this.#v2);
+  }
+
+  /** 街に出す目的地の案内 */
+  #introV2Goal(v: IntroV2, mapId: string): MessageKey | null {
+    if (mapId !== 'town') return null;
+    if (v.state === 'introGreeting' || v.state === 'escortToSchool') return 'introV2.goal.school';
+    if (v.state === 'escortToBureau') return 'introV2.goal.bureau';
+    return null;
+  }
+
+  /**
+   * 場所に入ったとき：導入イベントV2の続きを決める（主人公を置き直す・幼馴染を出すのはここで、会話・歩きは返す関数で始める）。
+   * 途中でアプリを閉じても、ここで続きから始まる。どれにも当てはまらない場所にいたら、決まった場所へ戻す
+   */
+  #introV2OnLoad(): (() => void) | null {
+    const store = this.#store;
+    if (isIntroV2Done(this.#v2)) return null;
+    const mapId = this.#map.id;
+    if (this.#v2.state === 'notStarted') return null;
+    const v = this.#v2;
+    const result = store.introV2Result;
+    store.introV2Result = null;
+    const inTown = mapId === 'town';
+    switch (v.state) {
+      case 'introGreeting':
+      case 'escortToSchool':
+        if (inTown) {
+          this.#follower = this.#makeFollower(this.#escortRoute('door-practice', true)?.guide ?? this.#sideTile(1), 'up');
+          this.#faceFollower();
+          const walk = (): void => this.#escortTo('door-practice', true);
+          return v.state === 'introGreeting' ? () => this.#playScene('v2Greeting', walk) : walk;
+        }
+        if (mapId === 'practice' && v.state === 'escortToSchool') return () => this.#walkToTeacher(() => this.#playScene('v2School', () => this.#startExam()));
+        break;
+      case 'schoolArrival':
+        if (mapId === 'practice') {
+          this.#placeBeforeTeacher();
+          const scene: SceneId = result === 'lost' ? 'v2Retry' : v.examAttempts > 0 ? 'v2Resume' : 'v2School';
+          return () => this.#playScene(scene, () => this.#startExam());
+        }
+        break;
+      case 'examPassed':
+        if (mapId === 'practice') {
+          this.#placeBeforeTeacher();
+          return () => this.#playScene('v2Pass', () => this.#walkOut('practice-exit'));
+        }
+        break;
+      case 'escortToBureau':
+        if (mapId === 'practice') return () => this.#walkOut('practice-exit');
+        if (inTown) {
+          this.#follower = this.#makeFollower(this.#escortRoute('door-bureau', true)?.guide ?? this.#sideTile(1), 'down');
+          this.#faceFollower();
+          return () => this.#escortTo('door-bureau', false);
+        }
+        if (mapId === 'bureau') return () => this.#walkToDesk(() => this.#playScene('v2Reception', () => this.#choosePack()));
+        break;
+      case 'bureauReception':
+        if (mapId === 'bureau') return () => this.#walkToDesk(() => this.#playScene('v2Reception', () => this.#choosePack()));
+        break;
+      case 'packSelection':
+        if (mapId === 'bureau') {
+          this.#placeAt(BUREAU_DESK_FRONT, 'up');
+          return () => this.#choosePack();
+        }
+        break;
+      case 'packClaimed':
+      case 'worldBriefing':
+        if (mapId === 'bureau' && v.state === 'packClaimed') return () => this.#walkOut('bureau-exit');
+        if (inTown) {
+          this.#follower = this.#makeFollower(this.#sideTile(FOLLOW_LEAD), 'left');
+          this.#faceFollower();
+          return () =>
+            this.#playScene('v2Briefing', () => {
+              // 幼馴染は家に帰る（となりの家にいる）
+              this.#follower = null;
+              this.#build();
+            });
+        }
+        break;
+      default:
+        break;
+    }
+    // 決まった場所に戻す（ふつうは起きない。古い記録・想定外の位置のとき）
+    const anchor = introV2Anchor(this.#v2);
+    if (anchor.mapId === mapId) return null;
+    return () => {
+      store.update((s) => ({ ...s, location: anchor }));
+      this.#goTo(() => this.load());
+    };
+  }
+
+  /** 上下左右だけの道（from を含まない） */
+  #path4(from: Point, isGoal: (x: number, y: number) => boolean): Point[] | null {
+    return findPathWhere(this.#map, from, isGoal, this.#blocked, 60000, STEPS_4);
+  }
+
+  /**
+   * 入口（ワープ）までの道と、幼馴染の立つ所。幼馴染は主人公の FOLLOW_LEAD マス先を歩く（重なって見えないように）。
+   * 歩き始める前は主人公の横（FOLLOW_LEAD マス）に立ち、目的地に近い側を選ぶ。歩いている途中（会話のあと）は今いるマスから
+   */
+  #escortRoute(warpId: string, placeGuide = false): { route: Point[]; guide: Point; lead: number } | null {
+    const warp = this.#map.objects.find((o) => o.id === warpId);
+    if (!warp || warp.type !== 'warp') return null;
+    const inWarp = (x: number, y: number): boolean => x >= warp.x && x < warp.x + warp.w && y >= warp.y && y < warp.y + warp.h;
+    const plan = (guide: Point): { route: Point[]; guide: Point; lead: number } | null => {
+      const toGuide = guide.x === this.#tile.x && guide.y === this.#tile.y ? [] : this.#path4(this.#tile, (x, y) => x === guide.x && y === guide.y);
+      const rest = this.#path4(guide, inWarp);
+      if (!toGuide || !rest) return null;
+      return { route: [...toGuide, ...rest], guide, lead: toGuide.length };
+    };
+    if (this.#follower) return plan(this.#follower.tile);
+    if (!placeGuide) {
+      const path = this.#path4(this.#tile, inWarp);
+      return path ? { route: path, guide: this.#tile, lead: 1 } : null;
+    }
+    let best: { route: Point[]; guide: Point; lead: number } | null = null;
+    for (const d of [DIR_DELTA.left, DIR_DELTA.right, DIR_DELTA.up, DIR_DELTA.down]) {
+      const side = this.#freeLine(d, FOLLOW_LEAD);
+      const p = side ? plan(side) : null;
+      if (p && (!best || p.route.length < best.route.length)) best = p;
+    }
+    if (best) return best;
+    // 横に場所がなければ、道の先に立つ
+    const path = this.#path4(this.#tile, inWarp);
+    if (!path || path.length === 0) return null;
+    const lead = Math.min(FOLLOW_LEAD, path.length);
+    return { route: path, guide: path[lead - 1] as Point, lead };
+  }
+
+  /** 主人公から d の向きに n マス、どれも歩けるなら n マス先（なければ null） */
+  #freeLine(d: Point, n: number): Point | null {
+    for (let k = 1; k <= n; k += 1) if (this.#blocked(this.#tile.x + d.x * k, this.#tile.y + d.y * k)) return null;
+    return { x: this.#tile.x + d.x * n, y: this.#tile.y + d.y * n };
+  }
+
+  /** 自動で道を歩く。終わったら（または進めなくなったら）done */
+  #autoWalk(path: readonly Point[], done: () => void): void {
+    this.#busy = false;
+    this.#held = null;
+    this.#keys.clear();
+    this.#running = false;
+    this.#afterPath = null;
+    this.#path = [...path];
+    this.#pathDone = done;
+    if (path.length === 0) this.#finishPath();
+  }
+
+  #finishPath(): void {
+    const done = this.#pathDone;
+    this.#pathDone = null;
+    this.#path = [];
+    done?.();
+  }
+
+  /** 幼馴染と一緒に、建物の入口まで歩く（入口を踏むと #arrive が中へ入れる）。道が無ければ暗転して入口の中へ */
+  #escortTo(warpId: string, talk: boolean): void {
+    const plan = this.#escortRoute(warpId);
+    const path = plan?.route ?? null;
+    this.#followLead = plan?.lead ?? 1;
+    const warp = this.#map.objects.find((o) => o.id === warpId);
+    const fallback = (): void => {
+      if (!warp || warp.type !== 'warp' || warp.target.kind !== 'map') return;
+      const target = warp.target;
+      this.#store.flashMessage = t('introV2.walkFail');
+      this.#store.update((s) => ({ ...s, location: { mapId: target.mapId, x: target.x, y: target.y, dir: target.dir } }));
+      this.#goTo(() => this.load());
+    };
+    if (!path || path.length === 0) {
+      fallback();
+      return;
+    }
+    // S02：道の半分くらいで幼馴染が話す（1回だけ）
+    this.#walkTalk = talk ? { at: Math.floor(path.length / 2), resume: () => this.#playScene('v2Walk', () => this.#escortTo(warpId, false)) } : null;
+    // 入口を踏めば場所が変わる（load がこの続きを決める）。ここに来たら入口に着けなかった
+    this.#autoWalk(path, fallback);
+  }
+
+  /** 部屋の出口まで歩く */
+  #walkOut(warpId: string): void {
+    this.#escortTo(warpId, false);
+  }
+
+  /** 教習所の先生の前のマス（話せる近さで、入口からいちばん近い所）まで */
+  #teacherFrontPath(): Point[] | null {
+    const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
+    if (!teacher) return null;
+    const near = (x: number, y: number): boolean => Math.max(Math.abs(teacher.x - x), Math.abs(teacher.y - y)) <= NPC_TALK_RANGE && x === teacher.x;
+    return findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ?? findPathWhere(this.#map, this.#tile, (x, y) => Math.max(Math.abs(teacher.x - x), Math.abs(teacher.y - y)) <= NPC_TALK_RANGE, this.#blocked, 40000, STEPS_4);
+  }
+
+  #walkToTeacher(done: () => void): void {
+    const path = this.#teacherFrontPath();
+    this.#autoWalk(path ?? [], () => {
+      this.#faceTeacher();
+      done();
+    });
+  }
+
+  /** 先生の前に立たせる（試験のあと・途中で閉じたあと） */
+  #placeBeforeTeacher(): void {
+    const entry = this.#map.spawn;
+    const save = { ...this.#tile };
+    this.#tile = { x: entry.x, y: entry.y };
+    const path = this.#teacherFrontPath();
+    const last = path?.[path.length - 1];
+    this.#tile = save;
+    if (last) this.#placeAt(last, 'up');
+    this.#faceTeacher();
+  }
+
+  #faceTeacher(): void {
+    const teacher = this.#map.objects.find((o): o is NpcObject => o.type === 'npc' && o.npcId === 'teacher');
+    if (!teacher) return;
+    this.#dir = this.#dirTo(teacher);
+    this.#diag = null;
+    const el = this.#objectEls.get(teacher.id);
+    if (el) this.#faceNpc(el, 'down');
+  }
+
+  /** 管理局（仮）の受付の前まで */
+  #walkToDesk(done: () => void): void {
+    const path = findPathWhere(this.#map, this.#tile, (x, y) => x === BUREAU_DESK_FRONT.x && y === BUREAU_DESK_FRONT.y, this.#blocked, 4000, STEPS_4);
+    this.#autoWalk(path ?? [], () => {
+      if (this.#tile.x !== BUREAU_DESK_FRONT.x || this.#tile.y !== BUREAU_DESK_FRONT.y) this.#placeAt(BUREAU_DESK_FRONT, 'up');
+      this.#dir = 'up';
+      this.#diag = null;
+      done();
+    });
+  }
+
+  /** 主人公をそのマスに置く（位置も保存する） */
+  #placeAt(p: Point, dir: Direction): void {
+    this.#tile = { x: p.x, y: p.y };
+    this.#pos = { ...this.#tile };
+    this.#move = null;
+    this.#dir = dir;
+    this.#diag = null;
+    this.#cam = null;
+    const loc: Location = { mapId: this.#map.id, x: p.x, y: p.y, dir };
+    this.#store.update((s) => ({ ...s, location: loc }));
+  }
+
+  /** 主人公の横 n マスの歩けるマス（幼馴染を立たせる。無ければもっと近く） */
+  #sideTile(n: number): Point {
+    for (let k = n; k >= 1; k -= 1) {
+      for (const d of [DIR_DELTA.right, DIR_DELTA.left, DIR_DELTA.down, DIR_DELTA.up]) {
+        const p = this.#freeLine(d, k);
+        if (p) return p;
+      }
+    }
+    return { ...this.#tile };
+  }
+
+  /** 試験の対戦（先生が相手。勝つまで再挑戦。負けるたびに先生のライフを少なくする：救済。ふつうの練習試合とは別の対戦） */
+  #startExam(): void {
+    const store = this.#store;
+    if (!isDeckValid(store.save.deck, store.save.collection)) {
+      this.#message(t('world.deckInvalidBattle'));
+      return;
+    }
+    this.#busy = true;
+    const ctx = this.#ctx;
+    store.update(beginExam);
+    const attempt = store.save.story.introV2.examAttempts;
+    store.pendingBattle = {
+      title: t('introV2.exam.title'),
+      opponent: { ...EXAM_OPPONENT, lifeScale: examLifeScale(attempt) },
+      // 試験は降参できない（負けても先生の前から再挑戦）
+      allowSurrender: false,
+      background: practiceBattleBg,
+      backgroundVivid: true,
+      tutorial: true,
+      hintSet: 'introV2',
+      eventBattleId: 'introV2-exam',
+      onFinish: (winner) => {
+        store.update((s) => finishExam(s, winner === 'player'));
+        store.introV2Result = winner === 'player' ? 'won' : 'lost';
+        ctx.reset('world');
+      },
+    };
+    ctx.navigate('battle');
+  }
+
+  /** 受付でブースターパックを3つから1つ選ぶ（選んだら確かめる。受け取ったら選び直せない） */
+  #choosePack(): void {
+    this.#busy = true;
+    const handle = openModal(this.#root, {
+      title: t('introV2.pack.title'),
+      className: 'intro-pack',
+      closeOnBackdrop: false,
+      body: [
+        h('p', { class: 'modal__text modal__text--sub', text: t('introV2.pack.temp') }),
+        h(
+          'div',
+          { class: 'intro-pack__list' },
+          ...BOOSTERS.map((b) =>
+            h(
+              'button',
+              { class: 'intro-pack__item', attrs: { type: 'button' }, dataset: { pack: b.key }, on: { click: () => { handle.close(); this.#confirmPack(b.key); } } },
+              h('span', { class: 'intro-pack__art', attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'intro-pack__temp', text: t('introV2.pack.artTemp') })),
+              h('span', { class: 'intro-pack__name', text: boosterName(b.key) }),
+              h('span', { class: 'intro-pack__choose', text: t('introV2.pack.choose') }),
+            ),
+          ),
+        ),
+      ],
+    });
+  }
+
+  #confirmPack(key: BoosterKey): void {
+    this.#busy = true;
+    // 受け取りの ID は確かめる窓を開いたときに作る（2回押しても、アプリを開き直しても1回だけ）
+    const tx = newId('introV2-booster');
+    const decide = once(() => {
+      handle.close();
+      this.#store.update((s) => claimBooster(s, key, tx));
+      this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit'));
+    });
+    const handle = openModal(this.#root, {
+      title: t('introV2.pack.confirmTitle'),
+      className: 'intro-pack',
+      closeOnBackdrop: false,
+      body: [h('p', { class: 'modal__text', text: t('introV2.pack.confirmText', { pack: boosterName(key) }) })],
+      actions: [
+        { label: t('introV2.pack.rechoose'), onTap: () => { handle.close(); this.#choosePack(); } },
+        { label: t('introV2.pack.decide'), primary: true, onTap: decide },
+      ],
+    });
+  }
+
+  /** 【仮】チュートリアルスキップ（確かめてから。試験・パックの受け取りはしない） */
+  #confirmSkipIntroV2(): void {
+    const wasBusy = this.#busy;
+    this.#busy = true;
+    confirmModal(
+      this.#root,
+      t('introV2.skip.title'),
+      [h('p', { class: 'modal__text', text: t('introV2.skip.text') })],
+      () => {
+        this.#store.update(skipIntroV2);
+        this.#follower = null;
+        this.#path = [];
+        this.#pathDone = null;
+        this.#walkTalk = null;
+        this.#build();
+        this.#busy = false;
+      },
+      () => {
+        if (isIntroV2Done(this.#v2)) return;
+        this.#busy = wasBusy;
+      },
+    );
+  }
+
+  /** 街の【仮】管理局の印（建物の絵が無いので、入口の場所に札と枠を出す） */
+  #addBureauMarker(): void {
+    const door = this.#map.objects.find((o): o is WarpObject => o.id === 'door-bureau' && o.type === 'warp');
+    if (!door) return;
+    const cell = this.#cell;
+    const goal = this.#v2.state === 'escortToBureau';
+    const box = h('div', { class: `world__bureau${goal ? ' is-goal' : ''}`, attrs: { 'aria-hidden': 'true' } });
+    Object.assign(box.style, { left: `${(door.x - 1) * cell}px`, top: `${(door.y - 2) * cell}px`, width: `${(door.w + 2) * cell}px`, height: `${3 * cell}px` });
+    const sign = h('div', { class: `world__sign world__sign--temp${goal ? ' is-goal' : ''}`, text: t('introV2.bureau.label') });
+    Object.assign(sign.style, { left: `${(door.x + door.w / 2) * cell}px`, top: `${(door.y - 2) * cell}px` });
+    this.#mapLayer.append(box, sign);
+  }
+
+  /* ---------- 一緒に歩く幼馴染 ---------- */
+
+  #makeFollower(tile: Point, dir: Direction): Follower {
+    const body = h('div', { class: 'world__npc-body' });
+    const el = h('div', { class: 'world__npc world__follower', dataset: { npc: 'neighbor_guide' }, attrs: { 'aria-label': t(NPC_NAME.neighbor_guide) } }, body);
+    this.#sizeFigure(el);
+    this.#addShadow(el);
+    body.style.backgroundImage = `url("${NPC_SHEET.neighbor_guide}")`;
+    body.style.transformOrigin = el.style.transformOrigin;
+    this.#faceNpc(el, dir);
+    this.#mapLayer.append(el);
+    const f: Follower = { el, tile: { ...tile }, from: { ...tile }, to: { ...tile }, dir };
+    this.#placeFigure(el, tile);
+    return f;
+  }
+
+  /** 幼馴染と主人公を向かい合わせる（声をかけるとき・案内のとき） */
+  #faceFollower(): void {
+    const f = this.#follower;
+    if (!f) return;
+    this.#dir = this.#dirTo(f.tile);
+    this.#diag = null;
+    const dx = this.#tile.x - f.tile.x;
+    const dy = this.#tile.y - f.tile.y;
+    f.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+    this.#faceNpc(f.el, f.dir);
+  }
+
+  /** 主人公が1歩進み終えたとき：幼馴染も次のマスに着く（入口に入ったら消える） */
+  #followerArrive(): void {
+    const f = this.#follower;
+    if (!f) return;
+    if (!f.to) {
+      f.el.remove();
+      this.#shadows.get(f.el)?.remove();
+      this.#shadows.delete(f.el);
+      this.#follower = null;
+      return;
+    }
+    f.tile = { ...f.to };
+    f.from = { ...f.to };
+  }
+
+  #renderFollower(): void {
+    const f = this.#follower;
+    if (!f) return;
+    const mv = this.#move;
+    const to = f.to;
+    const moving = mv !== null && to !== null && (to.x !== f.from.x || to.y !== f.from.y);
+    const p = moving && to ? { x: f.from.x + (to.x - f.from.x) * mv.t, y: f.from.y + (to.y - f.from.y) * mv.t } : f.tile;
+    if (moving && to) {
+      const dir: Direction = to.x !== f.from.x ? (to.x > f.from.x ? 'right' : 'left') : to.y > f.from.y ? 'down' : 'up';
+      f.dir = dir;
+      // 歩きの4コマ（左足・立つ・右足・立つ）
+      const col = Math.floor(this.#phase * 2) % 4;
+      const w = parseFloat(f.el.style.width);
+      const hgt = parseFloat(f.el.style.height);
+      const body = f.el.firstElementChild as HTMLElement | null;
+      if (body) body.style.backgroundPosition = `${-col * w}px ${-DIR_ROW[dir] * hgt}px`;
+      f.el.dataset.face = dir;
+    } else if (mv === null && f.el.dataset.walk !== 'idle') {
+      this.#faceNpc(f.el, f.dir);
+    }
+    f.el.dataset.walk = moving ? 'walk' : 'idle';
+    f.el.classList.toggle('is-leaving', mv !== null && to === null);
+    this.#placeFigure(f.el, p);
+  }
+
   /** 練習試合（報酬・戦績なし。勝ち負けで進行は止まらない） */
   #startPractice(tutorial: boolean): void {
     const store = this.#store;
@@ -1799,6 +2351,7 @@ export class WorldView {
       case 'gacha': return nav('gacha');
       case 'tournamentDesk': return nav('tournament');
       case 'practiceTable': return this.#playScene(sceneOnTable(this.#store.save));
+      case 'bureauDesk': return this.#playScene('v2BureauAfter');
       default: this.#message(message ?? '');
     }
   }

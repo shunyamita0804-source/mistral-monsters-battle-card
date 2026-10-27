@@ -8,6 +8,7 @@ import {
   createSoramoTestDeck,
   createStarterCollection,
   createStarterDeck,
+  createStarterDeckFor,
   isDeckValid,
   topUpDeck,
   type Deck,
@@ -19,6 +20,8 @@ import { NOBITON_REMOVED_14_IDS } from '../../data/nobiton.ts';
 import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
+import { LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
+import type { StarterDeckKey } from '../../data/introV2.ts';
 
 /**
  * セーブデータ（カード所持・通貨・パック解放・欠片・大会実績・ダンジョン進捗・デッキを一元管理）。
@@ -27,7 +30,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 14;
+export const SAVE_VERSION = 15;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -132,7 +135,11 @@ export interface SaveData {
     readonly packsOpened: number;
   };
   /** 物語の進み具合（序盤イベント。src/game/story/intro.ts） */
-  readonly story: { readonly intro: IntroState };
+  readonly story: {
+    readonly intro: IntroState;
+    /** 導入イベントV2「プロのカードバトラーになる試験」（2026-10-27。src/game/story/introV2.ts） */
+    readonly introV2: IntroV2;
+  };
 }
 
 export const TRANSACTION_LOG_SIZE = 100;
@@ -143,16 +150,21 @@ export const DEFAULT_LOCATION: Location = { mapId: 'town', x: 80, y: 100, dir: '
 /** 新しく始めたときの位置：自分の家の中（家から街に出ると、となりの家の女性が声をかける） */
 export const NEW_GAME_LOCATION: Location = { mapId: 'home', x: 12, y: 14, dir: 'down' };
 
-export function createNewSave(now: Date = new Date()): SaveData {
+/**
+ * 新しいセーブ。starter（導入イベントV2で選んだ初期デッキ）を渡すと、そのデッキ（仮の60枚）で始める。
+ * 前の序盤イベント（となりの家の女性の誘い）は使わないので completed にする（導入イベントV2に置き換え）
+ */
+export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | null = null): SaveData {
   const iso = now.toISOString();
+  const deck = starter ? createStarterDeckFor(starter) : createStarterDeck();
   return {
     version: SAVE_VERSION,
     createdAt: iso,
     updatedAt: iso,
     player: { gender: null },
     coins: CURRENCY.initial,
-    collection: createStarterCollection(),
-    deck: createStarterDeck(),
+    collection: createStarterCollection(deck),
+    deck,
     rank: 'E',
     unlockedPacks: PACKS.filter((p) => p.unlockedFromStart).map((p) => p.id),
     tournaments: {},
@@ -166,7 +178,7 @@ export function createNewSave(now: Date = new Date()): SaveData {
     location: NEW_GAME_LOCATION,
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
-    story: { intro: 'notSeen' },
+    story: { intro: 'completed', introV2: newIntroV2(starter) },
   };
 }
 
@@ -338,7 +350,7 @@ function migrateSoramo14V9(raw: RawObject): RawObject {
 
 /**
  * version 9 → 10（2026-10-26）：ガウルの技を新しい14技に替えた。旧16技（skl-gauul-01〜16）は所持カードとデッキから外す。
- * ガウルは初期配布が未確定なので、代わりのカードは配らない。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
+ * 代わりのカードは配らない（当時はガウルの初期配布をゲームに入れていなかった。2026-10-26 確定の16枚は新しく始めたときだけ）。デッキの抜けた分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
  */
 function migrateGaul14V10(raw: RawObject): RawObject {
   const removed = new Set(GAUUL_OLD_SKILL_IDS);
@@ -399,6 +411,15 @@ function migrateMyurol14V14(raw: RawObject): RawObject {
   return removeCardsFromSave(raw, MYUROL_REMOVED_14_IDS);
 }
 
+/**
+ * version 14 → 15（2026-10-27）：導入イベントV2「プロのカードバトラーになる試験」を足した。
+ * いままでのセーブには突然始めないよう legacySkipped にする（カード・大会の記録はそのまま）
+ */
+function migrateIntroV2V15(raw: RawObject): RawObject {
+  const story = isObject(raw.story) ? raw.story : {};
+  return { ...raw, story: { ...story, introV2: LEGACY_INTRO_V2 } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -414,6 +435,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   11: migrateNobiton14V12,
   12: migrateDungeonRunV13,
   13: migrateMyurol14V14,
+  14: migrateIntroV2V15,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -569,7 +591,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
       packsOpened: asCount(stats.packsOpened),
     },
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
-    story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred' },
+    story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };
 }
 

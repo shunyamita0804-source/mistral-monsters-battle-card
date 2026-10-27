@@ -89,6 +89,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:enc-run-npc:name': 'Dungeon Duelist (Temp)',
   'opponent:enc-run-guardian:name': 'Unseen Guardian (Temp)',
   'opponent:enc-practice:name': 'Practice partner (Temp)',
+  'opponent:exam-teacher:name': 'Practice Hall Instructor',
 
   // ---------- マップ・扉・家具（仮マップ。src/data/maps.ts） ----------
   'map:town:name': 'Town',
@@ -103,6 +104,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'map:shop:name': 'Card Shop',
   'map:hall:name': 'Tournament Hall',
   'map:practice:name': 'Card Practice Hall',
+  'map:bureau:name': 'Card Battler Bureau (Temp)',
   'map:dungeon-01-b1:name': 'B1F',
   'map:dungeon-01-b2:name': 'B2F',
   'map:dungeon-01-b3:name': 'B3F',
@@ -111,6 +113,13 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'map:dungeon-02-b3:name': 'B3F',
   // 街
   'object:door-practice:label': 'Card Practice Hall',
+  'object:door-bureau:label': 'Card Battler Bureau (Temp)',
+  'object:bureau-desk:label': 'Reception (Temp)',
+  'object:bureau-shelf-l:label': 'Document Shelf',
+  'object:bureau-shelf-l:message': 'Registration papers are lined up.',
+  'object:bureau-shelf-r:label': 'Document Shelf',
+  'object:bureau-shelf-r:message': 'Registration papers are lined up.',
+  'object:bureau-exit:label': 'Outside',
   'object:door-hall:label': 'Tournament Hall',
   'object:door-dungeon:label': 'Dungeon Entrance',
   'object:door-home:label': 'Home',

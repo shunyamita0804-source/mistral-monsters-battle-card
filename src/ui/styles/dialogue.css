@@ -15,6 +15,10 @@
 }
 
 /* スキップ（右上） */
+.talk__skip[hidden] {
+  display: none;
+}
+
 .talk__skip {
   position: absolute;
   top: calc(60px + env(safe-area-inset-top, 0px));

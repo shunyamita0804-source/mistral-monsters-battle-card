@@ -9,7 +9,8 @@ import type { MessageEntry } from '../i18n.ts';
  */
 export const STORY = {
   // 名前の札（話している人）
-  'story.speaker.neighborGuide': { ja: '隣家の女性', en: 'Neighbor' },
+  // 2026-10-27 導入イベントV2：となりの家の女性は主人公の幼馴染（名前は未定なので「幼馴染」）
+  'story.speaker.neighborGuide': { ja: '幼馴染', en: 'Childhood Friend' },
   // 【仮】街の人の呼び名（正式な名前は未定。2026-10-23）
   'story.speaker.clerk': { ja: '店員', en: 'Clerk' },
   'story.speaker.researcher': { ja: '研究員', en: 'Researcher' },

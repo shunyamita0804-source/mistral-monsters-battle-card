@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { getSkill, MONSTERS, SKILLS, skillsOf } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
-import { GAUL14_ROWS, GAUUL_MONSTER, GAUUL_OLD_SKILL_IDS, GAUUL_SKILLS, gauulSkillId } from '../src/data/gauul.ts';
+import { GAUL14_ROWS, GAUUL_MONSTER, GAUUL_OLD_SKILL_IDS, GAUUL_SKILLS, GAUUL_STARTER, gauulSkillId } from '../src/data/gauul.ts';
 import { LAZUCK_CROSS_GUARD_ID, LAZUCK_ITAZURA_ID, lazuckSkillId } from '../src/data/lazuck.ts';
 import evasionJson from '../src/data/official/evasion_LATEST_20261024.json';
 import gaulJson from '../src/data/official/gaul14_skills_OFFICIAL_20261026.json';
@@ -24,6 +24,8 @@ const gau = (n: number): string => gauulSkillId(n);
 const laz = (n: number): string => lazuckSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
 const ORIGINAL = 'design-parts/cards-original/gaul14-20261026';
+/** 初期配布16枚（2026-10-26 ユーザー正式確定。正式の番号 → 枚数。2026-10-27 の検収の指示のとおり） */
+const GAUUL_INITIAL: Readonly<Record<number, number>> = { 1: 3, 2: 2, 3: 1, 6: 3, 7: 2, 10: 2, 11: 1, 12: 1, 13: 1 };
 const sha256 = (buf: Buffer): string => createHash('sha256').update(buf).digest('hex');
 
 describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
@@ -77,8 +79,8 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
       expect(s.monsterId).toBe('mon-gauul');
       expect(s.isPlaceholder).toBe(false);
       expect(s.rarity).toBeNull();
-      // 初期配布は未確定（null）。0枚（収集）と決めつけず、区分を持たない
-      expect(s.availability).toBeUndefined();
+      // 届いた JSON の初期配布は null のまま（無改変）。区分は 2026-10-26 ユーザー正式確定の初期配布の枚数から（下のテスト）
+      expect(s.availability).toBe(GAUUL_INITIAL[Number(no)] ? 'initial' : 'collect');
     });
     expect(GAUUL_SKILLS).toHaveLength(14);
   });
@@ -129,12 +131,21 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     }
   });
 
-  it('初期配布は未確定なので、スターター・パック・相手の編成にはまだ入れていない', () => {
+  it('初期配布16枚（2026-10-26 ユーザー正式確定）：01・06 が3枚、02・07・10 が2枚、03・11・12・13 が1枚', () => {
+    expect(GAUUL_STARTER).toEqual(Object.entries(GAUUL_INITIAL).map(([no, copies]) => ({ id: gau(Number(no)), copies })));
+    expect(GAUUL_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
+    GAUUL_SKILLS.forEach((s, i) => expect(s.availability).toBe(GAUUL_INITIAL[i + 1] ? 'initial' : 'collect'));
+  });
+
+  it('新しく始めたときの所持カードにだけ入る（初期デッキ60枚・モンスターカード本体・パック・相手の編成には入れない）', () => {
+    const save = createNewSave();
+    for (const s of GAUUL_STARTER) expect(save.collection[s.id]).toBe(s.copies);
+    for (const n of [4, 5, 8, 9, 14]) expect(save.collection[gau(n)]).toBeUndefined();
+    expect(save.collection['mon-gauul']).toBeUndefined();
     for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('gauul'))).toBe(false);
     const starter = createStarterDeck();
     expect(starter.monsters).not.toContain('mon-gauul');
     expect(starter.skills.some((id) => id.includes('gauul'))).toBe(false);
-    expect(Object.keys(createNewSave().collection).some((id) => id.includes('gauul'))).toBe(false);
     for (const e of Object.values(ENCOUNTERS)) expect(e.monsters).not.toContain('mon-gauul');
     for (const t of TOURNAMENTS) for (const r of t.rounds) expect(r.monsters).not.toContain('mon-gauul');
   });

@@ -96,6 +96,9 @@ export const STEPS: readonly Point[] = [
   { x: -1, y: -1 }, { x: 1, y: -1 }, { x: -1, y: 1 }, { x: 1, y: 1 },
 ];
 
+/** 上下左右だけ（導入イベントで一緒に歩くとき。主人公の操作と同じく斜めには進まない） */
+export const STEPS_4: readonly Point[] = STEPS.slice(0, 4);
+
 /** from から (dx, dy) へ1歩進めるか（斜めは角のすり抜けをしない） */
 export function canStep(from: Point, dx: number, dy: number, blocked: (x: number, y: number) => boolean): boolean {
   if (blocked(from.x + dx, from.y + dy)) return false;
@@ -113,6 +116,7 @@ export function findPathWhere(
   isGoal: (x: number, y: number) => boolean,
   blocked: (x: number, y: number) => boolean,
   maxNodes = 40000,
+  steps: readonly Point[] = STEPS,
 ): Point[] | null {
   const { width, height } = mapSize(map);
   if (isGoal(start.x, start.y)) return [];
@@ -123,7 +127,7 @@ export function findPathWhere(
   let head = 0;
   while (head < queue.length && head < maxNodes) {
     const cur = queue[head++] as Point;
-    for (const d of STEPS) {
+    for (const d of steps) {
       const nx = cur.x + d.x;
       const ny = cur.y + d.y;
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;

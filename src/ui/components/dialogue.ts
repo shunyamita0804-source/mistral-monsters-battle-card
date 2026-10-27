@@ -83,6 +83,7 @@ const SPEAKER_NAME: Readonly<Record<Exclude<Speaker, 'system'>, MessageKey>> = {
   clerk: 'story.speaker.clerk',
   receptionist: 'story.speaker.receptionist',
   researcher: 'story.speaker.researcher',
+  bureau_clerk: 'introV2.speaker.bureau',
 };
 
 /** 1文字を出す間隔（ミリ秒） */
@@ -218,6 +219,7 @@ export function playScene(parent: HTMLElement, start: SceneId, options: Dialogue
     sceneId = id;
     stepIndex = 0;
     const scene = SCENES[id];
+    skip.hidden = scene.noSkip === true;
     if (scene.onStart?.length) options.onEffects(scene.onStart);
     runStep();
   };
@@ -235,7 +237,7 @@ export function playScene(parent: HTMLElement, start: SceneId, options: Dialogue
   const finish = (effects: readonly SceneEffect[] | null): void => {
     if (closed) return;
     const list = effects ?? [];
-    const intro = list.filter((e) => e.kind === 'intro');
+    const intro = list.filter((e) => e.kind !== 'practice');
     if (intro.length) options.onEffects(intro);
     const practice = list.find((e): e is Extract<SceneEffect, { kind: 'practice' }> => e.kind === 'practice');
     close();
@@ -257,6 +259,7 @@ export function playScene(parent: HTMLElement, start: SceneId, options: Dialogue
   function doSkip(): void {
     if (closed) return;
     const scene = SCENES[sceneId];
+    if (scene.noSkip) return;
     finish(scene.skipEffects ?? scene.effects ?? []);
   }
 
