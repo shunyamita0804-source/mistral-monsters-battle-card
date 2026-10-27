@@ -1,6 +1,6 @@
 import { getMonster, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
-import { DUNGEON_RUN, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import type { DungeonFloor, FloorEntity } from '../../game/dungeon/generate.ts';
@@ -37,6 +37,12 @@ import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
+import guardianArt from '@assets/images/characters/guardian.webp';
+import miniYou from '@assets/images/ui/dungeon/mini_you.webp';
+import miniStairs from '@assets/images/ui/dungeon/mini_stairs.webp';
+import miniChest from '@assets/images/ui/dungeon/mini_chest.webp';
+import miniBattler from '@assets/images/ui/dungeon/mini_battler.webp';
+import miniBoss from '@assets/images/ui/dungeon/mini_boss.webp';
 
 /**
  * ランダム生成のダンジョンの画面（2026-10-26 試作「ミスモンBC ダンジョン試作（たたき台）」。GB 版のダンジョンを参考に）。
@@ -62,8 +68,14 @@ const TILE = 48;
 const TEXTURE_TILES = 4;
 /** 1歩の動きの長さ（ミリ秒。押しっぱなしの1歩の間隔より少し短く） */
 const STEP_MS = 150;
-/** ミニマップの1マスの大きさ（px） */
-const MINI_CELL = 3;
+/** ミニマップの1マスの大きさ（ミニマップの絵の中の px。画面では枠に合わせて縮める。印の絵がつぶれないよう細かめに描く） */
+const MINI_CELL = 8;
+/** ミニマップの印の大きさ（マスの何倍か。2026-10-27 デザイン第12弾の印） */
+const MINI_MARK = 3.4;
+/** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
+const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
+/** 見えない番人が姿を現したときの絵の高さ（論理px。主人公と同じ） */
+const GUARDIAN_H = 70;
 /** 主人公の絵の高さ（論理px）と、1コマの縦横比（シート 310×360） */
 const PLAYER_H = 70;
 const PLAYER_W = Math.round((PLAYER_H * 310) / 360);
@@ -138,6 +150,8 @@ class DungeonRunView {
       return;
     }
     const dungeon = getDungeon(run.dungeonId);
+    // ダンジョンごとの見た目（床・壁・ボスのしるし。dungeonRun.css・uiParts12.css）
+    this.#root.classList.add(`drun--${run.dungeonId}`);
     bgm.play(RUN_BGM[run.dungeonId] ?? 'dungeon');
     sound.ambient(run.dungeonId === 'dungeon-02' ? null : 'drip');
     this.#player.style.backgroundImage = `url("${PLAYER_SHEET[this.#store.save.player.gender === 'female' ? 'female' : 'male']}")`;
@@ -206,6 +220,7 @@ class DungeonRunView {
     };
     const showPressed = (d: Direction | null): void => {
       for (const [i, a] of arrows.entries()) a.classList.toggle('is-on', DIRS[i] === d);
+      pad.classList.toggle('is-pressed', d !== null);
     };
     pad.addEventListener('pointerdown', (e) => {
       e.preventDefault();
@@ -260,7 +275,9 @@ class DungeonRunView {
     }
     for (const e of f.entities) {
       if (e.kind === 'guardian') continue;
-      const el = h('div', { class: `drun__entity drun__entity--${e.kind}`, attrs: { 'aria-hidden': 'true' } });
+      // バトラーは3人の見た目のどれか（対戦の顔の絵と同じ人。src/data/dungeonRun.ts の runBattlerLook）
+      const look = e.kind === 'npc' ? ` drun__entity--b${runBattlerLook(Number(e.id.split('-').pop() ?? 0))}` : '';
+      const el = h('div', { class: `drun__entity drun__entity--${e.kind}${look}`, attrs: { 'aria-hidden': 'true' } });
       el.style.left = `${e.x * TILE}px`;
       el.style.top = `${e.y * TILE}px`;
       this.#entityEls.set(e.id, el);
@@ -319,12 +336,18 @@ class DungeonRunView {
     // 上の札
     const dungeon = getDungeon(run.dungeonId);
     this.#place.textContent = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) });
-    this.#losses.textContent = t('dungeonRun.losses', { n: run.losses, max: DUNGEON_RUN.maxLosses });
+    // 負けた回数：灯りが負けるたびに1つずつ消える（2026-10-27 デザイン第13弾。文字は読み上げ用）
+    this.#losses.setAttribute('aria-label', t('dungeonRun.losses', { n: run.losses, max: DUNGEON_RUN.maxLosses }));
+    this.#losses.replaceChildren(
+      ...Array.from({ length: DUNGEON_RUN.maxLosses }, (_, i) =>
+        h('span', { class: `drun__lantern${i < DUNGEON_RUN.maxLosses - run.losses ? '' : ' is-out'}`, attrs: { 'aria-hidden': 'true' } }),
+      ),
+    );
     this.#gained.textContent = t('dungeonRun.gained', { n: run.gained.length });
     this.#drawMinimap();
   }
 
-  /** 右上の地図：見たマスだけ。自分（赤）・階段（青）・見たバトラー（橙）・宝箱（黄）・ボス（紫） */
+  /** 右上の地図：見たマスだけ。自分・階段・見たバトラー・宝箱・ボスは印の絵（2026-10-27 デザイン第12弾） */
   #drawMinimap(): void {
     const f = this.#floor;
     const g = this.#mini.getContext?.('2d');
@@ -338,19 +361,21 @@ class DungeonRunView {
         g.fillRect(x * MINI_CELL, y * MINI_CELL, MINI_CELL, MINI_CELL);
       }
     }
-    const dot = (x: number, y: number, color: string): void => {
-      g.fillStyle = color;
-      g.fillRect(x * MINI_CELL - 1, y * MINI_CELL - 1, MINI_CELL + 2, MINI_CELL + 2);
+    // 印はマスの真ん中に、足元（下の端）をマスの下の方に合わせて置く。絵の読み込み前は描かない（読み込んだら描き直す）
+    const mark = (x: number, y: number, kind: keyof typeof MINI_ICONS): void => {
+      const img = miniIcon(kind, () => !this.#destroyed && this.#drawMinimap());
+      if (!img) return;
+      const hgt = MINI_CELL * MINI_MARK;
+      const w = (hgt * img.naturalWidth) / img.naturalHeight;
+      g.drawImage(img, (x + 0.5) * MINI_CELL - w / 2, (y + 0.85) * MINI_CELL - hgt, w, hgt);
     };
-    if (f.stairs && run.explored[f.stairs.y * f.width + f.stairs.x] === '1') dot(f.stairs.x, f.stairs.y, '#4aa8ff');
-    const color: Readonly<Record<string, string>> = { npc: '#ff8a3d', chest: '#ffd84a', boss: '#c86bff' };
+    if (f.stairs && run.explored[f.stairs.y * f.width + f.stairs.x] === '1') mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
-      const c = color[e.kind];
-      if (!c || run.explored[e.y * f.width + e.x] !== '1') continue;
+      if (e.kind === 'guardian' || run.explored[e.y * f.width + e.x] !== '1') continue;
       if (e.kind === 'chest' && run.opened.includes(e.id)) continue;
-      dot(e.x, e.y, c);
+      mark(e.x, e.y, e.kind);
     }
-    dot(run.x, run.y, '#ff3b3b');
+    mark(run.x, run.y, 'you');
   }
 
   /** 主人公のコマ送り（歩いている間は歩きの8コマ、止まったら立ち止まりのコマ） */
@@ -475,7 +500,30 @@ class DungeonRunView {
 
   #guardianAppears(g: FloorEntity): void {
     this.#showMark();
+    this.#showGuardian();
     this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor), 'dungeonRun.guardianAppear');
+  }
+
+  /**
+   * 見えない番人が姿を現す（2026-10-27 デザイン第12弾の立ち姿）。主人公のとなりの通れるマス（前・左右・後ろの順）に、
+   * 煙のように浮かび上がる。番人の本当の位置は見せない（いつも主人公のとなりに出る）
+   */
+  #showGuardian(): void {
+    const f = this.#floor;
+    if (!f) return;
+    const run = this.#run;
+    const front = facingPoint(run);
+    const dx = front.x - run.x;
+    const dy = front.y - run.y;
+    const spots = [front, { x: run.x + dy, y: run.y - dx }, { x: run.x - dy, y: run.y + dx }, { x: run.x - dx, y: run.y - dy }];
+    const spot = spots.find((p) => f.tiles[p.y]?.[p.x] === '.') ?? front;
+    const w = Math.round((GUARDIAN_H * 244) / 360);
+    const el = h('img', { class: 'drun__guardian', attrs: { src: guardianArt, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
+    el.style.width = `${w}px`;
+    el.style.height = `${GUARDIAN_H}px`;
+    el.style.left = `${Math.round((spot.x + 0.5) * TILE - w / 2)}px`;
+    el.style.top = `${Math.round(spot.y * TILE + TILE * 0.82 - GUARDIAN_H)}px`;
+    this.#world.append(el);
   }
 
   #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear'): void {
@@ -581,6 +629,20 @@ class DungeonRunView {
   }
 }
 
+/** ミニマップの印の絵（一度だけ読み込んで使い回す。読み込み中は null を返し、読み込めたら onLoad） */
+const miniIcons = new Map<string, HTMLImageElement>();
+function miniIcon(kind: keyof typeof MINI_ICONS, onLoad: () => void): HTMLImageElement | null {
+  let img = miniIcons.get(kind);
+  if (!img) {
+    img = new Image();
+    img.src = MINI_ICONS[kind];
+    miniIcons.set(kind, img);
+  }
+  if (img.complete && img.naturalWidth > 0) return img;
+  img.addEventListener('load', onLoad, { once: true });
+  return null;
+}
+
 /** ダンジョンの足音（森は芝生、ほかは砂利） */
 function groundOf(dungeonId: string): 'grass' | 'gravel' {
   return dungeonId === 'dungeon-02' ? 'grass' : 'gravel';
@@ -611,4 +673,6 @@ function onRunLoss(store: GameStore, kind: BattleTargetKind, id: string): void {
   const r = loseRunBattle(store.save, { kind, id });
   store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesLost: s.stats.battlesLost + 1 } }));
   store.flashMessage = r.expelled ? t('dungeonRun.expelled', { n: r.lostCards.length }) : t('dungeonRun.lose', { n: r.lossesLeft });
+  // 3回負けて入り口へ戻されたときの帯（2026-10-27 デザイン第13弾）
+  if (r.expelled) store.flashBanner = 'retreat';
 }

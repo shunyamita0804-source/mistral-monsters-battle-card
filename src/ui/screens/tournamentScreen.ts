@@ -27,12 +27,16 @@ import type { RankId } from '../../data/economy.ts';
 import { sound } from '../sound.ts';
 import faceReceptionist from '@assets/images/characters/face_receptionist.webp';
 import arenaBg from '@assets/images/backgrounds/battle_arena.webp';
+import arenaDBg from '@assets/images/backgrounds/battle_arena_d.webp';
 import trophyArt from '@assets/images/ui/tournament/trophy.webp';
 import medalWinArt from '@assets/images/ui/tournament/medal_win.webp';
 import medalLoseArt from '@assets/images/ui/tournament/medal_lose.webp';
 
 /** 大会の対戦の背景（2026-10-23 納品「UI画像10種」の対戦背景：中央が空の紺のテーブル） */
 export const TOURNAMENT_BATTLE_BG = arenaBg;
+
+/** 大会ごとの対戦の背景（2026-10-27 デザイン第13弾：D ランクは大理石の縁の一段格の高い台）。無い大会は TOURNAMENT_BATTLE_BG */
+const TOURNAMENT_BG: Readonly<Record<string, string>> = { 'tournament-d': arenaDBg };
 
 function roundLabel(t: TournamentDefinition, i: number): string {
   const left = t.rounds.length - i;
@@ -87,7 +91,7 @@ export const tournamentScreen: ScreenDefinition = {
         opponent,
         allowSurrender: true,
         bgm: 'tournamentBattle',
-        background: TOURNAMENT_BATTLE_BG,
+        background: TOURNAMENT_BG[t.id] ?? TOURNAMENT_BATTLE_BG,
         onFinish: (winner) => {
           const won = winner === 'player';
           store.update((s) => ({
@@ -216,7 +220,8 @@ export const tournamentScreen: ScreenDefinition = {
         const won = active.status === 'won';
         body.push(
           h('div', { class: `tournament__result${won ? ' is-won' : ''}` },
-            // 優勝＝優勝杯、負け＝ひびの入った盾のメダル（2026-10-26 デザイン第8弾）
+            // 優勝＝優勝杯、負け＝ひびの入った盾のメダル（2026-10-26 デザイン第8弾）。
+            // 優勝のときは後ろに優勝の場面の絵（2026-10-27 デザイン第13弾。絵の中に優勝杯があるので小さな優勝杯は uiParts12.css で隠す）
             h('img', { class: `tournament__result-art${won ? ' is-trophy' : ''}`, attrs: { src: won ? trophyArt : medalLoseArt, alt: '', draggable: 'false' } }),
             h('p', { class: 'tournament__result-title', text: tr(won ? 'tournament.won' : 'tournament.lost', { name: tournamentName(t) }) }),
             h('p', { class: 'tournament__result-sub', text: won ? tr('tournament.wonSub') : tr('tournament.lostSub', { round: roundLabel(t, active.round) }) }),

@@ -13,6 +13,8 @@ export interface OpponentDefinition {
   readonly monsters: readonly string[];
   /** ライフ倍率（強さの調整用・仮） */
   readonly lifeScale: number;
+  /** 顔の絵（src/ui/components/opponentFace.ts のキー）。無ければ id で探す（同じ相手の定義で見た目だけ変えるとき：ダンジョンのバトラー） */
+  readonly face?: string;
 }
 
 export interface CardReward {

@@ -19,7 +19,7 @@ import {
   type BattleState,
   type Side,
 } from '../../game/battle/engine.ts';
-import { opponentFace, opponentFaceUrl } from '../components/opponentFace.ts';
+import { faceKeyOf, opponentFace, opponentFaceUrl } from '../components/opponentFace.ts';
 import {
   categoryLabel,
   describePlayCard,
@@ -42,7 +42,7 @@ import { openCardDetail } from '../components/cardDetail.ts';
 import { confirmModal, openModal } from '../components/modal.ts';
 import { commandButton, confirmCommand } from '../components/commandButton.ts';
 import { createMonsterPortrait } from '../components/monsterPortrait.ts';
-import { heroFaceUrl } from '../components/heroArt.ts';
+import { heroFaceUrl, heroResultUrl } from '../components/heroArt.ts';
 import { versusBanner } from '../components/versusBanner.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
@@ -854,7 +854,7 @@ export const battleScreen: ScreenDefinition = {
     /** 先攻・後攻を決める画面の上の「あなた VS 相手」。相手の顔の絵が無いとき（ダンジョン・練習）は、相手の先頭のモンスターのアイコン */
     const versusView = (): HTMLElement => {
       const faceImg = (url: string): HTMLElement => h('img', { attrs: { src: url, alt: '', draggable: 'false' } });
-      const opponentUrl = req.opponent.id ? opponentFaceUrl(req.opponent.id) : undefined;
+      const opponentUrl = opponentFaceUrl(faceKeyOf(req.opponent));
       const lead = req.opponent.monsters[0];
       const opponentFaceEl = opponentUrl ? faceImg(opponentUrl) : lead ? createMonsterPortrait(getMonster(lead), 44) : h('span');
       return versusBanner(
@@ -1165,7 +1165,7 @@ export const battleScreen: ScreenDefinition = {
           'span',
           { class: 'battle-stats__who' },
           h('span', { class: 'battle-line__tag', text: t(`battle.side.${side}`) }),
-          side === 'opponent' && req.opponent.id ? opponentFace(req.opponent.id, 16) : null,
+          side === 'opponent' ? opponentFace(faceKeyOf(req.opponent), 16) : null,
         ),
         side === 'opponent' ? h('span', { class: 'battle-stats__name', text: st.name }) : null,
         h('span', { class: 'battle-stats__state', text: sideState(s, side) }),
@@ -1329,7 +1329,7 @@ export const battleScreen: ScreenDefinition = {
      */
     const talkOverlay = (s: BattleState): HTMLElement | null => {
       if (!oppLine || Date.now() >= talkUntil) return null;
-      const url = req.opponent.id ? opponentFaceUrl(req.opponent.id) : undefined;
+      const url = opponentFaceUrl(faceKeyOf(req.opponent));
       const el = h(
         'div',
         {
@@ -1348,7 +1348,8 @@ export const battleScreen: ScreenDefinition = {
             },
           },
         },
-        url ? h('img', { class: 'battle__talk-face', attrs: { src: url, alt: '', draggable: 'false' } }) : null,
+        // 顔の絵は金とえんじの枠に入れる（2026-10-27 デザイン第13弾。枠は uiParts12.css の ::after）
+        url ? h('span', { class: 'battle__talk-frame' }, h('img', { class: 'battle__talk-face', attrs: { src: url, alt: '', draggable: 'false' } })) : null,
         h('div', { class: 'battle__talk-box' }, h('p', { class: 'battle__talk-name', text: s.sides.opponent.name }), typewriter(oppLine, talkStart)),
       );
       talkShownSeq = talkSeq;
@@ -1636,9 +1637,15 @@ export const battleScreen: ScreenDefinition = {
         go.disabled = true;
         finish(s.winner);
       });
+      // 勝ち・負けの主人公の姿（2026-10-27 デザイン第13弾。引き分けは出さない）。結果の窓の上に、窓が足元に重なるように
+      const hero =
+        w === 'player' || w === 'opponent'
+          ? h('img', { class: 'battle__result-hero', attrs: { src: heroResultUrl(save.player.gender, w === 'player'), alt: '', draggable: 'false' } })
+          : null;
       return h(
         'div',
         { class: `battle__result battle__result--${w ?? 'draw'}` },
+        hero,
         h(
           'div',
           { class: 'battle__result-panel' },

@@ -1,0 +1,330 @@
+/*
+ * デザイン第12弾・第13弾（2026-10-27 納品）の部品。素材は tools/design/ui12_13_build.py が切り出す（原本 design-parts/ui-quality1{2,3}-20261027/）。
+ * 第12弾＝ダンジョン（精霊の森の床・壁・階段、バトラー3人、ボスのしるし、見えない番人、十字キーと A・B、ミニマップ）
+ * 第13弾＝対戦・大会（主人公の勝ち・負けの姿、相手のひと言の吹き出し、戻されるときの帯と負けの灯り、優勝の場面）
+ */
+
+/* ===== 12-1〜3 精霊の森の床・壁・階段（固定のマップ。world__map--dungeon-02） ===== */
+.world__map--dungeon-02 .tile--floor,
+.world__map--dungeon-02 .tile--stairs-down,
+.world__map--dungeon-02 .tile--stairs-up {
+  /* 森の床は明るいので少しだけ沈める（人物と宝箱を目立たせる） */
+  background:
+    linear-gradient(rgb(10 16 8 / 0.18), rgb(10 16 8 / 0.18)),
+    url('@assets/images/maps/dungeon/forest_floor.webp') var(--tx, 0) var(--ty, 0) / 160px 160px repeat;
+}
+
+.world__map--dungeon-02 .tile--wall {
+  background:
+    linear-gradient(rgb(4 10 6 / 0.42), rgb(4 10 6 / 0.42)),
+    url('@assets/images/maps/dungeon/forest_wall_top.webp') var(--tx, 0) var(--ty, 0) / 160px 150px repeat;
+}
+
+.world__map--dungeon-02 .tile--wall.tile--wall-face {
+  /* 壁の正面（木の根と幹の帯）はマスの高さいっぱいに */
+  background:
+    url('@assets/images/maps/dungeon/forest_wall_face.webp') var(--tx, 0) 100% / 95px 40px repeat-x,
+    linear-gradient(rgb(4 10 6 / 0.42), rgb(4 10 6 / 0.42)),
+    url('@assets/images/maps/dungeon/forest_wall_top.webp') var(--tx, 0) var(--ty, 0) / 160px 150px repeat;
+}
+
+.world__map--dungeon-02 .tile--stairs-down::after {
+  background-image: url('@assets/images/maps/dungeon/forest_stairs_down.webp');
+}
+
+.world__map--dungeon-02 .tile--stairs-up::after {
+  background-image: url('@assets/images/maps/dungeon/forest_stairs_up.webp');
+}
+
+/* ===== 12-7 ボスのしるし（太古の遺跡＝石の門・精霊の森＝根の祭壇。モンスターの姿は描かない） ===== */
+.world__map--dungeon-01 .world__enemy--boss {
+  background-image: url('@assets/images/maps/dungeon/boss_mark_ruins.webp');
+  scale: 1.9;
+}
+
+.world__map--dungeon-02 .world__enemy--boss {
+  background-image: url('@assets/images/maps/dungeon/boss_mark_forest.webp');
+  scale: 1.9;
+}
+
+.drun--dungeon-01 .drun__entity--boss {
+  background-image: url('@assets/images/maps/dungeon/boss_mark_ruins.webp');
+  scale: 1.9;
+}
+
+.drun--dungeon-02 .drun__entity--boss {
+  background-image: url('@assets/images/maps/dungeon/boss_mark_forest.webp');
+  scale: 1.9;
+}
+
+/* ランダム生成のダンジョンを森でも使うときの床・壁・階段（いまは遺跡だけ。src/data/dungeonRun.ts の RUN_DUNGEON_IDS） */
+.drun--dungeon-02 .drun__tile--floor.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.66), rgb(0 0 0 / 0.66)),
+    url('@assets/images/maps/dungeon/forest_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-02 .drun__tile--floor.is-lit {
+  background:
+    linear-gradient(rgb(10 16 8 / 0.18), rgb(10 16 8 / 0.18)),
+    url('@assets/images/maps/dungeon/forest_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-02 .drun__tile--wall.is-seen {
+  background:
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    url('@assets/images/maps/dungeon/forest_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 180px repeat;
+}
+
+.drun--dungeon-02 .drun__tile--wall.is-lit {
+  background:
+    linear-gradient(rgb(4 10 6 / 0.42), rgb(4 10 6 / 0.42)),
+    url('@assets/images/maps/dungeon/forest_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 180px repeat;
+}
+
+.drun--dungeon-02 .drun__tile--face.is-seen,
+.drun--dungeon-02 .drun__tile--face.is-lit {
+  background-image:
+    url('@assets/images/maps/dungeon/forest_wall_face.webp'),
+    linear-gradient(rgb(4 10 6 / 0.42), rgb(4 10 6 / 0.42)),
+    url('@assets/images/maps/dungeon/forest_wall_top.webp');
+  background-position: var(--tx, 0) 100%, 0 0, var(--tx, 0) var(--ty, 0);
+  background-size: 114px 48px, auto, 192px 180px;
+  background-repeat: repeat-x, repeat, repeat;
+}
+
+.drun--dungeon-02 .drun__tile--stairs.is-seen::after {
+  background-image: url('@assets/images/maps/dungeon/forest_stairs_down.webp');
+}
+
+/* ===== 12-5 ダンジョンのバトラー3人（主人公と同じ大きさで、足元をマスの下の方に） ===== */
+.drun__entity--npc {
+  width: 48px;
+  height: 70px;
+  margin-top: -31px;
+  background: center bottom / auto 100% no-repeat;
+  scale: 1;
+}
+
+.drun__entity--npc.is-lit {
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+}
+
+.drun__entity--b1 {
+  background-image: url('@assets/images/characters/battler_1.webp');
+}
+
+.drun__entity--b2 {
+  background-image: url('@assets/images/characters/battler_2.webp');
+}
+
+.drun__entity--b3 {
+  background-image: url('@assets/images/characters/battler_3.webp');
+}
+
+/* ===== 12-8 見えない番人：気配の「！」の印と、姿を現したときの立ち姿 ===== */
+.drun__omen-mark {
+  width: 30px;
+  height: 44px;
+  font-size: 0;
+  color: transparent;
+  text-shadow: none;
+  background: url('@assets/images/ui/dungeon/omen_mark.webp') center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.8));
+}
+
+.drun__guardian {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgb(150 190 255 / 0.55));
+  animation: drun-guardian-in 700ms ease-out both;
+}
+
+@keyframes drun-guardian-in {
+  0% { opacity: 0; transform: translateY(6px) scaleY(0.92); filter: blur(4px) drop-shadow(0 0 8px rgb(150 190 255 / 0.55)); }
+  100% { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 0 8px rgb(150 190 255 / 0.55)); }
+}
+
+/* ===== 12-9 十字キーと A・B（ふつう・押したとき） ===== */
+.drun__pad-cross {
+  border-radius: 0;
+  background: url('@assets/images/ui/dungeon/dpad.webp') center / contain no-repeat;
+  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.6));
+}
+
+.drun__pad.is-pressed .drun__pad-cross {
+  background-image: url('@assets/images/ui/dungeon/dpad_pressed.webp');
+}
+
+/* 矢印は絵にあるので、押している向きだけ金色に光らせる */
+.drun__pad-arrow {
+  opacity: 0;
+}
+
+.drun__pad-arrow.is-on {
+  opacity: 0.85;
+}
+
+.drun__btn {
+  border-radius: 50%;
+  box-shadow: none;
+  filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.6));
+}
+
+.drun__btn:active {
+  translate: 0 2px;
+  box-shadow: none;
+}
+
+.drun__btn--a {
+  background: url('@assets/images/ui/dungeon/btn_a.webp') center / contain no-repeat;
+}
+
+.drun__btn--a:active {
+  background-image: url('@assets/images/ui/dungeon/btn_a_pressed.webp');
+}
+
+.drun__btn--b {
+  background: url('@assets/images/ui/dungeon/btn_b.webp') center / contain no-repeat;
+}
+
+.drun__btn--b:active {
+  background-image: url('@assets/images/ui/dungeon/btn_b_pressed.webp');
+}
+
+/* ===== 12-10 ミニマップの枠（地図は枠の中に縦横の比を保って描く） ===== */
+.drun__hud {
+  right: 146px;
+}
+
+.drun__minimap {
+  width: 132px;
+  height: 112px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/dungeon/minimap_frame.webp') center / 100% 100% no-repeat;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* ===== 13-4 負けの灯り（負けるたびに1つずつ消える）と、戻されるときの帯 ===== */
+.drun__chip:has(.drun__lantern) {
+  display: flex;
+  gap: 3px;
+  padding: 2px 8px;
+}
+
+.drun__lantern {
+  display: block;
+  width: 14px;
+  height: 23px;
+  background: url('@assets/images/ui/dungeon/lantern_on.webp') center / contain no-repeat;
+  filter: drop-shadow(0 0 4px rgb(255 170 70 / 0.55));
+}
+
+.drun__lantern.is-out {
+  background-image: url('@assets/images/ui/dungeon/lantern_off.webp');
+  filter: none;
+}
+
+.world__banner--retreat {
+  aspect-ratio: 900 / 249;
+  background-image: url('@assets/images/ui/dungeon/banner_retreat.webp');
+}
+
+.world__banner--retreat .world__banner-text {
+  color: #d6dbe6;
+}
+
+/* ===== 13-1・2 対戦の結果の主人公（結果の窓の上に、窓が足元に重なるように） ===== */
+.battle__result {
+  flex-direction: column;
+}
+
+.battle__result-hero {
+  position: relative;
+  z-index: 0;
+  height: min(320px, 40vh);
+  margin-bottom: -84px;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.6));
+  animation: result-hero-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.battle__result--opponent .battle__result-hero {
+  filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.6)) brightness(0.85) saturate(0.85);
+}
+
+.battle__result-panel {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes result-hero-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ===== 13-3 相手のひと言：顔の枠と吹き出し ===== */
+.battle__talk-frame {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 116px;
+  height: 116px;
+}
+
+.battle__talk-frame::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: url('@assets/images/ui/battle/talk_face_frame.webp') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.battle__talk-frame .battle__talk-face {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.battle__talk-box {
+  margin-left: 2px;
+  padding: 2px 4px 2px 6px;
+  border: solid transparent;
+  border-width: 13px 13px 13px 26px;
+  border-radius: 0;
+  border-image: url('@assets/images/ui/battle/talk_bubble.webp') 40 40 40 80 fill / 13px 13px 13px 26px / 0 stretch;
+  background: none;
+}
+
+/* ===== 13-5 優勝したときの結果（後ろに優勝の場面。絵の中に優勝杯があるので小さな優勝杯は出さない） ===== */
+.tournament__result.is-won {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 400px;
+  padding-bottom: 22px;
+  background:
+    linear-gradient(rgb(8 8 10 / 0) 45%, rgb(8 8 10 / 0.85) 82%),
+    url('@assets/images/backgrounds/tournament_champion.webp') center top / cover no-repeat;
+  box-shadow: inset 0 0 0 1px rgb(216 184 106 / 0.45);
+}
+
+.tournament__result.is-won .tournament__result-art.is-trophy {
+  display: none;
+}
+
+.tournament__result.is-won .tournament__result-title {
+  text-shadow: 0 2px 4px rgb(0 0 0 / 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun__guardian,
+  .battle__result-hero {
+    animation: none;
+  }
+}

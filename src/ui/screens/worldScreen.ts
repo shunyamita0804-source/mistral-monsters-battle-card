@@ -99,7 +99,7 @@ import chestGold3 from '@assets/images/maps/dungeon/chest_03_anim_03.webp';
 import chestGold4 from '@assets/images/maps/dungeon/chest_03_anim_04.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
-import meadowBattleBg from '@assets/images/backgrounds/battle_field_meadow.webp';
+import forestBattleBg from '@assets/images/backgrounds/battle_forest.webp';
 import { bgm, type BgmId } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
@@ -231,10 +231,10 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-01-b1': dungeonBattleBg,
   'dungeon-01-b2': dungeonBattleBg,
   'dungeon-01-b3': dungeonBattleBg,
-  // 【仮】森のダンジョン（2026-10-26）：ミスモンの野外（草原）の背景。森の絵が届いたら入れ替える
-  'dungeon-02-b1': meadowBattleBg,
-  'dungeon-02-b2': meadowBattleBg,
-  'dungeon-02-b3': meadowBattleBg,
+  // 精霊の森（2026-10-27 デザイン第12弾の森の対戦の背景。それまではミスモンの草原の背景 battle_field_meadow.webp）
+  'dungeon-02-b1': forestBattleBg,
+  'dungeon-02-b2': forestBattleBg,
+  'dungeon-02-b3': forestBattleBg,
 };
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
@@ -257,7 +257,7 @@ const ROOM_BGM: Readonly<Record<string, BgmId>> = {
  */
 const DUNGEON_SOUND: Readonly<Record<string, { readonly ground: StepSurface; readonly ambient: AmbientId | null }>> = {
   'dungeon-01': { ground: 'gravel', ambient: 'drip' },
-  // 【仮】森：芝生の足音・水滴なし（マップの絵はまだ遺跡の写し）
+  // 森：芝生の足音・水滴なし（マップの形は遺跡の写し。床・壁・階段の絵は 2026-10-27 デザイン第12弾の森の絵）
   'dungeon-02': { ground: 'grass', ambient: null },
 };
 const DEFAULT_DUNGEON_SOUND = { ground: 'gravel', ambient: 'drip' } as const;
@@ -634,7 +634,7 @@ export class WorldView {
       showDungeonIntro(this.#root, introDungeon);
     } else if (banner) {
       this.#store.flashBanner = null;
-      this.#banner('clear', t('world.bannerClear'));
+      this.#banner(banner, t(banner === 'retreat' ? 'world.bannerRetreat' : 'world.bannerClear'));
     } else if (!dev && !flash && map.area === 'dungeon') {
       const save = this.#store.save;
       const dungeon = save.activeDungeon ? getDungeon(save.activeDungeon.dungeonId) : undefined;
@@ -649,8 +649,8 @@ export class WorldView {
     }
   }
 
-  /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階）。タップの邪魔をしない */
-  #banner(kind: 'floor' | 'clear' | 'boss', text: string): void {
+  /** 画面の真ん中に少しの間だけ出す帯（階に入った・クリア・ボスの階・戻された）。タップの邪魔をしない */
+  #banner(kind: 'floor' | 'clear' | 'boss' | 'retreat', text: string): void {
     const el = h('div', { class: `world__banner world__banner--${kind}`, attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'world__banner-text', text }));
     this.#root.append(el);
     setTimeout(() => el.remove(), BANNER_MS);
@@ -771,7 +771,9 @@ export class WorldView {
     const title = map.area === 'dungeon' && dungeon ? t('world.placeDungeon', { dungeon: dungeonName(dungeon), floor: mapName(map) }) : mapName(map);
     const cell = this.#cell;
 
-    this.#mapLayer = h('div', { class: `world__map world__map--${map.area}${map.art ? ' world__map--art' : ''}` });
+    // ダンジョンはダンジョンごとの見た目も（world__map--dungeon-02 ＝精霊の森の床・壁・階段・ボスのしるし。uiParts12.css）
+    const look = map.area === 'dungeon' && save.activeDungeon ? ` world__map--${save.activeDungeon.dungeonId}` : '';
+    this.#mapLayer = h('div', { class: `world__map world__map--${map.area}${look}${map.art ? ' world__map--art' : ''}` });
     this.#mapLayer.style.width = `${width * cell}px`;
     this.#mapLayer.style.height = `${height * cell}px`;
     if (map.art) {
