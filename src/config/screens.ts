@@ -13,6 +13,8 @@ export const SCREEN_IDS = [
   'shopMenu',
   'cardList',
   'gacha',
+  /** カードショップの「道具を買う」（2026-10-27） */
+  'itemShop',
   'dungeonSelect',
   /** ランダム生成のダンジョン（2026-10-26 試作。挑戦中は 'world' の代わりにこの画面を開く） */
   'dungeonRun',

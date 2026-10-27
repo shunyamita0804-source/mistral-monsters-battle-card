@@ -59,6 +59,23 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'pack:pack-03:name': 'Set 3 Pack (Temp)',
   'pack:pack-03:description': 'Temp Monsters H and I, their skills, and the hidden monster’s skills.',
   'pack:pack-03:unlockHint': 'Unlocks when you first win the Rank D Cup',
+  // ダンジョンの道具（2026-10-27。英語は指示書の仮訳、説明は Claude の仮訳）
+  'item:torch:name': 'Torch',
+  'item:torch:description': 'See farther while you stay on this floor.',
+  'item:incense:name': 'Warding Incense',
+  'item:incense:description': 'Invisible guardians stay away for a while.',
+  'item:smokeBall:name': 'Smoke Ball',
+  'item:smokeBall:description': 'Run away when an invisible guardian appears.',
+  'item:returnFeather:name': 'Return Feather',
+  'item:returnFeather:description': 'Go back to town with the skill cards you got.',
+  'item:ruinsMap:name': 'Ruins Map',
+  'item:ruinsMap:description': "Shows this floor's corridors, rooms and stairs on the map.",
+  'item:luckyCoin:name': 'Lucky Coin',
+  'item:luckyCoin:description': 'Next time you win, choose your skill card from two.',
+  'item:sealBox:name': 'Seal Box',
+  'item:sealBox:description': 'Keep one skill card you got even if you are sent back.',
+  'item:guardianCharm:name': 'Guardian Charm',
+  'item:guardianCharm:description': 'Your next loss does not count, just once.',
 
   // 大会（仮）
   'tournament:tournament-e:name': 'Rank E Cup',

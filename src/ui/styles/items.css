@@ -1,0 +1,304 @@
+/*
+ * ダンジョンの道具（2026-10-27 ユーザー指示書「ダンジョンの道具とショップの『道具を買う』」）。
+ * 道具のアイコン・煙玉とお守りの演出・効き目の印・ショップの4つ目の札の絵はデザイン担当に依頼中。
+ * 届くまでは【仮】の見た目（丸い札に1文字と「仮」の印）
+ */
+
+/* ===== 道具のアイコン（仮） ===== */
+.item-icon {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 2px dashed rgb(216 184 106 / 0.75);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #5a4a30, #241b10);
+  color: #f3ead2;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.item-icon--small {
+  width: 20px;
+  height: 20px;
+  border-width: 1px;
+  font-size: 11px;
+}
+
+.item-icon__temp {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #3a3f48;
+  color: #f3ead2;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+/* ===== ショップの4つ目の札「道具を買う」（札の絵は届くまで仮。ほかの札と同じ形） ===== */
+.shop-menu__item--items {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 900 / 179;
+  padding: 0 4% 0 31%;
+  border: 2px dashed rgb(216 184 106 / 0.7);
+  border-radius: 10px;
+  background: linear-gradient(90deg, #2a2116 0 29%, #3a2e1e 29%);
+  color: #f3ead2;
+  font-size: 17px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.shop-menu__item-temp {
+  position: absolute;
+  left: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #3a3f48;
+  font-size: 12px;
+}
+
+.shop-menu__item-new,
+.item-shop__new {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #d9483b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  vertical-align: middle;
+  text-shadow: none;
+}
+
+/* ===== 道具を買う（一覧） ===== */
+.item-shop__coins {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 8px 12px 0;
+  font-weight: 700;
+}
+
+.item-shop__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.item-shop__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-panel);
+}
+
+.item-shop__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-shop__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.item-shop__desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-sub);
+}
+
+.item-shop__meta {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.item-shop__price {
+  font-weight: 800;
+  color: #e8c76a;
+}
+
+.item-shop__buy {
+  flex: none;
+  min-width: 64px;
+  min-height: 40px;
+}
+
+.item-shop__note {
+  margin: 4px 12px 16px;
+  font-size: 12px;
+  color: var(--color-sub);
+}
+
+/* 数を選ぶ窓 */
+.item-qty__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0;
+}
+
+.item-qty__btn {
+  min-width: 48px;
+  min-height: 44px;
+  font-size: 22px;
+}
+
+.item-qty__count {
+  min-width: 56px;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.item-qty__total {
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ===== ダンジョン：道具の一覧 ===== */
+.drun__item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drun__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drun__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.drun__item-name {
+  margin: 0;
+  font-weight: 800;
+}
+
+.drun__item-count {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--color-sub);
+}
+
+.drun__item-block {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-sub);
+}
+
+.drun__item .btn {
+  flex: none;
+  min-height: 40px;
+}
+
+/* 封印の小箱・幸運のコインの「1枚選ぶ」 */
+.drun__choose-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.drun__choose-card {
+  min-height: 44px;
+}
+
+/* ===== ダンジョン：効いている道具の印（左上。仮） ===== */
+.drun__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.drun__effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 3px;
+  border: 1px solid rgb(216 184 106 / 0.6);
+  border-radius: 999px;
+  background: rgb(10 8 6 / 0.72);
+  font-size: 11px;
+  font-weight: 700;
+  color: #f3ead2;
+}
+
+/* ===== 煙玉の演出（仮）：白い煙が広がって、番人が消える ===== */
+.drun__smoke {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 52%, rgb(240 240 240 / 0.95) 0 18%, rgb(220 220 220 / 0.6) 34%, transparent 62%);
+  animation: drun-smoke 0.9s ease-out forwards;
+}
+
+@keyframes drun-smoke {
+  0% { opacity: 0; transform: scale(0.4); }
+  35% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+.drun__guardian.is-gone {
+  transition: opacity 0.5s ease-out;
+  opacity: 0;
+}
+
+/* ===== お守りの演出（仮）：主人公の上でお守りが光って消える ===== */
+.drun__charm-fx {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 9;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 12px rgb(255 220 140 / 0.9));
+  animation: drun-charm 1.26s ease-out forwards;
+}
+
+@keyframes drun-charm {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  70% { opacity: 1; transform: translate(-50%, -60%) scale(1.1) rotate(8deg); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(1.6) rotate(-12deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun__smoke,
+  .drun__charm-fx {
+    animation-duration: 0.01s;
+  }
+}

@@ -1,6 +1,8 @@
 import { cardCatalog, getMonster, HIDDEN_MONSTER_ID } from '../../data/cards.ts';
 import { PACKS, type PackDefinition } from '../../data/economy.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
+import { ITEMS } from '../../data/items.ts';
+import { isNewItem } from '../../game/items/items.ts';
 import { kindLabel, rarityLabel } from '../../game/cards/cardTypes.ts';
 import { packCardRates, purchasePack } from '../../game/economy/gacha.ts';
 import { canRestoreHidden, fragmentCount, restoreHidden } from '../../game/progress/fragments.ts';
@@ -37,7 +39,7 @@ const RESTORE_FX_MS = 1600;
  */
 const PACK_ART: Readonly<Record<string, string>> = { 'pack-01': pack01Art, 'pack-02': pack02Art, 'pack-03': pack03Art };
 
-/** ショップの店員メニュー：カードを見る／売る（価格未確定のため無効）／ガチャ／特別復元（欠片を持っているときだけ） */
+/** ショップの店員メニュー：カードを見る／売る（価格未確定のため無効）／ガチャ／道具を買う／特別復元（欠片を持っているときだけ） */
 export const shopMenuScreen: ScreenDefinition = {
   id: 'shopMenu',
   titleKey: 'shop.title',
@@ -64,6 +66,14 @@ export const shopMenuScreen: ScreenDefinition = {
           button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item shop-menu__item--browse'),
           h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
           button(t('shop.gacha'), () => ctx.navigate('gacha'), 'shop-menu__item shop-menu__item--gacha'),
+          // 4つ目の札「道具を買う」（2026-10-27。札の絵は届くまで仮。新しく並んだ道具があれば NEW）
+          h(
+            'button',
+            { class: 'shop-menu__item shop-menu__item--items', attrs: { type: 'button' }, on: { click: () => ctx.navigate('itemShop') } },
+            h('span', { class: 'shop-menu__item-temp', text: t('items.temp') }),
+            t('items.shopButton'),
+            ITEMS.some((i) => isNewItem(save, i.id)) ? h('span', { class: 'shop-menu__item-new', text: t('items.new') }) : null,
+          ),
           fragments > 0 || save.hiddenRestored ? button(t('shop.restore', { n: fragments, total: FRAGMENT_TOTAL }), () => openRestore(), 'shop-menu__item shop-menu__item--special') : null,
         ),
       );

@@ -3,6 +3,7 @@ import { APP_INFO, localizedGameName } from '../src/config/app.ts';
 import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
+import { ITEMS } from '../src/data/items.ts';
 import { MAPS } from '../src/data/maps.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
 import { describeSkill, describeSupport, statLabel, supportShortText } from '../src/game/cards/cardTypes.ts';
@@ -168,6 +169,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
       ...cardCatalog.all().map((c) => `card:${c.id}`),
       'card:monster',
       ...PACKS.map((p) => `pack:${p.id}`),
+      ...ITEMS.map((i) => `item:${i.id}`),
       ...TOURNAMENTS.map((t) => `tournament:${t.id}`),
       ...TOURNAMENTS.flatMap((t) => t.rounds.map((r) => `opponent:${r.id}`)),
       ...DUNGEONS.map((d) => `dungeon:${d.id}`),

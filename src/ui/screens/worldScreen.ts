@@ -640,7 +640,8 @@ export class WorldView {
     const flash = dev ? null : this.#store.flashMessage;
     const scene = dev ? null : this.#sceneOnLoad();
     // ダンジョンの帯（2026-10-26 デザイン第10弾）：クリアして街に戻ったとき・階に入ったとき（対戦から戻ったときは出さない）
-    const banner = dev ? null : this.#store.flashBanner;
+    // 'charm'（身代わりのお守り）はダンジョン探索の画面だけで使う
+    const banner = dev || this.#store.flashBanner === 'charm' ? null : this.#store.flashBanner;
     const intro = dev ? null : this.#store.dungeonIntro;
     this.#store.dungeonIntro = null;
     const introDungeon = intro && map.area === 'dungeon' ? getDungeon(intro) : undefined;
