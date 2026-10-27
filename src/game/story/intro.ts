@@ -47,6 +47,8 @@ const GUIDE_AT: Readonly<Record<ReturnType<typeof guidePlace>, string>> = {
 
 /** 導入イベントV2の間、案内役（幼馴染）が教習所の中にいる進み具合（街では一緒に歩く絵を画面側で出す） */
 const V2_GUIDE_IN_PRACTICE: readonly IntroV2State[] = ['escortToSchool', 'schoolArrival', 'examBattleActive', 'examPassed', 'escortToBureau'];
+/** 管理局の中にいる進み具合（先に入って待ち、パックを選ぶときに説明する） */
+const V2_GUIDE_IN_BUREAU: readonly IntroV2State[] = ['escortToBureau', 'bureauReception', 'packSelection', 'packClaimed'];
 
 /**
  * マップ上の人を表示するか（案内役だけ、進み具合で1か所にいる。ほかの人はいつもいる）。
@@ -55,7 +57,9 @@ const V2_GUIDE_IN_PRACTICE: readonly IntroV2State[] = ['escortToSchool', 'school
 export function isNpcPresent(save: SaveData, npc: NpcObject): boolean {
   if (npc.npcId !== 'neighbor_guide') return true;
   const v2 = save.story.introV2;
-  if (!isIntroV2Done(v2)) return npc.id === 'guide-practice' && V2_GUIDE_IN_PRACTICE.includes(v2.state);
+  if (!isIntroV2Done(v2)) {
+    return (npc.id === 'guide-practice' && V2_GUIDE_IN_PRACTICE.includes(v2.state)) || (npc.id === 'guide-bureau' && V2_GUIDE_IN_BUREAU.includes(v2.state));
+  }
   return npc.id === GUIDE_AT[guidePlace(save.story.intro)];
 }
 

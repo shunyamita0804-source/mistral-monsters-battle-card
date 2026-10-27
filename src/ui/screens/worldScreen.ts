@@ -4,6 +4,10 @@ import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
 import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
+import { boosterArtUrl } from '../components/boosterArt.ts';
+import { INITIAL_BOOSTER_SELECT, tapBooster } from '../../game/story/boosterSelect.ts';
+import pointerFingerArt from '@assets/images/ui/booster/pointer_finger.webp';
+import guideTalkSmile from '@assets/images/characters/neighbor_guide_talk_smile.webp';
 import { cardCatalog, getMonster } from '../../data/cards.ts';
 import { createCardView } from '../components/cardView.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
@@ -81,7 +85,7 @@ import {
   startIntroV2OnTown,
   type IntroV2,
 } from '../../game/story/introV2.ts';
-import { newId, once } from '../gameStore.ts';
+import { newId } from '../gameStore.ts';
 import { playScene } from '../components/dialogue.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { showOpeningIntro } from '../components/openingIntro.ts';
@@ -388,6 +392,10 @@ interface Follower {
   to: Point | null;
   dir: Direction;
 }
+
+/** パック選び：1回目のタップから、同じ箱のタップを決定として受け付けるまで（ミリ秒）・決まってから受付のお礼まで */
+const BOOSTER_CONFIRM_DELAY_MS = 450;
+const BOOSTER_DECIDED_MS = 700;
 
 /** 導入イベントV2：幼馴染が主人公の何マス先を歩くか（1マスだと縦に歩くとき主人公に隠れる） */
 const FOLLOW_LEAD = 3;
@@ -2163,51 +2171,77 @@ export class WorldView {
     ctx.navigate('battle');
   }
 
-  /** 受付でブースターパックを3つから1つ選ぶ（選んだら確かめる。受け取ったら選び直せない） */
+  /**
+   * 受付でブースターパックを3つから1つ選ぶ（2026-10-27 指示書「BoosterPack_Claude_Request」）。
+   * 3箱を横に並べ、1回目のタップで仮に選ぶ（指が箱の上に出て、幼馴染が特徴をひと言）。同じ箱をもう一度タップすると決定（別の確認の窓は出さない）。
+   * 別の箱をタップしたら、その箱の1回目に切り替わるだけ。説明が見えてから少しのあいだは同じ箱のタップを決定にしない（連打で決まらない）。
+   * 決まったら1回だけ受け取り（claimBooster。ID で1回だけ）→ 受付のお礼 → 外へ
+   */
   #choosePack(): void {
     this.#busy = true;
-    const handle = openModal(this.#root, {
-      title: t('introV2.pack.title'),
-      className: 'intro-pack',
-      closeOnBackdrop: false,
-      body: [
-        h('p', { class: 'modal__text modal__text--sub', text: t('introV2.pack.temp') }),
-        h(
-          'div',
-          { class: 'intro-pack__list' },
-          ...BOOSTERS.map((b) =>
-            h(
-              'button',
-              { class: 'intro-pack__item', attrs: { type: 'button' }, dataset: { pack: b.key }, on: { click: () => { handle.close(); this.#confirmPack(b.key); } } },
-              h('span', { class: 'intro-pack__art', attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'intro-pack__temp', text: t('introV2.pack.artTemp') })),
-              h('span', { class: 'intro-pack__name', text: boosterName(b.key) }),
-              h('span', { class: 'intro-pack__choose', text: t('introV2.pack.choose') }),
-            ),
-          ),
-        ),
-      ],
-    });
-  }
-
-  #confirmPack(key: BoosterKey): void {
-    this.#busy = true;
-    // 受け取りの ID は確かめる窓を開いたときに作る（2回押しても、アプリを開き直しても1回だけ）
+    // 受け取りの ID は画面を開いたときに作る（連打・二重の処理でも1回だけ）
     const tx = newId('introV2-booster');
-    const decide = once(() => {
-      handle.close();
+    let state = INITIAL_BOOSTER_SELECT;
+    const finger = h('img', { class: 'booster-select__finger', attrs: { src: pointerFingerArt, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
+    finger.hidden = true;
+    const talkText = h('p', { class: 'booster-select__text', attrs: { 'aria-live': 'polite' } });
+    const talkSub = h('p', { class: 'booster-select__sub' });
+    const talkFace = h('img', { class: 'booster-select__face', attrs: { src: guideTalkSmile, alt: '', draggable: 'false' } });
+    const talkName = h('span', { class: 'booster-select__name', text: npcName('neighbor_guide') });
+    const talk = h('div', { class: 'booster-select__talk' }, talkFace, h('div', { class: 'booster-select__talk-body' }, talkName, talkText, talkSub));
+    const boxes = BOOSTERS.map((b) =>
+      h(
+        'button',
+        { class: 'booster-select__box', attrs: { type: 'button', 'aria-label': boosterName(b.key), 'aria-pressed': 'false' }, dataset: { pack: b.key }, on: { click: () => tap(b.key) } },
+        h('img', { class: 'booster-select__art', attrs: { src: boosterArtUrl(b), alt: '', draggable: 'false' } }),
+      ),
+    );
+    const row = h('div', { class: 'booster-select__row' }, ...boxes, finger);
+    const show = (): void => {
+      for (const el of boxes) {
+        const on = el.dataset.pack === state.selected;
+        el.classList.toggle('is-selected', on);
+        el.setAttribute('aria-pressed', String(on));
+      }
+      const box = boxes.find((el) => el.dataset.pack === state.selected);
+      finger.hidden = !box;
+      if (box) finger.style.left = `${box.offsetLeft + box.offsetWidth / 2}px`;
+      // 初めは案内だけ（顔なし）。選んだら幼馴染の顔とひと言
+      const selected = state.selected;
+      talk.classList.toggle('is-guide', selected !== null);
+      talkText.textContent = selected ? t(`introV2.pack.guide.${selected.slice(-1)}` as MessageKey) : t('introV2.pack.hint');
+      talkSub.textContent = selected ? t('introV2.pack.again') : '';
+    };
+    const tap = (key: BoosterKey): void => {
+      const before = state;
+      state = tapBooster(state, key, performance.now(), BOOSTER_CONFIRM_DELAY_MS);
+      if (state === before) return;
+      if (state.decided) decide(state.decided);
+      else {
+        sound.tap();
+        show();
+      }
+    };
+    const decide = (key: BoosterKey): void => {
+      for (const el of boxes) el.disabled = true;
+      view.classList.add('is-decided');
       this.#store.update((s) => claimBooster(s, key, tx));
-      this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit'));
-    });
-    const handle = openModal(this.#root, {
-      title: t('introV2.pack.confirmTitle'),
-      className: 'intro-pack',
-      closeOnBackdrop: false,
-      body: [h('p', { class: 'modal__text', text: t('introV2.pack.confirmText', { pack: boosterName(key) }) })],
-      actions: [
-        { label: t('introV2.pack.rechoose'), onTap: () => { handle.close(); this.#choosePack(); } },
-        { label: t('introV2.pack.decide'), primary: true, onTap: decide },
-      ],
-    });
+      sound.play('reward');
+      setTimeout(() => {
+        view.remove();
+        this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit'));
+      }, BOOSTER_DECIDED_MS);
+    };
+    const view = h(
+      'div',
+      { class: 'booster-select', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('introV2.pack.title') } },
+      h('h2', { class: 'booster-select__title', text: t('introV2.pack.title') }),
+      row,
+      talk,
+      h('p', { class: 'booster-select__note', text: t('introV2.pack.temp') }),
+    );
+    this.#root.append(view);
+    show();
   }
 
   /** 【仮】チュートリアルスキップ（確かめてから。試験・パックの受け取りはしない） */

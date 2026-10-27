@@ -78,61 +78,200 @@
   border: 1px dashed #f1c45a;
 }
 
-/* ===== 【仮】ブースターパックを選ぶ ===== */
-.intro-pack__list {
+/* ===== ブースターパックを選ぶ（2026-10-27 正式の箱3種・2回タップで決定） ===== */
+.booster-select {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 72px 12px 16px;
+  background: radial-gradient(ellipse at 50% 40%, rgb(30 40 70 / 0.88), rgb(8 10 16 / 0.94));
+}
+
+.booster-select__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: #f3ead2;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 0.7);
+}
+
+.booster-select__row {
+  position: relative;
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
+  width: 100%;
+  /* 箱は残りの高さの真ん中（説明の枠は下に寄せる） */
+  margin-top: auto;
+  /* 上の余白は指の場所（指は箱の上の面より上に出し、ロゴ・顔・名前にかけない） */
+  padding-top: 64px;
 }
 
-.intro-pack__item {
-  display: flex;
+.booster-select__box {
   flex: 1;
+  max-width: 120px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 140ms ease-out, filter 140ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.booster-select__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.55));
+  pointer-events: none;
+}
+
+.booster-select__box.is-selected {
+  transform: translateY(-6px);
+}
+
+.booster-select__box.is-selected .booster-select__art {
+  filter: drop-shadow(0 0 3px #ffe08a) drop-shadow(0 0 10px rgb(255 214 120 / 0.85)) drop-shadow(0 6px 10px rgb(0 0 0 / 0.55));
+}
+
+.booster-select.is-decided .booster-select__box:not(.is-selected) {
+  filter: brightness(0.45);
+}
+
+/* 指：選んだ箱の上に1つだけ（指先が箱の上の面に触れる） */
+.booster-select__finger {
+  position: absolute;
+  top: 0;
+  width: 34px;
+  height: auto;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+  animation: booster-finger 1s ease-in-out infinite;
+}
+
+.booster-select__finger[hidden] {
+  display: none;
+}
+
+@keyframes booster-finger {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: 6px; }
+}
+
+/* 幼馴染の説明：箱が見えたまま、下の一部にだけ出す（タップをさえぎらない） */
+.booster-select__talk {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 112px;
+  margin-top: auto;
+  padding: 10px 12px;
+  border: 2px solid #c9a24a;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgb(18 30 62 / 0.96), rgb(10 18 40 / 0.96));
+  color: #f3ead2;
+}
+
+.booster-select__face {
+  display: none;
+  flex: none;
+  width: 72px;
+  height: 90px;
+  object-fit: cover;
+  object-position: 50% 6%;
+  border-radius: 6px;
+  background: #1b2130;
+}
+
+.booster-select__talk.is-guide .booster-select__face {
+  display: block;
+}
+
+.booster-select__talk-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.booster-select__name {
+  display: none;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e8cf8a;
+}
+
+.booster-select__talk.is-guide .booster-select__name {
+  display: inline-block;
+}
+
+.booster-select__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.booster-select__sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #f1d58a;
+}
+
+.booster-select__note {
+  margin: 0;
+  font-size: 11px;
+  color: rgb(243 234 210 / 0.6);
+  text-align: center;
+}
+
+/* ===== カードショップ：管理局で選ばなかったパック（値段・中身は準備中） ===== */
+.shop-boosters {
+  margin: 4px 12px 16px;
+  padding: 10px;
+  border: 1px solid rgb(201 162 74 / 0.6);
+  border-radius: 10px;
+  background: rgb(10 14 24 / 0.6);
+}
+
+.shop-boosters__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+}
+
+.shop-boosters__note {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  color: var(--color-sub);
+}
+
+.shop-boosters__list {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.shop-boosters__item {
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  min-height: 40px;
-  padding: 6px 4px 8px;
-  border: 2px solid #6b4520;
-  border-radius: 8px;
-  background: #f6e7c0;
-  color: #4a2a10;
-  cursor: pointer;
+  width: 104px;
 }
 
-.intro-pack__item:active {
-  transform: scale(0.97);
+.shop-boosters__art {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.5));
 }
 
-/* パックの絵は未定：仮の箱（パックの形の縦長）に「仮」 */
-.intro-pack__art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 92px;
-  border: 2px dashed #8a6a3a;
-  border-radius: 6px;
-  background: repeating-linear-gradient(135deg, #e3cf9c 0 8px, #d8c08a 8px 16px);
-}
-
-.intro-pack__temp {
-  font-size: 18px;
-  font-weight: 800;
-  color: #7a4a1a;
-}
-
-.intro-pack__name {
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.intro-pack__choose {
-  padding: 4px 8px;
-  border-radius: 12px;
-  background: #6b4520;
-  color: #fff6dc;
+.shop-boosters__name {
   font-size: 12px;
   font-weight: 700;
+  text-align: center;
 }
