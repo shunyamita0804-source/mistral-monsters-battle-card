@@ -72,8 +72,8 @@ describe('正式な絵の街・部屋', () => {
 
   it('街のすべての玄関へ歩いて入れ、部屋の出口から同じ玄関の前に戻る（すぐ入り直さない）', () => {
     const doors = warps(TOWN).filter((w) => w.target.kind === 'map');
-    // 11棟＋【仮】カードバトラー管理局（導入イベントV2。建物の絵は未定）
-    expect(doors).toHaveLength(12);
+    // 11棟（2026-10-27 住宅C をカードバトラー管理局に置き換えた）
+    expect(doors).toHaveLength(11);
     for (const door of doors) {
       if (door.target.kind !== 'map') continue;
       const path = findPathToObject(TOWN, TOWN.spawn, { ...door, type: 'interact', action: 'message' } as MapObject, blockedIn(TOWN));

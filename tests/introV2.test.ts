@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, STARTER_DECKS } from '../src/data/introV2.ts';
-import { BUREAU, getMap, PRACTICE, TOWN, type NpcObject } from '../src/data/maps.ts';
+import { BUREAU, BUREAU_DESK_FRONT, getMap, PRACTICE, TOWN, type NpcObject } from '../src/data/maps.ts';
 import { SCENES } from '../src/data/storyScenes.ts';
 import { createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
@@ -18,6 +18,7 @@ import {
   startIntroV2OnTown,
   type IntroV2State,
 } from '../src/game/story/introV2.ts';
+import { sanitizeLocation } from '../src/game/progress/dungeon.ts';
 import { findPathWhere, isBlocked, STEPS_4 } from '../src/game/world/world.ts';
 import { t } from '../src/i18n/i18n.ts';
 
@@ -203,7 +204,7 @@ describe('導入イベントV2：地図', () => {
     expect(shown('skipped')).toEqual(['guide-home']);
   });
 
-  it('【仮】管理局：街の入口から受付の前まで歩け、出口から街の入口の前に戻る', () => {
+  it('管理局：街の入口から受付の前まで歩け、出口から街の入口の前に戻る', () => {
     const door = TOWN.objects.find((o) => o.id === 'door-bureau');
     if (!door || door.type !== 'warp' || door.target.kind !== 'map') throw new Error('door-bureau');
     expect(door.target.mapId).toBe('bureau');
@@ -213,9 +214,31 @@ describe('導入イベントV2：地図', () => {
     if (!school || school.type !== 'warp') throw new Error('door-practice');
     const fromSchool = findPathWhere(TOWN, { x: school.x + 2, y: school.y + 1 }, (x, y) => x === door.x && y === door.y, (x, y) => isBlocked(TOWN, x, y, () => true), 60000, STEPS_4);
     expect(fromSchool).not.toBeNull();
-    // 受付の前（4,3）へ
-    const toDesk = findPathWhere(BUREAU, BUREAU.spawn, (x, y) => x === 4 && y === 3, (x, y) => isBlocked(BUREAU, x, y, () => true), 4000, STEPS_4);
+    // 受付の前へ（受付の人のまわり1マスは通れない）
+    const clerk = BUREAU.objects.find((o) => o.type === 'npc' && o.npcId === 'bureau_clerk');
+    if (!clerk || clerk.type !== 'npc') throw new Error('bureau-clerk');
+    const blocked = (x: number, y: number): boolean => isBlocked(BUREAU, x, y, () => true) || Math.max(Math.abs(clerk.x - x), Math.abs(clerk.y - y)) <= 1;
+    const toDesk = findPathWhere(BUREAU, BUREAU.spawn, (x, y) => x === BUREAU_DESK_FRONT.x && y === BUREAU_DESK_FRONT.y, blocked, 4000, STEPS_4);
     expect(toDesk).not.toBeNull();
+    // 受付と話せる近さ（2マス以内）
+    expect(Math.max(Math.abs(clerk.x - BUREAU_DESK_FRONT.x), Math.abs(clerk.y - BUREAU_DESK_FRONT.y))).toBeLessThanOrEqual(2);
+    // 出口から街の入口の前へ
+    const exit = BUREAU.objects.find((o) => o.id === 'bureau-exit');
+    if (!exit || exit.type !== 'warp' || exit.target.kind !== 'map') throw new Error('bureau-exit');
+    expect(exit.target).toMatchObject({ mapId: 'town', y: door.y + 1 });
+    expect(exit.target.x >= door.x && exit.target.x < door.x + door.w).toBe(true);
+    expect(findPathWhere(BUREAU, BUREAU.spawn, (x, y) => x >= exit.x && x < exit.x + exit.w && y === exit.y, blocked, 4000, STEPS_4)).not.toBeNull();
+  });
+
+  it('管理局は街の北東（もとの住宅C の所）。住宅C の中にいたセーブは家に戻す', () => {
+    const door = TOWN.objects.find((o) => o.id === 'door-bureau');
+    if (!door || door.type !== 'warp') throw new Error('door-bureau');
+    expect(door.x * 32).toBeGreaterThan(2912);
+    expect(door.x * 32).toBeLessThan(3488);
+    expect(TOWN.objects.some((o) => o.id === 'door-house-c')).toBe(false);
+    const inHouseC = { ...fresh(), location: { mapId: 'house-c', x: 5, y: 5, dir: 'down' as const } };
+    const fixed = sanitizeLocation(inHouseC);
+    expect(getMap(fixed.location.mapId)).toBeDefined();
   });
 
   it('台詞の表示名は「プロのカードバトラー」「カードバトラー管理局」だけ（ほかの称号を使わない）', () => {

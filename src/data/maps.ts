@@ -1,4 +1,5 @@
 import type { Direction } from '../game/save/saveData.ts';
+import { BUREAU_ART as BUREAU_WORLD_ART, BUREAU_CLERK_DRAW_DY } from './bureauArt.generated.ts';
 import { BUREAU_MAP_ID } from './introV2.ts';
 import type { CardReward } from './tournaments.ts';
 import { WORLD_ART, type ArtMap, type CellRect } from './worldArt.generated.ts';
@@ -113,12 +114,14 @@ export interface ChestObject {
 }
 
 /** 街の住人（民家A〜E にいる人。話しかけると短い会話。台詞は仮） */
-export type ResidentId = 'resident_a' | 'resident_b' | 'resident_c' | 'resident_d' | 'resident_e';
-export const RESIDENT_IDS: readonly ResidentId[] = ['resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e'];
+/** 住人C（大工・住宅C）は 2026-10-27 に住宅C をカードバトラー管理局に置き換えたのでなくした */
+export type ResidentId = 'resident_a' | 'resident_b' | 'resident_d' | 'resident_e';
+export const RESIDENT_IDS: readonly ResidentId[] = ['resident_a', 'resident_b', 'resident_d', 'resident_e'];
 export const isResidentId = (id: string): id is ResidentId => (RESIDENT_IDS as readonly string[]).includes(id);
 
 /** 人物（会話の名前・歩行の絵の参照に使う） */
-export type NpcId = 'neighbor_guide' | 'clerk' | 'researcher' | 'receptionist' | 'teacher' | ResidentId;
+/** bureau_clerk：カードバトラー管理局の受付（絵は大会会場の受付の流用。暫定） */
+export type NpcId = 'neighbor_guide' | 'clerk' | 'researcher' | 'receptionist' | 'teacher' | 'bureau_clerk' | ResidentId;
 
 /**
  * 人（NPC）。足元の1マスが歩けない。絵は人物ごとの歩行の絵（worldScreen.ts）。
@@ -246,7 +249,7 @@ const TOWN_ART = artOf('town');
 /** 地図 ID → 部屋の絵 */
 const ROOM_ART_OF: Readonly<Record<string, string>> = {
   home: 'player', neighbor: 'guide', shop: 'shop', lab: 'lab', hall: 'arena', practice: 'training',
-  'house-a': 'house', 'house-b': 'house', 'house-c': 'house', 'house-d': 'house', 'house-e': 'house',
+  'house-a': 'house', 'house-b': 'house', 'house-d': 'house', 'house-e': 'house',
 };
 
 /** 街の建物（設計図の ID）→ 入る部屋 */
@@ -259,15 +262,16 @@ const TOWN_DOORS: readonly { readonly id: string; readonly building: string; rea
   { id: 'door-lab', building: 'LAB', mapId: 'lab', label: 'カード研究所' },
   { id: 'door-house-a', building: 'HOUSE_A', mapId: 'house-a', label: '民家' },
   { id: 'door-house-b', building: 'HOUSE_B', mapId: 'house-b', label: '民家' },
-  { id: 'door-house-c', building: 'HOUSE_C', mapId: 'house-c', label: '民家' },
+  // 2026-10-27 ユーザー指示：住宅C の所をカードバトラー管理局に置き換えた（住宅C と住人C はなくした）
+  { id: 'door-bureau', building: 'BUREAU', mapId: BUREAU_MAP_ID, label: 'カードバトラー管理局' },
   { id: 'door-house-d', building: 'HOUSE_D', mapId: 'house-d', label: '民家' },
   { id: 'door-house-e', building: 'HOUSE_E', mapId: 'house-e', label: '民家' },
 ];
 
 /** 街の上に出す施設の名前（絵には焼き込まない。表示は i18n の world.building.*）。位置は建物の絵の上端の中央（設計図の単位） */
-export const TOWN_SIGNS: readonly { readonly building: string; readonly label: 'hall' | 'practice' | 'home' | 'neighbor' | 'shop' | 'lab'; readonly x: number; readonly y: number }[] = (
+export const TOWN_SIGNS: readonly { readonly building: string; readonly label: 'hall' | 'practice' | 'home' | 'neighbor' | 'shop' | 'lab' | 'bureau'; readonly x: number; readonly y: number }[] = (
   [
-    ['ARENA', 'hall'], ['TRAINING', 'practice'], ['PLAYER_HOME', 'home'], ['GUIDE_HOME', 'neighbor'], ['SHOP', 'shop'], ['LAB', 'lab'],
+    ['ARENA', 'hall'], ['TRAINING', 'practice'], ['PLAYER_HOME', 'home'], ['GUIDE_HOME', 'neighbor'], ['SHOP', 'shop'], ['LAB', 'lab'], ['BUREAU', 'bureau'],
   ] as const
 ).map(([building, label]) => ({ building, label, ...doorOf(TOWN_ART, building).label }));
 
@@ -294,16 +298,6 @@ const artMap = (
 ): MapDefinition => ({ id, name, area, tiles: art.grid, objects, spawn, art });
 
 /**
- * 【仮】カードバトラー管理局の入口（街のマス）。位置は候補の中から Claude が仮に選んだもの（ユーザー承認待ち。docs/intro-v2.md）。
- * 街の中央の通りの西の行き止まり（住宅Bの南）。ほかの建物の入口・道をふさがない
- */
-export const BUREAU_TOWN_DOOR = { x: 5, y: 57, w: 1 } as const;
-/** 管理局から出たときに立つ所（入口のすぐ下。ほかの建物と同じく手前を向く） */
-const BUREAU_TOWN_FRONT = { x: 5, y: 58, dir: 'down' } as const satisfies { x: number; y: number; dir: Direction };
-/** 管理局に入ったときに立つ所（仮の部屋の入口の手前。奥を向く） */
-const BUREAU_ENTRY = { x: 4, y: 7, dir: 'up' } as const satisfies { x: number; y: number; dir: Direction };
-
-/**
  * 街。ユーザー承認済みの正式な絵（建物11棟・噴水・地面・小物）を、設計図（docs/design/seimon-town/）どおりに並べたもの。
  * 北中央＝大会会場、北西＝カード練習場・住宅A/B、北東＝住宅C/D/E、中央＝噴水広場、南西＝カードショップ・カード研究所、
  * 南東＝主人公の家ととなりの家（案内役の家）、南＝草原への出口（ダンジョン方面）。
@@ -316,7 +310,8 @@ export const TOWN: MapDefinition = artMap(
   [
     ...TOWN_DOORS.map((d) => {
       const door = doorOf(TOWN_ART, d.building);
-      const room = artOf(ROOM_ART_OF[d.mapId] ?? '');
+      // 管理局の部屋の絵は別のファイル（bureauArt.generated.ts）
+      const room = d.mapId === BUREAU_MAP_ID ? BUREAU_WORLD_ART : artOf(ROOM_ART_OF[d.mapId] ?? '');
       return warp(d.id, door.x, door.y, door.w, d.label, { kind: 'map', mapId: d.mapId, ...entryOf(room) });
     }),
     // 南の土の道の端（草原の方角）。踏むと既存のダンジョン選択（家の壁の地図と同じ画面）へ
@@ -324,8 +319,6 @@ export const TOWN: MapDefinition = artMap(
     interactAt('sign-fountain', TOWN_ART.fountain as CellRect, '噴水', 'message', '街の中央の噴水。水の音が心地よい。'),
     // となりの家の女性（案内役）。物語の進み具合で、街か練習場のどちらかにいる。街では自分の家の前の通り
     npc('guide-town', doorOf(TOWN_ART, 'GUIDE_HOME').back.x - 4, doorOf(TOWN_ART, 'GUIDE_HOME').back.y + 6, 'neighbor_guide'),
-    // 【仮】カードバトラー管理局の入口（建物の絵・位置は未定。承認までは仮の印。worldScreen.ts が札と印を描く）
-    warp('door-bureau', BUREAU_TOWN_DOOR.x, BUREAU_TOWN_DOOR.y, BUREAU_TOWN_DOOR.w, 'カードバトラー管理局（仮）', { kind: 'map', mapId: BUREAU_MAP_ID, ...BUREAU_ENTRY }),
   ],
   { ...townDoorFront('PLAYER_HOME'), y: TOWN_ART.spawn.y, dir: 'down' },
 );
@@ -409,44 +402,32 @@ export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
 
+const BUREAU_ART = BUREAU_WORLD_ART;
+/** 管理局の受付の前（主人公が受付と話すために止まる所。tools/design/bureau_v01.py の PLAYER_SPOT） */
+export const BUREAU_DESK_FRONT: { readonly x: number; readonly y: number } = itemOf(BUREAU_ART, 'PLAYER_SPOT');
 /**
- * 【仮】カードバトラー管理局の中（仮の部屋。正式な内装・受付の人物の絵が届くまで、記号のマスで描く）。
- * 奥に受付のカウンター。入口は手前の真ん中
+ * カードバトラー管理局の中（2026-10-27 素材 v01：床と壁・奥の書類棚・受付のカウンター。tools/design/bureau_v01.py）。
+ * 入口は扉のない開いた通り道（v01 の提案）。受付の人は大会会場の受付の絵を流用（暫定。正式な受付の絵は未納品）。
+ * 街では北東の、もとの住宅C の所（2026-10-27 ユーザー指示）
  */
-export const BUREAU: MapDefinition = {
-  id: BUREAU_MAP_ID,
-  name: 'カードバトラー管理局（仮）',
-  area: 'interior',
-  tiles: [
-    '#########',
-    '#h.....h#',
-    '#.ccccc.#',
-    '#.......#',
-    '#.......#',
-    '#r.....r#',
-    '#.......#',
-    '#.......#',
-    '####d####',
-  ],
-  objects: [
-    interact('bureau-desk', 2, 2, 5, 1, '受付（仮）', 'bureauDesk'),
-    interact('bureau-shelf-l', 1, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
-    interact('bureau-shelf-r', 7, 1, 1, 1, '書類の棚', 'message', '登録の書類が並んでいる。'),
-    warp('bureau-exit', 4, 8, 1, '外へ', { kind: 'map', mapId: 'town', ...BUREAU_TOWN_FRONT }),
-  ],
-  spawn: BUREAU_ENTRY,
-};
+export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラー管理局', 'interior', BUREAU_ART, [
+  interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
+  interactAt('bureau-shelves', itemOf(BUREAU_ART, 'SHELVES'), '書類棚', 'message', '登録の書類がきちんと並んでいる。'),
+  npc('bureau-clerk', spotOf(BUREAU_ART, 'CLERK_SPOT').x, spotOf(BUREAU_ART, 'CLERK_SPOT').y, 'bureau_clerk', 'bureauDesk', BUREAU_CLERK_DRAW_DY),
+  roomExit('bureau-exit', BUREAU_ART, 'BUREAU'),
+], entryOf(BUREAU_ART));
 
 const HOUSE_ART = artOf('house');
-/** 民家（住宅A〜E。部屋の絵は共通）。住宅A〜E にそれぞれ住人A〜E がいる */
-const house = (key: 'a' | 'b' | 'c' | 'd' | 'e'): MapDefinition =>
+/** 民家（住宅A・B・D・E。部屋の絵は共通）。それぞれ住人A・B・D・E がいる */
+const house = (key: 'a' | 'b' | 'd' | 'e'): MapDefinition =>
   artMap(`house-${key}`, '民家', 'interior', HOUSE_ART, [
     interactAt(`house-${key}-shelf`, itemOf(HOUSE_ART, 'SHELF'), '棚', 'message', '食器がきちんと並んでいる。'),
     interactAt(`house-${key}-table`, itemOf(HOUSE_ART, 'TABLE'), 'テーブル', 'message', 'テーブルクロスがかかっている。'),
     npc(`house-${key}-resident`, spotOf(HOUSE_ART, 'RESIDENT_SPOT').x, spotOf(HOUSE_ART, 'RESIDENT_SPOT').y, `resident_${key}`),
     roomExit(`house-${key}-exit`, HOUSE_ART, `HOUSE_${key.toUpperCase()}`),
   ], entryOf(HOUSE_ART));
-export const HOUSES: readonly MapDefinition[] = (['a', 'b', 'c', 'd', 'e'] as const).map(house);
+// 住宅C は 2026-10-27 にカードバトラー管理局に置き換えた（住人C もなくした）
+export const HOUSES: readonly MapDefinition[] = (['a', 'b', 'd', 'e'] as const).map(house);
 
 export const DUNGEON_B1: MapDefinition = {
   id: 'dungeon-01-b1',

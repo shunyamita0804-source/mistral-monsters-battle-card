@@ -28,6 +28,7 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import seimon_town_pack as pack  # noqa: E402
+import bureau_v01 as bureau  # noqa: E402  2026-10-27 カードバトラー管理局の外観
 import cardshop_v2 as shop2  # noqa: E402  2026-10-27 カードショップの新しい外観・内装・自動ドア
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -44,7 +45,7 @@ WEBP_Q = 82
 # 建物 ID → 部品のファイル名
 BUILDING_FILE = {
     'ARENA': 'town_arena', 'TRAINING': 'town_training', 'HOUSE_A': 'town_house_a', 'HOUSE_B': 'town_house_b',
-    'HOUSE_C': 'town_house_c', 'HOUSE_D': 'town_house_d', 'HOUSE_E': 'town_house_e', 'SHOP': 'town_shop',
+    'HOUSE_D': 'town_house_d', 'HOUSE_E': 'town_house_e', 'SHOP': 'town_shop',
     'LAB': 'town_lab', 'PLAYER_HOME': 'town_player_home', 'GUIDE_HOME': 'town_guide_home',
 }
 
@@ -133,7 +134,11 @@ def place_building(parts: str, b: dict) -> tuple[Image.Image, tuple[int, int], t
     """建物の絵を枠に合わせて置く。3つ目は切り抜いた範囲（カードショップだけ。戸の絵を同じに切り抜くため）"""
     x1, y1, x2, y2 = b['rect']
     bbox = None
-    if b['id'] == 'SHOP':
+    if b['id'] == 'BUREAU':
+        # 2026-10-27 カードバトラー管理局の外観（素材 v01。扉は閉じた絵のまま）
+        im = clean_alpha(bureau.town_exterior())
+        part = im.crop(im.getbbox())
+    elif b['id'] == 'SHOP':
         # 2026-10-27 新しい外観（cardshop_v2）。戸を開けたときに見える店の中を下に重ねたもの
         im = clean_alpha(shop2.town_shop_part())
         bbox = im.getbbox()

@@ -13,7 +13,6 @@ import receptionistFace from '@assets/images/characters/face_receptionist.webp';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import residentA from '@assets/images/characters/face_resident_a.webp';
 import residentB from '@assets/images/characters/face_resident_b.webp';
-import residentC from '@assets/images/characters/face_resident_c.webp';
 import residentD from '@assets/images/characters/face_resident_d.webp';
 import residentE from '@assets/images/characters/face_resident_e.webp';
 import { SCENES, type Expression, type SceneEffect, type SceneId, type SceneStep, type Speaker } from '../../data/storyScenes.ts';
@@ -42,20 +41,21 @@ const PORTRAITS: Readonly<Partial<Record<Exclude<Speaker, 'system'>, Partial<Rec
     troubled: guideWorried,
     happy: guideHappy,
   },
-  // 住人A〜E の顔の絵（2026-10-23 第3弾。店員・受付と同じ「顔の絵の形」：正方形・胸から上。表情は1種類）
+  // 住人の顔の絵（2026-10-23 第3弾。住人C は 2026-10-27 に住宅C ごとなくした。店員・受付と同じ「顔の絵の形」：正方形・胸から上。表情は1種類）
   resident_a: { normal: residentA },
   resident_b: { normal: residentB },
-  resident_c: { normal: residentC },
   resident_d: { normal: residentD },
   resident_e: { normal: residentE },
   teacher: { normal: teacherFace },
   clerk: { normal: clerkFace },
   receptionist: { normal: receptionistFace },
   researcher: { normal: researcherFace },
+  // カードバトラー管理局の受付：大会会場の受付の顔の絵を流用（暫定。正式な絵が届いたらここを差し替える）
+  bureau_clerk: { normal: receptionistFace },
 };
 
 /** 正方形の「顔の絵の形」で描かれた人（案内役の会話の絵より小さく、正方形の枠で出す） */
-const FACE_FORMAT: ReadonlySet<Speaker> = new Set<Speaker>(['resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e', 'teacher', 'clerk', 'receptionist', 'researcher']);
+const FACE_FORMAT: ReadonlySet<Speaker> = new Set<Speaker>(['resident_a', 'resident_b', 'resident_d', 'resident_e', 'teacher', 'clerk', 'receptionist', 'researcher', 'bureau_clerk']);
 
 /** 会話の絵を先に読み込む（表情を切り替えた瞬間に白く抜けないように） */
 const preloaded = new Set<string>();
@@ -76,7 +76,6 @@ const SPEAKER_NAME: Readonly<Record<Exclude<Speaker, 'system'>, MessageKey>> = {
   neighbor_guide: 'story.speaker.neighborGuide',
   resident_a: 'story.speaker.residentA',
   resident_b: 'story.speaker.residentB',
-  resident_c: 'story.speaker.residentC',
   resident_d: 'story.speaker.residentD',
   resident_e: 'story.speaker.residentE',
   teacher: 'story.speaker.teacher',

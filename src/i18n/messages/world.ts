@@ -12,6 +12,8 @@ export const WORLD = {
   'world.building.practice': { ja: 'カード練習場', en: 'Practice Hall' },
   'world.building.neighbor': { ja: 'となりの家', en: 'Neighbor\'s House' },
   'world.building.lab': { ja: 'カード研究所', en: 'Card Lab' },
+  // 英語名は仮訳（正式名称は未定）
+  'world.building.bureau': { ja: 'カードバトラー管理局', en: 'Card Battler Bureau' },
 
   // 上の帯・操作
   'world.placeDungeon': { ja: '{dungeon} {floor}', en: '{dungeon} {floor}' },
