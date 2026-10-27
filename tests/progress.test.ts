@@ -67,12 +67,15 @@ describe('大会', () => {
     expect(second.summary.coins).toBe((T_E?.rewards.participationCoins ?? 0) + (T_E?.rewards.repeatWin.coins ?? 0));
   });
 
-  it('負けたら参加報酬だけ。同じ回戦の結果は二重に記録されない', () => {
+  it('1位になれなければ参加報酬だけ。同じ回戦の結果は二重に記録されない', () => {
     let s = enterTournament(createNewSave(), 'tournament-e', 'entry-x');
     s = recordMatch(s, 0, true);
     s = recordMatch(s, 0, true); // 二重記録は無視
     expect(s.activeTournament?.round).toBe(1);
+    // 総当たりは負けても3試合まで続く。1勝2敗では1位になれない
     s = recordMatch(s, 1, false);
+    expect(s.activeTournament?.status).toBe('inProgress');
+    s = recordMatch(s, 2, false);
     const claim = claimTournamentRewards(s);
     if (claim.status !== 'ok') throw new Error('claim');
     expect(claim.summary.won).toBe(false);

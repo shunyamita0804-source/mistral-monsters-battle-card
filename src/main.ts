@@ -18,6 +18,7 @@ import './ui/styles/uiParts11.css';
 import './ui/styles/uiParts12.css';
 import './ui/styles/introV2.css';
 import './ui/styles/books.css';
+import './ui/styles/tournamentV2.css';
 import './ui/styles/gacha.css';
 import './ui/styles/items.css';
 import './ui/styles/ui33.css';

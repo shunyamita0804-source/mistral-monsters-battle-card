@@ -32,9 +32,10 @@ import {
   type PlayCard,
   type StatType,
 } from '../../game/cards/cardTypes.ts';
-import { buildAutoDeck } from '../../game/deck/deck.ts';
+import { buildOpponentDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
+import { summarizeBattle } from '../../game/battle/simulate.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, opponentName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -431,7 +432,7 @@ export const battleScreen: ScreenDefinition = {
     const finish = once((winner: BattleState['winner']) => {
       // 名刺図鑑：相手が人物なら登録して勝ち負けを数える（2026-10-27）
       ctx.store.update((s) => recordPersonBattle(s, req.opponent, winner ?? 'draw'));
-      req.onFinish(winner ?? 'draw');
+      req.onFinish(winner ?? 'draw', state ? summarizeBattle(state) : undefined);
     });
     /** 最初の練習試合のヒント（出したものは2度出さない。出ている間は相手も待つ） */
     const seenHints = new Set<BattleHintId>();
@@ -811,7 +812,7 @@ export const battleScreen: ScreenDefinition = {
         if (destroyed || !state) return;
         const s = actingSide(state);
         if (!s || (s === 'player' && !auto)) return;
-        const action = chooseAction(state, s);
+        const action = chooseAction(state, s, s === 'opponent' ? req.opponent.ai : undefined);
         if (action) dispatch(action);
       }, AI_STEP_MS + wait);
     };
@@ -828,7 +829,7 @@ export const battleScreen: ScreenDefinition = {
         if (destroyed) return;
         state = createBattle(
           { name: t('battle.side.player'), deck: save.deck },
-          { name: opponentName(req.opponent), deck: buildAutoDeck(req.opponent.monsters), lifeScale: req.opponent.lifeScale },
+          { name: opponentName(req.opponent), deck: buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
           seed,
           first,
         );
