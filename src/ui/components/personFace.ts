@@ -2,6 +2,7 @@ import guideFace from '@assets/images/characters/neighbor_guide_talk_normal.webp
 import clerkFace from '@assets/images/characters/face_clerk.webp';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import receptionistFace from '@assets/images/characters/face_receptionist.webp';
+import eleanorFace from '@assets/images/characters/face_eleanor_temp.webp';
 import teacherFace from '@assets/images/characters/face_teacher.webp';
 import residentA from '@assets/images/characters/face_resident_a.webp';
 import residentB from '@assets/images/characters/face_resident_b.webp';
@@ -31,6 +32,8 @@ const PERSON_FACES: Readonly<Record<string, string>> = {
   nina: clerkFace,
   lucas: researcherFace,
   celia: receptionistFace,
+  // エレノア：顔の絵がまだ無いので、立ち姿の絵から切り抜いた仮の顔
+  eleanor: eleanorFace,
   gareth: teacherFace,
   martha: residentA,
   pete: residentB,

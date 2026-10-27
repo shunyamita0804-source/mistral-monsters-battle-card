@@ -622,7 +622,7 @@ function normalizeTournaments(v: unknown): Record<string, TournamentRecord> {
  * 大会の途中の状態。出場者が読めない（前の形式・壊れた値）ときは、その大会の1試合目からやり直す（参加の回数はそのまま）。
  * 終わった試合も同じく、読めない試合があれば組み合わせごとやり直す
  */
-function normalizeActiveTournament(v: unknown): ActiveTournament | null {
+function normalizeActiveTournament(v: unknown, siennaLeft: boolean): ActiveTournament | null {
   if (!isObject(v) || typeof v.tournamentId !== 'string' || typeof v.entryId !== 'string') return null;
   const tour = getTournament(v.tournamentId);
   if (!tour) return null;
@@ -635,7 +635,7 @@ function normalizeActiveTournament(v: unknown): ActiveTournament | null {
   const matches = Array.isArray(v.matches) ? v.matches.map(normalizeMatch) : [];
   const matchesOk = matches.every((m): m is TournamentMatch => m !== null && entrants.includes(m.a) && entrants.includes(m.b));
   if (!entrantsOk || !matchesOk) {
-    return { tournamentId: v.tournamentId, entryId: v.entryId, round: 0, status, seed, entrants: drawEntrants(tour, seed), matches: [] };
+    return { tournamentId: v.tournamentId, entryId: v.entryId, round: 0, status, seed, entrants: drawEntrants(tour, seed, siennaLeft), matches: [] };
   }
   return { tournamentId: v.tournamentId, entryId: v.entryId, round: Math.min(asCount(v.round), TOURNAMENT_ROUNDS), status, seed, entrants, matches };
 }
@@ -754,7 +754,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
       ...asStringArray(migrated.unlockedPacks).filter((id) => PACKS.some((p) => p.id === id)),
     ]),
     tournaments,
-    activeTournament: normalizeActiveTournament(migrated.activeTournament),
+    activeTournament: normalizeActiveTournament(migrated.activeTournament, asStringArray(migrated.storyFlags).includes(FLAG_SIENNA_LEFT)),
     claimedEntries: unique(asStringArray(migrated.claimedEntries)),
     dungeons: normalizeDungeons(migrated.dungeons),
     activeDungeon: normalizeActiveDungeon(migrated.activeDungeon),

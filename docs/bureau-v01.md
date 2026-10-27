@@ -20,7 +20,7 @@
 
 - 受付の人の絵（歩く絵・顔の絵）は大会会場の受付の流用。大会会場の受付は置き換えていない。
   差し替えは `worldScreen.ts` の `NPC_SHEET.bureau_clerk` と `dialogue.ts` の `PORTRAITS.bureau_clerk` の2か所
-- 名前の札「管理局の受付（仮）」。英語名「Card Battler Bureau」は仮訳
+- 受付はエレノア（No.06。2026-10-27）。英語名「Card Battler Bureau」は仮訳
 
 ## 街の上の場所（2026-10-27 ユーザー決定）
 

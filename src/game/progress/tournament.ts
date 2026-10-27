@@ -54,7 +54,7 @@ export function enterTournament(save: SaveData, tournamentId: string, entryId: s
   const record = tournamentRecord(save, tournamentId);
   return {
     ...save,
-    activeTournament: { tournamentId, entryId, round: 0, status: 'inProgress', seed, entrants: drawEntrants(tournament, seed), matches: [] },
+    activeTournament: { tournamentId, entryId, round: 0, status: 'inProgress', seed, entrants: drawEntrants(tournament, seed, save.storyFlags.includes(FLAG_SIENNA_LEFT)), matches: [] },
     tournaments: { ...save.tournaments, [tournamentId]: { ...record, entries: record.entries + 1 } },
   };
 }

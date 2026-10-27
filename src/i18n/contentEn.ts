@@ -105,6 +105,8 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'opponent:gen-zara:name': 'Zara',
   'opponent:gen-walter:name': 'Walter',
   'opponent:reg-sienna:name': 'Sienna',
+  'opponent:e-marie:name': 'Marie',
+  'opponent:c-gordon:name': 'Gordon',
   'opponent:reg-dolf:name': 'Dolf',
   'opponent:reg-leonard:name': 'Leonard',
   'opponent:reg-greta:name': 'Greta',

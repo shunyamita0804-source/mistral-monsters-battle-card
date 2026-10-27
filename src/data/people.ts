@@ -8,7 +8,7 @@ import type { OpponentDefinition } from './tournaments.ts';
  *
  * - town：街の人（会話・対戦成績はなし）。初めて話したとき（会話の名前の札が出たとき）に名刺を登録する
  * - opponent：対戦する人。初めて対戦したとき（勝ち負けは問わない）に登録する
- * - inGame：いまゲームに出てくるか。false の人（管理局の職員・書庫・もと住人C）はデータだけ（登場は別の指示書）
+ * - inGame：いまゲームに出てくるか。false の人（書庫・もと住人C）はデータだけ（登場は別の指示書）
  */
 
 export interface LocalText {
@@ -71,7 +71,7 @@ export const PEOPLE: readonly Person[] = [
   p(3, 'lucas', 'town', ['ルーカス', 'Lucas'], ['カード研究所の研究員', 'Card Lab researcher'], ['カードには、聖獣の記録が眠っているんです。', 'Records of the sacred beasts sleep within the cards.'], { speaker: 'researcher' }),
   p(4, 'celia', 'town', ['セリア', 'Celia'], ['大会会場の受付', 'Tournament Hall receptionist'], ['公式ランク戦の受付はこちらです。', 'Official ranked matches are registered here.'], { speaker: 'receptionist' }),
   p(5, 'gareth', 'town', ['ガレス', 'Gareth'], ['練習場の先生・元大会選手', 'Practice Hall instructor, former tournament player'], ['負けた数だけ、強くなれるぞ。', 'Every loss makes you stronger.'], { speaker: 'teacher' }),
-  p(6, 'eleanor', 'town', ['エレノア', 'Eleanor'], ['カードバトラー管理局の職員', 'Card Battler Bureau officer'], ['登録の手続きは、こちらで承ります。', 'Registration procedures are handled here.'], { inGame: false }),
+  p(6, 'eleanor', 'town', ['エレノア', 'Eleanor'], ['カードバトラー管理局の職員', 'Card Battler Bureau officer'], ['登録の手続きは、こちらで承ります。', 'Registration procedures are handled here.'], { speaker: 'bureau_clerk' }),
   p(7, 'martha', 'town', ['マルタ', 'Martha'], ['花屋のおかみさん', 'Florist'], ['今日もいい花が咲いたわ。', 'Lovely flowers bloomed again today.'], { speaker: 'resident_a' }),
   p(8, 'pete', 'town', ['ピート', 'Pete'], ['カード集めが趣味の青年', 'Young card collector'], ['図鑑、どこまで埋まった？', "How far along is your card book?"], { speaker: 'resident_b' }),
   // ブルーノ（もと住人C）：2026-10-27 に住宅C をカードバトラー管理局に置き換えたので、いまはゲームに出てこない（データだけ）
@@ -84,7 +84,7 @@ export const PEOPLE: readonly Person[] = [
   p(14, 'sienna', 'tournament', ['シエナ', 'Sienna'], ['旅のカード使い・ノルディス地方出身', 'Traveling card user from Nordis'], ['次の街でも、また会えるといいわね。', 'I hope we meet again in the next town.'], { opponentIds: ['e-3', 'reg-sienna'] }),
   p(15, 'dario', 'tournament', ['ダリオ', 'Dario'], ['港町の漁師・港町カードクラブ', 'Port town fisherman, Port Town Card Club'], ['網もカードも、引きが大事だ！', "Nets or cards, it's all about the draw!"], { opponentIds: ['d-1'] }),
   p(16, 'isabella', 'tournament', ['イザベラ', 'Isabella'], ['ローゼンベルク家の夫人', 'Lady of the House of Rosenberg'], ['優雅に勝つのが、わたくしの流儀ですの。', 'Winning gracefully is my way.'], { opponentIds: ['d-2'] }),
-  p(17, 'gordon', 'tournament', ['ゴードン', 'Gordon'], ['かつての大会の常連', 'Former tournament regular'], ['昔はもっと上で戦っていたものだ。', 'I used to fight at a much higher level.'], { opponentIds: ['d-3'] }),
+  p(17, 'gordon', 'tournament', ['ゴードン', 'Gordon'], ['かつての大会の常連', 'Former tournament regular'], ['昔はもっと上で戦っていたものだ。', 'I used to fight at a much higher level.'], { opponentIds: ['d-3', 'c-gordon'] }),
   // ---------- ダンジョン ----------
   p(18, 'flora', 'dungeon', ['フローラ', 'Flora'], ['遺跡探検家', 'Ruins explorer'], ['この奥には、まだ誰も見ていない部屋があるの。', "Deeper in, there's a room no one has seen yet."], { opponentFaces: ['battler-1'] }),
   p(19, 'oscar', 'dungeon', ['オスカー', 'Oscar'], ['古代史の学者', 'Scholar of ancient history'], ['遺跡の石は、百年前の言葉を語っている。', 'The stones of the ruins speak words from a century ago.'], { opponentFaces: ['battler-2'] }),

@@ -122,7 +122,7 @@ export const RESIDENT_IDS: readonly ResidentId[] = ['resident_a', 'resident_b', 
 export const isResidentId = (id: string): id is ResidentId => (RESIDENT_IDS as readonly string[]).includes(id);
 
 /** 人物（会話の名前・歩行の絵の参照に使う） */
-/** bureau_clerk：カードバトラー管理局の受付（絵は大会会場の受付の流用。暫定） */
+/** bureau_clerk：カードバトラー管理局の受付（エレノア。No.06） */
 export type NpcId = 'neighbor_guide' | 'clerk' | 'researcher' | 'receptionist' | 'teacher' | 'bureau_clerk' | ResidentId;
 
 /**

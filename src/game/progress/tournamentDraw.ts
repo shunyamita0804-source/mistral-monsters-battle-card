@@ -23,22 +23,26 @@ export function seedFromId(id: string): number {
 
 /**
  * 出場者を決める。トーナメントは常連が毎回出て、一般の出場者は組の中から必要な人数をランダム。
- * 決勝まで必ず勝ち上がる人（C：シエナ、S：アルヴィン）は主人公と反対の山（右）に置く
+ * 決勝まで必ず勝ち上がる人（C：シエナ、S：アルヴィン）は主人公と反対の山（右）に置く。
+ * siennaLeft（「シエナがいなくなった」の記録があるとき）は、シエナの代わりの人が出る（決勝まで勝ち上がる決まりはなくなる）
  */
-export function drawEntrants(t: TournamentDefinition, seed: number): string[] {
-  if (t.format === 'league' || !t.bracket) return [PLAYER_ENTRANT, ...t.rounds.map((r) => r.id)];
+export function drawEntrants(t: TournamentDefinition, seed: number, siennaLeft = false): string[] {
+  const swap = siennaLeft ? t.siennaLeft : undefined;
+  const idOf = (id: string): string => (swap && id === swap.replace ? swap.with.id : id);
+  if (t.format === 'league' || !t.bracket) return [PLAYER_ENTRANT, ...t.rounds.map((r) => idOf(r.id))];
   const b = t.bracket;
+  const finalist = b.finalist && idOf(b.finalist) === b.finalist ? b.finalist : null;
   let s = seed;
   const general = shuffle(b.pool.map((o) => o.id), s);
   s = general.seed;
-  const others = [...b.regulars.map((o) => o.id), ...general.items.slice(0, b.generalCount)].filter((id) => id !== b.finalist);
+  const others = [...b.regulars.map((o) => idOf(o.id)), ...general.items.slice(0, b.generalCount)].filter((id) => id !== finalist);
   const mixed = shuffle(others, s);
   s = mixed.seed;
   const slots: (string | null)[] = [PLAYER_ENTRANT, null, null, null, null, null, null, null];
-  if (b.finalist) {
+  if (finalist) {
     const r = nextInt(s, 4);
     s = r.seed;
-    slots[4 + r.value] = b.finalist;
+    slots[4 + r.value] = finalist;
   }
   let i = 0;
   return slots.map((x) => x ?? (mixed.items[i++] as string));

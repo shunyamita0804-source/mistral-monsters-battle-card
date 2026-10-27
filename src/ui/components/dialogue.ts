@@ -10,6 +10,7 @@ import guideHappy from '@assets/images/characters/neighbor_guide_talk_happy.webp
 import teacherFace from '@assets/images/characters/face_teacher.webp';
 import clerkFace from '@assets/images/characters/face_clerk.webp';
 import receptionistFace from '@assets/images/characters/face_receptionist.webp';
+import eleanorFace from '@assets/images/characters/face_eleanor_temp.webp';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import residentA from '@assets/images/characters/face_resident_a.webp';
 import residentB from '@assets/images/characters/face_resident_b.webp';
@@ -52,8 +53,8 @@ const PORTRAITS: Readonly<Partial<Record<Exclude<Speaker, 'system'>, Partial<Rec
   clerk: { normal: clerkFace },
   receptionist: { normal: receptionistFace },
   researcher: { normal: researcherFace },
-  // カードバトラー管理局の受付：大会会場の受付の顔の絵を流用（暫定。正式な絵が届いたらここを差し替える）
-  bureau_clerk: { normal: receptionistFace },
+  // カードバトラー管理局の受付：エレノア。顔の絵がまだ無いので、立ち姿の絵の胸から上を切り抜いた仮の顔（正式な顔が届いたら差し替える）
+  bureau_clerk: { normal: eleanorFace },
 };
 
 /** 正方形の「顔の絵の形」で描かれた人（案内役の会話の絵より小さく、正方形の枠で出す） */

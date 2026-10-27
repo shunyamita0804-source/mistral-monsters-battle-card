@@ -48,6 +48,8 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'gen-beatrice': faceBeatrice,
   'gen-zara': faceZara,
   'gen-walter': faceWalter,
+  // シエナがいないあいだの代わり（E のマリー＝一般の出場者のマリーと同じ顔、C のゴードン＝D と同じ顔）
+  'c-gordon': faceD3,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
 };
