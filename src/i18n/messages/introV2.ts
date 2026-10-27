@@ -7,7 +7,7 @@ import type { MessageEntry } from '../i18n.ts';
  */
 export const INTRO_V2 = {
   // 名前の札
-  'introV2.speaker.bureau': { ja: '管理局の受付（仮）', en: 'Bureau Clerk (Temp)' },
+  'introV2.speaker.bureau': { ja: 'エレノア', en: 'Eleanor' },
 
   // 初期デッキを選ぶ（新しく始めるとき、主人公を選んだあと）
   'introV2.deck.heading': { ja: '最初のデッキを選んでください', en: 'Choose your first deck' },

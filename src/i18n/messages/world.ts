@@ -102,6 +102,8 @@ export const WORLD = {
     ja: 'ダンジョンへは、街の南の出口から出発します。',
     en: 'Dungeons are reached from the south exit of town.',
   },
+  'world.dungeonSelect.locked': { ja: 'まだ行けない場所です。', en: "You can't go there yet." },
+  'world.dungeonSelect.lockedName': { ja: '？？？', en: '???' },
   'world.dungeonSelect.viewOnly': { ja: '街の南の出口から出発できます', en: 'Set out from the south exit of town' },
   'world.dungeonSelect.town': { ja: '街', en: 'Town' },
   // 地方の名前（ミスモン本編の世界地図と同じ。英語は仮訳）

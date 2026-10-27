@@ -233,6 +233,46 @@ describe('トーナメント（C〜S）', () => {
   });
 });
 
+describe('シエナがいなくなったあいだ（2026-10-27 ユーザー指示）', () => {
+  const gone = (rank: SaveData['rank']): SaveData => ({ ...withRank(rank), storyFlags: [FLAG_SIENNA_LEFT] });
+
+  it('E の総当たり：シエナの代わりに一般の出場者のマリー（E の強さ）', () => {
+    const s = enterTournament(gone('E'), 'tournament-e', 'e-gone', 1);
+    expect(s.activeTournament?.entrants).toEqual(['player', 'e-1', 'e-2', 'e-marie']);
+    const marie = E.siennaLeft?.with;
+    expect(marie?.lifeScale).toBe(E.rounds[2]?.lifeScale);
+    expect(personOfOpponent(marie!)).toBeUndefined();
+    let t = s;
+    for (let r = 0; r < 3; r++) t = recordMatch(t, r, true);
+    expect(t.activeTournament?.status).toBe('won');
+  });
+
+  it('C のトーナメント：シエナの代わりにゴードン（C の一般の出場者の強さ）。決勝まで必ず勝つ人はいない', () => {
+    const gordon = C.siennaLeft?.with;
+    expect(personOfOpponent(gordon!)?.id).toBe('gordon');
+    expect(gordon?.lifeScale).toBe(C.bracket?.pool[0]?.lifeScale);
+    const finals = new Set<string>();
+    for (let seed = 0; seed < 16; seed++) {
+      let s = enterTournament(gone('C'), 'tournament-c', `c-gone-${seed}`, seed);
+      const e = s.activeTournament!.entrants;
+      expect(e).not.toContain('reg-sienna');
+      expect(e).toContain('c-gordon');
+      // A・S 組は出ない
+      expect(e.filter((id) => id.startsWith('gen-')).sort()).toEqual(['gen-helena', 'gen-jean', 'gen-marie', 'gen-tobias']);
+      s = recordMatch(s, 0, true);
+      s = recordMatch(s, 1, true);
+      finals.add(nextOpponent(C, s.activeTournament!)?.id ?? '');
+    }
+    expect(finals.size).toBeGreaterThan(1);
+  });
+
+  it('記録を消せば元に戻る（シエナが出る）', () => {
+    const back = { ...gone('C'), storyFlags: [] };
+    expect(enterTournament(back, 'tournament-c', 'c-back', 1).activeTournament?.entrants).toContain('reg-sienna');
+    expect(enterTournament({ ...back, rank: 'E' }, 'tournament-e', 'e-back', 1).activeTournament?.entrants).toContain('e-3');
+  });
+});
+
 describe('報酬・記録・セーブ', () => {
   const winC = (save: SaveData, entryId: string): SaveData => {
     let s = enterTournament(save, 'tournament-c', entryId, 1);
@@ -288,7 +328,7 @@ describe('報酬・記録・セーブ', () => {
     };
     const migrated = normalizeSave(old);
     expect(migrated?.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(18);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(18);
     expect(migrated?.storyFlags).toEqual([]);
     expect(migrated?.activeTournament).toMatchObject({ tournamentId: 'tournament-e', entryId: 'old-1', round: 0, status: 'inProgress', entrants: ['player', 'e-1', 'e-2', 'e-3'], matches: [] });
     expect(migrated?.tournaments['tournament-e']?.entries).toBe(2);

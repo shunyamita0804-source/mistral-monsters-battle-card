@@ -76,9 +76,10 @@ describe('名刺の登録・対戦成績', () => {
     s = meetSpeaker(s, 'clerk');
     expect(isMet(s, 'nina')).toBe(true);
     expect(meetSpeaker(s, 'clerk')).toBe(s);
-    // 話し手でない（system・管理局の受付）は登録しない
+    // 話し手でない（system）は登録しない
     expect(meetSpeaker(s, 'system')).toBe(s);
-    expect(meetSpeaker(s, 'bureau_clerk')).toBe(s);
+    // 管理局の受付はエレノア（2026-10-27 ユーザー指示）
+    expect(isMet(meetSpeaker(s, 'bureau_clerk'), 'eleanor')).toBe(true);
     const noel = TOURNAMENTS[0]!.rounds[0]!;
     s = recordPersonBattle(s, noel, 'opponent');
     expect(isMet(s, 'noel')).toBe(true);

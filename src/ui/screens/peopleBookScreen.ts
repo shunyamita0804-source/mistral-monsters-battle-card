@@ -1,19 +1,25 @@
 import { cardCatalog, getMonster } from '../../data/cards.ts';
 import { isOpponentPerson, PEOPLE, PEOPLE_TOTAL, type Person } from '../../data/people.ts';
 import { isMet, metCount, personRecord, type PersonRecord } from '../../game/people/peopleBook.ts';
-import { cardName, personEpithet, personLine, personName, personTitle } from '../../i18n/content.ts';
+import { cardName, personName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { createMonsterPortrait } from '../components/monsterPortrait.ts';
 import { openModal } from '../components/modal.ts';
-import { personFace } from '../components/personFace.ts';
+import { nameCard } from '../components/nameCard.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
-import { h } from '../dom.ts';
+import { button, h } from '../dom.ts';
+import { sound } from '../sound.ts';
 import type { ScreenDefinition } from './types.ts';
+
+/** 1ページの名刺の数（名刺ファイルのポケットの数） */
+const PER_PAGE = 5;
+/** 横になぞってページをめくる距離（論理px） */
+const SWIPE_PX = 48;
 
 /**
  * 名刺図鑑（家の本棚。2026-10-27 指示書「人物の名前・名刺図鑑・カード図鑑」）。
- * 会った人の名刺を No. 順に並べる。会っていない人は番号だけ（顔は人影・欄は空）。押すと大きく表示。
- * 街の人の名刺は紺、対戦する人の名刺はえんじ（台紙の絵が届くまで仮の見た目で色だけ分ける）
+ * 2026-10-27 に届いた絵：名刺ファイル（1ページにポケット5つ）に、No. 順に5枚ずつ。左右の矢印か、横になぞってページをめくる。
+ * 会った人は台紙（対戦相手はえんじ・街の人は紺）に顔・名前・肩書き・ひとこと。会っていない人は人影の名刺に番号だけ。押すと大きく表示
  */
 export const peopleBookScreen: ScreenDefinition = {
   id: 'peopleBook',
@@ -25,31 +31,20 @@ export const peopleBookScreen: ScreenDefinition = {
 
     const card = (person: Person): HTMLElement => {
       const met = isMet(save, person.id);
-      const kind = isOpponentPerson(person) ? 'opponent' : 'town';
-      const epithet = met ? personEpithet(person) : null;
       return h(
         'button',
         {
-          class: `name-card name-card--${kind}${met ? '' : ' is-unmet'}`,
+          class: `people-book__slot${met ? '' : ' is-unmet'}`,
           attrs: { type: 'button', 'aria-label': met ? personName(person) : `${no(person.no)} ${t('peopleBook.unmet')}` },
           dataset: { person: person.id },
           on: { click: () => met && openPerson(person) },
         },
-        h('span', { class: 'name-card__face' }, personFace(person, !met)),
-        h(
-          'span',
-          { class: 'name-card__text' },
-          h('span', { class: 'name-card__no', text: no(person.no) }),
-          epithet ? h('span', { class: 'name-card__epithet', text: epithet }) : null,
-          h('span', { class: 'name-card__name', text: met ? personName(person) : '' }),
-          h('span', { class: 'name-card__title', text: met ? personTitle(person) : '' }),
-        ),
+        nameCard(person, met, isOpponentPerson(person) ? personRecord(save, person.id) : null),
       );
     };
 
     const openPerson = (person: Person): void => {
       const record = personRecord(save, person.id);
-      const epithet = personEpithet(person);
       const rows: HTMLElement[] = [];
       if (isOpponentPerson(person)) {
         rows.push(
@@ -58,26 +53,54 @@ export const peopleBookScreen: ScreenDefinition = {
           row(t('peopleBook.cards'), cardsView(person, record)),
         );
       }
+      // 大きな名刺（一覧と同じ台紙）と、その下に使うモンスター・もらえるカード
       const handle = openModal(element, {
         className: `name-card-detail name-card-detail--${isOpponentPerson(person) ? 'opponent' : 'town'}`,
         body: [
-          h('div', { class: 'name-card-detail__face' }, personFace(person)),
-          h('p', { class: 'name-card-detail__no', text: no(person.no) }),
-          epithet ? h('p', { class: 'name-card-detail__epithet', text: epithet }) : null,
-          h('h2', { class: 'name-card-detail__name', text: personName(person) }),
-          h('p', { class: 'name-card-detail__title', text: personTitle(person) }),
-          h('p', { class: 'name-card-detail__line', text: personLine(person) }),
+          h('div', { class: 'name-card-detail__card' }, nameCard(person, true, isOpponentPerson(person) ? record : null)),
           rows.length > 0 ? h('dl', { class: 'name-card-detail__rows' }, ...rows) : null,
         ],
         actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
       });
     };
 
+    // 名刺ファイルのページ（5枚ずつ）
+    const people = [...PEOPLE].sort((a, b) => a.no - b.no);
+    const pages = Math.max(1, Math.ceil(people.length / PER_PAGE));
+    let page = 0;
+    const pageEl = h('div', { class: 'people-book__page' });
+    const pageNo = h('span', { class: 'people-book__page-no' });
+    const prev = button(t('peopleBook.prev'), () => turn(-1), 'people-book__turn');
+    const next = button(t('peopleBook.next'), () => turn(1), 'people-book__turn');
+    const show = (): void => {
+      pageEl.replaceChildren(...people.slice(page * PER_PAGE, (page + 1) * PER_PAGE).map(card));
+      pageNo.textContent = t('peopleBook.page', { n: page + 1, total: pages });
+      prev.disabled = page === 0;
+      next.disabled = page === pages - 1;
+    };
+    const turn = (d: number): void => {
+      const to = Math.min(pages - 1, Math.max(0, page + d));
+      if (to === page) return;
+      page = to;
+      sound.tap();
+      show();
+    };
+    // 横になぞってめくる
+    let downX: number | null = null;
+    pageEl.addEventListener('pointerdown', (e) => (downX = e.clientX));
+    pageEl.addEventListener('pointerup', (e) => {
+      if (downX === null) return;
+      const dx = (e.clientX - downX) / (element.getBoundingClientRect().width / (element.clientWidth || 1) || 1);
+      downX = null;
+      if (Math.abs(dx) >= SWIPE_PX) turn(dx < 0 ? 1 : -1);
+    });
+    show();
+
     element.append(
       createScreenHeader({ title: t('peopleBook.title'), back: { label: t('common.back'), onTap: () => ctx.back('world') } }),
       h('p', { class: 'people-book__count', text: t('peopleBook.count', { n: metCount(save), total: PEOPLE_TOTAL }) }),
-      h('p', { class: 'people-book__note', text: t('peopleBook.temp') }),
-      h('div', { class: 'people-book__list' }, ...[...PEOPLE].sort((a, b) => a.no - b.no).map(card)),
+      pageEl,
+      h('div', { class: 'people-book__nav' }, prev, pageNo, next),
     );
     return { element };
   },

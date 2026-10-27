@@ -348,6 +348,7 @@ export const SCREENS = {
     en: 'New pack “{pack}” unlocked! (Buy it at the shop’s gacha)',
   },
   'tournament.rankUp': { ja: 'ランクが {rank} に上がった！', en: 'Your rank went up to {rank}!' },
+  'tournament.dungeonFound': { ja: '新しいダンジョンが見つかった：{name}', en: 'A new dungeon was found: {name}' },
   'tournament.bannerChampion': { ja: '優勝！', en: 'Champion!' },
   'tournament.bannerRankUp': { ja: 'ランクアップ！', en: 'Rank Up!' },
   'tournament.cardGot': { ja: '{name} ×{n} を手に入れた。', en: 'Got {name} ×{n}.' },

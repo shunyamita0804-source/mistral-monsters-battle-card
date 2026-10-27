@@ -72,6 +72,11 @@ export interface TournamentDefinition {
   /** 総当たりの相手3人（1回目から順に主人公と戦う）。トーナメントは空（出場者は bracket） */
   readonly rounds: readonly OpponentDefinition[];
   readonly bracket?: BracketSetup;
+  /**
+   * 「シエナがいなくなった」の記録があるあいだの代わり（2026-10-27 ユーザー指示）。replace の相手の代わりに with が出る。
+   * 記録を消せば元に戻る（霧の廃坑で助けたら戻る予定）
+   */
+  readonly siennaLeft?: { readonly replace: string; readonly with: OpponentDefinition };
   readonly rewards: {
     /** 参加報酬（優勝・敗退に関係なく、1回の参加につき1回） */
     readonly participationCoins: number;
@@ -170,6 +175,8 @@ function bracketTournament(
       generalCount,
       finalist: finalist ? `reg-${finalist}` : null,
     },
+    // C でシエナがいないあいだは、D ランクの相手のゴードン（かつての大会の常連）が C の一般の出場者の強さで出る（2026-10-27 ユーザー指示）
+    ...(rank === 'C' ? { siennaLeft: { replace: 'reg-sienna', with: { id: 'c-gordon', name: 'ゴードン', monsters: TEST_TEAM, lifeScale: round2(scale * GENERAL_SCALE) } } } : {}),
     rewards: {
       participationCoins: participation,
       // パックの解放・カードの景品は C 以上では付けない（決まっていないため）
@@ -195,6 +202,8 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
       { id: 'e-2', name: 'ヴィクトル', monsters: TEST_TEAM, lifeScale: 0.65 },
       { id: 'e-3', name: 'シエナ', monsters: TEST_TEAM_ALT, lifeScale: 0.7 },
     ],
+    // シエナがいないあいだは、一般の出場者のマリーが E の強さで出る
+    siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: 0.7, face: 'gen-marie' } },
     rewards: {
       participationCoins: 20,
       firstWin: {
@@ -235,7 +244,7 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
 
 /** 大会に出てくる相手すべて（総当たりの3人・トーナメントの常連と一般の組） */
 export function tournamentOpponents(t: TournamentDefinition): readonly OpponentDefinition[] {
-  return [...t.rounds, ...(t.bracket ? [...t.bracket.regulars, ...t.bracket.pool] : [])];
+  return [...t.rounds, ...(t.bracket ? [...t.bracket.regulars, ...t.bracket.pool] : []), ...(t.siennaLeft ? [t.siennaLeft.with] : [])];
 }
 
 export function getTournament(id: string): TournamentDefinition | undefined {

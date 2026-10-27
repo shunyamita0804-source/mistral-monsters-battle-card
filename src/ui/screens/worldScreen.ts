@@ -97,6 +97,7 @@ import guideSheet from '@assets/images/characters/npc_neighbor_guide_walk.webp';
 import clerkSheet from '@assets/images/characters/npc_clerk_walk.webp';
 import researcherSheet from '@assets/images/characters/npc_researcher_walk.webp';
 import receptionistSheet from '@assets/images/characters/npc_receptionist_walk.webp';
+import eleanorSheet from '@assets/images/characters/npc_eleanor_walk.webp';
 import teacherSheet from '@assets/images/characters/npc_teacher_walk.webp';
 import residentASheet from '@assets/images/characters/npc_resident_a_walk.webp';
 import residentBSheet from '@assets/images/characters/npc_resident_b_walk.webp';
@@ -324,7 +325,8 @@ const NPC_SHEET: Readonly<Record<NpcId, string>> = {
   receptionist: receptionistSheet,
   teacher: teacherSheet,
   // カードバトラー管理局の受付：大会会場の受付の絵を流用（暫定。正式な絵が届いたらここを差し替える）
-  bureau_clerk: receptionistSheet,
+  // カードバトラー管理局の受付：エレノア（No.06。2026-10-27 に届いた歩く絵）
+  bureau_clerk: eleanorSheet,
   resident_a: residentASheet,
   resident_b: residentBSheet,
   resident_d: residentDSheet,

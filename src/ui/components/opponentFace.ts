@@ -17,6 +17,12 @@ import faceClaude from '@assets/images/characters/face_entrant_claude.webp';
 import faceBeatrice from '@assets/images/characters/face_entrant_beatrice.webp';
 import faceZara from '@assets/images/characters/face_entrant_zara.webp';
 import faceWalter from '@assets/images/characters/face_entrant_walter.webp';
+import faceDolf from '@assets/images/characters/face_regular_dolf.webp';
+import faceLeonard from '@assets/images/characters/face_regular_leonard.webp';
+import faceGreta from '@assets/images/characters/face_regular_greta.webp';
+import faceJulius from '@assets/images/characters/face_regular_julius.webp';
+import faceCamilla from '@assets/images/characters/face_regular_camilla.webp';
+import faceAlvin from '@assets/images/characters/face_regular_alvin.webp';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { h } from '../dom.ts';
 
@@ -48,6 +54,15 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'gen-beatrice': faceBeatrice,
   'gen-zara': faceZara,
   'gen-walter': faceWalter,
+  // シエナがいないあいだの代わり（E のマリー＝一般の出場者のマリーと同じ顔、C のゴードン＝D と同じ顔）
+  'c-gordon': faceD3,
+  // 大会の常連6人（2026-10-27 に届いた顔の絵）
+  'reg-dolf': faceDolf,
+  'reg-leonard': faceLeonard,
+  'reg-greta': faceGreta,
+  'reg-julius': faceJulius,
+  'reg-camilla': faceCamilla,
+  'reg-alvin': faceAlvin,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
 };

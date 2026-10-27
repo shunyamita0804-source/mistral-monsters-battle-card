@@ -2,6 +2,14 @@ import guideFace from '@assets/images/characters/neighbor_guide_talk_normal.webp
 import clerkFace from '@assets/images/characters/face_clerk.webp';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import receptionistFace from '@assets/images/characters/face_receptionist.webp';
+import eleanorFace from '@assets/images/characters/face_eleanor.webp';
+import ernstFace from '@assets/images/characters/face_ernst.webp';
+import faceDolf from '@assets/images/characters/face_regular_dolf.webp';
+import faceLeonard from '@assets/images/characters/face_regular_leonard.webp';
+import faceGreta from '@assets/images/characters/face_regular_greta.webp';
+import faceJulius from '@assets/images/characters/face_regular_julius.webp';
+import faceCamilla from '@assets/images/characters/face_regular_camilla.webp';
+import faceAlvin from '@assets/images/characters/face_regular_alvin.webp';
 import teacherFace from '@assets/images/characters/face_teacher.webp';
 import residentA from '@assets/images/characters/face_resident_a.webp';
 import residentB from '@assets/images/characters/face_resident_b.webp';
@@ -22,8 +30,8 @@ import type { Person } from '../../data/people.ts';
 import { h } from '../dom.ts';
 
 /**
- * 人物の顔の絵（名刺図鑑）。いまある顔の絵だけ。新しい顔（管理局の職員・C〜S ランクの常連など8人）は
- * デザイン担当に依頼中なので、届くまでは仮の人影（CSS の .person-face--none）
+ * 人物の顔の絵（名刺図鑑）。2026-10-27 に管理局の職員・常連6人・エルンストの顔が届き、28人すべてそろった。
+ * 顔の絵が無いとき（見えない番人など）は仮の人影（CSS の .person-face--none）
  */
 const PERSON_FACES: Readonly<Record<string, string>> = {
   // ミレイユ：顔の絵（正方形）は無いので、会話の絵（胸から上）を上の方で切り抜いて使う
@@ -31,6 +39,8 @@ const PERSON_FACES: Readonly<Record<string, string>> = {
   nina: clerkFace,
   lucas: researcherFace,
   celia: receptionistFace,
+  // 2026-10-27 に届いた顔（ZIP「人物・図鑑・研究所16枚」）：エレノア・常連6人・エルンスト
+  eleanor: eleanorFace,
   gareth: teacherFace,
   martha: residentA,
   pete: residentB,
@@ -47,6 +57,13 @@ const PERSON_FACES: Readonly<Record<string, string>> = {
   oscar: faceBattler2,
   kyle: faceBattler3,
   guardian: faceGuardian,
+  dolf: faceDolf,
+  leonard: faceLeonard,
+  greta: faceGreta,
+  julius: faceJulius,
+  camilla: faceCamilla,
+  alvin: faceAlvin,
+  ernst: ernstFace,
 };
 
 export function personFaceUrl(person: Person): string | undefined {

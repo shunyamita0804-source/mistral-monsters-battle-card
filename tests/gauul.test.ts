@@ -146,7 +146,9 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     const starter = createStarterDeck();
     expect(starter.monsters).not.toContain('mon-gauul');
     expect(starter.skills.some((id) => id.includes('gauul'))).toBe(false);
-    for (const e of Object.values(ENCOUNTERS)) expect(e.monsters).not.toContain('mon-gauul');
+    // 2026-10-27 からは、ランクで開放するダンジョンのボス・大会の常連にガウルが出る（ユーザー指示「今ある正式モンスターから仮で」）。
+    // それより前からある相手（練習・遺跡・森）には入れない
+    for (const id of ['enc-practice', 'enc-run-npc', 'enc-run-guardian', 'enc-b3-boss', 'enc-forest-boss']) expect(ENCOUNTERS[id]?.monsters).not.toContain('mon-gauul');
     for (const t of TOURNAMENTS) for (const r of t.rounds) expect(r.monsters).not.toContain('mon-gauul');
   });
 

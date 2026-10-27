@@ -14,7 +14,11 @@ import { t } from '../../i18n/i18n.ts';
 import { createCardGrid } from '../components/cardGrid.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
+import completeArt from '@assets/images/ui/album/book_complete.webp';
 import type { ScreenDefinition } from './types.ts';
+
+/** 詳しい画面のカードの幅（背景の絵の額の内側 149×224 に収まる大きさ） */
+const DETAIL_CARD_W = 134;
 
 /** 集めた割合のメダル（2026-10-26 デザイン第11弾）：25%＝銅・50%＝銀・75%＝金・100%＝完成 */
 const MEDAL_ART = Object.values(
@@ -98,8 +102,9 @@ export const collectionScreen: ScreenDefinition = {
             h(
               'h2',
               { class: `card-book__section${entry.section.kind === 'temp' ? ' card-book__section--temp' : ''}`, dataset: { section: key } },
-              h('span', { text: sectionTitle(entry) }),
-              complete ? h('span', { class: 'card-book__complete', text: t('collection.complete') }) : null,
+              // 区切りの見出し（2026-10-27 に届いた帯の絵）。左の丸に、そろったら「完成」の印
+              h('span', { class: 'card-book__seal' }, complete ? h('img', { class: 'card-book__complete', attrs: { src: completeArt, alt: t('collection.complete'), draggable: 'false' } }) : null),
+              h('span', { class: 'card-book__section-name', text: sectionTitle(entry) }),
             ),
           );
           grid = h('div', { class: 'card-grid__items card-book__items' });
@@ -118,10 +123,15 @@ export const collectionScreen: ScreenDefinition = {
               on: { click: () => openDetail(list, index) },
             },
             h('span', { class: 'card-book__no', text: label(entry) }),
-            unknown ? createUnknownCard(96) : createCardView(entry.card, 96, false),
+            h(
+              'span',
+              { class: 'card-book__art' },
+              unknown ? createUnknownCard(96) : createCardView(entry.card, 96, false),
+              // 持っている枚数（丸い札。2026-10-27 に届いた部品）
+              unknown ? null : h('span', { class: 'card-book__count', text: String(owned), attrs: { 'aria-label': t('common.owned', { n: owned }) } }),
+            ),
             isNew ? h('span', { class: 'card-book__new', text: t('collection.new') }) : null,
             h('span', { class: 'card-grid__name', text: unknown ? t('common.unknownName') : cardName(entry.card) }),
-            unknown ? null : h('span', { class: 'card-grid__owned', text: t('common.owned', { n: owned }) }),
           ),
         );
       });
@@ -153,7 +163,8 @@ export const collectionScreen: ScreenDefinition = {
             'div',
             { class: 'card-book-detail__top' },
             h('p', { class: 'card-book-detail__no', text: label(entry) || t('collection.section.temp') }),
-            h('div', { class: 'card-book-detail__card' }, unknown ? createUnknownCard(200) : createCardView(card, 200, true)),
+            // 詳しい画面の背景（2026-10-27 に届いた絵）の、机の上の額の中にカード
+            h('div', { class: 'card-book-detail__card' }, unknown ? createUnknownCard(DETAIL_CARD_W) : createCardView(card, DETAIL_CARD_W, true)),
           ),
           h(
             'div',
@@ -162,13 +173,14 @@ export const collectionScreen: ScreenDefinition = {
             unknown
               ? h('p', { class: 'card-book-detail__text', text: t('collection.unknownDetail') })
               : h('dl', { class: 'card-book-detail__rows' }, ...rows.flatMap(([k, v]) => [h('dt', { text: k }), h('dd', { text: v })])),
-            h(
-              'div',
-              { class: 'card-book-detail__nav' },
-              button(`‹ ${t('collection.prev')}`, () => go(-1), 'btn btn--small'),
-              button(t('common.close'), () => close(), 'btn btn--primary'),
-              button(`${t('collection.next')} ›`, () => go(1), 'btn btn--small'),
-            ),
+          ),
+          // 前後・閉じるのボタンは羊皮紙の下（背景の絵の下の帯）
+          h(
+            'div',
+            { class: 'card-book-detail__nav' },
+            button(`‹ ${t('collection.prev')}`, () => go(-1), 'btn btn--small'),
+            button(t('common.close'), () => close(), 'btn btn--primary'),
+            button(`${t('collection.next')} ›`, () => go(1), 'btn btn--small'),
           ),
         );
         const navButtons = view.querySelectorAll<HTMLButtonElement>('.card-book-detail__nav .btn--small');

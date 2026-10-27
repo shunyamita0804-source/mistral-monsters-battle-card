@@ -7,6 +7,11 @@ import battleMp3 from '@assets/audio/bgm/bgm_battle.mp3';
 import bossBattleMp3 from '@assets/audio/bgm/bgm_boss_battle.mp3';
 import dungeonRuinsMp3 from '@assets/audio/bgm/bgm_dungeon_ruins.mp3';
 import dungeonForestMp3 from '@assets/audio/bgm/bgm_dungeon_forest.mp3';
+import dungeonWaterMp3 from '@assets/audio/bgm/bgm_dungeon_water.mp3';
+import dungeonIceMp3 from '@assets/audio/bgm/bgm_dungeon_ice.mp3';
+import dungeonFireMp3 from '@assets/audio/bgm/bgm_dungeon_fire.mp3';
+import dungeonMachineMp3 from '@assets/audio/bgm/bgm_dungeon_machine.mp3';
+import dungeonHolyMp3 from '@assets/audio/bgm/bgm_dungeon_holy.mp3';
 import shopMp3 from '@assets/audio/bgm/bgm_shop.mp3';
 import practiceMp3 from '@assets/audio/bgm/bgm_practice.mp3';
 import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
@@ -34,6 +39,11 @@ export type BgmId =
   | 'dungeon'
   | 'dungeonRuins'
   | 'dungeonForest'
+  | 'dungeonWater'
+  | 'dungeonIce'
+  | 'dungeonFire'
+  | 'dungeonMachine'
+  | 'dungeonHoly'
   | 'shop'
   | 'practice'
   | 'lab'
@@ -65,6 +75,17 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   dungeonRuins: { src: dungeonRuinsMp3, gain: 0.38 },
   // 森のダンジョン：古代エルフの聖域 / ユーフルカ（Wingless Seraph）
   dungeonForest: { src: dungeonForestMp3, gain: 0.39 },
+  // 2026-10-27 ダンジョン7つ（ユーフルカ〔Wingless Seraph〕。2026-10-26 にユーザーが届けた曲。gain は docs/audio-credits.md の値）
+  // 水の神殿：Undersea Palace ～海底神殿～
+  dungeonWater: { src: dungeonWaterMp3, gain: 0.35 },
+  // 氷の洞窟：永遠の雪原
+  dungeonIce: { src: dungeonIceMp3, gain: 0.5 },
+  // 炎の火山：Tower of Despair（火か機械かは Claude の推測。docs/audio-credits.md）
+  dungeonFire: { src: dungeonFireMp3, gain: 0.33 },
+  // 機械の塔：Another Dimension（同じく推測）
+  dungeonMachine: { src: dungeonMachineMp3, gain: 0.35 },
+  // 天の聖域：The Sacred Place
+  dungeonHoly: { src: dungeonHolyMp3, gain: 0.46 },
   // カードショップ（店の中とショップの画面）：セールストーク / BGMer
   shop: { src: shopMp3, gain: 0.48 },
   // カード練習場（ユーザーの言う「教習所」）：無心になれる作業 / BGMer

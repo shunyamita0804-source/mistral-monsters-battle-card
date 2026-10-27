@@ -24,6 +24,8 @@ function progressedSave(): SaveData {
     unlockedPacks: ['pack-01', 'pack-02'],
     // Eランク大会の初優勝で並ぶ道具（読み込むときに記録から決まる）
     unlockedItems: [...base.unlockedItems, 'ruinsMap', 'luckyCoin'],
+    // D ランクなので水の神殿まで開放（2026-10-27 ダンジョン7つ）
+    unlockedDungeons: ['dungeon-01', 'dungeon-02', 'dungeon-03'],
     tournaments: { 'tournament-e': { entries: 2, wins: 1, firstWinClaimed: true } },
     claimedEntries: ['entry-1'],
     dungeons: { 'dungeon-01': { openedChests: ['chest-b2-a'], bossDefeated: true, clears: 1 } },

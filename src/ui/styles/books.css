@@ -54,146 +54,241 @@
   transform: translateX(-50%);
 }
 
-/* ===== 名刺図鑑 ===== */
+/* ===== 名刺図鑑（2026-10-27 に届いた名刺ファイルの背景と台紙。1ページにポケット5つ） ===== */
+.screen.people-book {
+  position: relative;
+  background: url('@assets/images/ui/album/binder_bg.webp') center top / 100% 100% no-repeat, #1b2232;
+}
+
+.people-book .screen-header {
+  position: relative;
+  z-index: 2;
+}
+
+/* 登録の数：上の革の当て布の上 */
 .people-book__count {
-  flex: none;
-  margin: 8px 12px 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 76px;
+  margin: 0;
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
+  color: #f1dfb4;
   text-align: center;
+  text-shadow: 0 2px 4px rgb(0 0 0 / 0.8);
 }
 
-.people-book__note {
-  flex: none;
-  margin: 4px 12px 6px;
-  font-size: 11px;
-  color: var(--color-sub);
-  text-align: center;
+/* ポケット5つ（背景の絵のポケットの位置。390×844 の論理px） */
+.people-book__page {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
 }
 
-.people-book__list {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  align-content: start;
-  gap: 8px;
-  padding: 4px 10px 24px;
-  overflow-y: auto;
-}
-
-/* 名刺：街の人は紺、対戦する人はえんじ（台紙の絵が届くまでの仮） */
-.name-card {
+.people-book__slot {
+  position: absolute;
+  left: 40px;
+  width: 310px;
+  height: 104px;
   display: flex;
-  align-items: stretch;
-  gap: 8px;
-  min-height: 84px;
-  padding: 6px;
-  border: 2px solid #c9a24a;
-  border-radius: 8px;
-  background: linear-gradient(160deg, #24345e, #18233f);
-  color: #f3ead2;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.name-card--opponent {
-  background: linear-gradient(160deg, #6e2433, #4a1622);
-}
+.people-book__slot:nth-child(1) { top: 210px; }
+.people-book__slot:nth-child(2) { top: 321px; }
+.people-book__slot:nth-child(3) { top: 433px; }
+.people-book__slot:nth-child(4) { top: 546px; }
+.people-book__slot:nth-child(5) { top: 659px; }
 
-.name-card.is-unmet {
-  border-color: rgb(201 162 74 / 0.4);
-  filter: saturate(0.4) brightness(0.75);
+.people-book__slot.is-unmet {
   cursor: default;
 }
 
-.name-card__face {
-  flex: none;
-  width: 64px;
-  height: 72px;
+.people-book__slot .ncard {
+  width: 200px;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.55));
 }
 
-.name-card__text {
+.people-book__nav {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
   display: flex;
-  flex: 1;
-  min-width: 0;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.name-card__no {
-  font-size: 11px;
-  color: #e8cf8a;
-}
-
-.name-card__epithet {
-  font-size: 10px;
-  color: #f1d58a;
-}
-
-.name-card__name {
-  font-family: var(--font-display);
-  font-size: 15px;
+.people-book__turn {
+  min-width: 112px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 2px solid #c9a24a;
+  border-radius: 20px;
+  background: rgb(20 26 42 / 0.92);
+  color: #f3ead2;
+  font-size: 13px;
   font-weight: 700;
-  min-height: 1.2em;
 }
 
-.name-card__title {
-  font-size: 10px;
-  line-height: 1.35;
-  color: rgb(243 234 210 / 0.85);
+.people-book__turn:disabled {
+  opacity: 0.35;
 }
 
-/* 名刺を押したとき：大きく表示 */
+.people-book__page-no {
+  font-size: 13px;
+  color: #f1dfb4;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.9);
+}
+
+/* ===== 名刺（台紙の絵に文字を重ねる。位置は台紙の欄を測った割合。文字の大きさは名刺の幅に合わせる） ===== */
+.ncard {
+  position: relative;
+  display: block;
+  container-type: inline-size;
+  aspect-ratio: 828 / 384;
+  color: #3b2a14;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.ncard--town {
+  aspect-ratio: 828 / 341;
+}
+
+.ncard__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ncard > span {
+  position: absolute;
+  overflow: hidden;
+}
+
+.ncard__no {
+  left: 3.1%;
+  top: 2.3%;
+  width: 9.2%;
+  height: 14.9%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 4.2cqw;
+  font-weight: 800;
+  color: #5a3d16;
+}
+
+.ncard__face {
+  left: 2.9%;
+  top: 22.4%;
+  width: 29.3%;
+  height: 66.4%;
+}
+
+.ncard__face .person-face {
+  border-radius: 0;
+  background: transparent;
+}
+
+.ncard__name {
+  left: 37.5%;
+  top: 10.2%;
+  width: 57%;
+  height: 14.5%;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 5.6cqw;
+  font-weight: 800;
+  color: #f6ead0;
+  white-space: nowrap;
+}
+
+.ncard__title {
+  left: 37.5%;
+  top: 29.2%;
+  width: 57.5%;
+  height: 8.8%;
+  display: flex;
+  align-items: center;
+  font-size: 3.4cqw;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ncard__body {
+  left: 37.5%;
+  top: 44.5%;
+  width: 58.5%;
+  height: 33%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4cqw;
+  font-size: 3.3cqw;
+}
+
+.ncard__epithet {
+  font-weight: 800;
+  color: #7a4a10;
+}
+
+.ncard__line {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ncard__cells {
+  left: 35.7%;
+  top: 84.1%;
+  width: 61.5%;
+  height: 11%;
+  display: grid;
+  grid-template-columns: 30.8% 29.9% 30.6%;
+  column-gap: 4.3%;
+}
+
+.ncard__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2cqw;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 街の人の台紙（下の小さな欄がなく、欄が少し下にある） */
+.ncard--town .ncard__no { top: 2.6%; height: 16.8%; }
+.ncard--town .ncard__face { top: 26.1%; height: 67.2%; }
+.ncard--town .ncard__name { top: 12.6%; height: 15.3%; }
+.ncard--town .ncard__title { top: 33.7%; height: 10.3%; }
+.ncard--town .ncard__body { top: 51.5%; height: 41%; }
+
+/* 押したとき：大きな名刺と、その下の使うモンスター・もらえるカード */
 .name-card-detail {
   border: 3px solid #c9a24a;
-  background: linear-gradient(160deg, #24345e, #18233f);
+  background: linear-gradient(160deg, #1d2740, #121a2c);
   color: #f3ead2;
 }
 
-.name-card-detail--opponent {
-  background: linear-gradient(160deg, #6e2433, #4a1622);
-}
-
-.name-card-detail__face {
-  width: 180px;
-  height: 200px;
-  margin: 0 auto 8px;
-}
-
-.name-card-detail__no,
-.name-card-detail__epithet,
-.name-card-detail__title,
-.name-card-detail__line {
-  margin: 2px 0;
-  text-align: center;
-}
-
-.name-card-detail__no {
-  font-size: 12px;
-  color: #e8cf8a;
-}
-
-.name-card-detail__epithet {
-  font-size: 12px;
-  color: #f1d58a;
-}
-
-.name-card-detail__name {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 22px;
-  text-align: center;
-}
-
-.name-card-detail__title {
-  font-size: 13px;
-}
-
-.name-card-detail__line {
-  margin-top: 8px;
-  font-size: 14px;
+.name-card-detail__card .ncard {
+  width: 100%;
 }
 
 .name-card-detail__rows {
@@ -389,4 +484,166 @@
 
 .card-book-detail__nav .btn {
   min-height: 44px;
+}
+
+/* ===== 2026-10-27 に届いたカード図鑑の部品（番号の札・未入手の枠・完成の印・枚数の札・区切りの見出し）と詳しい画面の背景 ===== */
+
+/* 区切りの見出し：帯の絵。左の丸に「完成」の印 */
+.card-book__section,
+.card-book__section--temp {
+  position: relative;
+  min-height: 46px;
+  margin: 12px 6px 4px;
+  padding: 0 18px 0 82px;
+  border: 0;
+  background: url('@assets/images/ui/album/book_section.webp') center / 100% 100% no-repeat;
+  color: #f3e6c6;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+}
+
+.card-book__section--temp {
+  filter: saturate(0.4);
+}
+
+.card-book__seal {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-book__section .card-book__complete {
+  width: 38px;
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.card-book__section-name {
+  font-size: 15px;
+}
+
+/* 番号の札 */
+.card-book__no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  height: 20px;
+  margin: 0 auto 2px;
+  padding: 0 6px;
+  background: url('@assets/images/ui/album/book_no_plate.webp') center / 100% 100% no-repeat;
+  color: #f3e6c6;
+  font-size: 10px;
+}
+
+.card-book__no:empty {
+  visibility: hidden;
+}
+
+/* 未入手の枠（カードの裏の形） */
+.card-book .card-unknown,
+.card-book-detail .card-unknown {
+  border: 0;
+  border-radius: 0;
+  background: url('@assets/images/ui/album/book_unknown.webp') center / 100% 100% no-repeat;
+  box-shadow: none;
+  color: transparent;
+}
+
+/* 持っている枚数の札（丸）：カードの右下に重ねる */
+.card-book__art {
+  position: relative;
+  display: block;
+}
+
+.card-book__count {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('@assets/images/ui/album/book_count.webp') center / contain no-repeat;
+  color: #f6ead0;
+  font-size: 12px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* 詳しい画面：背景の絵の上（額の中にカード、下の羊皮紙に文） */
+.card-book-detail {
+  background: url('@assets/images/ui/album/card_detail_bg.webp') center top / 100% 100% no-repeat, #120d0a;
+}
+
+.card-book-detail__top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 330px;
+  padding: 0;
+}
+
+.card-book-detail__card {
+  position: absolute;
+  left: 50%;
+  top: 188px;
+  transform: translate(-50%, -50%);
+}
+
+.card-book-detail__no {
+  position: absolute;
+  left: 50%;
+  top: 316px;
+  min-width: 96px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  background: url('@assets/images/ui/album/book_no_plate.webp') center / 100% 100% no-repeat;
+  color: #f3e6c6;
+  transform: translateX(-50%);
+}
+
+.card-book-detail__bottom {
+  position: absolute;
+  left: 30px;
+  right: 31px;
+  top: 430px;
+  height: 313px;
+  padding: 18px 20px;
+  border: 0;
+  overflow-y: auto;
+  color: #3b2a14;
+}
+
+.card-book-detail__name {
+  color: #3b2410;
+}
+
+.card-book-detail__rows dt {
+  color: #7a4a10;
+}
+
+.card-book-detail__text {
+  color: #5a4630;
+}
+
+.card-book-detail__nav {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 770px;
+  margin: 0;
 }

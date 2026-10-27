@@ -6,11 +6,15 @@ import { ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/
 import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
-import type { DungeonFloor, FloorEntity } from '../../game/dungeon/generate.ts';
+import { isWalkableTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
   chooseRunReward,
   descend,
+  doorsOpen,
+  floorsOf,
+  maxLossesOf,
+  pressSwitch,
   escapeGuardian,
   entityAt,
   facingPoint,
@@ -46,6 +50,9 @@ import { PLAYER_SHEET } from './worldScreen.ts';
 import type { ScreenContext, ScreenDefinition } from './types.ts';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
+import forestBattleBg from '@assets/images/backgrounds/battle_forest.webp';
+import coastBattleBg from '@assets/images/backgrounds/battle_field_coast.webp';
+import volcanoBattleBg from '@assets/images/backgrounds/battle_field_volcano.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
@@ -110,6 +117,8 @@ const MINI_CELL = 8;
 const MINI_MARK = 3.4;
 /** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
 const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
+/** ミニマップの色：水路・氷・扉（閉じている）（2026-10-27 ダンジョン7つ。印の絵はまだ無い） */
+const MINI_TILE_COLOR: Readonly<Record<string, string>> = { w: 'rgb(70 140 210 / 0.9)', i: 'rgb(190 230 250 / 0.9)', D: 'rgb(150 110 60 / 0.95)' };
 /** スティック（街と同じ大きさ・働き。worldScreen.ts の STICK_*）：動かし始める距離・向きを決めない真ん中・輪の半径・輪を出さない上の帯 */
 const STICK_START = 12;
 const STICK_DEAD = 16;
@@ -137,7 +146,25 @@ const LEAVE_FRAME_MS = 280;
 /** 革袋のふくらみ（手に入れた枚数が 0・1〜2・3 以上） */
 const POUCH_ART = [pouchArt1, pouchArt2, pouchArt3] as const;
 /** ダンジョンごとの BGM（歩行画面の DUNGEON_BGM と同じ） */
-const RUN_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
+const RUN_BGM: Readonly<Record<string, BgmId>> = {
+  'dungeon-01': 'dungeonRuins',
+  'dungeon-02': 'dungeonForest',
+  'dungeon-03': 'dungeonWater',
+  'dungeon-04': 'dungeonIce',
+  'dungeon-05': 'dungeonFire',
+  'dungeon-06': 'dungeonMachine',
+  'dungeon-07': 'dungeonHoly',
+};
+
+/**
+ * ダンジョンごとの対戦の背景（ボス以外）。新しい5つは専用の絵がまだ無いので、いまある絵を仮に使う（2026-10-27）。
+ * 森は森の背景、水の神殿は海辺、炎の火山は火山の野原、ほかは遺跡と同じ
+ */
+const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
+  'dungeon-02': forestBattleBg,
+  'dungeon-03': coastBattleBg,
+  'dungeon-05': volcanoBattleBg,
+};
 
 const KEY_DIR: Readonly<Record<string, Direction>> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
 
@@ -378,7 +405,7 @@ class DungeonRunView {
   #buildFloor(): void {
     const f = runFloor(this.#run);
     // 階ごとの床と壁（太古の遺跡の地下2階・3階：2026-10-27 デザイン33点の 3・4。uiParts12.css・ui33.css）
-    for (let n = 1; n <= DUNGEON_RUN.floors; n++) this.#root.classList.toggle(`drun--floor-${n}`, n === this.#run.floor + 1);
+    for (let n = 1; n <= floorsOf(this.#run.dungeonId); n++) this.#root.classList.toggle(`drun--floor-${n}`, n === this.#run.floor + 1);
     this.#floor = f;
     this.#world.replaceChildren();
     this.#entityEls.clear();
@@ -388,10 +415,15 @@ class DungeonRunView {
     this.#tiles = [];
     for (let y = 0; y < f.height; y++) {
       for (let x = 0; x < f.width; x++) {
-        const wall = f.tiles[y]?.[x] !== '.';
-        const face = wall && f.tiles[y + 1]?.[x] === '.';
+        const ch = f.tiles[y]?.[x];
+        const wall = ch === '#' || ch === undefined;
+        const below = f.tiles[y + 1]?.[x];
+        const face = wall && below !== undefined && below !== '#';
         const stairs = !!f.stairs && f.stairs.x === x && f.stairs.y === y;
-        const el = h('div', { class: `drun__tile drun__tile--${wall ? 'wall' : 'floor'}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}` });
+        // 水路・氷は床の代わり、扉は床の上に重ねる（仮の見た目。dungeonRun.css）
+        const kind = wall ? 'wall' : ch === 'w' ? 'water' : ch === 'i' ? 'ice' : 'floor';
+        const door = ch === 'D' ? ' drun__tile--door' : '';
+        const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}` });
         el.style.left = `${x * TILE}px`;
         el.style.top = `${y * TILE}px`;
         el.style.setProperty('--tx', `${-(x % TEXTURE_TILES) * TILE}px`);
@@ -420,7 +452,7 @@ class DungeonRunView {
   // ===== 表示の更新 =====
 
   /** 見たマス・見えているマス・置いてあるもの・カメラ・上の札・ミニマップを、いまの状態に合わせる */
-  #refresh(animate: boolean): void {
+  #refresh(animate: boolean, steps = 1): void {
     const f = this.#floor;
     if (!f) return;
     const run = this.#run;
@@ -447,12 +479,14 @@ class DungeonRunView {
       const seen = run.explored[e.y * f.width + e.x] === '1';
       el.hidden = !seen || !active.has(e.id);
       el.classList.toggle('is-lit', Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r);
-      el.classList.toggle('is-open', e.kind === 'chest' && run.opened.includes(e.id));
+      el.classList.toggle('is-open', (e.kind === 'chest' && run.opened.includes(e.id)) || (e.kind === 'switch' && doorsOpen(run)));
     }
+    // 扉：スイッチを押した階では開いている
+    this.#root.classList.toggle('is-doors-open', doorsOpen(run));
     // カメラ：主人公のマスが画面の真ん中
     const cx = this.#view.clientWidth / 2 || 195;
     const cy = this.#view.clientHeight / 2 || 300;
-    this.#world.style.transition = animate ? `transform ${STEP_MS}ms linear` : 'none';
+    this.#world.style.transition = animate ? `transform ${STEP_MS * steps}ms linear` : 'none';
     this.#world.style.transform = `translate(${Math.round(cx - (run.x + 0.5) * TILE)}px, ${Math.round(cy - (run.y + 0.5) * TILE)}px)`;
     // 主人公：足元がマスの下の方に来るように
     const viewTop = this.#view.offsetTop;
@@ -464,10 +498,12 @@ class DungeonRunView {
     const dungeon = getDungeon(run.dungeonId);
     this.#place.textContent = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) });
     // 負けた回数：灯りが負けるたびに1つずつ消える（2026-10-27 デザイン第13弾。文字は読み上げ用）
-    this.#losses.setAttribute('aria-label', t('dungeonRun.losses', { n: run.losses, max: DUNGEON_RUN.maxLosses }));
+    // 天の聖域は灯りが2つ（負けられる回数がダンジョンごと）
+    const maxLosses = maxLossesOf(run.dungeonId);
+    this.#losses.setAttribute('aria-label', t('dungeonRun.losses', { n: run.losses, max: maxLosses }));
     this.#losses.replaceChildren(
-      ...Array.from({ length: DUNGEON_RUN.maxLosses }, (_, i) =>
-        h('span', { class: `drun__lantern${i < DUNGEON_RUN.maxLosses - run.losses ? '' : ' is-out'}`, attrs: { 'aria-hidden': 'true' } }),
+      ...Array.from({ length: maxLosses }, (_, i) =>
+        h('span', { class: `drun__lantern${i < maxLosses - run.losses ? '' : ' is-out'}`, attrs: { 'aria-hidden': 'true' } }),
       ),
     );
     this.#gained.setAttribute('aria-label', t('dungeonRun.gained', { n: run.gained.length }));
@@ -482,7 +518,7 @@ class DungeonRunView {
     const p = facingPoint(run);
     const ahead = entityAt(run, f, p.x, p.y);
     const onStairs = !!f.stairs && f.stairs.x === run.x && f.stairs.y === run.y && !isLastFloor(run);
-    this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian') || onStairs);
+    this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian' && !(ahead.kind === 'switch' && doorsOpen(run))) || onStairs);
   }
 
   /** 右上の地図：見たマスだけ。自分・階段・見たバトラー・宝箱・ボスは印の絵（2026-10-27 デザイン第12弾） */
@@ -496,7 +532,9 @@ class DungeonRunView {
     const mapped = run.mapFloor === run.floor;
     for (let y = 0; y < f.height; y++) {
       for (let x = 0; x < f.width; x++) {
-        const floor = f.tiles[y]?.[x] === '.';
+        const ch = f.tiles[y]?.[x] ?? '#';
+        const floor = ch !== '#';
+        const special = ch === 'D' && doorsOpen(run) ? undefined : MINI_TILE_COLOR[ch];
         if (run.explored[y * f.width + x] !== '1') {
           if (mapped && floor) {
             g.fillStyle = 'rgb(214 200 168 / 0.42)';
@@ -504,7 +542,7 @@ class DungeonRunView {
           }
           continue;
         }
-        g.fillStyle = floor ? 'rgb(214 200 168 / 0.85)' : 'rgb(70 62 52 / 0.85)';
+        g.fillStyle = special ?? (floor ? 'rgb(214 200 168 / 0.85)' : 'rgb(70 62 52 / 0.85)');
         g.fillRect(x * MINI_CELL, y * MINI_CELL, MINI_CELL, MINI_CELL);
       }
     }
@@ -519,6 +557,13 @@ class DungeonRunView {
     if (f.stairs && (mapped || run.explored[f.stairs.y * f.width + f.stairs.x] === '1')) mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
       if (e.kind === 'guardian') continue;
+      // スイッチ：遺跡の地図を使った階では、まだ見ていなくても出す（機械の塔。印の絵はまだ無いので金色の四角）
+      if (e.kind === 'switch') {
+        if (run.explored[e.y * f.width + e.x] !== '1' && !mapped) continue;
+        g.fillStyle = doorsOpen(run) ? 'rgb(120 200 120)' : 'rgb(255 214 90)';
+        g.fillRect((e.x + 0.15) * MINI_CELL, (e.y + 0.15) * MINI_CELL, MINI_CELL * 0.7, MINI_CELL * 0.7);
+        continue;
+      }
       if (run.explored[e.y * f.width + e.x] !== '1' && !(mapped && e.kind === 'boss')) continue;
       if (e.kind === 'chest' && run.opened.includes(e.id)) continue;
       mark(e.x, e.y, e.kind);
@@ -576,13 +621,19 @@ class DungeonRunView {
     if (!d || this.#busy || !this.#store.save.dungeonRun) return;
     const r = move(this.#run, d);
     this.#store.update((s) => ({ ...s, dungeonRun: r.run }));
+    // すべる床：すべったマスの数だけ、ゆっくりカメラを動かす（すべっている間は次の1歩を受け付けない）
+    const steps = Math.max(1, r.path.length);
     if (r.moved) {
       const now = performance.now();
       if (now - this.#lastStep > STEP_MS + 60) this.#walkStart = now;
-      this.#lastStep = now;
+      this.#lastStep = now + STEP_MS * (steps - 1);
       sound.step(groundOf(this.#run.dungeonId), false);
     }
-    this.#refresh(r.moved);
+    if (steps > 1) {
+      this.#busy = true;
+      setTimeout(() => (this.#busy = false), STEP_MS * steps);
+    }
+    this.#refresh(r.moved, steps);
     this.#setOmen(r.omen);
     if (r.guardian) {
       this.#release();
@@ -620,8 +671,22 @@ class DungeonRunView {
     const p = facingPoint(run);
     const target = entityAt(run, f, p.x, p.y);
     if (target?.kind === 'chest') return this.#openChest(target);
+    if (target?.kind === 'switch') return this.#pressSwitch();
     if (target?.kind === 'npc' || target?.kind === 'boss') return this.#talk(target);
     if (f.stairs && f.stairs.x === run.x && f.stairs.y === run.y) this.#askStairs();
+  }
+
+  /** スイッチを調べた（機械の塔）：その階の扉が開く */
+  #pressSwitch(): void {
+    const r = pressSwitch(this.#run);
+    if (!r.opened) {
+      this.#message(t('dungeonRun.switchAlready'));
+      return;
+    }
+    this.#store.update((s) => ({ ...s, dungeonRun: r.run }));
+    sound.play('chestUnlock');
+    this.#refresh(false);
+    this.#message(t('dungeonRun.switchOpened'));
   }
 
   #openChest(chest: FloorEntity): void {
@@ -641,7 +706,7 @@ class DungeonRunView {
   /** バトラー・ボスに話しかけた：ひと言のあと対戦 */
   #talk(e: FloorEntity): void {
     const run = this.#run;
-    const opponent = e.kind === 'boss' ? runBossOpponent() : runNpcOpponent(run.floor, Number(e.id.split('-').pop() ?? 0));
+    const opponent = e.kind === 'boss' ? runBossOpponent(run.dungeonId) : runNpcOpponent(run.floor, Number(e.id.split('-').pop() ?? 0), run.dungeonId);
     const key = e.kind === 'boss' ? 'dungeonRun.bossTalk' : 'dungeonRun.npcTalk';
     this.#startBattle(e.kind === 'boss' ? 'boss' : 'npc', e.id, opponent, key);
   }
@@ -649,7 +714,7 @@ class DungeonRunView {
   #guardianAppears(g: FloorEntity): void {
     this.#showMark();
     this.#showGuardian();
-    this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor), 'dungeonRun.guardianAppear');
+    this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor, this.#run.dungeonId), 'dungeonRun.guardianAppear');
   }
 
   /**
@@ -664,7 +729,7 @@ class DungeonRunView {
     const dx = front.x - run.x;
     const dy = front.y - run.y;
     const spots = [front, { x: run.x + dy, y: run.y - dx }, { x: run.x - dy, y: run.y + dx }, { x: run.x - dx, y: run.y - dy }];
-    const spot = spots.find((p) => f.tiles[p.y]?.[p.x] === '.') ?? front;
+    const spot = spots.find((p) => isWalkableTile(f.tiles[p.y]?.[p.x], doorsOpen(run))) ?? front;
     const w = Math.round((GUARDIAN_H * 244) / 360);
     const el = h('img', { class: 'drun__guardian', attrs: { src: guardianArt, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
     el.style.width = `${w}px`;
@@ -688,7 +753,7 @@ class DungeonRunView {
       opponent,
       allowSurrender: true,
       bgm: kind === 'boss' ? 'bossBattle' : 'battle',
-      background: kind === 'boss' ? bossBattleBg : dungeonBattleBg,
+      background: kind === 'boss' ? bossBattleBg : (RUN_BATTLE_BG[this.#run.dungeonId] ?? dungeonBattleBg),
       onFinish: (winner) => {
         if (winner === 'player') onRunWin(store, kind, id, opponent);
         else onRunLoss(store, kind, id);
@@ -793,7 +858,7 @@ class DungeonRunView {
       className: 'drun__menu',
       body: [
         h('p', { class: 'modal__text drun__menu-place', text: t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) }) }),
-        h('div', { class: 'drun__menu-row' }, icon(menuIconLosses), h('p', { class: 'modal__text', text: t('dungeonRun.menuLosses', { n: run.losses, max: DUNGEON_RUN.maxLosses }) })),
+        h('div', { class: 'drun__menu-row' }, icon(menuIconLosses), h('p', { class: 'modal__text', text: t('dungeonRun.menuLosses', { n: run.losses, max: maxLossesOf(run.dungeonId) }) })),
         h('div', { class: 'drun__menu-row' }, icon(menuIconGained), h('p', { class: 'modal__text drun__menu-head', text: t('dungeonRun.menuGained') })),
         cards.length > 0
           ? h('ul', { class: 'drun__menu-cards' }, ...cards)

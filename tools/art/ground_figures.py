@@ -31,7 +31,7 @@ SHEETS = {
     'player_male_sheet.webp': (310, 360),
     'player_female_sheet.webp': (310, 360),
     **{f'npc_{n}_walk.webp': (270, 360) for n in (
-        'clerk', 'neighbor_guide', 'receptionist', 'researcher', 'teacher',
+        'clerk', 'neighbor_guide', 'receptionist', 'researcher', 'teacher', 'eleanor',
         'resident_a', 'resident_b', 'resident_c', 'resident_d', 'resident_e',
     )},
 }

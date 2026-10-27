@@ -46,7 +46,8 @@ WEBP_Q = 82
 BUILDING_FILE = {
     'ARENA': 'town_arena', 'TRAINING': 'town_training', 'HOUSE_A': 'town_house_a', 'HOUSE_B': 'town_house_b',
     'HOUSE_D': 'town_house_d', 'HOUSE_E': 'town_house_e', 'SHOP': 'town_shop',
-    'LAB': 'town_lab', 'PLAYER_HOME': 'town_player_home', 'GUIDE_HOME': 'town_guide_home',
+    # 研究所は 2026-10-27 に届いた新しい外観（town_lab_v2。キャンバスは今と同じ。原本 design-parts/people-album-lab-20261027/）
+    'LAB': 'town_lab_v2', 'PLAYER_HOME': 'town_player_home', 'GUIDE_HOME': 'town_guide_home',
 }
 
 
@@ -564,6 +565,8 @@ FURN = {
     'furn_guide': (3, ['fireplace', 'kitchen', 'round_table', 'flower_stand']),
     'furn_shop': (3, ['shelf_wall', 'pack_machine', 'counter', 'showcase']),
     'furn_lab': (3, ['big_shelf', 'crystal', 'specimen', 'desk', 'shelf2', 'reading_table']),
+    # 2026-10-27 に届いた研究所の新しい家具5つ（読む順：解析台・標本棚・記録の投影機・薬品の作業台・黒板）
+    'furn_lab_v2': (3, ['analysis', 'cabinet', 'projector', 'chem', 'blackboard']),
     'furn_training': (3, ['board', 'table', 'bench', 'shelf']),
     'furn_arena': (12, ['flags', 'stage', 'seats', 'reception']),
 }
@@ -582,7 +585,9 @@ ROOM_ITEMS = {
     'ROOM_SHOP': {'SHELF_WALL': 'furn_shop:shelf_wall', 'PACK_MACHINE': 'furn_shop:pack_machine', 'COUNTER': 'furn_shop:counter',
                   'CASE_L': 'furn_shop:showcase', 'CASE_R': 'furn_shop:showcase'},
     'ROOM_LAB': {'BIG_SHELF': 'furn_lab:big_shelf', 'CRYSTAL': 'furn_lab:crystal', 'SPECIMEN': 'furn_lab:specimen',
-                 'DESK': 'furn_lab:desk', 'SHELF2': 'furn_lab:shelf2', 'TABLE': 'furn_lab:reading_table'},
+                 'DESK': 'furn_lab:desk', 'SHELF2': 'furn_lab:shelf2', 'TABLE': 'furn_lab:reading_table',
+                 'BLACKBOARD': 'furn_lab_v2:blackboard', 'CABINET': 'furn_lab_v2:cabinet', 'PROJECTOR': 'furn_lab_v2:projector',
+                 'ANALYSIS': 'furn_lab_v2:analysis', 'CHEM': 'furn_lab_v2:chem'},
     'ROOM_TRAINING': {'BOARD': 'furn_training:board', 'SHELF': 'furn_training:shelf', 'TABLE_1': 'furn_training:table',
                       'TABLE_2': 'furn_training:table', 'BENCH_L': 'furn_training:bench', 'BENCH_R': 'furn_training:bench'},
     'ROOM_ARENA': {'FLAGS': 'furn_arena:flags', 'STAGE': 'furn_arena:stage', 'SEATS_L': 'furn_arena:seats',

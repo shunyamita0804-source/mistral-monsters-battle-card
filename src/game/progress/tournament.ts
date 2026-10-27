@@ -9,6 +9,7 @@ import {
   addCoins,
   FLAG_SIENNA_LEFT,
   unlockPacks,
+  unlockedDungeonsFor,
   type ActiveTournament,
   type SaveData,
   type TournamentMatch,
@@ -54,7 +55,7 @@ export function enterTournament(save: SaveData, tournamentId: string, entryId: s
   const record = tournamentRecord(save, tournamentId);
   return {
     ...save,
-    activeTournament: { tournamentId, entryId, round: 0, status: 'inProgress', seed, entrants: drawEntrants(tournament, seed), matches: [] },
+    activeTournament: { tournamentId, entryId, round: 0, status: 'inProgress', seed, entrants: drawEntrants(tournament, seed, save.storyFlags.includes(FLAG_SIENNA_LEFT)), matches: [] },
     tournaments: { ...save.tournaments, [tournamentId]: { ...record, entries: record.entries + 1 } },
   };
 }
@@ -222,6 +223,8 @@ export interface RewardSummary {
   readonly unlockedPacks: readonly string[];
   readonly rankUp: string | null;
   readonly cards: readonly CardReward[];
+  /** ランクが上がって新しく開放したダンジョン（2026-10-27 指示書「ダンジョン7つ」） */
+  readonly unlockedDungeons: readonly string[];
 }
 
 export type ClaimResult =
@@ -261,6 +264,10 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
     if (items.length > 0) next = { ...next, unlockedItems: [...next.unlockedItems, ...items] };
   }
   if (rankUp && !rankAtLeast(next.rank, rankUp)) next = { ...next, rank: rankUp };
+  // ランクが上がったら、そのランクのダンジョンを開放する
+  const dungeons = unlockedDungeonsFor(next.rank, next.unlockedDungeons);
+  const newDungeons = dungeons.filter((id) => !next.unlockedDungeons.includes(id));
+  if (newDungeons.length > 0) next = { ...next, unlockedDungeons: dungeons };
   // C ランク大会を終えたら（優勝しても負けても）「シエナがいなくなった」の記録（記録だけ。イベントダンジョンは別の指示書）
   if (tournament.id === 'tournament-c' && !next.storyFlags.includes(FLAG_SIENNA_LEFT)) next = { ...next, storyFlags: [...next.storyFlags, FLAG_SIENNA_LEFT] };
   next = {
@@ -279,6 +286,6 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
   return {
     status: 'ok',
     save: next,
-    summary: { won, firstWin, coins, unlockedPacks: unlocked, rankUp, cards },
+    summary: { won, firstWin, coins, unlockedPacks: unlocked, rankUp, cards, unlockedDungeons: newDungeons },
   };
 }

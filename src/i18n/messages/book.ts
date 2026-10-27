@@ -15,7 +15,12 @@ export const BOOK = {
   'peopleBook.cards': { ja: 'もらえるカード', en: 'Cards you can get' },
   'peopleBook.cardsOf': { ja: '{monster}の技', en: "{monster}'s skills" },
   'peopleBook.none': { ja: '—', en: '—' },
-  'peopleBook.temp': { ja: '【仮】名刺の台紙・顔の絵の一部は準備中です（顔の絵が無い人は人影）。', en: '[Temp] Card mounts and some portraits are in progress (silhouettes for now).' },
+  'peopleBook.page': { ja: '{n}／{total}ページ', en: 'Page {n}/{total}' },
+  'peopleBook.prev': { ja: '‹ 前のページ', en: '‹ Prev' },
+  'peopleBook.next': { ja: '次のページ ›', en: 'Next ›' },
+  'peopleBook.wins': { ja: '勝ち {n}', en: 'W {n}' },
+  'peopleBook.losses': { ja: '負け {n}', en: 'L {n}' },
+  'peopleBook.battles': { ja: '対戦 {n}', en: 'Played {n}' },
 
   // ---------- カード図鑑 ----------
   'collection.tab.support': { ja: 'サポート', en: 'Support' },
