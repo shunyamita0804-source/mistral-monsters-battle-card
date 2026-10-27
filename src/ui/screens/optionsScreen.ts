@@ -136,6 +136,8 @@ export const optionsScreen: ScreenDefinition = {
           if (check.settings) settings.update(check.settings);
           messageModal(element, t('options.importDone'), () => ctx.reset('title'));
         },
+        undefined,
+        'warn',
       );
     };
 
@@ -194,7 +196,8 @@ export const optionsScreen: ScreenDefinition = {
           h('p', { class: 'settings__note', text: t('options.helpNote') }),
 
           h('h2', { class: 'settings__heading', text: t('options.credits') }),
-          h('p', { class: 'settings__note', text: t('options.creditsText') }),
+          // 素材のクレジットは巻物の上に（2026-10-27 デザイン33点の 27。上の軸・紙・下の軸。ui33.css）
+          h('div', { class: 'credits-scroll' }, h('p', { class: 'settings__note credits-scroll__text', text: t('options.creditsText') })),
         ),
       );
       const body = element.querySelector('.options__body');

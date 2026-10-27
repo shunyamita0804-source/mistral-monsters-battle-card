@@ -1,0 +1,409 @@
+/*
+ * デザイン33点（2026-10-27「Mistral_UI_33」）の組み込み。部品は tools/design/ui33_build.py が切り出した assets/images/ の下の絵。
+ * 番号は依頼の番号（design-parts/ui33-20261027/資料/依頼原文.txt）。道具の5点は items.css
+ */
+
+/* ===== 1 暗闇の明かり：主人公のまわりのあたたかい光（3コマでゆらぐ。黒は「加算」で消える） ===== */
+.drun__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: url('@assets/images/effects/drun_light_1.webp') center / 100% 100% no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: drun-glow 0.9s step-end infinite;
+  transition: width 400ms ease-out, height 400ms ease-out;
+}
+
+@keyframes drun-glow {
+  0% { background-image: url('@assets/images/effects/drun_light_1.webp'); }
+  33% { background-image: url('@assets/images/effects/drun_light_2.webp'); }
+  66% { background-image: url('@assets/images/effects/drun_light_3.webp'); }
+}
+
+/* たいまつ：明かりが広がる（見える範囲 2マス） */
+.drun.is-torch .drun__glow {
+  width: 460px;
+  height: 460px;
+}
+
+.drun.is-torch .drun__light {
+  background: radial-gradient(circle at 50% 50%, rgb(0 0 0 / 0) 110px, rgb(0 0 0 / 0.3) 190px, rgb(0 0 0 / 0.72) 320px);
+}
+
+/*
+ * ===== 2 番人の気配：画面のふちに霧。紫の揺れの代わり =====
+ * 原本（omen_vignette.webp）は「乗算」用だが、ダンジョン試作は画面のほとんどが真っ黒で乗算の霧は見えないので、
+ * 白を透明にして霧を明るめにした版（omen_fog.webp。tools/design/ui33_build.py）をふつうに重ねる
+ */
+.drun__omen-edge {
+  inset: 0 0 var(--drun-controls-h) 0;
+  box-shadow: none;
+  background: url('@assets/images/ui/dungeon/omen_fog.webp') center / 100% 100% no-repeat;
+}
+
+.drun.is-omen .drun__omen-edge {
+  animation:
+    drun-omen-breathe 1600ms ease-in-out infinite,
+    drun-omen-shake 380ms steps(2) infinite;
+}
+
+@keyframes drun-omen-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1.04); }
+  50% { opacity: 0.9; transform: scale(1); }
+}
+
+/* ===== 3・4 太古の遺跡の地下2階・地下3階の床と壁（地下1階はいままでの絵） ===== */
+.drun--dungeon-01.drun--floor-2 { --ruins-floor: url('@assets/images/maps/dungeon/ruins_b2_floor.webp'); --ruins-top: url('@assets/images/maps/dungeon/ruins_b2_wall_top.webp'); --ruins-face: url('@assets/images/maps/dungeon/ruins_b2_wall_face.webp'); }
+.drun--dungeon-01.drun--floor-3 { --ruins-floor: url('@assets/images/maps/dungeon/ruins_b3_floor.webp'); --ruins-top: url('@assets/images/maps/dungeon/ruins_b3_wall_top.webp'); --ruins-face: url('@assets/images/maps/dungeon/ruins_b3_wall_face.webp'); }
+
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--floor.is-seen {
+  background: linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)), var(--ruins-floor) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--floor.is-lit {
+  background: linear-gradient(rgb(255 236 200 / 0.1), rgb(255 236 200 / 0.1)), var(--ruins-floor) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--wall.is-seen {
+  background: linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)), var(--ruins-top) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--wall.is-lit {
+  background: linear-gradient(rgb(6 7 10 / 0.55), rgb(6 7 10 / 0.55)), var(--ruins-top) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+/* 下が床の壁：壁の正面の絵の上の方（石の縁と石積み）を、マスの下の 38px に帯で出す */
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--face.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.55)),
+    var(--ruins-face) var(--tx, 0) 10px / 96px 96px repeat-x,
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    var(--ruins-top) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+.drun--dungeon-01:is(.drun--floor-2, .drun--floor-3) .drun__tile--face.is-lit {
+  background:
+    var(--ruins-face) var(--tx, 0) 10px / 96px 96px repeat-x,
+    linear-gradient(rgb(6 7 10 / 0.55), rgb(6 7 10 / 0.55)),
+    var(--ruins-top) var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+}
+
+/* ===== 5 勝った相手が去る：人の絵が薄れ、光の粒と土ぼこり ===== */
+.drun__leaving {
+  z-index: 3;
+  animation: drun-leave 900ms ease-in forwards;
+}
+
+@keyframes drun-leave {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+
+.drun__leave-fx {
+  position: absolute;
+  z-index: 4;
+  width: 112px;
+  height: 112px;
+  margin: -64px 0 0 -32px;
+  pointer-events: none;
+}
+
+/* ===== 6 技カードを手に入れたとき：光と台座の上にカード ===== */
+.drun__card-get {
+  position: relative;
+  width: 220px;
+  height: 232px;
+  margin: 0 auto;
+}
+
+.drun__card-get-light {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 210px;
+  transform: translateX(-50%);
+  opacity: 0.9;
+}
+
+.drun__card-get-stand {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 190px;
+  transform: translateX(-50%);
+}
+
+.drun__card-get-card {
+  position: absolute;
+  left: 50%;
+  bottom: 44px;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.6));
+}
+
+/* ===== 7 手に入れた技カードの革袋（左上） ===== */
+.drun__chip--pouch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px 0 4px;
+}
+
+.drun__pouch {
+  display: block;
+  width: auto;
+  height: 30px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+.drun__pouch-count {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ===== 9・10 ダンジョンのメニューの窓・項目の行・アイコン（道具の一覧の窓も同じ窓） ===== */
+.modal__panel.drun__menu,
+.modal__panel.drun__items {
+  border: 0;
+  border-image: none;
+  padding: 34px 22px 18px;
+  background: url('@assets/images/ui/dungeon/menu_window.webp') center / 100% 100% no-repeat;
+}
+
+.drun__menu .modal__title,
+.drun__items .modal__title {
+  margin-top: -26px;
+  font-size: 15px;
+}
+
+.drun__menu-place {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--color-sub);
+}
+
+.drun__menu-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  margin: 2px 0;
+  padding: 2px 12px 2px 5px;
+  border: 0;
+  background: url('@assets/images/ui/dungeon/menu_row.webp') center / 100% 100% no-repeat;
+  color: #f3ead2;
+  font: inherit;
+  text-align: left;
+}
+
+.drun__menu-row .modal__text {
+  margin: 0;
+  font-size: 13px;
+}
+
+.drun__menu-row--button {
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.drun__menu-row--button:active {
+  background-image: url('@assets/images/ui/dungeon/menu_row_pressed.webp');
+}
+
+.drun__menu-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+
+.drun__menu .drun__menu-head {
+  margin-top: 0;
+}
+
+/* ===== 26 一覧が空のとき ===== */
+.drun__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  text-align: center;
+}
+
+.drun__empty-art {
+  width: 132px;
+  height: auto;
+  opacity: 0.95;
+}
+
+/* ===== 18 階段を下りる確認の挿絵 ===== */
+.drun__stairs-art {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* ===== 23 確認の窓の紋章（窓の上のふちに乗せる） ===== */
+.modal__panel.has-emblem {
+  position: relative;
+  margin-top: 34px;
+  padding-top: 26px;
+}
+
+.modal__emblem {
+  position: absolute;
+  left: 50%;
+  top: -56px;
+  width: 64px;
+  height: 64px;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.6));
+  pointer-events: none;
+}
+
+.modal__panel.drun__menu.has-emblem,
+.modal__panel.drun__items.has-emblem {
+  padding-top: 40px;
+}
+
+/* ===== 24 街・ダンジョンの右上の「メニュー」「脱出」（左に本・扉の絵、右に文字） ===== */
+.world__hud .btn--small.world__hud-btn {
+  flex: none;
+  width: 78px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 9px 0 31px;
+  background: url('@assets/images/ui/hud/btn_menu.webp') center / 100% 100% no-repeat;
+  font-size: 11px;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.world__hud .btn--small.world__hud-btn--escape {
+  width: 62px;
+  font-size: 12px;
+}
+
+.world__hud .btn--small.world__hud-btn:active {
+  background-image: url('@assets/images/ui/hud/btn_menu_pressed.webp');
+}
+
+.world__hud .btn--small.world__hud-btn--escape:not(:active) {
+  background-image: url('@assets/images/ui/hud/btn_escape.webp');
+}
+
+.world__hud .btn--small.world__hud-btn--escape:active {
+  background-image: url('@assets/images/ui/hud/btn_escape_pressed.webp');
+}
+
+/* ===== 12・13 クリアの報酬を受け取る場面（祭壇の上にカード。お知らせの窓は下に寄せる） ===== */
+.world__clear-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #000;
+  animation: fade-in 400ms ease-out;
+}
+
+.world__clear-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.world__clear-altar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 33%;
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+}
+
+.world__clear-card {
+  position: relative;
+  filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.6)) drop-shadow(0 0 14px rgb(255 226 160 / 0.35));
+  animation: clear-card-rise 700ms ease-out both;
+}
+
+.world__clear-card + .world__clear-card {
+  animation-delay: 150ms;
+}
+
+@keyframes clear-card-rise {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.world__clear-seal {
+  position: absolute;
+  right: -22px;
+  bottom: -18px;
+  width: 64px;
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.6));
+}
+
+/* クリアの帯は、場面の上の 1/4（物を置かない所）に出す */
+.world:has(.world__clear-scene) .world__banner {
+  top: 14%;
+}
+
+.world__clear-scene ~ .modal {
+  align-items: flex-end;
+  padding-bottom: 40px;
+  background: rgb(6 7 9 / 0.25);
+}
+
+/* ===== 20 デッキ編集の画面の背景（家の机） ===== */
+.screen.deck {
+  background: #1a120b url('@assets/images/backgrounds/deck_bg.webp') center top / cover no-repeat;
+}
+
+/* ===== 27 素材のクレジット：巻物（上の軸・紙・下の軸）の上に文字 ===== */
+.credits-scroll {
+  padding: 27% 15% 29%;
+  background:
+    url('@assets/images/ui/settings/credits_top.webp') center top / 100% auto no-repeat,
+    url('@assets/images/ui/settings/credits_bottom.webp') center bottom / 100% auto no-repeat,
+    url('@assets/images/ui/settings/credits_paper.webp') center top / 100% auto repeat-y;
+}
+
+.credits-scroll .credits-scroll__text {
+  margin: 0;
+  color: #3a2a18;
+  text-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun__glow,
+  .drun.is-omen .drun__omen-edge,
+  .world__clear-card {
+    animation: none;
+  }
+}
+
+/* 脱出も並ぶとき（ダンジョン）：場所の名前が切れないよう、すき間と名前の札を少し詰める */
+.world__hud:has(.world__hud-btn--escape) {
+  gap: 4px;
+}
+
+.world__hud:has(.world__hud-btn--escape) .world__place-name {
+  padding: 4px 9px 5px;
+  font-size: 13px;
+  letter-spacing: 0;
+}

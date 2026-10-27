@@ -1,6 +1,7 @@
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import { monsterId, skillId } from './cards.ts';
 import type { RankId } from './economy.ts';
+import type { ItemId } from './items.ts';
 
 /**
  * 【仮データ】大会。
@@ -41,6 +42,11 @@ export interface TournamentDefinition {
       readonly unlockPacks: readonly string[];
       readonly rankUp: RankId | null;
       readonly cards: readonly CardReward[];
+      /**
+       * ショップに並ぶようになる道具（仮。src/data/items.ts）。内部の設定だけで、大会の画面・報酬の画面には出さない
+       * （2026-10-27 ユーザー指示書「ダンジョンの道具」）
+       */
+      readonly unlockItems: readonly ItemId[];
     };
     /** 2回目以降の優勝の景品 */
     readonly repeatWin: { readonly coins: number };
@@ -68,6 +74,7 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
         unlockPacks: ['pack-02'],
         rankUp: 'D',
         cards: [{ cardId: monsterId('e'), count: 1 }, { cardId: skillId('e', 1), count: 2 }],
+        unlockItems: ['ruinsMap', 'luckyCoin'],
       },
       repeatWin: { coins: 150 },
     },
@@ -86,7 +93,7 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     ],
     rewards: {
       participationCoins: 30,
-      firstWin: { coins: 400, unlockPacks: ['pack-03'], rankUp: 'C', cards: [] },
+      firstWin: { coins: 400, unlockPacks: ['pack-03'], rankUp: 'C', cards: [], unlockItems: ['sealBox', 'guardianCharm'] },
       repeatWin: { coins: 200 },
     },
     isPlaceholder: true,

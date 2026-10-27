@@ -101,6 +101,11 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
   let next = addCoins(save, coins);
   next = addCards(next, cards);
   next = unlockPacks(next, unlocked);
+  // 道具の解放（内部の設定だけ。報酬の画面には出さないので summary には入れない）
+  if (firstWin) {
+    const items = tournament.rewards.firstWin.unlockItems.filter((id) => !next.unlockedItems.includes(id));
+    if (items.length > 0) next = { ...next, unlockedItems: [...next.unlockedItems, ...items] };
+  }
   if (rankUp && !rankAtLeast(next.rank, rankUp)) next = { ...next, rank: rankUp };
   next = {
     ...next,

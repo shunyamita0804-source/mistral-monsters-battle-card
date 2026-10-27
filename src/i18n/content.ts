@@ -1,6 +1,7 @@
 import { cardCatalog } from '../data/cards.ts';
 import type { DungeonDefinition } from '../data/dungeons.ts';
 import type { PackDefinition } from '../data/economy.ts';
+import type { ItemDefinition } from '../data/items.ts';
 import type { MapDefinition, MapObject } from '../data/maps.ts';
 import { personOfOpponent, type LocalText, type Person } from '../data/people.ts';
 import type { OpponentDefinition, TournamentDefinition } from '../data/tournaments.ts';
@@ -43,6 +44,8 @@ export function cardDescription(card: CardDefinition): string {
 
 export const packName = (p: PackDefinition): string => contentText('pack', p.id, 'name', p.name);
 export const packDescription = (p: PackDefinition): string => contentText('pack', p.id, 'description', p.description);
+export const itemName = (i: ItemDefinition): string => contentText('item', i.id, 'name', i.name);
+export const itemDescription = (i: ItemDefinition): string => contentText('item', i.id, 'description', i.description);
 export const packUnlockHint = (p: PackDefinition): string => contentText('pack', p.id, 'unlockHint', p.unlockHint);
 export const tournamentName = (t: TournamentDefinition): string => contentText('tournament', t.id, 'name', t.name);
 export const tournamentDescription = (t: TournamentDefinition): string =>

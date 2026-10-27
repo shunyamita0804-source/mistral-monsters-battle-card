@@ -8,6 +8,7 @@ import { peopleBookScreen } from './peopleBookScreen.ts';
 import { newGameScreen } from './newGameScreen.ts';
 import { optionsScreen } from './optionsScreen.ts';
 import { settingsScreen } from './settingsScreen.ts';
+import { itemShopScreen } from './itemShopScreen.ts';
 import { gachaScreen, shopMenuScreen } from './shopScreens.ts';
 import { titleScreen } from './titleScreen.ts';
 import { tournamentScreen } from './tournamentScreen.ts';
@@ -29,6 +30,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   shopMenu: shopMenuScreen,
   cardList: cardListScreen,
   gacha: gachaScreen,
+  itemShop: itemShopScreen,
   dungeonSelect: dungeonSelectScreen,
   dungeonRun: dungeonRunScreen,
   tournament: tournamentScreen,

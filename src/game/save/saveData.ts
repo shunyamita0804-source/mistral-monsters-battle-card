@@ -1,5 +1,7 @@
 import { cardCatalog } from '../../data/cards.ts';
-import { CURRENCY, PACKS, RANK_ORDER, type RankId } from '../../data/economy.ts';
+import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
+import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
+import { TOURNAMENTS } from '../../data/tournaments.ts';
 import {
   buildDeckFromCollection,
   countCards,
@@ -31,7 +33,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 16;
+export const SAVE_VERSION = 17;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -103,7 +105,39 @@ export interface DungeonRun {
   readonly cooldown: number;
   /** 見えない番人の抽選の乱数の状態 */
   readonly rng: number;
+  /* ----- 道具の効き目（2026-10-27。中断して再開しても続く。src/data/items.ts・src/game/items/items.ts） ----- */
+  /** たいまつを使った階（その階のあいだ見える範囲が広がる。使っていなければ null） */
+  readonly torchFloor: number | null;
+  /** 遺跡の地図を使った階（その階のあいだ地図に通路・部屋・階段が出る） */
+  readonly mapFloor: number | null;
+  /** 魔除けの香の残りの歩数（0＝効いていない） */
+  readonly incenseSteps: number;
+  /** 身代わりのお守りを身につけている */
+  readonly charm: boolean;
+  /** この挑戦でお守りを使った（1回の挑戦で1個まで） */
+  readonly charmUsed: boolean;
+  /** 幸運のコインが効いている（次に勝ったとき、報酬を候補から選べる） */
+  readonly luckyCoin: boolean;
+  /** 幸運のコインで、選ぶのを待っている報酬の候補（対戦から戻ったら選ぶ。選ぶまでは null 以外） */
+  readonly rewardChoice: readonly string[] | null;
+  /** この挑戦で封印の小箱を使った（1回の挑戦で1個まで） */
+  readonly sealBoxUsed: boolean;
+  /** 封印の小箱で守った技カード（追い出されても失わない1枚） */
+  readonly sealedCard: string | null;
 }
+
+/** 挑戦を始めたときの道具の効き目（どれも効いていない） */
+export const NO_RUN_EFFECTS = {
+  torchFloor: null,
+  mapFloor: null,
+  incenseSteps: 0,
+  charm: false,
+  charmUsed: false,
+  luckyCoin: false,
+  rewardChoice: null,
+  sealBoxUsed: false,
+  sealedCard: null,
+} as const satisfies Partial<DungeonRun>;
 
 export interface SaveData {
   readonly version: number;
@@ -127,6 +161,12 @@ export interface SaveData {
   readonly fragments: readonly string[];
   /** 隠しモンスターを特別復元したか */
   readonly hiddenRestored: boolean;
+  /** 持っている道具の数（道具 ID → 個数。0個は書かない。src/data/items.ts） */
+  readonly items: Readonly<Partial<Record<ItemId, number>>>;
+  /** ショップに並ぶようになった道具（最初から並ぶものも含む） */
+  readonly unlockedItems: readonly ItemId[];
+  /** ショップで「NEW」を見た道具（最初に見たときだけ NEW の印） */
+  readonly seenItems: readonly ItemId[];
   readonly location: Location;
   /** 処理済みの購入・受け取りID（二重決済・二重タップ防止。新しい順に最大 TRANSACTION_LOG_SIZE 件） */
   readonly processedTransactions: readonly string[];
@@ -180,6 +220,9 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     dungeonRun: null,
     fragments: [],
     hiddenRestored: false,
+    items: {},
+    unlockedItems: ITEMS.filter((i) => i.unlockedFromStart).map((i) => i.id),
+    seenItems: [],
     location: NEW_GAME_LOCATION,
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
@@ -437,6 +480,15 @@ function migratePeopleBookV16(raw: RawObject): RawObject {
   return { ...raw, peopleBook: rescuePeopleBook(raw), cardsSeen: ownedCardIds(collection) };
 }
 
+/**
+ * version 16 → 17（2026-10-27）：ダンジョンの道具を足した。いままでのセーブは道具0個。
+ * ショップに並ぶ道具は、読み込むときに大会の初優勝の記録から決める（normalizeSave の unlockedItemsFor）。挑戦中の効き目はどれも無し
+ */
+function migrateItemsV17(raw: RawObject): RawObject {
+  const run = isObject(raw.dungeonRun) ? { ...raw.dungeonRun, ...NO_RUN_EFFECTS } : raw.dungeonRun;
+  return { ...raw, items: {}, unlockedItems: [], seenItems: [], dungeonRun: run };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -454,6 +506,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   13: migrateMyurol14V14,
   14: migrateIntroV2V15,
   15: migratePeopleBookV16,
+  16: migrateItemsV17,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -566,7 +619,42 @@ function normalizeDungeonRun(v: unknown): DungeonRun | null {
     gained: asStringArray(v.gained).filter((id) => !!cardCatalog.get(id)),
     cooldown: asCount(v.cooldown),
     rng: typeof v.rng === 'number' && Number.isFinite(v.rng) ? Math.floor(v.rng) : 1,
+    torchFloor: asFloorOrNull(v.torchFloor),
+    mapFloor: asFloorOrNull(v.mapFloor),
+    incenseSteps: Math.min(asCount(v.incenseSteps), ITEM_RULES.incenseSteps),
+    charm: asBool(v.charm, false),
+    charmUsed: asBool(v.charmUsed, false) || asBool(v.charm, false),
+    luckyCoin: asBool(v.luckyCoin, false),
+    rewardChoice: Array.isArray(v.rewardChoice) ? asStringArray(v.rewardChoice).filter((id) => !!cardCatalog.get(id)) : null,
+    sealBoxUsed: asBool(v.sealBoxUsed, false) || typeof v.sealedCard === 'string',
+    sealedCard: typeof v.sealedCard === 'string' && cardCatalog.get(v.sealedCard) ? v.sealedCard : null,
   };
+}
+
+const asFloorOrNull = (v: unknown): number | null => (typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : null);
+
+function normalizeItems(v: unknown): Partial<Record<ItemId, number>> {
+  const result: Partial<Record<ItemId, number>> = {};
+  if (!isObject(v)) return result;
+  for (const [id, count] of Object.entries(v)) {
+    const n = Math.min(asCount(count), ITEM_RULES.maxOwned);
+    if (n > 0 && isItemId(id)) result[id] = n;
+  }
+  return result;
+}
+
+/**
+ * ショップに並ぶ道具：最初から並ぶもの＋大会の初優勝で並ぶもの。初優勝は記録（firstWinClaimed）か、
+ * その景品のランクに上がっていること（2026-10-27 指示「すでにDランク以上のセーブでも、読み込んだときに条件どおり解放」）で見る
+ */
+export function unlockedItemsFor(save: Pick<SaveData, 'rank' | 'tournaments' | 'unlockedItems'>): ItemId[] {
+  const ids = new Set<ItemId>([...ITEMS.filter((i) => i.unlockedFromStart).map((i) => i.id), ...save.unlockedItems]);
+  for (const tour of TOURNAMENTS) {
+    const won = save.tournaments[tour.id]?.firstWinClaimed === true;
+    const rankUp = tour.rewards.firstWin.rankUp;
+    if (won || (rankUp !== null && rankAtLeast(save.rank, rankUp))) for (const id of tour.rewards.firstWin.unlockItems) ids.add(id);
+  }
+  return ITEM_IDS.filter((id) => ids.has(id));
 }
 
 /** 生データ（JSON.parse の結果）を検証してセーブデータにする。読めない場合は null */
@@ -580,6 +668,8 @@ export function normalizeSave(raw: unknown): SaveData | null {
   const story = isObject(migrated.story) ? migrated.story : {};
   const rank = RANK_ORDER.includes(migrated.rank as RankId) ? (migrated.rank as RankId) : 'E';
   const startPacks = PACKS.filter((p) => p.unlockedFromStart).map((p) => p.id);
+  const tournaments = normalizeTournaments(migrated.tournaments);
+  const itemIds = (v: unknown): ItemId[] => unique(asStringArray(v)).filter(isItemId);
   return {
     version: SAVE_VERSION,
     createdAt: asString(migrated.createdAt, base.createdAt),
@@ -593,7 +683,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
       ...startPacks,
       ...asStringArray(migrated.unlockedPacks).filter((id) => PACKS.some((p) => p.id === id)),
     ]),
-    tournaments: normalizeTournaments(migrated.tournaments),
+    tournaments,
     activeTournament: normalizeActiveTournament(migrated.activeTournament),
     claimedEntries: unique(asStringArray(migrated.claimedEntries)),
     dungeons: normalizeDungeons(migrated.dungeons),
@@ -601,6 +691,9 @@ export function normalizeSave(raw: unknown): SaveData | null {
     dungeonRun: normalizeDungeonRun(migrated.dungeonRun),
     fragments: unique(asStringArray(migrated.fragments)),
     hiddenRestored: asBool(migrated.hiddenRestored, false),
+    items: normalizeItems(migrated.items),
+    unlockedItems: unlockedItemsFor({ rank, tournaments, unlockedItems: itemIds(migrated.unlockedItems) }),
+    seenItems: itemIds(migrated.seenItems),
     location: normalizeLocation(migrated.location),
     processedTransactions: unique(asStringArray(migrated.processedTransactions)).slice(0, TRANSACTION_LOG_SIZE),
     stats: {

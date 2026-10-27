@@ -1,8 +1,10 @@
 import { getDungeon } from '../../data/dungeons.ts';
 import { DUNGEON_RUN, isRunDungeon } from '../../data/dungeonRun.ts';
 import { REWARDS } from '../../data/economy.ts';
+import { ITEM_RULES, type ItemId } from '../../data/items.ts';
+import { consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
-import { addCards, addCoins, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
+import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
 import { blocksWay, generateFloor, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 
 /**
@@ -13,6 +15,8 @@ import { blocksWay, generateFloor, type DungeonFloor, type FloorEntity, type Poi
  * - 勝つと相手のモンスターの技カードを1枚（画面が選んで渡す）。負けられる回数（maxLosses）負けると、
  *   街の入り口へ戻され、その挑戦で手に入れた技カードを失う。ボスを倒すとクリア
  * 中断して再開できるよう、状態はすべて save.dungeonRun に持つ
+ * 道具（2026-10-27）の効き目：たいまつ（見える範囲）・魔除けの香（番人が出ない歩数）・遺跡の地図・身代わりのお守り（負けを1回なかったことに）・
+ * 封印の小箱（追い出されても失わない1枚）・幸運のコイン（報酬を候補から選ぶ）・煙玉（番人から逃げる）。使うのは src/game/items/items.ts
  */
 
 /** 階の形（同じシード・階なら同じ。作り直しを減らすため、直近に作った階を覚えておく） */
@@ -27,6 +31,11 @@ export function runFloor(run: Pick<DungeonRun, 'seed' | 'floor'>): DungeonFloor 
     floorCache.set(key, f);
   }
   return f;
+}
+
+/** いまの見える範囲（たいまつを使った階なら広がる） */
+export function viewRadiusOf(run: Pick<DungeonRun, 'floor' | 'torchFloor'>): number {
+  return run.torchFloor === run.floor ? ITEM_RULES.torchViewRadius : DUNGEON_RUN.viewRadius;
 }
 
 export function isLastFloor(run: Pick<DungeonRun, 'floor'>): boolean {
@@ -70,6 +79,7 @@ export function startRun(save: SaveData, dungeonId: string, seed: number): SaveD
     gained: [],
     cooldown: 0,
     rng: (seed ^ 0x2545f491) | 0,
+    ...NO_RUN_EFFECTS,
   };
   return { ...save, activeDungeon: null, dungeonRun: run };
 }
@@ -121,12 +131,14 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   const x = run.x + d.x;
   const y = run.y + d.y;
   if (f.tiles[y]?.[x] !== '.' || entityAt(run, f, x, y)) return { run: turned, moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
-  let next: DungeonRun = { ...turned, x, y, explored: reveal(run.explored, f, { x, y }) };
-  // 見えない番人：戦ったあとの残り歩数があれば出ない。近くにいれば1歩ごとに抽選
+  let next: DungeonRun = { ...turned, x, y, explored: reveal(run.explored, f, { x, y }, viewRadiusOf(run)) };
+  // 見えない番人：魔除けの香が効いている間・戦ったあとの残り歩数があれば出ない。近くにいれば1歩ごとに抽選
   let guardian: FloorEntity | null = null;
+  const incense = next.incenseSteps > 0;
+  if (incense) next = { ...next, incenseSteps: next.incenseSteps - 1 };
   if (next.cooldown > 0) {
     next = { ...next, cooldown: next.cooldown - 1 };
-  } else {
+  } else if (!incense) {
     const near = nearestGuardian(next, f);
     if (near && near.distance <= DUNGEON_RUN.guardianEncounterRange) {
       const r = nextRandom(next.rng);
@@ -138,11 +150,20 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   return { run: next, moved: true, onStairs, omen: nearGuardian(next, f), guardian };
 }
 
-/** 見えない番人の予兆を出すか（近くにいて、戦ったあとの休みでない） */
+/** 見えない番人の予兆を出すか（近くにいて、戦ったあとの休みでなく、魔除けの香が効いていない） */
 export function nearGuardian(run: DungeonRun, f: DungeonFloor): boolean {
-  if (run.cooldown > 0) return false;
+  if (run.cooldown > 0 || run.incenseSteps > 0) return false;
   const near = nearestGuardian(run, f);
   return !!near && near.distance <= DUNGEON_RUN.guardianOmenRange;
+}
+
+/** ダンジョンの中で道具を使う（src/game/items/items.ts の useItem）。たいまつは使ったその場で、広がった範囲を見たことにする */
+export function useDungeonItem(save: SaveData, id: ItemId, sealCard?: string): UseItemResult {
+  const r = useItem(save, id, sealCard);
+  const run = r.save.dungeonRun;
+  if (r.status !== 'ok' || id !== 'torch' || !run) return r;
+  const f = runFloor(run);
+  return { ...r, save: { ...r.save, dungeonRun: { ...run, explored: reveal(run.explored, f, run, viewRadiusOf(run)) } } };
 }
 
 /** 下の階へ（上り階段はないので戻れない） */
@@ -150,7 +171,8 @@ export function descend(run: DungeonRun): DungeonRun {
   if (isLastFloor(run)) return run;
   const floor = run.floor + 1;
   const f = runFloor({ seed: run.seed, floor });
-  return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start) };
+  // たいまつ・遺跡の地図は下りると切れる（使った階を覚えているので、別の階では効かない）
+  return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start, viewRadiusOf({ ...run, floor })) };
 }
 
 /** 宝箱を開ける（1度だけ。中身は仮でまだ無い） */
@@ -200,6 +222,47 @@ export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; i
   return { save: next, cleared: true, firstClear, coins, clearCards };
 }
 
+/**
+ * 幸運のコインが効いているときの勝ち（バトラー・番人）：相手を倒したことにして、報酬は候補（choices）から選ぶのを待つ（rewardChoice）。
+ * コインの効き目はここで終わる。選ぶのは chooseRunReward
+ */
+export function winRunBattleChoosing(save: SaveData, target: { kind: BattleTargetKind; id: string }, choices: readonly string[]): SaveData {
+  const r = winRunBattle(save, target, null);
+  const run = r.save.dungeonRun;
+  if (!run || r.cleared) return r.save;
+  return { ...r.save, dungeonRun: { ...run, luckyCoin: false, rewardChoice: [...choices] } };
+}
+
+/** 幸運のコインの候補から1枚選んだ：所持カードに足して、この挑戦の獲得に記録する */
+export function chooseRunReward(save: SaveData, card: string): SaveData {
+  const run = save.dungeonRun;
+  if (!run?.rewardChoice || !run.rewardChoice.includes(card)) return save;
+  return { ...addCards(save, [{ cardId: card, count: 1 }]), dungeonRun: { ...run, rewardChoice: null, gained: [...run.gained, card] } };
+}
+
+/** 幸運のコインで報酬を選ぶか（効いていて、ボスでなく、別々の候補が2枚以上ある） */
+export function usesLuckyCoin(run: DungeonRun | null, kind: BattleTargetKind, candidates: readonly string[]): boolean {
+  return !!run?.luckyCoin && kind !== 'boss' && new Set(candidates).size >= ITEM_RULES.luckyCoinChoices;
+}
+
+/** 候補から別々のカードを n 枚えらぶ（random は 0 以上 1 未満を返す関数） */
+export function pickRewardChoices(candidates: readonly string[], n: number, random: () => number): string[] {
+  const pool = [...new Set(candidates)];
+  const picked: string[] = [];
+  while (picked.length < n && pool.length > 0) picked.push(pool.splice(Math.floor(random() * pool.length), 1)[0] as string);
+  return picked;
+}
+
+/**
+ * 煙玉で見えない番人から逃げる：煙玉を1つ使い、番人と戦ったときと同じく、しばらく番人が出ない。
+ * 負けの回数は増えず、カードはもらえず、番人は倒したことにならない。煙玉を持っていなければ何もしない（null）
+ */
+export function escapeGuardian(save: SaveData): SaveData | null {
+  const run = save.dungeonRun;
+  if (!run || itemCount(save, 'smokeBall') <= 0) return null;
+  return { ...consumeItem(save, 'smokeBall'), dungeonRun: { ...run, cooldown: DUNGEON_RUN.guardianCooldownSteps } };
+}
+
 export interface RunDefeat {
   readonly save: SaveData;
   /** 負けられる回数に達して、街の入り口へ戻された */
@@ -208,6 +271,10 @@ export interface RunDefeat {
   readonly lostCards: readonly string[];
   /** あと何回負けられるか（戻されたら 0） */
   readonly lossesLeft: number;
+  /** 身代わりのお守りが身代わりになった（負けの回数は増えていない） */
+  readonly charmSaved: boolean;
+  /** 封印の小箱で守って、戻されても失わなかった技カード */
+  readonly keptCard: string | null;
 }
 
 /**
@@ -216,19 +283,35 @@ export interface RunDefeat {
  */
 export function loseRunBattle(save: SaveData, target: { kind: BattleTargetKind; id: string }): RunDefeat {
   const run = save.dungeonRun;
-  if (!run) return { save, expelled: false, lostCards: [], lossesLeft: 0 };
+  if (!run) return { save, expelled: false, lostCards: [], lossesLeft: 0, charmSaved: false, keptCard: null };
+  const cooldown = target.kind === 'guardian' ? DUNGEON_RUN.guardianCooldownSteps : run.cooldown;
+  // 身代わりのお守り：負けの回数を増やさずにお守りが消える
+  if (run.charm) {
+    return {
+      save: { ...save, dungeonRun: { ...run, charm: false, cooldown } },
+      expelled: false,
+      lostCards: [],
+      lossesLeft: DUNGEON_RUN.maxLosses - run.losses,
+      charmSaved: true,
+      keptCard: null,
+    };
+  }
   const losses = run.losses + 1;
   if (losses < DUNGEON_RUN.maxLosses) {
-    const updated: DungeonRun = { ...run, losses, cooldown: target.kind === 'guardian' ? DUNGEON_RUN.guardianCooldownSteps : run.cooldown };
-    return { save: { ...save, dungeonRun: updated }, expelled: false, lostCards: [], lossesLeft: DUNGEON_RUN.maxLosses - losses };
+    const updated: DungeonRun = { ...run, losses, cooldown };
+    return { save: { ...save, dungeonRun: updated }, expelled: false, lostCards: [], lossesLeft: DUNGEON_RUN.maxLosses - losses, charmSaved: false, keptCard: null };
   }
+  // 封印の小箱で守った1枚は失わない（同じカードを2枚以上手に入れていても、守るのは1枚）。道具は失わない（save.items はそのまま）
+  const lost = [...run.gained];
+  const keep = run.sealedCard !== null ? lost.indexOf(run.sealedCard) : -1;
+  const keptCard = keep >= 0 ? (lost.splice(keep, 1)[0] as string) : null;
   const collection: Record<string, number> = { ...save.collection };
-  for (const id of run.gained) {
+  for (const id of lost) {
     const n = (collection[id] ?? 0) - 1;
     if (n > 0) collection[id] = n;
     else delete collection[id];
   }
-  return { save: { ...save, collection, dungeonRun: null }, expelled: true, lostCards: run.gained, lossesLeft: 0 };
+  return { save: { ...save, collection, dungeonRun: null }, expelled: true, lostCards: lost, lossesLeft: 0, charmSaved: false, keptCard };
 }
 
 /** 勝ったときにもらう技カードの候補（相手が使っていたモンスターの技） */
@@ -252,5 +335,5 @@ export function sanitizeRun(run: DungeonRun): DungeonRun | null {
   const fixed: DungeonRun = { ...run, floor, losses: Math.min(run.losses, DUNGEON_RUN.maxLosses - 1) };
   const onFloor = f.tiles[fixed.y]?.[fixed.x] === '.' && !entityAt(fixed, f, fixed.x, fixed.y);
   const at = onFloor && floor === run.floor ? { x: fixed.x, y: fixed.y } : f.start;
-  return { ...fixed, x: at.x, y: at.y, explored: reveal(floor === run.floor ? fixed.explored : '', f, at) };
+  return { ...fixed, x: at.x, y: at.y, explored: reveal(floor === run.floor ? fixed.explored : '', f, at, viewRadiusOf(fixed)) };
 }

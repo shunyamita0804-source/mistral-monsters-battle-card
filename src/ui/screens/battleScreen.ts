@@ -1118,7 +1118,7 @@ export const battleScreen: ScreenDefinition = {
         if (!state) return;
         state = { ...state, phase: 'ended', winner: 'opponent', endReason: 'knockout' };
         render();
-      });
+      }, undefined, 'warn');
     };
 
     const showRules = (): void => {

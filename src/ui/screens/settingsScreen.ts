@@ -88,8 +88,8 @@ export const settingsScreen: ScreenDefinition = {
               confirmModal(element, t('bed.deleteConfirm2'), [h('p', { class: 'modal__text', text: t('bed.deleteConfirm2Text') })], () => {
                 store.deleteSave();
                 ctx.reset('title');
-              });
-            });
+              }, undefined, 'warn');
+            }, undefined, 'warn');
           }, 'btn btn--danger'),
           store.qa
             ? h(

@@ -1,0 +1,301 @@
+/*
+ * ダンジョンの道具（2026-10-27 ユーザー指示書「ダンジョンの道具とショップの『道具を買う』」）。
+ * 道具のアイコン・煙玉とお守りの演出・効き目の印・ショップの4つ目の札の絵はデザイン担当に依頼中。
+ * 届くまでは【仮】の見た目（丸い札に1文字と「仮」の印）
+ */
+
+/* ===== 道具のアイコン（デザイン33点の 14） ===== */
+.item-icon {
+  flex: none;
+  display: block;
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.55));
+}
+
+.item-icon--small {
+  width: 22px;
+  height: 22px;
+}
+
+/* ===== ショップの4つ目の札「道具を買う」（デザイン33点の 15。ほかの札と同じ形・同じ置き方） ===== */
+.shop-menu__item--items {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 900 / 179;
+  padding: 0 4% 0 31%;
+  border: 0;
+  border-radius: 0;
+  border-image: none;
+  background: url('@assets/images/ui/shop/menu_items.webp') center / 100% 100% no-repeat;
+  color: #f3ead2;
+  font-size: 17px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* 道具の絵の右下の「持っている数」の丸い札 */
+.item-shop__art {
+  position: relative;
+  flex: none;
+}
+
+.item-shop__owned-tag {
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: url('@assets/images/ui/items/owned_tag.webp') center / contain no-repeat;
+  font-size: 12px;
+  font-weight: 800;
+  color: #f3ead2;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+.shop-menu__item-new,
+.item-shop__new {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #d9483b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  vertical-align: middle;
+  text-shadow: none;
+}
+
+/* ===== 道具を買う（一覧） ===== */
+.item-shop__coins {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 8px 12px 0;
+  font-weight: 700;
+}
+
+.item-shop__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.item-shop__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-panel);
+}
+
+.item-shop__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-shop__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.item-shop__desc {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-sub);
+}
+
+.item-shop__meta {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.item-shop__price {
+  font-weight: 800;
+  color: #e8c76a;
+}
+
+.item-shop__buy {
+  flex: none;
+  min-width: 64px;
+  min-height: 40px;
+}
+
+.item-shop__note {
+  margin: 4px 12px 16px;
+  font-size: 12px;
+  color: var(--color-sub);
+}
+
+/* 数を選ぶ窓 */
+.item-qty__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0;
+}
+
+.item-qty__btn {
+  min-width: 48px;
+  min-height: 44px;
+  font-size: 22px;
+}
+
+.item-qty__count {
+  min-width: 56px;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.item-qty__total {
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ===== ダンジョン：道具の一覧 ===== */
+.drun__item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drun__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drun__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.drun__item-name {
+  margin: 0;
+  font-weight: 800;
+}
+
+.drun__item-count {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--color-sub);
+}
+
+.drun__item-block {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-sub);
+}
+
+.drun__item .btn {
+  flex: none;
+  min-height: 40px;
+}
+
+/* 封印の小箱・幸運のコインの「1枚選ぶ」 */
+.drun__choose-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.drun__choose-card {
+  min-height: 44px;
+}
+
+/* ===== ダンジョン：効いている道具の印（左上。デザイン33点の 33） ===== */
+.drun__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.drun__effect {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.item-mark {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+/* 魔除けの香の残りの歩数 */
+.drun__effect-steps {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 18px;
+  padding: 0 4px;
+  border: 1px solid rgb(216 184 106 / 0.7);
+  border-radius: 999px;
+  background: rgb(10 8 6 / 0.85);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+  color: #f3ead2;
+}
+
+/* メニューの「手に入れた技カード」の、封印の小箱で守ったカードの印 */
+.drun__menu-cards .item-mark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* ===== 煙玉（4コマ）・お守り（3コマ）の演出：主人公の上に重ねる（デザイン33点の 31・32） ===== */
+.drun__smoke,
+.drun__charm-fx {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 9;
+  pointer-events: none;
+  transform: translate(-50%, -62%);
+}
+
+.drun__smoke img {
+  display: block;
+  width: 300px;
+  height: auto;
+}
+
+.drun__charm-fx img {
+  display: block;
+  width: 220px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgb(255 220 140 / 0.5));
+}
+
+.drun__guardian.is-gone {
+  transition: opacity 0.45s ease-out;
+  opacity: 0;
+}

@@ -1,13 +1,17 @@
-import { getMonster, skillsOf } from '../../data/cards.ts';
+import { cardCatalog, getMonster, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { recordPersonCard } from '../../game/people/peopleBook.ts';
 import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/items.ts';
+import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import type { DungeonFloor, FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
+  chooseRunReward,
   descend,
+  escapeGuardian,
   entityAt,
   facingPoint,
   isLastFloor,
@@ -15,20 +19,27 @@ import {
   move,
   nearGuardian,
   openRunChest,
+  pickRewardChoices,
   rewardCandidates,
   runFloor,
   sanitizeRun,
+  useDungeonItem,
+  usesLuckyCoin,
+  viewRadiusOf,
   winRunBattle,
+  winRunBattleChoosing,
   type BattleTargetKind,
 } from '../../game/dungeon/run.ts';
 import type { Direction, DungeonRun } from '../../game/save/saveData.ts';
 import { DIR_ROW, IDLE_COL, PLAYER_SHEET_COLS, PLAYER_SHEET_ROWS, WALK_COLS } from '../../game/world/walkAnim.ts';
 import { t } from '../../i18n/i18n.ts';
-import { cardName, dungeonName, opponentName } from '../../i18n/content.ts';
+import { cardName, dungeonName, itemName, opponentName } from '../../i18n/content.ts';
 import { bgm, type BgmId } from '../bgm.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
-import { confirmModal, messageModal, openModal } from '../components/modal.ts';
-import { h } from '../dom.ts';
+import { itemIcon, itemMark } from '../components/itemIcon.ts';
+import { confirmModal, messageModal, openModal, type ModalEmblem, type ModalHandle } from '../components/modal.ts';
+import { createCardView } from '../components/cardView.ts';
+import { button, h } from '../dom.ts';
 import type { GameStore } from '../gameStore.ts';
 import { sound } from '../sound.ts';
 import { PLAYER_SHEET } from './worldScreen.ts';
@@ -44,6 +55,28 @@ import miniStairs from '@assets/images/ui/dungeon/mini_stairs.webp';
 import miniChest from '@assets/images/ui/dungeon/mini_chest.webp';
 import miniBattler from '@assets/images/ui/dungeon/mini_battler.webp';
 import miniBoss from '@assets/images/ui/dungeon/mini_boss.webp';
+// 2026-10-27 デザイン33点（tools/design/ui33_build.py が切り出した部品）
+import stairsConfirmArt from '@assets/images/ui/dungeon/stairs_confirm.webp';
+import pouchArt1 from '@assets/images/ui/dungeon/pouch_1.webp';
+import pouchArt2 from '@assets/images/ui/dungeon/pouch_2.webp';
+import pouchArt3 from '@assets/images/ui/dungeon/pouch_3.webp';
+import menuIconGained from '@assets/images/ui/dungeon/menu_icon_gained.webp';
+import menuIconLosses from '@assets/images/ui/dungeon/menu_icon_losses.webp';
+import menuIconItems from '@assets/images/ui/dungeon/menu_icon_items.webp';
+import emptyBoxArt from '@assets/images/ui/frame/empty_box.webp';
+import emptyShelfArt from '@assets/images/ui/frame/empty_shelf.webp';
+import cardGetStand from '@assets/images/ui/reward/card_get_stand.webp';
+import cardGetLight from '@assets/images/ui/reward/card_get_light.webp';
+import fxLeave1 from '@assets/images/effects/fx_leave_1.webp';
+import fxLeave2 from '@assets/images/effects/fx_leave_2.webp';
+import fxLeave3 from '@assets/images/effects/fx_leave_3.webp';
+import fxSmoke1 from '@assets/images/effects/fx_smoke_1.webp';
+import fxSmoke2 from '@assets/images/effects/fx_smoke_2.webp';
+import fxSmoke3 from '@assets/images/effects/fx_smoke_3.webp';
+import fxSmoke4 from '@assets/images/effects/fx_smoke_4.webp';
+import fxCharm1 from '@assets/images/effects/fx_charm_1.webp';
+import fxCharm2 from '@assets/images/effects/fx_charm_2.webp';
+import fxCharm3 from '@assets/images/effects/fx_charm_3.webp';
 
 /**
  * ランダム生成のダンジョンの画面（2026-10-26 試作「ミスモンBC ダンジョン試作（たたき台）」。GB 版のダンジョンを参考に）。
@@ -97,6 +130,12 @@ const ENCOUNTER_FRAME_MS = 90;
 const ENCOUNTER_WHITE_MS = 220;
 /** 階に入ったときの帯 */
 const BANNER_MS = 2200;
+/** 煙玉（4コマ）・お守り（3コマ）・去るときの光（3コマ）の1コマの時間 */
+const SMOKE_FRAME_MS = 220;
+const CHARM_FRAME_MS = 380;
+const LEAVE_FRAME_MS = 280;
+/** 革袋のふくらみ（手に入れた枚数が 0・1〜2・3 以上） */
+const POUCH_ART = [pouchArt1, pouchArt2, pouchArt3] as const;
 /** ダンジョンごとの BGM（歩行画面の DUNGEON_BGM と同じ） */
 const RUN_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 
@@ -114,7 +153,12 @@ class DungeonRunView {
   readonly #omenEdge = h('div', { class: 'drun__omen-edge', attrs: { 'aria-hidden': 'true' } });
   readonly #place = h('p', { class: 'drun__place' });
   readonly #losses = h('span', { class: 'drun__chip' });
-  readonly #gained = h('span', { class: 'drun__chip' });
+  /** 手に入れた技カードの枚数：革袋（ふくらみ3段階。デザイン33点の 7）と数 */
+  readonly #pouch = h('img', { class: 'drun__pouch', attrs: { alt: '', draggable: 'false', 'aria-hidden': 'true' } });
+  readonly #gainedCount = h('span', { class: 'drun__pouch-count' });
+  readonly #gained = h('span', { class: 'drun__chip drun__chip--pouch' }, this.#pouch, this.#gainedCount);
+  /** 効いている道具の印（左上。魔除けの香は残りの歩数。印の絵は届くまで仮） */
+  readonly #effects = h('div', { class: 'drun__effects', attrs: { role: 'status', 'aria-label': t('dungeonRun.effects') } });
   readonly #mini = h('canvas', { class: 'drun__minimap', attrs: { role: 'img', 'aria-label': t('dungeonRun.minimap') } });
   readonly #live = h('p', { class: 'drun__live', attrs: { 'aria-live': 'polite' } });
   /** スティック（指を置いた所に出る）と、右下の「調べる」 */
@@ -177,10 +221,12 @@ class DungeonRunView {
     this.#root.append(
       this.#view,
       h('div', { class: 'drun__light', attrs: { 'aria-hidden': 'true' } }),
+      // 主人公のまわりのあたたかい明かり（2026-10-27 デザイン33点の 1。加算で重ねる。ui33.css）
+      h('div', { class: 'drun__glow', attrs: { 'aria-hidden': 'true' } }),
       this.#omenEdge,
       this.#player,
       this.#omenMark,
-      h('header', { class: 'drun__hud' }, this.#place, h('div', { class: 'drun__chips' }, this.#losses, this.#gained)),
+      h('header', { class: 'drun__hud' }, this.#place, h('div', { class: 'drun__chips' }, this.#losses, this.#gained), this.#effects),
       this.#mini,
       this.#stick,
       this.#actBtn,
@@ -206,12 +252,31 @@ class DungeonRunView {
     this.#store.dungeonIntro = null;
     const flash = this.#store.flashMessage;
     this.#store.flashMessage = null;
+    // 身代わりのお守りが身代わりになった：お守りが砕ける演出のあとでお知らせ
+    const charm = this.#store.flashBanner === 'charm';
+    if (charm) this.#store.flashBanner = null;
+    // 勝ったとき：相手が光の粒になって去り、手に入れた技カードを台座と光で見せる
+    const won = this.#store.flashRun;
+    this.#store.flashRun = null;
     if (intro && dungeon) {
       this.#busy = true;
       showDungeonIntro(this.#root, dungeon, () => {
         this.#busy = false;
         this.#floorBanner();
       });
+    } else if (run.rewardChoice) {
+      // 幸運のコイン：勝ったあと、もらう技カードを選ぶ（選ぶ前に閉じても、次に開いたときにまた選ぶ）
+      this.#chooseReward();
+    } else if (flash && charm) {
+      this.#charmEffect(() => this.#message(flash));
+    } else if (flash && won) {
+      // 勝った相手が去るのを見せてから、手に入れた技カードのお知らせ
+      const card = won.card;
+      const show = (): void => (card ? this.#message(flash, undefined, cardGetVisual(card), 'ok') : this.#message(flash));
+      if (won.leave) {
+        this.#busy = true;
+        this.#leaveEffect(won.leave, show);
+      } else show();
     } else if (flash) {
       this.#message(flash);
     } else {
@@ -312,6 +377,8 @@ class DungeonRunView {
   /** いまの階のマスと、置いてあるものを作り直す */
   #buildFloor(): void {
     const f = runFloor(this.#run);
+    // 階ごとの床と壁（太古の遺跡の地下2階・3階：2026-10-27 デザイン33点の 3・4。uiParts12.css・ui33.css）
+    for (let n = 1; n <= DUNGEON_RUN.floors; n++) this.#root.classList.toggle(`drun--floor-${n}`, n === this.#run.floor + 1);
     this.#floor = f;
     this.#world.replaceChildren();
     this.#entityEls.clear();
@@ -360,7 +427,7 @@ class DungeonRunView {
     // 見たマス（暗め）と、いま見えているマス（明るい）
     for (const i of this.#lit) this.#tiles[i]?.classList.remove('is-lit');
     this.#lit = [];
-    const r = DUNGEON_RUN.viewRadius;
+    const r = viewRadiusOf(run);
     for (let y = run.y - r; y <= run.y + r; y++) {
       for (let x = run.x - r; x <= run.x + r; x++) {
         if (x < 0 || y < 0 || x >= f.width || y >= f.height) continue;
@@ -403,7 +470,13 @@ class DungeonRunView {
         h('span', { class: `drun__lantern${i < DUNGEON_RUN.maxLosses - run.losses ? '' : ' is-out'}`, attrs: { 'aria-hidden': 'true' } }),
       ),
     );
-    this.#gained.textContent = t('dungeonRun.gained', { n: run.gained.length });
+    this.#gained.setAttribute('aria-label', t('dungeonRun.gained', { n: run.gained.length }));
+    const pouch = POUCH_ART[run.gained.length === 0 ? 0 : run.gained.length < 3 ? 1 : 2];
+    if (this.#pouch.getAttribute('src') !== pouch) this.#pouch.setAttribute('src', pouch);
+    this.#gainedCount.textContent = String(run.gained.length);
+    // たいまつ：明かりが大きくなる（dungeonRun.css・ui33.css）
+    this.#root.classList.toggle('is-torch', run.torchFloor === run.floor);
+    this.#refreshEffects(run);
     this.#drawMinimap();
     // 向いている先にバトラー・ボス・宝箱がある、または階段の上：「調べる」が金色に光る（街と同じ）
     const p = facingPoint(run);
@@ -419,10 +492,19 @@ class DungeonRunView {
     if (!f || !g) return;
     const run = this.#run;
     g.clearRect(0, 0, this.#mini.width, this.#mini.height);
+    // 遺跡の地図を使った階：まだ見ていない通路・部屋も薄く出す（宝箱・バトラー・番人は出さない。階段とボスの間は下で印）
+    const mapped = run.mapFloor === run.floor;
     for (let y = 0; y < f.height; y++) {
       for (let x = 0; x < f.width; x++) {
-        if (run.explored[y * f.width + x] !== '1') continue;
-        g.fillStyle = f.tiles[y]?.[x] === '.' ? 'rgb(214 200 168 / 0.85)' : 'rgb(70 62 52 / 0.85)';
+        const floor = f.tiles[y]?.[x] === '.';
+        if (run.explored[y * f.width + x] !== '1') {
+          if (mapped && floor) {
+            g.fillStyle = 'rgb(214 200 168 / 0.42)';
+            g.fillRect(x * MINI_CELL, y * MINI_CELL, MINI_CELL, MINI_CELL);
+          }
+          continue;
+        }
+        g.fillStyle = floor ? 'rgb(214 200 168 / 0.85)' : 'rgb(70 62 52 / 0.85)';
         g.fillRect(x * MINI_CELL, y * MINI_CELL, MINI_CELL, MINI_CELL);
       }
     }
@@ -434,9 +516,10 @@ class DungeonRunView {
       const w = (hgt * img.naturalWidth) / img.naturalHeight;
       g.drawImage(img, (x + 0.5) * MINI_CELL - w / 2, (y + 0.85) * MINI_CELL - hgt, w, hgt);
     };
-    if (f.stairs && run.explored[f.stairs.y * f.width + f.stairs.x] === '1') mark(f.stairs.x, f.stairs.y, 'stairs');
+    if (f.stairs && (mapped || run.explored[f.stairs.y * f.width + f.stairs.x] === '1')) mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
-      if (e.kind === 'guardian' || run.explored[e.y * f.width + e.x] !== '1') continue;
+      if (e.kind === 'guardian') continue;
+      if (run.explored[e.y * f.width + e.x] !== '1' && !(mapped && e.kind === 'boss')) continue;
       if (e.kind === 'chest' && run.opened.includes(e.id)) continue;
       mark(e.x, e.y, e.kind);
     }
@@ -612,10 +695,48 @@ class DungeonRunView {
         ctx.reset(store.save.dungeonRun ? 'dungeonRun' : 'world');
       },
     };
-    this.#message(t(key, { name: opponentName(opponent), monsters: names }), () => {
+    const text = t(key, { name: opponentName(opponent), monsters: names });
+    const fight = (): void => {
       this.#busy = true;
       this.#encounterFlash(() => ctx.navigate('battle'));
+    };
+    const smoke = itemCount(store.save, 'smokeBall');
+    if (kind !== 'guardian' || smoke <= 0) {
+      this.#message(text, fight);
+      return;
+    }
+    // 見えない番人で煙玉を持っている：相手の顔ぶれを見てから「戦う」か「煙玉を使う」（2026-10-27 道具）
+    let chosen = false;
+    const handle = openModal(this.#root, {
+      body: text.split('\n').map((line) => h('p', { class: 'modal__text', text: line })),
+      closeOnBackdrop: false,
+      actions: [
+        { label: t('dungeonRun.guardianSmoke', { n: smoke }), onTap: () => ((chosen = true), handle.close(), this.#escapeWithSmoke()) },
+        { label: t('dungeonRun.guardianFight'), primary: true, onTap: () => ((chosen = true), handle.close(), fight()) },
+      ],
+      onClose: () => {
+        if (!chosen) fight();
+      },
     });
+  }
+
+  /** 煙玉で見えない番人から逃げる：煙の中で番人が消える。負けの回数は増えず、カードももらえない */
+  #escapeWithSmoke(): void {
+    const next = escapeGuardian(this.#store.save);
+    if (!next) return;
+    this.#store.pendingBattle = null;
+    this.#store.update(() => next);
+    // 煙玉の演出（デザイン33点の 31。4コマ）：主人公の足元に玉が落ちてはじけ、煙が広がって番人が消える
+    this.#busy = true;
+    this.#playFrames([fxSmoke1, fxSmoke2, fxSmoke3, fxSmoke4], SMOKE_FRAME_MS, 'drun__smoke', () => {
+      for (const el of this.#world.querySelectorAll('.drun__guardian')) el.remove();
+      this.#refresh(false);
+      this.#setOmen(false);
+      this.#message(t('dungeonRun.smokeEscaped'));
+    });
+    setTimeout(() => {
+      for (const el of this.#world.querySelectorAll('.drun__guardian')) el.classList.add('is-gone');
+    }, SMOKE_FRAME_MS * 2);
   }
 
   /** 対戦に入るときの光（歩行画面と同じ絵） */
@@ -636,7 +757,8 @@ class DungeonRunView {
     confirmModal(
       this.#root,
       t('dungeonRun.stairsTitle'),
-      [h('p', { class: 'modal__text', text: t('dungeonRun.stairsBody') })],
+      // 階段を下りる確認の挿絵（2026-10-27 デザイン33点の 18）
+      [h('img', { class: 'drun__stairs-art', attrs: { src: stairsConfirmArt, alt: '', draggable: 'false' } }), h('p', { class: 'modal__text', text: t('dungeonRun.stairsBody') })],
       () => {
         sound.play('stairs');
         this.#store.update((s) => (s.dungeonRun ? { ...s, dungeonRun: descend(s.dungeonRun) } : s));
@@ -645,6 +767,7 @@ class DungeonRunView {
         this.#floorBanner();
       },
       () => (this.#busy = false),
+      'warn',
     );
   }
 
@@ -657,28 +780,252 @@ class DungeonRunView {
     const dungeon = getDungeon(run.dungeonId);
     const counts = new Map<string, number>();
     for (const id of run.gained) counts.set(id, (counts.get(id) ?? 0) + 1);
-    const cards = [...counts].map(([id, n]) => h('li', { text: t('dungeonRun.menuCard', { name: cardName(id), n }) }));
+    let keep = false;
+    const cards = [...counts].map(([id, n]) => {
+      const name = t('dungeonRun.menuCard', { name: cardName(id), n });
+      // 封印の小箱で守ったカード：守ったカードの印（デザイン33点の 33）
+      return id === run.sealedCard ? h('li', {}, itemMark('sealed'), t('dungeonRun.menuSealed', { name })) : h('li', { text: name });
+    });
+    // メニューの窓・項目の行・アイコン（2026-10-27 デザイン33点の 9・10。いまある項目だけ：負けた回数・手に入れたカード・道具）
+    const icon = (src: string): HTMLElement => h('img', { class: 'drun__menu-icon', attrs: { src, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
     const handle = openModal(this.#root, {
       title: t('dungeonRun.menuTitle'),
       className: 'drun__menu',
       body: [
-        h('p', { class: 'modal__text', text: t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) }) }),
-        h('p', { class: 'modal__text', text: t('dungeonRun.menuLosses', { n: run.losses, max: DUNGEON_RUN.maxLosses }) }),
-        h('p', { class: 'modal__text drun__menu-head', text: t('dungeonRun.menuGained') }),
-        cards.length > 0 ? h('ul', { class: 'drun__menu-cards' }, ...cards) : h('p', { class: 'modal__text', text: t('dungeonRun.menuNone') }),
+        h('p', { class: 'modal__text drun__menu-place', text: t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) }) }),
+        h('div', { class: 'drun__menu-row' }, icon(menuIconLosses), h('p', { class: 'modal__text', text: t('dungeonRun.menuLosses', { n: run.losses, max: DUNGEON_RUN.maxLosses }) })),
+        h('div', { class: 'drun__menu-row' }, icon(menuIconGained), h('p', { class: 'modal__text drun__menu-head', text: t('dungeonRun.menuGained') })),
+        cards.length > 0
+          ? h('ul', { class: 'drun__menu-cards' }, ...cards)
+          : h('div', { class: 'drun__empty' }, h('img', { class: 'drun__empty-art', attrs: { src: emptyBoxArt, alt: '', draggable: 'false' } }), h('p', { class: 'modal__text', text: t('dungeonRun.menuNone') })),
+        // 道具（2026-10-27）。朝の「未決事項への回答」（メニューの中身）が届くまでは、項目を足すところまで
+        h(
+          'button',
+          { class: 'drun__menu-row drun__menu-row--button', attrs: { type: 'button' }, on: { click: () => ((keep = true), handle.close(), this.#openItems()) } },
+          icon(menuIconItems),
+          h('span', { text: t('dungeonRun.menuItems') }),
+        ),
       ],
       actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
-      onClose: () => (this.#busy = false),
+      onClose: () => {
+        if (!keep) this.#busy = false;
+      },
     });
   }
 
-  #message(text: string, after?: () => void): void {
+  /* ---------- 道具（2026-10-27 ユーザー指示書「ダンジョンの道具」。ルールは src/game/items/items.ts・src/game/dungeon/run.ts） ---------- */
+
+  /** メニューの「道具」：持っている道具の一覧。使えないものは理由を出して押せなくする */
+  #openItems(): void {
+    this.#busy = true;
+    const save = this.#store.save;
+    const owned = ITEMS.filter((i) => itemCount(save, i.id) > 0);
+    let next: (() => void) | null = null;
+    const rows = owned.map((item) => {
+      const block = itemBlock(save, item.id);
+      const use = button(t('dungeonRun.itemUse'), () => {
+        next = () => this.#askUse(item);
+        handle.close();
+      }, 'btn btn--primary btn--small');
+      use.disabled = block !== null;
+      return h(
+        'li',
+        { class: 'drun__item', dataset: { id: item.id } },
+        itemIcon(item),
+        h(
+          'div',
+          { class: 'drun__item-info' },
+          h('p', { class: 'drun__item-name' }, itemName(item), h('span', { class: 'drun__item-count', text: t('dungeonRun.itemCount', { n: itemCount(save, item.id) }) })),
+          block ? h('p', { class: 'drun__item-block', text: blockText(block) }) : null,
+        ),
+        use,
+      );
+    });
+    const handle = openModal(this.#root, {
+      title: t('dungeonRun.itemsTitle'),
+      className: 'drun__items',
+      body:
+        rows.length > 0
+          ? [h('ul', { class: 'drun__item-list' }, ...rows)]
+          : [h('div', { class: 'drun__empty' }, h('img', { class: 'drun__empty-art', attrs: { src: emptyShelfArt, alt: '', draggable: 'false' } }), ...t('dungeonRun.itemsNone').split('\n').map((line) => h('p', { class: 'modal__text', text: line })))],
+      actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
+      onClose: () => {
+        if (next) next();
+        else this.#busy = false;
+      },
+    });
+  }
+
+  /** 使うか確かめてから使う（帰還の羽根は専用の確認、封印の小箱は守るカードを選ぶ） */
+  #askUse(item: ItemDefinition): void {
+    if (item.id === 'sealBox') return this.#chooseSealCard();
+    const title = item.id === 'returnFeather' ? t('world.leaveTitle') : t('dungeonRun.itemConfirm', { item: itemName(item) });
+    const body = item.id === 'returnFeather' ? t('dungeonRun.featherBody').split('\n').map((line) => h('p', { class: 'modal__text', text: line })) : [];
+    let used = false;
+    confirmModal(
+      this.#root,
+      title,
+      body,
+      () => {
+        used = true;
+        this.#useItem(item.id);
+      },
+      () => {
+        if (!used) this.#busy = false;
+      },
+      item.id === 'returnFeather' ? 'warn' : 'ask',
+    );
+  }
+
+  /** 封印の小箱：この挑戦で手に入れた技カードから1枚選ぶ */
+  #chooseSealCard(): void {
+    const run = this.#run;
+    let chosen: string | null = null;
+    const ids = [...new Set(run.gained)];
+    const handle: ModalHandle = openModal(this.#root, {
+      title: t('dungeonRun.sealTitle'),
+      className: 'drun__choose',
+      body: [
+        h('p', { class: 'modal__text', text: t('dungeonRun.sealChoose') }),
+        h(
+          'div',
+          { class: 'drun__choose-list' },
+          ...ids.map((id) => button(cardName(id), () => ((chosen = id), handle.close()), 'btn drun__choose-card')),
+        ),
+      ],
+      actions: [{ label: t('common.cancel'), onTap: () => handle.close() }],
+      onClose: () => {
+        if (chosen) this.#useItem('sealBox', chosen);
+        else this.#busy = false;
+      },
+    });
+  }
+
+  #useItem(id: ItemId, sealCard?: string): void {
+    const r = useDungeonItem(this.#store.save, id, sealCard);
+    if (r.status !== 'ok') {
+      this.#busy = false;
+      return;
+    }
+    const gained = this.#run.gained.length;
+    this.#store.update(() => r.save);
+    sound.play('reward');
+    if (r.returned) {
+      // 帰還の羽根：挑戦を終えて街の入り口へ
+      this.#store.flashMessage = t('dungeonRun.featherDone', { n: gained });
+      this.#ctx.reset('world');
+      return;
+    }
+    this.#refresh(false);
+    this.#setOmen(nearGuardian(this.#run, runFloor(this.#run)));
+    const done: Record<Exclude<ItemId, 'returnFeather' | 'smokeBall'>, string> = {
+      torch: t('dungeonRun.usedTorch'),
+      incense: t('dungeonRun.usedIncense', { n: ITEM_RULES.incenseSteps }),
+      ruinsMap: t('dungeonRun.usedMap'),
+      luckyCoin: t('dungeonRun.usedCoin'),
+      guardianCharm: t('dungeonRun.usedCharm'),
+      sealBox: t('dungeonRun.usedSeal', { card: sealCard ? cardName(sealCard) : '' }),
+    };
+    this.#message(done[id as keyof typeof done] ?? '');
+  }
+
+  /** 幸運のコイン：勝ったあと、候補から1枚選ぶ */
+  #chooseReward(): void {
+    const choices = this.#run.rewardChoice ?? [];
     this.#release();
     this.#busy = true;
-    messageModal(this.#root, text, () => {
-      this.#busy = false;
-      after?.();
+    let chosen: string | null = null;
+    const handle = openModal(this.#root, {
+      title: t('dungeonRun.coinTitle'),
+      className: 'drun__choose',
+      closeOnBackdrop: false,
+      body: [
+        ...t('dungeonRun.coinChoose').split('\n').map((line) => h('p', { class: 'modal__text', text: line })),
+        h(
+          'div',
+          { class: 'drun__choose-list' },
+          ...choices.map((id) => button(cardName(id), () => ((chosen = id), handle.close()), 'btn drun__choose-card')),
+        ),
+      ],
+      onClose: () => {
+        if (!chosen) return;
+        this.#store.update((s) => chooseRunReward(s, chosen as string));
+        this.#refresh(false);
+        this.#message(t('dungeonRun.coinGot', { card: cardName(chosen) }), undefined, cardGetVisual(chosen), 'ok');
+      },
     });
+  }
+
+  /** お守りが身代わりになった演出（デザイン33点の 32。3コマ）：主人公の上でお守りが光り、裂けて、金の粒が舞い上がる */
+  #charmEffect(after: () => void): void {
+    this.#busy = true;
+    sound.play('reward');
+    this.#playFrames([fxCharm1, fxCharm2, fxCharm3], CHARM_FRAME_MS, 'drun__charm-fx', () => {
+      this.#busy = false;
+      after();
+    });
+  }
+
+  /** 主人公の上にコマ送りの絵を重ねる（最後のコマのあと消して done） */
+  #playFrames(frames: readonly string[], frameMs: number, className: string, done: () => void): void {
+    const img = h('img', { attrs: { src: frames[0] ?? '', alt: '', draggable: 'false' } });
+    const el = h('div', { class: className, attrs: { 'aria-hidden': 'true' } }, img);
+    this.#root.append(el);
+    frames.slice(1).forEach((src, i) => setTimeout(() => (img.src = src), (i + 1) * frameMs));
+    setTimeout(() => {
+      el.remove();
+      done();
+    }, frames.length * frameMs);
+  }
+
+  /** 勝った相手（バトラー）が、その場から光の粒と土ぼこりになって去る（デザイン33点の 5。3コマ） */
+  #leaveEffect(id: string, done: () => void): void {
+    const f = this.#floor;
+    const e = f?.entities.find((x) => x.id === id);
+    if (!e || e.kind !== 'npc') return done();
+    const ghost = h('div', { class: `drun__entity drun__entity--npc drun__entity--b${runBattlerLook(Number(id.split('-').pop() ?? 0))} is-lit drun__leaving`, attrs: { 'aria-hidden': 'true' } });
+    const fx = h('img', { class: 'drun__leave-fx', attrs: { src: fxLeave1, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
+    for (const el of [ghost, fx]) {
+      el.style.left = `${e.x * TILE}px`;
+      el.style.top = `${e.y * TILE}px`;
+    }
+    this.#world.append(ghost, fx);
+    [fxLeave2, fxLeave3].forEach((src, i) => setTimeout(() => (fx.src = src), (i + 1) * LEAVE_FRAME_MS));
+    setTimeout(() => {
+      ghost.remove();
+      fx.remove();
+      done();
+    }, 3 * LEAVE_FRAME_MS + 120);
+  }
+
+  /** 効いている道具の印（左上。デザイン33点の 33。魔除けの香は残りの歩数を添える） */
+  #refreshEffects(run: DungeonRun): void {
+    const chips: HTMLElement[] = [];
+    const chip = (id: ItemId, label: string): void => {
+      chips.push(h('span', { class: `drun__effect drun__effect--${id}`, attrs: { 'aria-label': label } }, itemMark(id), id === 'incense' ? h('span', { class: 'drun__effect-steps', text: String(run.incenseSteps) }) : null));
+    };
+    if (run.torchFloor === run.floor) chip('torch', t('dungeonRun.effectTorch'));
+    if (run.incenseSteps > 0) chip('incense', t('dungeonRun.effectIncense', { n: run.incenseSteps }));
+    if (run.charm) chip('guardianCharm', t('dungeonRun.effectCharm'));
+    if (run.luckyCoin) chip('luckyCoin', t('dungeonRun.effectCoin'));
+    this.#effects.replaceChildren(...chips);
+    this.#effects.hidden = chips.length === 0;
+  }
+
+  #message(text: string, after?: () => void, visual?: HTMLElement, emblem?: ModalEmblem): void {
+    this.#release();
+    this.#busy = true;
+    messageModal(
+      this.#root,
+      text,
+      () => {
+        this.#busy = false;
+        after?.();
+      },
+      undefined,
+      visual,
+      emblem,
+    );
   }
 
   /** 階に入ったときの帯（最後の階はボスの帯） */
@@ -691,6 +1038,40 @@ class DungeonRunView {
     const el = h('div', { class: `world__banner world__banner--${kind}`, attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'world__banner-text', text }));
     this.#root.append(el);
     setTimeout(() => el.remove(), BANNER_MS);
+  }
+}
+
+/** 技カードを手に入れたときの絵：後ろに光、台座の上にカード（デザイン33点の 6） */
+function cardGetVisual(card: string): HTMLElement {
+  const def = cardCatalog.get(card);
+  return h(
+    'div',
+    { class: 'drun__card-get', attrs: { 'aria-hidden': 'true' } },
+    h('img', { class: 'drun__card-get-light', attrs: { src: cardGetLight, alt: '', draggable: 'false' } }),
+    h('img', { class: 'drun__card-get-stand', attrs: { src: cardGetStand, alt: '', draggable: 'false' } }),
+    def ? h('div', { class: 'drun__card-get-card' }, createCardView(def, 96, false)) : null,
+  );
+}
+
+/** 道具を使えない理由の文 */
+function blockText(block: ItemBlock): string {
+  switch (block) {
+    case 'torchActive':
+    case 'mapActive':
+      return t('dungeonRun.blockFloor');
+    case 'coinActive':
+      return t('dungeonRun.blockActive');
+    case 'charmUsed':
+    case 'sealBoxUsed':
+      return t('dungeonRun.blockOnce');
+    case 'noCards':
+      return t('dungeonRun.blockNoCards');
+    case 'guardianOnly':
+      return t('dungeonRun.blockGuardian');
+    case 'none':
+    case 'noRun':
+    case 'choosing':
+      return '';
   }
 }
 
@@ -716,6 +1097,12 @@ function groundOf(dungeonId: string): 'grass' | 'gravel' {
 /** 勝った：相手のモンスターの技から1枚（ランダム）。ボスならクリアして街へ */
 function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent: OpponentDefinition): void {
   const candidates = rewardCandidates(opponent.monsters, skillsOf);
+  // 幸運のコイン：バトラー・番人なら、別々の2枚の候補から選ぶ（選ぶのはダンジョンの画面に戻ってから。中断しても残る）
+  if (usesLuckyCoin(store.save.dungeonRun, kind, candidates)) {
+    const choices = pickRewardChoices(candidates, ITEM_RULES.luckyCoinChoices, Math.random);
+    store.update((s) => ({ ...winRunBattleChoosing(s, { kind, id }, choices), stats: { ...s.stats, battlesWon: s.stats.battlesWon + 1 } }));
+    return;
+  }
   const card = candidates.length > 0 ? (candidates[Math.floor(Math.random() * candidates.length)] as string) : null;
   const r = winRunBattle(store.save, { kind, id }, card);
   store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesWon: s.stats.battlesWon + 1 } }));
@@ -724,8 +1111,12 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
   const got = card ? t('dungeonRun.win', { card: cardName(card) }) : t('dungeonRun.winNoCard');
   if (!r.cleared) {
     store.flashMessage = got;
+    store.flashRun = { ...(card ? { card } : {}), ...(kind === 'npc' ? { leave: id } : {}) };
     return;
   }
+  // クリアの報酬の場面（デザイン33点の 12・13。worldScreen.ts）：祭壇にボスのモンスターカード（初めてのクリアの景品にあれば）と、勝って手に入れた技カード
+  const boss = r.clearCards.find((c) => cardCatalog.get(c.cardId)?.kind === 'monster')?.cardId;
+  store.flashClear = { cards: [boss, card].filter((c): c is string => !!c), firstClear: r.firstClear };
   const coins = t('common.coins', { n: r.coins });
   store.flashBanner = 'clear';
   store.flashMessage = `${got}\n${t(r.firstClear ? 'world.dungeonClearedFirst' : 'world.dungeonCleared', { coins })}`;
@@ -739,7 +1130,12 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
 function onRunLoss(store: GameStore, kind: BattleTargetKind, id: string): void {
   const r = loseRunBattle(store.save, { kind, id });
   store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesLost: s.stats.battlesLost + 1 } }));
-  store.flashMessage = r.expelled ? t('dungeonRun.expelled', { n: r.lostCards.length }) : t('dungeonRun.lose', { n: r.lossesLeft });
+  if (r.charmSaved) store.flashBanner = 'charm';
+  store.flashMessage = r.charmSaved
+    ? t('dungeonRun.charmSaved')
+    : r.expelled
+      ? t('dungeonRun.expelled', { n: r.lostCards.length }) + (r.keptCard ? `\n${t('dungeonRun.expelledKept', { card: cardName(r.keptCard) })}` : '')
+      : t('dungeonRun.lose', { n: r.lossesLeft });
   // 3回負けて入り口へ戻されたときの帯（2026-10-27 デザイン第13弾）
   if (r.expelled) store.flashBanner = 'retreat';
 }

@@ -43,7 +43,14 @@ export class GameStore {
   /** 歩行画面に戻ったときに出すお知らせ */
   flashMessage: string | null = null;
   /** 歩行画面に戻ったときに出す帯（2026-10-26 デザイン第10弾：ダンジョンをクリアしたとき。2026-10-27 第13弾：3回負けて入り口へ戻されたとき） */
-  flashBanner: 'clear' | 'retreat' | null = null;
+  flashBanner: 'clear' | 'retreat' | 'charm' | null = null; // 'charm'：身代わりのお守りの演出（ダンジョン探索の画面。2026-10-27）
+  /**
+   * ダンジョン探索の画面に戻ったときの演出（2026-10-27 デザイン33点）：card＝手に入れた技カード（台座と光で見せる）・
+   * leave＝勝った相手のバトラーの ID（その場から光の粒になって去る）
+   */
+  flashRun: { readonly card?: string; readonly leave?: string } | null = null;
+  /** ダンジョン（ランダム生成）をクリアして街に戻ったときの、報酬の場面（祭壇に置くカードと、初回クリアか） */
+  flashClear: { readonly cards: readonly string[]; readonly firstClear: boolean } | null = null;
   /** ダンジョンに入った直後に出す、挿絵とダンジョン名の札（ダンジョンの ID。2026-10-26 ユーザー指示） */
   dungeonIntro: string | null = null;
   /** 新しく始めた直後に、物語の始まりの挿絵を出す（2026-10-27 ユーザー指示。主人公を選んだあとに1回だけ） */
@@ -119,6 +126,8 @@ export class GameStore {
     this.pendingBattle = null;
     this.flashMessage = null;
     this.flashBanner = null;
+    this.flashRun = null;
+    this.flashClear = null;
     this.practiceResult = null;
     this.introV2Result = null;
     this.lastSaveOk = true;

@@ -1,0 +1,233 @@
+[
+  {
+    "id": 1,
+    "name": "dungeon_light.png",
+    "width": 3072,
+    "height": 1024,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 2,
+    "name": "omen_vignette.png",
+    "width": 1170,
+    "height": 2532,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 3,
+    "name": "ruins_b2_tiles.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 4,
+    "name": "ruins_b3_tiles.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 5,
+    "name": "leave_fx.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 6,
+    "name": "card_get.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 1
+  },
+  {
+    "id": 7,
+    "name": "gain_pouch.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 8,
+    "name": "card_lost.png",
+    "width": 2048,
+    "height": 768,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 9,
+    "name": "drun_menu_window.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 10,
+    "name": "drun_menu_icons.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 11,
+    "name": "full_map_parts.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 228
+  },
+  {
+    "id": 12,
+    "name": "clear_reward_scene.png",
+    "width": 1170,
+    "height": 2532,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 13,
+    "name": "first_clear_seal.png",
+    "width": 1536,
+    "height": 768,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 14,
+    "name": "dungeon_items.png",
+    "width": 2048,
+    "height": 1024,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 15,
+    "name": "shop_item_parts.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 16,
+    "name": "splash_art.png",
+    "width": 1170,
+    "height": 2532,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 17,
+    "name": "loading_mark.png",
+    "width": 2048,
+    "height": 256,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 18,
+    "name": "stairs_confirm.png",
+    "width": 1024,
+    "height": 640,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 19,
+    "name": "worldmap_locked.png",
+    "width": 1536,
+    "height": 768,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 20,
+    "name": "deck_bg.png",
+    "width": 1170,
+    "height": 2532,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 21,
+    "name": "coin_burst.png",
+    "width": 2048,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 22,
+    "name": "toast_plate.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 23,
+    "name": "dialog_emblems.png",
+    "width": 2048,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 24,
+    "name": "hud_top_buttons.png",
+    "width": 1536,
+    "height": 1024,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 25,
+    "name": "tutorial_pointer.png",
+    "width": 1536,
+    "height": 768,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 26,
+    "name": "empty_states.png",
+    "width": 1536,
+    "height": 768,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 27,
+    "name": "credits_scroll.png",
+    "width": 1170,
+    "height": 2532,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 28,
+    "name": "store_frame.png",
+    "width": 1290,
+    "height": 2796,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 29,
+    "name": "feature_graphic_bg.png",
+    "width": 2048,
+    "height": 1000,
+    "cornerAlpha": 255
+  },
+  {
+    "id": 30,
+    "name": "adaptive_icon.png",
+    "width": 2048,
+    "height": 1024,
+    "cornerAlpha": 247
+  },
+  {
+    "id": 31,
+    "name": "smoke_escape.png",
+    "width": 2048,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 32,
+    "name": "charm_break.png",
+    "width": 1536,
+    "height": 512,
+    "cornerAlpha": 0
+  },
+  {
+    "id": 33,
+    "name": "item_status_marks.png",
+    "width": 2048,
+    "height": 512,
+    "cornerAlpha": 0
+  }
+]
