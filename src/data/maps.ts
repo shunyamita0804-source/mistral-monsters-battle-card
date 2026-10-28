@@ -115,7 +115,7 @@ export interface ChestObject {
   readonly look: 'wood' | 'iron' | 'gold';
 }
 
-/** 街の住人（民家A〜E にいる人。話しかけると短い会話。台詞は仮） */
+/** 街の住人（話しかけると短い会話。台詞は仮）。A＝マルタ・D＝ロザリーは店の中、B＝ピート・E＝ハロルドは街の外（2026-10-28） */
 /** 住人C（大工・住宅C）は 2026-10-27 に住宅C をカードバトラー管理局に置き換えたのでなくした */
 export type ResidentId = 'resident_a' | 'resident_b' | 'resident_d' | 'resident_e';
 export const RESIDENT_IDS: readonly ResidentId[] = ['resident_a', 'resident_b', 'resident_d', 'resident_e'];
@@ -299,10 +299,15 @@ const artMap = (
   spawn: MapDefinition['spawn'],
 ): MapDefinition => ({ id, name, area, tiles: art.grid, objects, spawn, art });
 
+/** 街の立ち位置（worldArt.generated.ts の town.items の *_SPOT）の足元のマス */
+const townSpot = (id: string): { x: number; y: number } => spotOf(TOWN_ART, id);
+
 /**
- * 街。ユーザー承認済みの正式な絵（建物11棟・噴水・地面・小物）を、設計図（docs/design/seimon-town/）どおりに並べたもの。
- * 北中央＝大会会場、北西＝カード練習場・住宅A/B、北東＝住宅C/D/E、中央＝噴水広場、南西＝カードショップ・カード研究所、
- * 南東＝主人公の家ととなりの家（案内役の家）、南＝草原への出口（ダンジョン方面）。
+ * 街（2026-10-28 指示書「街を新しい絵で作り直す」。tools/design/town2026_build.py が組み立てる）。配置図の番号：
+ * 北の高台＝1 大会会場（15 大階段）、西の高台＝3 カード研究所・17 見晴らし台（16 階段）、北東＝2 カードバトラー管理局・12 大工の作業小屋（入れない）、
+ * 中央＝13 噴水の広場、西＝4 カード練習場、東＝5 カードショップ・6 花屋（住宅A）・22 屋台・7 仕立て屋（住宅D）、
+ * 南西＝8 ピートの家（住宅B）・9 ハロルドの家（住宅E）・18 小川・24 木の橋・10 主人公の家・11 となりの家、南＝19 石の橋・14 南の門（ダンジョンへ）。
+ * 住人：ピートとハロルドは外だけ（ショップの前・広場のベンチのそば）、マルタとロザリーは店の中だけ（2026-10-28 ユーザー）
  */
 export const TOWN: MapDefinition = artMap(
   'town',
@@ -316,13 +321,16 @@ export const TOWN: MapDefinition = artMap(
       const room = d.mapId === BUREAU_MAP_ID ? BUREAU_WORLD_ART : artOf(ROOM_ART_OF[d.mapId] ?? '');
       return warp(d.id, door.x, door.y, door.w, d.label, { kind: 'map', mapId: d.mapId, ...entryOf(room) });
     }),
-    // 南の土の道の端（草原の方角）。踏むと既存のダンジョン選択（家の壁の地図と同じ画面）へ
+    // 14 南の門の扉の前。踏むと既存のダンジョン選択（家の壁の地図と同じ画面）へ
     warp('door-dungeon', TOWN_ART.exit.x, TOWN_ART.exit.y, TOWN_ART.exit.w, 'ダンジョン入口', { kind: 'dungeonGate' }),
     interactAt('sign-fountain', TOWN_ART.fountain as CellRect, '噴水', 'message', '街の中央の噴水。水の音が心地よい。'),
-    // となりの家の女性（案内役）。物語の進み具合で、街か練習場のどちらかにいる。街では自分の家の前の通り
-    npc('guide-town', doorOf(TOWN_ART, 'GUIDE_HOME').back.x - 4, doorOf(TOWN_ART, 'GUIDE_HOME').back.y + 6, 'neighbor_guide'),
+    // となりの家の女性（案内役）。物語の進み具合で、街か練習場のどちらかにいる。街では自分の家の前の道
+    npc('guide-town', townSpot('GUIDE_SPOT').x, townSpot('GUIDE_SPOT').y, 'neighbor_guide'),
+    // 住人B（ピート）：カードショップの前。住人E（ハロルド）：噴水の広場のベンチのそば（新聞を読んでいる人のイメージ）
+    npc('town-pete', townSpot('PETE_SPOT').x, townSpot('PETE_SPOT').y, 'resident_b'),
+    npc('town-harold', townSpot('HAROLD_SPOT').x, townSpot('HAROLD_SPOT').y, 'resident_e'),
   ],
-  { ...townDoorFront('PLAYER_HOME'), y: TOWN_ART.spawn.y, dir: 'down' },
+  { x: TOWN_ART.spawn.x, y: TOWN_ART.spawn.y, dir: 'down' },
 );
 
 const HOME_ART = artOf('player');
@@ -429,12 +437,19 @@ export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラ�
 ], entryOf(BUREAU_ART));
 
 const HOUSE_ART = artOf('house');
-/** 民家（住宅A・B・D・E。部屋の絵は共通）。それぞれ住人A・B・D・E がいる */
+/**
+ * 部屋の中に住人がいる民家（2026-10-28 ユーザー：マルタ〔花屋＝住宅A〕とロザリー〔仕立て屋＝住宅D〕は店番で中だけ。
+ * ピート〔住宅B〕とハロルド〔住宅E〕は外だけなので、家の中は空）
+ */
+const RESIDENT_INSIDE: ReadonlySet<'a' | 'b' | 'd' | 'e'> = new Set(['a', 'd'] as const);
+/** 民家（住宅A・B・D・E。部屋の絵は共通） */
 const house = (key: 'a' | 'b' | 'd' | 'e'): MapDefinition =>
   artMap(`house-${key}`, '民家', 'interior', HOUSE_ART, [
     interactAt(`house-${key}-shelf`, itemOf(HOUSE_ART, 'SHELF'), '棚', 'message', '食器がきちんと並んでいる。'),
     interactAt(`house-${key}-table`, itemOf(HOUSE_ART, 'TABLE'), 'テーブル', 'message', 'テーブルクロスがかかっている。'),
-    npc(`house-${key}-resident`, spotOf(HOUSE_ART, 'RESIDENT_SPOT').x, spotOf(HOUSE_ART, 'RESIDENT_SPOT').y, `resident_${key}`),
+    ...(RESIDENT_INSIDE.has(key)
+      ? [npc(`house-${key}-resident`, spotOf(HOUSE_ART, 'RESIDENT_SPOT').x, spotOf(HOUSE_ART, 'RESIDENT_SPOT').y, `resident_${key}`)]
+      : []),
     roomExit(`house-${key}-exit`, HOUSE_ART, `HOUSE_${key.toUpperCase()}`),
   ], entryOf(HOUSE_ART));
 // 住宅C は 2026-10-27 にカードバトラー管理局に置き換えた（住人C もなくした）

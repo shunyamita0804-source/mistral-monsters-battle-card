@@ -1,6 +1,6 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
-import type { ArtDoorAnim } from '../../data/worldArt.generated.ts';
+import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
 import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
@@ -296,8 +296,6 @@ const DUNGEON_SOUND: Readonly<Record<string, { readonly ground: StepSurface; rea
   'dungeon-02': { ground: 'grass', ambient: null },
 };
 const DEFAULT_DUNGEON_SOUND = { ground: 'gravel', ambient: 'drip' } as const;
-/** 街の南の出口へ続く土の道（この行から下）。ほかの道は石畳 */
-const TOWN_DIRT_FROM_Y = 117;
 /** 建物の中の床（無い部屋は板）。大会会場は石 */
 const ROOM_GROUND: Readonly<Record<string, StepSurface>> = { hall: 'stone', bureau: 'stone' };
 /** 施設の看板を上の帯の下に保つ位置（論理px） */
@@ -511,6 +509,8 @@ export class WorldView {
   #last = 0;
   /** 自動ドア */
   #doors: DoorState[] = [];
+  /** くり返す絵（2026-10-28 街の噴水のしぶき）と、いま見せているコマ */
+  #loops: { readonly el: HTMLImageElement; readonly loop: ArtLoop; frame: number }[] = [];
   /** 歩きの位相（歩数。1歩＝4コマ。コマ送り用。walkAnim.ts）・最後に歩いていた時刻 */
   #phase = 0;
   #lastMoving = 0;
@@ -807,6 +807,7 @@ export class WorldView {
       for (const id of ['town', 'home', 'neighbor', 'shop', 'lab', 'hall', 'practice', 'house-a', 'bureau']) {
         const art = getMap(id)?.art;
         for (const img of [...(art?.tiles ?? []), ...(art?.sprites ?? [])]) urls.add(img.file);
+        for (const loop of art?.loops ?? []) for (const f of loop.frames) urls.add(f);
       }
       for (const url of urls) {
         const img = new Image();
@@ -865,6 +866,7 @@ export class WorldView {
     this.#touch = null;
     this.#shadows.clear();
     this.#doors = [];
+    this.#loops = [];
     this.#held = null;
     this.#keys.clear();
     const map = this.#map;
@@ -887,6 +889,11 @@ export class WorldView {
         this.#mapLayer.append(this.#artImage(img.file, img, 'world__furniture', z));
       }
       this.#buildDoors(map.art.doorAnims ?? []);
+      for (const loop of map.art.loops ?? []) {
+        const el = this.#artImage(loop.frames[0] ?? '', loop, 'world__furniture world__loop', 10 + Math.round(loop.z * this.#scale)) as HTMLImageElement;
+        this.#loops.push({ el, loop, frame: 0 });
+        this.#mapLayer.append(el);
+      }
     } else {
       const tiles = h('div', { class: 'world__tiles' });
       tiles.style.gridTemplateColumns = `repeat(${width}, ${TILE}px)`;
@@ -1034,6 +1041,16 @@ export class WorldView {
     const dx = door.anim.travel * door.t * this.#scale;
     door.left.style.transform = `translateX(${-dx}px)`;
     door.right.style.transform = `translateX(${dx}px)`;
+  }
+
+  /** くり返す絵のコマを進める（コマが変わったときだけ書きかえる） */
+  #updateLoops(time: number): void {
+    for (const l of this.#loops) {
+      const frame = Math.floor(time / l.loop.ms) % l.loop.frames.length;
+      if (frame === l.frame) continue;
+      l.frame = frame;
+      l.el.src = l.loop.frames[frame] ?? l.el.src;
+    }
   }
 
   #updateDoors(time: number): void {
@@ -1397,6 +1414,7 @@ export class WorldView {
   #render(time = performance.now()): void {
     const p = this.#pos;
     this.#updateDoors(time);
+    this.#updateLoops(time);
     // 歩いている間（と、歩き続けている途中のマスの切り替わり）は歩行シート、止まったら待機の絵
     const walking = isWalking(time, this.#lastMoving, this.#move !== null || this.#treadmillMoving);
     const w = parseFloat(this.#player.style.width);
@@ -2469,12 +2487,12 @@ export class WorldView {
     return (id ? DUNGEON_SOUND[id] : undefined) ?? DEFAULT_DUNGEON_SOUND;
   }
 
-  /** 立っている所の地面（足音の種類）。街は石畳、南の出口への道だけ土 */
+  /** 立っている所の地面（足音の種類）。街は石畳と草（2026-10-28 の新しい街はマス目の ',' が草） */
   #ground(): StepSurface {
     const map = this.#map;
     if (map.area === 'dungeon') return this.#dungeonSound().ground;
     if (map.area === 'interior') return ROOM_GROUND[map.id] ?? 'wood';
-    return map.id === 'town' && this.#tile.y >= TOWN_DIRT_FROM_Y ? 'dirt' : 'stone';
+    return map.tiles[this.#tile.y]?.[this.#tile.x] === ',' ? 'grass' : 'stone';
   }
 
   #confirmLeave(): void {

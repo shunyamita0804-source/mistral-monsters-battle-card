@@ -1,0 +1,51 @@
+{
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
+  "coordinate_system": "top-left pixels; x right, y down",
+  "layers": [
+    {
+      "file": "cardshop_building_open.png",
+      "x": 0,
+      "y": 0,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "file": "cardshop_door_left.png",
+      "x": 646,
+      "y": 546,
+      "width": 124,
+      "height": 254,
+      "open_dx": -120
+    },
+    {
+      "file": "cardshop_door_right.png",
+      "x": 766,
+      "y": 546,
+      "width": 122,
+      "height": 254,
+      "open_dx": 120
+    }
+  ],
+  "door_clip": {
+    "x": 648,
+    "y": 548,
+    "width": 238,
+    "height": 250
+  },
+  "duration_seconds": 0.35,
+  "entrance_trigger": {
+    "x": 620,
+    "y": 790,
+    "width": 290,
+    "height": 90
+  },
+  "notes": [
+    "Doors clip to the central portal so retracted panels disappear behind fixed facade.",
+    "Glass is low-alpha with no baked shop interior. Interior remains stationary.",
+    "Only the central doorway of the approved art was patched to reveal the open interior.",
+    "Trigger is a suggested starting value; adapt to actual player collider and scene scale."
+  ]
+}

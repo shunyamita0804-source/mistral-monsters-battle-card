@@ -1,0 +1,98 @@
+[
+  {
+    "file": "tile_street.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": false,
+    "sha256": "84153725ea0e8bc8ec4b1af46a1b68b0e4d74ed7632cc94ec5b3a300b073eae6"
+  },
+  {
+    "file": "tile_plaza.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": false,
+    "sha256": "e97dda03c8976c0e248c64e48fd76d1e2a60b3480d65d07afbf55d5ba8726160"
+  },
+  {
+    "file": "tile_grass.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": false,
+    "sha256": "556b419f5eb7879ac92465bb5670dfe4cbb2a779c92fcfa9a5bab40801ea6da8"
+  },
+  {
+    "file": "decal_grass.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "38ece27968e87d6fa2bf9c0d262e24df5217651a1fcf4b6c4a48fd8f6dae970d"
+  },
+  {
+    "file": "edges_curb.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "060cfdc0f33958cfe7aba893711d5c68c6262ab3c5a4f42d101c5b1905df8079"
+  },
+  {
+    "file": "terrace_parts.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "edbf3739c9508d565a901075e8d9962d905460070de53da2960c7efe3dbae537"
+  },
+  {
+    "file": "stream_parts.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "84a580fcc0ea566e22309bea0df2834628f83362a701da764bb6ded5a8f05413"
+  },
+  {
+    "file": "bridges.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "b8be351d226d9fc2052344a155f4510de150bf699509d83fcc7356c3707594a5"
+  },
+  {
+    "file": "wall_gate.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "c9cb3d3c61c6ed3d6e1f731d75e0c828254ece4fade68cf28fecb3563bb745c2"
+  },
+  {
+    "file": "fountain_layers.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "f51d9684737414bca1c009ea8186d9a843e3e5ca36035c0eee0e4376ef198202"
+  },
+  {
+    "file": "props_street.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "fb443de7c9f7c89fe4459cc76ab5abff8f6e50ae22790a07b341ebf87262057f"
+  },
+  {
+    "file": "props_nature.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "302b7ec7ece472ad84025fc6a3ac15a0f4a3399d944af4e1199c1ef9c79f5348"
+  }
+]

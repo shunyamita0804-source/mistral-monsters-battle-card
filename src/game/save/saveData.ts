@@ -35,7 +35,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 19;
+export const SAVE_VERSION = 20;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -225,8 +225,8 @@ export interface SaveData {
 
 export const TRANSACTION_LOG_SIZE = 100;
 
-/** 街の決まった位置：主人公の家の前（正式な絵の街。マスは設計図の 32px） */
-export const DEFAULT_LOCATION: Location = { mapId: 'town', x: 80, y: 100, dir: 'down' };
+/** 街の決まった位置：主人公の家の前（2026-10-28 の新しい街。マスは設計図の 32px。worldArt.generated.ts の town.spawn と同じ） */
+export const DEFAULT_LOCATION: Location = { mapId: 'town', x: 31, y: 185, dir: 'down' };
 
 /** 新しく始めたときの位置：自分の家の中（家から街に出ると、となりの家の女性が声をかける） */
 export const NEW_GAME_LOCATION: Location = { mapId: 'home', x: 12, y: 14, dir: 'down' };
@@ -549,6 +549,16 @@ function migrateDungeonsV19(raw: RawObject): RawObject {
   };
 }
 
+/**
+ * v19 → v20（2026-10-28 指示書「街を新しい絵で作り直す」）：街の広さと建物の並びが変わり、街の座標が変わった。
+ * 街にいたら主人公の家の前に移す（部屋・ダンジョンの座標は変わっていないのでそのまま）
+ */
+function migrateTown2026V20(raw: RawObject): RawObject {
+  const loc = raw.location;
+  if (isObject(loc) && loc.mapId === 'town') return { ...raw, location: { ...DEFAULT_LOCATION } };
+  return raw;
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -569,6 +579,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   16: migrateItemsV17,
   17: migrateTournamentV18,
   18: migrateDungeonsV19,
+  19: migrateTown2026V20,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

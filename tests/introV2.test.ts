@@ -230,11 +230,11 @@ describe('導入イベントV2：地図', () => {
     expect(findPathWhere(BUREAU, BUREAU.spawn, (x, y) => x >= exit.x && x < exit.x + exit.w && y === exit.y, blocked, 4000, STEPS_4)).not.toBeNull();
   });
 
-  it('管理局は街の北東（もとの住宅C の所）。住宅C の中にいたセーブは家に戻す', () => {
+  it('管理局は街の北東（2026-10-28 の新しい街の配置図の 2）。住宅C の中にいたセーブは家に戻す', () => {
     const door = TOWN.objects.find((o) => o.id === 'door-bureau');
     if (!door || door.type !== 'warp') throw new Error('door-bureau');
-    expect(door.x * 32).toBeGreaterThan(2912);
-    expect(door.x * 32).toBeLessThan(3488);
+    expect(door.x * 32).toBeGreaterThan((TOWN.art?.width ?? 0) * 0.6);
+    expect(door.y * 32).toBeLessThan((TOWN.art?.height ?? 0) * 0.35);
     expect(TOWN.objects.some((o) => o.id === 'door-house-c')).toBe(false);
     const inHouseC = { ...fresh(), location: { mapId: 'house-c', x: 5, y: 5, dir: 'down' as const } };
     const fixed = sanitizeLocation(inHouseC);
