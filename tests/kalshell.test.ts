@@ -100,9 +100,7 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
     const original = readFileSync(`${ORIGINAL_DIR}/02_ASSETS/BattleArt/Kalshell_BattleArt_Transparent_Approved.png`);
     expect(readFileSync('assets/images/cards/monsters/kalshell_battlecard.png').equals(original)).toBe(true);
     expect(existsSync('assets/images/ui/battlecard/frame_kalshell.png')).toBe(true);
-    for (const size of ['normal', 'hand'])
-      for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade'])
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_kalshell.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_kalshell.webp`)).toBe(true);
   });
 });
 

@@ -353,6 +353,16 @@ export function skillShortText(skill: SkillCard): string {
   return t(`card.short.${e.type}`, { v });
 }
 
+/**
+ * 技カードの効果の帯の文字（2026-10-29 技カードの新しい形）。
+ * 防御・回避・特殊は今の説明の文。攻撃技は追加の効果があるときだけ、その部分だけ（「回避されない」など）。
+ * 「相手1体に2ダメージ」のような数字の言い直しは出さない（ふつうの攻撃技は ''＝帯なし）
+ */
+export function skillBandText(skill: SkillCard): string {
+  if (skill.effect.type !== 'attack') return skillShortText(skill);
+  return officialEffectText(skill) ?? attackNote(skill.effect);
+}
+
 /** 攻撃の印の説明 */
 function attackNote(effect: Extract<SkillEffect, { type: 'attack' }>): string {
   if (effect.unblockable && effect.undodgeable) return t('card.attackNote.both');

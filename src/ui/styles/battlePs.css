@@ -1092,16 +1092,6 @@
 
 /* ===== 2026-10-26 ユーザー指示（iPhone の試遊から）：手札の絵・大きさ・選んだ手札・配る動き・相手のカードを大きく裏から表へ ===== */
 
-/* 手札の絵：横長の窓いっぱいに（左右のすき間をぼかした絵で埋めていたのが「右の方が黒い」と見えたため。上下を少し切る） */
-.skill-card--hand .skill-card__art-fill {
-  display: none;
-}
-
-.skill-card--hand .skill-card__art {
-  object-fit: cover;
-  object-position: 50% 38%;
-}
-
 /* 手札の列：横に送らず全部見せる（入りきらないときは handRow が --hand-overlap で少し重ねる）。選んだカードが上の欄へはみ出して見えるように */
 .battle__hand {
   overflow: visible;

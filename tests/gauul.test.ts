@@ -123,12 +123,8 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     expect(MONSTERS.filter((m) => m.id === 'mon-gauul')).toHaveLength(1);
   });
 
-  it('技カード新UI（v5）のガウルの色（オレンジ）の枠が全分類にある', () => {
-    for (const size of ['normal', 'hand']) {
-      for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade']) {
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_gauul.webp`)).toBe(true);
-      }
-    }
+  it('技カードのガウルの色（オレンジ）の枠が2つの大きさにある（2026-10-29 新しい形：モンスターごとに1枚）', () => {
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_gauul.webp`)).toBe(true);
   });
 
   it('初期配布16枚（2026-10-26 ユーザー正式確定）：01・06 が3枚、02・07・10 が2枚、03・11・12・13 が1枚', () => {

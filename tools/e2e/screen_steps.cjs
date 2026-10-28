@@ -1,4 +1,4 @@
-// 使い方: STEPS='[{"click":"セレクタ","wait":1000,"shot":"名前"}, {"drag":".gacha-open__pack"}, {"slow":15}, {"burst":3,"every":1500,"shot":"x"}]' PREFIX=G DPR=3 node tools/e2e/screen_steps.cjs URL セーブ.json 出力
+// 使い方: STEPS='[{"click":"セレクタ","wait":1000,"shot":"名前"}, {"drag":".gacha-open__pack"}, {"slow":15}, {"burst":3,"every":1500,"shot":"x"}]' PREFIX=G DPR=3 node tools/e2e/screen_steps.cjs URL セーブ.json 出力（画面の大きさは W・H で変えられる。2026-10-29）
 // 「続きから」のあと Enter（調べる）を押し、STEPS を順に行う。ガチャ（{shop,45,20,up}）・デッキ編集（{home,8,18,left}）で使った。slow＝setTimeout を何倍に遅くするか（一瞬の演出を撮る）
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -8,7 +8,7 @@ const t0 = Date.now();
 const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`, ...a);
 (async () => {
   const browser = await chromium.launch();
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: +(process.env.DPR || 2), isMobile: true, hasTouch: true });
+  const ctx = await browser.newContext({ viewport: { width: +(process.env.W || 390), height: +(process.env.H || 844) }, deviceScaleFactor: +(process.env.DPR || 2), isMobile: true, hasTouch: true });
   await ctx.addInitScript((s) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('mistria-battle-card/save', s); sessionStorage.setItem('seeded', '1'); } }, save);
   const page = await ctx.newPage();
   page.on('pageerror', (e) => log('PAGEERROR', e.message));

@@ -214,9 +214,7 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(readFileSync('assets/images/cards/monsters/myurol_battlecard.png').equals(original)).toBe(true);
     expect([original.readUInt32BE(16), original.readUInt32BE(20)]).toEqual([800, 920]);
     expect(existsSync('assets/images/ui/battlecard/frame_myurol.png')).toBe(true);
-    for (const size of ['normal', 'hand'])
-      for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade'])
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_myurol.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_myurol.webp`)).toBe(true);
   });
 
   it('日本語は JSON の効果の文のまま。英語は仮訳で、日本語が残らない', () => {

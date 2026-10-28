@@ -67,7 +67,7 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     expect(PUKARIM_GACHA_RARE).toEqual([puk(7), puk(14)]);
     expect(BATTLE_CARDS[PUKARIM_MONSTER_ID]?.frame).toBe('pukarim');
     expect(existsSync('assets/images/ui/battlecard/frame_pukarim.png')).toBe(true);
-    for (const size of ['normal', 'hand']) for (const c of ['force', 'wisdom', 'special', 'defense', 'evade']) expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${c}_pukarim.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_pukarim.webp`)).toBe(true);
   });
 
   it('ふつうに遊んでいる人には出ない：カードの一覧・初期配布・新しいセーブには入らない（台帳と適合技にはある）', () => {

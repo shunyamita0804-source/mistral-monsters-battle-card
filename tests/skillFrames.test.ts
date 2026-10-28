@@ -1,11 +1,14 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { cardCatalog, getSkill } from '../src/data/cards.ts';
+import { skillBandText } from '../src/game/cards/cardTypes.ts';
 
 /**
- * 技・サポートカードの枠（2026-10-28：v3 の絵を LAYOUT の2倍の大きさの webp で。npm run art:skillframes）。
- * 重さは前の PNG の合計（約4.6MB）より大きくしない（ユーザー指示）
+ * 技・サポートカードの枠（2026-10-29 新しい形：平らな名前の帯＋大きな絵の窓。npm run art:skillframes＝tools/art/skillcard_simple_build.py）。
+ * 枠はモンスターごとに1枚（frame_{normal,hand}_{モンスター}.webp）とサポートの銀（frame_{normal,hand}_support.webp）
  */
-const DIR = 'assets/images/ui/skillcard_v5';
+const DIR = 'assets/images/ui/skillcard_simple';
+const ORIGINAL = 'design-parts/ui-skillcard-simple-20261028/frames';
 const frames = readdirSync(DIR).filter((f) => f.startsWith('frame_'));
 
 /** webp の絵の大きさ（VP8X の見出しから読む） */
@@ -15,28 +18,51 @@ function webpSize(path: string): [number, number] {
   return [1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)];
 }
 
-describe('技・サポートカードの枠', () => {
-  it('すべて webp（前の PNG は残っていない）', () => {
-    expect(frames.length).toBeGreaterThan(0);
-    expect(frames.filter((f) => !f.endsWith('.webp'))).toEqual([]);
+/** PNG の大きさ */
+function pngSize(path: string): [number, number] {
+  const b = readFileSync(path);
+  return [b.readUInt32BE(16), b.readUInt32BE(20)];
+}
+
+describe('技・サポートカードの枠（新しい形）', () => {
+  it('原本は LAYOUT（253×382・208×210）のちょうど4倍。届いたままの絵も保管してある', () => {
+    expect(pngSize(`${ORIGINAL}/frame_normal_simple.png`)).toEqual([1012, 1528]);
+    expect(pngSize(`${ORIGINAL}/frame_hand_simple.png`)).toEqual([832, 840]);
+    for (const k of ['normal', 'hand']) expect(existsSync(`${ORIGINAL}/original/frame_${k}_simple_as_delivered.png`)).toBe(true);
   });
 
-  it('分類の色・モンスターの色・サポートの枠がそろっている', () => {
-    for (const size of ['normal', 'hand']) {
-      expect(existsSync(`${DIR}/frame_${size}_support.webp`)).toBe(true);
-      for (const c of ['force', 'wisdom', 'defense', 'evade', 'special']) {
-        expect(existsSync(`${DIR}/frame_${size}_${c}.webp`)).toBe(true);
-        for (const m of ['soramo', 'gauul', 'lazuck', 'myurol', 'kalshell']) expect(existsSync(`${DIR}/frame_${size}_${c}_${m}.webp`)).toBe(true);
-      }
-    }
+  it('技を持つモンスターは、すべて自分の色の枠がある（サポート以外のカードに銀の枠が出ない）', () => {
+    const monsters = new Set([...cardCatalog.all()].filter((c) => c.kind === 'skill').map((c) => (c.kind === 'skill' ? c.monsterId : '')));
+    expect(monsters.size).toBeGreaterThan(6);
+    for (const id of monsters) for (const size of ['normal', 'hand']) expect(existsSync(`${DIR}/frame_${size}_${id.replace(/^mon-/, '')}.webp`), `${id} ${size}`).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`${DIR}/frame_${size}_support.webp`)).toBe(true);
   });
 
-  it('大きさは LAYOUT（253×382・208×210）のちょうど2倍', () => {
+  it('大きさは LAYOUT の2倍（506×764・416×420）', () => {
     for (const f of frames) expect(webpSize(`${DIR}/${f}`)).toEqual(f.startsWith('frame_normal') ? [506, 764] : [416, 420]);
   });
 
-  it('合計の重さは前の PNG（約4.6MB）より小さい', () => {
+  it('前の枠（v5 の分類の色の枠）・数字の入ったマナの玉の絵は残っていない', () => {
+    expect(readdirSync('assets/images/ui/skillcard_v5').filter((f) => f.startsWith('frame_') || f.startsWith('mana_'))).toEqual([]);
+  });
+
+  it('合計の重さは前の枠（約4.6MB）よりずっと小さい', () => {
     const total = frames.reduce((n, f) => n + statSync(`${DIR}/${f}`).size, 0);
-    expect(total).toBeLessThan(4_600_000);
+    expect(total).toBeLessThan(1_500_000);
+  });
+});
+
+describe('効果の帯の文字', () => {
+  it('ふつうの攻撃技は帯なし（数字の言い直しは出さない）', () => {
+    expect(skillBandText(getSkill('skl-soramo14-03'))).toBe('');
+  });
+
+  it('効果のある攻撃技は、その部分だけ', () => {
+    expect(skillBandText(getSkill('skl-lazuck-04'))).toBe('回避されない');
+    expect(skillBandText(getSkill('skl-pukarim-07'))).toBe('ほっぺにためているときに使うと、回避されない');
+  });
+
+  it('防御・回避・特殊は今の説明の文', () => {
+    for (const id of ['skl-soramo14-11', 'skl-soramo14-13', 'skl-soramo14-09']) expect(skillBandText(getSkill(id))).not.toBe('');
   });
 });

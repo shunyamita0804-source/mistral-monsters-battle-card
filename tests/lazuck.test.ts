@@ -113,7 +113,7 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
   });
 
   it('枠は紫：技カードの枠（全分類・2つの大きさ）とバトル用カードの枠がある。技の種類の色・マナの色は共通のまま', () => {
-    for (const size of ['normal', 'hand']) for (const c of ['force', 'wisdom', 'special', 'defense', 'evade']) expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${c}_lazuck.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_lazuck.webp`)).toBe(true);
     expect(battleCardOf('mon-lazuck')).toMatchObject({ art: 'lazuck_battlecard.png', frame: 'lazuck' });
     expect(existsSync('assets/images/ui/battlecard/frame_lazuck.png')).toBe(true);
     expect(readFileSync('assets/images/cards/monsters/lazuck_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/08_BATTLE_MONSTER_CARD_ASSETS/02_Razuk_Battle_800x920_RGBA.png`))).toBe(true);
