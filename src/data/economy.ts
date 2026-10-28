@@ -93,6 +93,50 @@ export function getPack(id: string): PackDefinition | undefined {
 /** 通常ガチャで排出してはいけないカード */
 export const NEVER_IN_PACKS: readonly string[] = [HIDDEN_MONSTER_ID];
 
+/**
+ * 【仮】カードショップのガチャ（2026-10-28 作り直し。指示書 design-parts/gacha-20261028/00_instructions_for_claude_code.txt）。
+ * 数字はここだけで変える。1シリーズ＝1モンスター（正式の技14種＋モンスターカード＝15枠）。
+ * - 値段はどれも同じ・すべて最初から選べる・中身は無限・天井なし（すべて仮）
+ * - カードにレアリティの表示は出さない。中の確率だけ「ノーマル枠」と「レア枠」に分ける
+ * - 同じカードの4枚目からもそのまま持つ（お金にかえない）
+ */
+export const GACHA = {
+  /** 1回の値段（G） */
+  price: 150,
+  /** 1パックの枚数 */
+  cardsPerPack: 5,
+  /** モンスターカードが入る確率（1パックあたり。当たったら5枚のうち1枚がモンスターカードに替わる） */
+  monsterRate: 0.05,
+  /** 技1種あたりの出やすさ（重み）。レアはノーマルの4分の1 */
+  weight: { normal: 4, rare: 1 },
+} as const;
+
+export interface GachaSeries {
+  /** シリーズの ID（パックの絵 pack_{id}.webp の名前にも使う） */
+  readonly id: string;
+  /** そのシリーズのモンスター（技はこのモンスターの技カード14種） */
+  readonly monsterId: string;
+  /** レア枠の技（ユーザー決定。技の名前で指定し、ID は今のデータから引く） */
+  readonly rareSkillNames: readonly string[];
+}
+
+/**
+ * ガチャのシリーズ（並び順＝選ぶ画面の順）。新しいモンスターが来たら、パックの絵1枚（assets/images/ui/gacha/pack_{id}.webp）と
+ * ここに1行足すだけでシリーズが増える
+ */
+export const GACHA_SERIES: readonly GachaSeries[] = [
+  { id: 'soramo', monsterId: 'mon-soramo', rareSkillNames: ['ソラモビーム', '星影ステップ'] },
+  { id: 'gauul', monsterId: 'mon-gauul', rareSkillNames: ['聖なる炎', '炎の壁', '高速飛行'] },
+  { id: 'lazuck', monsterId: 'mon-lazuck', rareSkillNames: ['とびかかり', 'トリックショット', 'シャドウバースト', 'フェイントステップ'] },
+  { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ['まきつく', 'ダウナーミスト', 'のびのびガード', '必死によける'] },
+  { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ['スリップガード'] },
+  { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ['てっぺきシェル'] },
+];
+
+export function getGachaSeries(id: string): GachaSeries | undefined {
+  return GACHA_SERIES.find((s) => s.id === id);
+}
+
 /** バトル・宝箱などの報酬（仮） */
 export const REWARDS = {
   dungeonBattleWin: 30,

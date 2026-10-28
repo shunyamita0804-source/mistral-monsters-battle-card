@@ -1,5 +1,5 @@
-import { cardCatalog, getMonster, HIDDEN_MONSTER_ID } from '../../data/cards.ts';
-import { PACKS, type PackDefinition } from '../../data/economy.ts';
+import { getMonster, HIDDEN_MONSTER_ID } from '../../data/cards.ts';
+import { GACHA, GACHA_SERIES, type GachaSeries } from '../../data/economy.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import { ITEMS } from '../../data/items.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS } from '../../data/introV2.ts';
@@ -7,41 +7,32 @@ import type { SaveData } from '../../game/save/saveData.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
 import { isNewItem } from '../../game/items/items.ts';
-import { kindLabel, rarityLabel } from '../../game/cards/cardTypes.ts';
-import { packCardRates, purchasePack } from '../../game/economy/gacha.ts';
+import { purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
 import { canRestoreHidden, fragmentCount, restoreHidden } from '../../game/progress/fragments.ts';
 import restoreSceneArt from '@assets/images/ui/restore/restore_scene.webp';
 import restoreFxArt from '@assets/images/effects/fx_restore.webp';
 
 import { randomSeed } from '../../game/rng.ts';
-import { cardName, packDescription, packName, packUnlockHint } from '../../i18n/content.ts';
+import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
-import { openCardDetail } from '../components/cardDetail.ts';
 import { createCardView } from '../components/cardView.ts';
-import { showGachaTurn } from '../components/gachaTurn.ts';
+import { seriesPackUrl } from '../components/gachaArt.ts';
+import { showGachaMachine } from '../components/gachaMachine.ts';
+import { showGachaOpen } from '../components/gachaOpen.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { coinIcon } from '../components/coinIcon.ts';
-import { rarityBadge } from '../components/rarityBadge.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { button, h } from '../dom.ts';
 import { newId } from '../gameStore.ts';
 import type { ScreenDefinition } from './types.ts';
 import { sound } from '../sound.ts';
 import faceClerk from '@assets/images/characters/face_clerk.webp';
-import pack01Art from '@assets/images/ui/packs/pack_01.webp';
-import packLockedArt from '@assets/images/ui/packs/pack_locked.webp';
-import gachaMachineArt from '@assets/images/ui/gacha_machine.webp';
-import pack02Art from '@assets/images/ui/packs/pack_02.webp';
-import pack03Art from '@assets/images/ui/packs/pack_03.webp';
+
+/** シリーズの名前「○○のパック」 */
+const seriesName = (series: GachaSeries): string => t('gacha.series.name', { monster: cardName(series.monsterId) });
 
 /** 特別復元の光を見せる時間 */
 const RESTORE_FX_MS = 1600;
-
-/**
- * パックの絵（2026-10-23 納品「UI画像10種」のカードパック3種：紺・緑・赤）。
- * パックの中身・価格・提供割合は仮のまま。絵の割り当て（第1弾＝紺・第2弾＝緑・第3弾＝赤）も仮
- */
-const PACK_ART: Readonly<Record<string, string>> = { 'pack-01': pack01Art, 'pack-02': pack02Art, 'pack-03': pack03Art };
 
 /** ショップの店員メニュー：カードを見る／売る（価格未確定のため無効）／ガチャ／道具を買う／特別復元（欠片を持っているときだけ） */
 /**
@@ -160,91 +151,64 @@ export const shopMenuScreen: ScreenDefinition = {
   },
 };
 
-/** レア度の割合の円グラフ（丸い台の中に、コモン・アンコモン・レアの順に色を塗る） */
-function ratesPie(pack: PackDefinition): HTMLElement {
-  const { C, U } = pack.rarityRates;
-  const chart = h('span', { class: 'rates-pie__chart' });
-  chart.style.background = `conic-gradient(var(--rate-c) 0 ${C}%, var(--rate-u) ${C}% ${C + U}%, var(--rate-r) ${C + U}% 100%)`;
-  return h('span', { class: 'rates-pie', attrs: { 'aria-hidden': 'true' } }, chart);
-}
-
-/** カードガチャマシン（カプセルではなくカードパックが出る） */
+/**
+ * カードショップのガチャ（2026-10-28 作り直し。指示書 design-parts/gacha-20261028/00_instructions_for_claude_code.txt。記録 docs/gacha-20261028.md）。
+ * 販売機を調べる → シリーズを選ぶ（1回タップで光って少し浮く、同じパックをもう1回で決定）→ 値段の確認 → 払って機械の画面（gachaMachine.ts）
+ * → つまみを1周 → 取り出し口からパックを取り出す → 開けてめくる（gachaOpen.ts）→「もう1回」（同じシリーズ。値段の確認あり）か「もどる」
+ * 中身・確率・値段は data/economy.ts の GACHA・GACHA_SERIES（すべて仮）
+ */
 export const gachaScreen: ScreenDefinition = {
   id: 'gacha',
   titleKey: 'shop.gacha',
   create(ctx) {
     const store = ctx.store;
-    const element = h('main', { class: 'screen gacha' });
+    const element = h('main', { class: 'screen gacha-select' });
+    // 選ぶ画面の中身（描き直すのはここだけ。機械・開ける画面は element に重ねるので、描き直しで消えない）
+    const body = h('div', { class: 'gacha-select__body' });
+    element.append(body);
+    let picked: string | null = null;
 
-    const showRates = (pack: PackDefinition): void => {
-      const rates = packCardRates(pack);
-      const total = rates.reduce((s, r) => s + r.rate, 0);
+    // 提供割合（レアの文字・技ごとの％は出さない）
+    const showRates = (): void => {
       const handle = openModal(element, {
-        title: t('gacha.ratesTitle', { pack: packName(pack) }),
+        title: t('gacha.ratesTitle'),
         className: 'gacha-rates',
         body: [
-          h('p', { class: 'modal__text modal__text--warn', text: t('gacha.ratesWarn') }),
-          h('p', { class: 'modal__text', text: t('gacha.ratesPerCard', { n: pack.cardsPerPack }) }),
-          // レア度ごとの割合の円グラフ（2026-10-26 デザイン第11弾の丸い台。色はレア度の宝石：コモン銀・アンコモン青緑・レア金）
-          h(
-            'div',
-            { class: 'rates-summary' },
-            ratesPie(pack),
-            h('p', { class: 'modal__text', text: t('gacha.ratesByRarity', { rates: (['C', 'U', 'R'] as const).map((r) => `${rarityLabel(r)} ${pack.rarityRates[r]}%`).join(' / ') }) }),
-          ),
-          h(
-            'table',
-            { class: 'gacha-rates__table' },
-            h('thead', {}, h('tr', {}, h('th', { text: t('gacha.colCard') }), h('th', { text: t('gacha.colKind') }), h('th', { text: t('gacha.colRarity') }), h('th', { text: t('gacha.colRate') }))),
-            h(
-              'tbody',
-              {},
-              ...rates.map((r) => {
-                const card = cardCatalog.get(r.cardId);
-                return h(
-                  'tr',
-                  { class: `is-${r.rarity.toLowerCase()}` },
-                  h('td', { text: card ? cardName(card) : r.cardId }),
-                  h('td', { text: card ? kindLabel(card.kind) : '' }),
-                  h('td', { text: r.rarity }),
-                  h('td', { text: `${r.rate.toFixed(3)}%` }),
-                );
-              }),
-            ),
-            h('tfoot', {}, h('tr', {}, h('td', { text: t('gacha.total'), attrs: { colspan: '3' } }), h('td', { text: `${total.toFixed(3)}%` }))),
-          ),
+          h('p', { class: 'modal__text', text: t('gacha.ratesMonster', { rate: Math.round(GACHA.monsterRate * 1000) / 10 }) }),
+          h('p', { class: 'modal__text', text: t('gacha.ratesSkills') }),
         ],
         actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
       });
     };
 
-    const buy = (pack: PackDefinition): void => {
+    /**
+     * 値段の確認 → 払う。確認を開いた時点で購入 ID を1つ作る（同じ ID の購入は1回しか処理されない＝連打で二重に払わない）。
+     * 払えたら onPaid（中身と、払う前に持っていたカード）
+     */
+    const askPay = (series: GachaSeries, onPaid: (cards: readonly string[], before: Readonly<Record<string, number>>) => void): void => {
       const save = store.save;
-      if (save.coins < pack.price) {
-        messageModal(element, t('gacha.notEnough', { price: pack.price }));
+      if (save.coins < GACHA.price) {
+        messageModal(element, t('gacha.notEnough', { price: GACHA.price }));
         return;
       }
-      // 購入確認を開いた時点で購入IDを1つ作る。同じIDの購入は1回しか処理されない（二重決済防止）
       const tx = newId('purchase');
       confirmModal(
         element,
         t('gacha.confirmTitle'),
         [
-          h('p', { class: 'modal__text', text: t('gacha.confirmText', { pack: packName(pack), price: pack.price }) }),
-          h('p', { class: 'modal__text', text: t('gacha.confirmCoins', { before: save.coins, after: save.coins - pack.price }) }),
+          h('img', { class: 'gacha-select__confirm-pack', attrs: { src: seriesPackUrl(series), alt: '', draggable: 'false' } }),
+          h('p', { class: 'modal__text', text: t('gacha.confirmText', { pack: seriesName(series), price: GACHA.price }) }),
+          h('p', { class: 'modal__text', text: t('gacha.confirmCoins', { before: save.coins, after: save.coins - GACHA.price }) }),
           h('p', { class: 'modal__text modal__text--sub', text: t('gacha.confirmNote') }),
         ],
         () => {
           const before = store.save.collection;
-          const r = purchasePack(store.save, pack.id, tx, randomSeed());
-          // 先に画面を描き直してから演出を重ねる（描き直しで演出が消えないように）
-          render();
+          const r = purchaseSeriesPack(store.save, series.id, tx, randomSeed());
           if (r.status === 'ok') {
-            // お金を払う（レジ）→ 販売機のハンドルを1周まわす → 出てきたパックを開ける
             sound.play('register');
             store.update(() => r.save);
             render();
-            showGachaTurn(element, PACK_ART[pack.id], packName(pack), () => openPack(pack, r.cards, before));
+            onPaid(r.cards, before);
           } else if (r.status === 'error') {
             messageModal(element, r.message);
           }
@@ -252,75 +216,84 @@ export const gachaScreen: ScreenDefinition = {
       );
     };
 
-    /** パック開封の演出：パックが震えて開き、カードを1枚ずつめくる */
-    const openPack = (pack: PackDefinition, cards: readonly string[], before: Readonly<Record<string, number>>): void => {
-      const seen = new Set<string>();
-      // 詳細は演出の上に重ねる（演出の下に隠れて閉じられなくならないように）
-      const overlay = h('div', { class: 'pack-open' });
-      const slots = cards.map((id) => {
-        const card = cardCatalog.get(id);
-        const isNew = (before[id] ?? 0) === 0 && !seen.has(id);
-        seen.add(id);
-        const face = card ? createCardView(card, 92, false) : h('div');
-        return h(
-          'button',
-          { class: 'pack-open__card', attrs: { type: 'button' }, on: { click: () => card && openCardDetail(overlay, card, { owned: store.save.collection[id] ?? 0 }) } },
-          h('div', { class: 'pack-open__back' }),
-          h('div', { class: 'pack-open__face' }, face),
-          h('span', { class: 'pack-open__name', text: card ? cardName(card) : id }),
-          card ? rarityBadge(card.rarity, 22) : null,
-          isNew ? h('span', { class: 'pack-open__new', text: t('gacha.new') }) : null,
-        );
+    /** 機械の画面（paid＝払ってある。払う前は「パックを選び直す」が出て、つまみをさわると値段の確認） */
+    const openMachine = (series: GachaSeries, paid: { cards: readonly string[]; before: Readonly<Record<string, number>> } | null): (() => void) => {
+      let result = paid;
+      const requestPay = (): void =>
+        askPay(series, (cards, before) => {
+          result = { cards, before };
+          machine.markPaid();
+        });
+      const machine = showGachaMachine(element, {
+        series,
+        paid: !!paid,
+        collection: paid ? paid.before : store.save.collection,
+        onReselect: () => {
+          machine.close();
+          render();
+        },
+        onRequestPay: requestPay,
+        onRates: showRates,
+        onTake: () => {
+          if (!result) return;
+          showGachaOpen(element, {
+            series,
+            cards: result.cards,
+            before: result.before,
+            owned: (id) => store.save.collection[id] ?? 0,
+            // 同じシリーズをもう1回：機械の画面（払う前）に戻して、値段の確認を出す
+            onAgain: () => openMachine(series, null)(),
+            onBack: render,
+          });
+        },
       });
-      const packEl = h('div', { class: `pack-open__pack${PACK_ART[pack.id] ? ' has-art' : ''}`, text: packName(pack) });
-      if (PACK_ART[pack.id]) packEl.style.setProperty('--pack-art', `url("${PACK_ART[pack.id]}")`);
-      const cardsEl = h('div', { class: 'pack-open__cards' }, ...slots);
-      const done = button(t('common.close'), () => overlay.remove(), 'btn btn--primary');
-      done.disabled = true;
-      overlay.append(packEl, cardsEl, h('p', { class: 'pack-open__hint', text: t('gacha.openHint') }), done);
-      element.append(overlay);
-      setTimeout(() => packEl.classList.add('is-opening'), 50);
-      sound.play('packOpen', 450);
-      setTimeout(() => {
-        packEl.classList.add('is-open');
-        slots.forEach((s, i) => setTimeout(() => s.classList.add('is-revealed'), 250 * i));
-        setTimeout(() => {
-          done.disabled = false;
-        }, 250 * slots.length);
-      }, 800);
+      return requestPay;
+    };
+
+    const decide = (series: GachaSeries): void => {
+      askPay(series, (cards, before) => {
+        picked = null;
+        render();
+        openMachine(series, { cards, before });
+      });
     };
 
     const render = (): void => {
       const save = store.save;
-      const packs = PACKS.map((pack) => {
-        const unlocked = save.unlockedPacks.includes(pack.id);
-        const buyBtn = button(t('gacha.buyPrice', { price: pack.price }), () => buy(pack), 'btn btn--primary btn--small');
-        buyBtn.disabled = !unlocked;
+      const tiles = GACHA_SERIES.map((series) => {
+        const { owned, total } = seriesOwned(save, series);
+        const on = picked === series.id;
         return h(
-          'div',
-          { class: `gacha__pack${unlocked ? '' : ' is-locked'}`, dataset: { id: pack.id } },
-          !unlocked
-            ? // まだ買えないパック：鎖と鍵の絵（2026-10-26 デザイン第8弾）
-              h('div', { class: 'gacha__pack-art has-art' }, h('img', { attrs: { src: packLockedArt, alt: t('gacha.lockedState'), draggable: 'false' } }))
-            : PACK_ART[pack.id]
-              ? h('div', { class: 'gacha__pack-art has-art' }, h('img', { attrs: { src: PACK_ART[pack.id] ?? '', alt: packName(pack), draggable: 'false' } }))
-              : h('div', { class: 'gacha__pack-art', text: packName(pack).replace(/（仮）| \(Temp\)/, '') }),
-          h(
-            'div',
-            { class: 'gacha__pack-info' },
-            h('p', { class: 'gacha__pack-name', text: packName(pack) }),
-            h('p', { class: 'gacha__pack-desc', text: unlocked ? packDescription(pack) : t('gacha.locked', { hint: packUnlockHint(pack) }) }),
-            h('p', { class: 'gacha__pack-meta', text: t('gacha.meta', { n: pack.cardsPerPack, state: t(unlocked ? 'gacha.unlocked' : 'gacha.lockedState') }) }),
-            h('div', { class: 'gacha__pack-actions' }, button(t('gacha.rates'), () => showRates(pack), 'btn btn--small'), buyBtn),
-          ),
+          'button',
+          {
+            class: `gacha-select__tile${on ? ' is-picked' : ''}`,
+            attrs: { type: 'button', 'aria-pressed': on ? 'true' : 'false' },
+            dataset: { series: series.id },
+            on: {
+              click: () => {
+                // 1回目で光って少し浮く、同じパックをもう1回で決定（別のパックを押すと選び直し）
+                if (picked === series.id) {
+                  decide(series);
+                  return;
+                }
+                picked = series.id;
+                sound.tap();
+                render();
+              },
+            },
+          },
+          h('img', { class: 'gacha-select__pack', attrs: { src: seriesPackUrl(series), alt: '', draggable: 'false' } }),
+          h('b', { class: 'gacha-select__name', text: seriesName(series) }),
+          h('small', { class: 'gacha-select__owned', text: t('gacha.series.owned', { n: owned, total }) }),
         );
       });
-      element.replaceChildren(
+      body.replaceChildren(
         createScreenHeader({ title: t('shop.gacha'), back: { label: t('common.back'), onTap: () => ctx.back('shopMenu') } }),
-        // パックの販売機の絵（デザイン第4弾）
-        h('img', { class: 'gacha__machine-art', attrs: { src: gachaMachineArt, alt: t('gacha.machine'), draggable: 'false' } }),
-        h('p', { class: 'gacha__coins' }, coinIcon(), t('shop.coins', { n: save.coins })),
-        h('div', { class: 'gacha__packs' }, ...packs),
+        h('h1', { class: 'gacha-select__title', text: t('gacha.select.title') }),
+        h('p', { class: 'gacha-select__lead', text: t('gacha.select.lead', { price: GACHA.price }) }),
+        h('p', { class: 'gacha-select__coins' }, coinIcon(), t('shop.coins', { n: save.coins })),
+        h('div', { class: 'gacha-select__grid' }, ...tiles),
+        button(t('gacha.rates'), showRates, 'gacha-select__rates'),
       );
     };
 
