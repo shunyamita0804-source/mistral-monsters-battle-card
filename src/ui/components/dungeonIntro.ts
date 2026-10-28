@@ -10,31 +10,36 @@ import forestIntroTitle from '@assets/images/ui/dungeon_intro/forest_title.webp'
 import forestIntroOverlay from '@assets/images/ui/dungeon_intro/forest_overlay.webp';
 import waterIntroArt from '@assets/images/ui/dungeon_intro/water_art.webp';
 import waterIntroOverlay from '@assets/images/ui/dungeon_intro/water_overlay.webp';
+import waterIntroTitle from '@assets/images/ui/dungeon_intro/water_title.webp';
 import iceIntroArt from '@assets/images/ui/dungeon_intro/ice_art.webp';
 import iceIntroOverlay from '@assets/images/ui/dungeon_intro/ice_overlay.webp';
+import iceIntroTitle from '@assets/images/ui/dungeon_intro/ice_title.webp';
 import fireIntroArt from '@assets/images/ui/dungeon_intro/fire_art.webp';
 import fireIntroOverlay from '@assets/images/ui/dungeon_intro/fire_overlay.webp';
+import fireIntroTitle from '@assets/images/ui/dungeon_intro/fire_title.webp';
 import machineIntroArt from '@assets/images/ui/dungeon_intro/machine_art.webp';
 import machineIntroOverlay from '@assets/images/ui/dungeon_intro/machine_overlay.webp';
+import machineIntroTitle from '@assets/images/ui/dungeon_intro/machine_title.webp';
 import holyIntroArt from '@assets/images/ui/dungeon_intro/holy_art.webp';
 import holyIntroOverlay from '@assets/images/ui/dungeon_intro/holy_overlay.webp';
+import holyIntroTitle from '@assets/images/ui/dungeon_intro/holy_title.webp';
 
 /**
  * ダンジョンに入ったときの挿絵・ダンジョン名の絵・重ねる部品（2026-10-26 ユーザー指示「ダンジョン入った時に挿絵とダンジョン名を入れたい」。
  * 同じ日に届いた6枚。原本 design-parts/dungeon-intro-20261026/、ゲーム用は tools/design/dungeon_intro_build.py）。
  * 挿絵は横長なので、画面いっぱいに切り抜いて真ん中を見せる（artX＝横のどこを見せるか）。絵が無いダンジョンは名前を文字で。
  * 2026-10-28：新しい5つ（水の神殿〜天の聖域）の挿絵と重ねる輪（tools/design/dungeons5_build.py）。挿絵は縦長で、真ん中を基準に上下左右を少しだけ切る。
- * ダンジョン名の絵（title）はまだ無いので、名前は文字で出す
+ * 同じ日に5つのダンジョン名の絵も届いた（tools/design/dungeon_titles_build.py。遺跡・森と同じ大きさ・位置）
  * 歩行画面（固定のマップのダンジョン）と、ランダム生成のダンジョンの画面の両方で使う。見た目は world.css の .world__dungeon-intro
  */
 const DUNGEON_INTRO: Readonly<Record<string, { readonly art: string; readonly title?: string; readonly overlay: string; readonly artX: string }>> = {
   'dungeon-01': { art: ruinsIntroArt, title: ruinsIntroTitle, overlay: ruinsIntroOverlay, artX: '50%' },
   'dungeon-02': { art: forestIntroArt, title: forestIntroTitle, overlay: forestIntroOverlay, artX: '50%' },
-  'dungeon-03': { art: waterIntroArt, overlay: waterIntroOverlay, artX: '50%' },
-  'dungeon-04': { art: iceIntroArt, overlay: iceIntroOverlay, artX: '50%' },
-  'dungeon-05': { art: fireIntroArt, overlay: fireIntroOverlay, artX: '50%' },
-  'dungeon-06': { art: machineIntroArt, overlay: machineIntroOverlay, artX: '50%' },
-  'dungeon-07': { art: holyIntroArt, overlay: holyIntroOverlay, artX: '50%' },
+  'dungeon-03': { art: waterIntroArt, title: waterIntroTitle, overlay: waterIntroOverlay, artX: '50%' },
+  'dungeon-04': { art: iceIntroArt, title: iceIntroTitle, overlay: iceIntroOverlay, artX: '50%' },
+  'dungeon-05': { art: fireIntroArt, title: fireIntroTitle, overlay: fireIntroOverlay, artX: '50%' },
+  'dungeon-06': { art: machineIntroArt, title: machineIntroTitle, overlay: machineIntroOverlay, artX: '50%' },
+  'dungeon-07': { art: holyIntroArt, title: holyIntroTitle, overlay: holyIntroOverlay, artX: '50%' },
 };
 /** 絵の読み込みを待つ長さの上限（ミリ秒。遅い回線でも札がいつまでも残らないように） */
 const DUNGEON_INTRO_LOAD_WAIT_MS = 1500;
