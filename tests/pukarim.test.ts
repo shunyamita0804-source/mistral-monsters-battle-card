@@ -36,9 +36,9 @@ function csvRows(path: string): string[][] {
 
 describe('プカリム：データ（届いた JSON・CSV を無改変で置き、ゲームはその JSON を読む）', () => {
   it('保管した JSON・CSV・バトル用の絵は ZIP の原本と同じバイト列', () => {
-    expect(readFileSync('src/data/official/pukarim14_skills_DRAFT_20261028.json')).toEqual(readFileSync(`${ORIGINAL_DIR}/data/pukarim14_skills_DRAFT_20261028.json`));
-    expect(readFileSync('src/data/official/pukarim14_skills_DRAFT_20261028.csv')).toEqual(readFileSync(`${ORIGINAL_DIR}/data/pukarim14_skills_DRAFT_20261028.csv`));
-    expect(readFileSync('assets/images/cards/monsters/pukarim_battlecard.png')).toEqual(readFileSync(`${ORIGINAL_DIR}/art/pukarim_battleart.png`));
+    expect(readFileSync('src/data/official/pukarim14_skills_DRAFT_20261028.json').equals(readFileSync(`${ORIGINAL_DIR}/data/pukarim14_skills_DRAFT_20261028.json`))).toBe(true);
+    expect(readFileSync('src/data/official/pukarim14_skills_DRAFT_20261028.csv').equals(readFileSync(`${ORIGINAL_DIR}/data/pukarim14_skills_DRAFT_20261028.csv`))).toBe(true);
+    expect(readFileSync('assets/images/cards/monsters/pukarim_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/art/pukarim_battleart.png`))).toBe(true);
   });
 
   it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
@@ -67,7 +67,7 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     expect(PUKARIM_GACHA_RARE).toEqual([puk(7), puk(14)]);
     expect(BATTLE_CARDS[PUKARIM_MONSTER_ID]?.frame).toBe('pukarim');
     expect(existsSync('assets/images/ui/battlecard/frame_pukarim.png')).toBe(true);
-    for (const size of ['normal', 'hand']) for (const c of ['force', 'wisdom', 'special', 'defense', 'evade']) expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${c}_pukarim.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_pukarim.webp`)).toBe(true);
   });
 
   it('ふつうに遊んでいる人には出ない：カードの一覧・初期配布・新しいセーブには入らない（台帳と適合技にはある）', () => {
@@ -260,6 +260,30 @@ describe('10 おいかぜ：プカリム以外の味方1体の、次の自分の
     s = nextOwnTurn(s);
     expect(attackPower(s, lazuck, monster(s, 'p-m3'))).toBe(base);
     expect((w?.turn ?? 0) >= s.turn).toBe(false);
+  });
+});
+
+describe('相手の CPU：おいかぜは「次の自分のターンに攻撃できそうな味方」にかける（2026-10-29 ユーザー指示）', () => {
+  it('この手番にもう動いた味方でも、攻撃技が手札にあり次のターンに払えそうならかける', () => {
+    const s = withMonster(scene({ player: [puk(10), sor(3), puk(11)] }, { player: 3 }), 'p-m2', { acted: true });
+    expect(chooseAction(s, 'player')).toMatchObject({ type: 'useCard', cardUid: 'p0', targetUid: 'p-m2' });
+  });
+
+  it('味方の攻撃技が手札に無いときはかけない', () => {
+    const s = scene({ player: [puk(10), puk(11), puk(12)] }, { player: 5 });
+    expect(chooseAction(s, 'player')).not.toMatchObject({ cardUid: 'p0' });
+  });
+
+  it('次のターンにもマナが足りなさそうな攻撃技しか無いときはかけない', () => {
+    // マナ2：おいかぜを払うと0。残りの手札は1枚（マナにできても1）で、ラズックの 06（マナ4）は払えない
+    const s = scene({ player: [puk(10), 'skl-lazuck-06'] }, { player: 2 });
+    expect(chooseAction(s, 'player')).not.toMatchObject({ cardUid: 'p0' });
+  });
+
+  it('次のターンのおいかぜがもうかかっている味方にはかけない', () => {
+    const s0 = scene({ player: [puk(10), sor(3), puk(11)] }, { player: 3 });
+    const s = withMonster(s0, 'p-m2', { acted: true, tailwind: { amount: 1, turn: s0.turn + 2 } });
+    expect(chooseAction(s, 'player')).not.toMatchObject({ cardUid: 'p0' });
   });
 });
 

@@ -27,7 +27,7 @@ export const MYUROL_MONSTER: MonsterCard = {
   rarity: null,
   life: 7,
   themeColor: MYUROL_COLOR,
-  description: 'ミュロル（水系・モンスターランクC）。',
+  description: 'ミュロル（水系）。',
   isPlaceholder: false,
   // 対戦画面のアイコンの切り抜きに使う絵：正式のバトル用の絵（透明つき 800×920。src/data/battleCards.ts と同じファイル）。
   // 名前・LIFE 入りの正式カードの1枚絵は無い（見本は確認用で貼らない）ので、図鑑などのカードはバトル用カードを重ねて描く（monsterCard.ts）

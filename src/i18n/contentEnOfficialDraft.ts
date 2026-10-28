@@ -7,7 +7,7 @@
  */
 export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:mon-soramo:name': 'Soramo',
-  'card:mon-soramo:description': 'Soramo (Monster Rank C).',
+  'card:mon-soramo:description': 'Soramo.',
 
   // ソラモ14技（2026-10-25・仮訳。旧16技は削除）
   'card:skl-soramo14-01:name': 'Scratch',
@@ -32,7 +32,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-soramo14-14:effect': "Dodge the opponent's POW and INT skills regardless of mana cost.",
   // ラズック（2026-10-23。技名は届いた 09_英語名_仮訳 のとおり。効果の文は Claude の仮訳）
   'card:mon-lazuck:name': 'Lazuck',
-  'card:mon-lazuck:description': 'Lazuck (Monster Rank C).',
+  'card:mon-lazuck:description': 'Lazuck.',
   'card:skl-lazuck-01:name': 'Scratch',
   'card:skl-lazuck-02:name': 'Bite',
   'card:skl-lazuck-03:name': 'Pounce',
@@ -58,7 +58,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-lazuck-itazura:effect': "Return 1 random card from the opponent's hand to their deck and shuffle it. They don't draw a replacement.",
   // ガウル14技（2026-10-26・仮訳。技名・効果の英語はどちらも Claude の仮訳。正式な英語は未承認。旧16技は削除）
   'card:mon-gauul:name': 'Gaul',
-  'card:mon-gauul:description': 'Gaul (Monster Rank C).',
+  'card:mon-gauul:description': 'Gaul.',
   'card:skl-gauul14-01:name': 'Peck',
   'card:skl-gauul14-02:name': 'Rapid Peck',
   'card:skl-gauul14-03:name': 'Talon',
@@ -82,7 +82,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
 
   // ノビトン（2026-10-25・仮訳）
   'card:mon-nobiton:name': 'Nobiton',
-  'card:mon-nobiton:description': 'Nobiton (Monster Rank C).',
+  'card:mon-nobiton:description': 'Nobiton.',
   'card:skl-nobiton-01:name': 'Nose Slap',
   'card:skl-nobiton-02:name': 'Headbutt',
   'card:skl-nobiton-03:name': 'Coil',
@@ -111,7 +111,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
 
   // ミュロル（2026-10-25・仮訳）
   'card:mon-myurol:name': 'Myurol',
-  'card:mon-myurol:description': 'Myurol (Water, Monster Rank C).',
+  'card:mon-myurol:description': 'Myurol (Water).',
   'card:skl-myurol-01:name': 'Tackle',
   'card:skl-myurol-02:name': 'Tail Slap',
   'card:skl-myurol-03:name': 'Fury Scratch',

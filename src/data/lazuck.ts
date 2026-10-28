@@ -46,7 +46,7 @@ export const LAZUCK_MONSTER: MonsterCard = {
   rarity: null,
   life: officialSkills.monster_life,
   themeColor: themeColors.monsters.lazuck.hex,
-  description: 'ラズック（モンスターランクC）。',
+  description: 'ラズック。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'lazuck_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'lazuck_battle.webp', layout: 'full' },

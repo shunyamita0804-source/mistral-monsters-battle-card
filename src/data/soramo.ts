@@ -37,7 +37,7 @@ export const SORAMO_MONSTER: MonsterCard = {
   rarity: null,
   life: 7,
   themeColor: themeColors.monsters.soramo.hex,
-  description: 'ソラモ（モンスターランクC）。',
+  description: 'ソラモ。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'soramo_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'soramo_battle.webp', layout: 'full' },

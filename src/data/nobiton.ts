@@ -24,7 +24,7 @@ export const NOBITON_MONSTER: MonsterCard = {
   rarity: null,
   life: officialSkills.monster_life,
   themeColor: THEME_COLOR_CANDIDATE,
-  description: 'ノビトン（モンスターランクC）。',
+  description: 'ノビトン。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'nobiton_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'nobiton_battle.webp', layout: 'full' },

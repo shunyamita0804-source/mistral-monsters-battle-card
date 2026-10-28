@@ -55,8 +55,8 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
   const CATEGORY = { ちから: 'force', かしこさ: 'wisdom', 特殊: 'special', 防御: 'defense', 回避: 'evade' } as const;
 
   it('保管した JSON・CSV は ZIP の原本と同じバイト列', () => {
-    expect(readFileSync('src/data/official/myurol14_skills_OFFICIAL_20261027.json')).toEqual(readFileSync(`${ORIGINAL_DIR}/02_正式技データ_初期配布_UTF8.json`));
-    expect(readFileSync('src/data/official/myurol14_skills_OFFICIAL_20261027.csv')).toEqual(readFileSync(`${ORIGINAL_DIR}/01_正式技一覧と初期配布_UTF8.csv`));
+    expect(readFileSync('src/data/official/myurol14_skills_OFFICIAL_20261027.json').equals(readFileSync(`${ORIGINAL_DIR}/02_正式技データ_初期配布_UTF8.json`))).toBe(true);
+    expect(readFileSync('src/data/official/myurol14_skills_OFFICIAL_20261027.csv').equals(readFileSync(`${ORIGINAL_DIR}/01_正式技一覧と初期配布_UTF8.csv`))).toBe(true);
   });
 
   it('番号・技名・分類・マナ・ダメージ・効果・画像・初期配布が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
@@ -214,9 +214,7 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(readFileSync('assets/images/cards/monsters/myurol_battlecard.png').equals(original)).toBe(true);
     expect([original.readUInt32BE(16), original.readUInt32BE(20)]).toEqual([800, 920]);
     expect(existsSync('assets/images/ui/battlecard/frame_myurol.png')).toBe(true);
-    for (const size of ['normal', 'hand'])
-      for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade'])
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_myurol.webp`)).toBe(true);
+    for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_myurol.webp`)).toBe(true);
   });
 
   it('日本語は JSON の効果の文のまま。英語は仮訳で、日本語が残らない', () => {

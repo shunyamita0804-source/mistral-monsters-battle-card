@@ -1,4 +1,4 @@
-/* ===== 技カード（2026-10-25 新UI「v5」：承認済みの参考画像から切り出した枠。skillCard.ts） ===== */
+/* ===== 技カード（2026-10-29 新しい形：平らな名前の帯＋大きな絵の窓。skillCard.ts） ===== */
 .skill-card {
   position: relative;
   flex: none;
@@ -18,28 +18,11 @@
   pointer-events: none;
 }
 
-/* イラスト：縦横比を保って全体を入れる（キャラクターを切らない）。窓との形の差は、同じ絵をぼかして暗くしたもので埋める */
-.skill-card__art-box {
-  overflow: hidden;
-  background: #1a1d24;
-}
-
-.skill-card__art-fill,
-.skill-card__art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.skill-card__art-fill {
+/* イラスト：窓いっぱいに（縦横比を保ち、はみ出しは切る・真ん中合わせ）。窓の角の丸みは枠が隠す */
+img.skill-card__art {
   object-fit: cover;
-  filter: blur(3cqw) brightness(0.62) saturate(0.9);
-  transform: scale(1.15);
-}
-
-.skill-card__art {
-  object-fit: contain;
+  object-position: 50% 50%;
+  background: #1a1d24;
 }
 
 .skill-card__art--placeholder {
@@ -57,10 +40,10 @@
   font-weight: 800;
 }
 
-/* 「仮」の札：枠の窓の角は枠に隠れるので、窓の下の真ん中に出す */
+/* 「仮」の札：窓の真ん中より少し下に出す（左下のダメージの四角・下の効果の帯と重ならないように） */
 .skill-card__art-note {
   position: absolute;
-  bottom: 12%;
+  top: 62%;
   left: 50%;
   transform: translateX(-50%);
   padding: 0 3cqw;
@@ -78,62 +61,87 @@
     linear-gradient(160deg, #e3e7ec, #9aa3ad);
 }
 
-/* マナの玉の数字（数字の入った玉の絵を、枠の玉に重ねる） */
+/* マナの丸：平らな紺の丸・細い金のふち・白い太い数字（大きさは skillCard.ts で直径の約7割）。つや・影はつけない */
 .skill-card__mana {
-  object-fit: contain;
-}
-
-.skill-card__mana--text {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  border: max(1px, 0.9cqw) solid #f0d78c;
+  border-radius: 50%;
+  background: #1b3252;
   color: #fff;
-  font-size: 15.4cqw;
+  font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
   font-weight: 900;
-  -webkit-text-stroke: 0.6cqw #0b2a3a;
-  paint-order: stroke fill;
+  line-height: 1;
 }
 
-/* 技名（上の札） */
+.skill-card__mana-num {
+  /* 数字の形の上下の空きをならす（Arial Black の数字は少し上に寄って見える） */
+  transform: translateY(0.04em);
+}
+
+/* 分類の印（今の icon_{分類}.png をそのまま縮める） */
+.skill-card__icon {
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* 技名：帯の上に白い太い字・濃い縁取り（どの色の帯でも読めるように）。名前の札（箱）はない */
 .skill-card__title {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3cqw;
-  color: #3a2a12;
-  font-size: 6.6cqw;
-  font-weight: 800;
+  padding: 0 2cqw;
+  color: #fff;
+  font-size: 7.6cqw;
+  font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  -webkit-text-stroke: 1.1cqw #2a1d10;
+  paint-order: stroke fill;
+  letter-spacing: 0.02em;
 }
 
-/* 説明（右下の欄）。特殊・防御・回避の効果の文は、攻撃の説明より濃く */
-.skill-card__desc {
+.skill-card .skill-card__title {
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+}
+
+/* 効果の帯（大きなカードだけ）：ほぼ不透明のクリーム色・角を丸く・濃い茶の字。絵の上に重ねる */
+.skill-card__band {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   padding: 0 2.5cqw;
-  overflow-wrap: anywhere;
-  color: #6a5a3a;
-  font-size: 5cqw;
-  font-weight: 700;
-  line-height: 1.28;
-  text-align: center;
+  border-radius: 2.4cqw;
+  background: rgb(250 243 225 / 0.9);
   overflow: hidden;
 }
 
-.skill-card__desc.is-effect {
-  color: #2b1640;
+.skill-card__band-text {
+  position: static;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: #3a2614;
+  font-size: 4.6cqw;
   font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
 }
 
-/* 数値の欄（左下の暗い四角）：ダメージ・軽減値は大きな数字、回避・特殊・サポートは短い文字 */
+/* ダメージの四角（窓の左下の角にぴったり。右上の角だけ丸い）：ダメージ・軽減値は大きな数字、回避・特殊・サポートは短い文字 */
 .skill-card__value {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-radius: 0 3.2cqw 0 0;
+  background: rgb(30 22 18 / 0.9);
   color: #fff;
   line-height: 1;
   overflow: hidden;
@@ -141,11 +149,9 @@
 
 .skill-card__value-num {
   font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
-  /* 大きさは skillCard.ts の VALUE_FONT（2026-10-28：1.4倍の 21cqw・手札用 22cqw。はみ出すときは収まる大きさまで下げる） */
+  /* 大きさは skillCard.ts の VALUE_FONT（normal 21cqw・手札用 22cqw が上限。はみ出すときは収まる大きさまで下げる） */
   font-size: 21cqw;
   font-weight: 900;
-  -webkit-text-stroke: 0.4cqw #000;
-  paint-order: stroke fill;
 }
 
 .skill-card--hand .skill-card__value-num {
@@ -176,22 +182,15 @@
   height: 100%;
 }
 
-.skill-card__value-sub {
-  margin-top: 1cqw;
-  font-size: 4cqw;
-  font-weight: 800;
-  opacity: 0.9;
-}
-
 .skill-card__value-word {
-  /* 大きさは skillCard.ts の VALUE_FONT（2026-10-28：約1.3倍の 8.5cqw・手札用 9.5cqw。「サポート」など長い語は欄に収まる大きさまで下げる） */
+  /* 大きさは skillCard.ts の VALUE_FONT（8.5cqw・手札用 9.5cqw。「サポート」など長い語は四角に収まる大きさまで下げる） */
   font-size: 8.5cqw;
   font-weight: 900;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
-/* サポートの区分（「サポート」「全体」）：字の間を詰める（大きさは欄に収まるように skillCard.ts で決める） */
+/* サポートの区分（「サポート」「全体」）：字の間を詰める（大きさは四角に収まるように skillCard.ts で決める） */
 .skill-card--support .skill-card__value-word {
   letter-spacing: 0;
 }
