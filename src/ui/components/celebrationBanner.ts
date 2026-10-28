@@ -14,3 +14,15 @@ export function celebrationBanner(title: string, rank: RankId | null): HTMLEleme
     h('span', { class: 'celebration-banner__title', text: title }),
   );
 }
+
+/**
+ * 「新しいダンジョン発見」の帯（2026-10-28 デザイン担当 banner_dungeon_found。大会でランクが上がって新しいダンジョンが開いたとき）。
+ * 紺の帯に「新しいダンジョンが見つかった：」と、そのダンジョンの名前をゲームが重ねる（2行）。ランクアップの帯のあとに続けて出る（CSS の animation-delay）
+ */
+export function dungeonFoundBanner(lead: string, name: string, label: string): HTMLElement {
+  return h(
+    'div',
+    { class: 'dungeon-found-banner', attrs: { role: 'img', 'aria-label': label } },
+    h('span', { class: 'dungeon-found-banner__text', attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'dungeon-found-banner__lead', text: lead }), h('span', { class: 'dungeon-found-banner__name', text: name })),
+  );
+}

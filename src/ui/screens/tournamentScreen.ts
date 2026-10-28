@@ -26,7 +26,7 @@ import { newId, once } from '../gameStore.ts';
 import type { ScreenDefinition } from './types.ts';
 import { bracketView, leagueTable, openEntrant, playerPlace, standingsTable } from '../components/tournamentBoards.ts';
 import { rewardGlow } from '../components/rewardGlow.ts';
-import { celebrationBanner } from '../components/celebrationBanner.ts';
+import { celebrationBanner, dungeonFoundBanner } from '../components/celebrationBanner.ts';
 import type { RankId } from '../../data/economy.ts';
 import { sound } from '../sound.ts';
 import faceReceptionist from '@assets/images/characters/face_receptionist.webp';
@@ -139,17 +139,19 @@ export const tournamentScreen: ScreenDefinition = {
         ...s.unlockedPacks.map((p) => tr('tournament.packUnlocked', { pack: packLabel(p) })),
         ...(s.rankUp ? [tr('tournament.rankUp', { rank: s.rankUp })] : []),
         ...s.cards.map((c) => tr('tournament.cardGot', { name: cardName(c.cardId), n: c.count })),
-        // ランクが上がって開放したダンジョン（2026-10-27 指示書「ダンジョン7つ」）
-        ...s.unlockedDungeons.map((id) => {
-          const d = getDungeon(id);
-          return tr('tournament.dungeonFound', { name: d ? dungeonName(d) : id });
-        }),
       ];
+      // ランクが上がって開放したダンジョン（2026-10-27 指示書「ダンジョン7つ」）：2026-10-28 から「新しいダンジョン発見」の帯の上に出す
+      const found = s.unlockedDungeons.map((id) => {
+        const d = getDungeon(id);
+        const name = d ? dungeonName(d) : id;
+        return dungeonFoundBanner(tr('tournament.dungeonFoundLead'), name, tr('tournament.dungeonFound', { name }));
+      });
       const handle = openModal(element, {
         title: tr(s.won ? (s.firstWin ? 'tournament.rewardFirst' : 'tournament.rewardWin') : 'tournament.rewardEntry'),
         // 優勝・ランクアップは特別な帯（2026-10-26 デザイン第8弾）。参加報酬だけのときは今までどおり金貨の光
         body: [
           s.won ? celebrationBanner(tr(s.rankUp ? 'tournament.bannerRankUp' : 'tournament.bannerChampion'), (s.rankUp as RankId | null) ?? null) : rewardGlow(coinIcon),
+          ...found,
           ...lines.map((t) => h('p', { class: 'modal__text', text: t })),
         ],
         actions: [{ label: tr('common.ok'), primary: true, onTap: () => handle.close() }],
