@@ -1,4 +1,5 @@
 import { HIDDEN_MONSTER_ID, monsterId, skillId, supportId } from './cards.ts';
+import type { ItemId } from './items.ts';
 
 /**
  * 【仮データ】通貨・パック・提供割合。
@@ -137,9 +138,45 @@ export function getGachaSeries(id: string): GachaSeries | undefined {
   return GACHA_SERIES.find((s) => s.id === id);
 }
 
-/** バトル・宝箱などの報酬（仮） */
-export const REWARDS = {
-  dungeonBattleWin: 30,
-  dungeonBossFirstClear: 200,
-  dungeonBossRepeat: 60,
-} as const;
+/**
+ * ダンジョンのお金の入り方（2026-10-28 ユーザー承認の指示書「お金の入る側」design-parts/money-income-20261028/。すべて「最初の値」で、試遊して直す）。
+ * ダンジョンごとの表はここ1か所。win＝バトラー・見えない番人に1勝ごと、chest＝宝箱のお金の範囲（stepG きざみ）、bossFirst／bossRepeat＝ボスの初回／2回目から
+ * （初回のモンスターカードは src/data/dungeons.ts の firstClearCards のまま）
+ */
+export interface DungeonMoney {
+  readonly win: number;
+  readonly chest: readonly [min: number, max: number];
+  readonly bossFirst: number;
+  readonly bossRepeat: number;
+}
+
+export const DUNGEON_MONEY: Readonly<Record<string, DungeonMoney>> = {
+  'dungeon-01': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
+  'dungeon-02': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
+  'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
+  'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
+  'dungeon-05': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
+  'dungeon-06': { win: 35, chest: [35, 70], bossFirst: 850, bossRepeat: 250 },
+  'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
+};
+
+/** そのダンジョンのお金（表に無いダンジョンは太古の遺跡と同じ） */
+export function dungeonMoney(dungeonId: string | undefined): DungeonMoney {
+  return DUNGEON_MONEY[dungeonId ?? ''] ?? (DUNGEON_MONEY['dungeon-01'] as DungeonMoney);
+}
+
+/**
+ * 【仮】宝箱の中身（2026-10-28 指示書。1つの宝箱から1つ）。割合は％（合計100）。
+ * - coins：お金（DUNGEON_MONEY の chest の範囲から coinStep きざみ）
+ * - item：items の道具から同じ確率で1つ（所持の上限を超えるときはお金に替える）
+ * - card：そのダンジョンのボスの切り札のモンスター（初回クリアでもらえるモンスターカードのモンスター）の技カードから1枚
+ */
+export const CHEST_RULES: {
+  readonly rates: { readonly coins: number; readonly item: number; readonly card: number };
+  readonly coinStep: number;
+  readonly items: readonly ItemId[];
+} = {
+  rates: { coins: 70, item: 25, card: 5 },
+  coinStep: 5,
+  items: ['torch', 'incense', 'smokeBall', 'returnFeather'],
+};

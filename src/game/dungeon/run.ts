@@ -1,8 +1,9 @@
+import { cardCatalog, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { DUNGEON_RUN, isRunDungeon, runConfig } from '../../data/dungeonRun.ts';
-import { REWARDS } from '../../data/economy.ts';
+import { CHEST_RULES, dungeonMoney } from '../../data/economy.ts';
 import { ITEM_RULES, type ItemId } from '../../data/items.ts';
-import { consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
+import { addItem, canAddItem, consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
 import { generateFloor, isWalkableTile, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
@@ -211,10 +212,76 @@ export function descend(run: DungeonRun): DungeonRun {
   return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start, viewRadiusOf({ ...run, floor })) };
 }
 
-/** 宝箱を開ける（1度だけ。中身は仮でまだ無い） */
-export function openRunChest(run: DungeonRun, chestId: string): { run: DungeonRun; opened: boolean } {
-  if (run.opened.includes(chestId)) return { run, opened: false };
-  return { run: { ...run, opened: [...run.opened, chestId] }, opened: true };
+/**
+ * 【仮】宝箱の中身（2026-10-28 指示書「お金の入る側」。割合・道具・お金の範囲は src/data/economy.ts の CHEST_RULES・DUNGEON_MONEY）。
+ * 中身は開けたときに、挑戦の種（seed）と宝箱の ID から決める（セーブとロードを繰り返しても選び直せない）。
+ * - coins：お金。item：道具（持ちきれないときは coins のお金に替える）。card：ボスの切り札のモンスターの技カード
+ */
+export type ChestRoll =
+  | { readonly kind: 'coins'; readonly coins: number }
+  | { readonly kind: 'item'; readonly item: ItemId; readonly coins: number }
+  | { readonly kind: 'card'; readonly card: string };
+
+/** 文字列から決まった数を作る（FNV-1a） */
+function hashText(text: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h | 0;
+}
+
+/** そのダンジョンのボスの切り札のモンスター（初回クリアでもらえるモンスターカード）の技カード */
+export function bossTrumpSkills(dungeonId: string): string[] {
+  const monster = (getDungeon(dungeonId)?.firstClearCards ?? []).find((c) => cardCatalog.get(c.cardId)?.kind === 'monster')?.cardId;
+  return monster ? skillsOf(monster).map((k) => k.id) : [];
+}
+
+/** 宝箱の中身を決める（同じダンジョン・seed・宝箱の ID なら、いつも同じ） */
+export function rollChest(dungeonId: string, seed: number, chestId: string): ChestRoll {
+  let rng = nextRandom(hashText(`${dungeonId}:${seed}:${chestId}`)).seed;
+  const next = (): number => {
+    const r = nextRandom(rng);
+    rng = r.seed;
+    return r.value;
+  };
+  const kindRoll = next() * 100;
+  const [min, max] = dungeonMoney(dungeonId).chest;
+  const steps = Math.floor((max - min) / CHEST_RULES.coinStep) + 1;
+  const coins = min + Math.floor(next() * steps) * CHEST_RULES.coinStep;
+  const pick = next();
+  const { coins: coinRate, item: itemRate } = CHEST_RULES.rates;
+  if (kindRoll < coinRate) return { kind: 'coins', coins };
+  if (kindRoll < coinRate + itemRate) return { kind: 'item', item: CHEST_RULES.items[Math.floor(pick * CHEST_RULES.items.length)] as ItemId, coins };
+  const skills = bossTrumpSkills(dungeonId);
+  if (skills.length === 0) return { kind: 'coins', coins };
+  return { kind: 'card', card: skills[Math.floor(pick * skills.length)] as string };
+}
+
+/** 宝箱を開けたときに手に入れたもの（道具が持ちきれずにお金に替えたときは overflowItem） */
+export type ChestContent =
+  | { readonly kind: 'coins'; readonly coins: number; readonly overflowItem?: ItemId }
+  | { readonly kind: 'item'; readonly item: ItemId }
+  | { readonly kind: 'card'; readonly card: string };
+
+/**
+ * 宝箱を開ける（1度だけ）。中身（rollChest）を手に入れる：お金・道具はそのまま持ち物に（3回負けて戻されてもなくさない）。
+ * 技カードは勝ってもらった技カードと同じ扱い（この挑戦の獲得に入れる。戻されたら失う。封印の小箱で守れる）
+ */
+export function openRunChest(save: SaveData, chestId: string): { save: SaveData; opened: boolean; content: ChestContent | null } {
+  const run = save.dungeonRun;
+  if (!run || run.opened.includes(chestId)) return { save, opened: false, content: null };
+  const roll = rollChest(run.dungeonId, run.seed, chestId);
+  const opened: DungeonRun = { ...run, opened: [...run.opened, chestId] };
+  if (roll.kind === 'card') {
+    return { save: { ...addCards(save, [{ cardId: roll.card, count: 1 }]), dungeonRun: { ...opened, gained: [...opened.gained, roll.card] } }, opened: true, content: roll };
+  }
+  if (roll.kind === 'item' && canAddItem(save, roll.item)) {
+    return { save: { ...addItem(save, roll.item), dungeonRun: opened }, opened: true, content: { kind: 'item', item: roll.item } };
+  }
+  const content: ChestContent = roll.kind === 'item' ? { kind: 'coins', coins: roll.coins, overflowItem: roll.item } : roll;
+  return { save: { ...addCoins(save, roll.coins), dungeonRun: opened }, opened: true, content };
 }
 
 export type BattleTargetKind = 'npc' | 'guardian' | 'boss';
@@ -224,7 +291,7 @@ export interface RunVictory {
   /** ボスを倒してクリアした */
   readonly cleared: boolean;
   readonly firstClear: boolean;
-  /** クリアでもらったお金（仮） */
+  /** もらったお金（バトラー・番人は1勝ごとのお金、ボスはクリアのお金。src/data/economy.ts の DUNGEON_MONEY） */
   readonly coins: number;
   /** クリアでもらったカード（初めてのクリアだけ。仮のジオル） */
   readonly clearCards: readonly { cardId: string; count: number }[];
@@ -232,7 +299,8 @@ export interface RunVictory {
 
 /**
  * 対戦に勝った：相手を倒したことにし、技カード（card。画面が相手のモンスターの技から選ぶ）を所持カードに足して、この挑戦の獲得に記録する。
- * 見えない番人なら、しばらく番人が出てこない。ボスならクリア（挑戦を終える。報酬は仮：それまでの固定のダンジョンと同じお金と、初めてのときのカード）
+ * お金（2026-10-28 指示書「お金の入る側」）：バトラー・見えない番人は1勝ごとのお金をその場で所持金に入れる（幸運のコインで選ぶ勝ちも同じ）。
+ * 見えない番人なら、しばらく番人が出てこない。ボスならクリア（挑戦を終える。ボスのお金と、初めてのときのカード）
  */
 export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; id: string }, card: string | null): RunVictory {
   const run = save.dungeonRun;
@@ -244,10 +312,11 @@ export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; i
     gained: card ? [...run.gained, card] : run.gained,
     cooldown: target.kind === 'guardian' ? DUNGEON_RUN.guardianCooldownSteps : run.cooldown,
   };
-  if (target.kind !== 'boss') return { save: { ...next, dungeonRun: updated }, cleared: false, firstClear: false, coins: 0, clearCards: [] };
+  const money = dungeonMoney(run.dungeonId);
+  if (target.kind !== 'boss') return { save: { ...addCoins(next, money.win), dungeonRun: updated }, cleared: false, firstClear: false, coins: money.win, clearCards: [] };
   const record = next.dungeons[run.dungeonId] ?? { openedChests: [], bossDefeated: false, clears: 0 };
   const firstClear = !record.bossDefeated;
-  const coins = firstClear ? REWARDS.dungeonBossFirstClear : REWARDS.dungeonBossRepeat;
+  const coins = firstClear ? money.bossFirst : money.bossRepeat;
   const clearCards = firstClear ? (getDungeon(run.dungeonId)?.firstClearCards ?? []) : [];
   next = addCards(addCoins(next, coins), clearCards);
   next = {

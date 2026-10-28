@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { skillsOf, TMP_GEOL_ID } from '../src/data/cards.ts';
 import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../src/data/dungeonRun.ts';
-import { REWARDS } from '../src/data/economy.ts';
+import { DUNGEON_MONEY } from '../src/data/economy.ts';
 import { bfs, blocksWay, generateFloor, isFloorReachable, type DungeonFloor } from '../src/game/dungeon/generate.ts';
 import {
   activeEntities,
@@ -169,13 +169,16 @@ describe('ダンジョンの挑戦', () => {
     expect(descend(r2)).toBe(r2);
   });
 
-  it('宝箱は1度だけ開く（中身は仮でまだ無い）', () => {
-    const run = runOf(started(3));
-    const chest = runFloor(run).entities.find((e) => e.kind === 'chest');
+  it('宝箱は1度だけ開く（2回目は中身なし）', () => {
+    const save = started(3);
+    const chest = runFloor(runOf(save)).entities.find((e) => e.kind === 'chest');
     if (!chest) throw new Error('宝箱がない');
-    const a = openRunChest(run, chest.id);
+    const a = openRunChest(save, chest.id);
     expect(a.opened).toBe(true);
-    expect(openRunChest(a.run, chest.id).opened).toBe(false);
+    expect(a.content).not.toBeNull();
+    const b = openRunChest(a.save, chest.id);
+    expect(b.opened).toBe(false);
+    expect(b.save).toBe(a.save);
   });
 
   it('勝つと技カードを1枚手に入れ、相手は消える。番人なら一定歩数出ない', () => {
@@ -228,7 +231,7 @@ describe('ダンジョンの挑戦', () => {
     expect(last.save.location).toEqual(save.location);
   });
 
-  it('ボスを倒すとクリア：挑戦が終わり、報酬（仮）と初めてのときのカード（仮のジオル）', () => {
+  it('ボスを倒すとクリア：挑戦が終わり、ボスのお金（遺跡は初回 300G・2回目から 90G）と初めてのときのカード（仮のジオル）', () => {
     let s = started(5);
     s = { ...s, dungeonRun: descend(descend(runOf(s))) };
     const boss = runFloor(runOf(s)).entities.find((e) => e.kind === 'boss');
@@ -239,13 +242,14 @@ describe('ダンジョンの挑戦', () => {
     expect(w.cleared).toBe(true);
     expect(w.firstClear).toBe(true);
     expect(w.save.dungeonRun).toBeNull();
-    expect(w.save.coins).toBe(coins + REWARDS.dungeonBossFirstClear);
+    expect(w.save.coins).toBe(coins + 300);
     expect(w.save.collection[TMP_GEOL_ID]).toBe((s.collection[TMP_GEOL_ID] ?? 0) + 1);
     expect(w.save.dungeons['dungeon-01']?.bossDefeated).toBe(true);
     // 2回目は初めてのカードなし
     const again = winRunBattle({ ...startRun(w.save, 'dungeon-01', 6), dungeonRun: { ...runOf(startRun(w.save, 'dungeon-01', 6)), floor: 2 } }, { kind: 'boss', id: boss.id }, null);
     expect(again.firstClear).toBe(false);
-    expect(again.coins).toBe(REWARDS.dungeonBossRepeat);
+    expect(again.coins).toBe(90);
+    expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 300, bossRepeat: 90 });
   });
 });
 

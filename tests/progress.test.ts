@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HIDDEN_MONSTER_ID, TMP_FLUNE_ID, TMP_GEOL_ID } from '../src/data/cards.ts';
-import { REWARDS } from '../src/data/economy.ts';
+import { dungeonMoney } from '../src/data/economy.ts';
 import { FRAGMENTS } from '../src/data/fragments.ts';
 import { DUNGEON_B2, HOME } from '../src/data/maps.ts';
 import { getTournament } from '../src/data/tournaments.ts';
@@ -147,7 +147,7 @@ describe('ダンジョン', () => {
     const r = defeatEnemy(s, 'b1-enemy-1', false);
     s = r.save;
     expect(isEnemyActive(s, 'b1-enemy-1')).toBe(false);
-    expect(s.coins).toBe(coins + REWARDS.dungeonBattleWin);
+    expect(s.coins).toBe(coins + dungeonMoney('dungeon-01').win);
     expect(defeatEnemy(s, 'b1-enemy-1', false).coins).toBe(0);
     s = startDungeon(leaveDungeon(s), 'dungeon-01');
     expect(isEnemyActive(s, 'b1-enemy-1')).toBe(true);
@@ -156,9 +156,9 @@ describe('ダンジョン', () => {
   it('ボスを倒すとクリア記録。初回と2回目で報酬が違う', () => {
     const s = startDungeon(createNewSave(), 'dungeon-01');
     const first = defeatEnemy(s, 'b3-boss', true);
-    expect(first).toMatchObject({ cleared: true, firstClear: true, coins: REWARDS.dungeonBossFirstClear });
+    expect(first).toMatchObject({ cleared: true, firstClear: true, coins: dungeonMoney('dungeon-01').bossFirst });
     const again = defeatEnemy(startDungeon(leaveDungeon(first.save), 'dungeon-01'), 'b3-boss', true);
-    expect(again).toMatchObject({ cleared: true, firstClear: false, coins: REWARDS.dungeonBossRepeat });
+    expect(again).toMatchObject({ cleared: true, firstClear: false, coins: dungeonMoney('dungeon-01').bossRepeat });
     expect(again.save.dungeons['dungeon-01']?.clears).toBe(2);
   });
 

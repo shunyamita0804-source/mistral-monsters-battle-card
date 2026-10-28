@@ -4,11 +4,12 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜〜：手札の大きさ）
+### まず読む：いまの状態（2026-10-28 深夜〜：お金の入る側）
 
-- **最新の作業：手札の大きさ・数字 1.4倍・手札の印・枠の2倍（公開済み・公開ページで確認済み）**（作業ブランチ `claude/handsize-20261028`。記録 `docs/handsize-20261028.md`、写真 `docs/design/handsize-20261028/`、
-  報告書 `docs/report-2026-10-28-handsize.md`）。手札の幅 90（小さくせず重ねる）・マナの玉と数値の欄 1.4倍（はみ出すときは自動で小さく）・
-  手札の印は色と光（トゲの枠の絵はやめた）・技カードの枠は2倍の webp（`npm run art:skillframes`）。テスト 659件
+- **最新の作業：お金の入る側（ダンジョンの1勝ごとのお金・宝箱の中身・ボスのお金）**（作業ブランチ `claude/money-income-20261028`。記録 `docs/money-income-20261028.md`、
+  写真 `docs/design/money-income-20261028/`、報告書 `docs/report-2026-10-28-money.md`）。表は `src/data/economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`（前の `REWARDS` はなくした）。
+  宝箱は `run.ts` の `rollChest`／`openRunChest(save, 宝箱ID)`。テスト 673件
+- その前：手札の大きさ・数字 1.4倍・手札の印・枠の2倍（ユーザー確認で合格。記録 `docs/handsize-20261028.md`）
 - その前：カードの見た目3点 v3・試験の先生のデッキ（ユーザー確認で合格。記録 `docs/cardlook-v3-20261028.md`）
 - 前の報告書の「Claude が決めたこと」（`docs/report-2026-10-28-evening.md` 2章・`docs/report-2026-10-28-cardlook-v3.md` 2章）は、ユーザーが「すべてそのままで構わない」と回答（2026-10-28）
 - **セーブ version 21**（`lastLeague`。今回は変えていない）
