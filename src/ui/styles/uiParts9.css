@@ -198,65 +198,63 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
 }
 
-/* ===== 8 手札の印（選んだ＝金の光る枠、マナにする＝青い光る枠と札、使えない＝灰色のくもり） ===== */
+/*
+ * ===== 8 手札の印（2026-10-28 ユーザー指示：トゲのある飾りの枠の絵〔hand_selected・hand_mana・hand_unusable・hand_mana_tag〕は重ねない。
+ * 新しい枠の上に色と光で出す。光は場のモンスターの光る印〔battlePs.css〕と同じ感じ）=====
+ * - 使えない：カード全体を灰色にくもらせて少し暗く
+ * - 選んだ：少し持ち上げて（battlePs.css）、まわりを金色にやわらかく光らせる
+ * - マナにする：少し持ち上げて（battle.css）、まわりをマナの玉と同じ水色に光らせる。上に小さな「マナ」の札（丸い形）
+ */
 .battle__hand-card {
   position: relative;
+  transition: transform 170ms cubic-bezier(0.2, 0.8, 0.3, 1.25), filter 150ms;
 }
 
-.battle__hand-card::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: calc(var(--hand-card-h) / 2);
-  width: calc(var(--hand-card-w) * 1.22);
-  height: calc(var(--hand-card-h) * 1.18);
-  transform: translate(-50%, -50%);
-  background: center / 100% 100% no-repeat;
-  pointer-events: none;
-}
-
-.battle__hand-card.is-selected {
+.battle__hand-card.is-selected,
+.battle__hand-card.is-picked,
+.battle__hand-card.is-touching {
   border-color: transparent;
   box-shadow: none;
-}
-
-.battle__hand-card.is-selected::after {
-  background-image: url('@assets/images/ui/battle/hand_selected.webp');
-}
-
-.battle__hand-card.is-picked {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-.battle__hand-card.is-picked::after {
-  background-image: url('@assets/images/ui/battle/hand_mana.webp');
 }
 
 .battle__hand-card.is-unusable {
   opacity: 1;
-  filter: none;
+  filter: grayscale(0.85) brightness(0.6);
 }
 
-.battle__hand-card.is-unusable::after {
-  width: var(--hand-card-w);
-  height: var(--hand-card-h);
-  background-image: url('@assets/images/ui/battle/hand_unusable.webp');
-  opacity: 0.7;
+.battle__hand-card.is-selected {
+  filter: drop-shadow(0 0 3px rgb(255 222 130)) drop-shadow(0 0 9px rgb(255 200 80 / 0.9));
 }
 
+.battle__hand-card.is-touching {
+  filter: drop-shadow(0 0 3px rgb(255 222 130 / 0.8)) drop-shadow(0 0 7px rgb(255 200 80 / 0.6));
+}
+
+.battle__hand-card.is-unusable.is-selected {
+  filter: grayscale(0.85) brightness(0.6) drop-shadow(0 0 3px rgb(255 222 130)) drop-shadow(0 0 9px rgb(255 200 80 / 0.9));
+}
+
+.battle__hand-card.is-unusable.is-touching {
+  filter: grayscale(0.85) brightness(0.6) drop-shadow(0 0 3px rgb(255 222 130 / 0.8)) drop-shadow(0 0 7px rgb(255 200 80 / 0.6));
+}
+
+.battle__hand-card.is-picked {
+  filter: drop-shadow(0 0 3px rgb(140 238 255)) drop-shadow(0 0 10px rgb(40 200 240 / 0.95));
+}
+
+/* 「マナ」の札：トゲのない丸い形（水色のふちの紺） */
 .battle__hand-mana {
-  top: -6px;
+  top: -8px;
   z-index: 2;
-  width: 58px;
-  height: 18px;
-  padding: 0 0 0 16px;
-  border-radius: 0;
-  background: url('@assets/images/ui/battle/hand_mana_tag.webp') center / 100% 100% no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1px 9px;
+  border: 1.5px solid #8ceeff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1c5f8c, #0b2c4a);
+  box-shadow: 0 0 6px rgb(40 200 240 / 0.8);
+  color: #e8fbff;
   font-size: 10px;
+  font-weight: 900;
+  line-height: 1.4;
 }
 
 /* ===== 9 練習試合の背景（机の絵を濃いめに見せる。ほかの背景はうっすらのまま） ===== */

@@ -152,6 +152,7 @@ export const BATTLE = {
   'battle.qa.autoStop': { ja: 'QA:オート停止', en: 'QA: Stop Auto' },
   'battle.qa.win': { ja: 'QA:即勝利', en: 'QA: Win Now' },
   'battle.qa.lose': { ja: 'QA:即敗北', en: 'QA: Lose Now' },
+  'battle.qa.draw': { ja: 'QA:手札+1', en: 'QA: Draw 1' },
 
   // 情報箱・モンスター
   'battle.info.manaAria': { ja: 'マナ {n}', en: 'Mana {n}' },
