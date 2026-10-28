@@ -7,7 +7,7 @@ import { personOfOpponent, type LocalText, type Person } from '../data/people.ts
 import type { OpponentDefinition, TournamentDefinition } from '../data/tournaments.ts';
 import type { CardDefinition } from '../game/cards/cardTypes.ts';
 import { CONTENT_EN } from './contentEn.ts';
-import { getLanguage } from './i18n.ts';
+import { getLanguage, t } from './i18n.ts';
 
 /**
  * data/ の固有名・説明を、いまの言語で返す。
@@ -51,6 +51,13 @@ export const tournamentName = (t: TournamentDefinition): string => contentText('
 export const tournamentDescription = (t: TournamentDefinition): string =>
   contentText('tournament', t.id, 'description', t.description);
 /** 相手の名前。人物（src/data/people.ts）なら人物の名前（見えない番人は「？？？」） */
+/**
+ * 主人公の名前（2026-10-28。プレイヤーが決めた名前はどの言語でもそのまま）。まだ決めていない前のセーブでは「あなた」
+ */
+export function heroName(name: string | null | undefined): string {
+  return name ?? t('battle.side.player');
+}
+
 export function opponentName(o: OpponentDefinition): string {
   const person = personOfOpponent(o);
   return person ? personName(person) : contentText('opponent', o.id, 'name', o.name);

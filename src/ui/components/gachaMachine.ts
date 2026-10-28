@@ -143,6 +143,8 @@ export function showGachaMachine(root: HTMLElement, options: GachaMachineOptions
 
   const hint = h('p', { class: 'gacha-machine__hint' });
   const autoBtn = button(t('gacha.turnAuto'), () => (paid ? autoTurn() : options.onRequestPay()), 'btn gacha-machine__auto');
+  // 回すと歯車の「カチッ」が鳴るので、ボタンの音は付けない（2026-10-28 二重にしない）
+  autoBtn.dataset.se = 'none';
   const reselect = button(t('gacha.reselect'), () => options.onReselect(), 'gacha-machine__reselect');
   const rates = button(t('gacha.rates'), () => options.onRates(), 'gacha-machine__rates');
   const lineupHost = lineupView(series, options.collection);

@@ -6,11 +6,11 @@
 
 ### まず読む：いまの状態（2026-10-28 深夜〜29 のセッション終わり）
 
-- **公開中：`main` の `1e99e13` 以降**（最後の公開はプカリムの試遊。公開ページで確認済み）。**セーブ version 21**（`lastLeague`。このセッションでは変えていない）。テスト 693件。
-  作業ブランチはすべて main に取り込み済み
-- **2026-10-29**：プカリムの試遊は合格。ライフ・技の数字は確定。おいかぜを「次の自分のターンだけ＋1」に直した（作業ブランチ `claude/tailwind-fix-20261029`。main に取り込み済み・**まだ公開していない**）。
-  ユーザーから次の指示「名前の入力・取得カード画面・ボタンの効果音・手札の上限」（添付 ZIP の 00_instructions_for_claude_code.txt）が来たが、**ZIP が届いていない**ので再送を頼んだ。
-  ZIP が届いたらそれを作業し、おいかぜの直しと一緒に公開して画面写真で報告する
+- **2026-10-29（このセッションの続き）**：おいかぜの直し（`claude/tailwind-fix-20261029`）と、
+  **名前の入力・取得カード画面・ボタンの効果音・手札の上限9枚**（`claude/name-cardlist-uisound-20261029`。`docs/name-cardlist-uisound.md`）を main に取り込んで公開。
+  **セーブ version 22**（`player.name`。前のセーブは「続きから」で1回だけ名前の窓）。テスト 714件。報告は Artifact のページ（**返事待ち**）
+- 名前・取得カード・ボタンの音の未完了：iPhone 実機（キーボードが出たときの窓のずれ・変換中の文字・音の大きさ・Safari で灰色のボタンの音）。
+  取得カードをダンジョンの勝ち・宝箱・ガチャにつなぐ（部品はできている）
 - **ユーザーは iPhone で作業している。ファイル（ZIP・.md）はダウンロードできない** → 報告書は **Artifact の Web ページ** にしてリンクで渡す
   （プカリムの報告：https://claude.ai/artifact/JubpTGTyZ6RVs53iQG2DjD 。中身は `docs/report-2026-10-28-pukarim.md` と同じ。元のファイルはリポジトリに入れていない）。
   画面写真も同じページに入れる。ZIP を作る場合も、スクラッチパッドでなく作業フォルダ（`downloads/`。`.git/info/exclude` で git に入れない）に置く
@@ -25,7 +25,7 @@
 | カードの見た目3点 v3（技カードの枠・裏面の獅子・場のモンスターの二重の枠）・試験の先生のデッキ（ラズック・カルシェル・ノビトン）・倒れたときのひと言 | 合格 | `docs/cardlook-v3-20261028.md`・`docs/report-2026-10-28-cardlook-v3.md` | `src/game/battle/talk.ts`・`tests/battleTalk.test.ts` |
 | 手札の大きさ（幅90・小さくせず重ねる）・マナの玉と数字 1.4倍・手札の印（色と光）・技カードの枠を2倍の webp | 合格（「縦が足りない画面だけ80」は作らなくてよい） | `docs/handsize-20261028.md`・`docs/report-2026-10-28-handsize.md` | `handLayout.ts`・`valueFit.ts`・`npm run art:skillframes`・`tests/skillFrames.test.ts` |
 | お金の入る側（ダンジョンの1勝ごと・宝箱の中身・ボス） | 合格（水の神殿の合計が見込みより多めな点は、iPhone での試遊のあとで直すか決める） | `docs/money-income-20261028.md`・`docs/report-2026-10-28-money.md` | `economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`・`run.ts` の `rollChest`・`tests/moneyIncome.test.ts` |
-| 新モンスター「プカリム」の試遊（確認用 ?qa=1 だけ） | **報告済み・返事待ち** | `docs/pukarim.md`・`docs/report-2026-10-28-pukarim.md`・裁定 `docs/battle-rules.md`「プカリム（試遊中）」 | `src/data/pukarim.ts`・`src/game/battle/playtest.ts`・`npm run playtest:pukarim`・`tests/pukarim*.test.ts` |
+| 新モンスター「プカリム」の試遊（確認用 ?qa=1 だけ） | 合格（数字は確定。おいかぜだけ直した） | `docs/pukarim.md`・`docs/report-2026-10-28-pukarim.md`・裁定 `docs/battle-rules.md`「プカリム（試遊中）」 | `src/data/pukarim.ts`・`src/game/battle/playtest.ts`・`npm run playtest:pukarim`・`tests/pukarim*.test.ts` |
 
 前の報告書の「Claude が決めたこと」（`report-2026-10-28-evening.md` 2章・`report-2026-10-28-cardlook-v3.md` 2章）は「すべてそのままで構わない」とユーザーが回答済み。
 
@@ -49,7 +49,7 @@
 
 #### ユーザーの判断待ち・未完了（いま）
 
-- プカリムの試遊の結果（報告書 3〜4章）：直し方と、Claude が決めたこと（試遊用の16枚・おいかぜを同じ手番にも効かせる・ためる の重ね方・印の仮の見た目）
+- 名前・取得カード・ボタンの音・手札の上限の報告（`docs/name-cardlist-uisound.md`）への返事
 - 水の神殿を1回まわったときのお金（約 723G。見込み 500〜600G）：iPhone での試遊のあとで直すか決める
 - 前からの判断待ち：【仮】スキップのボタンを消す時期（販売前）・前のセーブの対戦成績・道具の値段と歩数（すべて仮）・すなをほるで隠れたカルシェルを特殊の技で狙えるか・
   図鑑のカードの1枚絵・レアリティと正式英語（`docs/review-2026-10-27-answer.md`）

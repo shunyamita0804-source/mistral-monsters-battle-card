@@ -1,3 +1,4 @@
+import { readSavedName } from '../player/playerName.ts';
 import { cardCatalog } from '../../data/cards.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
@@ -35,7 +36,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 21;
+export const SAVE_VERSION = 22;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -175,7 +176,11 @@ export interface SaveData {
   readonly version: number;
   readonly createdAt: string;
   readonly updatedAt: string;
-  readonly player: { readonly gender: Gender | null };
+  /**
+   * 主人公。name は 2026-10-28 から（主人公を選んだすぐあとに決める。最大8文字。src/game/player/playerName.ts）。
+   * null＝まだ決めていない（前のセーブ）。次に「つづきから」で始めたとき1回だけ名前の画面を出す
+   */
+  readonly player: { readonly gender: Gender | null; readonly name: string | null };
   readonly coins: number;
   readonly collection: Readonly<Record<string, number>>;
   readonly deck: Deck;
@@ -244,7 +249,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     version: SAVE_VERSION,
     createdAt: iso,
     updatedAt: iso,
-    player: { gender: null },
+    player: { gender: null, name: null },
     coins: CURRENCY.initial,
     collection: createStarterCollection(deck),
     deck,
@@ -594,6 +599,8 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   18: migrateDungeonsV19,
   19: migrateTown2026V20,
   20: (raw) => ({ ...raw, lastLeague: null }),
+  // 2026-10-28：主人公の名前。前のセーブは名前なし（つづきからで始めたとき1回だけ名前を決める）
+  21: (raw) => ({ ...raw, player: { ...(isObject(raw.player) ? raw.player : {}), name: null } }),
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -802,7 +809,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     version: SAVE_VERSION,
     createdAt: asString(migrated.createdAt, base.createdAt),
     updatedAt: asString(migrated.updatedAt, base.updatedAt),
-    player: { gender: player.gender === 'male' || player.gender === 'female' ? player.gender : null },
+    player: { gender: player.gender === 'male' || player.gender === 'female' ? player.gender : null, name: readSavedName(player.name) },
     coins: asCount(migrated.coins, base.coins),
     collection: normalizeCollection(migrated.collection),
     deck: normalizeDeck(migrated.deck),

@@ -41,6 +41,10 @@ import coinsMp3 from '@assets/audio/se/coins.mp3';
 import dripMp3 from '@assets/audio/se/drip.mp3';
 import autoDoorMp3 from '@assets/audio/se/auto_door.mp3';
 import underwaterLoopMp3 from '@assets/audio/se/underwater_loop.mp3';
+import uiTapMp3 from '@assets/audio/se/ui/ui_tap.mp3';
+import uiDecideMp3 from '@assets/audio/se/ui/ui_decide.mp3';
+import uiCancelMp3 from '@assets/audio/se/ui/ui_cancel.mp3';
+import uiDisabledMp3 from '@assets/audio/se/ui/ui_disabled.mp3';
 
 /**
  * 効果音（SE）。
@@ -93,7 +97,11 @@ export type SoundId =
   | 'coins'
   | 'drip'
   | 'ironDoorOpen'
-  | 'autoDoor';
+  | 'autoDoor'
+  | 'uiTap'
+  | 'uiDecide'
+  | 'uiCancel'
+  | 'uiDisabled';
 
 /**
  * 足音の地面の種類（2026-10-23。ユーザー提供の「〇〇の上を走る」から1歩ぶんずつ切り出した音。tools/audio/world_se_build.py）。
@@ -120,6 +128,9 @@ type SoundEntry = (
   /** 音量（1 = 元のまま） */
   readonly gain: number;
 };
+
+/** ボタンの音の大きさ（2026-10-28 指示書「ほかの効果音より少し小さめ（耳につかないように）」。届いた音は大きめなので半分弱に） */
+const UI_GAIN = 0.4;
 
 /** カードを配る音の大きさ（届いた音は大きめなので、ほかの効果音とそろえる） */
 const DEAL_GAIN = 0.45;
@@ -188,6 +199,12 @@ export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
   // カードショップに出入りする＝自動ドア（録音が小さいので gain で大きく）
   ironDoorOpen: { mp3: chestOpenIronMp3, gain: 0.8 },
   autoDoor: { mp3: autoDoorMp3, gain: 4.0 },
+  // 2026-10-28 ボタンの音（ZIP「Mistral_Name_CardList_UISound_20261028」。進行が合成した音。どのボタンに何を付けるかは src/ui/buttonSound.ts）
+  // ふつうのボタン・メニュー・タブ・一覧の行／決める（決定・はい・買う・出発）／戻る・いいえ・閉じる／押せない（灰色の）ボタン
+  uiTap: { mp3: uiTapMp3, gain: UI_GAIN },
+  uiDecide: { mp3: uiDecideMp3, gain: UI_GAIN },
+  uiCancel: { mp3: uiCancelMp3, gain: UI_GAIN },
+  uiDisabled: { mp3: uiDisabledMp3, gain: UI_GAIN * 1.2 },
 };
 
 const STEP_FILES = import.meta.glob<string>('/assets/audio/se/steps/*.mp3', { eager: true, query: '?url', import: 'default' });
@@ -225,6 +242,7 @@ class SoundPlayer {
   #unlockInstalled = false;
   /** 設定の効果音の音量（0〜1） */
   #volume = 1;
+  #played = 0;
 
   setVolume(volume: number): void {
     this.#volume = Number.isFinite(volume) ? Math.min(1, Math.max(0, volume)) : 1;
@@ -306,35 +324,20 @@ class SoundPlayer {
     return task;
   }
 
-  /** delayMs 後に鳴らす（カードを1枚ずつ配るときの時間差に使う） */
   /**
-   * ボタンを押したときの小さな「コッ」という音（2026-10-23）。音の素材ファイルは使わず、その場で短い音を作る。
-   * 木の札を軽くたたくような、低めで短い音。効果音の音量・ミュートに従う
+   * 押したことが分かる小さな音（2026-10-28 からボタンの音 ui_tap。前はその場で作った「コッ」）。
+   * ボタンでない所（歩く画面で人を押した・ページをめくった など）や、選んだ状態にするだけのボタンで使う
    */
   tap(): void {
-    if (this.#volume <= 0) return;
-    const ctx = this.#context();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(520, now);
-    osc.frequency.exponentialRampToValueAtTime(260, now + 0.06);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.16 * this.#volume, now + 0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.09);
+    this.play('uiTap');
   }
 
   /**
-   * ガチャのハンドルを回すときの歯車の「カチッ」（2026-10-27）。tap() と同じく素材ファイルを使わずその場で作る。
+   * ガチャのハンドルを回すときの歯車の「カチッ」（2026-10-27）。素材ファイルを使わずその場で作る。
    * 金属の小さな爪が歯車にかかるような、高めで短い音。効果音の音量・ミュートに従う
    */
   ratchet(): void {
+    this.#played += 1;
     if (this.#volume <= 0) return;
     const ctx = this.#context();
     if (!ctx) return;
@@ -353,7 +356,19 @@ class SoundPlayer {
     osc.stop(now + 0.04);
   }
 
+  /**
+   * これまでに play()・ratchet() で鳴らした回数。ボタンの音（buttonSound.ts）は、押したボタンがほかの効果音を鳴らしたときは鳴らさない（二重にしない）ために使う。
+   * 足音・環境音は数えない
+   */
+  get playCount(): number {
+    return this.#played;
+  }
+
+  /** delayMs 後に鳴らす（カードを1枚ずつ配るときの時間差に使う） */
   play(id: SoundId, delayMs = 0): void {
+    this.#played += 1;
+    // 自動の確認（tools/e2e）用：window.__seLog を用意したときだけ、鳴らした音の名前を記録する
+    (globalThis as { __seLog?: string[] }).__seLog?.push(id);
     this.#playUrl(this.#source(SE_REGISTRY[id]), SE_REGISTRY[id].gain, delayMs);
   }
 

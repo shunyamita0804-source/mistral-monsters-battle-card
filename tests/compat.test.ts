@@ -110,7 +110,7 @@ describe('設定（言語・音量）', () => {
   it('保存した言語・音量は次の起動でも使われ、セーブとは別に保存される', () => {
     const storage = new MemoryStorage();
     const store = new GameStore(storage);
-    store.newGame('male');
+    store.newGame('male', 'テスト');
     const saveBefore = storage.getItem(SAVE_KEY);
     store.settings.update({ language: 'en', seVolume: 30 });
     expect(getLanguage()).toBe('en');

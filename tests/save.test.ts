@@ -15,7 +15,7 @@ describe('セーブデータ', () => {
 
   it('保存して読み込むと同じ内容に戻る（updatedAt を除く）', () => {
     const repo = new SaveRepository(new MemoryStorage());
-    const save: SaveData = { ...createNewSave(), coins: 1234, fragments: ['fragment-01'], player: { gender: 'female' } };
+    const save: SaveData = { ...createNewSave(), coins: 1234, fragments: ['fragment-01'], player: { gender: 'female', name: 'ミレ' } };
     expect(repo.save(save)).toBe(true);
     const result = repo.load();
     expect(result.status).toBe('loaded');

@@ -111,7 +111,7 @@ describe('復元（GameStore.restoreSave）', () => {
   it('いまのセーブを退避してから入れ替える', () => {
     const storage = new MemoryStorage();
     const store = new GameStore(storage);
-    store.newGame('male');
+    store.newGame('male', 'テスト');
     const before = storage.getItem(SAVE_KEY);
     expect(store.restoreSave(progressedSave())).toBe(true);
     expect(storage.getItem(BEFORE_RESTORE_KEY)).toBe(before);
@@ -121,7 +121,7 @@ describe('復元（GameStore.restoreSave）', () => {
   it('書き込めなければ入れ替えず、いまのセーブはそのまま', () => {
     const storage = new FullStorage();
     const store = new GameStore(storage);
-    store.newGame('female');
+    store.newGame('female', 'テスト');
     const before = storage.getItem(SAVE_KEY);
     storage.full = true;
     expect(store.restoreSave(progressedSave())).toBe(false);
@@ -144,7 +144,7 @@ describe('復元（GameStore.restoreSave）', () => {
     const store = new GameStore(broken);
     expect(store.loadResult).toEqual({ status: 'unreadable', reason: 'storage' });
     expect(store.settings.value).toEqual(DEFAULT_SETTINGS);
-    expect(() => store.newGame('male')).not.toThrow();
+    expect(() => store.newGame('male', 'テスト')).not.toThrow();
     expect(store.lastSaveOk).toBe(false);
   });
 

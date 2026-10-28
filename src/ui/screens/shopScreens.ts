@@ -44,6 +44,7 @@ function boosterShelf(save: SaveData, onBuy: (key: BoosterKey) => void): HTMLEle
       ...shelf.map(({ key, bought }) => {
         const b = BOOSTERS.find((x) => x.key === key) as (typeof BOOSTERS)[number];
         const buy = button(bought ? t('introV2.shop.owned') : t('introV2.shop.buy', { price: BOOSTER_SHOP_PRICE }), () => onBuy(key), 'btn btn--small');
+        buy.dataset.se = 'decide';
         buy.disabled = bought;
         return h(
           'div',
@@ -252,7 +253,8 @@ export const gachaScreen: ScreenDefinition = {
           {
             class: `gacha-select__tile${on ? ' is-picked' : ''}`,
             attrs: { type: 'button', 'aria-pressed': on ? 'true' : 'false' },
-            dataset: { series: series.id },
+            // 選んだパックをもう1回押す＝決める（ボタンの音 ui_decide。src/ui/buttonSound.ts）
+            dataset: { series: series.id, ...(on ? { se: 'decide' } : {}) },
             on: {
               click: () => {
                 // 1回目で光って少し浮く、同じパックをもう1回で決定（別のパックを押すと選び直し）

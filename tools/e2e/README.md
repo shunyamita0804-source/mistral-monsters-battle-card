@@ -43,3 +43,14 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 - どれもセーブの JSON が要る（Vitest の一時テスト `tests/zz-*.test.ts` で作って、終わったら消す）
 - 対戦中の確認の窓（「まだ使えるカードがあります…」）は `.modal` ではないので、ボタンの文字（マナ化へ進む）で押す
 - 手札が多すぎる（12枚以上）と列が画面からはみ出し、ボタンが押しにくくなる
+
+## 2026-10-28 名前・取得カード・ボタンの音・手札の上限（いま動く。`docs/name-cardlist-uisound.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `name_shot.cjs` | 最初から → 主人公 → 名前の窓（入力前・キーボードが出たとき・「○○ でいい？」・はい）。キーボードは visualViewport をまねて灰色の板を重ねる（`KB_RATIO=0.58` で高いキーボード）。鳴った音も書き出す |
+| `name_resume_shot.cjs` | 名前の無い前のセーブで「続きから」→ 名前の窓は1回だけ |
+| `name_places_shot.cjs` | 8文字の名前が出る所（VS・大会の受付・総当たり表・壁の板・トーナメント表・名刺図鑑）。セーブは名前入りの exam/league/bracket/home_N.json |
+| `card_list_shot.cjs` | 管理局で箱を選ぶ → 取得カード（一覧・行を押す・スクロール・閉じる）。セーブは introV2.state 'packSelection' |
+| `hand_full_shot.cjs` | 試験の対戦（?qa=1）で手札10枚から「2枚引く」を使い、「手札がいっぱい」の記録を撮る |
+| `se_probe.cjs` | いくつかのボタンを押して、鳴った音の名前を書き出す |

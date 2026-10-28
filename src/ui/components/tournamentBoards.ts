@@ -3,9 +3,13 @@ import { personOfOpponent } from '../../data/people.ts';
 import type { TournamentDefinition } from '../../data/tournaments.ts';
 import { entrantOpponent, leagueMatch, leagueStandings, nextOpponent, pairsOf } from '../../game/progress/tournament.ts';
 import { PLAYER_ENTRANT } from '../../game/progress/tournamentDraw.ts';
-import type { ActiveTournament, Gender, TournamentMatch } from '../../game/save/saveData.ts';
-import { cardName, opponentName, personEpithet } from '../../i18n/content.ts';
+import type { ActiveTournament, SaveData, TournamentMatch } from '../../game/save/saveData.ts';
+
+/** 主人公（顔は男女、名前は決めた名前。2026-10-28） */
+type Hero = SaveData['player'];
+import { cardName, heroName, opponentName, personEpithet } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
+import { graphemes } from '../../game/player/playerName.ts';
 import { h } from '../dom.ts';
 import { openModal } from './modal.ts';
 import { faceKeyOf, opponentFaceUrl } from './opponentFace.ts';
@@ -54,16 +58,32 @@ function barView(src: string): HTMLElement {
 
 const img = (src: string, cls: string): HTMLElement => h('img', { class: cls, attrs: { src, alt: '', draggable: 'false', decoding: 'async' } });
 
-/** 出場者の名前（主人公は「あなた」） */
-export function entrantName(tour: TournamentDefinition, id: string): string {
-  if (id === PLAYER_ENTRANT) return t('battle.side.player');
+/**
+ * 表の中の名前（2026-10-28）。長い名前（6文字以上。主人公の名前は8文字まで）は文字を小さくし（CSS の is-long）、
+ * 前半・後半の2行に分ける（「WWWWWWW／W」のような折り返しにならないように）
+ */
+function boardName(cls: string, name: string): HTMLElement {
+  const chars = graphemes(name);
+  if (chars.length < 6) return h('span', { class: cls, text: name });
+  const half = Math.ceil(chars.length / 2);
+  return h(
+    'span',
+    { class: `${cls} is-long`, attrs: { 'aria-label': name } },
+    h('span', { class: 'board-name__line', text: chars.slice(0, half).join('') }),
+    h('span', { class: 'board-name__line', text: chars.slice(half).join('') }),
+  );
+}
+
+/** 出場者の名前（主人公は決めた名前。まだ無い前のセーブは「あなた」） */
+export function entrantName(tour: TournamentDefinition, id: string, hero: Hero): string {
+  if (id === PLAYER_ENTRANT) return heroName(hero.name);
   const o = entrantOpponent(tour, id);
   return o ? opponentName(o) : id;
 }
 
 /** 出場者の顔（主人公は男女の顔。顔の絵が無い常連は人影） */
-export function entrantFace(tour: TournamentDefinition, id: string, gender: Gender | null): HTMLElement {
-  if (id === PLAYER_ENTRANT) return h('span', { class: 'person-face' }, img(gender === 'female' ? heroFemale : heroMale, 'person-face__img'));
+export function entrantFace(tour: TournamentDefinition, id: string, hero: Hero): HTMLElement {
+  if (id === PLAYER_ENTRANT) return h('span', { class: 'person-face' }, img(hero.gender === 'female' ? heroFemale : heroMale, 'person-face__img'));
   const o = entrantOpponent(tour, id);
   const url = o ? opponentFaceUrl(faceKeyOf(o)) : undefined;
   if (url) return h('span', { class: 'person-face' }, img(url, 'person-face__img'));
@@ -78,7 +98,7 @@ function epithetOf(tour: TournamentDefinition, id: string): string | null {
 }
 
 /** 出場者の札を押したとき：顔・二つ名・名前・常連なら通算の勝率（仮の固定値）・モンスター */
-export function openEntrant(parent: HTMLElement, tour: TournamentDefinition, id: string, gender: Gender | null): void {
+export function openEntrant(parent: HTMLElement, tour: TournamentDefinition, id: string, hero: Hero): void {
   if (id === PLAYER_ENTRANT) return;
   const o = entrantOpponent(tour, id);
   if (!o) return;
@@ -86,9 +106,9 @@ export function openEntrant(parent: HTMLElement, tour: TournamentDefinition, id:
   const handle = openModal(parent, {
     className: 'entrant-detail',
     body: [
-      h('div', { class: 'entrant-detail__face' }, entrantFace(tour, id, gender)),
+      h('div', { class: 'entrant-detail__face' }, entrantFace(tour, id, hero)),
       epithet ? h('p', { class: 'entrant-detail__epithet', text: epithet }) : null,
-      h('h2', { class: 'entrant-detail__name', text: entrantName(tour, id) }),
+      h('h2', { class: 'entrant-detail__name', text: entrantName(tour, id, hero) }),
       h('p', { class: 'entrant-detail__kind', text: t(o.winRate !== undefined ? 'tournament.regular' : 'tournament.general') }),
       o.winRate !== undefined ? h('p', { class: 'entrant-detail__rate', text: t('tournament.winRate', { n: o.winRate }) }) : null,
       h('p', { class: 'entrant-detail__monsters', text: t('tournament.monsters', { names: o.monsters.map((m) => cardName(getMonster(m))).join(t('common.listSeparator')) }) }),
@@ -142,7 +162,7 @@ function leagueMark(kind: 'win' | 'lose' | 'self'): SVGSVGElement {
  * 本編の総当たり表の4人版：左の列と上の行に顔と名前、自分どうしは斜線1本、終わった試合は勝ち（青い○）・負け（赤い×）、
  * 次の相手のマスを光る枠で囲む。自分の行はうすい帯
  */
-export function leagueTable(tour: TournamentDefinition, active: ActiveTournament, gender: Gender | null): HTMLElement {
+export function leagueTable(tour: TournamentDefinition, active: ActiveTournament, hero: Hero): HTMLElement {
   const e = active.entrants;
   const next = nextOpponent(tour, active)?.id;
   const cells: HTMLElement[] = [];
@@ -151,8 +171,8 @@ export function leagueTable(tour: TournamentDefinition, active: ActiveTournament
       h(
         'div',
         { class: `league__head${id === PLAYER_ENTRANT ? ' is-player' : ''}`, dataset: { entrant: id } },
-        h('span', { class: 'league__face' }, entrantFace(tour, id, gender), img(leagueFaceFrame, 'league__frame')),
-        h('span', { class: 'league__name', text: entrantName(tour, id) }),
+        h('span', { class: 'league__face' }, entrantFace(tour, id, hero), img(leagueFaceFrame, 'league__frame')),
+        boardName('league__name', entrantName(tour, id, hero)),
       ),
       col,
       row,
@@ -185,7 +205,7 @@ export function leagueTable(tour: TournamentDefinition, active: ActiveTournament
 }
 
 /** 総当たりの順位表（3試合が終わったら） */
-export function standingsTable(tour: TournamentDefinition, active: ActiveTournament, gender: Gender | null): HTMLElement {
+export function standingsTable(tour: TournamentDefinition, active: ActiveTournament, hero: Hero): HTMLElement {
   const rows = leagueStandings(active);
   return h(
     'div',
@@ -213,7 +233,7 @@ export function standingsTable(tour: TournamentDefinition, active: ActiveTournam
             'tr',
             { class: `${r.id === PLAYER_ENTRANT ? 'is-player' : ''}${i === 0 ? ' is-first' : ''}`, dataset: { entrant: r.id } },
             h('td', { class: 'standings__rank', text: t('tournament.rankN', { n: i + 1 }) }),
-            h('td', { class: 'standings__who' }, h('span', { class: 'standings__face' }, entrantFace(tour, r.id, gender)), h('span', { text: entrantName(tour, r.id) })),
+            h('td', { class: 'standings__who' }, h('span', { class: 'standings__face' }, entrantFace(tour, r.id, hero)), h('span', { text: entrantName(tour, r.id, hero) })),
             h('td', { text: String(r.wins) }),
             h('td', { text: String(r.losses) }),
             h('td', { text: String(r.left) }),
@@ -282,7 +302,7 @@ const joinKind = (m: TournamentMatch | undefined): keyof typeof JOIN_ART => (!m 
 /**
  * 縦長の画面に8人を左右4人ずつ。真ん中の上に優勝杯。出場者の札は勝ち残り・敗退で見た目を変え、勝ち上がった線が光る。いま戦う対戦に剣の印
  */
-export function bracketView(tour: TournamentDefinition, active: ActiveTournament, gender: Gender | null, onCard: (id: string) => void): HTMLElement {
+export function bracketView(tour: TournamentDefinition, active: ActiveTournament, hero: Hero, onCard: (id: string) => void): HTMLElement {
   const e = active.entrants;
   const byRound = (r: number): TournamentMatch[] => active.matches.filter((m) => m.round === r);
   const lost = new Set(active.matches.map((m) => (m.winner === m.a ? m.b : m.a)));
@@ -297,7 +317,7 @@ export function bracketView(tour: TournamentDefinition, active: ActiveTournament
       { class: 'bracket__trophy' },
       img(trophyArt, 'bracket__cup'),
       img(pedestalArt, 'bracket__pedestal'),
-      final ? h('span', { class: 'bracket__champion', text: entrantName(tour, final.winner) }) : null,
+      final ? h('span', { class: 'bracket__champion', text: entrantName(tour, final.winner, hero) }) : null,
     ),
   );
 
@@ -329,13 +349,13 @@ export function bracketView(tour: TournamentDefinition, active: ActiveTournament
       'button',
       {
         class: `bracket__card is-${state}${id === PLAYER_ENTRANT ? ' is-player' : ''}${side ? ' is-right' : ''}`,
-        attrs: { type: 'button', 'aria-label': entrantName(tour, id) },
+        attrs: { type: 'button', 'aria-label': entrantName(tour, id, hero) },
         dataset: { entrant: id },
         on: { click: () => onCard(id) },
       },
       img(state === 'out' ? cardOut : state === 'win' ? cardWin : cardNormal, 'bracket__card-art'),
-      h('span', { class: 'bracket__card-face' }, entrantFace(tour, id, gender)),
-      h('span', { class: 'bracket__card-name', text: entrantName(tour, id) }),
+      h('span', { class: 'bracket__card-face' }, entrantFace(tour, id, hero)),
+      boardName('bracket__card-name', entrantName(tour, id, hero)),
       epithet ? h('span', { class: 'bracket__epithet', text: epithet }) : null,
     );
     card.style.left = `${side ? BOX_W - CARD.w : 0}px`;

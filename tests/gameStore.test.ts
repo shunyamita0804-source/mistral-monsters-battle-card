@@ -4,19 +4,20 @@ import { MemoryStorage, SAVE_KEY } from '../src/game/save/saveRepository.ts';
 import { GameStore, once } from '../src/ui/gameStore.ts';
 
 describe('GameStore（セーブの一元管理）', () => {
-  it('新しく始めると主人公を記録して保存する', () => {
+  it('新しく始めると主人公（男女と名前）を記録して保存する', () => {
     const storage = new MemoryStorage();
     const store = new GameStore(storage);
     expect(store.hasSave).toBe(false);
-    store.newGame('female');
-    expect(store.save.player.gender).toBe('female');
-    expect(JSON.parse(storage.getItem(SAVE_KEY) ?? '{}').player.gender).toBe('female');
+    store.newGame('female', 'ミレ');
+    expect(store.save.player).toEqual({ gender: 'female', name: 'ミレ' });
+    expect(JSON.parse(storage.getItem(SAVE_KEY) ?? '{}').player).toEqual({ gender: 'female', name: 'ミレ' });
+    expect(new GameStore(storage).save.player.name).toBe('ミレ');
   });
 
   it('update のたびに保存され、作り直しても同じ内容を読める', () => {
     const storage = new MemoryStorage();
     const store = new GameStore(storage);
-    store.newGame('male');
+    store.newGame('male', 'テスト');
     store.update((s) => ({ ...s, coins: 999 }));
     expect(new GameStore(storage).save.coins).toBe(999);
   });

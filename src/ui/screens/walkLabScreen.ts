@@ -111,7 +111,7 @@ export const walkLabScreen: ScreenDefinition = {
     const buildView = (): void => {
       view?.destroy();
       const store = new GameStore(new MemoryStorage(), true);
-      store.newGame(gender);
+      store.newGame(gender, t('battle.side.player'));
       const devCtx: ScreenContext = { navigate: ctx.navigate, back: ctx.back, reset: ctx.reset, store };
       worldRoot = h('main', { class: 'screen world' });
       stage.replaceChildren(worldRoot);

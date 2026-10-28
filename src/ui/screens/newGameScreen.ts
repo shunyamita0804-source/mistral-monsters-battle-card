@@ -4,6 +4,7 @@ import type { MessageKey } from '../../i18n/messages/index.ts';
 import { button, h } from '../dom.ts';
 import { once } from '../gameStore.ts';
 import { heroArtUrl } from '../components/heroArt.ts';
+import { openNamePrompt } from '../components/namePrompt.ts';
 import type { ScreenDefinition } from './types.ts';
 
 /**
@@ -12,14 +13,15 @@ import type { ScreenDefinition } from './types.ts';
  * 2026-10-26：札（ふつう・押したとき光る）と大きな立ち絵はデザイン第8弾（src/ui/components/heroArt.ts）。
  * 2026-10-26 ユーザー指示：1回目に押すと札が光って選んだ状態に、同じ札をもう1回押すと決まる（別の札を押すと選び直し）。
  * 始めたあとの「ようこそ」の説明は出さない（ユーザー「自分で確かめさせるRPG要素にしたい」）
+ * 2026-10-28 ユーザー決定：主人公を決めたすぐあと（導入が始まる前）に名前を決める（src/ui/components/namePrompt.ts）
  */
 export const newGameScreen: ScreenDefinition = {
   id: 'newGame',
   titleKey: 'newGame.title',
   create(ctx) {
     const element = h('main', { class: 'screen new-game' });
-    const start = once((gender: Gender) => {
-      ctx.store.newGame(gender);
+    const start = once((gender: Gender, name: string) => {
+      ctx.store.newGame(gender, name);
       // 家の中の画面の上に、物語の始まりの挿絵を1回だけ（2026-10-27 デザイン第13弾。src/ui/components/openingIntro.ts）
       ctx.store.openingIntro = true;
       ctx.reset('world');
@@ -38,6 +40,9 @@ export const newGameScreen: ScreenDefinition = {
           const on = el.dataset[attr] === key;
           el.classList.toggle('is-selected', on);
           el.setAttribute('aria-pressed', String(on));
+          // ボタンの音：1回目（選ぶ）は ui_tap、選んだ札をもう1回（決める）は ui_decide（src/ui/buttonSound.ts）
+          if (on) el.dataset.se = 'decide';
+          else delete el.dataset.se;
         }
         hint.textContent = t(hintKey);
       };
@@ -45,7 +50,7 @@ export const newGameScreen: ScreenDefinition = {
 
     const showHeroes = (): void => {
       const hint = h('p', { class: 'new-game__hint', attrs: { 'aria-live': 'polite' } });
-      const pick = twoTap<Gender>('gender', (gender) => start(gender), hint, 'newGame.confirmHint');
+      const pick = twoTap<Gender>('gender', (gender) => openNamePrompt(element, (name) => start(gender, name)), hint, 'newGame.confirmHint');
       const choice = (gender: Gender, label: string, note: string): HTMLElement =>
         h(
           'button',

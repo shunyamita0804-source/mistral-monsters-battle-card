@@ -1,0 +1,357 @@
+/*
+ * 名前を決める窓（src/ui/components/namePrompt.ts）と、取得カードの画面（src/ui/components/cardListView.ts）。2026-10-28
+ */
+
+/* ---------- 名前を決める ---------- */
+.name-prompt {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 150px 16px 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgb(40 58 102 / 0.55), transparent 70%),
+    rgb(8 12 24 / 0.86);
+}
+
+.name-prompt__window {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 358px;
+  padding: 4px 6px 6px;
+  border: 22px solid transparent;
+  border-image: url('@assets/images/ui/frame/window_frame.webp') 50 fill / 22px / 0 stretch;
+  color: #f3ead2;
+  transform: translateY(var(--name-shift, 0px));
+  transition: transform 0.18s ease-out;
+}
+
+.name-prompt__talk {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.name-prompt__face {
+  flex: none;
+  width: 76px;
+  height: 94px;
+  object-fit: cover;
+  object-position: 50% 6%;
+  border: 2px solid #c9a24a;
+  border-radius: 8px;
+  background: #1b2130;
+}
+
+.name-prompt__talk-body {
+  flex: 1;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.name-prompt__speaker {
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: rgb(201 162 74 / 0.22);
+  font-size: 12px;
+  font-weight: 700;
+  color: #e8cf8a;
+}
+
+.name-prompt__text {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.name-prompt__input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name-prompt__field {
+  position: relative;
+}
+
+.name-prompt__input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 52px;
+  padding: 0 64px 0 14px;
+  border: 2px solid #c9a24a;
+  border-radius: 8px;
+  background: #fbf6e8;
+  color: #1d2238;
+  /* iPhone で入力欄を拡大しないよう 16px 以上 */
+  font-size: 20px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.name-prompt__input:focus {
+  border-color: #f2d27a;
+  box-shadow: 0 0 0 3px rgb(242 210 122 / 0.35);
+}
+
+.name-prompt__input::placeholder {
+  color: #8d8a80;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.name-prompt__count {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #6b6658;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.name-prompt__rule {
+  margin: 0;
+  font-size: 11px;
+  color: #bdb39a;
+}
+
+.name-prompt__ok {
+  width: 100%;
+}
+
+/* 押せない「決定」（aria-disabled。押すと ui_disabled の音） */
+.name-prompt__ok.is-disabled {
+  border-color: #555;
+  background: #4a4a4f;
+  color: #a5a5aa;
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+
+.name-prompt__confirm {
+  display: none;
+  gap: 10px;
+}
+
+.name-prompt__confirm .btn {
+  flex: 1;
+  min-height: 52px;
+  font-size: 17px;
+}
+
+.name-prompt__window.is-confirm .name-prompt__input-area {
+  display: none;
+}
+
+.name-prompt__window.is-confirm .name-prompt__confirm {
+  display: flex;
+}
+
+/* キーボードで高さが足りないとき：顔を小さく、説明を省く */
+.name-prompt__window.is-tight .name-prompt__face {
+  width: 48px;
+  height: 56px;
+}
+
+.name-prompt__window.is-tight .name-prompt__rule {
+  display: none;
+}
+
+.name-prompt__window.is-tight .name-prompt__text {
+  font-size: 15px;
+}
+
+/* ---------- 取得カード ---------- */
+.card-list {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  padding: 10px 8px 12px;
+  background: rgb(8 12 24 / 0.9);
+}
+
+.card-list__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 0;
+  padding: 2px 4px 4px;
+  border: 18px solid transparent;
+  border-image: url('@assets/images/ui/frame/window_frame.webp') 50 fill / 18px / 0 stretch;
+  color: #f3ead2;
+}
+
+.card-list__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.card-list__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: #f1dfb4;
+}
+
+.card-list__total {
+  font-size: 13px;
+  color: #cfc4a6;
+}
+
+/* 上：選んだカードを大きく（効果つき） */
+.card-list__selected {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgb(201 162 74 / 0.55);
+  border-radius: 8px;
+  background: rgb(10 16 34 / 0.75);
+}
+
+.card-list__big-card {
+  flex: none;
+  width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card-list__big-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-list__big-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.card-list__big-name {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.card-list__big-count {
+  flex: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f2d27a;
+}
+
+.card-list__big-meta {
+  margin: 0;
+  font-size: 11px;
+  color: #cfc4a6;
+}
+
+.card-list__big-text {
+  margin: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 下：一覧（たくさんあるときは一覧だけスクロール） */
+.card-list__rows {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 2px;
+}
+
+.card-list__group {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 4px 0 0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #2a2f45;
+  font-size: 12px;
+  color: #e8cf8a;
+}
+
+.card-list__row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 3px 10px 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.05);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.card-list__row.is-selected {
+  border-color: #f2d27a;
+  background: rgb(242 210 122 / 0.16);
+  box-shadow: 0 0 8px rgb(242 210 122 / 0.35);
+}
+
+.card-list__thumb {
+  flex: none;
+  width: 30px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.card-list__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-list__count {
+  flex: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2d27a;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-list__close {
+  flex: none;
+  width: 100%;
+}

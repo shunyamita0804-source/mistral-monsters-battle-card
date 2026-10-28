@@ -80,6 +80,24 @@
   text-shadow: 0 2px 4px rgb(0 0 0 / 0.8);
 }
 
+/* 持ち主の名前（2026-10-28）：登録の数の上に小さく */
+.people-book__owner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 64px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #d9c79d;
+  text-align: center;
+  text-shadow: 0 2px 4px rgb(0 0 0 / 0.8);
+}
+
+.people-book__count.has-owner {
+  top: 84px;
+}
+
 /* ポケット5つ（背景の絵のポケットの位置。390×844 の論理px） */
 .people-book__page {
   position: absolute;

@@ -39,7 +39,7 @@ import { summarizeBattle } from '../../game/battle/simulate.ts';
 import { knockTalk } from '../../game/battle/talk.ts';
 import { handOverlap } from '../components/handLayout.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
-import { cardName, localText, opponentName } from '../../i18n/content.ts';
+import { cardName, heroName, localText, opponentName } from '../../i18n/content.ts';
 import { personOfOpponent, type LocalText } from '../../data/people.ts';
 import { t } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
@@ -113,6 +113,16 @@ const FX_SOUND: Readonly<Record<BattleFxKind, SoundId>> = {
 };
 
 /** 使ったカードを大きく見せるときの音（カードの種類ごと） */
+/** ボタンの音（src/ui/buttonSound.ts）を付けない／「決める」の音にする */
+const seNone = <E extends HTMLElement>(el: E): E => {
+  el.dataset.se = 'none';
+  return el;
+};
+const seDecide = <E extends HTMLElement>(el: E): E => {
+  el.dataset.se = 'decide';
+  return el;
+};
+
 function showcaseSound(card: PlayCard): SoundId {
   if (card.kind === 'support') return 'cardSupport';
   switch (card.effect.type) {
@@ -707,6 +717,8 @@ export const battleScreen: ScreenDefinition = {
         {
           class: `${where} battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}`,
           attrs: { role: 'button', 'aria-label': t('battle.spot.skip') },
+          // 使ったカードを大きく見せている所（カードの演出）。ボタンの音は付けない
+          dataset: { se: 'none' },
           on: { click: skipSpotlight },
         },
         inInfo ? null : line,
@@ -839,7 +851,7 @@ export const battleScreen: ScreenDefinition = {
       setTimeout(() => {
         if (destroyed) return;
         state = createBattle(
-          { name: t('battle.side.player'), deck: req.playerDeck ?? save.deck },
+          { name: heroName(save.player.name), deck: req.playerDeck ?? save.deck },
           { name: opponentName(req.opponent), deck: req.opponentDeck ?? buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
           seed,
           first,
@@ -885,7 +897,7 @@ export const battleScreen: ScreenDefinition = {
       const lead = req.opponent.monsters[0];
       const opponentFaceEl = opponentUrl ? faceImg(opponentUrl) : lead ? createMonsterPortrait(getMonster(lead), 44) : h('span');
       return versusBanner(
-        { name: t('battle.side.player'), face: faceImg(heroFaceUrl(save.player.gender)) },
+        { name: heroName(save.player.name), face: faceImg(heroFaceUrl(save.player.gender)) },
         { name: opponentName(req.opponent), face: opponentFaceEl },
       );
     };
@@ -1247,7 +1259,8 @@ export const battleScreen: ScreenDefinition = {
               // 対象を選ぶ間は、選べないモンスターを暗くして候補と見分ける
               class: `battle__monster battle__monster--${side}${isTarget ? ' is-target' : targeting ? ' is-not-target' : ''}${isPendingTarget ? ' is-attacked' : ''}${m.acted && !down ? ' is-acted' : ''}${down ? ' is-down' : ''}${diff < 0 ? ' is-hit' : ''}${spotClass}`,
               attrs: { type: 'button', 'aria-label': t('battle.monster.aria', { name: cardName(m.cardId), life: m.life }) },
-              dataset: { uid: m.uid },
+              // 技の対象に選ぶとき（カードを使う操作）はボタンの音を付けない
+              dataset: { uid: m.uid, ...(targeting ? { se: 'none' } : {}) },
               on: { click: () => tapMonster(side, m) },
             },
             h(
@@ -1647,6 +1660,8 @@ export const battleScreen: ScreenDefinition = {
               {
                 class: `battle__defense-card${usable.usable ? '' : ' is-unusable'}`,
                 attrs: { type: 'button', 'aria-label': t('battle.defense.cardAria', { name: cardName(skill) }) },
+                // 守りのカードを使う操作（カードの音がある）
+                dataset: { se: 'none' },
                 on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
               },
               createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'hand' }),
@@ -1669,10 +1684,12 @@ export const battleScreen: ScreenDefinition = {
       }
       const title = t(w === 'player' ? 'battle.result.win' : w === 'opponent' ? 'battle.result.lose' : 'battle.result.draw');
       const reason = s.endReason === 'deckOut' ? t(w === 'player' ? 'battle.result.deckOutOpponent' : 'battle.result.deckOutPlayer') : '';
-      const go = commandButton(t('battle.result.next'), () => {
-        go.disabled = true;
-        finish(s.winner);
-      });
+      const go = seDecide(
+        commandButton(t('battle.result.next'), () => {
+          go.disabled = true;
+          finish(s.winner);
+        }),
+      );
       // 勝ち・負けの主人公の姿（2026-10-27 デザイン第13弾。引き分けは出さない）。結果の窓の上に、窓が足元に重なるように
       const hero =
         w === 'player' || w === 'opponent'
@@ -1709,11 +1726,13 @@ export const battleScreen: ScreenDefinition = {
         }
       }
       if (!hintOpen) return null;
-      const ok = commandButton(t('story.hint.ok'), () => {
-        ok.disabled = true;
-        hintOpen = null;
-        render();
-      });
+      const ok = seDecide(
+        commandButton(t('story.hint.ok'), () => {
+          ok.disabled = true;
+          hintOpen = null;
+          render();
+        }),
+      );
       return h(
         'div',
         { class: 'battle__hint', dataset: { hint: hintOpen }, attrs: { role: 'dialog' } },
@@ -1916,16 +1935,17 @@ export const battleScreen: ScreenDefinition = {
           ? h('span', { class: 'battle-cmds__status battle-cmds__status--wait' }, h('span', { class: 'battle-cmds__sand', attrs: { 'aria-hidden': 'true' } }), h('span', { text }))
           : h('span', { class: 'battle-cmds__status', text });
       if (mine && s.phase === 'main') {
-        if (!targeting && selected && cardUsability(s, 'player', selected.uid).usable) actions.push(commandButton(t('battle.cmd.use'), () => useCard(selected.uid)));
-        if (targeting || selected) actions.push(commandButton(t('common.cancel'), deselect, 'cancel'));
-        middle = commandButton(t('battle.cmd.endAttack'), () => requestEndAttack(s), 'cancel');
+        // カードの操作（使う・やめる・マナにする）はカードの音があるのでボタンの音は付けない（2026-10-28。src/ui/buttonSound.ts）
+        if (!targeting && selected && cardUsability(s, 'player', selected.uid).usable) actions.push(seNone(commandButton(t('battle.cmd.use'), () => useCard(selected.uid))));
+        if (targeting || selected) actions.push(seNone(commandButton(t('common.cancel'), deselect, 'cancel')));
+        middle = seDecide(commandButton(t('battle.cmd.endAttack'), () => requestEndAttack(s), 'cancel'));
       } else if (mine && s.phase === 'mana') {
-        if (manaPicks.size > 0 && canConvertToMana(s, 'player')) actions.push(commandButton(t('battle.cmd.makeMana', { n: manaPicks.size }), convertPicked));
-        middle = commandButton(t('battle.cmd.endTurn'), () => requestEndTurn(), 'cancel');
+        if (manaPicks.size > 0 && canConvertToMana(s, 'player')) actions.push(seNone(commandButton(t('battle.cmd.makeMana', { n: manaPicks.size }), convertPicked)));
+        middle = seDecide(commandButton(t('battle.cmd.endTurn'), () => requestEndTurn(), 'cancel'));
       } else if (canChooseDefense(s) && s.pending) {
         // 守備の選択はフォーカスエリア。「守備しない／守備を終える」は真ん中
         const pass = s.pending.responses.length === 0;
-        middle = commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel');
+        middle = seDecide(commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel'));
       } else if (s.phase === 'defense' && s.pending?.attacker === 'opponent' && !auto) {
         middle = statusTag(t('battle.dock.noDefense'), true);
       } else {
@@ -1977,8 +1997,8 @@ export const battleScreen: ScreenDefinition = {
       };
       const mine = s.active === 'player' && !auto && !blocked;
       const items: HTMLButtonElement[] = [];
-      if (mine && s.phase === 'main') items.push(commandButton(t('battle.cmd.endAttack'), run(() => requestEndAttack(s)), 'cancel'));
-      if (mine && s.phase === 'mana') items.push(commandButton(t('battle.cmd.endTurn'), run(requestEndTurn), 'cancel'));
+      if (mine && s.phase === 'main') items.push(seDecide(commandButton(t('battle.cmd.endAttack'), run(() => requestEndAttack(s)), 'cancel')));
+      if (mine && s.phase === 'mana') items.push(seDecide(commandButton(t('battle.cmd.endTurn'), run(requestEndTurn), 'cancel')));
       items.push(commandButton(t('battle.rules'), run(showRules)));
       if (req.allowSurrender) items.push(commandButton(t('battle.surrender'), run(surrender), 'cancel'));
       return h(

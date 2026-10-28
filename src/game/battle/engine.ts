@@ -833,9 +833,7 @@ function redrawHand(state: BattleState, side: Side): BattleState {
   if (n === 0) return state;
   const mixed = shuffle([...s.deck, ...s.hand.map((c) => c.cardId)], state.seed);
   const emptied = updateSide({ ...state, seed: mixed.seed }, side, { hand: [], deck: mixed.items });
-  const drawn = drawCards(emptied.sides[side], n, emptied.nextUid);
-  const next = updateSide({ ...emptied, nextUid: drawn.nextUid }, side, drawn.side);
-  return addLog(next, t('battle.log.redrawHand', { side: sideLabel(side), n }));
+  return drawUpToMax(emptied, side, n, (drawn) => t('battle.log.redrawHand', { side: sideLabel(side), n: drawn }));
 }
 
 /**
@@ -919,12 +917,29 @@ function deckToMana(state: BattleState, side: Side, count: number): BattleState 
   return addLog(moved.length > 0 ? addFx(next, 'manaGain', side) : next, t('battle.log.deckToMana', { n: moved.length }));
 }
 
-/** 効果のドロー。指示された枚数を引けなければ負け */
+/**
+ * 引く効果で count 枚を山札から取る。手札の上限（BATTLE_RULES.maxHand）までは手札へ、超える分は引かずに山札の上からそのままマナへ
+ * （2026-10-28 ユーザー決定。捨てる画面は作らない）。山札が count 枚あることは呼ぶ側で確かめる。
+ * 引いた記録（drawLog。1枚も引けなかったときは出さない）のあと、マナにした分があれば「手札がいっぱいなので…」の記録を足す
+ */
+function drawUpToMax(state: BattleState, side: Side, count: number, drawLog: (drawn: number) => string): BattleState {
+  const room = Math.max(0, BATTLE_RULES.maxHand - state.sides[side].hand.length);
+  const drawn = drawCards(state.sides[side], Math.min(count, room), state.nextUid);
+  let next = updateSide({ ...state, nextUid: drawn.nextUid }, side, drawn.side);
+  if (drawn.drawn > 0) next = addLog(next, drawLog(drawn.drawn));
+  const toMana = Math.min(count - drawn.drawn, next.sides[side].deck.length);
+  if (toMana > 0) {
+    const s = next.sides[side];
+    next = updateSide(next, side, { deck: s.deck.slice(toMana), manaPile: [...s.manaPile, ...s.deck.slice(0, toMana)] });
+    next = addLog(addFx(next, 'manaGain', side), t('battle.log.handFullMana', { max: BATTLE_RULES.maxHand, n: toMana }));
+  }
+  return next;
+}
+
+/** 効果のドロー。指示された枚数を引けなければ負け（手札の上限を超える分はマナになるが、山札から取る枚数は同じ） */
 function drawByEffect(state: BattleState, side: Side, count: number): BattleState {
   if (state.sides[side].deck.length < count) return loseByDeckOut(state, side);
-  const drawn = drawCards(state.sides[side], count, state.nextUid);
-  const next = updateSide({ ...state, nextUid: drawn.nextUid }, side, drawn.side);
-  return addLog(next, t('battle.log.draw', { n: drawn.drawn }));
+  return drawUpToMax(state, side, count, (n) => t('battle.log.draw', { n }));
 }
 
 /**
