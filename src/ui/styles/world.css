@@ -845,6 +845,20 @@
   transform: translateY(-50%);
 }
 
+/* 挿絵はあるが名前の絵がまだ無いダンジョン（2026-10-28 新しい5つ）：名前の文字を、名前の絵と同じように少し遅れて出す */
+.world__dungeon-intro--text .world__dungeon-intro-name {
+  opacity: 0;
+}
+
+.world__dungeon-intro--text.is-ready .world__dungeon-intro-name {
+  animation: dungeon-intro-name 900ms cubic-bezier(0.2, 0.8, 0.3, 1) 300ms both;
+}
+
+@keyframes dungeon-intro-name {
+  0% { opacity: 0; transform: translateY(-50%) scale(1.18); filter: brightness(1.6); }
+  100% { opacity: 1; transform: translateY(-50%) scale(1); filter: brightness(1); }
+}
+
 @keyframes dungeon-intro-out {
   from { opacity: 1; }
   to { opacity: 0; }
@@ -873,7 +887,8 @@
 @media (prefers-reduced-motion: reduce) {
   .world__dungeon-intro.is-ready .world__dungeon-intro-art,
   .world__dungeon-intro.is-ready .world__dungeon-intro-overlay,
-  .world__dungeon-intro.is-ready .world__dungeon-intro-title {
+  .world__dungeon-intro.is-ready .world__dungeon-intro-title,
+  .world__dungeon-intro--text.is-ready .world__dungeon-intro-name {
     animation-duration: 1ms;
   }
 }
