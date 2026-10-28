@@ -1,21 +1,16 @@
-import { getMonster, HIDDEN_MONSTER_ID } from '../../data/cards.ts';
 import { GACHA, GACHA_SERIES, type GachaSeries } from '../../data/economy.ts';
-import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import { ITEMS } from '../../data/items.ts';
-import { BOOSTER_SHOP_PRICE, BOOSTERS } from '../../data/introV2.ts';
+import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
+import { boosterShelf as boosterShelfOf, buyBooster } from '../../game/story/introV2.ts';
 import type { SaveData } from '../../game/save/saveData.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
 import { isNewItem } from '../../game/items/items.ts';
 import { purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
-import { canRestoreHidden, fragmentCount, restoreHidden } from '../../game/progress/fragments.ts';
-import restoreSceneArt from '@assets/images/ui/restore/restore_scene.webp';
-import restoreFxArt from '@assets/images/effects/fx_restore.webp';
 
 import { randomSeed } from '../../game/rng.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
-import { createCardView } from '../components/cardView.ts';
 import { seriesPackUrl } from '../components/gachaArt.ts';
 import { showGachaMachine } from '../components/gachaMachine.ts';
 import { showGachaOpen } from '../components/gachaOpen.ts';
@@ -31,18 +26,13 @@ import faceClerk from '@assets/images/characters/face_clerk.webp';
 /** シリーズの名前「○○のパック」 */
 const seriesName = (series: GachaSeries): string => t('gacha.series.name', { monster: cardName(series.monsterId) });
 
-/** 特別復元の光を見せる時間 */
-const RESTORE_FX_MS = 1600;
-
-/** ショップの店員メニュー：カードを見る／売る（価格未確定のため無効）／ガチャ／道具を買う／特別復元（欠片を持っているときだけ） */
 /**
- * 管理局で選ばなかったブースターパック2種（2026-10-27 ユーザー方針「少し高い値段でショップで買える」）。
- * 値段・中身が決まるまでは並べるだけ（買うボタンは押せない・コインは減らない）。管理局で受け取ったあとだけ出す
+ * ブースターの箱の棚（2026-10-28 ユーザー決定）：管理局で選ばなかった箱を 1箱 1,500G で買える（各箱1回まで。買ったら「購入済み」）。
+ * 中身はモンスター3体＋山札60枚（その箱の初期デッキ。src/game/story/introV2.ts の boosterDeck）
  */
-function boosterShelf(save: SaveData): HTMLElement | null {
-  const v = save.story.introV2;
-  if (!v.boosterClaimed || !v.selectedBoosterKey) return null;
-  const others = BOOSTERS.filter((b) => b.key !== v.selectedBoosterKey);
+function boosterShelf(save: SaveData, onBuy: (key: BoosterKey) => void): HTMLElement | null {
+  const shelf = boosterShelfOf(save);
+  if (shelf.length === 0) return null;
   return h(
     'section',
     { class: 'shop-boosters' },
@@ -51,15 +41,15 @@ function boosterShelf(save: SaveData): HTMLElement | null {
     h(
       'div',
       { class: 'shop-boosters__list' },
-      ...others.map((b) => {
-        // 値段が決まるまで押せない（購入・コインを減らす処理はまだ作らない）
-        const buy = button(t('introV2.shop.buy'), () => undefined, 'btn btn--small');
-        buy.disabled = BOOSTER_SHOP_PRICE === null;
+      ...shelf.map(({ key, bought }) => {
+        const b = BOOSTERS.find((x) => x.key === key) as (typeof BOOSTERS)[number];
+        const buy = button(bought ? t('introV2.shop.owned') : t('introV2.shop.buy', { price: BOOSTER_SHOP_PRICE }), () => onBuy(key), 'btn btn--small');
+        buy.disabled = bought;
         return h(
           'div',
-          { class: 'shop-boosters__item', dataset: { pack: b.key } },
+          { class: `shop-boosters__item${bought ? ' is-bought' : ''}`, dataset: { pack: key } },
           h('img', { class: 'shop-boosters__art', attrs: { src: boosterArtUrl(b), alt: '', draggable: 'false' } }),
-          h('span', { class: 'shop-boosters__name', text: t(`introV2.pack.name.${b.key.slice(-1)}` as MessageKey) }),
+          h('span', { class: 'shop-boosters__name', text: t(`introV2.pack.name.${key.slice(-1)}` as MessageKey) }),
           buy,
         );
       }),
@@ -67,6 +57,11 @@ function boosterShelf(save: SaveData): HTMLElement | null {
   );
 }
 
+/**
+ * ショップの店員（カウンター）：カードを見る／売る（価格未確定のため無効）／道具を買う／ブースターの箱。
+ * 2026-10-28 ユーザー決定：カウンターで買えるのはブースターの箱と道具だけ（カードはふだんは販売機のガチャで）。
+ * ガチャの札と欠片の特別復元（研究所へ移した）はここから外した
+ */
 export const shopMenuScreen: ScreenDefinition = {
   id: 'shopMenu',
   titleKey: 'shop.title',
@@ -75,7 +70,6 @@ export const shopMenuScreen: ScreenDefinition = {
     const element = h('main', { class: 'screen shop-menu' });
     const render = (): void => {
       const save = store.save;
-      const fragments = fragmentCount(save);
       const sell = button(t('shop.sell'), () => undefined, 'shop-menu__item shop-menu__item--sell');
       sell.disabled = true;
       element.replaceChildren(
@@ -92,7 +86,6 @@ export const shopMenuScreen: ScreenDefinition = {
           { class: 'shop-menu__items' },
           button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item shop-menu__item--browse'),
           h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
-          button(t('shop.gacha'), () => ctx.navigate('gacha'), 'shop-menu__item shop-menu__item--gacha'),
           // 4つ目の札「道具を買う」（2026-10-27。札の絵はデザイン33点の 15。新しく並んだ道具があれば NEW）
           h(
             'button',
@@ -100,50 +93,41 @@ export const shopMenuScreen: ScreenDefinition = {
             t('items.shopButton'),
             ITEMS.some((i) => isNewItem(save, i.id)) ? h('span', { class: 'shop-menu__item-new', text: t('items.new') }) : null,
           ),
-          fragments > 0 || save.hiddenRestored ? button(t('shop.restore', { n: fragments, total: FRAGMENT_TOTAL }), () => openRestore(), 'shop-menu__item shop-menu__item--special') : null,
         ),
-        boosterShelf(save) ?? '',
+        boosterShelf(save, buyBox) ?? '',
       );
     };
 
-    const openRestore = (): void => {
+    /** 箱を買う（値段の確認を開いたときに購入 ID を1つ作る。連打で二重に払わない） */
+    const buyBox = (key: BoosterKey): void => {
       const save = store.save;
-      if (save.hiddenRestored) {
-        messageModal(element, t('shop.restoreDone'));
+      const name = t(`introV2.pack.name.${key.slice(-1)}` as MessageKey);
+      if (save.coins < BOOSTER_SHOP_PRICE) {
+        messageModal(element, t('gacha.notEnough', { price: BOOSTER_SHOP_PRICE }));
         return;
       }
-      if (!canRestoreHidden(save)) {
-        messageModal(element, t('shop.restoreNotReady', { n: fragmentCount(save), total: FRAGMENT_TOTAL }), undefined, t('shop.restoreTitle'));
-        return;
-      }
-      const tx = newId('restore');
-      // 特別復元の場面（2026-10-26 デザイン第11弾）：欠片の祭壇の絵を確認の窓に、復元したら祭壇に光があふれてから結果を出す
-      const scene = (): HTMLElement => h('img', { class: 'restore-scene', attrs: { src: restoreSceneArt, alt: '', draggable: 'false' } });
-      confirmModal(element, t('shop.restoreTitle'), [scene(), h('p', { class: 'modal__text', text: t('shop.restoreConfirm') })], () => {
-        const r = restoreHidden(store.save, tx);
-        if (r.status !== 'ok') return;
-        store.update(() => r.save);
-        sound.play('reward');
-        const fx = h('div', { class: 'restore-fx', attrs: { 'aria-hidden': 'true' } }, scene(), h('img', { class: 'restore-fx__light', attrs: { src: restoreFxArt, alt: '', draggable: 'false' } }));
-        element.append(fx);
-        setTimeout(() => {
-          fx.remove();
-          showResult();
-        }, RESTORE_FX_MS);
-      });
-      const showResult = (): void => {
-        const monster = getMonster(HIDDEN_MONSTER_ID);
-        const handle = openModal(element, {
-          title: t('shop.restoreSuccess'),
-          body: [
-            h('div', { class: 'card-detail__card' }, createCardView(monster, 150, true)),
-            h('p', { class: 'modal__text', text: t('shop.restoreGot', { name: cardName(monster) }) }),
-            h('p', { class: 'modal__text modal__text--sub', text: t('shop.restoreNote') }),
-          ],
-          actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
-          onClose: render,
-        });
-      };
+      const tx = newId('booster-buy');
+      const b = BOOSTERS.find((x) => x.key === key) as (typeof BOOSTERS)[number];
+      confirmModal(
+        element,
+        t('gacha.confirmTitle'),
+        [
+          h('img', { class: 'shop-boosters__confirm-art', attrs: { src: boosterArtUrl(b), alt: '', draggable: 'false' } }),
+          h('p', { class: 'modal__text', text: t('introV2.shop.confirm', { name, price: BOOSTER_SHOP_PRICE }) }),
+          h('p', { class: 'modal__text', text: t('gacha.confirmCoins', { before: save.coins, after: save.coins - BOOSTER_SHOP_PRICE }) }),
+        ],
+        () => {
+          const r = buyBooster(store.save, key, tx);
+          if (r.status === 'ok') {
+            store.update(() => r.save);
+            sound.play('register');
+            render();
+            messageModal(element, t('introV2.shop.bought', { name }), undefined, undefined, undefined, 'ok');
+          } else if (r.status === 'error') {
+            messageModal(element, r.message);
+          }
+        },
+      );
     };
 
     render();

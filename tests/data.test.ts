@@ -101,9 +101,8 @@ describe('大会（仮）', () => {
     }
   });
 
-  it('すべてのパックが最初から解放されているか、いずれかの大会で解放される', () => {
-    const unlockable = new Set(TOURNAMENTS.flatMap((t) => t.rewards.firstWin.unlockPacks));
-    for (const p of PACKS) expect(p.unlockedFromStart || unlockable.has(p.id)).toBe(true);
+  it('大会の景品に、販売機から外した仮パックの解放は入れない（2026-10-28 夜）', () => {
+    expect(TOURNAMENTS.flatMap((t) => t.rewards.firstWin.unlockPacks)).toEqual([]);
   });
 });
 

@@ -835,7 +835,7 @@ export const battleScreen: ScreenDefinition = {
       setTimeout(() => {
         if (destroyed) return;
         state = createBattle(
-          { name: t('battle.side.player'), deck: save.deck },
+          { name: t('battle.side.player'), deck: req.playerDeck ?? save.deck },
           { name: opponentName(req.opponent), deck: buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
           seed,
           first,

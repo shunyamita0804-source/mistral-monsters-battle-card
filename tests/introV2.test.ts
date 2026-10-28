@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOOSTERS, EXAM_OPPONENT, examLifeScale, STARTER_DECKS } from '../src/data/introV2.ts';
+import { EXAM_OPPONENT, examLifeScale, STARTER_DECKS } from '../src/data/introV2.ts';
 import { BUREAU, BUREAU_DESK_FRONT, getMap, PRACTICE, TOWN, type NpcObject } from '../src/data/maps.ts';
 import { SCENES } from '../src/data/storyScenes.ts';
 import { createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
@@ -131,10 +131,10 @@ describe('導入イベントV2：パックの受け取り（1回だけ）', () =
     expect(a.story.introV2).toMatchObject({ boosterClaimed: true, selectedBoosterKey: 'booster-1', boosterClaimId: 'tx-a', state: 'packClaimed' });
     expect(claimBooster(a, 'booster-1', 'tx-a')).toBe(a);
     expect(claimBooster(a, 'booster-3', 'tx-b')).toBe(a);
-    // 中身が決まるまでは、カードは配らない（選んだ記録だけ）
-    expect(BOOSTERS.every((b) => b.cards === null)).toBe(true);
-    expect(a.collection).toEqual(s.collection);
-    expect(a.story.introV2.boosterGranted).toBe(false);
+    // 2026-10-28：箱の中身（3体＋60枚）が1回だけ入り、そのままデッキになる
+    expect(a.story.introV2.boosterGranted).toBe(true);
+    expect(a.deck.monsters).toHaveLength(3);
+    expect(a.deck.skills).toHaveLength(60);
   });
 
   it('アプリを開き直しても（保存して読み直しても）受け取りは1回だけ', () => {

@@ -3,8 +3,8 @@ import type { BattleSummary } from '../game/battle/simulate.ts';
 import type { BattleWinner } from '../game/battle/engine.ts';
 import { sanitizeLocation } from '../game/progress/dungeon.ts';
 import type { PracticeResult } from '../game/story/intro.ts';
-import { createNewSave, type SaveData } from '../game/save/saveData.ts';
-import type { StarterDeckKey } from '../data/introV2.ts';
+import type { Deck } from '../game/deck/deck.ts';
+import { createNewGameSave, type SaveData } from '../game/save/saveData.ts';
 import { MemoryStorage, SaveRepository, type KeyValueStorage, type LoadResult } from '../game/save/saveRepository.ts';
 import type { BgmId } from './bgm.ts';
 import { SettingsStore } from './settingsStore.ts';
@@ -29,6 +29,8 @@ export interface BattleRequest {
   readonly backgroundVivid?: boolean;
   /** 対戦後に1回だけ呼ばれる（summary：残ったモンスター・与えたダメージ。対戦が始まる前に終わったときは無い） */
   readonly onFinish: (winner: BattleWinner, summary?: BattleSummary) => void;
+  /** 借りるデッキ（試験で先生が貸すデッキ。無ければ自分のデッキ。所持カードには入れない） */
+  readonly playerDeck?: Deck;
 }
 
 /**
@@ -99,8 +101,9 @@ export class GameStore {
     return this.#save;
   }
 
-  newGame(gender: 'male' | 'female', starter: StarterDeckKey | null = null): void {
-    this.#save = { ...createNewSave(new Date(), starter), player: { gender } };
+  /** 最初から（2026-10-28：カードを持たずに始める。初期デッキ3択はなくした） */
+  newGame(gender: 'male' | 'female'): void {
+    this.#save = { ...createNewGameSave(new Date()), player: { gender } };
     this.persist();
   }
 

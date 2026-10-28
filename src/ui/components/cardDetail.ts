@@ -1,7 +1,11 @@
 import { getMonster } from '../../data/cards.ts';
-import { PACKS } from '../../data/economy.ts';
+import { GACHA_SERIES } from '../../data/economy.ts';
+import { BOOSTERS } from '../../data/introV2.ts';
+import { seriesLineup } from '../../game/economy/gachaSeries.ts';
+import { boosterCardCounts } from '../../game/story/introV2.ts';
+import type { MessageKey } from '../../i18n/messages/index.ts';
 import { categoryLabel, describeSkill, describeSupport, effectLabel, kindLabel, rarityLabel, skillCategory, type CardDefinition } from '../../game/cards/cardTypes.ts';
-import { cardDescription, cardName, packName } from '../../i18n/content.ts';
+import { cardDescription, cardName } from '../../i18n/content.ts';
 import { t, tKey } from '../../i18n/i18n.ts';
 import { h } from '../dom.ts';
 import { createCardView } from './cardView.ts';
@@ -36,7 +40,11 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
   // レア度：印（決まっているときだけ）と名前
   const badge = rarityBadge(card.rarity, 18);
   rows.push([t('card.detail.rarity'), badge ? h('span', { class: 'card-detail__rarity' }, badge, rarityLabel(card.rarity)) : rarityLabel(card.rarity)]);
-  const packs = PACKS.filter((p) => p.cardIds.includes(card.id)).map(packName);
+  // 入手方法：販売機のガチャのシリーズ・ブースターの箱（2026-10-28 夜。前は販売機から外した仮パックの名前を出していた）
+  const packs = [
+    ...GACHA_SERIES.filter((s) => seriesLineup(s).all.includes(card.id)).map((s) => t('gacha.series.name', { monster: cardName(s.monsterId) })),
+    ...BOOSTERS.filter((b) => (boosterCardCounts(b.key)[card.id] ?? 0) > 0).map((b) => t(`introV2.pack.name.${b.key.slice(-1)}` as MessageKey)),
+  ];
   rows.push([
     t('card.detail.source'),
     card.kind === 'monster' && card.hidden ? t('card.detail.sourceHidden') : packs.join(t('common.listSeparator')) || t('common.none'),

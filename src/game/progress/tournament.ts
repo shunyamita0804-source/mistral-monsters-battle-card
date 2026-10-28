@@ -273,6 +273,8 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
   next = {
     ...next,
     activeTournament: null,
+    // 総当たりの大会は、終わった表を残す（大会会場の壁の板に描く）
+    ...(tournament.format === 'league' ? { lastLeague: active } : {}),
     claimedEntries: [...next.claimedEntries, active.entryId],
     tournaments: {
       ...next.tournaments,

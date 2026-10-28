@@ -903,3 +903,41 @@
 .world__door-leaf {
   will-change: transform;
 }
+
+/*
+ * 大会会場の左の壁の紺の板（2026-10-28 夜）：いま出ている（または最後に出た）総当たりの大会の表を小さく描く。
+ * 板は縦長なので、表は板の幅に合わせて上の方に置く（worldScreen.ts の #addLeagueBoard）
+ */
+.world__league-board {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3%;
+  padding: 0 5%;
+  box-sizing: border-box;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.world__league-board-title {
+  margin: 0;
+  color: #f3dc9a;
+  font-size: calc(var(--board-w) * 0.075);
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.7);
+  white-space: nowrap;
+}
+
+.world__league-board .league {
+  flex: none;
+  width: calc(var(--board-w) * 0.9);
+  max-width: none;
+}
+
+.world__league-board .league__name {
+  font-size: calc(var(--board-w) * 0.03);
+}

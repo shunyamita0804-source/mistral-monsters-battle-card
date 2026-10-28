@@ -26,6 +26,11 @@ export const WORLD = {
     en: 'Slide to walk\nTap nearby people or\nfurniture, or the button,\nto talk or check',
   },
   'world.examine': { ja: '調べる', en: 'Check' },
+  'world.researcher.title': { ja: 'カード研究所', en: 'Card Laboratory' },
+  'world.researcher.text': { ja: '図鑑を見ますか？ 欠片がそろっていれば、解析台で特別復元もできますよ。', en: 'Would you like to see the album? If you have all the shards, we can also do a special restoration at the analysis table.' },
+  'world.researcher.collection': { ja: '図鑑を見る', en: 'View Album' },
+  'world.leagueBoard.title': { ja: '大会の対戦表', en: 'Cup Match Board' },
+  'world.leagueBoard.empty': { ja: '大会の対戦表を貼る板。まだ何も貼られていない。', en: 'A board for cup match tables. Nothing is posted yet.' },
   // 話せる人のそばでは、右下のボタンの文字を「話す」に（2026-10-24 改訂R2 フェーズ1）
   'world.talk': { ja: '話す', en: 'Talk' },
 

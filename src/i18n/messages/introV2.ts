@@ -71,7 +71,8 @@ export const INTRO_V2 = {
   'introV2.pack.title': { ja: 'ブースターパックを選ぶ', en: 'Choose a Booster Pack' },
   'introV2.pack.hint': { ja: '気になる箱をタップしてください。', en: 'Tap a box that catches your eye.' },
   'introV2.pack.again': { ja: '同じ箱をもう一度タップすると決定します。', en: 'Tap the same box again to decide.' },
-  'introV2.pack.temp': { ja: '【仮】パックの中身は準備中です。受け取った記録を残し、中身が決まったら一度だけお渡しします。', en: '[Temp] Pack contents are in progress. Your choice is recorded and the pack will be given once when ready.' },
+  'introV2.pack.temp': { ja: '箱の中には、3体のモンスターカードと山札60枚が入っています。そのままあなたのデッキになります。', en: 'Each box holds 3 monster cards and a 60-card deck. It becomes your deck as it is.' },
+  'introV2.pack.got': { ja: '{name} を受け取った！\nモンスターカード3枚と山札60枚が、あなたのデッキになった。', en: 'You received {name}!\nIts 3 monster cards and 60-card deck are now your deck.' },
   'introV2.pack.name.1': { ja: '旅立ちのきらめき', en: 'Sparkle of Departure' },
   'introV2.pack.name.2': { ja: '烈火の猛攻', en: 'Blazing Onslaught' },
   'introV2.pack.name.3': { ja: '蒼海の守り', en: 'Guard of the Azure Sea' },
@@ -90,8 +91,11 @@ export const INTRO_V2 = {
 
   // カードショップ：管理局で選ばなかった2箱（値段・中身は未定なので買えない）
   'introV2.shop.title': { ja: 'ブースターパック', en: 'Booster Packs' },
-  'introV2.shop.note': { ja: '管理局で選ばなかったパックです。値段と中身は準備中のため、まだ買えません。', en: "These are the packs you didn't choose at the Bureau. Price and contents are in progress, so they can't be bought yet." },
-  'introV2.shop.buy': { ja: '準備中', en: 'Coming soon' },
+  'introV2.shop.note': { ja: '管理局で選ばなかった箱です。中身はモンスター3体と山札60枚（そのまま1つのデッキ）。各1回まで。', en: "The boxes you didn't choose at the Bureau. Each holds 3 monsters and a 60-card deck. One of each." },
+  'introV2.shop.buy': { ja: '{price}G で買う', en: 'Buy {price}G' },
+  'introV2.shop.owned': { ja: '購入済み', en: 'Purchased' },
+  'introV2.shop.confirm': { ja: '「{name}」を {price}G で買いますか？', en: 'Buy "{name}" for {price}G?' },
+  'introV2.shop.bought': { ja: '「{name}」を買った！\nモンスターカード3枚と山札60枚を手に入れた。デッキの編集で使えます。', en: 'You bought "{name}"!\nYou got 3 monster cards and 60 deck cards. Use them in deck editing.' },
 
   // 街の目的地・管理局
   'introV2.goal.school': { ja: '目的地：カードバトル教習所（カード練習場）', en: 'Destination: Card Battle School (Practice Hall)' },

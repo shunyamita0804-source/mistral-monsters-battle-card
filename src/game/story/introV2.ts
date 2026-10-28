@@ -1,4 +1,6 @@
-import { BOOSTERS, isBoosterKey, isStarterDeckKey, type BoosterKey, type StarterDeckKey } from '../../data/introV2.ts';
+import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, isBoosterKey, isStarterDeckKey, type BoosterKey, type StarterDeckKey } from '../../data/introV2.ts';
+import { t } from '../../i18n/i18n.ts';
+import { countCards, createStarterDeckFor, isDeckValid, type Deck } from '../deck/deck.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
 
 /**
@@ -57,7 +59,7 @@ export interface IntroV2 {
   readonly boosterClaimed: boolean;
   /** 受け取りの ID（1回だけ処理する。アプリの再起動・2回のタップでも同じ） */
   readonly boosterClaimId: string | null;
-  /** パックの中身（正式なカード）を所持カードに入れたか。中身が決まるまでは false のまま */
+  /** 箱の中身を所持カードに入れたか（2026-10-28 に中身が決まるまでは受け取りの記録だけだった。その記録だけのセーブには1回だけ配る） */
   readonly boosterGranted: boolean;
   readonly tutorialCompleted: boolean;
   readonly version: number;
@@ -124,31 +126,100 @@ export function finishExam(save: SaveData, won: boolean): SaveData {
   return won ? setV2(save, { state: 'examPassed', examPassed: true }) : setV2(save, { state: 'schoolArrival' });
 }
 
+/* ---------- ブースターの箱（2026-10-28 ユーザー決定：箱＝初期配布。モンスター3＋山札60＝そのまま1つのデッキ） ---------- */
+
+/** 箱の中身のデッキ（モンスター3体＋技48枚＋仮サポート12枚） */
+export function boosterDeck(key: BoosterKey): Deck {
+  const def = BOOSTERS.find((b) => b.key === key) ?? (BOOSTERS[0] as (typeof BOOSTERS)[number]);
+  return createStarterDeckFor(def.category);
+}
+
+/** 箱の中身（カード ID → 枚数） */
+export function boosterCardCounts(key: BoosterKey): Record<string, number> {
+  const deck = boosterDeck(key);
+  return countCards([...deck.monsters, ...deck.skills]);
+}
+
+/** 試験で先生が貸すデッキ（「旅立ちのきらめき」と同じ。所持カードには入れない） */
+export function examLoanDeck(): Deck {
+  return boosterDeck(EXAM_LOAN_BOOSTER);
+}
+
+/** 箱の中身を所持カードに足す（同じカードが重なってもそのまま持つ） */
+function addBoosterCards(save: SaveData, key: BoosterKey): SaveData {
+  return addCards(save, Object.entries(boosterCardCounts(key)).map(([cardId, count]) => ({ cardId, count })));
+}
+
+/** カウンターで買った箱の記録（storyFlags。各箱1回まで） */
+const boughtFlag = (key: BoosterKey): string => `booster-bought:${key}`;
+
+/** 持っている箱（管理局で受け取った箱・カウンターで買った箱） */
+export function ownedBoosters(save: SaveData): BoosterKey[] {
+  const v = save.story.introV2;
+  return BOOSTERS.map((b) => b.key).filter((k) => (v.boosterClaimed && v.selectedBoosterKey === k) || save.storyFlags.includes(boughtFlag(k)));
+}
+
+/** カウンターの棚に並べる箱：管理局で受け取った箱は出さない。買った箱は「購入済み」 */
+export function boosterShelf(save: SaveData): { readonly key: BoosterKey; readonly bought: boolean }[] {
+  const v = save.story.introV2;
+  return BOOSTERS.filter((b) => !(v.boosterClaimed && v.selectedBoosterKey === b.key)).map((b) => ({ key: b.key, bought: save.storyFlags.includes(boughtFlag(b.key)) }));
+}
+
+export type BoosterPurchaseResult =
+  | { readonly status: 'ok'; readonly save: SaveData }
+  | { readonly status: 'duplicate'; readonly save: SaveData }
+  | { readonly status: 'error'; readonly save: SaveData; readonly message: string };
+
 /**
- * パックを受け取る（1回だけ）。tx は確認の窓を開いたときに作る ID。
- * 中身（正式なカード）が決まっていれば所持カードに入れる。決まっていなければ選んだ記録だけ（あとで grantPendingBooster が1回だけ配る）
+ * カウンターで箱を買う（1箱 1,500G・各箱1回まで）。tx は値段の確認を開いたときに作る ID（連打で二重に払わない）。
+ * 中身は所持カードに足すだけ（使うデッキは変えない）
+ */
+export function buyBooster(save: SaveData, key: BoosterKey, tx: string): BoosterPurchaseResult {
+  if (hasProcessed(save, tx)) return { status: 'duplicate', save };
+  if (!isBoosterKey(key)) return { status: 'error', save, message: t('gacha.error.noPack') };
+  if (ownedBoosters(save).includes(key)) return { status: 'error', save, message: t('introV2.shop.owned') };
+  if (save.coins < BOOSTER_SHOP_PRICE) return { status: 'error', save, message: t('gacha.error.coins') };
+  let next = addBoosterCards({ ...save, coins: save.coins - BOOSTER_SHOP_PRICE }, key);
+  next = markProcessed({ ...next, storyFlags: [...next.storyFlags, boughtFlag(key)] }, tx);
+  return { status: 'ok', save: next };
+}
+
+/**
+ * 管理局で箱を受け取る（1回だけ）。tx は画面を開いたときに作る ID。
+ * 箱の中身を所持カードに入れ、その3体＋60枚をそのまま使うデッキにする
  */
 export function claimBooster(save: SaveData, key: BoosterKey, tx: string): SaveData {
   const v = save.story.introV2;
   if (v.boosterClaimed || hasProcessed(save, tx) || !isBoosterKey(key) || !v.examPassed) return save;
-  const claimed = markProcessed(setV2(save, { state: 'packClaimed', selectedBoosterKey: key, boosterClaimed: true, boosterClaimId: tx }), tx);
-  return grantPendingBooster(claimed);
+  const claimed = markProcessed(setV2(save, { state: 'packClaimed', selectedBoosterKey: key, boosterClaimed: true, boosterClaimId: tx, boosterGranted: true }), tx);
+  return { ...addBoosterCards(claimed, key), deck: boosterDeck(key) };
 }
 
-/** 受け取ったパックの中身が決まっていて、まだ配っていなければ1回だけ配る（正式な中身が届いたあと、読み込むたびに呼んでよい） */
+/**
+ * 中身が決まる前（2026-10-27〜28）に箱を選んだセーブ：中身を1回だけ配る（読み込むたびに呼んでよい）。
+ * 前から持っているカード・デッキは減らさない。使えるデッキが無いときだけ、箱のデッキを使うデッキにする
+ */
 export function grantPendingBooster(save: SaveData): SaveData {
   const v = save.story.introV2;
   if (!v.boosterClaimed || v.boosterGranted || !v.selectedBoosterKey) return save;
-  const cards = BOOSTERS.find((b) => b.key === v.selectedBoosterKey)?.cards;
-  if (!cards || cards.length === 0) return save;
-  const counts = new Map<string, number>();
-  for (const id of cards) counts.set(id, (counts.get(id) ?? 0) + 1);
-  return setV2(addCards(save, [...counts].map(([cardId, count]) => ({ cardId, count }))), { boosterGranted: true });
+  const next = setV2(addBoosterCards(save, v.selectedBoosterKey), { boosterGranted: true });
+  return isDeckValid(next.deck, next.collection) ? next : { ...next, deck: boosterDeck(v.selectedBoosterKey) };
 }
 
-/** 【仮】チュートリアルスキップ：イベントを終えて自由に歩けるようにする（試験の合格・パックの受け取りはしない） */
+/**
+ * 【仮】チュートリアルスキップ：イベントを終えて自由に歩けるようにする（試験の合格・管理局での受け取りはしない）。
+ * 2026-10-28 から新しく始めたときはカードを持たないので、モンスターを1枚も持っていなければ「旅立ちのきらめき」の中身を配ってデッキにする
+ * （遊べなくならないように。Claude の判断。カウンターの棚ではこの箱を「購入済み」にする）
+ */
 export function skipIntroV2(save: SaveData): SaveData {
-  return isIntroV2Active(save.story.introV2) || save.story.introV2.state === 'notStarted' ? setV2(save, { state: 'skipped' }) : save;
+  const v = save.story.introV2;
+  if (!(isIntroV2Active(v) || v.state === 'notStarted')) return save;
+  let next = setV2(save, { state: 'skipped' });
+  if (next.deck.monsters.length === 0 && !Object.keys(next.collection).some((id) => id.startsWith('mon-'))) {
+    next = { ...addBoosterCards(next, EXAM_LOAN_BOOSTER), deck: boosterDeck(EXAM_LOAN_BOOSTER) };
+    next = { ...next, storyFlags: [...next.storyFlags, boughtFlag(EXAM_LOAN_BOOSTER)] };
+  }
+  return next;
 }
 
 /**

@@ -1,0 +1,25 @@
+﻿検査日：2026-10-27
+集計対象：元の正式84技統合CSVを使用。6体×14技、各モンスターの初期配布合計16枚、初期デッキ組み合わせ各48枚を機械検証。
+
+正本はGitHubの正式ファイルであり、本ZIPは参照・知識共有の統合写しです。
+- ソラモ：src/data/official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+- ガウル：src/data/official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+- ラズック：src/data/official/lazuck14_skills_OFFICIAL_20261026.json
+- ノビトン：src/data/official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+- ミュロル：src/data/official/myurol14_skills_OFFICIAL_20261027.json
+- カルシェル：src/data/official/kalshell14_skills_OFFICIAL_20261027.json
+
+注意：初期配布カード一覧に含まれる場合でも、ブースターパックの正式収録カードであると読み替えてはいけません。
+また、過去の旧技番号・旧技データ、ゲーム内カードIDが異なる場合は現行mainのコードマップを優先して確認してください。
+
+検証値：
+ソラモ 技14種類／初期配布16枚
+ガウル 技14種類／初期配布16枚
+ラズック 技14種類／初期配布16枚
+ノビトン 技14種類／初期配布16枚
+ミュロル 技14種類／初期配布16枚
+カルシェル 技14種類／初期配布16枚
+
+旅立ちのきらめき: 48枚
+烈火の猛攻: 48枚
+蒼海の守り: 48枚

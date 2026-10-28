@@ -166,6 +166,12 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "w": 7,
     "h": 4
    },
+   "BOARD_TOUCH": {
+    "x": 2,
+    "y": 5,
+    "w": 8,
+    "h": 19
+   },
    "BOARD": {
     "x": 2,
     "y": 5,

@@ -220,7 +220,8 @@ describe('街の人', () => {
     const staff = [SHOP, LAB, HALL, PRACTICE].flatMap((m) => m.objects).filter((o): o is NpcObject => o.type === 'npc' && o.npcId !== 'neighbor_guide');
     expect(Object.fromEntries(staff.map((n) => [n.npcId, n.action]))).toEqual({
       clerk: 'shopClerk',
-      researcher: 'collection',
+      // 2026-10-28 夜：研究員は図鑑と特別復元を選べる（欠片が無ければ図鑑）
+      researcher: 'researcher',
       receptionist: 'tournamentDesk',
       teacher: 'practiceTable',
     });
