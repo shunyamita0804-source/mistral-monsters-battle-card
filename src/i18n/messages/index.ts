@@ -8,6 +8,7 @@ import { STORY } from './story.ts';
 import { INTRO_V2 } from './introV2.ts';
 import { BOOK } from './book.ts';
 import { WALK_LAB } from './walkLab.ts';
+import { PUKARIM_LAB } from './pukarimLab.ts';
 import { WORLD } from './world.ts';
 
 /**
@@ -26,6 +27,7 @@ export const MESSAGE_GROUPS = {
   introV2: INTRO_V2,
   book: BOOK,
   walkLab: WALK_LAB,
+  pukarimLab: PUKARIM_LAB,
 } as const;
 
 export const MESSAGES = {
@@ -40,6 +42,7 @@ export const MESSAGES = {
   ...INTRO_V2,
   ...BOOK,
   ...WALK_LAB,
+  ...PUKARIM_LAB,
 };
 
 export type MessageKey = keyof typeof MESSAGES;

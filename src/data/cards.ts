@@ -2,6 +2,7 @@ import { createCardCatalog } from '../game/cards/cardCatalog.ts';
 import type { MonsterCard, PlayCard, Rarity, SkillCard, SkillEffect, StatType, SupportCard } from '../game/cards/cardTypes.ts';
 import { GAUUL_MONSTER, GAUUL_SKILLS } from './gauul.ts';
 import { KALSHELL_MONSTER, KALSHELL_SKILLS } from './kalshell.ts';
+import { PUKARIM_MONSTER, PUKARIM_SKILLS } from './pukarim.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -189,7 +190,14 @@ export const SUPPORTS: readonly SupportCard[] = [
   { no: 6, name: '仮全体3', cost: 3, rarity: 'R', duration: 'field', effect: { type: 'field', stat: 'all', modifier: 1 } },
 ].map(({ no, ...rest }) => ({ ...rest, kind: 'support', id: supportId(no), isPlaceholder: true }) as SupportCard);
 
-export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS]);
+/**
+ * 確認用（?qa=1）だけで使うカード（2026-10-28：試遊中のプカリム）。カードの一覧（MONSTERS・SKILLS）には入れないので、
+ * 図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）
+ */
+export const QA_MONSTERS: readonly MonsterCard[] = [PUKARIM_MONSTER];
+export const QA_SKILLS: readonly SkillCard[] = [...PUKARIM_SKILLS];
+
+export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
 
 export function getMonster(id: string): MonsterCard {
   const card = cardCatalog.get(id);
@@ -218,5 +226,5 @@ export function getPlayCard(id: string): PlayCard {
 
 /** モンスターの適合技（そのモンスターが使える技）一覧 */
 export function skillsOf(monster: string): SkillCard[] {
-  return SKILLS.filter((s) => s.monsterId === monster);
+  return [...SKILLS, ...QA_SKILLS].filter((s) => s.monsterId === monster);
 }

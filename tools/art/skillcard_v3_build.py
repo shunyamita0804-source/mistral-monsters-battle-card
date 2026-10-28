@@ -41,6 +41,7 @@ MONSTER_COLORS = {
     'lazuck': '#844DC5',
     'myurol': '#84E5FA',
     'kalshell': '#DFF2F6',
+    'pukarim': '#A8DCC4',  # 試遊中（2026-10-28）。確認用の画面だけで使う
 }
 
 

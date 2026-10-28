@@ -109,6 +109,8 @@ export const settingsScreen: ScreenDefinition = {
                   render();
                 }, 'btn btn--small'),
                 button(t('walkLab.title'), () => ctx.navigate('walkLab'), 'btn btn--small'),
+                // 試遊中のプカリム（2026-10-28）：ふつうに遊んでいる人には出さない
+                button(t('pukarimLab.title'), () => ctx.navigate('pukarimLab'), 'btn btn--small'),
               )
             : null,
         ),

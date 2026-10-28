@@ -31,6 +31,8 @@ export interface BattleRequest {
   readonly onFinish: (winner: BattleWinner, summary?: BattleSummary) => void;
   /** 借りるデッキ（試験で先生が貸すデッキ。無ければ自分のデッキ。所持カードには入れない） */
   readonly playerDeck?: Deck;
+  /** 相手のデッキ（無ければ opponent のモンスターから組む。確認用の画面：プカリムの試遊で、元の箱のデッキと戦うとき） */
+  readonly opponentDeck?: Deck;
 }
 
 /**

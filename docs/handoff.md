@@ -4,11 +4,13 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜〜：お金の入る側）
+### まず読む：いまの状態（2026-10-28 深夜〜：プカリムの試遊）
 
-- **最新の作業：お金の入る側（ダンジョンの1勝ごとのお金・宝箱の中身・ボスのお金。公開済み・公開ページで確認済み）**（作業ブランチ `claude/money-income-20261028`。記録 `docs/money-income-20261028.md`、
-  写真 `docs/design/money-income-20261028/`、報告書 `docs/report-2026-10-28-money.md`）。表は `src/data/economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`（前の `REWARDS` はなくした）。
-  宝箱は `run.ts` の `rollChest`／`openRunChest(save, 宝箱ID)`。テスト 673件
+- **最新の作業：新モンスター「プカリム」を仮の絵で入れて試遊（手順 4）**（報告書 `docs/report-2026-10-28-pukarim.md`。作業ブランチ `claude/pukarim-step4-20261028`。記録 `docs/pukarim.md`、
+  裁定 `docs/battle-rules.md`「プカリム（試遊中）」、写真と生の数字 `docs/design/pukarim-20261028/`）。
+  **確認用（?qa=1）だけ**：設定の「QA用」→「プカリムの試遊」（`?qa=1&lab=pukarim` でも開く）。カードの一覧（MONSTERS・SKILLS）には入れず `QA_MONSTERS`・`QA_SKILLS`。
+  新しい効果 `charge`（ほっぺにためる）・`tailwind`（おいかぜ）・攻撃の `undodgeableWhenCharged`（ぷはーっ）。試遊は `npm run playtest:pukarim`（200 回ずつ。数字は変えずに報告）
+- その前：お金の入る側（ユーザー確認で合格。水の神殿の合計は iPhone での試遊のあとで直すか決める。記録 `docs/money-income-20261028.md`）
 - その前：手札の大きさ・数字 1.4倍・手札の印・枠の2倍（ユーザー確認で合格。記録 `docs/handsize-20261028.md`）
 - その前：カードの見た目3点 v3・試験の先生のデッキ（ユーザー確認で合格。記録 `docs/cardlook-v3-20261028.md`）
 - 前の報告書の「Claude が決めたこと」（`docs/report-2026-10-28-evening.md` 2章・`docs/report-2026-10-28-cardlook-v3.md` 2章）は、ユーザーが「すべてそのままで構わない」と回答（2026-10-28）

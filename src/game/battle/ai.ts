@@ -10,7 +10,9 @@ import {
   otherSide,
   incomingDamage,
   shieldOf,
+  tailwindTargets,
   targetsFor,
+  undodgeableNow,
   type BattleAction,
   type BattleMonster,
   type BattleState,
@@ -113,6 +115,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
     .sort((a, b) => b.score - a.score)[0];
   if (field && field.score > 0 && field.score > current) return { type: 'useCard', side, cardUid: field.o.card.uid };
 
+  // 2.5 試遊中：プカリム（2026-10-28）。その手番に倒せる相手がいなければ、ほっぺにためる（次の手番に大きな攻撃）か、おいかぜ
+  const puff = chooseChargeOrTailwind(state, side, options, enemies);
+  if (puff) return puff;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃をライフの少ない相手へ
   const attack = chooseAttack(state, side, options, enemies, style);
   if (attack) return attack;
@@ -162,8 +168,10 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   const attacks = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack');
   if (attacks.length === 0 || enemies.length === 0) return null;
   const power = (o: SkillOption): number => attackPower(state, o.def, availableUsers(state, side, o.def)[0]);
+  // ためているときのぷはーっ（回避されない）は、少し強いものとして先に考える（試遊中：プカリム）
+  const rank = (o: SkillOption): number => power(o) + (undodgeableNow(o.def, availableUsers(state, side, o.def)[0]) ? 1.5 : 0);
   // 大技を先に（flashy）は必要マナの多い順、ほかは強い順
-  const byPower = [...attacks].sort((a, b) => (style === 'flashy' ? b.def.cost - a.def.cost : 0) || power(b) - power(a));
+  const byPower = [...attacks].sort((a, b) => (style === 'flashy' ? b.def.cost - a.def.cost : 0) || rank(b) - rank(a));
   // 攻撃できる相手（ちょうはつで限られていればそれだけ）
   const reachable = (o: SkillOption): BattleMonster[] => targetsFor(state, side, o.def);
   // 弱いモンスターを先に狙う（hunter）：最大ライフの少ない順・残りライフの少ない順
@@ -178,6 +186,34 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   const strongest = byPower[0];
   const target = strongest ? [...reachable(strongest)].sort(weakFirst)[0] : undefined;
   return target && strongest ? attackAction(state, side, strongest, target.uid) : null;
+}
+
+/**
+ * 試遊中：プカリム（2026-10-28。仮の思考）。ためていないプカリムが、その手番に攻撃で相手を倒せないとき：
+ * - ほっぺにためる（次の手番に、ためた攻撃〔ぷはーっ・おおつむじ〕を使えるように）
+ * - ほっぺにためるが無ければ、おいかぜ：まだ動いていない味方が、おいかぜのあとのマナで攻撃技を使えるならその味方に
+ */
+function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[]): BattleAction | null {
+  const skills = options.filter(isSkillOption);
+  const special = skills.filter((o) => o.def.effect.type === 'charge' || o.def.effect.type === 'tailwind');
+  if (special.length === 0 || enemies.length === 0) return null;
+  const attacks = skills.filter((o) => o.def.effect.type === 'attack');
+  const canKill = (user: BattleMonster): boolean =>
+    attacks.some((o) => availableUsers(state, side, o.def).some((u) => u.uid === user.uid) && targetsFor(state, side, o.def, user).some((e) => e.life <= attackPower(state, o.def, user)));
+  const charge = special.find((o) => o.def.effect.type === 'charge');
+  if (charge) {
+    const user = availableUsers(state, side, charge.def).find((m) => !m.charge && !canKill(m));
+    if (user) return { type: 'useCard', side, cardUid: charge.card.uid, userUid: user.uid };
+  }
+  const wind = special.find((o) => o.def.effect.type === 'tailwind');
+  if (!wind) return null;
+  const user = availableUsers(state, side, wind.def).find((m) => !m.charge && !canKill(m));
+  if (!user) return null;
+  const manaAfter = manaOf(state.sides[side]) - wind.def.cost;
+  const ally = tailwindTargets(state, side, wind.def).find(
+    (m) => !m.acted && !m.tailwind && attacks.some((o) => o.def.cost <= manaAfter && availableUsers(state, side, o.def).some((u) => u.uid === m.uid)),
+  );
+  return ally ? { type: 'useCard', side, cardUid: wind.card.uid, userUid: user.uid, targetUid: ally.uid } : null;
 }
 
 /** 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）。使えなければ null */

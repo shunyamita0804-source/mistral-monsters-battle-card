@@ -62,6 +62,10 @@ export interface BattleMonster {
   readonly shield?: { readonly against: StatType | 'all'; readonly reduce: number; readonly untilTurn: number } | null;
   /** この手番（turn）の間は攻撃の技の対象にならない（正式：カルシェルのすなをほる「次のターン攻撃対象にならない」2026-10-27） */
   readonly hiddenTurn?: number | null;
+  /** 次に使う攻撃技のダメージ＋（試遊中：プカリムのほっぺにためる 2026-10-28）。使うまで続く。攻撃技を使ったら・倒れたら消える */
+  readonly charge?: number | null;
+  /** 次に使う攻撃技のダメージ＋amount（試遊中：プカリムのおいかぜ 2026-10-28）。untilTurn の手番が終わるまで。攻撃技を使ったら・倒れたら消える */
+  readonly tailwind?: { readonly amount: number; readonly untilTurn: number } | null;
 }
 
 export interface HandCard {
@@ -104,6 +108,8 @@ export interface PendingAttack {
   readonly power: number;
   /** 守備側がこの攻撃に使ったカード（使った順）。守備がすべて終わってからまとめてダメージを計算する */
   readonly responses: readonly string[];
+  /** この攻撃は回避されない（試遊中：ほっぺにためているときのぷはーっ。カードの「回避されない」とは別に、使ったときの状態で決まる） */
+  readonly undodgeable?: boolean;
 }
 
 /** main＝技を使う（攻撃）、defense＝相手の防御待ち、mana＝攻撃のあとのマナ化 */
@@ -335,7 +341,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     const attack = attackCard.effect;
     if (attack.type === 'attack' && type === 'defense' && attack.unblockable) return NO(t('battle.ng.unblockable'));
     // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）
-    if (attack.type === 'attack' && type === 'evade' && attack.undodgeable) return NO(t('battle.ng.undodgeable'));
+    if (attack.type === 'attack' && type === 'evade' && (attack.undodgeable || pending.undodgeable)) return NO(t('battle.ng.undodgeable'));
     // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
     // 受ける攻撃カードに印字された必要マナで判定（いまのマナの残りではない）
     const minCost = guardMinCost(skill);
@@ -355,6 +361,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   }
   // 考える：このカードのほかに戻す手札がないときは使えない
   if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
+  // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
+  if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
   if (availableUsers(state, side, skill).length === 0) {
     // まきつくで止められている・すなかけで攻撃を封じられているだけのとき
@@ -407,7 +415,24 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
     );
   }
   if (card.effect.type === 'heal') return aliveMonsters(state.sides[side]);
+  if (card.kind === 'skill' && card.effect.type === 'tailwind') return tailwindTargets(state, side, card);
   return [];
+}
+
+/** おいかぜをかけられる味方（生きていて、使ったモンスターと同じ種類〔プカリム〕でない） */
+export function tailwindTargets(state: BattleState, side: Side, skill: SkillCard): BattleMonster[] {
+  return aliveMonsters(state.sides[side]).filter((m) => m.cardId !== skill.monsterId);
+}
+
+/** 使うモンスターがためている「次の攻撃技のダメージ＋」（ほっぺにためる） */
+export function chargeOf(user: BattleMonster | undefined): number {
+  return user && user.life > 0 ? (user.charge ?? 0) : 0;
+}
+
+/** 使うモンスターにかかっている「次の攻撃技のダメージ＋」（おいかぜ。期限〔untilTurn〕が過ぎていないときだけ） */
+export function tailwindOf(state: BattleState, user: BattleMonster | undefined): number {
+  const w = user?.tailwind;
+  return w && user.life > 0 && state.turn <= w.untilTurn ? w.amount : 0;
 }
 
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
@@ -431,10 +456,16 @@ export function weakenTurnOf(state: BattleState, user: BattleMonster | undefined
   return w && w.turn === state.turn && skill.stat && w.stat === skill.stat.type ? w.amount : 0;
 }
 
-/** 攻撃の威力（場の増減と、使うモンスターへの「吠える」「ダストキック」を反映。0未満にはならない） */
+/** 攻撃の威力（場の増減と、使うモンスターへの「吠える」「ダストキック」「ほっぺにためる」「おいかぜ」を反映。0未満にはならない） */
 export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
   if (!skill.stat) return 0;
-  return Math.max(0, skill.stat.value + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
+  const boost = chargeOf(user) + tailwindOf(state, user);
+  return Math.max(0, skill.stat.value + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
+}
+
+/** その攻撃が、使うモンスターの今の状態で「回避されない」か（ぷはーっ：ためているとき） */
+export function undodgeableNow(skill: SkillCard, user: BattleMonster | undefined): boolean {
+  return skill.effect.type === 'attack' && (!!skill.effect.undodgeable || (!!skill.effect.undodgeableWhenCharged && chargeOf(user) > 0));
 }
 
 /** 手札をマナにできるか（攻撃のあとのマナ化の間だけ。枚数の制限なし） */
@@ -513,7 +544,8 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   const found = findMonster(state, targetUid);
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
-  let next = updateMonster(state, targetUid, { life });
+  // 倒れたら、ほっぺにためた分・おいかぜは消える
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -667,7 +699,7 @@ function useCard(
 
   const targets = targetsFor(state, side, skill, user);
   let target: BattleMonster | undefined;
-  if (targetsEnemy(skill) || skill.effect.type === 'heal') {
+  if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'tailwind') {
     target = targetUid ? targets.find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
@@ -681,8 +713,13 @@ function useCard(
     case 'attack': {
       if (!target || !skill.stat) return state;
       const power = attackPower(state, skill, user);
+      const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
+      // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）
+      if (user.charge) next = updateMonster(next, user.uid, { charge: null });
+      if (user.tailwind) next = updateMonster(next, user.uid, { tailwind: null });
+      if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
         // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
@@ -701,6 +738,7 @@ function useCard(
           stat: skill.stat.type,
           power,
           responses: [],
+          ...(undodgeable ? { undodgeable: true } : {}),
         },
       };
     }
@@ -755,6 +793,17 @@ function useCard(
       // すなをほる：相手の次の手番（turn + 1）の間、使ったモンスターは攻撃の技の対象にならない
       next = updateMonster(next, user.uid, { hiddenTurn: state.turn + 1 });
       return addLog(next, t('battle.log.hide', { name: nameOf(user.cardId) }));
+    }
+    case 'charge': {
+      // ほっぺにためる：次の攻撃技のダメージ＋amount。重ねない（もう一度使っても amount のまま）
+      next = updateMonster(next, user.uid, { charge: skill.effect.amount });
+      return addLog(next, t('battle.log.charge', { name: nameOf(user.cardId), n: skill.effect.amount }));
+    }
+    case 'tailwind': {
+      // おいかぜ：選んだ味方の次の攻撃技のダメージ＋amount。次の自分の手番（turn + 2）が終わるまで。重ねない（期限だけ新しく）
+      if (!target) return state;
+      next = updateMonster(next, target.uid, { tailwind: { amount: skill.effect.amount, untilTurn: state.turn + 2 } });
+      return addLog(next, t('battle.log.tailwind', { name: nameOf(target.cardId), n: skill.effect.amount }));
     }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));

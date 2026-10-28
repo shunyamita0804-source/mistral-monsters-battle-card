@@ -840,7 +840,7 @@ export const battleScreen: ScreenDefinition = {
         if (destroyed) return;
         state = createBattle(
           { name: t('battle.side.player'), deck: req.playerDeck ?? save.deck },
-          { name: opponentName(req.opponent), deck: buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
+          { name: opponentName(req.opponent), deck: req.opponentDeck ?? buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
           seed,
           first,
         );
@@ -899,7 +899,7 @@ export const battleScreen: ScreenDefinition = {
       const card = getPlayCard(hand.cardId);
       const targets = targetsFor(state, 'player', card);
       const enemyTarget = card.kind === 'skill' && targetsEnemy(card);
-      if (enemyTarget || card.effect.type === 'heal') {
+      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'tailwind') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
           return;
@@ -907,7 +907,15 @@ export const battleScreen: ScreenDefinition = {
         targeting = {
           cardUid,
           targets: targets.map((t) => t.uid),
-          prompt: t(card.effect.type === 'attack' ? 'battle.prompt.attackTarget' : enemyTarget ? 'battle.prompt.specialTarget' : 'battle.prompt.healTarget'),
+          prompt: t(
+            card.effect.type === 'attack'
+              ? 'battle.prompt.attackTarget'
+              : enemyTarget
+                ? 'battle.prompt.specialTarget'
+                : card.effect.type === 'tailwind'
+                  ? 'battle.prompt.tailwindTarget'
+                  : 'battle.prompt.healTarget',
+          ),
         };
         render();
         return;
@@ -1319,6 +1327,9 @@ export const battleScreen: ScreenDefinition = {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
         items.push(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
       }
+      // 試遊中：プカリムのほっぺにためる（相手からも見える。ふくらんだほっぺの印は仮の見た目）・おいかぜ
+      if (m.charge && m.life > 0) items.push(h('span', { class: 'battle__status-text battle__status-text--charged' }, h('span', { class: 'battle__status-puff', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.charged') })));
+      if (m.tailwind && m.life > 0 && m.tailwind.untilTurn >= s.turn) items.push(h('span', { class: 'battle__status-text battle__status-text--tailwind' }, h('span', { class: 'battle__status-wind', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.tailwind', { n: m.tailwind.amount }) })));
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
     };

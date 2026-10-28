@@ -22,6 +22,7 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-nobiton': { x: 0.52, y: 0.36, zoom: 1.3 },
   'mon-myurol': { x: 0.5, y: 0.3, zoom: 1.6 },
   'mon-kalshell': { x: 0.5, y: 0.4, zoom: 1.4 },
+  'mon-pukarim': { x: 0.5, y: 0.42, zoom: 1.4 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {
