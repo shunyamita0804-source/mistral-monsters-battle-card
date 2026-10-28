@@ -16,6 +16,9 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.omenMark': { ja: '！', en: '!' },
   'dungeonRun.npcTalk': { ja: '{name}が勝負を挑んできた！\n（{monsters}）', en: '{name} challenges you!\n({monsters})' },
   'dungeonRun.guardianAppear': { ja: '{name}が姿を現した！\n（{monsters}）', en: '{name} reveals itself!\n({monsters})' },
+  // ダンジョンの人（守り手・バトラー。2026-10-28）：顔の絵とその人のせりふ（src/data/people.ts の lines）
+  'dungeonRun.personTalk': { ja: '{name}「{line}」\n（{monsters}）', en: '{name}: "{line}"\n({monsters})' },
+  'dungeonRun.keeperAfter': { ja: '{name}「{line}」', en: '{name}: "{line}"' },
   'dungeonRun.bossTalk': { ja: '{name}が立ちはだかる！\n（{monsters}）', en: '{name} blocks your way!\n({monsters})' },
   'dungeonRun.stairsTitle': { ja: '階段を下りますか？', en: 'Go down the stairs?' },
   'dungeonRun.stairsBody': { ja: '下りると、この階には戻れません。', en: 'You cannot come back to this floor.' },

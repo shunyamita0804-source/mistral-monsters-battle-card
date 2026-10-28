@@ -52,6 +52,8 @@ export class GameStore {
   flashRun: { readonly card?: string; readonly leave?: string } | null = null;
   /** ダンジョン（ランダム生成）をクリアして街に戻ったときの、報酬の場面（祭壇に置くカードと、初回クリアか） */
   flashClear: { readonly cards: readonly string[]; readonly firstClear: boolean } | null = null;
+  /** 守り手（ボス）に勝って街に戻ったときの、守り手のひと言（顔の絵のキーと文。2026-10-28）。報酬のお知らせの前に出す */
+  flashKeeper: { readonly face: string; readonly text: string } | null = null;
   /** ダンジョンに入った直後に出す、挿絵とダンジョン名の札（ダンジョンの ID。2026-10-26 ユーザー指示） */
   dungeonIntro: string | null = null;
   /** 新しく始めた直後に、物語の始まりの挿絵を出す（2026-10-27 ユーザー指示。主人公を選んだあとに1回だけ） */
@@ -129,6 +131,7 @@ export class GameStore {
     this.flashBanner = null;
     this.flashRun = null;
     this.flashClear = null;
+    this.flashKeeper = null;
     this.practiceResult = null;
     this.introV2Result = null;
     this.lastSaveOk = true;

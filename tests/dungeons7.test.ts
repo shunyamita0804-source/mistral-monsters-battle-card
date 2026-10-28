@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { DUNGEON_RUN, RUN_DUNGEONS, runBossOpponent, runConfig, runGuardianOpponent } from '../src/data/dungeonRun.ts';
 import { getTournament } from '../src/data/tournaments.ts';
+import { personOfOpponent } from '../src/data/people.ts';
 import { isFloorReachable, isSwitchReachable, slide, type DungeonFloor } from '../src/game/dungeon/generate.ts';
 import {
   descend,
@@ -56,7 +57,8 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
   it('ボス：初回クリアはボスのモンスターカード（真ん中のモンスター）＋そのモンスターの技カード', () => {
     for (const d of DUNGEONS.slice(2)) {
       const boss = runBossOpponent(d.id);
-      expect(boss.name, d.id).toMatch(/の主（仮）$/);
+      // 2026-10-28：ボスはそのダンジョンの守り手（名前は src/data/people.ts）
+      expect(personOfOpponent(boss)?.title.ja, d.id).toMatch(/の守り手/);
       const monster = boss.monsters[1] as string;
       expect(d.firstClearCards?.[0]).toEqual({ cardId: monster, count: 1 });
       expect(d.firstClearCards?.slice(1).every((c) => c.cardId.includes(monster.replace('mon-', '')))).toBe(true);

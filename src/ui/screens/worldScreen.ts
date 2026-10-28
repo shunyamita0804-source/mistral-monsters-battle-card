@@ -10,6 +10,7 @@ import pointerFingerArt from '@assets/images/ui/booster/pointer_finger.webp';
 import guideTalkSmile from '@assets/images/characters/neighbor_guide_talk_smile.webp';
 import { cardCatalog, getMonster } from '../../data/cards.ts';
 import { createCardView } from '../components/cardView.ts';
+import { talkFaceVisual } from '../components/dungeonPeopleArt.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import {
   changeFloor,
@@ -734,15 +735,21 @@ export class WorldView {
     // ダンジョン（ランダム生成）をクリアして戻ったとき：報酬を受け取る場面（祭壇の上にカード）の上にお知らせ
     const clear = dev ? null : this.#store.flashClear;
     this.#store.flashClear = null;
+    // 守り手に勝ったとき：祭壇の場面の上に、まず守り手の顔とひと言（2026-10-28）
+    const keeper = dev ? null : this.#store.flashKeeper;
+    this.#store.flashKeeper = null;
     const afterOpening = (): void => {
       const next = v2Run ?? (scene ? () => this.#playScene(scene) : undefined);
       if (flash) {
         this.#store.flashMessage = null;
         const stage = clear ? this.#clearScene(clear) : null;
-        this.#message(flash, () => {
-          stage?.remove();
-          next?.();
-        });
+        const reward = (): void =>
+          this.#message(flash, () => {
+            stage?.remove();
+            next?.();
+          });
+        if (keeper) this.#message(keeper.text, reward, talkFaceVisual(keeper.face));
+        else reward();
       } else next?.();
     };
     // 新しく始めた直後：物語の始まりの挿絵（2026-10-27）。消えてからお知らせ・場面を出す

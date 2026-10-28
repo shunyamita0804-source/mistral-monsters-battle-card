@@ -1,7 +1,10 @@
 import { cardCatalog, getMonster, skillsOf } from '../../data/cards.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { recordPersonCard } from '../../game/people/peopleBook.ts';
-import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { DUNGEON_RUN, runBattlerFace, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { personOfOpponent } from '../../data/people.ts';
+import { battlerStandUrl, talkFaceVisual } from '../components/dungeonPeopleArt.ts';
+import { faceKeyOf } from '../components/opponentFace.ts';
 import { ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/items.ts';
 import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
@@ -38,7 +41,7 @@ import {
 import type { Direction, DungeonRun } from '../../game/save/saveData.ts';
 import { DIR_ROW, IDLE_COL, PLAYER_SHEET_COLS, PLAYER_SHEET_ROWS, WALK_COLS } from '../../game/world/walkAnim.ts';
 import { t } from '../../i18n/i18n.ts';
-import { cardName, dungeonName, itemName, opponentName } from '../../i18n/content.ts';
+import { cardName, dungeonName, itemName, localText, opponentName } from '../../i18n/content.ts';
 import { bgm, type BgmId } from '../bgm.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { itemIcon, itemMark } from '../components/itemIcon.ts';
@@ -172,6 +175,9 @@ const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-06': machineBattleBg,
   'dungeon-07': holyBattleBg,
 };
+
+/** ボス戦もそのダンジョンの対戦の背景にするダンジョン（2026-10-28 ユーザー：新しい5つ） */
+const BOSS_OWN_BG: readonly string[] = ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
 
 /** 水路のふちの石を置く辺（上・下・左・右）と、そのとなりのマスの向き */
 const WATER_EDGES = [['n', 0, -1], ['s', 0, 1], ['w', -1, 0], ['e', 1, 0]] as const;
@@ -461,9 +467,9 @@ class DungeonRunView {
     });
     for (const e of f.entities) {
       if (e.kind === 'guardian') continue;
-      // バトラーは3人の見た目のどれか（対戦の顔の絵と同じ人。src/data/dungeonRun.ts の runBattlerLook）
-      const look = e.kind === 'npc' ? ` drun__entity--b${runBattlerLook(Number(e.id.split('-').pop() ?? 0))}` : '';
-      const el = h('div', { class: `drun__entity drun__entity--${e.kind}${look}`, attrs: { 'aria-hidden': 'true' } });
+      // バトラーの見た目は対戦の顔の絵と同じ人（src/data/dungeonRun.ts の runBattlerFace）
+      const el = h('div', { class: `drun__entity drun__entity--${e.kind}`, attrs: { 'aria-hidden': 'true' } });
+      if (e.kind === 'npc') this.#battlerLook(el, e.id);
       el.style.left = `${e.x * TILE}px`;
       el.style.top = `${e.y * TILE}px`;
       this.#entityEls.set(e.id, el);
@@ -784,21 +790,26 @@ class DungeonRunView {
       opponent,
       allowSurrender: true,
       bgm: kind === 'boss' ? 'bossBattle' : 'battle',
-      background: kind === 'boss' ? bossBattleBg : (RUN_BATTLE_BG[this.#run.dungeonId] ?? dungeonBattleBg),
+      // ボス戦の背景：新しい5つ（水〜聖域）はそのダンジョンの対戦の背景（2026-10-28 ユーザー）。遺跡・森はボス戦の背景のまま
+      background: kind === 'boss' && !BOSS_OWN_BG.includes(this.#run.dungeonId) ? bossBattleBg : (RUN_BATTLE_BG[this.#run.dungeonId] ?? dungeonBattleBg),
       onFinish: (winner) => {
         if (winner === 'player') onRunWin(store, kind, id, opponent);
         else onRunLoss(store, kind, id);
         ctx.reset(store.save.dungeonRun ? 'dungeonRun' : 'world');
       },
     };
-    const text = t(key, { name: opponentName(opponent), monsters: names });
+    // ダンジョンの人（守り手・バトラー。2026-10-28）は顔の絵とその人のせりふ
+    const meet = personOfOpponent(opponent)?.lines?.meet;
+    const text = meet && kind !== 'guardian'
+      ? t('dungeonRun.personTalk', { name: opponentName(opponent), line: localText(meet), monsters: names })
+      : t(key, { name: opponentName(opponent), monsters: names });
     const fight = (): void => {
       this.#busy = true;
       this.#encounterFlash(() => ctx.navigate('battle'));
     };
     const smoke = itemCount(store.save, 'smokeBall');
     if (kind !== 'guardian' || smoke <= 0) {
-      this.#message(text, fight);
+      this.#message(text, fight, meet ? talkFaceVisual(faceKeyOf(opponent)) : undefined);
       return;
     }
     // 見えない番人で煙玉を持っている：相手の顔ぶれを見てから「戦う」か「煙玉を使う」（2026-10-27 道具）
@@ -1075,11 +1086,22 @@ class DungeonRunView {
   }
 
   /** 勝った相手（バトラー）が、その場から光の粒と土ぼこりになって去る（デザイン33点の 5。3コマ） */
+  /** バトラーの見た目：今の3人は CSS の drun__entity--b1〜3、新しいダンジョンの人は立ち姿の絵（幅を広く） */
+  #battlerLook(el: HTMLElement, id: string): void {
+    const face = runBattlerFace(Number(id.split('-').pop() ?? 0), this.#run.dungeonId);
+    const stand = battlerStandUrl(face);
+    if (stand) {
+      el.classList.add('drun__entity--wide');
+      el.style.backgroundImage = `url("${stand}")`;
+    } else el.classList.add(`drun__entity--b${face.replace('battler-', '')}`);
+  }
+
   #leaveEffect(id: string, done: () => void): void {
     const f = this.#floor;
     const e = f?.entities.find((x) => x.id === id);
     if (!e || e.kind !== 'npc') return done();
-    const ghost = h('div', { class: `drun__entity drun__entity--npc drun__entity--b${runBattlerLook(Number(id.split('-').pop() ?? 0))} is-lit drun__leaving`, attrs: { 'aria-hidden': 'true' } });
+    const ghost = h('div', { class: 'drun__entity drun__entity--npc is-lit drun__leaving', attrs: { 'aria-hidden': 'true' } });
+    this.#battlerLook(ghost, id);
     const fx = h('img', { class: 'drun__leave-fx', attrs: { src: fxLeave1, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
     for (const el of [ghost, fx]) {
       el.style.left = `${e.x * TILE}px`;
@@ -1213,6 +1235,9 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
   // クリアの報酬の場面（デザイン33点の 12・13。worldScreen.ts）：祭壇にボスのモンスターカード（初めてのクリアの景品にあれば）と、勝って手に入れた技カード
   const boss = r.clearCards.find((c) => cardCatalog.get(c.cardId)?.kind === 'monster')?.cardId;
   store.flashClear = { cards: [boss, card].filter((c): c is string => !!c), firstClear: r.firstClear };
+  // 守り手のひと言（顔の絵と）：「最奥の祭壇へ」。お知らせの前に出す（worldScreen.ts）
+  const after = personOfOpponent(opponent)?.lines?.after;
+  if (kind === 'boss' && after) store.flashKeeper = { face: faceKeyOf(opponent), text: t('dungeonRun.keeperAfter', { name: opponentName(opponent), line: localText(after) }) };
   const coins = t('common.coins', { n: r.coins });
   store.flashBanner = 'clear';
   store.flashMessage = `${got}\n${t(r.firstClear ? 'world.dungeonClearedFirst' : 'world.dungeonCleared', { coins })}`;

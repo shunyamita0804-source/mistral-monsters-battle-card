@@ -146,11 +146,33 @@ export function runBattlerLook(index: number): 1 | 2 | 3 {
   return ((((index % 3) + 3) % 3) + 1) as 1 | 2 | 3;
 }
 
-/** 【仮】通常のバトラー（話しかけると対戦）。編成はダンジョンごとの仮の編成。顔ぶれはフローラ・オスカー・カイルを使い回す */
+/**
+ * 新しいダンジョン（水〜聖域）のバトラー（2026-10-28 指示書「ダンジョンの人物12人」）：そのダンジョンの人と、
+ * 今の3人（フローラ・オスカー・カイル）のうち1人（だれにするかは Claude の割り振り）。遺跡・森は今の3人のまま
+ */
+const LOCAL_BATTLERS: Readonly<Record<string, { readonly face: string; readonly guest: 1 | 2 | 3 }>> = {
+  'dungeon-03': { face: 'battler-pia', guest: 1 },
+  'dungeon-04': { face: 'battler-hans', guest: 3 },
+  'dungeon-05': { face: 'battler-zack', guest: 3 },
+  'dungeon-06': { face: 'battler-otto', guest: 2 },
+  'dungeon-07': { face: 'battler-mina', guest: 2 },
+};
+
+/**
+ * バトラーの顔のキー（地図の上の姿と対戦の顔をそろえる。src/ui/components/opponentFace.ts）。
+ * 新しいダンジョンは、階の中の番号（1〜3）が奇数ならそのダンジョンの人、偶数なら今の3人のうちの1人
+ */
+export function runBattlerFace(index: number, dungeonId?: string): string {
+  const local = LOCAL_BATTLERS[dungeonId ?? ''];
+  if (!local) return `battler-${runBattlerLook(index)}`;
+  return index % 2 === 1 ? local.face : `battler-${local.guest}`;
+}
+
+/** 【仮】通常のバトラー（話しかけると対戦）。編成はダンジョンごとの仮の編成。顔ぶれは runBattlerFace */
 export function runNpcOpponent(floor: number, index: number, dungeonId?: string): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-npc'] as OpponentDefinition;
   const teams = runConfig(dungeonId).npcTeams;
-  return { ...base, monsters: teams[index % teams.length] ?? TEST_TEAM, lifeScale: floorLife(dungeonId, floor), face: `battler-${runBattlerLook(index)}` };
+  return { ...base, monsters: teams[index % teams.length] ?? TEST_TEAM, lifeScale: floorLife(dungeonId, floor), face: runBattlerFace(index, dungeonId) };
 }
 
 /** 【仮】見えない番人。編成はダンジョンごとの仮の編成（天の聖域は強い） */
@@ -160,7 +182,7 @@ export function runGuardianOpponent(floor: number, dungeonId?: string): Opponent
   return { ...base, monsters: c.guardianTeam, lifeScale: Math.round((floorLife(dungeonId, floor) + c.guardianLifeBonus) * 100) / 100, face: 'guardian' };
 }
 
-/** ボス（src/data/dungeons.ts の ENCOUNTERS。遺跡は仮のジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */
+/** ボス＝そのダンジョンの守り手（src/data/dungeons.ts の ENCOUNTERS・人物は src/data/people.ts。遺跡は仮のジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */
 export function runBossOpponent(dungeonId?: string): OpponentDefinition {
-  return ENCOUNTERS[runConfig(dungeonId).bossId] ?? { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 };
+  return ENCOUNTERS[runConfig(dungeonId).bossId] ?? { id: 'enc-b3-boss', name: 'グラント', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 };
 }

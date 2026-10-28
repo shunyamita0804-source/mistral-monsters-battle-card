@@ -283,3 +283,17 @@
     animation: none;
   }
 }
+
+/* ===== 2026-10-28 ダンジョンの人物12人 ===== */
+/* 新しいダンジョンのバトラー5人の立ち姿（絵は dungeonRunScreen.ts で入れる）。横に広い絵があるので枠を広く */
+.drun__entity--npc.drun__entity--wide {
+  width: 72px;
+  margin-left: -12px;
+}
+
+/* 話しかけたとき・守り手に勝ったときの会話の窓の顔（対戦のひと言と同じ枠） */
+.drun__talk-visual {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 10px;
+}

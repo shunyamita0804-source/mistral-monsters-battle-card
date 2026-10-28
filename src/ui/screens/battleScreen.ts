@@ -37,7 +37,8 @@ import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutori
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { summarizeBattle } from '../../game/battle/simulate.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
-import { cardName, opponentName } from '../../i18n/content.ts';
+import { cardName, localText, opponentName } from '../../i18n/content.ts';
+import { personOfOpponent, type LocalText } from '../../data/people.ts';
 import { t } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { openCardDetail } from '../components/cardDetail.ts';
@@ -332,8 +333,14 @@ export const battleScreen: ScreenDefinition = {
     let talkShownSeq = -1;
     const detailW = DETAIL_CARD_W;
     /** 相手のひと言（【仮】台詞）を、顔の絵と一緒に大きく出す（カードの上に重ねる） */
+    // ダンジョンの人（守り手・バトラー。2026-10-28）は、対戦の始め・勝ち・負けにその人のせりふ（src/data/people.ts の lines）
+    const personLines = personOfOpponent(req.opponent)?.lines;
+    const ownLine: Partial<Record<string, LocalText>> = personLines
+      ? { 'battle.talk.start': personLines.start, 'battle.talk.win': personLines.win, 'battle.talk.lose': personLines.lose }
+      : {};
     const say = (key: Parameters<typeof t>[0]): void => {
-      oppLine = t(key);
+      const own = ownLine[key];
+      oppLine = own ? localText(own) : t(key);
       talkStart = Date.now();
       // 1文字ずつ出し終わってから TALK_MS 読めるように
       talkUntil = talkStart + [...oppLine].length * TALK_CHAR_MS + TALK_MS;

@@ -26,11 +26,23 @@ import faceBattler1 from '@assets/images/characters/face_battler_1.webp';
 import faceBattler2 from '@assets/images/characters/face_battler_2.webp';
 import faceBattler3 from '@assets/images/characters/face_battler_3.webp';
 import faceGuardian from '@assets/images/characters/face_guardian.webp';
+import faceGrant from '@assets/images/characters/face_guardian_ruins_grant.webp';
+import faceSera from '@assets/images/characters/face_guardian_forest_sera.webp';
+import faceLucia from '@assets/images/characters/face_guardian_water_lucia.webp';
+import faceIvan from '@assets/images/characters/face_guardian_ice_ivan.webp';
+import faceBalka from '@assets/images/characters/face_guardian_fire_balka.webp';
+import faceTeo from '@assets/images/characters/face_guardian_machine_teo.webp';
+import faceAurelio from '@assets/images/characters/face_guardian_holy_aurelio.webp';
+import facePia from '@assets/images/characters/face_battler_water_pia.webp';
+import faceHans from '@assets/images/characters/face_battler_ice_hans.webp';
+import faceZack from '@assets/images/characters/face_battler_fire_zack.webp';
+import faceOtto from '@assets/images/characters/face_battler_machine_otto.webp';
+import faceMina from '@assets/images/characters/face_battler_holy_mina.webp';
 import type { Person } from '../../data/people.ts';
 import { h } from '../dom.ts';
 
 /**
- * 人物の顔の絵（名刺図鑑）。2026-10-27 に管理局の職員・常連6人・エルンストの顔が届き、28人すべてそろった。
+ * 人物の顔の絵（名刺図鑑）。2026-10-27 に管理局の職員・常連6人・エルンストの顔が届き、28人すべてそろった。2026-10-28 にダンジョンの12人（29〜40）。
  * 顔の絵が無いとき（見えない番人など）は仮の人影（CSS の .person-face--none）
  */
 const PERSON_FACES: Readonly<Record<string, string>> = {
@@ -64,6 +76,19 @@ const PERSON_FACES: Readonly<Record<string, string>> = {
   camilla: faceCamilla,
   alvin: faceAlvin,
   ernst: ernstFace,
+  // 2026-10-28 指示書「ダンジョンの人物12人」
+  grant: faceGrant,
+  sera: faceSera,
+  lucia: faceLucia,
+  ivan: faceIvan,
+  balka: faceBalka,
+  teo: faceTeo,
+  aurelio: faceAurelio,
+  pia: facePia,
+  hans: faceHans,
+  zack: faceZack,
+  otto: faceOtto,
+  mina: faceMina,
 };
 
 export function personFaceUrl(person: Person): string | undefined {

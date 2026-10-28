@@ -23,6 +23,18 @@ import faceGreta from '@assets/images/characters/face_regular_greta.webp';
 import faceJulius from '@assets/images/characters/face_regular_julius.webp';
 import faceCamilla from '@assets/images/characters/face_regular_camilla.webp';
 import faceAlvin from '@assets/images/characters/face_regular_alvin.webp';
+import faceGrant from '@assets/images/characters/face_guardian_ruins_grant.webp';
+import faceSera from '@assets/images/characters/face_guardian_forest_sera.webp';
+import faceLucia from '@assets/images/characters/face_guardian_water_lucia.webp';
+import faceIvan from '@assets/images/characters/face_guardian_ice_ivan.webp';
+import faceBalka from '@assets/images/characters/face_guardian_fire_balka.webp';
+import faceTeo from '@assets/images/characters/face_guardian_machine_teo.webp';
+import faceAurelio from '@assets/images/characters/face_guardian_holy_aurelio.webp';
+import facePia from '@assets/images/characters/face_battler_water_pia.webp';
+import faceHans from '@assets/images/characters/face_battler_ice_hans.webp';
+import faceZack from '@assets/images/characters/face_battler_fire_zack.webp';
+import faceOtto from '@assets/images/characters/face_battler_machine_otto.webp';
+import faceMina from '@assets/images/characters/face_battler_holy_mina.webp';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { h } from '../dom.ts';
 
@@ -30,7 +42,7 @@ import { h } from '../dom.ts';
  * 大会の対戦相手の顔の絵（2026-10-23 第5弾。人物像は Claude の仮の案・名前は未定）。
  * キーは大会の相手の ID（src/data/tournaments.ts の rounds）か、相手の定義の face。
  * 2026-10-27 デザイン第12弾：ランダム生成のダンジョンのバトラー3人と見えない番人（人物像は Claude の仮の案・名前は未定）。
- * 固定のダンジョンの魔物・ボスには顔の絵はない
+ * 固定のダンジョンの魔物には顔の絵はない。ダンジョンのボスは守り手7人（2026-10-28）
  */
 const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'e-1': faceE1,
@@ -63,6 +75,19 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'reg-julius': faceJulius,
   'reg-camilla': faceCamilla,
   'reg-alvin': faceAlvin,
+  // 2026-10-28 指示書「ダンジョンの人物12人」：守り手（ボス）7人は相手の定義の ID、新しいダンジョンのバトラー5人は顔のキー
+  'enc-b3-boss': faceGrant,
+  'enc-forest-boss': faceSera,
+  'enc-water-boss': faceLucia,
+  'enc-ice-boss': faceIvan,
+  'enc-fire-boss': faceBalka,
+  'enc-machine-boss': faceTeo,
+  'enc-holy-boss': faceAurelio,
+  'battler-pia': facePia,
+  'battler-hans': faceHans,
+  'battler-zack': faceZack,
+  'battler-otto': faceOtto,
+  'battler-mina': faceMina,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
 };

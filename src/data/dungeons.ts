@@ -82,15 +82,15 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：仮のジオルを真ん中に（正式データが届いたら入れ替える）
-  'enc-b3-boss': { id: 'enc-b3-boss', name: '遺跡の主（仮）', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 },
+  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 },
   // 森のボス：仮のフルーネを真ん中に
-  'enc-forest-boss': { id: 'enc-forest-boss', name: '森の主（仮）', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
+  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
-  'enc-water-boss': { id: 'enc-water-boss', name: '水の神殿の主（仮）', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
-  'enc-ice-boss': { id: 'enc-ice-boss', name: '氷の洞窟の主（仮）', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },
-  'enc-fire-boss': { id: 'enc-fire-boss', name: '炎の火山の主（仮）', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], lifeScale: 1.5 },
-  'enc-machine-boss': { id: 'enc-machine-boss', name: '機械の塔の主（仮）', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], lifeScale: 1.6 },
-  'enc-holy-boss': { id: 'enc-holy-boss', name: '天の聖域の主（仮）', monsters: [GAU, SORAMO_MONSTER_ID, KAL], lifeScale: 1.75 },
+  'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
+  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },
+  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], lifeScale: 1.5 },
+  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], lifeScale: 1.6 },
+  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], lifeScale: 1.75 },
   // 【仮】ランダム生成のダンジョン（2026-10-26 試作。src/data/dungeonRun.ts）：通常のバトラー・見えない番人。編成とライフは階ごとに src/data/dungeonRun.ts で決める
   'enc-run-npc': { id: 'enc-run-npc', name: 'ダンジョンのバトラー（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
   'enc-run-guardian': { id: 'enc-run-guardian', name: '見えない番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
