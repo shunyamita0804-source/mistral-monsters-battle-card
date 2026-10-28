@@ -31,10 +31,19 @@ FRONT_Z = 99999           # 手前の壁・入口の柱：いつも人より手�
 FURNITURE = {
     'back_shelves': 245, 'stockroom': 190, 'back_left_shelf': 198, 'back_left': 265, 'counter': 390,
     'left_wall': 572, 'center_left': 552, 'center_right': 552, 'front_left': 745, 'right_wall': 735,
-    'right_display': 503, 'easel': 503, 'plant_counter_left': 212, 'plant_back_left': 170,
+    'right_display': 503, 'plant_counter_left': 212, 'plant_back_left': 170,
     'plant_counter_right': 228, 'plant_right': 350, 'plant_left': 578,
 }
 GACHA_FOOT = 490
+# 2026-10-29 iPhone の試遊「販売機をもっと大きく・存在感を。棚と重なっている」：
+# 販売機を 1.5 倍（足元の真ん中 GACHA_ANCHOR を動かさずに大きくし、少し手前へ GACHA_FORWARD）。
+# 左わきの小展示台（right_display）は左へ RIGHT_DISPLAY_SHIFT ずらし、右わきのイーゼル（easel）は置かない。
+# 足元に光の床（GLOW。絵ではなく、やわらかい金色の楕円をここで作る）を敷いて主役にする
+GACHA_SCALE = 1.5
+GACHA_ANCHOR = (1190, 490)
+GACHA_FORWARD = 30
+RIGHT_DISPLAY_SHIFT = -130
+GLOW = dict(rx=190, ry=58, color=(255, 214, 120))
 
 # 入口の戸（素材の「内側の自動ドア E」）：開口・戸1枚の幅・戸の足元
 DOOR_OPENING = (600, 680, 352, 141)
@@ -55,9 +64,8 @@ BLOCKS = [
     (398, 418, 518, 553),                                     # 中央右の展示台
     (50, 605, 435, 745),                                      # 手前左の展示台
     [(1340, 175), (1530, 175), (1530, 745), (1462, 745), (1340, 470)],  # 右の壁の棚
-    (1023, 440, 1126, 504),                                   # 販売機の左の小展示台
-    (1100, 420, 1280, 492),                                   # 店の中の販売機
-    (1260, 450, 1358, 504),                                   # 販売機の右のイーゼル
+    (893, 440, 996, 504),                                     # 販売機の左の小展示台（2026-10-29 左へずらした）
+    (1068, 440, 1312, 522),                                   # 店の中の販売機（2026-10-29 1.5 倍）
     (1265, 300, 1325, 351),                                   # 右の植木
     (445, 618, 602, 760),                                     # 入口の左の柱と植木
     (948, 618, 1090, 760),                                    # 入口の右の柱と植木
@@ -65,7 +73,7 @@ BLOCKS = [
 # 調べる物（絵の px の範囲）。maps.ts の ID と同じ
 ITEMS = {
     'COUNTER': (445, 240, 1100, 392),
-    'PACK_MACHINE': (1100, 400, 1280, 492),
+    'PACK_MACHINE': (1068, 420, 1312, 522),
     'SHELF_WALL': (40, 166, 240, 578),
     'CASE_L': (245, 400, 415, 553),
     'CASE_R': (398, 410, 518, 553),
@@ -102,6 +110,30 @@ def _cells(box: tuple[float, float, float, float]) -> dict:
     return dict(x=cx1, y=cy1, w=cx2 - cx1, h=cy2 - cy1)
 
 
+def _gacha_machine() -> dict:
+    """店の中の販売機を GACHA_SCALE 倍に（足元の真ん中を GACHA_ANCHOR に保ったまま、GACHA_FORWARD だけ手前へ）"""
+    im = _load('shop_gacha_machine')
+    big = im.resize((round(im.width * GACHA_SCALE), round(im.height * GACHA_SCALE)), Image.LANCZOS)
+    ax, ay = GACHA_ANCHOR
+    canvas = Image.new('RGBA', im.size)
+    canvas.alpha_composite(big, (round(ax - ax * GACHA_SCALE), round(ay + GACHA_FORWARD - ay * GACHA_SCALE)))
+    return _save_cropped(canvas, 'cardshop_gacha_machine.webp')
+
+
+def _gacha_glow() -> dict:
+    """販売機の足元の光の床（やわらかい金色の楕円。床の上・家具より奥）"""
+    from PIL import ImageFilter
+    ax, ay = GACHA_ANCHOR
+    cy = ay + GACHA_FORWARD - 6
+    rx, ry = GLOW['rx'], GLOW['ry']
+    canvas = Image.new('RGBA', (1536, 1024))
+    m = Image.new('L', canvas.size, 0)
+    ImageDraw.Draw(m).ellipse([ax - rx, cy - ry, ax + rx, cy + ry], fill=150)
+    m = m.filter(ImageFilter.GaussianBlur(26))
+    canvas.paste(Image.new('RGBA', canvas.size, GLOW['color'] + (255,)), (0, 0), m)
+    return _save_cropped(canvas, 'cardshop_gacha_glow.webp')
+
+
 def build_shop_room() -> dict:
     u = ROOM_UNIT
     cols, rows = ROOM_W // CELL, ROOM_H // CELL
@@ -132,9 +164,15 @@ def build_shop_room() -> dict:
     tiles = [dict(file='maps/rooms/cardshop_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
     sprites = []
     for name, foot in FURNITURE.items():
-        s = _save_cropped(_load(f'shop_furniture_{name}'), f'cardshop_{name}.webp')
+        im = _load(f'shop_furniture_{name}')
+        if name == 'right_display':
+            moved = Image.new('RGBA', im.size)
+            moved.alpha_composite(im, (RIGHT_DISPLAY_SHIFT, 0))
+            im = moved
+        s = _save_cropped(im, f'cardshop_{name}.webp')
         sprites.append({**s, 'z': round(foot * u)})
-    sprites.append({**_save_cropped(_load('shop_gacha_machine'), 'cardshop_gacha_machine.webp'), 'z': round(GACHA_FOOT * u)})
+    sprites.append({**_gacha_glow(), 'z': round(GACHA_FOOT * u) - 200})
+    sprites.append({**_gacha_machine(), 'z': round((GACHA_FOOT + GACHA_FORWARD) * u)})
     # 戸袋・戸枠は戸の足元の高さで（店の中にいる人より手前・敷居の外に出た人より奥）。手前の壁はいつも手前
     door_z = round(DOOR_FOOT * u)
     for name in ('shop_door_pocket_left', 'shop_door_pocket_right', 'shop_door_frame'):

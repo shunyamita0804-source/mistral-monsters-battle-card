@@ -25,8 +25,8 @@ import openBurstArt from '@assets/images/ui/gacha/open_burst.webp';
  * - 全部めくったら「もう1回」「もどる」
  * 時間・動きはお試しページ（design-parts/gacha-20261028/prototype/gacha_prototype_reference.html）に合わせた
  */
-/** 破れる線（パックの上からの割合） */
-const TEAR_AT = 0.17;
+/** 破れる線（パックの上からの割合。2026-10-29 上の封を短くしたので、残った青い封の真ん中＝950 の 100 あたり） */
+const TEAR_AT = 0.105;
 /** なぞり始めてよい所（パックの上からこの割合まで。下のほうをなぞっても破れない） */
 const TEAR_ZONE = 0.45;
 /** 破れるまでになぞる長さ（パックの幅に対する割合） */
