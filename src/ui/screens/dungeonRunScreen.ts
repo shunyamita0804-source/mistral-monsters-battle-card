@@ -5,7 +5,8 @@ import { DUNGEON_RUN, runBattlerFace, runBossOpponent, runGuardianOpponent, runN
 import { personOfOpponent } from '../../data/people.ts';
 import { battlerStandUrl, talkFaceVisual } from '../components/dungeonPeopleArt.ts';
 import { faceKeyOf } from '../components/opponentFace.ts';
-import { ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/items.ts';
+import { dungeonMoney } from '../../data/economy.ts';
+import { getItem, ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/items.ts';
 import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
@@ -44,7 +45,8 @@ import { t } from '../../i18n/i18n.ts';
 import { cardName, dungeonName, itemName, localText, opponentName } from '../../i18n/content.ts';
 import { bgm, type BgmId } from '../bgm.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
-import { itemIcon, itemMark } from '../components/itemIcon.ts';
+import { itemArtUrl, itemIcon, itemMark } from '../components/itemIcon.ts';
+import { itemGetWindow } from '../components/rewardGlow.ts';
 import { confirmModal, messageModal, openModal, type ModalEmblem, type ModalHandle } from '../components/modal.ts';
 import { createCardView } from '../components/cardView.ts';
 import { button, h } from '../dom.ts';
@@ -52,6 +54,7 @@ import type { GameStore } from '../gameStore.ts';
 import { sound } from '../sound.ts';
 import { PLAYER_SHEET } from './worldScreen.ts';
 import type { ScreenContext, ScreenDefinition } from './types.ts';
+import prizePouchArt from '@assets/images/icons/prize_pouch.webp';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import forestBattleBg from '@assets/images/backgrounds/battle_forest.webp';
@@ -726,18 +729,37 @@ class DungeonRunView {
     this.#message(t('dungeonRun.switchOpened'));
   }
 
+  /**
+   * 宝箱を開ける（2026-10-28 指示書「お金の入る側」）：中身はお金・道具・技カードのどれか1つ（src/game/dungeon/run.ts の rollChest）。
+   * お金は袋の絵、道具はその道具の絵を小窓に、技カードはカードの絵（勝ってもらったときと同じ）を出す
+   */
   #openChest(chest: FloorEntity): void {
-    const r = openRunChest(this.#run, chest.id);
-    if (!r.opened) {
+    const r = openRunChest(this.#store.save, chest.id);
+    if (!r.opened || !r.content) {
       this.#message(t('world.chestAlreadyEmpty'));
       return;
     }
-    this.#store.update((s) => ({ ...s, dungeonRun: r.run }));
+    const content = r.content;
+    this.#store.update(() => r.save);
     sound.play('chestUnlock');
     sound.play('chestOpenWood', 280);
+    sound.play('reward', 750);
     this.#refresh(false);
-    // 【仮】中身はまだ決まっていない（推測で決めない）
-    this.#message(t('dungeonRun.chestOpened'));
+    if (content.kind === 'card') {
+      this.#message(t('dungeonRun.chestCard', { card: cardName(content.card) }), undefined, cardGetVisual(content.card), 'ok');
+      return;
+    }
+    if (content.kind === 'item') {
+      const item = getItem(content.item);
+      const name = item ? itemName(item) : '';
+      this.#message(t('dungeonRun.chestItem', { item: name }), undefined, itemGetWindow(itemArtUrl(content.item), name));
+      return;
+    }
+    sound.play('coins', 950);
+    const coins = t('common.coins', { n: content.coins });
+    const full = content.overflowItem ? getItem(content.overflowItem) : undefined;
+    const text = full ? t('dungeonRun.chestItemFull', { item: itemName(full), coins }) : t('dungeonRun.chestCoins', { coins });
+    this.#message(text, undefined, itemGetWindow(prizePouchArt, coins));
   }
 
   /** バトラー・ボスに話しかけた：ひと言のあと対戦 */
@@ -1058,7 +1080,9 @@ class DungeonRunView {
         if (!chosen) return;
         this.#store.update((s) => chooseRunReward(s, chosen as string));
         this.#refresh(false);
-        this.#message(t('dungeonRun.coinGot', { card: cardName(chosen) }), undefined, cardGetVisual(chosen), 'ok');
+        // 1勝のお金は勝ったときにもう入っている（winRunBattleChoosing）。ここで技カードと一緒に見せる
+        const money = t('dungeonRun.winCoins', { coins: t('common.coins', { n: dungeonMoney(this.#run.dungeonId).win }) });
+        this.#message(`${t('dungeonRun.coinGot', { card: cardName(chosen) })}\n${money}`, undefined, cardGetVisual(chosen), 'ok');
       },
     });
   }
@@ -1228,7 +1252,8 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
   if (card) store.update((s) => recordPersonCard(s, opponent, card));
   const got = card ? t('dungeonRun.win', { card: cardName(card) }) : t('dungeonRun.winNoCard');
   if (!r.cleared) {
-    store.flashMessage = got;
+    // 1勝ごとのお金（2026-10-28 指示書「お金の入る側」）：技カードと一緒に「＋15G」
+    store.flashMessage = `${got}\n${t('dungeonRun.winCoins', { coins: t('common.coins', { n: r.coins }) })}`;
     store.flashRun = { ...(card ? { card } : {}), ...(kind === 'npc' ? { leave: id } : {}) };
     return;
   }

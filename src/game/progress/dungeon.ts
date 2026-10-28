@@ -1,5 +1,5 @@
 import { getDungeon } from '../../data/dungeons.ts';
-import { REWARDS } from '../../data/economy.ts';
+import { dungeonMoney } from '../../data/economy.ts';
 import { getMap, HOME, type ChestObject } from '../../data/maps.ts';
 import { addCards, addCoins, type DungeonRecord, type Location, type SaveData } from '../save/saveData.ts';
 import { isSolidTile } from '../world/world.ts';
@@ -68,12 +68,14 @@ export function defeatEnemy(save: SaveData, enemyId: string, boss: boolean): Vic
     ...save,
     activeDungeon: { ...active, defeatedEnemies: [...active.defeatedEnemies, enemyId] },
   };
+  // お金はランダム生成のダンジョンと同じ表（src/data/economy.ts の DUNGEON_MONEY。2026-10-28 指示書「お金の入る側」）
+  const money = dungeonMoney(active.dungeonId);
   if (!boss) {
-    return { save: addCoins(next, REWARDS.dungeonBattleWin), coins: REWARDS.dungeonBattleWin, cleared: false, firstClear: false, cards: [] };
+    return { save: addCoins(next, money.win), coins: money.win, cleared: false, firstClear: false, cards: [] };
   }
   const record = dungeonRecord(save, active.dungeonId);
   const firstClear = !record.bossDefeated;
-  const coins = firstClear ? REWARDS.dungeonBossFirstClear : REWARDS.dungeonBossRepeat;
+  const coins = firstClear ? money.bossFirst : money.bossRepeat;
   next = addCoins(next, coins);
   // 初めて倒したときだけ、そのダンジョンのボスのカード（bossDefeated で1回だけ）
   const cards = firstClear ? (getDungeon(active.dungeonId)?.firstClearCards ?? []) : [];

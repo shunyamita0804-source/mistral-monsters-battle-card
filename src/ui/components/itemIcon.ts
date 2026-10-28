@@ -20,6 +20,11 @@ const MARK_ART: Readonly<Record<string, string>> = Object.fromEntries(
   ]),
 );
 
+/** 道具の絵の URL（宝箱で手に入れたときの小窓など） */
+export function itemArtUrl(id: ItemId): string {
+  return ITEM_ART[snake(id)] ?? '';
+}
+
 /** 道具のアイコン */
 export function itemIcon(item: ItemDefinition, size: 'normal' | 'small' = 'normal'): HTMLElement {
   return h('img', {

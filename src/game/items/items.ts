@@ -19,6 +19,16 @@ function setItemCount(save: SaveData, id: ItemId, n: number): SaveData {
   return { ...save, items };
 }
 
+/** 道具を1つ足せるか（所持の上限 ITEM_RULES.maxOwned より少ない） */
+export function canAddItem(save: SaveData, id: ItemId): boolean {
+  return itemCount(save, id) < ITEM_RULES.maxOwned;
+}
+
+/** 道具を1つ足す（宝箱など。上限のときはそのまま） */
+export function addItem(save: SaveData, id: ItemId): SaveData {
+  return canAddItem(save, id) ? setItemCount(save, id, itemCount(save, id) + 1) : save;
+}
+
 /** 道具を1つ減らす（持っていなければそのまま） */
 export function consumeItem(save: SaveData, id: ItemId): SaveData {
   const n = itemCount(save, id);

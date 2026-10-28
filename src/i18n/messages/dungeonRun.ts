@@ -24,9 +24,17 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.stairsBody': { ja: '下りると、この階には戻れません。', en: 'You cannot come back to this floor.' },
   'dungeonRun.switchOpened': { ja: 'スイッチを入れた。\nどこかで扉の開く音がした。', en: 'You flipped the switch.\nSomewhere, a door creaked open.' },
   'dungeonRun.switchAlready': { ja: 'スイッチはもう入っている。', en: 'The switch is already on.' },
-  'dungeonRun.chestOpened': { ja: '宝箱を開けた。\n中身はまだ決まっていません（仮）。', en: 'You opened the chest.\nIts contents are not decided yet (Temp).' },
+  // 宝箱の中身（2026-10-28 指示書「お金の入る側」。中身は【仮】）
+  'dungeonRun.chestCoins': { ja: '宝箱を開けた！\n{coins} を手に入れた！', en: 'Opened the chest!\nGot {coins}!' },
+  'dungeonRun.chestItem': { ja: '宝箱を開けた！\n{item}を手に入れた！', en: 'Opened the chest!\nGot a {item}!' },
+  'dungeonRun.chestItemFull': {
+    ja: '宝箱を開けた！\n{item}はもう持てないので、お金に替えた。\n{coins} を手に入れた！',
+    en: "Opened the chest!\nYou can't carry another {item}, so it became money.\nGot {coins}!",
+  },
+  'dungeonRun.chestCard': { ja: '宝箱を開けた！\n技カード「{card}」を手に入れた！', en: 'Opened the chest!\nGot the skill card "{card}"!' },
   'dungeonRun.win': { ja: '勝利！\n技カード「{card}」を手に入れた。', en: 'Victory!\nGot the skill card "{card}".' },
   'dungeonRun.winNoCard': { ja: '勝利！', en: 'Victory!' },
+  'dungeonRun.winCoins': { ja: '＋{coins}', en: '+{coins}' },
   'dungeonRun.lose': {
     ja: '負けてしまった…\nあと{n}回負けると、街の入り口へ戻されます。',
     en: 'You lost...\n{n} more losses and you will be sent back to town.',
