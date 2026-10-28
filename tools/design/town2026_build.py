@@ -123,26 +123,38 @@ STAIRS_N = dict(cx=3200, top=1505, s=0.9)   # 15 大階段（terrace_parts の�
 STAIRS_W = dict(cx=1960, top=1812, s=0.9)   # 16 西の高台への階段（小さい階段）
 
 # 道（石畳 tile_street）：長方形。噴水のまわりは円い広場（tile_plaza）
+# 2026-10-28 直し（ユーザー「行き止まりの四角い道を残さない」）：道の端は扉の前の小道（DOOR_PATH_W）か別の道で終わる
 PLAZA = dict(cx=3200, cy=3220, r=720)
 STREETS = [
     (2944, 1860, 3456, 2600),     # 大階段の下 → 広場
-    (3456, 1840, 6140, 2120),     # 北東の道（管理局の前）
-    (1060, 3080, 2944, 3360),     # 西の道（練習場の前）
-    (3456, 3028, 6260, 3412),     # 東の道（ショップ・花屋の前・商店街）
+    (3456, 1840, 5960, 2120),     # 北東の道（管理局の前。建物の右のはしで終わる）
+    (1000, 3080, 2944, 3360),     # 西の道（練習場の扉の前で終わる）
+    (3456, 3028, 6000, 3412),     # 東の道（ショップ・花屋の前・商店街）
+    (5060, 3412, 6000, 3960),     # 商店街の石畳（屋台の足元。東の道とひと続き）
     (1840, 2160, 2080, 3100),     # 西の高台の階段の下 → 西の道
     (2944, 3800, 3456, 4900),     # 南の大通り（広場 → 石の橋）
-    (450, 4380, 2944, 4600),      # ピート・ハロルドの家の前
-    (3456, 4380, 4900, 4600),     # 仕立て屋の前
+    (800, 4380, 2944, 4600),      # ピート・ハロルドの家の前（ピートの家の扉の前で終わる）
+    (3456, 4380, 4600, 4600),     # 仕立て屋の前（仕立て屋の扉の前で終わる）
     (2944, 5640, 3456, 6180),     # 南の大通り（石の橋 → 南の門）
     (3080, 6180, 3320, 6300),     # 南の門の前
-    (500, 5930, 2944, 6170),      # 主人公の家・となりの家の前
-    (2300, 1330, 4100, 1560),     # 大会会場の前（高台の上）
-    (700, 1560, 1960, 1760),      # 研究所の前 → 西の高台の階段（高台の上）
+    (900, 5930, 2944, 6170),      # 主人公の家・となりの家の前（主人公の家の扉の前で終わる）
+    (2420, 1330, 3980, 1560),     # 大会会場の前（高台の上。建物の幅だけ）
+    (1050, 1560, 1960, 1760),     # 研究所の扉の前 → 西の高台の階段（高台の上）
 ]
+# 扉の前の小道：扉の敷居から下の道まで（幅。BUILDINGS の扉の真ん中に合わせる）
+DOOR_PATH_W = 200
+# 縁石（edges_curb）：石の高さ（単位）
+CURB_STONE = 30
 # 小川（18）：中心線と幅。石の橋（19）・木の橋（24）の所だけ渡れる
-STREAM = [(100, 4840), (2600, 4840), (3200, 5500), (6400, 5660)]
+# 東西のはしは林の下へ流れていく（林の木は小川の上に置かない）
+STREAM = [(-300, 4840), (2600, 4840), (3200, 5500), (6700, 5675)]
 STREAM_W = 240
 BRIDGE_STONE = dict(cx=3200, s=1.1)       # 石の橋：アーチの下の端を小川の下の岸に合わせる
+# 石の橋の手前（南）のアーチの面と水は使わない（2026-10-28 ユーザー「橋の下の水の上を歩いてしまう」）。
+# シートの y 518（デッキの南の端＝アーチの上のふち）より下は、左右の柱（x 895 より左・1265 より右）だけ残す。
+# そこから南は道（tile_street）がデッキにそのままつながる。小川は柱の左右に見える
+BRIDGE_DECK_S = 518
+BRIDGE_PILLARS = (895, 1265)
 BRIDGE_WOOD = dict(cx=1525, top=4600, s=0.85)
 # 噴水（13）：水の輪の中心・柱（輪の穴より上。水の上に描き直す）・しぶきの下の端（どれもシートの px）
 FOUNTAIN_WATER = (328, 682)
@@ -151,11 +163,13 @@ FOUNTAIN_PILLAR = [(230, 200), (432, 200), (432, 515), (393, 515), (393, 600), (
 # しぶきは水盤の奥の水面に下の端を合わせ、少し大きく（柱の上の皿から水盤へ落ちて見える）
 FOUNTAIN_SPRAY_FOOT = (326, 592)
 FOUNTAIN_SPRAY_SCALE = 1.2
-# 街のまわりの塀・南の門（14）
+# 街のまわりの塀・南の門（14）。東西のはしは塀をやめて林のへり（2026-10-28 ユーザー）
 WALL_N_BASE = 300
 WALL_SIDE = 140
 WALL_S_TOP = 6474
 GATE_CX = 3200
+# 林のへり：はしからこの幅は歩けない（木と植え込みをすき間なく並べる）
+FOREST_W = 300
 
 # 小物（足元の位置）。番号のない★・丸（木）は配置図の目安
 PROPS = [
@@ -193,6 +207,26 @@ PROPS = [
     ('lamp', 2880, 5780), ('lamp', 3520, 5780), ('sign', 2760, 6440), ('bench', 3850, 5920),
     ('bench', 4400, 4900),        # 23 ★
     ('flowerbowl', 3700, 6120),
+    # 2026-10-28 直し（ユーザー「広く空いた草地に小物を置いて、にぎやかに」。歩く道はふさがない）
+    # 西の道の北（西の高台の階段の道と大通りの間）
+    ('tree_mid', 2600, 2330), ('bush_big', 2300, 2620), ('bench', 2400, 2990), ('flowerbowl', 2160, 3010),
+    # 北東の道とショップの間
+    ('tree_mid', 3650, 2560), ('bush_small', 3830, 2400),
+    # 西の高台の石垣の下（練習場の裏）
+    ('hedge', 700, 2190), ('bush_small', 960, 2180), ('hedge', 1250, 2190), ('bush_big', 1600, 2200),
+    # ピートの家とハロルドの家の間・ハロルドの家と大通りの間
+    ('bush_big', 1525, 4270), ('bush_small', 2650, 4010), ('flowerbowl', 2740, 4260),
+    # 仕立て屋と広場の間
+    ('bush_big', 3800, 4060), ('flowerbowl', 3600, 4260),
+    # 商店街の南
+    ('flowerbowl', 5000, 4110), ('bench', 5300, 4130), ('lamp', 5600, 4020),
+    # 東の南側（小川の北）
+    ('planter', 4000, 4800), ('bush_big', 4720, 4760), ('lamp', 4260, 4730), ('flowerbowl', 4950, 5010),
+    ('hedge', 5650, 5300), ('bench', 4980, 5360), ('bush_small', 3900, 5360),
+    # 東の南側（小川の南）
+    ('bush_big', 4250, 5880), ('flowerbowl', 5300, 5860), ('lamp', 4120, 6250), ('hedge', 4400, 6200), ('bench', 5250, 6230),
+    # となりの家と石の橋の間・主人公の家の西
+    ('bush_big', 2720, 5420), ('bush_small', 470, 5420), ('flowerbowl', 520, 5760),
 ]
 # 外に立つ人の足元（単位）。maps.ts の spotOf で読む（2026-10-28 ユーザー：ピートとハロルドは外だけ、マルタとロザリーは店の中だけ）
 SPOTS = {
@@ -215,6 +249,9 @@ PROP_PARTS = {
     'barrel': ('props_street', (861, 429, 1057, 706), 0.6), 'crate': ('props_street', (1163, 415, 1473, 704), 0.55),
     'banner': ('props_street', (56, 652, 239, 1024), 0.8), 'sign': ('props_street', (368, 721, 721, 1016), 0.7),
     'manhole': ('props_street', (821, 736, 1121, 976), 0.45), 'drain': ('props_street', (1163, 779, 1492, 967), 0.45),
+    # 林のへり用（少し小さく）
+    'conifer_e': ('props_nature', (1174, 36, 1517, 686), 0.8), 'tree_e': ('props_nature', (661, 137, 1159, 691), 0.78),
+    'bush_e': ('props_nature', (23, 718, 329, 985), 0.62),
 }
 # 当たり（足元の何マス分をふさぐか：幅の割合・奥行きの単位）
 PROP_BLOCK = {
@@ -222,6 +259,7 @@ PROP_BLOCK = {
     'hedge': (0.95, 64), 'fence': (0.9, 40), 'telescope': (0.9, 120), 'lamp': (0.9, 32), 'lamp2': (0.6, 32),
     'bench': (0.9, 70), 'bench_side': (0.9, 120), 'planter': (0.95, 90), 'flowerbowl': (0.9, 80), 'barrel': (0.9, 64),
     'crate': (0.95, 80), 'banner': (0.5, 32), 'sign': (0.8, 40),
+    'conifer_e': (0.35, 64), 'tree_e': (0.30, 64), 'bush_e': (0.9, 80),
 }
 STALLS = [((6, 181, 526, 844), 5240), ((539, 183, 1042, 849), 5600), ((1043, 183, 1536, 853), 5960)]
 STALL_BASE, STALL_S = 3880, 0.6
@@ -279,6 +317,139 @@ def stream_y(x: float) -> float:
         if x1 <= x <= x2:
             return y1 + (y2 - y1) * (x - x1) / (x2 - x1)
     return STREAM[-1][1]
+
+
+def door_paths() -> list[tuple[float, float, float, float]]:
+    """扉の前の小道：扉の敷居（少し上から。段の絵の下に隠れる）から、すぐ下の道の上の辺まで"""
+    out = []
+    for b in BUILDINGS:
+        if not b['door_w']:
+            continue
+        x, sill = b['at']
+        tops = [r[1] for r in STREETS if r[0] <= x <= r[2] and r[1] >= sill - 10]
+        if tops and min(tops) - sill > 10:
+            out.append((x - DOOR_PATH_W / 2, sill - 40, x + DOOR_PATH_W / 2, min(tops)))
+    return out
+
+
+def _stone_span(im: Image.Image, axis: int) -> tuple[int, int]:
+    """縁石の部品の中で、石の所（草でない所）の始まりと終わり（axis=1：行、axis=0：列）"""
+    a = np.array(im).astype(int)
+    stone = (a[..., 3] > 128) & ~(a[..., 1] > a[..., 0] + 15)
+    idx = np.where(stone.mean(axis=axis) > 0.5)[0]
+    return int(idx[0]), int(idx[-1]) + 1
+
+
+def draw_curbs(base: Image.Image, rects, extra_paved) -> None:
+    """縁石（edges_curb）を、道の辺の向きに合わせて並べる。上・下の辺は横の石（草が外側）、左・右の辺は縦の石。
+    噴水の円い広場は石を1つずつ回して並べる。となりが道の所（つながっている所）には置かない。
+    道の下に描くので、石のはしが道にはみ出しても道の絵で隠れる（角は辺の石をのばして埋める）"""
+    hsrc = cut('edges_curb', (65, 90, 1081, 231))      # 横（上が草）
+    vsrc = cut('edges_curb', (40, 270, 200, 950))      # 縦（左が草）
+    h0, h1 = _stone_span(hsrc, 1)
+    v0, v1 = _stone_span(vsrc, 0)
+    hs, vs = CURB_STONE / (h1 - h0), CURB_STONE / (v1 - v0)
+    pieces = {
+        'top': resize(hsrc, hs * K), 'bottom': resize(hsrc.transpose(Image.FLIP_TOP_BOTTOM), hs * K),
+        'left': resize(vsrc, vs * K), 'right': resize(vsrc.transpose(Image.FLIP_LEFT_RIGHT), vs * K),
+    }
+    all_rects = list(rects) + list(extra_paved)
+    cx, cy, r = PLAZA['cx'], PLAZA['cy'], PLAZA['r']
+
+    def paved(x: float, y: float) -> bool:
+        return any(a <= x < c and b <= y < d for a, b, c, d in all_rects) or (x - cx) ** 2 + (y - cy) ** 2 <= r * r
+
+    def runs(points: list[tuple[float, float]], vals: list[float]) -> list[tuple[float, float]]:
+        out, start = [], None
+        for v, (px, py) in zip(vals, points):
+            if not paved(px, py):
+                start = v if start is None else start
+            elif start is not None:
+                out.append((start, v))
+                start = None
+        if start is not None:
+            out.append((start, vals[-1]))
+        return out
+
+    ov = 4      # 石を道の側へ少し重ねる（すき間を作らない）
+    for x1, y1, x2, y2 in rects:
+        for side in ('top', 'bottom', 'left', 'right'):
+            horiz = side in ('top', 'bottom')
+            a, b = (x1, x2) if horiz else (y1, y2)
+            vals = list(np.arange(a + 4, b, 8.0)) + [b - 1]
+            off = {'top': y1 - 8, 'bottom': y2 + 8, 'left': x1 - 8, 'right': x2 + 8}[side]
+            pts = [(v, off) if horiz else (off, v) for v in vals]
+            for s0, s1 in runs(pts, vals):
+                s0, s1 = s0 - 4 - CURB_STONE, s1 + 4 + CURB_STONE
+                im = pieces[side]
+                if horiz:
+                    # 上の辺：石の下の辺を道の上の辺に。下の辺：石の上の辺を道の下の辺に
+                    py = (y1 + ov - h1 * hs) if side == 'top' else (y2 - ov - (hsrc.height - h1) * hs)
+                    x = P(s0)
+                    while x < P(s1):
+                        _paste(base, im.crop((0, 0, min(im.width, P(s1) - x), im.height)), (x, P(py)))
+                        x += im.width - P(4)
+                else:
+                    # 左の辺：石の右の辺を道の左の辺に。右の辺：石の左の辺を道の右の辺に
+                    px_ = (x1 + ov - v1 * vs) if side == 'left' else (x2 - ov - (vsrc.width - v1) * vs)
+                    y = P(s0)
+                    while y < P(s1):
+                        _paste(base, im.crop((0, 0, im.width, min(im.height, P(s1) - y))), (P(px_), y))
+                        y += im.height - P(4)
+    # 円い広場：横の石を1つずつ（草が外を向くように回して）並べる
+    n_bricks = 6
+    bw = hsrc.width / n_bricks
+    brick = resize(hsrc.crop((0, 0, round(bw), hsrc.height)), hs * K)
+    stone_c = (h0 + h1) / 2 * hs * K
+    step = bw * hs * 0.92
+    n = int(np.ceil(2 * np.pi * r / step))
+    for i in range(n):
+        th = 2 * np.pi * i / n
+        nx, ny = np.cos(th), np.sin(th)
+        if paved(cx + nx * (r + 20), cy + ny * (r + 20)):
+            continue
+        rot = brick.rotate(-(np.degrees(th) + 90), expand=True, resample=Image.BICUBIC)
+        # 石の真ん中を円の外側 CURB_STONE/2 - ov の所に。絵の真ん中は石の真ん中より外へ（草のぶん）
+        rad = r + CURB_STONE / 2 - ov + (stone_c - brick.height / 2) / K
+        bx, by = cx + nx * rad, cy + ny * rad
+        _paste(base, rot, (P(bx) - rot.width // 2, P(by) - rot.height // 2))
+
+
+def _paste(base: Image.Image, im: Image.Image, xy: tuple[int, int]) -> None:
+    """絵の外にはみ出す所を切って重ねる（alpha_composite は負の位置を受け付けない）"""
+    x, y = xy
+    l, t_ = max(0, -x), max(0, -y)
+    r, b = min(im.width, base.width - x), min(im.height, base.height - y)
+    if r > l and b > t_:
+        base.alpha_composite(im.crop((l, t_, r, b)), (x + l, y + t_))
+
+
+def forest_edge(rng: random.Random) -> list[tuple[str, float, float]]:
+    """東西のはしの林のへり（2026-10-28 ユーザー「塀をやめて、木と植え込みをすき間なく並べる」）。
+    奥の列・手前の列の木を互い違いに、その手前に植え込み。建物・見晴らし台・高台の石垣の前は手前の列を置かない"""
+    out = []
+    # 手前の列・植え込みを置かない y の範囲（西・東）
+    skip = {'w': [(1640, 1900), (1880, 2070)], 'e': [(2180, 3120), (3440, 3980)]}
+    for side in ('w', 'e'):
+        def X(v: float) -> float:
+            return v if side == 'w' else W - v
+        # 小川が林の下へ流れていく所（岸のあいだ）には置かない
+        sy = stream_y(X(200))
+        skip[side].append((sy - STREAM_W / 2 - 60, sy + STREAM_W / 2 + 90))
+        for i, y in enumerate(range(540, 6470, 170)):
+            yy = y + rng.randint(-20, 20)
+            if not (1880 <= yy <= 2070 and side == 'w') and not (skip[side][-1][0] <= yy <= skip[side][-1][1]):
+                out.append(('conifer_e' if (i + (side == 'e')) % 2 else 'tree_e', X(95), yy))
+            fy = y + 85 + rng.randint(-15, 15)
+            if fy < 6460 and not any(a <= fy <= b for a, b in skip[side]):
+                out.append(('tree_e' if (i + (side == 'e')) % 2 else 'conifer_e', X(245 + rng.randint(-20, 20)), fy))
+            by_ = y + 140 + rng.randint(-10, 10)
+            if by_ < 6460 and not any(a <= by_ <= b for a, b in skip[side]):
+                out.append((rng.choice(['bush_e', 'bush_small', 'bush_e']), X(330 + rng.randint(-15, 15)), by_))
+    # 西の高台の石垣のはしを隠す木
+    out.append(('tree_e', 250, 2110))
+    out.append(('bush_e', 380, 2130))
+    return out
 
 
 # ───────────── 建物の影（seimon_world_build の building_shadow と同じ形。単位を K 倍） ─────────────
@@ -370,16 +541,18 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     base.paste(bright, (0, 0), terr)
 
     # ── 道・広場 ──
-    streets = mask_rects(size, STREETS)
+    # 石の橋の下（デッキの北の端 〜 小川の南の岸）も道。小川を描いたあとで塗る（橋の柱の間に見える）
+    bridge_gap = (2944, 4880, 3456, 5660)
+    rects = STREETS + door_paths()
+    streets = mask_rects(size, rects)
+    gap_mask = mask_rects(size, [bridge_gap])
     plaza = mask_rects(size, [], (PLAZA['cx'], PLAZA['cy'], PLAZA['r']))
-    paved = Image.fromarray(np.maximum(np.array(streets), np.array(plaza)))
-    # 道のまわりの草に落ちる陰・縁石（edges_curb の石の色）
+    paved = Image.fromarray(np.maximum.reduce([np.array(streets), np.array(plaza), np.array(gap_mask)]))
+    # 道のまわりの草に落ちる陰
     outer = paved.filter(ImageFilter.MaxFilter(31)).filter(ImageFilter.GaussianBlur(10))
     base.paste(Image.new('RGBA', size, (24, 40, 18, 255)), (0, 0), outer.point(lambda v: int(v * 0.22)))
-    curb_src = cut('edges_curb', (65, 90, 1081, 231))
-    curb_tex = tiled(curb_src.crop((0, curb_src.height // 3, curb_src.width, curb_src.height)), size, 0.55)
-    curb = paved.filter(ImageFilter.MaxFilter(P(36) | 1))
-    base.paste(curb_tex, (0, 0), Image.fromarray(np.minimum(np.array(curb), np.array(curb_tex.getchannel('A')))).filter(ImageFilter.GaussianBlur(1)))
+    # 縁石（edges_curb）：道の辺の向きに合わせて横・縦の石を並べる（道の下に描き、はみ出しは道で隠れる）
+    draw_curbs(base, rects, [bridge_gap])
     street_tex = tiled(sheet('tile_street'), size, 0.45)
     plaza_tex = tiled(sheet('tile_plaza'), size, 0.45)
     # 石畳：ふちに近いほど少し暗く（へこみの陰）
@@ -389,12 +562,13 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     shade = (1 - 0.16 * np.exp(-dist / 18))[..., None]
     st = np.array(street_tex).astype(np.float32)
     st[..., :3] *= shade
+    st_img = Image.fromarray(st.astype(np.uint8))
     pl = np.array(plaza_tex).astype(np.float32)
     pl[..., :3] *= shade
-    base.paste(Image.fromarray(st.astype(np.uint8)), (0, 0), streets.filter(ImageFilter.GaussianBlur(0.8)))
+    base.paste(st_img, (0, 0), streets.filter(ImageFilter.GaussianBlur(0.8)))
     base.paste(Image.fromarray(pl.astype(np.uint8)), (0, 0), plaza.filter(ImageFilter.GaussianBlur(0.8)))
     xs, ys = t.cell_centers()
-    for (x1, y1, x2, y2) in STREETS:
+    for (x1, y1, x2, y2) in rects:
         t.paved[np.ix_((ys >= y1) & (ys < y2), (xs >= x1) & (xs < x2))] = True
     t.paved |= ((xs[None, :] - PLAZA['cx']) ** 2 + (ys[:, None] - PLAZA['cy']) ** 2) <= PLAZA['r'] ** 2
     # 道の飾り（マンホール・排水口。地面に描く）
@@ -445,9 +619,15 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         base.alpha_composite(im, (P(ux) - im.width // 2, P(stream_y(ux) + rng.randint(-20, 40)) - im.height // 2))
     sblock = np.array(stream_mask(size, 60).resize((t.cols, t.rows), Image.BILINEAR)) > 40
     t.block |= sblock
+    # 石の橋の下の道（小川の上に塗る。左右は橋の柱で隠れる）
+    base.paste(st_img, (0, 0), gap_mask)
 
     # ── 石の橋（19）・木の橋（24） ──
     br, (box_, boy_) = cut_at('bridges', (629, 14, 1535, 954))
+    # デッキの南の端より下は、左右の柱だけ残す（アーチの面と、その下の水は使わない）
+    ba = np.array(br)
+    ba[BRIDGE_DECK_S - boy_:, BRIDGE_PILLARS[0] - box_:BRIDGE_PILLARS[1] - box_, 3] = 0
+    br = Image.fromarray(ba)
     s = BRIDGE_STONE['s']
     bim = resize(br, s * K)
     # アーチの下の端（シートの y 905）を小川の下の岸に合わせる。橋の板（シートの x 880〜1260）を道の真ん中に
@@ -509,7 +689,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     tw, tn = TERRACE_W, TERRACE_N
     side(tn[2], tn[1], tn[3])
     side(tw[2], tn[3] + 20, tw[3])
-    face(tw[0], tw[2], tw[3], [(sw_x, sw_x + small_stairs.width * STAIRS_W['s'])])
+    # 西の高台の石垣は林のへりの手前で止める（はしは林の木で隠れる）
+    face(FOREST_W - 60, tw[2], tw[3], [(sw_x, sw_x + small_stairs.width * STAIRS_W['s'])])
     face(tn[0], tn[2], tn[3], [(sn_x, sn_x + big_stairs.width * STAIRS_N['s'])])
     base.alpha_composite(sn, (P(sn_x), P(STAIRS_N['top'])))
     base.alpha_composite(sw, (P(sw_x), P(STAIRS_W['top'])))
@@ -537,15 +718,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     stepw = seg_k.width - P(36)
     for x in range(-P(30), size[0], stepw):
         base.alpha_composite(seg_k, (x, P(WALL_N_BASE) - seg_k.height))
-    # 東西の塀：塀の上の石（高台の手すりの石）を縦にした帯。四すみに塔
-    rail_ = cut('terrace_parts', (55, 408, 762, 556))
-    side_bar = rail_.crop((round(rail_.width * 0.18), 0, round(rail_.width * 0.82), rail_.height)).rotate(90, expand=True)
-    side_bar = side_bar.resize((P(WALL_SIDE), max(1, round(side_bar.height * P(WALL_SIDE) / side_bar.width))), Image.LANCZOS)
-    for sx in (0, P(W - WALL_SIDE)):
-        y = P(WALL_N_BASE - 120)
-        while y < P(WALL_S_TOP):
-            base.alpha_composite(side_bar, (sx, y))
-            y += side_bar.height - P(8)
+    # 東西のはしは塀をやめて林のへり（下の「林のへり」。2026-10-28 ユーザー）。北と南の塀の両はしに塔
     tower_k = resize(tower, 0.62 * K)
     for tx, ty in [(WALL_SIDE / 2, WALL_N_BASE + 40), (W - WALL_SIDE / 2, WALL_N_BASE + 40)]:
         base.alpha_composite(tower_k, (P(tx) - tower_k.width // 2, P(ty) - tower_k.height))
@@ -564,8 +737,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     gate_door = (GATE_CX - 110, GATE_CX + 110)
     t.add_sprite(gate_k, 'gate', gate_x, gate_y, WALL_S_TOP + 10)
     t.block_rect(0, 0, W, WALL_N_BASE + 10)
-    t.block_rect(0, 0, WALL_SIDE + 10, H)
-    t.block_rect(W - WALL_SIDE - 10, 0, W, H)
+    t.block_rect(0, 0, FOREST_W, H)
+    t.block_rect(W - FOREST_W, 0, W, H)
     t.block_rect(0, WALL_S_TOP + 20, W, H)
     # 出口：門の真ん中のとがった屋根（シートの y 318）の手前。人が門の絵に隠れる前に、ダンジョンを選ぶ画面へ
     gate_exit_y = gate_y + (318 - goy) * gs - 40
@@ -673,14 +846,18 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
 
     # ── 木・小物 ──
     cache: dict[str, Image.Image] = {}
-    for name, ux, uy in PROPS:
+    for name, ux, uy in PROPS + forest_edge(rng):
         if name not in cache:
             src, box, s = PROP_PARTS[name]
             cache[name] = resize(cut(src, box), s * K)
         im = cache[name]
         x, y = ux - im.width / K / 2, uy - im.height / K
         soft_shadow(base, im, (P(x), P(y)), 16 if name.startswith(('tree', 'conifer')) else 10, 8, 9, 70)
-        t.add_sprite(im, name, x, y, uy - 10)
+        # 街の外にはみ出す所は切る（林のへりの木）
+        l, tp = max(0, -P(x)), max(0, -P(y))
+        r = min(im.width, P(W) - P(x))
+        key = name if (l, tp, r) == (0, 0, im.width) else f'{name}_c{l}_{tp}_{im.width - r}'
+        t.add_sprite(im.crop((l, tp, r, im.height)), key, x + l / K, y + tp / K, uy - 10)
         fw, fd = PROP_BLOCK[name]
         t.block_rect(ux - im.width / K * fw / 2, uy - fd, ux + im.width / K * fw / 2, uy + 4)
 

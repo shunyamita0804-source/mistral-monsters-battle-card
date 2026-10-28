@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getMap, HOUSES, TOWN, townDoorFront, type MapDefinition } from '../src/data/maps.ts';
 import { createNewSave, DEFAULT_LOCATION, normalizeSave, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { findPath, isBlocked } from '../src/game/world/world.ts';
+import { FRAGMENTS } from '../src/data/fragments.ts';
 
 /** 2026-10-28 指示書「街を新しい絵で作り直す」 */
 const art = TOWN.art!;
@@ -66,6 +67,34 @@ describe('新しい街（2026-10-28）', () => {
     }
     expect(getMap('house-a')?.objects.some((o) => o.type === 'npc')).toBe(true);
     expect(getMap('house-d')?.objects.some((o) => o.type === 'npc')).toBe(true);
+  });
+
+  it('2026-10-28 直し：石の橋は道の幅だけ歩ける（橋の下の水の上は歩けない）・東西のはしは林で通れない・欠片の場所へ歩いて行ける', () => {
+    const cell = art.cell;
+    // 小川の上（石の橋：y 4900〜5650・x 2750〜3680、木の橋：y 4780〜4900・x 1100〜2000）で歩けるのは橋の真ん中の列だけ
+    const check = (ys: [number, number], xs: [number, number], ok: [number, number]) => {
+      let open = 0;
+      for (let y = Math.floor(ys[0] / cell); y <= Math.floor(ys[1] / cell); y++) {
+        for (let x = Math.floor(xs[0] / cell); x <= Math.floor(xs[1] / cell); x++) {
+          if (blockedIn(TOWN)(x, y)) continue;
+          open++;
+          const ux = (x + 0.5) * cell;
+          expect(ux > ok[0] && ux < ok[1], `x=${x} y=${y}`).toBe(true);
+        }
+      }
+      expect(open).toBeGreaterThan(0);
+    };
+    check([4900, 5650], [2750, 3680], [3040, 3360]);
+    check([4780, 4900], [1100, 2000], [1440, 1640]);
+    // 東西のはし（林のへり 300 単位）はどの行も歩けない
+    for (let y = 0; y < art.rows; y++) {
+      expect(blockedIn(TOWN)(0, y)).toBe(true);
+      expect(blockedIn(TOWN)(Math.floor(250 / cell), y)).toBe(true);
+      expect(blockedIn(TOWN)(art.cols - 1 - Math.floor(250 / cell), y)).toBe(true);
+    }
+    for (const f of FRAGMENTS.filter((x) => x.mapId === 'town')) {
+      expect(findPath(TOWN, TOWN.spawn, { x: f.x, y: f.y }, blockedIn(TOWN)), f.id).not.toBeNull();
+    }
   });
 
   it(`前の街にいたセーブ（version 19）は、主人公の家の前に移す（version ${SAVE_VERSION}）`, () => {

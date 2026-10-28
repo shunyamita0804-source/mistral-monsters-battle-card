@@ -11,13 +11,12 @@ export interface FragmentDefinition {
 }
 
 export const FRAGMENTS: readonly FragmentDefinition[] = [
-  // 街（マスは 32px）：道の行き止まり4か所（2026-10-28 の新しい街で置き直し：北東の道の東の端・ピートの家の前の道の西の端・
-  // 仕立て屋の前の道の東の端・主人公の家の前の道の西の端）
-  { id: 'fragment-01', mapId: 'town', x: 190, y: 63 },
-  { id: 'fragment-02', mapId: 'town', x: 152, y: 140 },
-  { id: 'fragment-03', mapId: 'town', x: 14, y: 140 },
-  { id: 'fragment-04', mapId: 'town', x: 16, y: 189 },
-  // 2026-10-26：太古の遺跡がランダム生成のダンジョンになったので、同じ形の精霊の森（遺跡の写し）の同じ場所へ移した
+  // 街（マスは 32px）。2026-10-28 の直しで道の行き止まりが無くなったので、街のすみ4か所へ置き直した：
+  // 作業小屋の裏（北東）・南東のすみ・練習場の裏（西の高台の石垣の下）・南西のすみ
+  { id: 'fragment-01', mapId: 'town', x: 181, y: 21 },
+  { id: 'fragment-02', mapId: 'town', x: 182, y: 196 },
+  { id: 'fragment-03', mapId: 'town', x: 14, y: 67 },
+  { id: 'fragment-04', mapId: 'town', x: 12, y: 197 },
   { id: 'fragment-05', mapId: 'dungeon-02-b1', x: 9, y: 1 },
   { id: 'fragment-06', mapId: 'dungeon-02-b1', x: 3, y: 14 },
   { id: 'fragment-07', mapId: 'dungeon-02-b2', x: 5, y: 11 },
