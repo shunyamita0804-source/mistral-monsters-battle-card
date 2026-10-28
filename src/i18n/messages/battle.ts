@@ -51,7 +51,7 @@ export const BATTLE = {
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
-  'battle.log.tailwind': { ja: '{name}においかぜ。次の攻撃技のダメージ＋{n}。', en: 'A tailwind for {name}. Its next attack deals +{n}.' },
+  'battle.log.tailwind': { ja: '{name}においかぜ。次のターンの攻撃技のダメージ＋{n}。', en: 'A tailwind for {name}. Its attack next turn deals +{n}.' },
   'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',

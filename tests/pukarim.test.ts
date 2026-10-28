@@ -213,7 +213,7 @@ describe('07 ぷはーっ：ためているときは回避されない', () => {
   });
 });
 
-describe('10 おいかぜ：プカリム以外の味方1体の、次の攻撃技のダメージ＋1', () => {
+describe('10 おいかぜ：プカリム以外の味方1体の、次の自分のターンの攻撃技のダメージ＋1', () => {
   it('選べるのはプカリム以外の、生きている味方', () => {
     const s = scene({ player: [puk(10)] });
     expect(targetsFor(s, 'player', getSkill(puk(10))).map((m) => m.uid)).toEqual(['p-m2', 'p-m3']);
@@ -221,24 +221,45 @@ describe('10 おいかぜ：プカリム以外の味方1体の、次の攻撃技
     expect(cardUsability(none, 'player', 'p0')).toMatchObject({ usable: false, reason: 'おいかぜをかけられる味方がいません' });
   });
 
-  it('おいかぜは1回：次の攻撃だけ＋1（2回目の攻撃はふつう）', () => {
+  it('かけた同じ手番には効かない。次の自分のターンの攻撃だけ＋1（2026-10-29 カードの文のとおり）', () => {
     let s = applyAction(scene({ player: [puk(10), sor(1)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m2' });
-    expect(monster(s, 'p-m2').tailwind).toEqual({ amount: 1, untilTurn: s.turn + 2 });
-    expect(s.log.at(-1)?.text).toBe('ソラモにおいかぜ。次の攻撃技のダメージ＋1。');
+    expect(monster(s, 'p-m2').tailwind).toEqual({ amount: 1, turn: s.turn + 2 });
+    expect(s.log.at(-1)?.text).toBe('ソラモにおいかぜ。次のターンの攻撃技のダメージ＋1。');
     const base = getSkill(sor(1)).stat?.value ?? 0;
-    expect(attackPower(s, getSkill(sor(1)), monster(s, 'p-m2'))).toBe(base + 1);
-    s = attack(s, 'p1');
-    expect(monster(s, 'o-m2').life).toBe(SORAMO_LIFE - (base + 1));
-    expect(monster(s, 'p-m2').tailwind ?? null).toBeNull();
+    // 同じ手番：まだ動いていないソラモが攻撃しても＋1 にならず、おいかぜは残る
     expect(attackPower(s, getSkill(sor(1)), monster(s, 'p-m2'))).toBe(base);
+    s = attack(s, 'p1');
+    expect(monster(s, 'o-m2').life).toBe(SORAMO_LIFE - base);
+    expect(monster(s, 'p-m2').tailwind).toEqual({ amount: 1, turn: s.turn + 2 });
+    // 次の自分のターン：＋1
+    s = nextOwnTurn(s, [sor(1)]);
+    expect(attackPower(s, getSkill(sor(1)), monster(s, 'p-m2'))).toBe(base + 1);
+    s = attack(s, 'n0');
+    expect(monster(s, 'o-m2').life).toBe(SORAMO_LIFE - base - (base + 1));
   });
 
-  it('使わなければ、次の自分のターンが終わったら消える', () => {
-    let s = applyAction(scene({ player: [puk(10)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m3' });
+  it('おいかぜは1回：次のターンに攻撃技を1回使ったら消える', () => {
+    let s = applyAction(scene({ player: [puk(10)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m2' });
     s = nextOwnTurn(s, [sor(1)]);
-    expect(attackPower(s, getSkill('skl-lazuck-01'), monster(s, 'p-m3'))).toBe((getSkill('skl-lazuck-01').stat?.value ?? 0) + 1);
+    s = attack(s, 'n0');
+    expect(monster(s, 'p-m2').tailwind ?? null).toBeNull();
+    expect(attackPower(s, getSkill(sor(1)), monster(s, 'p-m2'))).toBe(getSkill(sor(1)).stat?.value ?? 0);
+  });
+
+  it('使わなければ、次の自分のターンが終わったら消える（印もそのターンまで）', () => {
+    const lazuck = getSkill('skl-lazuck-01');
+    const base = lazuck.stat?.value ?? 0;
+    let s = applyAction(scene({ player: [puk(10)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m3' });
+    const w = monster(s, 'p-m3').tailwind;
+    // 相手の手番：効かない（印は出したまま：w.turn >= いまの手番）
+    const opp = applyAction(applyAction(s, { type: 'endAttack', side: 'player' }), { type: 'endTurn', side: 'player' });
+    expect(attackPower(opp, lazuck, monster(opp, 'p-m3'))).toBe(base);
+    expect((w?.turn ?? 0) >= opp.turn).toBe(true);
+    s = nextOwnTurn(s, [sor(1)]);
+    expect(attackPower(s, lazuck, monster(s, 'p-m3'))).toBe(base + 1);
     s = nextOwnTurn(s);
-    expect(attackPower(s, getSkill('skl-lazuck-01'), monster(s, 'p-m3'))).toBe(getSkill('skl-lazuck-01').stat?.value ?? 0);
+    expect(attackPower(s, lazuck, monster(s, 'p-m3'))).toBe(base);
+    expect((w?.turn ?? 0) >= s.turn).toBe(false);
   });
 });
 
