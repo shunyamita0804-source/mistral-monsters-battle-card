@@ -8,7 +8,7 @@
 
 - **2026-10-29（このセッションの続き）**：おいかぜの直し（`claude/tailwind-fix-20261029`）と、
   **名前の入力・取得カード画面・ボタンの効果音・手札の上限9枚**（`claude/name-cardlist-uisound-20261029`。`docs/name-cardlist-uisound.md`）を main に取り込んで公開。
-  **セーブ version 22**（`player.name`。前のセーブは「続きから」で1回だけ名前の窓）。テスト 714件。報告は Artifact のページ（**返事待ち**）
+  **セーブ version 22**（`player.name`。前のセーブは「続きから」で1回だけ名前の窓）。テスト 714件。報告は Artifact のページ https://claude.ai/artifact/5LjJuRs6vQCabzCPBGCUtB （**返事待ち**）
 - 名前・取得カード・ボタンの音の未完了：iPhone 実機（キーボードが出たときの窓のずれ・変換中の文字・音の大きさ・Safari で灰色のボタンの音）。
   取得カードをダンジョンの勝ち・宝箱・ガチャにつなぐ（部品はできている）
 - **ユーザーは iPhone で作業している。ファイル（ZIP・.md）はダウンロードできない** → 報告書は **Artifact の Web ページ** にしてリンクで渡す
