@@ -1,23 +1,30 @@
-# 引き継ぎメモ（2026-10-28 新しいダンジョン5つの正式な絵を公開したあと・セッション引き継ぎ用）
+# 引き継ぎメモ（2026-10-28 ダンジョン5つの絵・名前の絵を公開したあと・セッション引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 新しいダンジョン5つの正式な絵・名前の絵を公開したあと）
+### まず読む：いまの状態（2026-10-28 セッション終了時）
 
-- **公開中：`main` の `a8b1fdd`（2026-10-28 2回目）**：新しい5つのダンジョン名の絵（入ったときの挿絵の上。遺跡・森と同じ）と「新しいダンジョン発見」の帯（大会のランクアップで開いたとき、報酬の窓でランクアップの帯のあと）。
-  原本 `design-parts/dungeon-titles-20261028/`、切り出し `tools/design/dungeon_titles_build.py`。記録 `docs/dungeons7.md`「見た目」
-- **公開中：`main` の `9fc32e4`（2026-10-28 ユーザー「main に取り込んで公開し、画面写真で報告」）**：水の神殿・氷の洞窟・炎の火山・機械の塔・天の聖域の正式な絵30枚（床・壁・階段・水路・氷・扉とスイッチ・飾り・対戦の背景・ボスのしるし・入ったときの挿絵と輪）。
-  記録 `docs/dungeons7.md`「見た目」・`docs/design/dungeons5-20261028/10_受け取り結果_UTF8.txt`。テスト 605件。未公開の作業ブランチは無い
-  - **ユーザーに確認中**：ボス戦の背景もそのダンジョンの絵にするか（いまは共通の battle_boss のまま）。ダンジョン名の絵は同じ日に届いて組み込み済み
-  - 飾りの割合（火山7%・聖域6%）は仮
-- 以下は 2026-10-27 夜の状態（ダンジョンの見た目以外はそのまま）
-
-- **公開中：`main` の `919248d`（2026-10-27 夜 ユーザー「許可を取らないでいいので最後まで進めて公開して」。公開ページで新しい中身とエラーなしを確認）**：作業ブランチ3つを取り込んだ。セーブ version 19。テスト 601件。未公開の作業ブランチは無い
-  - シエナがいないあいだの代わり（E マリー・C ゴードン）・管理局の受付をエレノアに（歩く絵・顔）
-  - ダンジョン7つ（ランクで開放・水路・すべる床・視界と番人・扉とスイッチ・聖域は2回まで）。記録 `docs/dungeons7.md`
-  - 顔8人・名刺の台紙とファイル（5枚ずつ）・カード図鑑の部品と詳しい画面の背景・研究所の外観と家具5つ（置き場所は Claude の判断、調べた文は仮）。記録 `docs/people-book.md` の最後
+- **公開中：`main` の `a8b1fdd`**（その後の `5dc4777` などは引き継ぎメモだけ）。手元の `main` と `origin/main` は同じ。**未公開の作業ブランチは無い**。セーブ version 19。テスト 605件
+- 2026-10-28 に公開したもの（どちらもユーザーの指示書どおり。公開ページで新しい絵が出ることを確認済み）
+  - `9fc32e4`：新しいダンジョン5つ（水の神殿・氷の洞窟・炎の火山・機械の塔・天の聖域）の正式な絵30枚。床・壁・階段・水路（ふちの石）・氷・扉とスイッチ（閉→開・切→入）・
+    床の飾り（火山のひび割れ・聖域の羽根／燭台／光の筋。`src/game/dungeon/decor.ts`、見た目だけ）・対戦の背景（番人・バトラー）・ボスの間のしるし・入ったときの挿絵と輪。
+    原本 `design-parts/dungeons5-20261028/`、切り出し `tools/design/dungeons5_build.py`、受け取り記録 `docs/design/dungeons5-20261028/10_受け取り結果_UTF8.txt`
+  - `a8b1fdd`：5つのダンジョン名の絵（入ったときの挿絵の上。遺跡・森と同じ大きさ・位置）と「新しいダンジョン発見」の帯（大会のランクアップで開いたとき、報酬の窓でランクアップの帯のあと。
+    紺の帯に「新しいダンジョンが見つかった：」と名前の2行）。原本 `design-parts/dungeon-titles-20261028/`、切り出し `tools/design/dungeon_titles_build.py`
+  - 記録はどちらも `docs/dungeons7.md`「見た目」
+- **ユーザーの返事待ち（2026-10-28）**：ボス戦の背景もそのダンジョンの絵にするか（いまは全ダンジョン共通の `battle_boss.webp`。`dungeonRunScreen.ts` の `#startBattle` 付近、`kind === 'boss' ? bossBattleBg : …`）。
+  ユーザーは報告に「OK」とだけ返事。はっきりした答えはまだなので、推測で変えない
+- 2026-10-28 の仮のもの：床の飾りの割合（火山7%・聖域6%。`decor.ts` の `DECOR_RULES`）。対戦の背景は対戦画面の決まりで暗い膜の下にうっすら（遺跡・森と同じ）
+- その前の公開：`919248d`（2026-10-27 夜）シエナの代わり・エレノア・ダンジョン7つ・顔8人・名刺の台紙・カード図鑑の部品・研究所の外観と家具（記録 `docs/dungeons7.md`・`docs/people-book.md` の最後）
+- 画面写真の撮り方（2026-10-28 に使ったやり方。スクリプトはスクラッチパッドにあったので次のセッションには残らない）
+  - セーブを作る：`tests/zz-*.test.ts` を一時的に置いて Vitest で `createNewSave`・`startRun`・`enterTournament`・`recordMatch` などを呼び、JSON をスクラッチパッドに書き出す → 終わったら消す
+    （Node で直接 ts を動かすと JSON の import で止まる）。`story.intro: 'skipped'`・`story.introV2: LEGACY_INTRO_V2` で導入イベントを飛ばす
+  - ダンジョンの中：`dungeonRun` を入れたセーブで「続きから」。全部見せるときは `explored` を全部 '1'、明るく見せるときは `torchFloor`、番人の予兆を出さないときは `cooldown: 999`
+  - 入ったときの挿絵：街の南の出口の手前 `{mapId:'town', x:62, y:123, dir:'down'}` で下キー → 世界地図 → `[aria-label="水の神殿"]` などを押して約1.9秒後に撮る
+  - 大会の報酬：`{mapId:'hall', x:20, y:27, dir:'up'}` で「調べる」→ 受付の画面 →「景品を受け取る」
+  - 撮影は `npx vite build` のあと `npx vite preview --port 4173 --host 127.0.0.1`。公開ページは `https://shunyamita0804-source.github.io/mistral-monsters-battle-card/` で同じ操作
 - その前に公開したもの（`0fe602c`）：大会の新しい形（`docs/tournament-v2.md`）・ブースターパック3箱（`docs/booster-select.md`。中身・値段は未定）・ガウルのバトル用カード
 - そのさらに前（`e1542da`）：導入イベントV2（`docs/intro-v2.md`）・カードバトラー管理局（`docs/bureau-v01.md`）・人物28人と名刺図鑑・カード図鑑（`docs/people-book.md`）・ダンジョンの道具8種（`docs/design-ui33-20261027.md`）・カードの裏面
 - 大会の未完了：ユリウスの試合の観客の声（音が見つかってから。ユーザー了承）
@@ -43,10 +50,17 @@
   `python3 -I tools/art/skillcard_v5_monster_color.py design-parts/ui-skillcard-v5/extracted assets/images/ui/skillcard_v5 soramo=#E4D2AC gauul=#E68A46 lazuck=#844DC5 myurol=#84E5FA kalshell=#DFF2F6`
   （2つ目は `frame_*_tintmask.png` も assets に書き出すので、終わったら消す）
 - 新しいダンジョン5つの絵（2026-10-28）：`python3 -I tools/design/dungeons5_build.py design-parts/dungeons5-20261028 assets/images`（scipy が要る。約2分半）
+- ダンジョン名の絵と発見の帯（2026-10-28）：`python3 -I tools/design/dungeon_titles_build.py design-parts/dungeon-titles-20261028 assets/images/ui`
+- 作業環境（2026-10-28 も Node 22・`node_modules` なしで始まった）：`export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → `export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH` → `npm install`。
+  手元の `main` が古いことがあるので最初に `git checkout -B main origin/main`。切り出しの道具は `pip install scipy` が要る
 - 正式モンスターの追加の型：`src/data/kalshell.ts`（新しいモンスター）・`src/data/myurol.ts`（技の入れ替え・ID の引き継ぎ・セーブの移し方）と、それぞれのテスト
 
 ### これまでの記録（新しい順）
 
+- **2026-10-28 ダンジョン名の絵5つと「新しいダンジョン発見」の帯（作業ブランチ `claude/dungeon-titles-20261028`・main に取り込み `a8b1fdd` で公開）**。
+  最初に届いた ZIP には指示書が入っておらず、ユーザーに確認して送り直してもらってから実装した。記録 `docs/dungeons7.md`「見た目」
+- **2026-10-28 新しいダンジョン5つの正式な絵30枚（作業ブランチ `claude/dungeons5-art-20261028`・main に取り込み `9fc32e4` で公開）**。
+  途中で見つけて直したこと：切り出しの並び順で火山の上り階段がひび割れに、機械の塔のスイッチの切／入が入れ替わっていた（どちらも公開前に直した）。記録 `docs/dungeons7.md`「見た目」
 - **2026-10-27 カルシェル（ライフ8・技14・初期配布16枚）を入れた（作業ブランチ `claude/kalshell-20261027`・main に取り込み `e9f9ecd` で公開）**。記録 `docs/card-data-policy.md`「2026-10-27 カルシェル」。
   色は淡い氷色 `#DFF2F6`。新しい動き「すなをほる」（`hide`・`hiddenTurn`）。正式モンスターカードの1枚絵は資料の注意どおり貼らない。テスト `tests/kalshell.test.ts`
 - **2026-10-27 カードショップ素材一式（A〜G）を組み込んだ（作業ブランチ `claude/cardshop-assets-20261027`・main に取り込み `e9f9ecd` で公開）**。原本 `design-parts/cardshop-assets-20261027/`、記録 `docs/design/cardshop-20261027/11_素材一式の受け取り_UTF8.txt`。
