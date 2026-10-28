@@ -1,7 +1,7 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
-import { BUREAU_DESK_FRONT, getMap, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
+import { BUREAU_DESK_FRONT, getMap, HALL_BOARD, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
@@ -21,7 +21,10 @@ import {
   openChest,
 } from '../../game/progress/dungeon.ts';
 import { collectFragment, fragmentAt, fragmentCount } from '../../game/progress/fragments.ts';
-import type { Direction, Location } from '../../game/save/saveData.ts';
+import type { ActiveTournament, Direction, Location } from '../../game/save/saveData.ts';
+import { getTournament, type TournamentDefinition } from '../../data/tournaments.ts';
+import { leagueTable } from '../components/tournamentBoards.ts';
+import { openRestore } from '../components/restoreFlow.ts';
 import {
   adjacentCellOf,
   canStep,
@@ -79,6 +82,7 @@ import {
 } from '../../game/story/intro.ts';
 import {
   beginExam,
+  examLoanDeck,
   claimBooster,
   finishExam,
   isIntroV2Active,
@@ -131,7 +135,7 @@ import signUpArt from '@assets/images/maps/dungeon/sign_up.webp';
 import signExitArt from '@assets/images/maps/dungeon/sign_exit.webp';
 import { t, type Params } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
-import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName, personName } from '../../i18n/content.ts';
+import { cardName, dungeonName, mapName, objectLabel, objectMessage, opponentName, personName, tournamentName } from '../../i18n/content.ts';
 import { personOfSpeaker } from '../../data/people.ts';
 import { meetSpeaker } from '../../game/people/peopleBook.ts';
 import { itemGetWindow } from '../components/rewardGlow.ts';
@@ -926,6 +930,7 @@ export class WorldView {
       this.#mapLayer.append(tiles);
     }
     this.#addLabels();
+    this.#addLeagueBoard();
     this.#objectEls.clear();
     for (const obj of map.objects) {
       const el = this.#objectElement(obj);
@@ -2172,13 +2177,9 @@ export class WorldView {
     return { ...this.#tile };
   }
 
-  /** 試験の対戦（先生が相手。勝つまで再挑戦。負けるたびに先生のライフを少なくする：救済。ふつうの練習試合とは別の対戦） */
+  /** 試験の対戦（先生が相手。勝つまで再挑戦。負けるたびに先生のライフを少なくする：救済。先生が貸すデッキで戦う。ふつうの練習試合とは別の対戦） */
   #startExam(): void {
     const store = this.#store;
-    if (!isDeckValid(store.save.deck, store.save.collection)) {
-      this.#message(t('world.deckInvalidBattle'));
-      return;
-    }
     this.#busy = true;
     const ctx = this.#ctx;
     store.update(beginExam);
@@ -2193,6 +2194,8 @@ export class WorldView {
       tutorial: true,
       hintSet: 'introV2',
       eventBattleId: 'introV2-exam',
+      // 2026-10-28：先生が貸すデッキ（「旅立ちのきらめき」と同じ中身）。試験のあいだだけ使い、所持カードには入れない
+      playerDeck: examLoanDeck(),
       onFinish: (winner) => {
         store.update((s) => finishExam(s, winner === 'player'));
         store.introV2Result = winner === 'player' ? 'won' : 'lost';
@@ -2260,7 +2263,15 @@ export class WorldView {
       sound.play('reward');
       setTimeout(() => {
         view.remove();
-        this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit'));
+        // 何をもらったか：箱の絵とモンスター3体、そのままデッキになったこと（2026-10-28 夜）
+        const def = BOOSTERS.find((b) => b.key === key);
+        const got = h(
+          'div',
+          { class: 'booster-got' },
+          def ? h('img', { class: 'booster-got__box', attrs: { src: boosterArtUrl(def), alt: '', draggable: 'false' } }) : null,
+          h('div', { class: 'booster-got__monsters' }, ...(def?.monsters ?? []).map((id) => createCardView(getMonster(id), 86, true))),
+        );
+        messageModal(this.#root, t('introV2.pack.got', { name: boosterName(key) }), () => this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit')), undefined, got, 'ok');
       }, BOOSTER_DECIDED_MS);
     };
     const view = h(
@@ -2397,6 +2408,84 @@ export class WorldView {
     ctx.navigate('battle');
   }
 
+  /** 欠片の特別復元（2026-10-28 研究所へ移した。src/ui/components/restoreFlow.ts） */
+  #openRestore(): void {
+    this.#busy = true;
+    openRestore(this.#root, this.#store, () => {
+      this.#busy = false;
+    });
+  }
+
+  /** 研究員ルーカス：欠片を持っていれば（または復元したあとは）図鑑と特別復元を選べる。なければ図鑑 */
+  #researcherMenu(): void {
+    const save = this.#store.save;
+    if (fragmentCount(save) === 0 && !save.hiddenRestored) {
+      this.#ctx.navigate('collection');
+      return;
+    }
+    this.#busy = true;
+    let next: (() => void) | null = null;
+    const handle = openModal(this.#root, {
+      title: t('world.researcher.title'),
+      body: [h('p', { class: 'modal__text', text: t('world.researcher.text') })],
+      actions: [
+        { label: t('world.researcher.collection'), onTap: () => ((next = () => this.#ctx.navigate('collection')), handle.close()) },
+        { label: t('shop.restore', { n: fragmentCount(save), total: FRAGMENT_TOTAL }), primary: true, onTap: () => ((next = () => this.#openRestore()), handle.close()) },
+      ],
+      onClose: () => {
+        this.#busy = false;
+        next?.();
+      },
+    });
+  }
+
+  /** 総当たりの大会の表（出ている大会、なければ最後に出た E・D の大会） */
+  #leagueNow(): { tour: TournamentDefinition; active: ActiveTournament } | null {
+    const save = this.#store.save;
+    for (const active of [save.activeTournament, save.lastLeague]) {
+      const tour = active ? getTournament(active.tournamentId) : undefined;
+      if (active && tour && tour.format === 'league') return { tour, active };
+    }
+    return null;
+  }
+
+  /** 大会会場の左の壁の板を調べる：対戦表の画面（受付と同じ表） */
+  #openLeagueBoard(): void {
+    const now = this.#leagueNow();
+    if (!now) {
+      this.#message(t('world.leagueBoard.empty'));
+      return;
+    }
+    this.#busy = true;
+    const gender = this.#store.save.player.gender;
+    const handle = openModal(this.#root, {
+      title: tournamentName(now.tour),
+      className: 'league-board-modal',
+      body: [leagueTable(now.tour, now.active, gender)],
+      actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
+      onClose: () => {
+        this.#busy = false;
+      },
+    });
+  }
+
+  /** 大会会場の左の壁の紺の板に、総当たりの表を小さく描く（板の位置は rooms4Art の BOARD） */
+  #addLeagueBoard(): void {
+    if (this.#map.id !== 'hall') return;
+    const board = HALL_BOARD;
+    const k = this.#scale;
+    const now = this.#leagueNow();
+    const el = h(
+      'div',
+      { class: 'world__league-board', attrs: { 'aria-hidden': 'true' } },
+      h('p', { class: 'world__league-board-title', text: now ? tournamentName(now.tour) : t('world.leagueBoard.title') }),
+      now ? leagueTable(now.tour, now.active, this.#store.save.player.gender) : null,
+    );
+    Object.assign(el.style, { left: `${board.x * k}px`, top: `${board.y * k}px`, width: `${board.w * k}px`, height: `${board.h * k}px`, transform: `skewY(${board.skewDeg}deg)` });
+    el.style.setProperty('--board-w', `${board.w * k}px`);
+    this.#mapLayer.append(el);
+  }
+
   #action(action: string, message?: string): void {
     const nav = this.#ctx.navigate;
     switch (action) {
@@ -2410,6 +2499,9 @@ export class WorldView {
       case 'tournamentDesk': return nav('tournament');
       case 'practiceTable': return this.#playScene(sceneOnTable(this.#store.save));
       case 'bureauDesk': return this.#playScene('v2BureauAfter');
+      case 'restore': return this.#openRestore();
+      case 'researcher': return this.#researcherMenu();
+      case 'leagueBoard': return this.#openLeagueBoard();
       default: this.#message(message ?? '');
     }
   }

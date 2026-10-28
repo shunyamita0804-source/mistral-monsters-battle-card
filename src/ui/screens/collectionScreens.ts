@@ -7,7 +7,8 @@ import { isCardNew, markCardSeen } from '../../game/people/peopleBook.ts';
 import { cardName, personName } from '../../i18n/content.ts';
 import { createCardView, createUnknownCard } from '../components/cardView.ts';
 import { button, h } from '../dom.ts';
-import { PACKS } from '../../data/economy.ts';
+import { GACHA_SERIES } from '../../data/economy.ts';
+import { seriesLineup } from '../../game/economy/gachaSeries.ts';
 import { cardCatalog } from '../../data/cards.ts';
 import type { CardDefinition } from '../../game/cards/cardTypes.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -245,7 +246,8 @@ export const cardListScreen: ScreenDefinition = {
   create(ctx) {
     const save = ctx.store.save;
     const element = h('main', { class: 'screen card-list' });
-    const ids = new Set(PACKS.filter((p) => save.unlockedPacks.includes(p.id)).flatMap((p) => p.cardIds));
+    // 販売機のガチャ6シリーズの中身（2026-10-28 夜。前は販売機から外した仮パックの中身だった）
+    const ids = new Set(GACHA_SERIES.flatMap((s) => seriesLineup(s).all));
     const cards = [...ids].map((id) => cardCatalog.get(id)).filter((c): c is CardDefinition => c !== undefined);
     element.append(
       createScreenHeader({ title: t('cardList.heading'), back: { label: t('common.back'), onTap: () => ctx.back('shopMenu') } }),

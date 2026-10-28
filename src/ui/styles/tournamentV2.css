@@ -104,16 +104,21 @@
   color: #ffe08a;
 }
 
-.league__self {
-  width: 92%;
-  height: 92%;
+/* 勝ち＝青い○・負け＝赤い×・自分どうし＝斜線1本（2026-10-28 夜。コードで描く。tournamentBoards.ts の leagueMark） */
+.league__svg {
+  display: block;
+  width: 78%;
+  height: 78%;
 }
 
-.league__mark {
-  width: 74%;
-  height: auto;
-  max-height: 86%;
-  object-fit: contain;
+.league__svg--self {
+  width: 96%;
+  height: 96%;
+}
+
+.league__svg--win,
+.league__svg--lose {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.5));
 }
 
 .league__next {
@@ -393,4 +398,9 @@
 
 .entrant-detail__monsters {
   font-size: 13px;
+}
+
+/* 対戦表の窓（大会会場の左の壁の板を調べたとき） */
+.league-board-modal .league {
+  margin: 0 auto;
 }

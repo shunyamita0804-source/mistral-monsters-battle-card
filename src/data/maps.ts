@@ -65,6 +65,12 @@ export type InteractAction =
   | 'practiceTable'
   /** 【仮】カードバトラー管理局の受付（導入イベントV2。src/game/story/introV2.ts） */
   | 'bureauDesk'
+  /** 欠片の特別復元（2026-10-28 カードショップから研究所の解析台へ移した） */
+  | 'restore'
+  /** 研究員：図鑑と、欠片を持っていれば特別復元も選べる */
+  | 'researcher'
+  /** 大会会場の左の壁の板：総当たりの対戦表を見る（受付と同じ表） */
+  | 'leagueBoard'
   | 'message';
 
 export type WarpTarget =
@@ -396,13 +402,19 @@ export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior'
   interactAt('lab-cabinet', itemOf(LAB_ART, 'CABINET'), '標本棚', 'message', '結晶や羽根が、標本のように並んでいる。'),
   interactAt('lab-desk', itemOf(LAB_ART, 'DESK'), '研究机', 'message', '研究の資料が広げてある。'),
   interactAt('lab-projector', itemOf(LAB_ART, 'PROJECTOR'), '記録の投影機', 'message', '光の板に、昔の対戦の記録が映っている。'),
-  interactAt('lab-analysis', itemOf(LAB_ART, 'ANALYSIS'), '解析台', 'message', 'カードを調べるための大きなレンズがある。'),
+  // 解析台で欠片の特別復元（2026-10-28 ユーザー決定：カードショップから研究所へ）
+  interactAt('lab-analysis', itemOf(LAB_ART, 'ANALYSIS'), '解析台', 'restore'),
   interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '黒板', 'message', '星と円の図がびっしり描かれている。'),
-  spotNpc('lab-researcher', LAB_ART, 'RESEARCHER_SPOT', ROOMS4_DRAW_OFFSET.lab.RESEARCHER_SPOT, 'researcher', 'collection'),
+  spotNpc('lab-researcher', LAB_ART, 'RESEARCHER_SPOT', ROOMS4_DRAW_OFFSET.lab.RESEARCHER_SPOT, 'researcher', 'researcher'),
   roomExit('lab-exit', LAB_ART, 'LAB'),
 ], entryOf(LAB_ART));
 
 const HALL_ART = ROOMS4_ART.arena;
+/**
+ * 大会会場の左の壁の紺の板（部屋の絵の中で斜めに見える平行四辺形）。部屋の単位（絵の px × 1.25）。
+ * 左の辺 x 75・上 220〜下 440、右の辺 x 243 は 110 上がる（絵 arena_shell.png で測った）。skewY で板の傾きに合わせて表を描く
+ */
+export const HALL_BOARD = { x: 94, y: 275, w: 210, h: 275, skewDeg: -33.2 } as const;
 /**
  * 大会会場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥に観客席、中央の円形の段に対戦台、右手前に受付。
  * 受付のセリアはカウンターの奥（話しかけるのはカウンターの左から）。左の壁の大きな紺の板は空（大会の総当たり表を描く予定。位置は HALL_ART.items.BOARD）
@@ -410,6 +422,8 @@ const HALL_ART = ROOMS4_ART.arena;
 export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HALL_ART, [
   interactAt('hall-desk', itemOf(HALL_ART, 'RECEPTION'), '受付カウンター', 'tournamentDesk'),
   interactAt('hall-table', itemOf(HALL_ART, 'TABLE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
+  // 左の壁の紺の板：いま出ている（または最後に出た）総当たりの大会の表を小さく描き（worldScreen.ts）、調べると対戦表の画面
+  interactAt('hall-board', itemOf(HALL_ART, 'BOARD_TOUCH'), '対戦表', 'leagueBoard'),
   interactAt('hall-seats-l', itemOf(HALL_ART, 'SEATS_L'), '客席', 'message', '観客席。'),
   interactAt('hall-seats-r', itemOf(HALL_ART, 'SEATS_R'), '客席', 'message', '観客席。'),
   spotNpc('hall-receptionist', HALL_ART, 'RECEPTIONIST_SPOT', ROOMS4_DRAW_OFFSET.arena.RECEPTIONIST_SPOT, 'receptionist', 'tournamentDesk'),

@@ -40,7 +40,8 @@ describe('大会', () => {
     expect(claim.status).toBe('ok');
     if (claim.status !== 'ok') return;
     expect(claim.summary.firstWin).toBe(true);
-    expect(claim.save.unlockedPacks).toContain('pack-02');
+    // 2026-10-28 夜：仮パックの解放は景品から外した
+    expect(claim.save.unlockedPacks).not.toContain('pack-02');
     expect(claim.save.rank).toBe('D');
     expect(claim.save.coins).toBe(start.coins + (T_E?.rewards.participationCoins ?? 0) + (T_E?.rewards.firstWin.coins ?? 0));
     expect(claim.save.activeTournament).toBeNull();

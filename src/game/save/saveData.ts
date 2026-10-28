@@ -25,7 +25,7 @@ import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER } from '../../data/soramo.ts';
 import type { IntroState } from '../../data/storyScenes.ts';
 import { isIntroState, recoverIntro } from '../story/intro.ts';
 import { EMPTY_PEOPLE_BOOK, normalizePeopleBook, ownedCardIds, rescuePeopleBook, type PeopleBook } from '../people/peopleBook.ts';
-import { LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
+import { grantPendingBooster, LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
 import type { StarterDeckKey } from '../../data/introV2.ts';
 
 /**
@@ -35,7 +35,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 20;
+export const SAVE_VERSION = 21;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -183,6 +183,8 @@ export interface SaveData {
   readonly unlockedPacks: readonly string[];
   readonly tournaments: Readonly<Record<string, TournamentRecord>>;
   readonly activeTournament: ActiveTournament | null;
+  /** 最後に出た総当たり（E・D）の大会の表（大会会場の壁の板に描く。2026-10-28 夜。version 21） */
+  readonly lastLeague: ActiveTournament | null;
   /** 景品を受け取り済みの大会参加ID（二重受け取り防止） */
   readonly claimedEntries: readonly string[];
   readonly dungeons: Readonly<Record<string, DungeonRecord>>;
@@ -250,6 +252,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     unlockedPacks: PACKS.filter((p) => p.unlockedFromStart).map((p) => p.id),
     tournaments: {},
     activeTournament: null,
+    lastLeague: null,
     claimedEntries: [],
     dungeons: {},
     activeDungeon: null,
@@ -269,6 +272,16 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     cardsSeen: ownedCardIds(createStarterCollection(deck)),
     story: { intro: 'completed', introV2: newIntroV2(starter) },
   };
+}
+
+/**
+ * ゲームで「最初から」を選んだときのセーブ（2026-10-28 ユーザー決定）：カードを1枚も持たず、デッキも空。
+ * カードは管理局で受け取るブースターの箱（＝初期配布。そのままデッキになる）から。試験は先生が貸すデッキで戦う。
+ * createNewSave（テストや前の形式の読み込みの土台）はこれまでどおり
+ */
+export function createNewGameSave(now: Date = new Date()): SaveData {
+  const base = createNewSave(now, null);
+  return { ...base, collection: {}, deck: { monsters: [], skills: [] }, cardsSeen: [] };
 }
 
 /* ---------- 形式の変換（マイグレーション） ---------- */
@@ -580,6 +593,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   17: migrateTournamentV18,
   18: migrateDungeonsV19,
   19: migrateTown2026V20,
+  20: (raw) => ({ ...raw, lastLeague: null }),
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -784,7 +798,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
   const startPacks = PACKS.filter((p) => p.unlockedFromStart).map((p) => p.id);
   const tournaments = normalizeTournaments(migrated.tournaments);
   const itemIds = (v: unknown): ItemId[] => unique(asStringArray(v)).filter(isItemId);
-  return {
+  const normalized: SaveData = {
     version: SAVE_VERSION,
     createdAt: asString(migrated.createdAt, base.createdAt),
     updatedAt: asString(migrated.updatedAt, base.updatedAt),
@@ -799,6 +813,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     ]),
     tournaments,
     activeTournament: normalizeActiveTournament(migrated.activeTournament, asStringArray(migrated.storyFlags).includes(FLAG_SIENNA_LEFT)),
+    lastLeague: normalizeActiveTournament(migrated.lastLeague, asStringArray(migrated.storyFlags).includes(FLAG_SIENNA_LEFT)),
     claimedEntries: unique(asStringArray(migrated.claimedEntries)),
     dungeons: normalizeDungeons(migrated.dungeons),
     activeDungeon: normalizeActiveDungeon(migrated.activeDungeon),
@@ -822,6 +837,8 @@ export function normalizeSave(raw: unknown): SaveData | null {
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
     story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };
+  // 中身が決まる前に管理局で箱を選んだセーブには、中身を1回だけ配る（2026-10-28）
+  return grantPendingBooster(normalized);
 }
 
 /* ---------- よく使う変更 ---------- */

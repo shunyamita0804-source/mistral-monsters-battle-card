@@ -14,9 +14,6 @@ import heroMale from '@assets/images/characters/face_hero_male.webp';
 import heroFemale from '@assets/images/characters/face_hero_female.webp';
 import leagueGrid from '@assets/images/ui/tournament/league_grid.webp';
 import leagueFaceFrame from '@assets/images/ui/tournament/league_face_frame.webp';
-import leagueWin from '@assets/images/ui/tournament/league_win.webp';
-import leagueLose from '@assets/images/ui/tournament/league_lose.webp';
-import leagueSelf from '@assets/images/ui/tournament/league_self.webp';
 import leagueNext from '@assets/images/ui/tournament/league_next.webp';
 import leagueRow from '@assets/images/ui/tournament/league_row.webp';
 import cardNormal from '@assets/images/ui/tournament/bracket_card.webp';
@@ -120,7 +117,29 @@ function place(el: HTMLElement, col: number, row: number, colSpan = 1): HTMLElem
 }
 
 /**
- * 本編の総当たり表の4人版：左の列と上の行に顔と名前、自分どうしは斜線、終わった試合は勝ち（金の輪）・負け（えんじの交差線）、
+ * 勝ち・負け・自分どうしの印（2026-10-28 夜 ユーザー決定：コードで描く ○ と ×）：勝ち＝青い○、負け＝赤い×、自分どうし＝斜線1本
+ */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function leagueMark(kind: 'win' | 'lose' | 'self'): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('class', `league__svg league__svg--${kind}`);
+  svg.setAttribute('aria-hidden', 'true');
+  const add = (tag: string, attrs: Record<string, string>): void => {
+    const el = document.createElementNS(SVG_NS, tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    svg.append(el);
+  };
+  if (kind === 'win') add('circle', { cx: '50', cy: '50', r: '30', fill: 'none', stroke: '#2f7bff', 'stroke-width': '11' });
+  else if (kind === 'lose') {
+    add('line', { x1: '24', y1: '24', x2: '76', y2: '76', stroke: '#e0352b', 'stroke-width': '11', 'stroke-linecap': 'round' });
+    add('line', { x1: '76', y1: '24', x2: '24', y2: '76', stroke: '#e0352b', 'stroke-width': '11', 'stroke-linecap': 'round' });
+  } else add('line', { x1: '8', y1: '92', x2: '92', y2: '8', stroke: '#8a7a55', 'stroke-width': '4', 'stroke-linecap': 'round' });
+  return svg;
+}
+
+/**
+ * 本編の総当たり表の4人版：左の列と上の行に顔と名前、自分どうしは斜線1本、終わった試合は勝ち（青い○）・負け（赤い×）、
  * 次の相手のマスを光る枠で囲む。自分の行はうすい帯
  */
 export function leagueTable(tour: TournamentDefinition, active: ActiveTournament, gender: Gender | null): HTMLElement {
@@ -147,13 +166,13 @@ export function leagueTable(tour: TournamentDefinition, active: ActiveTournament
   e.forEach((rowId, i) => {
     e.forEach((colId, j) => {
       const cell = place(h('div', { class: 'league__cell', dataset: { row: rowId, col: colId } }), j + 1, i + 1);
-      if (i === j) cell.append(img(leagueSelf, 'league__self'));
+      if (i === j) cell.append(leagueMark('self'));
       else {
         const m = leagueMatch(active, rowId, colId);
         if (m) {
           const won = m.winner === rowId;
           cell.classList.add(won ? 'is-win' : 'is-lose');
-          cell.append(img(won ? leagueWin : leagueLose, 'league__mark'));
+          cell.append(leagueMark(won ? 'win' : 'lose'));
         } else if (next && ((rowId === PLAYER_ENTRANT && colId === next) || (colId === PLAYER_ENTRANT && rowId === next))) {
           cell.classList.add('is-next');
           cell.append(img(leagueNext, 'league__next'));

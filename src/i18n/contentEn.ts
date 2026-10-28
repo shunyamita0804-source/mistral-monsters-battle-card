@@ -219,7 +219,6 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:lab-projector:label': 'Record Projector',
   'object:lab-projector:message': 'A panel of light shows records of old battles.',
   'object:lab-analysis:label': 'Analysis Table',
-  'object:lab-analysis:message': 'There is a large lens for examining cards.',
   'object:lab-exit:label': 'Outside',
   'object:house-a-shelf:label': 'Shelf',
   'object:house-a-shelf:message': 'Dishes are neatly lined up.',
@@ -253,6 +252,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:shop-exit:label': 'Outside',
   // 大会会場
   'object:hall-desk:label': 'Reception desk',
+  'object:hall-board:label': 'Match Board',
   'object:hall-table:label': 'Battle table',
   'object:hall-table:message': 'The battle table in the middle of the indoor hall. Tournament matches are played here.',
   'object:hall-seats-l:label': 'Seats',

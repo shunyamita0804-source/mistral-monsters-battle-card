@@ -208,7 +208,8 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
       participationCoins: 20,
       firstWin: {
         coins: 300,
-        unlockPacks: ['pack-02'],
+        // 2026-10-28 夜：販売機の仮パック（第2弾）は外したので、パックの解放は景品にしない
+        unlockPacks: [],
         rankUp: 'D',
         cards: [{ cardId: monsterId('e'), count: 1 }, { cardId: skillId('e', 1), count: 2 }],
         unlockItems: ['ruinsMap', 'luckyCoin'],
@@ -231,7 +232,7 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     ],
     rewards: {
       participationCoins: 30,
-      firstWin: { coins: 400, unlockPacks: ['pack-03'], rankUp: 'C', cards: [], unlockItems: ['sealBox', 'guardianCharm'] },
+      firstWin: { coins: 400, unlockPacks: [], rankUp: 'C', cards: [], unlockItems: ['sealBox', 'guardianCharm'] },
       repeatWin: { coins: 200 },
     },
     isPlaceholder: true,

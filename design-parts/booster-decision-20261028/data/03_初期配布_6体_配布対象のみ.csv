@@ -1,0 +1,51 @@
+﻿monster,skill_no,name,category,mana,damage,effect,initial_copies,source
+ソラモ,02,連続ひっかき,ちから,1,1,なし,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,03,たいあたり,ちから,2,2,なし,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,04,しっぽアタック,ちから,3,3,なし,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,07,スターダストレイ,かしこさ,4,4,なし,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,09,すなかけ,特殊,2,,相手は次の攻撃を行えなくなる,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,10,吠える,特殊,2,,相手の手札からランダムに1枚を捨てさせる,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,11,まるまる,防御,1,,相手のちから技によるダメージを3軽減する,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ソラモ,13,ひらりジャンプ,回避,2,,消費マナ2以上の相手のちから技・かしこさ技を回避する,2,GitHub official/soramo14_artv2_skills_OFFICIAL_20261026.csv
+ガウル,01,つつく,ちから,1,1,なし,3,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,02,連続つつき,ちから,2,2,なし,2,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,03,かぎ爪,ちから,3,3,なし,1,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,06,火の粉,かしこさ,2,2,なし,3,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,07,ファイアボール,かしこさ,3,3,なし,2,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,10,威嚇,特殊,2,,相手モンスター1体は、次の攻撃を行えない。,2,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,11,翼の盾,防御,2,,相手のちから技のダメージを3軽減する。,1,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,12,炎の壁,防御,2,,相手のちから技・かしこさ技のダメージを3軽減する。,1,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ガウル,13,上に飛ぶ,回避,2,,消費マナ2以上のちから技・かしこさ技を回避する。,1,GitHub official/gaul14_skills_OFFICIAL_20261026.csv + src/data/gauul.ts INITIAL_COPIES
+ラズック,01,ひっかき,ちから,0,1,なし,3,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,02,かみつき,ちから,1,1,なし,3,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,05,しっぷうタックル,ちから,4,4,なし,3,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,08,ちょうはつ,特殊,2,,指定した相手モンスターは次のターン、ラズックにしか攻撃できない。,2,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,09,ダストキック,特殊,0,,指定した相手の次のターンのちから技ダメージ−1。,2,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,11,しっぽいなし,防御,2,,相手のちから技から受けるダメージを3軽減する。,1,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,12,シャドウガード,防御,2,,相手のかしこさ技から受けるダメージを3軽減する。,1,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ラズック,13,シャドウスリップ,回避,2,,相手の消費マナ2以上のちから技・かしこさ技を回避する。,1,GitHub official/lazuck14_skills_OFFICIAL_20261026.json
+ノビトン,01,はなビンタ,ちから,1,1,なし,3,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,02,ずつき,ちから,2,2,なし,3,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,03,まきつく,ちから,3,2,相手は次のターン行動不可,1,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,05,くしゃみ,かしこさ,3,1,相手のマナを1減らす,3,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,08,考える,特殊,2,,手札をすべて交換,2,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,10,鼻でまもる,防御,1,,ちから技のダメージを2軽減,2,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ノビトン,13,横によける,回避,2,,ちから技を回避,2,GitHub official/nobiton14_skills_OFFICIAL_20261026.csv + src/data/nobiton.ts INITIAL_COPIES
+ミュロル,01,たいあたり,ちから,1,1,なし,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,02,しっぽたたき,ちから,2,2,なし,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,03,連続ひっかき,ちから,3,3,なし,1,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,05,みずでっぽう,かしこさ,1,1,なし,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,06,バブルショット,かしこさ,2,2,なし,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,07,アクアボール,かしこさ,3,3,なし,1,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,08,しめったはだ,特殊,2,,発動ターンを含む2ターン、受けるちから技のダメージを1軽減。重複不可,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,12,スリップガード,防御,2,,相手のちから技・かしこさ技（攻撃カードの消費マナ3以上）のダメージを4軽減,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+ミュロル,13,ひらりよける,回避,2,,相手のちから技を回避,2,Myurol_ArtV2_14Skills_BattleCard_Claude_FinalPack_20261027.zip/01_正式技一覧と初期配布_UTF8.csv
+カルシェル,01,はさむ,ちから,1,1,なし,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,02,シェルタックル,ちから,2,2,なし,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,03,クラッシュクロー,ちから,4,3,なし,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,06,あわだま,かしこさ,2,2,なし,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,07,アクアバースト,かしこさ,3,3,なし,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,09,いかくのハサミ,特殊,2,,指定した相手モンスター1体は次のターン攻撃技を使えない,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,10,すなをほる,特殊,2,,次のターン攻撃対象にならない,2,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,11,からにこもる,防御,1,,ちから技のダメージを3軽減,1,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv
+カルシェル,12,あわのまく,防御,1,,かしこさ技のダメージを3軽減,1,Kalshell_MasterPack…/03_DATA/01_正式技一覧_UTF8.csv + 02_初期配布16枚_UTF8.csv

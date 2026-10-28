@@ -10,15 +10,15 @@ import type { NpcObject } from '../src/data/maps.ts';
 const D = 450;
 
 describe('ブースターパック3種（2026-10-27 正式の箱）', () => {
-  it('左から 旅立ちのきらめき・烈火の猛攻・蒼海の守り。種類と箱のモンスターは指示書のとおり。中身・値段は未定', () => {
+  it('左から 旅立ちのきらめき・烈火の猛攻・蒼海の守り。種類と箱のモンスターは指示書のとおり。値段は 1,500G', () => {
     expect(BOOSTERS.map((b) => [b.key, b.name, b.art, b.category])).toEqual([
       ['booster-1', '旅立ちのきらめき', 'booster_tabidachi', 'balance'],
       ['booster-2', '烈火の猛攻', 'booster_rekka', 'attack'],
       ['booster-3', '蒼海の守り', 'booster_soukai', 'defense'],
     ]);
     expect(BOOSTERS.map((b) => b.monsters)).toEqual(STARTER_DECKS.map((d) => d.monsters));
-    expect(BOOSTERS.every((b) => b.cards === null)).toBe(true);
-    expect(BOOSTER_SHOP_PRICE).toBeNull();
+    // 2026-10-28 ユーザー決定：1箱 1,500G
+    expect(BOOSTER_SHOP_PRICE).toBe(1500);
   });
 });
 

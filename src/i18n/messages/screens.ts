@@ -175,8 +175,8 @@ export const SCREENS = {
   'cardList.title': { ja: 'カード一覧', en: 'Card List' },
   'cardList.heading': { ja: 'カードを見る', en: 'View Cards' },
   'cardList.note': {
-    ja: '解放済みのパックに収録されているカードです。タップで拡大・詳細。',
-    en: 'Cards in the packs you have unlocked. Tap for details.',
+    ja: '販売機のガチャ（6つのパック）で出るカードです。タップで拡大・詳細。',
+    en: 'Cards from the gacha machine (6 packs). Tap for details.',
   },
 
   // デッキ編集
@@ -288,8 +288,8 @@ export const SCREENS = {
   'shop.restoreSuccess': { ja: '復元成功！', en: 'Restored!' },
   'shop.restoreGot': { ja: '{name} のカードを1枚手に入れた。', en: 'You got 1 {name} card.' },
   'shop.restoreNote': {
-    ja: '正式な名称・画像・能力は未確定です。技カードは第3弾パックから入手できます。',
-    en: 'Its official name, art and abilities are not decided yet. Its skill cards come from the Set 3 Pack.',
+    ja: '正式な名称・画像・能力は未確定です。',
+    en: 'Its official name, art and abilities are not decided yet.',
   },
 
   // ガチャ
