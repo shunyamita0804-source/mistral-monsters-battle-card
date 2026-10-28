@@ -149,6 +149,127 @@ export function findPathWhere(
   return null;
 }
 
+/** 道の真ん中を好む経路：端からこのマス数より近いと遠回りに数える（findPathCentered） */
+const CENTER_CAP = 4;
+const CENTER_WEIGHT = 0.8;
+/** 道の外（草 ','）のマスの遠回りの重さ。案内は草地を横切らず、石畳の道を通る */
+const OFFROAD_WEIGHT = 6;
+const wallDistCache = new WeakMap<MapDefinition, Uint8Array>();
+
+/** 歩けるマスごとの、いちばん近い歩けないマス（地図の地形だけ）までの歩数（4方向。CENTER_CAP まで） */
+function wallDistance(map: MapDefinition): Uint8Array {
+  const cached = wallDistCache.get(map);
+  if (cached) return cached;
+  const { width, height } = mapSize(map);
+  const dist = new Uint8Array(width * height).fill(CENTER_CAP);
+  const queue: number[] = [];
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++)
+      if (isSolidTile(tileAt(map, x, y))) {
+        dist[y * width + x] = 0;
+        queue.push(y * width + x);
+      }
+  for (let head = 0; head < queue.length; head++) {
+    const k = queue[head] as number;
+    const d = (dist[k] as number) + 1;
+    if (d >= CENTER_CAP) continue;
+    const x = k % width;
+    const y = (k - x) / width;
+    for (const s of STEPS_4) {
+      const nx = x + s.x;
+      const ny = y + s.y;
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+      const nk = ny * width + nx;
+      if ((dist[nk] as number) > d) {
+        dist[nk] = d;
+        queue.push(nk);
+      }
+    }
+  }
+  wallDistCache.set(map, dist);
+  return dist;
+}
+
+/**
+ * isGoal までの経路で、道の真ん中を通るもの（2026-10-28 点検：ユーザー「チュートリアルで練習所に行くとき道の真ん中を歩かせたい」）。
+ * 道の端（歩けないマスの近く）のマスと草地は遠回りに数えるので、少し長くても石畳の道の真ん中を通る。案内で連れて歩くときに使う
+ */
+export function findPathCentered(
+  map: MapDefinition,
+  start: Point,
+  isGoal: (x: number, y: number) => boolean,
+  blocked: (x: number, y: number) => boolean,
+  steps: readonly Point[] = STEPS_4,
+  maxNodes = 120000,
+): Point[] | null {
+  if (isGoal(start.x, start.y)) return [];
+  const { width, height } = mapSize(map);
+  const wall = wallDistance(map);
+  const startKey = start.y * width + start.x;
+  const cost = new Float64Array(width * height).fill(Infinity);
+  const prev = new Int32Array(width * height).fill(-1);
+  cost[startKey] = 0;
+  // 小さい順に取り出すヒープ（[コスト, マス]）
+  const heap: [number, number][] = [[0, startKey]];
+  const push = (item: [number, number]): void => {
+    heap.push(item);
+    let i = heap.length - 1;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if ((heap[p] as [number, number])[0] <= item[0]) break;
+      heap[i] = heap[p] as [number, number];
+      i = p;
+    }
+    heap[i] = item;
+  };
+  const pop = (): [number, number] => {
+    const top = heap[0] as [number, number];
+    const last = heap.pop() as [number, number];
+    if (heap.length > 0) {
+      let i = 0;
+      for (;;) {
+        const l = i * 2 + 1;
+        const r = l + 1;
+        let m = i;
+        if (l < heap.length && (heap[l] as [number, number])[0] < (m === i ? last[0] : (heap[m] as [number, number])[0])) m = l;
+        if (r < heap.length && (heap[r] as [number, number])[0] < (m === i ? last[0] : (heap[m] as [number, number])[0])) m = r;
+        if (m === i) break;
+        heap[i] = heap[m] as [number, number];
+        i = m;
+      }
+      heap[i] = last;
+    }
+    return top;
+  };
+  let visited = 0;
+  while (heap.length > 0 && visited < maxNodes) {
+    const [c, k] = pop();
+    if (c > (cost[k] as number)) continue;
+    visited += 1;
+    const x = k % width;
+    const y = (k - x) / width;
+    if (k !== startKey && isGoal(x, y)) {
+      const path: Point[] = [];
+      for (let p = k; p !== startKey; p = prev[p] as number) path.unshift({ x: p % width, y: Math.floor(p / width) });
+      return path;
+    }
+    for (const d of steps) {
+      const nx = x + d.x;
+      const ny = y + d.y;
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height || !canStep({ x, y }, d.x, d.y, blocked)) continue;
+      const nk = ny * width + nx;
+      const offroad = tileAt(map, nx, ny) === ',' ? OFFROAD_WEIGHT : 0;
+      const nc = c + Math.hypot(d.x, d.y) + CENTER_WEIGHT * (CENTER_CAP - (wall[nk] as number)) + offroad;
+      if (nc < (cost[nk] as number)) {
+        cost[nk] = nc;
+        prev[nk] = k;
+        push([nc, nk]);
+      }
+    }
+  }
+  return null;
+}
+
 /**
  * goal までの経路（start を含まない）。
  * goal が通れないマス（家具・敵など）のときは、その隣まで行く経路を返す。見つからなければ null。

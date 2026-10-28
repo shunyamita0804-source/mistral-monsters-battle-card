@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { FRAGMENTS } from '../src/data/fragments.ts';
-import { DUNGEON_B1, getMap, HOME, MAPS, TOWN, type MapDefinition, type MapObject } from '../src/data/maps.ts';
+import { DUNGEON_B1, getMap, HOME, MAPS, TOWN, townDoorFront, type MapDefinition, type MapObject } from '../src/data/maps.ts';
 import { DEFAULT_LOCATION, NEW_GAME_LOCATION } from '../src/game/save/saveData.ts';
-import { adjacentCellOf, canStep, findPath, findPathToObject, isBlocked, objectsAt, type Point } from '../src/game/world/world.ts';
+import { adjacentCellOf, canStep, findPath, findPathCentered, findPathToObject, findPathWhere, isBlocked, objectsAt, STEPS_4, type Point } from '../src/game/world/world.ts';
 
 const blockedIn = (map: MapDefinition) => (x: number, y: number) => isBlocked(map, x, y, () => true);
 const warps = (map: MapDefinition) => map.objects.filter((o): o is Extract<MapObject, { type: 'warp' }> => o.type === 'warp');
@@ -138,5 +138,30 @@ describe('街のダンジョン入口', () => {
   it('入口の手前（戻ってくる位置）は歩けるマス', () => {
     if (!gate || gate.type !== 'warp') throw new Error('gate');
     for (let x = gate.x; x < gate.x + gate.w; x += 1) expect(isBlocked(TOWN, x, gate.y - 1, () => true)).toBe(false);
+  });
+});
+
+describe('案内で連れて歩く道（2026-10-28 点検）', () => {
+  it('街の案内（主人公の家の前 → 練習場）は、最短の道より道の真ん中を通る', () => {
+    const blocked = blockedIn(TOWN);
+    const door = warps(TOWN).find((w) => w.id === 'door-practice');
+    if (!door) throw new Error('door-practice');
+    const inDoor = (x: number, y: number): boolean => x >= door.x && x < door.x + door.w && y === door.y;
+    const front = townDoorFront('PLAYER_HOME');
+    const start = { x: front.x, y: front.y };
+    const centered = findPathCentered(TOWN, start, inDoor, blocked);
+    const shortest = findPathWhere(TOWN, start, inDoor, blocked, 60000, STEPS_4);
+    if (!centered || !shortest) throw new Error('path');
+    expectValidPath(TOWN, start, centered);
+    // 道の端（となりのマスが歩けない）を通るマスの割合が、最短の道より少ない
+    const edge = (p: Point): boolean => STEPS_4.some((d) => blocked(p.x + d.x, p.y + d.y));
+    const ratio = (path: readonly Point[]): number => path.filter(edge).length / path.length;
+    expect(ratio(centered)).toBeLessThan(ratio(shortest));
+    expect(ratio(centered)).toBeLessThan(0.25);
+    // 草地を横切らない（石畳の道を通る）
+    const grass = centered.filter((p) => TOWN.tiles[p.y]?.[p.x] === ',').length;
+    expect(grass).toBeLessThanOrEqual(2);
+    // 遠回りしすぎない
+    expect(centered.length).toBeLessThan(shortest.length * 2);
   });
 });

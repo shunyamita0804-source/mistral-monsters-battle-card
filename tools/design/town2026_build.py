@@ -16,6 +16,7 @@ tools/design/seimon_world_build.py の main() から呼ばれる（部屋はい�
 """
 from __future__ import annotations
 
+import math
 import os
 import random
 
@@ -140,6 +141,7 @@ STREETS = [
     (900, 5930, 2944, 6170),      # 主人公の家・となりの家の前（主人公の家の扉の前で終わる）
     (2420, 1330, 3980, 1560),     # 大会会場の前（高台の上。建物の幅だけ）
     (1050, 1560, 1960, 1760),     # 研究所の扉の前 → 西の高台の階段（高台の上）
+    (1535, 4990, 1695, 5930),     # 木の橋 → 主人公の家・となりの家の前の道（2026-10-28 点検。橋の先の行き止まりをなくす）
 ]
 # 扉の前の小道：扉の敷居から下の道まで（幅。BUILDINGS の扉の真ん中に合わせる）
 DOOR_PATH_W = 200
@@ -155,7 +157,11 @@ BRIDGE_STONE = dict(cx=3200, s=1.1)       # 石の橋：アーチの下の端を
 # そこから南は道（tile_street）がデッキにそのままつながる。小川は柱の左右に見える
 BRIDGE_DECK_S = 518
 BRIDGE_PILLARS = (895, 1265)
-BRIDGE_WOOD = dict(cx=1525, top=4600, s=0.85)
+# 木の橋（24）：2026-10-28 点検（ユーザー「斜めだから歩くと違和感」）。部品は上ほど右へずれた斜めの絵なので、
+# 下の端はそのままに上を左へずらしてまっすぐにする（WOOD_DESKEW＝高さ1あたりのずれ。シートの橋板の真ん中は上下で約155px ずれていた）。
+# 渡った先は主人公の家ととなりの家のあいだ。そこから南の道まで小道（STREETS の最後）でつなぐ（前は草地で行き止まりだった）
+BRIDGE_WOOD = dict(cx=1615, top=4600, s=0.85)
+WOOD_DESKEW = 0.32
 # 噴水（13）：水の輪の中心・柱（輪の穴より上。水の上に描き直す）・しぶきの下の端（どれもシートの px）
 FOUNTAIN_WATER = (328, 682)
 FOUNTAIN_PILLAR = [(230, 200), (432, 200), (432, 515), (393, 515), (393, 600), (397, 600), (397, 642),
@@ -185,7 +191,8 @@ PROPS = [
     ('hedge', 420, 6440), ('bush_big', 640, 6430), ('hedge', 900, 6440), ('bush_small', 1150, 6420), ('hedge', 1420, 6440),
     ('bush_big', 1700, 6430), ('hedge', 1980, 6440), ('bush_small', 2250, 6420), ('hedge', 2520, 6440),
     # 主人公の家・となりの家のまわり
-    ('flowerbowl', 1640, 6000), ('bush_small', 380, 5800), ('planter', 2700, 5880), ('lamp', 2860, 5900),
+    # 2026-10-28 点検：(1640, 6000) の植木鉢は、木の橋からの小道の出口をふさぐので外した
+    ('bush_small', 380, 5800), ('planter', 2700, 5880), ('lamp', 2860, 5900),
     # 西の高台（★：研究所の前）
     ('flowerbowl', 760, 1640), ('flowerbowl', 1560, 1640), ('lamp', 640, 1580), ('lamp', 1660, 1580),
     ('telescope', 470, 1850),     # 17 見晴らし台
@@ -309,6 +316,22 @@ def stream_mask(size: tuple[int, int], widen: float = 0) -> Image.Image:
     pts = [(P(x), P(y)) for x, y in STREAM]
     d.line(pts, fill=255, width=P(STREAM_W + widen), joint='curve')
     return m
+
+
+def stream_slope(x: float) -> float:
+    """小川の中心線の傾き（x の位置。dy/dx）"""
+    for (x1, y1), (x2, y2) in zip(STREAM, STREAM[1:]):
+        if x1 <= x <= x2:
+            return (y2 - y1) / (x2 - x1)
+    return 0.0
+
+
+def deskew(im: Image.Image, k: float) -> Image.Image:
+    """上ほど右へずれて描かれた絵を、下の端はそのままに上を左へずらしてまっすぐにする（行ごとに k×(下からの高さ) だけ）"""
+    w, h = im.size
+    pad = int(k * h) + 2
+    out = im.transform((w + pad, h), Image.AFFINE, (1, -k, 0, 0, 1, 0), resample=Image.BICUBIC)
+    return out.crop(out.getchannel('A').getbbox())
 
 
 def stream_y(x: float) -> float:
@@ -607,12 +630,30 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     bank = resize(bank, 0.34 * K)
     cap = bank.crop((0, 0, bank.width, round(bank.height * 0.42)))
     step = bank.width - P(14)
+    flat = 0.12
+    covered: list[tuple[int, int]] = []
     for x in range(-P(40), size[0], step):
         ux = (x + bank.width / 2) / K
+        # 2026-10-28 点検（ユーザー「橋の横に残骸」）：小川が斜めの所に横長の石を置くと、水の上に石垣のかけらが浮いて見えた。
+        # 横長の石は、石の幅の全体で小川がほぼ水平な所だけ。斜めの所は下で細い石を細かく並べる
+        if max(abs(stream_slope(x / K)), abs(stream_slope((x + bank.width) / K))) > flat:
+            continue
         cy = stream_y(ux)
         # 北の岸：石の壁の面（水の上に見える）。南の岸：石のふちだけ
         base.alpha_composite(bank, (x, P(cy - STREAM_W / 2) - P(14)))
         base.alpha_composite(cap, (x, P(cy + STREAM_W / 2) - cap.height + P(10)))
+        covered.append((x, x + step))
+    # 斜めの所：岸の石を細く切って細かく並べ、斜めの岸に沿わせる。水の帯の上下の端は、傾きのぶん中心線から遠い（半分の幅 × √(1+傾き²)）
+    nb = bank.crop((0, 0, P(44), bank.height))
+    nc = cap.crop((0, 0, P(44), cap.height))
+    for x in range(-P(40), size[0], P(12)):
+        if any(a <= x + nb.width // 2 < b for a, b in covered):
+            continue
+        ux = (x + nb.width / 2) / K
+        cy = stream_y(ux)
+        half = STREAM_W / 2 * math.hypot(1, stream_slope(ux))
+        base.alpha_composite(nb, (x, P(cy - half) - P(14)))
+        base.alpha_composite(nc, (x, P(cy + half) - nc.height + P(10)))
     pads = [cut('stream_parts', b) for b in [(910, 736, 1151, 939), (1174, 778, 1358, 930), (1385, 811, 1518, 922)]]
     for ux in (700, 1150, 2250, 3900, 4700, 5300, 5900):
         im = resize(rng.choice(pads), 0.4 * K)
@@ -640,14 +681,14 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     t.block_rect(BRIDGE_STONE['cx'] - 150, by, BRIDGE_STONE['cx'] + 150, deck_bot + 40, False)
     t.paved[np.ix_((ys >= deck_top) & (ys < deck_bot), (xs >= BRIDGE_STONE['cx'] - 150) & (xs < BRIDGE_STONE['cx'] + 150))] = True
     t.extra['bridge_stone'] = (bx, by, deck_top, deck_bot)
-    wb = cut('bridges', (42, 379, 572, 951))
+    wb = deskew(cut('bridges', (42, 379, 572, 951)), WOOD_DESKEW)
     s = BRIDGE_WOOD['s']
     wim = resize(wb, s * K)
     wx, wy = BRIDGE_WOOD['cx'] - wb.width * s / 2, BRIDGE_WOOD['top']
     soft_shadow(base, wim, (P(wx), P(wy)), 14, 8, 8, 60)
     base.alpha_composite(wim, (P(wx), P(wy)))
     t.block_rect(wx, wy + 40, wx + wb.width * s, wy + wb.height * s)
-    t.block_rect(BRIDGE_WOOD['cx'] - 64, wy, BRIDGE_WOOD['cx'] + 96, wy + wb.height * s + 30, False)
+    t.block_rect(BRIDGE_WOOD['cx'] - 64, wy, BRIDGE_WOOD['cx'] + 64, wy + wb.height * s + 30, False)
 
     # ── 高台（1・3 の段）：石の壁（terrace_parts）と階段 ──
     wall = cut('terrace_parts', (40, 39, 630, 353))

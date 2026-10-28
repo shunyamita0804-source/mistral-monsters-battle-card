@@ -26,6 +26,7 @@ import {
   adjacentCellOf,
   canStep,
   DIR_DELTA,
+  findPathCentered,
   findPathWhere,
   isBlocked,
   isNearNpc,
@@ -2009,8 +2010,9 @@ export class WorldView {
   }
 
   /** 上下左右だけの道（from を含まない） */
+  /** 案内で連れて歩く道（4方向。道の真ん中を通る。2026-10-28 点検） */
   #path4(from: Point, isGoal: (x: number, y: number) => boolean): Point[] | null {
-    return findPathWhere(this.#map, from, isGoal, this.#blocked, 60000, STEPS_4);
+    return findPathCentered(this.#map, from, isGoal, this.#blocked, STEPS_4) ?? findPathWhere(this.#map, from, isGoal, this.#blocked, 60000, STEPS_4);
   }
 
   /**
