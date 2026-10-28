@@ -19,14 +19,14 @@ export function hasBattleCard(monsterId: string): boolean {
 
 /**
  * バトル用カード（2026-10-25）：共通の背景 → モンスター → モンスターの色の枠 → 名前とライフ（文字はゲームが描く。画像に焼き込まない）。
- * life を渡すと「いま／最大」で出す
+ * life を渡すと対戦の場の形（右上のライフの札は出さない。読み上げだけ「いま／最大」）
  */
 export function createBattleMonsterCard(monster: MonsterCard, width: number, life?: { current: number; max: number }): HTMLElement {
   const spec = battleCardOf(monster.id);
   const artUrl = spec ? resolveCardArt({ category: 'monsterCards', file: spec.art, layout: 'full' }) : undefined;
   const frameUrl = spec ? FRAME_URLS[`/assets/images/ui/battlecard/frame_${spec.frame}.png`] : undefined;
   const name = cardName(monster);
-  const lifeText = life ? `${life.current}/${life.max}` : String(monster.life);
+  const lifeText = String(monster.life);
   const card = h(
     'div',
     {
@@ -36,7 +36,8 @@ export function createBattleMonsterCard(monster: MonsterCard, width: number, lif
     h('img', { class: 'battle-card__bg', attrs: { src: backgroundUrl, alt: '', draggable: 'false' } }),
     artUrl ? h('img', { class: 'battle-card__art', attrs: { src: artUrl, alt: '', draggable: 'false' } }) : null,
     frameUrl ? h('img', { class: 'battle-card__frame', attrs: { src: frameUrl, alt: '', draggable: 'false' } }) : null,
-    h('span', { class: 'battle-card__life' }, h('span', { class: 'battle-card__life-label', text: 'LIFE' }), h('b', { class: 'battle-card__life-value', text: lifeText })),
+    // 対戦の場（life を渡したとき）は右上のライフの札を出さない（2026-10-29 ユーザー指示。ライフはカードの下の「いま/最大」で見せる）
+    life ? null : h('span', { class: 'battle-card__life' }, h('span', { class: 'battle-card__life-label', text: 'LIFE' }), h('b', { class: 'battle-card__life-value', text: lifeText })),
     h('span', { class: 'battle-card__name', text: name }),
   );
   // 枠の外形で切り抜く（枠の外の角に背景が出ないように）
