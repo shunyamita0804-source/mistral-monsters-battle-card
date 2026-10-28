@@ -1,17 +1,20 @@
-# 引き継ぎメモ（2026-10-28 深夜〜29：セッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-29：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜〜29 のセッション終わり）
+### まず読む：いまの状態（2026-10-29 のセッション終わり）
 
-- **2026-10-29（このセッションの続き）**：おいかぜの直し（`claude/tailwind-fix-20261029`）と、
+- **公開中：`main` の `3f92ad8` 以降**（公開ページで確認済み）。作業ブランチはすべて main に取り込み済み。次の指示を待っている
+- **2026-10-29（このセッションの最後）**：おいかぜの直し（`claude/tailwind-fix-20261029`）と、
   **名前の入力・取得カード画面・ボタンの効果音・手札の上限9枚**（`claude/name-cardlist-uisound-20261029`。`docs/name-cardlist-uisound.md`）を main に取り込んで公開。
   **セーブ version 22**（`player.name`。前のセーブは「続きから」で1回だけ名前の窓）。テスト 714件。報告は Artifact のページ https://claude.ai/artifact/5LjJuRs6vQCabzCPBGCUtB （**返事待ち**）
 - 名前・取得カード・ボタンの音の未完了：iPhone 実機（キーボードが出たときの窓のずれ・変換中の文字・音の大きさ・Safari で灰色のボタンの音）。
   取得カードをダンジョンの勝ち・宝箱・ガチャにつなぐ（部品はできている）
-- **ユーザーは iPhone で作業している。ファイル（ZIP・.md）はダウンロードできない** → 報告書は **Artifact の Web ページ** にしてリンクで渡す
+- 報告書の ZIP もほしいと言われることがある（2026-10-29「作業報告書をジップファイルでください」）→ `downloads/`（git に入れない）に
+  `作業報告書.html`（Artifact と同じ）・`作業報告書.md`・`画面写真/` を入れた ZIP を作り、SendUserFile で渡し、開けないとき用に Artifact のリンクも添える
+- **ユーザーは iPhone で作業している。ファイル（ZIP・.md）はダウンロードできないことがある** → 報告書は **Artifact の Web ページ** にしてリンクで渡す
   （プカリムの報告：https://claude.ai/artifact/JubpTGTyZ6RVs53iQG2DjD 。中身は `docs/report-2026-10-28-pukarim.md` と同じ。元のファイルはリポジトリに入れていない）。
   画面写真も同じページに入れる。ZIP を作る場合も、スクラッチパッドでなく作業フォルダ（`downloads/`。`.git/info/exclude` で git に入れない）に置く
 - 作業の順番の約束：指示どおり作業 → `npm run check` → main に取り込み → 公開 → 公開ページで写真 → 報告（日本語・短く・専門用語なし）。ユーザーは毎回「main に取り込んで公開し、画面写真で報告」を求めている
@@ -26,8 +29,19 @@
 | 手札の大きさ（幅90・小さくせず重ねる）・マナの玉と数字 1.4倍・手札の印（色と光）・技カードの枠を2倍の webp | 合格（「縦が足りない画面だけ80」は作らなくてよい） | `docs/handsize-20261028.md`・`docs/report-2026-10-28-handsize.md` | `handLayout.ts`・`valueFit.ts`・`npm run art:skillframes`・`tests/skillFrames.test.ts` |
 | お金の入る側（ダンジョンの1勝ごと・宝箱の中身・ボス） | 合格（水の神殿の合計が見込みより多めな点は、iPhone での試遊のあとで直すか決める） | `docs/money-income-20261028.md`・`docs/report-2026-10-28-money.md` | `economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`・`run.ts` の `rollChest`・`tests/moneyIncome.test.ts` |
 | 新モンスター「プカリム」の試遊（確認用 ?qa=1 だけ） | 合格（数字は確定。おいかぜだけ直した） | `docs/pukarim.md`・`docs/report-2026-10-28-pukarim.md`・裁定 `docs/battle-rules.md`「プカリム（試遊中）」 | `src/data/pukarim.ts`・`src/game/battle/playtest.ts`・`npm run playtest:pukarim`・`tests/pukarim*.test.ts` |
+| おいかぜを「次の自分のターンだけ＋1」に直した | ユーザー指示どおり | `docs/pukarim.md` 6章 | `tests/pukarim.test.ts` |
+| 名前の入力・取得カード画面・ボタンの効果音・手札の上限9枚 | **報告済み・返事待ち** | `docs/name-cardlist-uisound.md`（名前を出す所の一覧・ボタンと音の対応表・未完了）・写真 `docs/design/name-cardlist-20261028/` | `playerName.ts`・`namePrompt.ts`・`cardListView.ts`・`receivedCards.ts`・`buttonSound.ts`・`tests/playerName.test.ts`・`tests/handLimit.test.ts`・`tools/e2e/name_*.cjs` ほか |
 
 前の報告書の「Claude が決めたこと」（`report-2026-10-28-evening.md` 2章・`report-2026-10-28-cardlook-v3.md` 2章）は「すべてそのままで構わない」とユーザーが回答済み。
+
+#### 名前・取得カード・ボタンの音の仕組み（次に触るとき）
+
+- 名前：`player.name`（null＝まだ。画面は `heroName()` で「あなた」に戻す）。窓は `openNamePrompt`（新規は `newGameScreen`、前のセーブは `titleScreen` の続きから）。
+  大会の表の長い名前（6文字以上）は `tournamentBoards.ts` の `boardName` で小さく2行
+- 取得カード：`openCardList(parent, { cardIds, onClose })`。今つないでいるのは `worldScreen.ts` の `#choosePack` だけ
+- ボタンの音：`app.ts` の `installButtonSound()`。決め方は `buttonSoundKind`（`data-se="tap|decide|cancel|none"` で上書き）。
+  押したボタンの処理でほかの効果音が鳴ったら鳴らさない（`sound.playCount`）。自動の確認は `window.__seLog = []` で鳴った音の名前が取れる
+- 手札の上限：`BATTLE_RULES.maxHand`・`engine.ts` の `drawUpToMax`
 
 #### プカリムの仕組み（次に触るとき）
 
@@ -49,7 +63,8 @@
 
 #### ユーザーの判断待ち・未完了（いま）
 
-- 名前・取得カード・ボタンの音・手札の上限の報告（`docs/name-cardlist-uisound.md`）への返事
+- 名前・取得カード・ボタンの音・手札の上限の報告（`docs/name-cardlist-uisound.md`）への返事。とくに Claude からの質問：
+  台本の台詞・ダンジョンの人の「あなた」・ベッドの冒険の記録の板にも名前を出すか（いまは出していない）
 - 水の神殿を1回まわったときのお金（約 723G。見込み 500〜600G）：iPhone での試遊のあとで直すか決める
 - 前からの判断待ち：【仮】スキップのボタンを消す時期（販売前）・前のセーブの対戦成績・道具の値段と歩数（すべて仮）・すなをほるで隠れたカルシェルを特殊の技で狙えるか・
   図鑑のカードの1枚絵・レアリティと正式英語（`docs/review-2026-10-27-answer.md`）
