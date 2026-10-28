@@ -323,55 +323,135 @@
   }
 }
 
-/* ===== 2026-10-27 指示書「ダンジョン7つ」：新しい5つの仮の見た目（絵が届くまで） ===== */
+/* ===== 2026-10-28 新しいダンジョン5つの正式な絵（原本 design-parts/dungeons5-20261028/、切り出し tools/design/dungeons5_build.py） ===== */
 
-/* 床・壁：太古の遺跡の絵に色を重ねた色違い（--tint。水＝青・氷＝白い水色・火＝赤・機械＝灰色・聖域＝金） */
-.drun--dungeon-03 { --tint: rgb(40 120 190 / 0.32); }
-.drun--dungeon-04 { --tint: rgb(190 225 250 / 0.3); }
-.drun--dungeon-05 { --tint: rgb(210 70 20 / 0.3); }
-.drun--dungeon-06 { --tint: rgb(120 135 150 / 0.4); }
-.drun--dungeon-07 { --tint: rgb(255 228 150 / 0.3); }
+/*
+ * 床・壁の上面・壁の正面・下り階段。床の石の大きさは太古の遺跡（dungeon_floor を 192px で敷く）と同じくらいの見え方に縮める。
+ * 絵の大きさが 4マス（192px）で割り切れないので、敷く位置はマスの位置そのまま（--ax・--ay。dungeonRunScreen.ts）
+ */
+.drun--dungeon-03 {
+  --d5-floor: url('@assets/images/maps/dungeon/water_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/water_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/water_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/water_stairs_down.webp');
+  --d5-floor-size: 134px 134px;
+  --d5-top-size: 128px 134px;
+  --d5-face-size: 104px 48px;
+}
+
+.drun--dungeon-04 {
+  --d5-floor: url('@assets/images/maps/dungeon/ice_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/ice_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/ice_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/ice_stairs_down.webp');
+  --d5-floor-size: 108px 110px;
+  --d5-top-size: 112px 111px;
+  --d5-face-size: 111px 48px;
+}
+
+.drun--dungeon-05 {
+  --d5-floor: url('@assets/images/maps/dungeon/fire_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/fire_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/fire_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/fire_stairs_down.webp');
+  --d5-floor-size: 104px 129px;
+  --d5-top-size: 108px 131px;
+  --d5-face-size: 90px 48px;
+}
+
+.drun--dungeon-06 {
+  --d5-floor: url('@assets/images/maps/dungeon/machine_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/machine_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/machine_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/machine_stairs_down.webp');
+  --d5-floor-size: 135px 137px;
+  --d5-top-size: 130px 137px;
+  --d5-face-size: 101px 48px;
+}
+
+/* 天の聖域：壁の上面は雲（壁の外側が雲の海）、壁の正面は手すり */
+.drun--dungeon-07 {
+  --d5-floor: url('@assets/images/maps/dungeon/holy_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/holy_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/holy_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/holy_stairs_down.webp');
+  --d5-floor-size: 134px 136px;
+  --d5-top-size: 130px 137px;
+  --d5-face-size: 104px 48px;
+}
 
 :is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-seen {
   background:
     linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)),
-    linear-gradient(var(--tint), var(--tint)),
-    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+    var(--d5-floor) var(--ax, 0) var(--ay, 0) / var(--d5-floor-size) repeat;
 }
 
 :is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-lit {
   background:
-    linear-gradient(var(--tint), var(--tint)),
-    url('@assets/images/maps/dungeon/dungeon_floor.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+    linear-gradient(rgb(255 236 200 / 0.08), rgb(255 236 200 / 0.08)),
+    var(--d5-floor) var(--ax, 0) var(--ay, 0) / var(--d5-floor-size) repeat;
 }
 
 :is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-seen {
   background:
     linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
-    linear-gradient(var(--tint), var(--tint)),
-    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+    var(--d5-top) var(--ax, 0) var(--ay, 0) / var(--d5-top-size) repeat;
 }
 
 :is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-lit {
   background:
     linear-gradient(rgb(6 7 10 / 0.5), rgb(6 7 10 / 0.5)),
-    linear-gradient(var(--tint), var(--tint)),
-    url('@assets/images/maps/dungeon/dungeon_wall_top.webp') var(--tx, 0) var(--ty, 0) / 192px 192px repeat;
+    var(--d5-top) var(--ax, 0) var(--ay, 0) / var(--d5-top-size) repeat;
 }
+
+/* 下が床の壁：壁の正面の絵をマスの高さいっぱいに横に並べる */
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--face.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)),
+    var(--d5-face) var(--ax, 0) 100% / var(--d5-face-size) repeat-x;
+}
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--face.is-lit {
+  background: var(--d5-face) var(--ax, 0) 100% / var(--d5-face-size) repeat-x;
+}
+
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--stairs.is-seen::after {
+  background-image: var(--d5-stairs);
+}
+
+/* ボスの間のしるし（遺跡・森と同じ使い方・同じ大きさ） */
+.drun--dungeon-03 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_water.webp'); scale: 1.9; }
+.drun--dungeon-04 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_ice.webp'); scale: 1.9; }
+.drun--dungeon-05 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_fire.webp'); scale: 1.9; }
+.drun--dungeon-06 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_machine.webp'); scale: 1.9; }
+.drun--dungeon-07 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_holy.webp'); scale: 1.9; }
 
 /* 炎の火山：溶岩の明かりで、まわりの暗さを少し弱く */
 .drun--dungeon-05 .drun__light {
   opacity: 0.6;
 }
 
-/* 水路（通れない） */
+/* 水路（通れない）：水のマス＋水と床の境目にふちの石（dungeonRunScreen.ts の drun__tile--edge-n/s/w/e） */
+.drun__tile--water {
+  --edge-n: none;
+  --edge-s: none;
+  --edge-w: none;
+  --edge-e: none;
+}
+
+.drun__tile--edge-n { --edge-n: url('@assets/images/maps/dungeon/water_edge.webp'); }
+.drun__tile--edge-s { --edge-s: url('@assets/images/maps/dungeon/water_edge.webp'); }
+.drun__tile--edge-w { --edge-w: url('@assets/images/maps/dungeon/water_edge_v.webp'); }
+.drun__tile--edge-e { --edge-e: url('@assets/images/maps/dungeon/water_edge_v.webp'); }
+
 .drun__tile--water.is-seen,
 .drun__tile--water.is-lit {
   background:
-    radial-gradient(ellipse at 30% 35%, rgb(200 235 255 / 0.35) 0 12%, transparent 13%),
-    radial-gradient(ellipse at 70% 70%, rgb(200 235 255 / 0.25) 0 10%, transparent 11%),
-    linear-gradient(180deg, rgb(30 90 150), rgb(16 58 108));
-  box-shadow: inset 0 3px 0 rgb(0 0 0 / 0.35);
+    var(--edge-n) 0 0 / 64px 10px repeat-x,
+    var(--edge-s) 0 100% / 64px 10px repeat-x,
+    var(--edge-w) 0 0 / 10px 64px repeat-y,
+    var(--edge-e) 100% 0 / 10px 64px repeat-y,
+    url('@assets/images/maps/dungeon/water_channel.webp') var(--ax, 0) var(--ay, 0) / 96px 96px repeat;
 }
 
 .drun__tile--water.is-seen:not(.is-lit) {
@@ -381,52 +461,107 @@
 /* 氷（すべる） */
 .drun__tile--ice.is-seen,
 .drun__tile--ice.is-lit {
-  background:
-    linear-gradient(135deg, transparent 0 40%, rgb(255 255 255 / 0.55) 41% 44%, transparent 45% 100%),
-    linear-gradient(180deg, rgb(200 236 252 / 0.92), rgb(150 205 235 / 0.92));
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+  background: url('@assets/images/maps/dungeon/ice_slide.webp') var(--ax, 0) var(--ay, 0) / 112px 112px repeat;
 }
 
 .drun__tile--ice.is-seen:not(.is-lit) {
   filter: brightness(0.45);
 }
 
-/* 扉（スイッチで開く）。開いた扉は床と同じで、ふちだけ残る */
+/* 扉（スイッチで開く）：閉じた扉 → スイッチを入れた階では開いた扉。上のマスに少しはみ出して立てる */
+.drun__tile--door {
+  z-index: 1;
+}
+
 .drun__tile--door.is-seen::after,
 .drun__tile--door.is-lit::after {
   content: '';
   position: absolute;
-  inset: 2px;
-  border: 3px solid #8a6a3a;
-  border-radius: 3px;
-  background:
-    repeating-linear-gradient(90deg, rgb(60 66 74) 0 6px, rgb(40 44 50) 6px 8px),
-    linear-gradient(rgb(70 76 84), rgb(46 50 56));
-  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.4);
+  left: 50%;
+  bottom: 0;
+  width: 44px;
+  height: 60px;
+  translate: -50% 0;
+  background: url('@assets/images/maps/dungeon/machine_door_closed.webp') center bottom / contain no-repeat;
 }
 
 .is-doors-open .drun__tile--door.is-seen::after,
 .is-doors-open .drun__tile--door.is-lit::after {
-  background: none;
-  box-shadow: none;
-  opacity: 0.6;
+  background-image: url('@assets/images/maps/dungeon/machine_door_open.webp');
 }
 
 .drun__tile--door.is-seen:not(.is-lit)::after {
   filter: brightness(0.5);
 }
 
-/* スイッチ（調べると扉が開く）：台と取っ手。入れると緑に */
+/* スイッチ（調べると扉が開く）：切 → 入 */
 .drun__entity--switch {
-  background:
-    radial-gradient(circle at 50% 78%, rgb(255 214 90) 0 7px, transparent 8px),
-    linear-gradient(60deg, transparent 0 46%, rgb(200 170 110) 46% 54%, transparent 54% 100%) 50% 30% / 60% 70% no-repeat,
-    radial-gradient(ellipse at 50% 82%, rgb(70 76 84) 0 16px, transparent 17px);
+  background: url('@assets/images/maps/dungeon/machine_switch_off.webp') center 85% / auto 42px no-repeat;
 }
 
 .drun__entity--switch.is-open {
-  background:
-    radial-gradient(circle at 50% 78%, rgb(120 210 120) 0 7px, transparent 8px),
-    linear-gradient(-60deg, transparent 0 46%, rgb(200 170 110) 46% 54%, transparent 54% 100%) 50% 30% / 60% 70% no-repeat,
-    radial-gradient(ellipse at 50% 82%, rgb(70 76 84) 0 16px, transparent 17px);
+  background-image: url('@assets/images/maps/dungeon/machine_switch_on.webp');
 }
+
+/* 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）：炎の火山の溶岩のひび割れ・天の聖域の羽根・燭台・光の筋 */
+.drun__decor {
+  position: absolute;
+  z-index: 1;
+  display: none;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+}
+
+.drun__decor::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: center / contain no-repeat;
+}
+
+.drun__decor.is-seen {
+  display: block;
+  filter: brightness(0.45);
+}
+
+.drun__decor.is-lit {
+  display: block;
+  filter: none;
+}
+
+.drun__decor--crack-1::after { inset: -6px; background-image: url('@assets/images/maps/dungeon/fire_crack_1.webp'); }
+.drun__decor--crack-2::after { inset: -4px; background-image: url('@assets/images/maps/dungeon/fire_crack_2.webp'); }
+.drun__decor--crack-3::after { inset: 3px; background-image: url('@assets/images/maps/dungeon/fire_crack_3.webp'); }
+.drun__decor--crack-4::after { inset: 8px; background-image: url('@assets/images/maps/dungeon/fire_crack_4.webp'); }
+
+.drun__decor--feather-1::after { inset: 12px; background-image: url('@assets/images/maps/dungeon/holy_feather_1.webp'); }
+.drun__decor--feather-2::after { inset: 12px; background-image: url('@assets/images/maps/dungeon/holy_feather_2.webp'); }
+.drun__decor--feather-3::after { inset: 12px; background-image: url('@assets/images/maps/dungeon/holy_feather_3.webp'); }
+
+/* 燭台：床に立てる（足元をマスの下の方に） */
+.drun__decor--candle-1::after,
+.drun__decor--candle-2::after {
+  inset: auto auto 6px 50%;
+  width: 20px;
+  height: 48px;
+  translate: -50% 0;
+  background-position: center bottom;
+}
+
+.drun__decor--candle-1::after { background-image: url('@assets/images/maps/dungeon/holy_candle_1.webp'); }
+.drun__decor--candle-2::after { background-image: url('@assets/images/maps/dungeon/holy_candle_2.webp'); }
+
+/* 光の筋：上から床へ差し込む（上のマスにはみ出す） */
+.drun__decor--light-1::after,
+.drun__decor--light-2::after {
+  inset: auto auto 2px 50%;
+  width: 42px;
+  height: 96px;
+  translate: -50% 0;
+  background-position: center bottom;
+  opacity: 0.85;
+}
+
+.drun__decor--light-1::after { background-image: url('@assets/images/maps/dungeon/holy_light_1.webp'); }
+.drun__decor--light-2::after { background-image: url('@assets/images/maps/dungeon/holy_light_2.webp'); }

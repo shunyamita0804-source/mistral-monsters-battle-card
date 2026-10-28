@@ -6,6 +6,7 @@ import { ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/
 import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
+import { floorDecorations } from '../../game/dungeon/decor.ts';
 import { isWalkableTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
@@ -51,8 +52,11 @@ import type { ScreenContext, ScreenDefinition } from './types.ts';
 import dungeonBattleBg from '@assets/images/backgrounds/battle_dungeon.webp';
 import bossBattleBg from '@assets/images/backgrounds/battle_boss.webp';
 import forestBattleBg from '@assets/images/backgrounds/battle_forest.webp';
-import coastBattleBg from '@assets/images/backgrounds/battle_field_coast.webp';
-import volcanoBattleBg from '@assets/images/backgrounds/battle_field_volcano.webp';
+import waterBattleBg from '@assets/images/backgrounds/battle_water.webp';
+import iceBattleBg from '@assets/images/backgrounds/battle_ice.webp';
+import fireBattleBg from '@assets/images/backgrounds/battle_fire.webp';
+import machineBattleBg from '@assets/images/backgrounds/battle_machine.webp';
+import holyBattleBg from '@assets/images/backgrounds/battle_holy.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
@@ -157,14 +161,22 @@ const RUN_BGM: Readonly<Record<string, BgmId>> = {
 };
 
 /**
- * ダンジョンごとの対戦の背景（ボス以外）。新しい5つは専用の絵がまだ無いので、いまある絵を仮に使う（2026-10-27）。
- * 森は森の背景、水の神殿は海辺、炎の火山は火山の野原、ほかは遺跡と同じ
+ * ダンジョンごとの対戦の背景（ボス以外。番人・バトラー）。森は森の背景、遺跡はいままでの絵。
+ * 新しい5つは 2026-10-28 に届いた正式な絵（tools/design/dungeons5_build.py）
  */
 const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-02': forestBattleBg,
-  'dungeon-03': coastBattleBg,
-  'dungeon-05': volcanoBattleBg,
+  'dungeon-03': waterBattleBg,
+  'dungeon-04': iceBattleBg,
+  'dungeon-05': fireBattleBg,
+  'dungeon-06': machineBattleBg,
+  'dungeon-07': holyBattleBg,
 };
+
+/** 水路のふちの石を置く辺（上・下・左・右）と、そのとなりのマスの向き */
+const WATER_EDGES = [['n', 0, -1], ['s', 0, 1], ['w', -1, 0], ['e', 1, 0]] as const;
+/** 水路のとなりが床（水路でも壁でもない）か */
+const isShore = (ch: string | undefined): boolean => ch !== undefined && ch !== '#' && ch !== 'w';
 
 const KEY_DIR: Readonly<Record<string, Direction>> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
 
@@ -199,6 +211,8 @@ class DungeonRunView {
   /** 指を置いた所（なぞり始めたらスティック） */
   #touch: { id: number; x: number; y: number; dragging: boolean } | null = null;
   #tiles: HTMLElement[] = [];
+  /** 床の上の飾り（炎の火山・天の聖域）と、そのマスの番号 */
+  #decors: { readonly i: number; readonly el: HTMLElement }[] = [];
   readonly #entityEls = new Map<string, HTMLElement>();
   #floor: DungeonFloor | null = null;
   /** いま見えている（明るい）マスの番号 */
@@ -420,18 +434,31 @@ class DungeonRunView {
         const below = f.tiles[y + 1]?.[x];
         const face = wall && below !== undefined && below !== '#';
         const stairs = !!f.stairs && f.stairs.x === x && f.stairs.y === y;
-        // 水路・氷は床の代わり、扉は床の上に重ねる（仮の見た目。dungeonRun.css）
+        // 水路・氷は床の代わり、扉は床の上に重ねる（dungeonRun.css）
         const kind = wall ? 'wall' : ch === 'w' ? 'water' : ch === 'i' ? 'ice' : 'floor';
         const door = ch === 'D' ? ' drun__tile--door' : '';
-        const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}` });
+        // 水路のふちの石：となりが水路でも壁でもない辺（水と床の境目）
+        const edges = kind !== 'water' ? '' : WATER_EDGES.filter(([, dx, dy]) => isShore(f.tiles[y + dy]?.[x + dx])).map(([d]) => ` drun__tile--edge-${d}`).join('');
+        const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}${edges}` });
         el.style.left = `${x * TILE}px`;
         el.style.top = `${y * TILE}px`;
         el.style.setProperty('--tx', `${-(x % TEXTURE_TILES) * TILE}px`);
         el.style.setProperty('--ty', `${-(y % TEXTURE_TILES) * TILE}px`);
+        // 4マスで割り切れない大きさの絵（新しい5つのダンジョン）用：マスの位置そのまま
+        el.style.setProperty('--ax', `${-x * TILE}px`);
+        el.style.setProperty('--ay', `${-y * TILE}px`);
         this.#tiles.push(el);
         frag.append(el);
       }
     }
+    // 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）
+    this.#decors = floorDecorations(f, this.#run.seed, this.#run.dungeonId).map((d) => {
+      const el = h('div', { class: `drun__decor drun__decor--${d.kind}-${d.variant + 1}`, attrs: { 'aria-hidden': 'true' } });
+      el.style.left = `${d.x * TILE}px`;
+      el.style.top = `${d.y * TILE}px`;
+      frag.append(el);
+      return { i: d.y * f.width + d.x, el };
+    });
     for (const e of f.entities) {
       if (e.kind === 'guardian') continue;
       // バトラーは3人の見た目のどれか（対戦の顔の絵と同じ人。src/data/dungeonRun.ts の runBattlerLook）
@@ -470,6 +497,10 @@ class DungeonRunView {
     }
     for (let i = 0; i < this.#tiles.length; i++) {
       if (run.explored[i] === '1') this.#tiles[i]?.classList.add('is-seen');
+    }
+    for (const d of this.#decors) {
+      d.el.classList.toggle('is-seen', run.explored[d.i] === '1');
+      d.el.classList.toggle('is-lit', this.#tiles[d.i]?.classList.contains('is-lit') ?? false);
     }
     // 置いてあるもの：見たマスにあれば見える（倒した相手は消える。開けた宝箱は開いた絵）
     const active = new Set(activeEntities(run, f).map((e) => e.id));
