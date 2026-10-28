@@ -20,3 +20,9 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 ```
 
 スクリーンショットは `E2E_OUT` に保存されます。URL に `?qa=1` を付けると QA 用ボタン（オート・即勝利・所持金追加など）が出ます。
+
+## 2026-10-28 街の確認の道具（いま動く）
+
+- `town_shot.cjs`：街・部屋の好きな場所の画面写真（390×844）。使い方はファイルの先頭
+- `town_doors.cjs`：街の11か所の入口を全部ためす（入る → 部屋 → 外へ → 扉の前に戻ったか）
+- どちらもセーブの JSON が要る（`docs/handoff.md`「画面写真の撮り方」）
