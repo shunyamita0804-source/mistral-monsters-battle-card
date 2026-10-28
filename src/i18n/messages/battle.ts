@@ -112,7 +112,9 @@ export const BATTLE = {
   // 対戦相手のひと言（【仮】台詞。正式な台詞・人物ごとの言い回しは未定）
   'battle.talk.start': { ja: 'よろしく。いい勝負にしよう！', en: "Let's have a good match!" },
   'battle.talk.knock': { ja: 'よし、まず1体！', en: 'Got one!' },
+  'battle.talk.knockLast': { ja: 'よし、あと1体！', en: 'Just one more to go!' },
   'battle.talk.ownDown': { ja: 'くっ……まだまだ！', en: "Ugh... I'm not done yet!" },
+  'battle.talk.ownDownLast': { ja: 'くっ……もう後がない！', en: "Ugh... I'm down to my last one!" },
   'battle.talk.win': { ja: '今回はわたしの勝ちだね。', en: 'This one goes to me.' },
   'battle.talk.lose': { ja: '参った……強いね。', en: "I give up... you're strong." },
   'battle.status.taunted': { ja: '{only}だけ', en: '{only} only' },

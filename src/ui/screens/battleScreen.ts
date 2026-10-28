@@ -36,6 +36,7 @@ import { buildOpponentDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { summarizeBattle } from '../../game/battle/simulate.ts';
+import { knockTalk } from '../../game/battle/talk.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, localText, opponentName } from '../../i18n/content.ts';
 import { personOfOpponent, type LocalText } from '../../data/people.ts';
@@ -2058,8 +2059,10 @@ export const battleScreen: ScreenDefinition = {
           const before = prevLife.get(m.uid);
           if (before !== undefined && before > 0 && m.life === 0) {
             sound.play('knockout', (countEnds.get(m.uid) ?? 0) + 200);
-            // 相手のひと言（【仮】台詞）：自分のモンスターが倒れた／こちらのモンスターを倒した
-            say(side === 'opponent' ? 'battle.talk.ownDown' : 'battle.talk.knock');
+            // 相手のひと言（【仮】台詞）：自分のモンスターが倒れた／こちらのモンスターを倒した。
+            // 何体目かで言葉を変える（2026-10-28：2体目・3体目でも「まず1体」と言っていた）。最後の1体のときは何も言わない（勝ち・負けのひと言が出る）
+            const line = knockTalk(side, s.sides[side].monsters);
+            if (line) say(`battle.talk.${line}`);
           }
           else if (before !== undefined && m.life > before) sound.play('heal');
           prevLife.set(m.uid, m.life);

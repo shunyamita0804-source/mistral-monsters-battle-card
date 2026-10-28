@@ -15,7 +15,7 @@ import type { OpponentDefinition } from './tournaments.ts';
  *   ブースターの箱＝初期配布（モンスター3枚＋その3体の初期配布16枚ずつ＝技48枚＋仮サポート12枚＝そのまま1つのデッキ）。
  *   新しく始めたときはカードを持たない（初期デッキ3択はなくした）。試験は先生が「旅立ちのきらめき」と同じデッキを貸す。
  *   管理局で選んだ箱の中身がそのまま使うデッキになる。選ばなかった2箱はカードショップのカウンターで1箱 1,500G・各1回
- * 仮のまま：仮サポート12枚・試験の先生のデッキとライフ
+ * 仮のまま：仮サポート12枚（試験の先生のデッキとライフは 2026-10-28 にユーザー決定）
  */
 
 export type StarterDeckKey = 'balance' | 'attack' | 'defense';
@@ -77,10 +77,11 @@ export const EXAM_LOAN_BOOSTER: BoosterKey = 'booster-1';
 export const isBoosterKey = (v: unknown): v is BoosterKey => BOOSTERS.some((b) => b.key === v);
 
 /**
- * 【仮】試験の対戦相手：練習場の先生ガレス（Claude が設計した「必ず勝てる」テスト用。正式採用前にユーザー確認）。
- * 編成は練習相手と同じ（ソラモ・ラズック・ソラモ）で、ライフをとても少なくする。負けて再挑戦するたびにさらに少なく（救済）
+ * 試験の対戦相手：練習場の先生ガレス。ライフをとても少なくし、負けて再挑戦するたびにさらに少なく（救済）。
+ * 2026-10-28 ユーザー決定：編成は「ラズック・カルシェル・ノビトン」（前のソラモ・ラズック・ソラモは同じモンスターが2体いて不具合に見え、
+ * 貸しデッキ〔旅立ちのきらめき〕のソラモとも重なるため）。ライフの割合（0.35 → 0.25 → 0.15）はそのまま
  */
-export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: 'ガレス', monsters: [SORAMO_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: 0.35, face: 'teacher' };
+export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: 'ガレス', monsters: [LAZUCK_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID], lifeScale: 0.35, face: 'teacher' };
 
 /** 何回目の挑戦かで、先生のモンスターのライフの割合（1回目 0.35 → 2回目 0.25 → 3回目以降 0.15。最低でもライフ1） */
 export function examLifeScale(attempt: number): number {
