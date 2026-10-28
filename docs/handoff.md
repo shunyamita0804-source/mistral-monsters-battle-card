@@ -6,7 +6,7 @@
 
 ### まず読む：いまの状態（2026-10-28 深夜〜：プカリムの試遊）
 
-- **最新の作業：新モンスター「プカリム」を仮の絵で入れて試遊（手順 4）**（報告書 `docs/report-2026-10-28-pukarim.md`。作業ブランチ `claude/pukarim-step4-20261028`。記録 `docs/pukarim.md`、
+- **最新の作業：新モンスター「プカリム」を仮の絵で入れて試遊（手順 4。公開済み・公開ページで確認済み）**（報告書 `docs/report-2026-10-28-pukarim.md`。作業ブランチ `claude/pukarim-step4-20261028`。記録 `docs/pukarim.md`、
   裁定 `docs/battle-rules.md`「プカリム（試遊中）」、写真と生の数字 `docs/design/pukarim-20261028/`）。
   **確認用（?qa=1）だけ**：設定の「QA用」→「プカリムの試遊」（`?qa=1&lab=pukarim` でも開く）。カードの一覧（MONSTERS・SKILLS）には入れず `QA_MONSTERS`・`QA_SKILLS`。
   新しい効果 `charge`（ほっぺにためる）・`tailwind`（おいかぜ）・攻撃の `undodgeableWhenCharged`（ぷはーっ）。試遊は `npm run playtest:pukarim`（200 回ずつ。数字は変えずに報告）
