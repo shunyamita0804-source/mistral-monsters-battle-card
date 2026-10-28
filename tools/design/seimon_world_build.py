@@ -329,6 +329,10 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
     )
 
 
+# 2026-10-28 から rooms4_build.py が作る部屋（設計図の ID）
+ROOMS4_IDS = ('ROOM_ARENA', 'ROOM_TRAINING', 'ROOM_LAB')
+
+
 def main() -> None:
     parts = sys.argv[1]
     check = sys.argv[2] if len(sys.argv) > 2 else None
@@ -337,8 +341,13 @@ def main() -> None:
     # 街：2026-10-28 の新しい部品（design-parts/town-20261028/。色の処理は town_tone_20261028.py）
     town = town2026.build_town(shade_building, check)
     furn = load_furniture(parts)
-    # カードショップは 2026-10-27 の新しい内装（cardshop_v2）
-    rooms = [shop2.build_shop_room() if r['id'] == 'ROOM_SHOP' else build_room(parts, r, furn, check) for r in pack.ROOMS]
+    # カードショップは 2026-10-27 の新しい内装（cardshop_v2）。
+    # 大会会場・練習場・研究所は 2026-10-28 の新しい部屋の絵（tools/design/rooms4_build.py → src/data/rooms4Art.generated.ts）なので、ここでは作らない
+    rooms = [
+        shop2.build_shop_room() if r['id'] == 'ROOM_SHOP' else build_room(parts, r, furn, check)
+        for r in pack.ROOMS
+        if r['id'] not in ROOMS4_IDS
+    ]
     with open(OUT_TS, 'w', encoding='utf-8') as f:
         f.write(to_ts(town, rooms))
     print('ok', OUT_TS)

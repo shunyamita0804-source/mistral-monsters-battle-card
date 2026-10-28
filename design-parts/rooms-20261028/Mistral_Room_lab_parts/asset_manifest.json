@@ -1,0 +1,68 @@
+[
+  {
+    "file": "lab_shell.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "c7fc173da3e93893f583fc7caad807be7815c8540f77f656893ae0f0bb4536ed"
+  },
+  {
+    "file": "lab_01_glass_cabinet.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "d5faffbd872098936eef1e190891c32afe25ef4be2c264058ee2de144fe1dde2"
+  },
+  {
+    "file": "lab_02_desk.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "a318a674edaf4f8fb2cff0b493b977d8b06384e4ff12c18860f4f85a6f4b8502"
+  },
+  {
+    "file": "lab_03_machine.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "5d12238d5e808f6c5c36df209788ddabfaaa3768792039ac1e53ec1a76197a33"
+  },
+  {
+    "file": "lab_04_lab_counter.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "70e20c39772a0e1aaaf99acd6f5c6fa668b912fdf67797a8f98f63d2e96b5d2e"
+  },
+  {
+    "file": "lab_front.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "a1974ac9a52f69df759ec92ee86a59851925fb9539dde64dba3c62c2ed054ffa"
+  }
+]

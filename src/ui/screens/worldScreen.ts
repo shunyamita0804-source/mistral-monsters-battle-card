@@ -1159,7 +1159,7 @@ export class WorldView {
       // 人ごとに呼吸の始まりをずらす（そろって動かないように）
       body.style.animationDelay = `${-((obj.x * 7 + obj.y * 13) % 32) / 10}s`;
       this.#faceNpc(el, 'down');
-      this.#placeFigure(el, { x: obj.x, y: obj.y + (obj.drawDy ?? 0) });
+      this.#placeFigure(el, { x: obj.x + (obj.drawDx ?? 0), y: obj.y + (obj.drawDy ?? 0) });
       return el;
     }
     if (obj.type === 'chest') {
@@ -1785,7 +1785,7 @@ export class WorldView {
     const talk = obj.type === 'npc';
     marker.className = `world__marker ${talk ? 'is-talk' : 'is-examine'}`;
     if (talk) {
-      const f = this.#foot({ x: obj.x, y: obj.y + (obj.drawDy ?? 0) });
+      const f = this.#foot({ x: obj.x + (obj.drawDx ?? 0), y: obj.y + (obj.drawDy ?? 0) });
       marker.style.transform = `translate(${f.x}px, ${f.y - this.#figureH * 0.84}px)`;
       return;
     }

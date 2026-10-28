@@ -1,0 +1,20 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "arena_shell.png",
+    "arena_01_stage.png",
+    "arena_02_battle_table.png",
+    "arena_03_bench_left_back.png",
+    "arena_04_bench_left_front.png",
+    "arena_05_reception.png",
+    "arena_front.png"
+  ],
+  "chairs": 2
+}

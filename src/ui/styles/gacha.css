@@ -75,7 +75,7 @@
   align-items: center;
   gap: 3px;
   min-height: 44px;
-  padding: 8px 2px 8px;
+  padding: 8px 0;
   border: 0;
   border-radius: 12px;
   background: rgb(8 12 30 / 0.35);
@@ -95,8 +95,11 @@
   pointer-events: none;
 }
 
+/* 6つとも1行に収める（いちばん長い「カルシェルのパック」が入る大きさ。2026-10-28 ユーザー指示） */
 .gacha-select__name {
-  font-size: 13px;
+  font-size: 12px;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
   line-height: 1.25;
   text-align: center;
   text-shadow: 0 1px 3px #000;

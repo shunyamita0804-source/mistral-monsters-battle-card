@@ -1,0 +1,79 @@
+[
+  {
+    "file": "practice_shell.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "133943be4dd5457e76ec9c57df6a2ebe6b200a17cf37b92bbb90e04c0ccb1760"
+  },
+  {
+    "file": "practice_01_table_center.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "44478141c3ad8345075286e4a5ae25cd05a805a72af24d04a26d02c890ace18a"
+  },
+  {
+    "file": "practice_02_table_right_back.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "a6576ddbe5ea642c9bfde39210d19b015130608e168c2fb465080ccd77d53232"
+  },
+  {
+    "file": "practice_03_table_right_front.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "8bb8647d30becf2b7005921286ed6d7a9f32129f4c962d3307a0da48ae8c6855"
+  },
+  {
+    "file": "practice_04_left_counter.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "2f9e96d2cb34a24414a6982ee60ce65680b740dabb2fe65d49810686a6240d4f"
+  },
+  {
+    "file": "practice_05_stool.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "e4ed3483be282ae427d100f33655616f762bb4e0ac8db7ba733e4846cc03be3e"
+  },
+  {
+    "file": "practice_front.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "c842195c59591b891c88d35effe6cd23d5fb8a8d72882720945fccb675064836"
+  }
+]
