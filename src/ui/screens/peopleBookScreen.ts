@@ -82,7 +82,8 @@ export const peopleBookScreen: ScreenDefinition = {
       const to = Math.min(pages - 1, Math.max(0, page + d));
       if (to === page) return;
       page = to;
-      sound.tap();
+      // 名刺（固いカード）をめくる音：カードを滑らせる短い音（2026-10-29 iPhone の試遊「本の紙をめくる音が名刺に合わない」。前は ui_tap）
+      sound.play('cardSlide');
       show();
     };
     // 横になぞってめくる

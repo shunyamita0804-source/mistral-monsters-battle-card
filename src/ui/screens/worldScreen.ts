@@ -179,6 +179,17 @@ const FIGURE_ZOOM = 1.55;
  * 2026-10-24 ユーザー「NPC と少しサイズ感が違う」：背の高さ・頭の大きさは同じで、違いはこの倍率が主人公だけだったこと → 人（NPC）にも同じ倍率をかける
  */
 const FIGURE_WIDEN = 1.1;
+/**
+ * 街の中だけ人物をさらに大きくする倍率（2026-10-29 iPhone の試遊「人が街に対して小さい」：主人公・住人とも約1.2倍。
+ * 歩幅・影・吹き出し・タップの当たりは人物の高さ #figureH から決まるので、いっしょに大きくなる。部屋の中は今のまま）。
+ * 確認用（?qa=1）だけ ?fig=1.15 などで比べられる
+ */
+const TOWN_FIGURE_BOOST = 1.2;
+function townFigureBoost(qa: boolean): number {
+  if (!qa || typeof location === 'undefined') return TOWN_FIGURE_BOOST;
+  const v = Number(new URLSearchParams(location.search).get('fig'));
+  return v >= 0.8 && v <= 1.6 ? v : TOWN_FIGURE_BOOST;
+}
 /** 部屋の絵が画面の高さのどれくらいを占めるか */
 const ROOM_FILL = 0.9;
 /** 自動ドア（2026-10-27 カードショップ）：全部開くまで・全部閉じるまでの時間（ミリ秒） */
@@ -637,7 +648,8 @@ export class WorldView {
 
   /** 人物の絵の高さ（論理px）。街・部屋は設計図の 144 単位の FIGURE_ZOOM 倍、仮マップ（ダンジョン）は小さめ（2026-10-24 に街と同じ割合で 54→61→70） */
   get #figureH(): number {
-    return this.#map.art ? 144 * this.#scale * FIGURE_ZOOM : 70;
+    if (!this.#map.art) return 70;
+    return 144 * this.#scale * FIGURE_ZOOM * (this.#map.id === 'town' ? townFigureBoost(this.#store.qa) : 1);
   }
 
   /** マス (x, y) に立つ人の足元（論理px） */
@@ -964,6 +976,8 @@ export class WorldView {
       this.#devOrigin = h('div', { class: 'world__dev-origin', attrs: { 'aria-hidden': 'true' } });
       this.#mapLayer.append(this.#devGrid, this.#devGround, this.#devOrigin);
     }
+    // 確認用（?qa=1&hit=1）：通れないマスを赤くうすく重ねる（2026-10-29 当たり判定の点検）
+    if (this.#store.qa && typeof location !== 'undefined' && new URLSearchParams(location.search).get('hit') === '1') this.#mapLayer.append(this.#hitOverlay(width, height, cell));
     this.#player = h('div', { class: 'world__player', attrs: { 'aria-label': t('world.player') } });
     this.#sizeFigure(this.#player);
     // 絵は最初に1回だけ設定する（あとは位置だけ動かす）
@@ -1297,7 +1311,9 @@ export class WorldView {
   /** いまの歩く速さ（論理px/秒）。走る・歩き出しの加速・止まる最後のマスの減速（walkAnim.ts） */
   #speed(): number {
     const decel = this.#move && !this.#held && this.#path.length === 0 ? this.#move.t : null;
-    return walkSpeed(this.#running, this.#moveTime, decel, this.#dev?.state.speedScale ?? 1);
+    // 街で人物を大きくした分（TOWN_FIGURE_BOOST）、歩く速さも少しだけ上げる（大きさの平方根。足の運びが遅く見えないように・街を歩く時間はほぼ同じ）
+    const boost = this.#map.id === 'town' && this.#map.art ? Math.sqrt(townFigureBoost(this.#store.qa)) : 1;
+    return walkSpeed(this.#running, this.#moveTime, decel, (this.#dev?.state.speedScale ?? 1) * boost);
   }
 
   /** 止まっているとき：道順・調べる予約・押している向きから、次の1歩を始める */
@@ -1877,6 +1893,18 @@ export class WorldView {
       }
     }
     return false;
+  }
+
+  /** 確認用：通れないマスの重ね絵（1マス＝4px の小さな絵を、地図の大きさに引き伸ばす） */
+  #hitOverlay(width: number, height: number, cell: number): HTMLElement {
+    const canvas = h('canvas', { class: 'world__hit', attrs: { 'aria-hidden': 'true', width: String(width * 4), height: String(height * 4) } }) as HTMLCanvasElement;
+    const g = canvas.getContext('2d');
+    if (g) {
+      g.fillStyle = 'rgba(255, 30, 30, 0.38)';
+      for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (this.#blocked(x, y)) g.fillRect(x * 4, y * 4, 4, 4);
+    }
+    canvas.style.cssText = `position:absolute;left:0;top:0;width:${width * cell}px;height:${height * cell}px;z-index:99998;pointer-events:none;image-rendering:pixelated`;
+    return canvas;
   }
 
   /* ---------- 会話・練習試合（序盤イベント。進み具合は src/game/story/intro.ts） ---------- */

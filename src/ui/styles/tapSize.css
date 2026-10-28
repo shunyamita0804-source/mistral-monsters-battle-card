@@ -1,0 +1,36 @@
+/*
+ * 押す所の大きさ（2026-10-29 iPhone の試遊「戻るの押す所が小さい」とゲーム全体の点検）。
+ * 指で押す所は 44×44 以上にする（Apple のすすめる大きさ）。見た目の絵の大きさはなるべく変えず、押せる範囲と高さを広げる。
+ * ほかの CSS より後に読む（main.ts の最後）
+ */
+.btn--small,
+.card-grid__tab,
+.deck__tab,
+.btn.options__choice,
+.gacha-select__rates,
+.world__hud-btn,
+.battle__top-btn {
+  min-height: 44px;
+}
+
+.card-grid__tab,
+.deck__tab {
+  min-width: 52px;
+}
+
+/* デッキ編集の −・＋：44×44 */
+.deck__step {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* 街の右上の「メニュー」（高さが決めてあるので高さごと） */
+.world__hud .world__hud-btn {
+  height: 44px;
+}
+
+/* デッキ編集の技の名前（押すと詳しい表示）・上の状態の札 */
+.deck__item-name,
+.deck__status {
+  min-height: 44px;
+}

@@ -111,9 +111,22 @@ MACHINE_PARTS = {
 TURN_BG_WIDTH = 780
 
 
+# 封をしたパック（シリーズの絵が無いとき）：シリーズのパックと同じ縦横比 600:950 にするため、
+# 真ん中の無地の青い所（y 150〜202）を切りとって上下をつなぐ（2026-10-29 パックの上の封を短くしたのに合わせる）
+SEALED_CUT = (150, 202)
+
+
+def cut_rows(im: Image.Image, a: int, b: int) -> Image.Image:
+    out = Image.new('RGBA', (im.width, im.height - (b - a)))
+    out.alpha_composite(im.crop((0, 0, im.width, a)), (0, 0))
+    out.alpha_composite(im.crop((0, b, im.width, im.height)), (0, a))
+    return out
+
+
 def machine(src: Path) -> None:
     for name, out in MACHINE_PARTS.items():
-        save(Image.open(src / f'{name}.png').convert('RGBA'), f'{out}.webp')
+        im = Image.open(src / f'{name}.png').convert('RGBA')
+        save(cut_rows(im, *SEALED_CUT) if out == 'pack_sealed' else im, f'{out}.webp')
     save(Image.open(src / 'gacha_turn_bg.png').convert('RGB'), 'turn_bg.webp', width=TURN_BG_WIDTH)
 
 

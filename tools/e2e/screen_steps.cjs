@@ -46,6 +46,8 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
     await page.waitForTimeout(st.wait || 1200);
     if (st.shot) await shot(st.shot);
     if (st.dump) await dump();
+    // small：押す所が 44×44 より小さいボタン（画面に見えているもの）を書き出す（2026-10-29 iPhone の試遊の点検）
+    if (st.small) log('SMALL', st.small, await page.evaluate(() => [...document.querySelectorAll('button, [role=button], a')].filter((b) => b.offsetParent && getComputedStyle(b).visibility !== 'hidden').map((b) => { const r = b.getBoundingClientRect(); return { r, t: (b.getAttribute('aria-label') || b.textContent || b.className).trim().slice(0, 16) }; }).filter((o) => o.r.width > 0 && (o.r.width < 44 || o.r.height < 44)).map((o) => `${o.t}(${Math.round(o.r.width)}x${Math.round(o.r.height)})`).join(' | ')));
   }
   await browser.close();
 })();
