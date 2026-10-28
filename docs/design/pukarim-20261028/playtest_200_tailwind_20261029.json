@@ -1,0 +1,582 @@
+{
+ "games": 200,
+ "base": {
+  "booster-1": {
+   "booster-1": {
+    "wins": 96,
+    "losses": 104,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-2": {
+    "wins": 126,
+    "losses": 74,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-3": {
+    "wins": 110,
+    "losses": 90,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   }
+  },
+  "booster-2": {
+   "booster-1": {
+    "wins": 77,
+    "losses": 123,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-2": {
+    "wins": 101,
+    "losses": 99,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-3": {
+    "wins": 83,
+    "losses": 117,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   }
+  },
+  "booster-3": {
+   "booster-1": {
+    "wins": 102,
+    "losses": 98,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-2": {
+    "wins": 129,
+    "losses": 71,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   },
+   "booster-3": {
+    "wins": 107,
+    "losses": 93,
+    "draws": 0,
+    "stats": {
+     "charges": 0,
+     "chargedAttacks": 0,
+     "chargedDamage": 0,
+     "chargedPuhaa": 0,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 0
+    }
+   }
+  }
+ },
+ "pukarim": {
+  "booster-1#0": {
+   "booster-1": {
+    "wins": 93,
+    "losses": 107,
+    "draws": 0,
+    "stats": {
+     "charges": 86,
+     "chargedAttacks": 44,
+     "chargedDamage": 169,
+     "chargedPuhaa": 10,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 1
+    }
+   },
+   "booster-2": {
+    "wins": 112,
+    "losses": 88,
+    "draws": 0,
+    "stats": {
+     "charges": 88,
+     "chargedAttacks": 43,
+     "chargedDamage": 150,
+     "chargedPuhaa": 15,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 10
+    }
+   },
+   "booster-3": {
+    "wins": 87,
+    "losses": 113,
+    "draws": 0,
+    "stats": {
+     "charges": 84,
+     "chargedAttacks": 42,
+     "chargedDamage": 145,
+     "chargedPuhaa": 13,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 12
+    }
+   }
+  },
+  "booster-1#1": {
+   "booster-1": {
+    "wins": 97,
+    "losses": 103,
+    "draws": 0,
+    "stats": {
+     "charges": 73,
+     "chargedAttacks": 42,
+     "chargedDamage": 155,
+     "chargedPuhaa": 10,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 14
+    }
+   },
+   "booster-2": {
+    "wins": 126,
+    "losses": 74,
+    "draws": 0,
+    "stats": {
+     "charges": 93,
+     "chargedAttacks": 50,
+     "chargedDamage": 166,
+     "chargedPuhaa": 13,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 11
+    }
+   },
+   "booster-3": {
+    "wins": 115,
+    "losses": 85,
+    "draws": 0,
+    "stats": {
+     "charges": 71,
+     "chargedAttacks": 36,
+     "chargedDamage": 128,
+     "chargedPuhaa": 10,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 10
+    }
+   }
+  },
+  "booster-1#2": {
+   "booster-1": {
+    "wins": 114,
+    "losses": 86,
+    "draws": 0,
+    "stats": {
+     "charges": 178,
+     "chargedAttacks": 148,
+     "chargedDamage": 476,
+     "chargedPuhaa": 35,
+     "chargedOtsumuji": 6,
+     "otsumujiKo": 6,
+     "otsumujiKoFromFull": 4,
+     "tailwinds": 19
+    }
+   },
+   "booster-2": {
+    "wins": 139,
+    "losses": 61,
+    "draws": 0,
+    "stats": {
+     "charges": 199,
+     "chargedAttacks": 159,
+     "chargedDamage": 578,
+     "chargedPuhaa": 34,
+     "chargedOtsumuji": 6,
+     "otsumujiKo": 5,
+     "otsumujiKoFromFull": 5,
+     "tailwinds": 16
+    }
+   },
+   "booster-3": {
+    "wins": 89,
+    "losses": 111,
+    "draws": 0,
+    "stats": {
+     "charges": 190,
+     "chargedAttacks": 157,
+     "chargedDamage": 567,
+     "chargedPuhaa": 39,
+     "chargedOtsumuji": 8,
+     "otsumujiKo": 8,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 15
+    }
+   }
+  },
+  "booster-2#0": {
+   "booster-1": {
+    "wins": 69,
+    "losses": 131,
+    "draws": 0,
+    "stats": {
+     "charges": 92,
+     "chargedAttacks": 51,
+     "chargedDamage": 187,
+     "chargedPuhaa": 16,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 11
+    }
+   },
+   "booster-2": {
+    "wins": 111,
+    "losses": 89,
+    "draws": 0,
+    "stats": {
+     "charges": 87,
+     "chargedAttacks": 43,
+     "chargedDamage": 142,
+     "chargedPuhaa": 7,
+     "chargedOtsumuji": 1,
+     "otsumujiKo": 1,
+     "otsumujiKoFromFull": 1,
+     "tailwinds": 26
+    }
+   },
+   "booster-3": {
+    "wins": 73,
+    "losses": 127,
+    "draws": 0,
+    "stats": {
+     "charges": 85,
+     "chargedAttacks": 49,
+     "chargedDamage": 159,
+     "chargedPuhaa": 4,
+     "chargedOtsumuji": 2,
+     "otsumujiKo": 2,
+     "otsumujiKoFromFull": 1,
+     "tailwinds": 15
+    }
+   }
+  },
+  "booster-2#1": {
+   "booster-1": {
+    "wins": 83,
+    "losses": 117,
+    "draws": 0,
+    "stats": {
+     "charges": 202,
+     "chargedAttacks": 156,
+     "chargedDamage": 507,
+     "chargedPuhaa": 40,
+     "chargedOtsumuji": 1,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 22
+    }
+   },
+   "booster-2": {
+    "wins": 107,
+    "losses": 93,
+    "draws": 0,
+    "stats": {
+     "charges": 211,
+     "chargedAttacks": 167,
+     "chargedDamage": 551,
+     "chargedPuhaa": 39,
+     "chargedOtsumuji": 5,
+     "otsumujiKo": 5,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 24
+    }
+   },
+   "booster-3": {
+    "wins": 80,
+    "losses": 120,
+    "draws": 0,
+    "stats": {
+     "charges": 191,
+     "chargedAttacks": 158,
+     "chargedDamage": 537,
+     "chargedPuhaa": 44,
+     "chargedOtsumuji": 8,
+     "otsumujiKo": 6,
+     "otsumujiKoFromFull": 1,
+     "tailwinds": 22
+    }
+   }
+  },
+  "booster-2#2": {
+   "booster-1": {
+    "wins": 95,
+    "losses": 105,
+    "draws": 0,
+    "stats": {
+     "charges": 243,
+     "chargedAttacks": 213,
+     "chargedDamage": 709,
+     "chargedPuhaa": 47,
+     "chargedOtsumuji": 16,
+     "otsumujiKo": 13,
+     "otsumujiKoFromFull": 11,
+     "tailwinds": 14
+    }
+   },
+   "booster-2": {
+    "wins": 134,
+    "losses": 66,
+    "draws": 0,
+    "stats": {
+     "charges": 268,
+     "chargedAttacks": 234,
+     "chargedDamage": 790,
+     "chargedPuhaa": 56,
+     "chargedOtsumuji": 11,
+     "otsumujiKo": 8,
+     "otsumujiKoFromFull": 1,
+     "tailwinds": 33
+    }
+   },
+   "booster-3": {
+    "wins": 90,
+    "losses": 110,
+    "draws": 0,
+    "stats": {
+     "charges": 259,
+     "chargedAttacks": 226,
+     "chargedDamage": 852,
+     "chargedPuhaa": 52,
+     "chargedOtsumuji": 21,
+     "otsumujiKo": 16,
+     "otsumujiKoFromFull": 5,
+     "tailwinds": 29
+    }
+   }
+  },
+  "booster-3#0": {
+   "booster-1": {
+    "wins": 78,
+    "losses": 122,
+    "draws": 0,
+    "stats": {
+     "charges": 86,
+     "chargedAttacks": 56,
+     "chargedDamage": 194,
+     "chargedPuhaa": 16,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 9
+    }
+   },
+   "booster-2": {
+    "wins": 119,
+    "losses": 81,
+    "draws": 0,
+    "stats": {
+     "charges": 72,
+     "chargedAttacks": 41,
+     "chargedDamage": 149,
+     "chargedPuhaa": 11,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 8
+    }
+   },
+   "booster-3": {
+    "wins": 92,
+    "losses": 108,
+    "draws": 0,
+    "stats": {
+     "charges": 86,
+     "chargedAttacks": 50,
+     "chargedDamage": 177,
+     "chargedPuhaa": 12,
+     "chargedOtsumuji": 1,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 9
+    }
+   }
+  },
+  "booster-3#1": {
+   "booster-1": {
+    "wins": 97,
+    "losses": 103,
+    "draws": 0,
+    "stats": {
+     "charges": 78,
+     "chargedAttacks": 37,
+     "chargedDamage": 116,
+     "chargedPuhaa": 8,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 7
+    }
+   },
+   "booster-2": {
+    "wins": 117,
+    "losses": 83,
+    "draws": 0,
+    "stats": {
+     "charges": 98,
+     "chargedAttacks": 49,
+     "chargedDamage": 167,
+     "chargedPuhaa": 6,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 8
+    }
+   },
+   "booster-3": {
+    "wins": 100,
+    "losses": 100,
+    "draws": 0,
+    "stats": {
+     "charges": 91,
+     "chargedAttacks": 39,
+     "chargedDamage": 137,
+     "chargedPuhaa": 6,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 7
+    }
+   }
+  },
+  "booster-3#2": {
+   "booster-1": {
+    "wins": 111,
+    "losses": 89,
+    "draws": 0,
+    "stats": {
+     "charges": 65,
+     "chargedAttacks": 28,
+     "chargedDamage": 94,
+     "chargedPuhaa": 8,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 10
+    }
+   },
+   "booster-2": {
+    "wins": 133,
+    "losses": 67,
+    "draws": 0,
+    "stats": {
+     "charges": 78,
+     "chargedAttacks": 49,
+     "chargedDamage": 154,
+     "chargedPuhaa": 6,
+     "chargedOtsumuji": 1,
+     "otsumujiKo": 1,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 18
+    }
+   },
+   "booster-3": {
+    "wins": 104,
+    "losses": 96,
+    "draws": 0,
+    "stats": {
+     "charges": 83,
+     "chargedAttacks": 50,
+     "chargedDamage": 177,
+     "chargedPuhaa": 12,
+     "chargedOtsumuji": 0,
+     "otsumujiKo": 0,
+     "otsumujiKoFromFull": 0,
+     "tailwinds": 3
+    }
+   }
+  }
+ },
+ "swapped": {
+  "booster-1#0": "ソラモ",
+  "booster-1#1": "ガウル",
+  "booster-1#2": "ミュロル",
+  "booster-2#0": "ガウル",
+  "booster-2#1": "ラズック",
+  "booster-2#2": "ノビトン",
+  "booster-3#0": "カルシェル",
+  "booster-3#1": "ミュロル",
+  "booster-3#2": "ノビトン"
+ }
+}

@@ -64,8 +64,11 @@ export interface BattleMonster {
   readonly hiddenTurn?: number | null;
   /** 次に使う攻撃技のダメージ＋（試遊中：プカリムのほっぺにためる 2026-10-28）。使うまで続く。攻撃技を使ったら・倒れたら消える */
   readonly charge?: number | null;
-  /** 次に使う攻撃技のダメージ＋amount（試遊中：プカリムのおいかぜ 2026-10-28）。untilTurn の手番が終わるまで。攻撃技を使ったら・倒れたら消える */
-  readonly tailwind?: { readonly amount: number; readonly untilTurn: number } | null;
+  /**
+   * 攻撃技のダメージ＋amount（プカリムのおいかぜ。2026-10-29 ユーザー指示でカードの文のとおりに）。効くのは turn の手番（かけた側の次の自分の手番）だけ。
+   * その手番にそのモンスターが攻撃技を1回使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える
+   */
+  readonly tailwind?: { readonly amount: number; readonly turn: number } | null;
 }
 
 export interface HandCard {
@@ -429,10 +432,10 @@ export function chargeOf(user: BattleMonster | undefined): number {
   return user && user.life > 0 ? (user.charge ?? 0) : 0;
 }
 
-/** 使うモンスターにかかっている「次の攻撃技のダメージ＋」（おいかぜ。期限〔untilTurn〕が過ぎていないときだけ） */
+/** 使うモンスターにかかっている「次のターンの攻撃技のダメージ＋」（おいかぜ。効く手番〔turn〕のときだけ。かけた同じ手番には効かない） */
 export function tailwindOf(state: BattleState, user: BattleMonster | undefined): number {
   const w = user?.tailwind;
-  return w && user.life > 0 && state.turn <= w.untilTurn ? w.amount : 0;
+  return w && user.life > 0 && state.turn === w.turn ? w.amount : 0;
 }
 
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
@@ -716,9 +719,9 @@ function useCard(
       const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
-      // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）
+      // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）。おいかぜは効く手番に使ったときだけ消える
       if (user.charge) next = updateMonster(next, user.uid, { charge: null });
-      if (user.tailwind) next = updateMonster(next, user.uid, { tailwind: null });
+      if (tailwindOf(state, user) > 0) next = updateMonster(next, user.uid, { tailwind: null });
       if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
@@ -800,9 +803,10 @@ function useCard(
       return addLog(next, t('battle.log.charge', { name: nameOf(user.cardId), n: skill.effect.amount }));
     }
     case 'tailwind': {
-      // おいかぜ：選んだ味方の次の攻撃技のダメージ＋amount。次の自分の手番（turn + 2）が終わるまで。重ねない（期限だけ新しく）
+      // おいかぜ：選んだ味方の、次の自分の手番（turn + 2）の攻撃技のダメージ＋amount（2026-10-29 カードの文のとおり。かけた同じ手番には効かない）。
+      // 重ねない（もう一度かけたら、効く手番だけ新しく）
       if (!target) return state;
-      next = updateMonster(next, target.uid, { tailwind: { amount: skill.effect.amount, untilTurn: state.turn + 2 } });
+      next = updateMonster(next, target.uid, { tailwind: { amount: skill.effect.amount, turn: state.turn + 2 } });
       return addLog(next, t('battle.log.tailwind', { name: nameOf(target.cardId), n: skill.effect.amount }));
     }
     case 'handToDeck':

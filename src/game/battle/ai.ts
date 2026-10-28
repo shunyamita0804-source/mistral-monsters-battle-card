@@ -192,6 +192,7 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
  * 試遊中：プカリム（2026-10-28。仮の思考）。ためていないプカリムが、その手番に攻撃で相手を倒せないとき：
  * - ほっぺにためる（次の手番に、ためた攻撃〔ぷはーっ・おおつむじ〕を使えるように）
  * - ほっぺにためるが無ければ、おいかぜ：まだ動いていない味方が、おいかぜのあとのマナで攻撃技を使えるならその味方に
+ *   （2026-10-29 からおいかぜは次の自分のターンだけ効くが、選び方は試遊のときのまま。ユーザー了承）
  */
 function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[]): BattleAction | null {
   const skills = options.filter(isSkillOption);

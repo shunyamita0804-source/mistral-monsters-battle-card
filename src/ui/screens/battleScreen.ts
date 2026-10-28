@@ -1327,9 +1327,9 @@ export const battleScreen: ScreenDefinition = {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
         items.push(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
       }
-      // 試遊中：プカリムのほっぺにためる（相手からも見える。ふくらんだほっぺの印は仮の見た目）・おいかぜ
+      // 試遊中：プカリムのほっぺにためる（相手からも見える。ふくらんだほっぺの印は仮の見た目）・おいかぜ（かけてから、＋1 が効く次の自分のターンまで出す）
       if (m.charge && m.life > 0) items.push(h('span', { class: 'battle__status-text battle__status-text--charged' }, h('span', { class: 'battle__status-puff', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.charged') })));
-      if (m.tailwind && m.life > 0 && m.tailwind.untilTurn >= s.turn) items.push(h('span', { class: 'battle__status-text battle__status-text--tailwind' }, h('span', { class: 'battle__status-wind', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.tailwind', { n: m.tailwind.amount }) })));
+      if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) items.push(h('span', { class: 'battle__status-text battle__status-text--tailwind' }, h('span', { class: 'battle__status-wind', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.tailwind', { n: m.tailwind.amount }) })));
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
     };
