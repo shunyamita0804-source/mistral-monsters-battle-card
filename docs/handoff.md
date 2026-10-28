@@ -6,7 +6,7 @@
 
 ### まず読む：いまの状態（2026-10-28 夜）
 
-- **公開中：`main` の最新（部屋4つの新しい絵）**（公開ページで確認済み）。セーブ version 20（変えていない）。テスト 634件。作業ブランチ `claude/rooms4-20261028` は main に取り込み済み
+- **公開中：`main` の `113ce18`（部屋4つの新しい絵）**（公開ページで確認済み）。セーブ version 20（変えていない）。テスト 634件。作業ブランチ `claude/rooms4-20261028` は main に取り込み済み
 - 2026-10-28 夜にしたこと
   - **部屋4つ（大会会場・管理局・練習場・研究所）を新しい絵に**（指示 ZIP「Mistral_Rooms4_ClaudeCode_20261028」Part1〜3。原本 `design-parts/rooms-20261028/`。記録 **`docs/rooms4-20261028.md`**）。
     組み立て `python3 -I tools/design/rooms4_build.py`（数秒）→ `src/data/rooms4Art.generated.ts`。カウンターの奥の人は見た目だけずらす（`drawDx`・`drawDy`）。テスト `tests/rooms4.test.ts`
