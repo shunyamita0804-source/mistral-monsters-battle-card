@@ -15,7 +15,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run typecheck && npm run test && npm run build"
+    "check": "npm run typecheck && npm run test && npm run build",
+    "art:skillframes": "python3 -I tools/art/skillcard_v3_build.py"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

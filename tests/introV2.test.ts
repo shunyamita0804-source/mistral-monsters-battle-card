@@ -94,6 +94,13 @@ describe('導入イベントV2：進み具合', () => {
     expect(EXAM_OPPONENT.monsters).toHaveLength(3);
   });
 
+  it('試験の先生のモンスターは「ラズック・カルシェル・ノビトン」（同じモンスターを2体入れない・貸しデッキと重ならない。2026-10-28 ユーザー決定）', () => {
+    expect(EXAM_OPPONENT.monsters).toEqual(['mon-lazuck', 'mon-kalshell', 'mon-nobiton']);
+    expect(new Set(EXAM_OPPONENT.monsters).size).toBe(3);
+    expect(EXAM_OPPONENT.lifeScale).toBe(0.35);
+    expect([1, 2, 3, 4].map(examLifeScale)).toEqual([0.35, 0.25, 0.15, 0.15]);
+  });
+
   it('場面の効果で、幼馴染→教習所→試験→管理局→パック→案内→完了の順に進む', () => {
     let s = startIntroV2OnTown(fresh());
     s = applySceneEffects(s, SCENES.v2Greeting.effects ?? []);

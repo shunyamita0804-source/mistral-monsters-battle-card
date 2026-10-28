@@ -145,17 +145,8 @@
   position: relative;
   display: block;
   padding: 0;
-  border: 2px solid var(--side-color);
   border-radius: 8px;
-  transition: border-color 150ms, box-shadow 150ms, filter 150ms;
-}
-
-.battle__monster--player {
-  --side-color: var(--side-player);
-}
-
-.battle__monster--opponent {
-  --side-color: var(--side-opponent);
+  transition: filter 150ms;
 }
 
 /* 切り抜いたアイコン（素材の絵はそのまま。表示のときに顔〜上半身を切り抜く） */
@@ -238,10 +229,17 @@
   font-size: 12px;
 }
 
-/* 状態：対象の候補＝金の枠が脈打つ、狙われている＝赤く光る、行動済＝暗く＋札、戦闘不能＝灰色＋札 */
+/*
+ * 状態：対象の候補＝金色にやわらかく光って脈打つ、狙われている＝赤く光る、行動済＝暗く＋札、戦闘不能＝灰色＋札。
+ * 場のカードのまわりの色の線（自分＝青・相手＝赤）は 2026-10-28 にやめた（枠が二重に見えるため）。印はカードの形に沿った光（drop-shadow）
+ */
+.battle__monster.is-target,
+.battle__monster.is-attacked {
+  box-shadow: none;
+}
+
 .battle__monster.is-target .battle__monster-icon {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgb(255 207 90 / 0.85);
+  filter: drop-shadow(0 0 3px rgb(255 222 130)) drop-shadow(0 0 9px rgb(255 200 80 / 0.9));
   animation: target-pulse 0.9s ease-in-out infinite;
 }
 
@@ -250,8 +248,7 @@
 }
 
 .battle__monster.is-attacked .battle__monster-icon {
-  border-color: #ff4d6d;
-  box-shadow: 0 0 14px rgb(255 77 109 / 0.85);
+  filter: drop-shadow(0 0 3px rgb(255 120 140)) drop-shadow(0 0 10px rgb(255 60 90 / 0.9));
 }
 
 .battle__monster.is-acted .battle-portrait,
@@ -262,10 +259,6 @@
 .battle__monster.is-down .battle-portrait,
 .battle__monster.is-down .battle-card {
   filter: grayscale(1) brightness(0.4);
-}
-
-.battle__monster.is-down .battle__monster-icon {
-  border-color: rgb(120 120 120 / 0.6);
 }
 
 .battle__monster-down {
@@ -502,14 +495,12 @@
 
 /* 使った側・対象のアイコンを光らせて揺らす（つながりが分かるように） */
 .battle__monster.is-spot-user .battle__monster-icon {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 14px rgb(255 214 120 / 0.9);
+  filter: drop-shadow(0 0 3px rgb(255 222 130)) drop-shadow(0 0 10px rgb(255 214 120 / 0.9));
   animation: spot-user 0.5s ease-in-out 2 alternate;
 }
 
 .battle__monster.is-spot-target .battle__monster-icon {
-  border-color: #ff6b7d;
-  box-shadow: 0 0 14px rgb(255 90 110 / 0.85);
+  filter: drop-shadow(0 0 3px rgb(255 130 145)) drop-shadow(0 0 10px rgb(255 90 110 / 0.9));
   animation: spot-target 0.36s ease-in-out 3;
 }
 

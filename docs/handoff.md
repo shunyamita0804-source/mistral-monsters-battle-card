@@ -4,14 +4,15 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜・セッション終わり）
+### まず読む：いまの状態（2026-10-28 深夜〜：カードの見た目 v3・試験の先生のデッキ）
 
-- **公開中：`main` の `554f2a6`**（公開ページで確認済み。そのあとの main は記録・写真だけ）。**セーブ version 21**（`lastLeague`）。テスト 646件。作業ブランチはすべて main に取り込み済み
-- **このセッションの作業報告書：`docs/report-2026-10-28-evening.md`**（ユーザー向け。したこと・Claude が決めたこと・未完了）
-- **次のセッションへ**：ユーザーは報告（写真）を見て返事と新しい依頼を送ってくる。返事が来るまで「Claude が決めたこと」（報告書 2章）を推測で変えない。
-  前回のように返事が無ければ、次の報告でもう一度聞く（ユーザー「次回回答なければまた聞いてください」）
-- **次に届く予定**：「カードの見た目3点 v2」（`Mistral_CardLook_ClaudeCode_v2_20261028.zip`）。届いたらそれをやり、続けて**手札の大きさの指示書**
-  （`design-parts/handsize-20261028/00_instructions_for_claude_code.txt`。手札の幅 90・マナとダメージの数字 1.4倍など。v2 のあとにやる約束）
+- **最新の作業：カードの見た目3点 v3 と試験の先生のデッキ**（作業ブランチ `claude/cardlook-v3-exam-20261028`。記録 `docs/cardlook-v3-20261028.md`、写真 `docs/design/cardlook-v3-exam-20261028/`）。
+  技・サポートカードの枠を v3 に（作り直しは `npm run art:skillframes`）・裏面を獅子の紋に・場のモンスターの色の線をやめて光る印に・
+  先生のモンスターを「ラズック・カルシェル・ノビトン」に・倒れたときのひと言を何体目かで変える（`src/game/battle/talk.ts`）。テスト 649件
+- **ユーザーに聞いていること**：手札の「使えない／選んだ／マナにする」の印がトゲのある古い飾りの枠の絵なので、新しい枠の上で浮いて見える。どうするか（記録の「未完了・気になる所」）
+- **次にやる**：**手札の大きさの指示書**（`design-parts/handsize-20261028/00_instructions_for_claude_code.txt`。手札の幅 90・マナとダメージの数字 1.4倍など。v3 の公開のあと）
+- その前の公開：`554f2a6`（ブースターとカウンター・街の建物7つ）。**セーブ version 21**（`lastLeague`）
+- その前のセッションの作業報告書：`docs/report-2026-10-28-evening.md`（「Claude が決めたこと」2章は返事待ち。返事が来るまで推測で変えない。返事が無ければ次の報告でもう一度聞く）
 - 作業の順番の約束：指示どおり作業 → `npm run check` → main に取り込み → 公開（`deploy-pages.yml`）→ 公開ページで写真 → 報告。ユーザーは毎回「main に取り込んで公開し、画面写真で報告」を求めている
 
 #### このセッションでしたこと（記録の場所）
@@ -116,8 +117,7 @@
 - 販売機の画面の部品：`python3 -I tools/design/gacha_build.py design-parts/cardshop-20261027 design-parts/cardshop-assets-20261027/assets`
 - モンスターの色の枠（新しいモンスターは色を足して全部作り直す。ほかの枠は1バイトも変わらない）：
   `python3 -I tools/art/battle_card_frame.py design-parts/cards-original/soramo-battle-20261025/04_Approved_Battle_Frame_Reference.png design-parts/cards-original/soramo-battle-20261025/MonsterColor_AccentMask_800x920.png assets/images/ui/battlecard soramo=#E4D2AC lazuck=#844DC5 nobiton=#FFD400 myurol=#84E5FA kalshell=#DFF2F6`
-  `python3 -I tools/art/skillcard_v5_monster_color.py design-parts/ui-skillcard-v5/extracted assets/images/ui/skillcard_v5 soramo=#E4D2AC gauul=#E68A46 lazuck=#844DC5 myurol=#84E5FA kalshell=#DFF2F6`
-  （2つ目は `frame_*_tintmask.png` も assets に書き出すので、終わったら消す）
+  技・サポートカードの枠は `npm run art:skillframes`（2026-10-28 から v3 の絵。色は `tools/art/skillcard_v3_build.py` の `MONSTER_COLORS`。scipy が要る）
 - 新しいダンジョン5つの絵（2026-10-28）：`python3 -I tools/design/dungeons5_build.py design-parts/dungeons5-20261028 assets/images`（scipy が要る。約2分半）
 - ダンジョン名の絵と発見の帯（2026-10-28）：`python3 -I tools/design/dungeon_titles_build.py design-parts/dungeon-titles-20261028 assets/images/ui`
 - 作業環境（2026-10-28 も Node 22・`node_modules` なしで始まった）：`export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → `export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH` → `npm install`。
