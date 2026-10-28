@@ -7,8 +7,7 @@ tools/design/seimon_world_build.py から呼ばれる（街と部屋をまとめ
 - 部屋（build_shop_room）：床と壁・家具・店の中の販売機・入口の戸・戸袋・戸枠・手前の壁を、素材の位置のまま並べる。
   素材は 1536×1024 の同じキャンバス。1px ＝ 部屋の単位 ROOM_UNIT（主人公の背 144×1.55 単位が、絵の中の人の背 約178px になる大きさ）。
   歩ける所（マス目）は、床の範囲から家具の足元を除いたもの（下の FLOOR・BLOCKS。素材の「家具と組み込み」の足元の線を見て決めた）
-- 街（town_shop_part・town_shop_doors）：新しい外観に「戸を開けたときに見える店の中」を下に重ねて街の絵に焼き込み、
-  左右の戸だけを別の絵にして、ゲームが入口の枠の中で左右に動かす
+- 街の外観と外の自動ドアは 2026-10-28 に新しい外観（tools/design/town2026_build.py）へ替えたので、ここの街の部分は消した
 """
 from __future__ import annotations
 
@@ -19,7 +18,6 @@ from PIL import Image, ImageDraw
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/cardshop-assets-20261027/assets')
 OUT_ROOMS = os.path.join(ROOT, 'assets/images/maps/rooms')
-OUT_TOWN = os.path.join(ROOT, 'assets/images/maps/town')
 WEBP_Q = 88
 
 CELL = 32
@@ -170,49 +168,4 @@ def build_shop_room() -> dict:
         exit=dict(x=exit_cols[0], y=exit_row, w=len(exit_cols), h=1),
         spawn=dict(x=door_cx, y=spawn_row),
         doorAnims=[door],
-    )
-
-
-# ───────────── 街の外観（F） ─────────────
-# 外側の自動ドア（素材の「外側の自動ドア F」）：開口
-TOWN_DOOR_OPENING = (663, 604, 210, 330)
-
-
-def town_shop_part() -> Image.Image:
-    """街に焼き込む外観：戸を開けたときに見える店の中を下に、建物を上に（戸は別の絵。戸袋は建物に描かれている）"""
-    im = _load('town_shop_door_inside')
-    im.alpha_composite(_load('town_shop'))
-    return im
-
-
-def town_shop_doors(bbox: tuple[int, int, int, int], size: tuple[int, int], xy: tuple[int, int], shade, door_cells: dict) -> dict:
-    """街の外側の戸。建物と同じ切り抜き（bbox）・縮小（size）・陰（shade）をかけ、街の位置（xy）に置く。
-    door_cells：街の扉のマス（seimon_world_build の doors）。戸が開く範囲は扉のマスとその前の4行"""
-    bx1, by1, bx2, by2 = bbox
-    sx, sy = size[0] / (bx2 - bx1), size[1] / (by2 - by1)
-    ox, oy, ow, oh = TOWN_DOOR_OPENING
-    half = ow // 2
-
-    def to_town(x: float, y: float) -> tuple[float, float]:
-        return xy[0] + (x - bx1) * sx, xy[1] + (y - by1) * sy
-
-    def leaf(name: str, x1: int, out: str) -> dict:
-        full = _load(name).crop(bbox).resize(size, Image.LANCZOS)
-        full = shade(full)
-        tx1, ty1 = to_town(x1, oy)
-        tx2, ty2 = to_town(x1 + half, oy + oh)
-        box = (round(tx1 - xy[0]), round(ty1 - xy[1]), round(tx2 - xy[0]), round(ty2 - xy[1]))
-        os.makedirs(OUT_TOWN, exist_ok=True)
-        full.crop(box).save(os.path.join(OUT_TOWN, out), quality=WEBP_Q, method=6)
-        return dict(file=f'maps/town/{out}', x=xy[0] + box[0], y=xy[1] + box[1], w=box[2] - box[0], h=box[3] - box[1])
-
-    left = leaf('town_shop_door_left', ox, 'shop_door_left.webp')
-    right = leaf('town_shop_door_right', ox + half, 'shop_door_right.webp')
-    cx1, cy1 = to_town(ox, oy)
-    cx2, cy2 = to_town(ox + ow, oy + oh)
-    return dict(
-        id='SHOP',
-        clip=dict(x=round(cx1), y=round(cy1), w=round(cx2 - cx1), h=round(cy2 - cy1)),
-        left=left, right=right, travel=left['w'], z=round(xy[1] + size[1]),
-        near=dict(x=door_cells['x'] - 1, y=door_cells['y'], w=door_cells['w'] + 2, h=5),
     )

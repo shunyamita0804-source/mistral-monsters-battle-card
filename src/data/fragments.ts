@@ -11,11 +11,12 @@ export interface FragmentDefinition {
 }
 
 export const FRAGMENTS: readonly FragmentDefinition[] = [
-  // 街（正式な絵の街。マスは 32px）：道の行き止まり4か所（2026-10-22 に街を詰めたので置き直し）
-  { id: 'fragment-01', mapId: 'town', x: 6, y: 59 },
-  { id: 'fragment-02', mapId: 'town', x: 107, y: 105 },
-  { id: 'fragment-03', mapId: 'town', x: 12, y: 105 },
-  { id: 'fragment-04', mapId: 'town', x: 114, y: 59 },
+  // 街（マスは 32px）：道の行き止まり4か所（2026-10-28 の新しい街で置き直し：北東の道の東の端・ピートの家の前の道の西の端・
+  // 仕立て屋の前の道の東の端・主人公の家の前の道の西の端）
+  { id: 'fragment-01', mapId: 'town', x: 190, y: 63 },
+  { id: 'fragment-02', mapId: 'town', x: 152, y: 140 },
+  { id: 'fragment-03', mapId: 'town', x: 14, y: 140 },
+  { id: 'fragment-04', mapId: 'town', x: 16, y: 189 },
   // 2026-10-26：太古の遺跡がランダム生成のダンジョンになったので、同じ形の精霊の森（遺跡の写し）の同じ場所へ移した
   { id: 'fragment-05', mapId: 'dungeon-02-b1', x: 9, y: 1 },
   { id: 'fragment-06', mapId: 'dungeon-02-b1', x: 3, y: 14 },

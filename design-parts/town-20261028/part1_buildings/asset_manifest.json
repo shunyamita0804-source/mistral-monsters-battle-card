@@ -1,0 +1,98 @@
+[
+  {
+    "file": "building_arena.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "32f422d8884b29c0c34e7b3ab141bf33fbbb719baaafb3110f4bcf1ad8d11c93"
+  },
+  {
+    "file": "building_bureau.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "8b7231581db99efb7b8c444a82dfcc941994ea59b8e8c4d751d4abfd754070d2"
+  },
+  {
+    "file": "building_lab.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "506038bf93ee3d6c5c745ea2b8c3de70a90c3c678f246ae570e3fd52e4340f70"
+  },
+  {
+    "file": "building_practice.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "d41444c1d24b43e093287cc3f48f22cf27101e05dad9ef3aedcd288a217944eb"
+  },
+  {
+    "file": "building_florist.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "6fdcf3e9a90b4df679e15c53e767803e8dde6b7f902bd02ce833adc7b0209ab6"
+  },
+  {
+    "file": "building_tailor.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "27531db46d4dd8907b98b7a10d1fad98e29f3cae1dd042d5f512907d597f06e4"
+  },
+  {
+    "file": "building_home.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "91512910f46fb94d2ef03b0d4faa4b9c1acfbea79e8c25c770f21c6b5b87dc5e"
+  },
+  {
+    "file": "building_neighbor.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "b790f06ce54bd745ad1e166a9fe93714785fd51e7ca025dc4f7d556b51e39242"
+  },
+  {
+    "file": "building_house_pete.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "054ff63fde3d6947f3b385445c0c2dd176e320018f4b26ec8dde8abb1ec91aef"
+  },
+  {
+    "file": "building_house_harold.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "d297a059f1d60196a2c4dc6f5008ac88e8e4b1879c61686da12c70c8a70d3045"
+  },
+  {
+    "file": "building_shed.png",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "0fdc01ec49c8554c5c041fdbf53d7a449e301d8addc159a97e892f3998ea7c57"
+  },
+  {
+    "file": "stalls.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "transparent": true,
+    "sha256": "d4d65a5ccc58d058851992fec4768680d77552e4103abfee7cd566e7a76ea978"
+  }
+]
