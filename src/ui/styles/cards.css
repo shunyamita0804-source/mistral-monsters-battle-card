@@ -63,17 +63,17 @@ img.skill-card__art {
 
 /* マナの丸：平らな紺の丸・細い金のふち・白い太い数字（大きさは skillCard.ts で直径の約7割）。つや・影はつけない */
 .skill-card__mana {
+  /* 前の版のつやのある青い球（mana_ball.webp）に白い太い数字（2026-10-29） */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
-  border: max(1px, 0.9cqw) solid #f0d78c;
-  border-radius: 50%;
-  background: #1b3252;
+  background: url('@assets/images/ui/skillcard_simple/mana_ball.webp') center / contain no-repeat;
   color: #fff;
   font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
   font-weight: 900;
   line-height: 1;
+  -webkit-text-stroke: 0.5cqw #06222e;
+  paint-order: stroke fill;
 }
 
 .skill-card__mana-num {
@@ -81,7 +81,7 @@ img.skill-card__art {
   transform: translateY(0.04em);
 }
 
-/* 分類の印（今の icon_{分類}.png をそのまま縮める） */
+/* 分類の札（前の版の八角形の札。tile_{分類}.webp） */
 .skill-card__icon {
   object-fit: contain;
   pointer-events: none;
@@ -147,12 +147,6 @@ img.skill-card__art {
   color: #fff;
   line-height: 1;
   overflow: visible;
-}
-
-/* マナの玉（前の数字の入った玉の絵） */
-.skill-card__mana-img {
-  object-fit: contain;
-  pointer-events: none;
 }
 
 .skill-card__value-num {
