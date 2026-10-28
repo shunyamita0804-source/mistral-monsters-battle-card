@@ -17,7 +17,7 @@ import { fitValueFont } from './valueFit.ts';
  *   LAYOUT の2倍の大きさ。npm run art:skillframes（tools/art/skillcard_simple_build.py）で作り直す
  * - 'normal'（縦長 253×382）：図鑑・詳しい表示・大きなカード。'hand'（ほぼ正方形 208×210）：対戦の手札・守備のカードなど小さな表示。
  *   手札は名前・効果の帯を出さず、マナ・印・ダメージを重ねたときに見える左35%に置く
- * - ダメージの四角：攻撃＝大きな数字だけ、防御＝盾と軽減値、回避＝「回避」、特殊＝「効果」（skillValueBadge）、サポート＝区分
+ * - ダメージの四角：攻撃＝大きな数字だけ、防御＝軽減値の数字だけ（-3）、回避＝「回避」、特殊＝「効果」（skillValueBadge）、サポート＝区分
  * - 効果の帯：防御・回避・特殊・サポートは説明の文、攻撃は追加の効果のときだけ（skillBandText）
  */
 export type SkillCardSize = 'normal' | 'hand';
@@ -110,15 +110,13 @@ function categoryIcon(l: FrameLayout, category: SkillCategory | 'support'): HTML
 }
 
 /**
- * 数値の欄の文字の大きさ（cqw。2026-10-28 手札の大きさの指示書：数字 1.4倍・短い文字 約1.3倍・盾 1.4倍）。
+ * 数値の欄の文字の大きさ（cqw。2026-10-28 手札の大きさの指示書：数字 1.4倍・短い文字 約1.3倍）。
  * 欄からはみ出すときは、その端末の字の形で幅を測って、収まる大きさまで下げる（valueFit.ts）
  */
-const VALUE_FONT: Readonly<Record<SkillCardSize, { readonly num: number; readonly word: number; readonly shield: number }>> = {
-  normal: { num: 21, word: 8.5, shield: 8.4 },
-  hand: { num: 22, word: 9.5, shield: 9.8 },
+const VALUE_FONT: Readonly<Record<SkillCardSize, { readonly num: number; readonly word: number }>> = {
+  normal: { num: 21, word: 8.5 },
+  hand: { num: 22, word: 9.5 },
 };
-/** 盾と数字のすき間（cqw。cards.css の .skill-card__value-guard の gap と同じ） */
-const GUARD_GAP = 0.5;
 const NUM_FONT = "900 100px 'Arial Black', 'Hiragino Sans', sans-serif";
 
 let measureCtx: CanvasRenderingContext2D | null | undefined;
@@ -147,10 +145,7 @@ function wordFontOf(): string {
   return wordFont;
 }
 
-const SHIELD_SVG =
-  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" fill="currentColor"/></svg>';
-
-/** ダメージの四角（窓の左下の角）：攻撃＝大きな数字だけ、防御＝盾と軽減値、回避＝「回避」、特殊＝「効果」。サポートは区分の文字 */
+/** ダメージの四角（窓の左下の角）：攻撃＝大きな数字だけ、防御＝軽減値の数字だけ（-3。2026-10-29 ユーザー「盾のアイコン不要」）、回避＝「回避」、特殊＝「効果」。サポートは区分の文字 */
 function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, supportLabel: string): HTMLElement {
   const box = place(h('div', { class: 'skill-card__value' }), l, l.value);
   const boxW = ((l.value[2] - l.value[0]) / l.w) * 100;
@@ -166,22 +161,12 @@ function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, 
     return box;
   }
   const badge = skillValueBadge(skill);
-  if (badge.kind === 'damage') {
+  if (badge.kind === 'damage' || badge.kind === 'guard') {
+    // 攻撃＝ダメージ、防御＝軽減値（-3）。どちらも数字だけ（はみ出すときは収まる大きさまで下げる）
     const text = skillValueBadgeText(badge);
     const num = h('span', { class: 'skill-card__value-num', text });
     num.style.fontSize = cqw(fitValueFont(font.num, boxW, textEm(text, NUM_FONT)));
     box.append(num);
-  } else if (badge.kind === 'guard') {
-    // 盾と数字を1行に。はみ出すときは、盾と数字を同じ割合で小さくする
-    const text = skillValueBadgeText(badge);
-    const ratio = font.shield / font.num;
-    const size = fitValueFont(font.num, boxW, textEm(text, NUM_FONT), ratio, GUARD_GAP);
-    const shield = h('span', { class: 'skill-card__value-shield' });
-    shield.innerHTML = SHIELD_SVG;
-    shield.style.width = shield.style.height = cqw(size * ratio);
-    const num = h('span', { class: 'skill-card__value-num', text });
-    num.style.fontSize = cqw(size);
-    box.append(h('span', { class: 'skill-card__value-guard' }, shield, num));
   } else {
     box.classList.add('is-word');
     box.append(word(skillValueBadgeText(badge)));
