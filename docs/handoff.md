@@ -6,7 +6,7 @@
 
 ### まず読む：いまの状態（2026-10-28 深夜〜：お金の入る側）
 
-- **最新の作業：お金の入る側（ダンジョンの1勝ごとのお金・宝箱の中身・ボスのお金）**（作業ブランチ `claude/money-income-20261028`。記録 `docs/money-income-20261028.md`、
+- **最新の作業：お金の入る側（ダンジョンの1勝ごとのお金・宝箱の中身・ボスのお金。公開済み・公開ページで確認済み）**（作業ブランチ `claude/money-income-20261028`。記録 `docs/money-income-20261028.md`、
   写真 `docs/design/money-income-20261028/`、報告書 `docs/report-2026-10-28-money.md`）。表は `src/data/economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`（前の `REWARDS` はなくした）。
   宝箱は `run.ts` の `rollChest`／`openRunChest(save, 宝箱ID)`。テスト 673件
 - その前：手札の大きさ・数字 1.4倍・手札の印・枠の2倍（ユーザー確認で合格。記録 `docs/handsize-20261028.md`）
