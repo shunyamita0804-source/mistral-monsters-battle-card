@@ -1,39 +1,56 @@
-# 引き継ぎメモ（2026-10-28 深夜：ブースターとカウンター・建物7つを公開したあと・セッション引き継ぎ用）
+# 引き継ぎメモ（2026-10-28 深夜：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜）
+### まず読む：いまの状態（2026-10-28 深夜・セッション終わり）
 
-- **公開中：`main` の `554f2a6`（ブースターとカウンター・建物7つ）**（公開ページで確認済み）。**セーブ version 21**（`lastLeague` を足した）。テスト 646件
-- 2026-10-28 深夜にしたこと
-  - **ブースターとカウンター**（記録 `docs/booster-select.md` の最後の章）：箱＝初期配布・新しく始めたらカードなし・試験は貸しデッキ・カウンターで残り2箱 1,500G・
-    特別復元を研究所へ・総当たり表を ○×・大会会場の壁の板に表。テスト `tests/boosterCounter.test.ts`
-  - **街の建物7つを正面向きに**（記録 `docs/design/town-20261028/10_受け取り結果_UTF8.txt` の最後）
-  - **仮パックの名残3か所**（ユーザー「3つとも直す」）
-- **待っているもの**：手札の大きさの指示書（`Mistral_HandSize_20261028`）は「カードの見た目3点 v2」の ZIP が届いてから（ユーザー了承）。原本は届いた ZIP のまま（まだ design-parts に置いていない）
-- **Claude が決めたこと（返事待ち）**：カウンターのメニューからガチャの札を外した／【仮】スキップでカードが無ければ旅立ちのきらめきを配る／研究員の窓（図鑑・特別復元）
-- **未完了**：iPhone 実機での確認
+- **公開中：`main` の `554f2a6`**（公開ページで確認済み。そのあとの main は記録・写真だけ）。**セーブ version 21**（`lastLeague`）。テスト 646件。作業ブランチはすべて main に取り込み済み
+- **このセッションの作業報告書：`docs/report-2026-10-28-evening.md`**（ユーザー向け。したこと・Claude が決めたこと・未完了）
+- **次のセッションへ**：ユーザーは報告（写真）を見て返事と新しい依頼を送ってくる。返事が来るまで「Claude が決めたこと」（報告書 2章）を推測で変えない。
+  前回のように返事が無ければ、次の報告でもう一度聞く（ユーザー「次回回答なければまた聞いてください」）
+- **次に届く予定**：「カードの見た目3点 v2」（`Mistral_CardLook_ClaudeCode_v2_20261028.zip`）。届いたらそれをやり、続けて**手札の大きさの指示書**
+  （`design-parts/handsize-20261028/00_instructions_for_claude_code.txt`。手札の幅 90・マナとダメージの数字 1.4倍など。v2 のあとにやる約束）
+- 作業の順番の約束：指示どおり作業 → `npm run check` → main に取り込み → 公開（`deploy-pages.yml`）→ 公開ページで写真 → 報告。ユーザーは毎回「main に取り込んで公開し、画面写真で報告」を求めている
 
-- 2026-10-28 夜（その2）：画面の点検と直し（記録 **`docs/polish-20261028.md`**）。木の橋をまっすぐに・橋から南の道へ小道・小川の斜めの所の石垣・
-  案内は石畳の道の真ん中（`findPathCentered`）・精霊の森の名前と遺跡の光の切れ目・名刺図鑑の帯とマナの絵のかけら・図鑑の説明にカルシェル
-- 2026-10-28 夜にしたこと
-  - **部屋4つ（大会会場・管理局・練習場・研究所）を新しい絵に**（指示 ZIP「Mistral_Rooms4_ClaudeCode_20261028」Part1〜3。原本 `design-parts/rooms-20261028/`。記録 **`docs/rooms4-20261028.md`**）。
-    組み立て `python3 -I tools/design/rooms4_build.py`（数秒）→ `src/data/rooms4Art.generated.ts`。カウンターの奥の人は見た目だけずらす（`drawDx`・`drawDy`）。テスト `tests/rooms4.test.ts`
-  - ガチャのシリーズを選ぶ画面：パックの名前を1行に（文字 12px）
-- **次にやる予定（指示書より）**：大会会場の左の壁の紺の板に総当たり表（`HALL_ART.items.BOARD`）・欠片の特別復元を研究所へ（機械か実験台）＝「ブースターとカウンター」の指示書
-- **未完了**：iPhone 実機での確認（部屋4つ・ガチャ・街の倍率。ブラウザでは確認済み）
+#### このセッションでしたこと（記録の場所）
 
-- 2026-10-28 夕方にしたこと（ユーザーは前回の「Claude が決めたこと」〔せりふの文・混ぜる3人〕をすべて了承）
-  - **街の倍率 0.85 → 0.7**（`worldScreen.ts` の `VIEW_ZOOM`。部屋・ダンジョンは変えない）
-  - **カードショップのガチャの作り直し**（指示 ZIP「Mistral_Gacha_ClaudeCode_20261028」。原本 `design-parts/gacha-20261028/`。記録 **`docs/gacha-20261028.md`**）：
-    シリーズを選ぶ画面（6シリーズ・2回タップで決定）→ 値段の確認 → 機械（つまみを1周）→ 取り出し口に寄る → パックを横になぞって破る → 1枚ずつめくる。
-    中身・確率・値段は `src/data/economy.ts` の `GACHA`・`GACHA_SERIES`（すべて仮：150G・5枚・レアはノーマルの4分の1・モンスター5％）。ロジック `src/game/economy/gachaSeries.ts`
-  - 画面写真の撮り方（ガチャ）：ショップの販売機の前 `{mapId:'shop', x:45, y:20, dir:'up'}` で「調べる」。モンスターが出る回を撮るときは、「はい」を押す直前に Math.random を1回だけ (1109+0.5)/0x7fffffff にする（ソラモで ノーマル3・レア1・モンスター）
-- **ユーザーの判断待ち（ガチャ）**：大会 E・D の景品にまだ「第2弾・第3弾パック（仮）の解放」が出る／特別復元の説明「技カードは第3弾パックから」／ショップの「カードを見る」が仮パックの中身を並べる（どれも販売機から外した仮パックのこと。`docs/gacha-20261028.md` の最後）
-- **未完了**：iPhone 実機での確認（ガチャの音・手ざわり・街の倍率。ブラウザでは確認済み）
-- ユーザーが後で送るもの：ブースターパックの中身と値段・初期デッキの正式な中身（今は仮のまま）
+| 内容 | 記録 | 道具・テスト |
+| --- | --- | --- |
+| 街の倍率 0.85→0.7 | `worldScreen.ts` の `VIEW_ZOOM` | — |
+| ガチャの作り直し | `docs/gacha-20261028.md` | `tools/design/gacha_series_build.py`・`tests/gachaSeries.test.ts` |
+| 部屋4つの新しい絵 | `docs/rooms4-20261028.md` | `tools/design/rooms4_build.py`（数秒）・`tests/rooms4.test.ts` |
+| 画面の点検と直し | `docs/polish-20261028.md` | `findPathCentered`（案内の道）・`tools/design/edge_debris_20261028.py` |
+| ブースターとカウンター | `docs/booster-select.md` の最後の章 | `src/game/story/introV2.ts`（`boosterDeck`・`buyBooster` など）・`tests/boosterCounter.test.ts` |
+| 街の建物7つを正面向きに | `docs/design/town-20261028/10_受け取り結果_UTF8.txt` の最後 | `tools/design/town2026_build.py`（原本 `design-parts/town-20261028/front-facing-20261028/`） |
+| 仮パックの名残（大会の景品・特別復元の説明・カードを見る） | `docs/booster-select.md` の最後の章 | — |
+
+#### 大事な仕組み（このセッションで変わったところ）
+
+- 新しく始めたときのセーブは `createNewGameSave`（カードなし）。`createNewSave` はテストや読み込みの土台としてこれまでどおり（初期デッキ入り）
+- 試験は `BattleRequest.playerDeck`（先生の貸しデッキ。`examLoanDeck`）。所持カードには入らない
+- カウンターで買った箱の記録は `storyFlags` の `booster-bought:*`。管理局で受け取った箱は `story.introV2.selectedBoosterKey`
+- 特別復元は `src/ui/components/restoreFlow.ts`（研究所の解析台 `restore`・研究員 `researcher`）。カウンターのメニューにはもう無い
+- 大会会場の壁の板の位置は `maps.ts` の `HALL_BOARD`（板の傾き skewY −33.2°）。表は `#addLeagueBoard`。○× は `tournamentBoards.ts` の `leagueMark`
+- 部屋4つは `rooms4Art.generated.ts`（`ROOMS4_ART`）。大会会場・練習場・研究所は `seimon_world_build.py` では作らない（`ROOMS4_IDS`）。管理局の前の部品（bureau-v01）は消した
+- 街の絵を作り直すとき：`python3 -I tools/design/seimon_world_build.py design-parts/seimon-world`（約4分。`pip install scipy matplotlib` が要る）
+- 画面写真：セーブは Vitest の一時テスト（`tests/zz-*.test.ts`、終わったら消す）で `createNewGameSave`・`claimBooster`・`enterTournament` などから作る。
+  場所の例：カウンター `{shop, 30,16, up}`・研究所の解析台 `{lab, 43,26, right}`・研究員 `{lab, 31,24, up}`・大会会場の板 `{hall, 10,23, left}`・家の机（デッキ編集）`{home, 8,18, left}`。
+  街の入口11か所の出入り `node tools/e2e/town_doors.cjs URL 出力 セーブ.json`
+- 作業環境：セッションの始めは Node 22・`node_modules` なしのことがある → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → `export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH` → `npm install`
+
+#### ユーザーの判断待ち・未完了
+
+- Claude が決めたこと（報告書 2章）：ガチャの数字（仮）・部屋の人の立ち位置と調べたときの文・カウンターからガチャの札を外した・【仮】スキップで旅立ちのきらめきを配る・研究員の選択の窓・植木鉢と木箱の位置
+- 前からの判断待ち：試験の先生のデッキとライフ・【仮】スキップのボタンを消す時期（販売前）・前のセーブの対戦成績・道具の値段と歩数（すべて仮）・
+  すなをほるで隠れたカルシェルを特殊の技で狙えるか・図鑑のカードの1枚絵・レアリティと正式英語（`docs/review-2026-10-27-answer.md`）
+- 未完了：iPhone 実機での確認（ガチャの音と手ざわり・部屋4つ・建物7つ・街の倍率）
+- 気になる所（前から）：店の中の入口から出るとき、一瞬だけ主人公の頭が戸枠の上の横木に隠れる
+
+#### これより下は前の記録（古い順に積み上げ。上と食いちがうときは上が正しい）
+
+- 2026-10-28 夜〜夕方の作業の細かいメモ（上の表と同じ内容）は git の履歴にある（`git log --oneline b386425..554f2a6`）
 - 2026-10-28 午後（その前）の公開：`f02555b`（街の直し・ダンジョンの人物12人。報告書 `docs/report-2026-10-28-town-fix-dungeon-people.md`）
 - 2026-10-28 午後にしたこと（指示 ZIP「Mistral_Dungeon_People_24_20261028」。原本は `design-parts/dungeon-people-20261028/`）
   - **A 街の直し**（`bfd9607`。作業ブランチ `claude/town-fix-20261028`）：街の倍率 1.15→0.85（`worldScreen.ts` の `VIEW_ZOOM`）・石の橋のアーチの面と水を使わず道をデッキへ・
