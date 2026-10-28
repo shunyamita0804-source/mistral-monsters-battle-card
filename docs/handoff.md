@@ -1,10 +1,25 @@
-# 引き継ぎメモ（2026-10-29：セッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-29 夜：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 のセッション終わり）
+### まず読む：いまの状態（2026-10-29 夜のセッション終わり）
+
+- **公開中：`main` の `3bf46e8` 以降**（公開ページで確認済み）。作業ブランチはすべて main に取り込み済み。報告は Artifact https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 （**返事待ち**）。
+  ZIP は `downloads/作業報告書_20261029.zip`（git に入れない。`.git/info/exclude` に downloads/ を足した）
+- このセッションでしたこと（どれも main・公開済み。テスト 732件）
+  1. 小さな直し：モンスターの説明から「（モンスターランクC）」を消した・CPU のおいかぜを「次のターンに攻撃できそうな味方」に（`docs/pukarim.md` 7章）
+  2. 技カードの新しい形（`docs/cardshape-20261029.md`）：枠は `assets/images/ui/skillcard_simple/`（`npm run art:skillframes`＝`tools/art/skillcard_simple_build.py`）。手札も正方形の枠
+  3. プカリムの最終（`docs/pukarim-final-20261029.md`）：ふつうの一覧へ・ピートとの勝負（`src/game/story/pete.ts`。記録 `storyFlags` の `pete-beaten`）・ガチャのシリーズ（`unlockFlag`）・相手のチーム
+  4. iPhone の試遊の直し（`docs/polish-20261029.md`）：街は `tools/design/town2026_build.py`（小川・門・石垣・噴水・小物）を `seimon_world_build.py` で作り直す（約5分）。部屋は `rooms4_build.py`・`cardshop_v2.py`。
+     人物は街で 1.2 倍（`worldScreen.ts` の `TOWN_FIGURE_BOOST`）。押す所は `tapSize.css`。確認用 `?qa=1&hit=1`（当たり判定）・`&fig=1.15`（人の大きさ）
+  5. 依頼文7つ：`docs/design-requests-20261028/`（一覧 `00_README.md`）
+- 未完了：iPhone 実機・依頼文の絵・ダンジョン7つと対戦の全画面の点検の続き・絵が切れる技（ソラモ04・カルシェル02・13）の直し方はユーザー判断
+- 写真の道具：`tools/e2e/card_gallery_shot.cjs`（開発サーバーでカードを並べる）・`gacha_shot.cjs`・`pete_shot.cjs`・`town_shot.cjs`（W・H・qs）・`screen_steps.cjs`（W・H・`small` で 44 未満のボタンを書き出す）
+- 作業環境：最初に `nvm install 24`・`npm install`・`pip install scipy matplotlib`。ローカルの main が古いことがある → `git checkout -B main origin/main`
+
+### 前のセッション（2026-10-29 昼）の「いまの状態」
 
 - **公開中：`main` の `3f92ad8` 以降**（公開ページで確認済み）。作業ブランチはすべて main に取り込み済み。次の指示を待っている
 - **2026-10-29（このセッションの最後）**：おいかぜの直し（`claude/tailwind-fix-20261029`）と、
