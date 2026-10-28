@@ -26,6 +26,8 @@ export const SCREEN_IDS = [
   'options',
   /** 歩きの確認画面（開発用。?qa=1 のときだけ入れる） */
   'walkLab',
+  /** プカリムの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-28） */
+  'pukarimLab',
 ] as const;
 
 export type ScreenId = (typeof SCREEN_IDS)[number];

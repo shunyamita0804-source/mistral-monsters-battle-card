@@ -1,6 +1,7 @@
 import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
+import { PUKARIM_MONSTER_ID } from './pukarim.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -43,6 +44,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // カルシェル（2026-10-27）：枠は淡い氷色（#DFF2F6。src/data/kalshell.ts の KALSHELL_COLOR）。絵は届いた BattleArt/Kalshell_BattleArt_Transparent_Approved.png（1169×1345）を無改変
   // 0.8・少し上へ：絵がキャンバスいっぱいに描かれている（ノビトンと同じくらい）ので、ハサミ・脚が枠の飾りと名前の札に隠れない大きさ
   [KALSHELL_MONSTER_ID]: { art: 'kalshell_battlecard.png', frame: 'kalshell', scale: 0.8, offsetY: -0.02 },
+  // プカリム（2026-10-28 試遊中）：枠はミント（#A8DCC4）。絵は届いた art/pukarim_battleart.png（1169×1345。カルシェルと同じ大きさ・縦横比）を無改変
+  [PUKARIM_MONSTER_ID]: { art: 'pukarim_battlecard.png', frame: 'pukarim', scale: 0.8, offsetY: -0.02 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

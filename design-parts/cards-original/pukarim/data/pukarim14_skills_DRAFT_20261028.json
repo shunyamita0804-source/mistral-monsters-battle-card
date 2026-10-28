@@ -1,0 +1,151 @@
+{
+  "monster": "プカリム",
+  "monster_id": "mon-pukarim",
+  "life": 6,
+  "monster_rank": "C",
+  "frame_color_name": "ミント",
+  "frame_color_hex": "#A8DCC4",
+  "status": "G3 承認（2026-10-28）。試遊（G4）で数字を直す可能性あり。絵は仮",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-pukarim-01",
+      "name": "しっぽ",
+      "category": "ちから技",
+      "mana": 0,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 2,
+      "id": "skl-pukarim-02",
+      "name": "たいあたり",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 3,
+      "id": "skl-pukarim-03",
+      "name": "ころがる",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 4,
+      "id": "skl-pukarim-04",
+      "name": "ボディプレス",
+      "category": "ちから技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 5,
+      "id": "skl-pukarim-05",
+      "name": "とっぷう",
+      "category": "かしこさ技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 6,
+      "id": "skl-pukarim-06",
+      "name": "エアショット",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 7,
+      "id": "skl-pukarim-07",
+      "name": "ぷはーっ",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "ほっぺにためているときに使うと、回避されない",
+      "gacha_slot": "レア"
+    },
+    {
+      "no": 8,
+      "id": "skl-pukarim-08",
+      "name": "おおつむじ",
+      "category": "かしこさ技",
+      "mana": 5,
+      "damage": "5",
+      "effect": "なし",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 9,
+      "id": "skl-pukarim-09",
+      "name": "ほっぺにためる",
+      "category": "特殊技",
+      "mana": 1,
+      "damage": "なし",
+      "effect": "プカリムが次に使う攻撃技のダメージを＋2する（使うまで続く。重ねられない）",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 10,
+      "id": "skl-pukarim-10",
+      "name": "おいかぜ",
+      "category": "特殊技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "指定したプカリム以外の味方モンスター1体の、次のターンの攻撃技のダメージを＋1する",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 11,
+      "id": "skl-pukarim-11",
+      "name": "ぷにぷにボディ",
+      "category": "防御技",
+      "mana": 1,
+      "damage": "なし",
+      "effect": "ちから技のダメージを2軽減",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 12,
+      "id": "skl-pukarim-12",
+      "name": "くうきのクッション",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "ちから技・かしこさ技のダメージを2軽減",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 13,
+      "id": "skl-pukarim-13",
+      "name": "ぷかっとうく",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "ちから技を回避",
+      "gacha_slot": "ノーマル"
+    },
+    {
+      "no": 14,
+      "id": "skl-pukarim-14",
+      "name": "ぷかぷか",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "なし",
+      "effect": "ちから技・かしこさ技を、消費マナに関係なく回避",
+      "gacha_slot": "レア"
+    }
+  ]
+}

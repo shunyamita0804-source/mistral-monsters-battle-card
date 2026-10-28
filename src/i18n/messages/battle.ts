@@ -49,6 +49,10 @@ export const BATTLE = {
   },
   'battle.log.seal': { ja: '{name}は次のターン攻撃できない。', en: "{name} can't attack next turn." },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
+  // 試遊中：プカリム（2026-10-28）
+  'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
+  'battle.log.tailwind': { ja: '{name}においかぜ。次の攻撃技のダメージ＋{n}。', en: 'A tailwind for {name}. Its next attack deals +{n}.' },
+  'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',
     en: "{name}'s {stat} skills deal {n} less damage next turn.",
@@ -107,6 +111,8 @@ export const BATTLE = {
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
   'battle.status.stunned': { ja: '行動不可', en: "Can't act" },
   'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
+  'battle.status.charged': { ja: 'ためている', en: 'Charged' },
+  'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
   'battle.cmd.menu': { ja: 'コマンド', en: 'Command' },
   // 対戦相手のひと言（【仮】台詞。正式な台詞・人物ごとの言い回しは未定）
@@ -122,6 +128,7 @@ export const BATTLE = {
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
   'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
+  'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },
 
   // 先攻・後攻を決める
   'battle.order.faceFirst': { ja: '先攻', en: '1st' },
@@ -188,6 +195,7 @@ export const BATTLE = {
   // 説明欄
   'battle.prompt.attackTarget': { ja: '攻撃する相手モンスターをタップしてください', en: 'Tap an enemy monster to attack' },
   'battle.prompt.healTarget': { ja: '回復する味方モンスターをタップしてください', en: 'Tap an ally monster to heal' },
+  'battle.prompt.tailwindTarget': { ja: 'おいかぜをかける味方モンスターをタップしてください', en: 'Tap an ally monster to give a tailwind' },
   'battle.prompt.specialTarget': { ja: '効果を与える相手モンスターをタップしてください', en: 'Tap an enemy monster to target' },
   'battle.prompt.incoming': { ja: '相手の「{skill}」！ {stat}{power}の攻撃', en: "Opponent's {skill}! {stat} {power} attack" },
   'battle.prompt.incomingNoDefense': {

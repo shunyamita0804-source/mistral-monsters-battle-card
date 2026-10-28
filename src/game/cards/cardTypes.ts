@@ -87,6 +87,8 @@ export type SkillEffect =
       readonly manaDrain?: number;
       /** 回避されなかったとき、対象は次の手番に行動できない（正式：ノビトンのまきつく 2026-10-25） */
       readonly stunTarget?: boolean;
+      /** 使ったモンスターが「ほっぺにためる」でためているときに使うと、回避されない（試遊中：プカリムのぷはーっ 2026-10-28） */
+      readonly undodgeableWhenCharged?: boolean;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -143,6 +145,16 @@ export type SkillEffect =
   | { readonly type: 'hide' }
   /** 特殊（正式：ミュロルのみずあび 2026-10-25）：使ったモンスターのライフを amount 回復する（最大ライフまで） */
   | { readonly type: 'healSelf'; readonly amount: number }
+  /**
+   * 特殊（試遊中：プカリムのほっぺにためる 2026-10-28）：使ったモンスターが次に使う攻撃技のダメージを amount 増やす。
+   * 使うまで続く（ターンをまたいでも消えない）。重ねない。次に攻撃技を使ったら（当たっても・守られても・回避されても）消える。倒れたら消える
+   */
+  | { readonly type: 'charge'; readonly amount: number }
+  /**
+   * 特殊（試遊中：プカリムのおいかぜ 2026-10-28）：選んだ味方モンスター1体（使ったモンスターと同じ種類は選べない）の、
+   * 次のそのモンスターの攻撃技のダメージを amount 増やす。1回使うか、次の自分の手番が終わったら消える
+   */
+  | { readonly type: 'tailwind'; readonly amount: number }
   | { readonly type: 'heal' }
   | { readonly type: 'mana' }
   | { readonly type: 'draw' };
@@ -309,8 +321,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide' | 'charge' | 'tailwind';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide', 'charge', 'tailwind'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

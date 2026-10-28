@@ -13,6 +13,7 @@ import { gachaScreen, shopMenuScreen } from './shopScreens.ts';
 import { titleScreen } from './titleScreen.ts';
 import { tournamentScreen } from './tournamentScreen.ts';
 import { walkLabScreen } from './walkLabScreen.ts';
+import { pukarimLabScreen } from './pukarimLabScreen.ts';
 import type { ScreenDefinition } from './types.ts';
 import { worldScreen } from './worldScreen.ts';
 
@@ -38,4 +39,5 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   settings: settingsScreen,
   options: optionsScreen,
   walkLab: walkLabScreen,
+  pukarimLab: pukarimLabScreen,
 };

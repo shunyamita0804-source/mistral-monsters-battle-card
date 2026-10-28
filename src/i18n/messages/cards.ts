@@ -39,6 +39,8 @@ export const CARDS = {
   'card.effect.shield': { ja: '特殊', en: 'Special' },
   'card.effect.healSelf': { ja: '特殊', en: 'Special' },
   'card.effect.hide': { ja: '特殊', en: 'Special' },
+  'card.effect.charge': { ja: '特殊', en: 'Special' },
+  'card.effect.tailwind': { ja: '特殊', en: 'Special' },
   'card.supportKind.field': { ja: '全体', en: 'Field' },
 
   // 技の効果説明（ゲーム側で描く文字）
