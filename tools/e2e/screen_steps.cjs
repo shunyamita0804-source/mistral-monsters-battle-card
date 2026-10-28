@@ -41,6 +41,7 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
       if (box) { const cx = box.x + box.width / 2, cy = box.y + box.height / 2; await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx + 120, cy - 20, { steps: 6 }); await page.mouse.up(); }
     }
     if (st.burst) { for (let k = 0; k < st.burst; k++) { await page.waitForTimeout(st.every || 300); await shot((st.shot || 'b') + k); } continue; }
+    if (st.scrollTo) await page.locator(st.scrollTo).first().scrollIntoViewIfNeeded().catch(() => log('miss', st.scrollTo));
     if (st.click) await page.locator(st.click).first().click({ timeout: 8000 }).catch((e) => log('miss', st.click));
     await page.waitForTimeout(st.wait || 1200);
     if (st.shot) await shot(st.shot);

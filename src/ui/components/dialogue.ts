@@ -92,8 +92,8 @@ export interface DialogueOptions {
   readonly onEffects: (effects: readonly SceneEffect[]) => void;
   /** 話し手の名前の札を出したとき（名刺図鑑の登録に使う） */
   readonly onSpeaker?: (speaker: Exclude<Speaker, 'system'>) => void;
-  /** 会話が閉じたとき。練習試合を始める場面なら practice が入る */
-  readonly onClose: (practice: { readonly tutorial: boolean } | null) => void;
+  /** 会話が閉じたとき。練習試合を始める場面なら practice、住人との勝負を始める場面なら battle が入る */
+  readonly onClose: (practice: { readonly tutorial: boolean } | null, battle?: 'pete' | null) => void;
 }
 
 export interface DialogueHandle {
@@ -238,11 +238,12 @@ export function playScene(parent: HTMLElement, start: SceneId, options: Dialogue
   const finish = (effects: readonly SceneEffect[] | null): void => {
     if (closed) return;
     const list = effects ?? [];
-    const intro = list.filter((e) => e.kind !== 'practice');
+    const intro = list.filter((e) => e.kind !== 'practice' && e.kind !== 'battle');
     if (intro.length) options.onEffects(intro);
     const practice = list.find((e): e is Extract<SceneEffect, { kind: 'practice' }> => e.kind === 'practice');
+    const battle = list.find((e): e is Extract<SceneEffect, { kind: 'battle' }> => e.kind === 'battle');
     close();
-    options.onClose(practice ? { tutorial: practice.tutorial } : null);
+    options.onClose(practice ? { tutorial: practice.tutorial } : null, battle ? battle.id : null);
   };
 
   function advance(): void {

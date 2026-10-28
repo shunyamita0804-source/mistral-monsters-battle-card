@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
-import { GACHA, GACHA_SERIES } from '../src/data/economy.ts';
+import { availableGachaSeries, GACHA, GACHA_SERIES } from '../src/data/economy.ts';
 import {
   canReselectSeries,
   drawSeriesPack,
@@ -10,13 +10,14 @@ import {
   tierOf,
 } from '../src/game/economy/gachaSeries.ts';
 import { createNewSave } from '../src/game/save/saveData.ts';
+import { PETE_BEATEN_FLAG } from '../src/game/story/pete.ts';
 
 const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
-  it('6シリーズ。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell']);
+  it('7シリーズ（2026-10-29 にプカリム）。どれも 150G・5枚', () => {
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -118,11 +119,23 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(r.save.coins).toBe(149);
   });
 
-  it('すべて最初から選べる（新しいセーブでも買える）', () => {
-    for (const series of GACHA_SERIES) {
+  it('プカリム以外は最初から選べる（新しいセーブでも買える）', () => {
+    for (const series of GACHA_SERIES.filter((s) => s.id !== 'pukarim')) {
       const r = purchaseSeriesPack({ ...createNewSave(), coins: 150 }, series.id, `tx-${series.id}`, 3);
       expect(r.status).toBe('ok');
     }
+  });
+
+  it('プカリムはピートに勝ったあと（記録 pete-beaten）だけ並び、買える。レア枠は 7 ぷはーっ・14 ぷかぷか', () => {
+    const before = { ...createNewSave(), coins: 150 };
+    expect(availableGachaSeries(before.storyFlags).map((s) => s.id)).not.toContain('pukarim');
+    expect(purchaseSeriesPack(before, 'pukarim', 'tx-p', 3).status).toBe('error');
+    const after = { ...before, storyFlags: [PETE_BEATEN_FLAG] };
+    expect(availableGachaSeries(after.storyFlags).map((s) => s.id)).toContain('pukarim');
+    expect(purchaseSeriesPack(after, 'pukarim', 'tx-p', 3).status).toBe('ok');
+    const pukarim = GACHA_SERIES.find((s) => s.id === 'pukarim');
+    if (!pukarim) throw new Error('pukarim');
+    expect(seriesLineup(pukarim).rareIds).toEqual(['skl-pukarim-07', 'skl-pukarim-14']);
   });
 
   it('「パックを選び直す」は払う前だけ', () => {

@@ -159,7 +159,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-kalshell-14:effect': 'Dodge POW skills costing 2 or more mana.',
   // プカリム（2026-10-28 試遊中。確認用の画面だけ。英語は仮訳）
   'card:mon-pukarim:name': 'Pukarim',
-  'card:mon-pukarim:description': 'Pukarim (in playtest).',
+  'card:mon-pukarim:description': 'Pukarim.',
   'card:skl-pukarim-01:name': 'Tail Tap',
   'card:skl-pukarim-02:name': 'Tackle',
   'card:skl-pukarim-03:name': 'Roll',

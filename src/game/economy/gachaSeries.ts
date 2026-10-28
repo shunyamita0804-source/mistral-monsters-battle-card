@@ -102,7 +102,8 @@ export type SeriesPurchaseResult =
 export function purchaseSeriesPack(save: SaveData, seriesId: string, transactionId: string, seed: number): SeriesPurchaseResult {
   if (hasProcessed(save, transactionId)) return { status: 'duplicate', save };
   const series = getGachaSeries(seriesId);
-  if (!series) return { status: 'error', save, message: t('gacha.error.noPack') };
+  // まだ並んでいないシリーズ（プカリム：ピートに勝つ前）は買えない
+  if (!series || (series.unlockFlag && !save.storyFlags.includes(series.unlockFlag))) return { status: 'error', save, message: t('gacha.error.noPack') };
   if (save.coins < GACHA.price) return { status: 'error', save, message: t('gacha.error.coins') };
   const { cards } = drawSeriesPack(series, seed);
   let next = addCards(

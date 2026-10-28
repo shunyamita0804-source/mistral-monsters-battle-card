@@ -98,6 +98,7 @@ import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { showOpeningIntro } from '../components/openingIntro.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { openCardList } from '../components/cardListView.ts';
+import { canChallengePete, hasBeatenPete, PETE_OPPONENT, winPete } from '../../game/story/pete.ts';
 import { button, h } from '../dom.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
 import femaleSheet from '@assets/images/characters/player_female_sheet.webp';
@@ -132,6 +133,7 @@ import forestBattleBg from '@assets/images/backgrounds/battle_forest.webp';
 import { bgm, type BgmId } from '../bgm.ts';
 import { coinIcon } from '../components/coinIcon.ts';
 import practiceBattleBg from '@assets/images/backgrounds/battle_practice.webp';
+import meadowBattleBg from '@assets/images/backgrounds/battle_field_meadow.webp';
 import signDownArt from '@assets/images/maps/dungeon/sign_down.webp';
 import signUpArt from '@assets/images/maps/dungeon/sign_up.webp';
 import signExitArt from '@assets/images/maps/dungeon/sign_exit.webp';
@@ -567,6 +569,8 @@ export class WorldView {
   #touch: { id: number; x: number; y: number; dragging: boolean } | null = null;
   /** 住人に話しかけた回数（人の ID → 回数。アプリを開いている間） */
   static #talkCount = new Map<string, number>();
+  /** 来たときの会話のあとにすること（ピートに勝ったあとの取得カード。#sceneOnLoad で決める） */
+  #afterLoadScene: (() => void) | null = null;
   /** 一度スティックを使ったら操作の説明を出さない（アプリを開いている間） */
   static #stickUsed = false;
   /** 導入イベントV2：一緒に歩く幼馴染（街だけ。主人公の1マス先を歩く。to が null なら建物に入って消える） */
@@ -746,7 +750,9 @@ export class WorldView {
     const keeper = dev ? null : this.#store.flashKeeper;
     this.#store.flashKeeper = null;
     const afterOpening = (): void => {
-      const next = v2Run ?? (scene ? () => this.#playScene(scene) : undefined);
+      const afterScene = this.#afterLoadScene ?? undefined;
+      this.#afterLoadScene = null;
+      const next = v2Run ?? (scene ? () => this.#playScene(scene, afterScene) : undefined);
       if (flash) {
         this.#store.flashMessage = null;
         const stage = clear ? this.#clearScene(clear) : null;
@@ -847,6 +853,14 @@ export class WorldView {
   /** このマップに来たときに始まる会話（練習試合のあと・最初に街へ出たとき・練習場に着いたとき） */
   #sceneOnLoad(): SceneId | null {
     const store = this.#store;
+    // ピートとの勝負のあと（2026-10-29）：ピートのひと言 → 勝ったらもらったカード（取得カードの画面）
+    const pete = store.peteResult;
+    if (pete) {
+      store.peteResult = null;
+      if (pete === 'lost') return 'peteLose';
+      if (pete.cardId) this.#afterLoadScene = () => openCardList(this.#root, { cardIds: [pete.cardId], onClose: () => {} });
+      return pete.first ? 'peteFirstWin' : 'peteWinAgain';
+    }
     const result = store.practiceResult;
     if (result) {
       store.practiceResult = null;
@@ -1881,7 +1895,10 @@ export class WorldView {
       const action = npc.action;
       this.#playScene(STAFF_GREETING[npc.npcId] as SceneId, () => this.#action(action));
     } else if (npc.action) this.#action(npc.action);
-    else if (isResidentId(npc.npcId)) {
+    else if (npc.npcId === 'resident_b' && canChallengePete(this.#store.save)) {
+      // ピート：管理局で箱を受け取ったあとは勝負を申し込まれる（2026-10-29 プカリムの最終）
+      this.#playScene(hasBeatenPete(this.#store.save) ? 'peteAgain' : 'peteAsk');
+    } else if (isResidentId(npc.npcId)) {
       // 住人：話しかけるたびに 2つの話を交互に（回数はアプリを開いている間だけ覚える）
       const count = WorldView.#talkCount.get(npc.id) ?? 0;
       WorldView.#talkCount.set(npc.id, count + 1);
@@ -1900,12 +1917,13 @@ export class WorldView {
       onEffects: (effects) => store.update((s) => applySceneEffects(s, effects)),
       // 名刺図鑑：話した人を登録（2026-10-27）
       onSpeaker: (speaker) => store.update((s) => meetSpeaker(s, speaker)),
-      onClose: (practice) => {
+      onClose: (practice, battle) => {
         if (this.#destroyed) return;
         // 案内役の場所・目的地の表示が変わることがあるので描き直す
         this.#build();
         this.#busy = false;
         if (practice) this.#startPractice(practice.tutorial);
+        else if (battle === 'pete') this.#startPete();
         else after?.();
       },
     });
@@ -2413,6 +2431,38 @@ export class WorldView {
       tutorial: tutorial && store.save.story.intro !== 'completed',
       onFinish: (winner) => {
         store.practiceResult = { winner, tutorial, withGuide };
+        ctx.reset('world');
+      },
+    };
+    ctx.navigate('battle');
+  }
+
+  /** ピートとの勝負（2026-10-29 プカリムの最終。src/game/story/pete.ts）。負けても何も失わない。勝ったらカード1枚 */
+  #startPete(): void {
+    const store = this.#store;
+    if (!isDeckValid(store.save.deck, store.save.collection)) {
+      this.#message(t('world.deckInvalidBattle'));
+      return;
+    }
+    this.#busy = true;
+    const ctx = this.#ctx;
+    const battleId = `${Date.now()}`;
+    store.pendingBattle = {
+      title: t('story.pete.battleTitle'),
+      opponent: PETE_OPPONENT,
+      allowSurrender: true,
+      background: meadowBattleBg,
+      backgroundVivid: true,
+      onFinish: (winner) => {
+        const won = winner === 'player';
+        if (won) {
+          const r = winPete(store.save, battleId);
+          store.update((s) => ({ ...r.save, stats: { ...s.stats, battlesWon: s.stats.battlesWon + 1 } }));
+          store.peteResult = { first: r.first, cardId: r.cardId };
+        } else {
+          store.update((s) => ({ ...s, stats: { ...s.stats, battlesLost: s.stats.battlesLost + 1 } }));
+          store.peteResult = 'lost';
+        }
         ctx.reset('world');
       },
     };

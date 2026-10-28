@@ -1,4 +1,4 @@
-import { GACHA, GACHA_SERIES, type GachaSeries } from '../../data/economy.ts';
+import { availableGachaSeries, GACHA, type GachaSeries } from '../../data/economy.ts';
 import { ITEMS } from '../../data/items.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
 import { boosterShelf as boosterShelfOf, buyBooster } from '../../game/story/introV2.ts';
@@ -245,7 +245,8 @@ export const gachaScreen: ScreenDefinition = {
 
     const render = (): void => {
       const save = store.save;
-      const tiles = GACHA_SERIES.map((series) => {
+      // 並ぶシリーズ：プカリムはピートに勝ったあと（2026-10-29）
+      const tiles = availableGachaSeries(save.storyFlags).map((series) => {
         const { owned, total } = seriesOwned(save, series);
         const on = picked === series.id;
         return h(

@@ -4,6 +4,7 @@ import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
+import { PUKARIM_MONSTER_ID } from './pukarim.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import type { CardDefinition, SkillCard } from '../game/cards/cardTypes.ts';
 
@@ -20,6 +21,7 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   NOBITON_MONSTER_ID,
   MYUROL_MONSTER_ID,
   KALSHELL_MONSTER_ID,
+  PUKARIM_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（いまは正式なサポートカードが無い。仮サポートは「仮」の区切りへ） */

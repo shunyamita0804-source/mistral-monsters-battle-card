@@ -1,10 +1,10 @@
-import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import { monsterId, skillId } from './cards.ts';
 import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
 import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID as LAZ } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
 import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
+import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SORAMO_MONSTER_ID as SOR } from './soramo.ts';
 import type { RankId } from './economy.ts';
 import type { ItemId } from './items.ts';
@@ -176,7 +176,7 @@ function bracketTournament(
       finalist: finalist ? `reg-${finalist}` : null,
     },
     // C でシエナがいないあいだは、D ランクの相手のゴードン（かつての大会の常連）が C の一般の出場者の強さで出る（2026-10-27 ユーザー指示）
-    ...(rank === 'C' ? { siennaLeft: { replace: 'reg-sienna', with: { id: 'c-gordon', name: 'ゴードン', monsters: TEST_TEAM, lifeScale: round2(scale * GENERAL_SCALE) } } } : {}),
+    ...(rank === 'C' ? { siennaLeft: { replace: 'reg-sienna', with: { id: 'c-gordon', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: round2(scale * GENERAL_SCALE) } } } : {}),
     rewards: {
       participationCoins: participation,
       // パックの解放・カードの景品は C 以上では付けない（決まっていないため）
@@ -198,9 +198,9 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     participants: 4,
     // 相手の名前は人物（src/data/people.ts。2026-10-27 決定）。編成・強さは仮のまま
     rounds: [
-      { id: 'e-1', name: 'ノエル', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
-      { id: 'e-2', name: 'ヴィクトル', monsters: TEST_TEAM, lifeScale: 0.65 },
-      { id: 'e-3', name: 'シエナ', monsters: TEST_TEAM_ALT, lifeScale: 0.7 },
+      { id: 'e-1', name: 'ノエル', monsters: [PUK, SOR, MYU], lifeScale: 0.6 },
+      { id: 'e-2', name: 'ヴィクトル', monsters: [GAU, LAZ, PUK], lifeScale: 0.65 },
+      { id: 'e-3', name: 'シエナ', monsters: [SOR, MYU, PUK], lifeScale: 0.7 },
     ],
     // シエナがいないあいだは、一般の出場者のマリーが E の強さで出る
     siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: 0.7, face: 'gen-marie' } },
@@ -226,9 +226,9 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     description: 'Eランク優勝者向けの大会（内容は仮）。4人の総当たりで1位なら優勝。',
     participants: 4,
     rounds: [
-      { id: 'd-1', name: 'ダリオ', monsters: TEST_TEAM, lifeScale: 1 },
-      { id: 'd-2', name: 'イザベラ', monsters: TEST_TEAM_ALT, lifeScale: 1.05 },
-      { id: 'd-3', name: 'ゴードン', monsters: TEST_TEAM, lifeScale: 1.1 },
+      { id: 'd-1', name: 'ダリオ', monsters: [MYU, KAL, PUK], lifeScale: 1 },
+      { id: 'd-2', name: 'イザベラ', monsters: [SOR, MYU, NOB], lifeScale: 1.05 },
+      { id: 'd-3', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: 1.1 },
     ],
     rewards: {
       participationCoins: 30,

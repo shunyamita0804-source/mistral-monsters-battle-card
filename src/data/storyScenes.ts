@@ -78,6 +78,13 @@ export type SceneId =
   | 'v2Thanks'
   | 'v2Briefing'
   | 'v2BureauAfter'
+  // ピートとの勝負（2026-10-29 プカリムの最終。src/game/story/pete.ts）
+  | 'peteAsk'
+  | 'peteAgain'
+  | 'peteGo'
+  | 'peteFirstWin'
+  | 'peteWinAgain'
+  | 'peteLose'
   | ResidentSceneId;
 
 /** 場面の終わり（またはスキップ）にすること */
@@ -86,7 +93,9 @@ export type SceneEffect =
   /** 導入イベントV2の進み具合（src/game/story/introV2.ts の setIntroV2State。勝つ前に試験より先へは進まない） */
   | { readonly kind: 'introV2'; readonly value: IntroV2State }
   /** 練習試合を始める。tutorial＝最初の練習（バトル画面にヒントを出す） */
-  | { readonly kind: 'practice'; readonly tutorial: boolean };
+  | { readonly kind: 'practice'; readonly tutorial: boolean }
+  /** 住人との勝負を始める（2026-10-29：ピート） */
+  | { readonly kind: 'battle'; readonly id: 'pete' };
 
 export type SceneStep =
   | { readonly kind: 'line'; readonly text: MessageKey; readonly speaker: Speaker; readonly expression?: Expression }
@@ -117,6 +126,7 @@ const SKIP_INVITE = [intro('skipped')];
 const v2 = (value: IntroV2State): SceneEffect => ({ kind: 'introV2', value });
 const teacher = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'teacher' });
 const bureau = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'bureau_clerk' });
+const pete = (text: MessageKey): SceneStep => ({ kind: 'line', text, speaker: 'resident_b' });
 
 export const SCENES: Readonly<Record<SceneId, Scene>> = {
   // E01 家から街に出た直後（1回だけ）
@@ -277,6 +287,21 @@ export const SCENES: Readonly<Record<SceneId, Scene>> = {
   },
   // 【仮】導入イベントのあとに受付を調べたとき（地の文）
   v2BureauAfter: { id: 'v2BureauAfter', steps: [system('introV2.bureau.after')], skipEffects: [] },
+  // ---------- ピートとの勝負（2026-10-29 プカリムの最終。台詞は進行の案を元にした仮。src/i18n/messages/story.ts の story.pete.*） ----------
+  peteAsk: {
+    id: 'peteAsk',
+    steps: [pete('story.pete.ask'), { kind: 'choice', options: [{ label: 'story.pete.yes', next: 'peteGo' }, { label: 'story.pete.no', next: null }] }],
+    skipEffects: [],
+  },
+  peteAgain: {
+    id: 'peteAgain',
+    steps: [pete('story.pete.again'), { kind: 'choice', options: [{ label: 'story.pete.yes', next: 'peteGo' }, { label: 'story.pete.no', next: null }] }],
+    skipEffects: [],
+  },
+  peteGo: { id: 'peteGo', steps: [], effects: [{ kind: 'battle', id: 'pete' }] },
+  peteFirstWin: { id: 'peteFirstWin', steps: [pete('story.pete.firstWin1'), pete('story.pete.firstWin2')], skipEffects: [] },
+  peteWinAgain: { id: 'peteWinAgain', steps: [pete('story.pete.winAgain')], skipEffects: [] },
+  peteLose: { id: 'peteLose', steps: [pete('story.pete.lose')], skipEffects: [] },
   ...residentScenes(),
 };
 
