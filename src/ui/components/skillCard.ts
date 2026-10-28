@@ -17,7 +17,7 @@ import { fitValueFont } from './valueFit.ts';
  *   LAYOUT の2倍の大きさ。npm run art:skillframes（tools/art/skillcard_simple_build.py）で作り直す
  * - 'normal'（縦長 253×382）：図鑑・詳しい表示・大きなカード。'hand'（少し縦長 208×260）：対戦の手札・守備のカードなど小さな表示。
  *   手札は名前・効果の帯を出さず、マナ・印・ダメージを重ねたときに見える左35%に置く
- * - マナの玉・ダメージの四角は前の v5 の見た目（2026-10-29 ユーザー指示）：玉は mana_N.png、四角は金のふちの黒い欄 value_box.webp
+ * - マナの球・分類の札・ダメージの四角は前の版（3cf9050）の見た目（2026-10-29 ユーザー指示）：mana_ball.webp・tile_{分類}.webp・value_box.webp
  * - ダメージの四角：攻撃＝大きな数字だけ、防御＝軽減値の数字だけ（-3）、回避＝「回避」、特殊＝「効果」（skillValueBadge）、サポート＝区分
  * - 効果の帯：防御・回避・特殊・サポートは説明の文、攻撃は追加の効果のときだけ（skillBandText）
  */
@@ -53,14 +53,16 @@ interface FrameLayout {
 
 /** 枠の中の位置（枠の絵の 1/4 の画素。design-parts/ui-skillcard-simple-20261028/ref/layout_positions.png） */
 const LAYOUT: Readonly<Record<SkillCardSize, FrameLayout>> = {
-  normal: { w: 253, h: 382, art: [13, 40, 240.5, 371.25], name: [58, 9, 240, 34], mana: [31, 26, 24], icon: [31, 63, 21], value: [13, 315, 69, 371.25], band: [73, 336, 236, 367] },
-  // 手札：2026-10-29 ユーザー「もう少し縦長にしてOK」で 208×210 → 208×260（下のふちの位置を 50 下げただけ。マナ・印は今のまま）
-  hand: { w: 208, h: 260, art: [8.5, 9.5, 199.5, 250.5], name: null, mana: [34, 34, 27], icon: [34, 84, 37], value: [8.5, 190.5, 68.5, 250.5], band: null },
+  // 2026-10-29 ユーザー指示：左上の部品（マナの球＋分類の札）は絵の窓の幅・高さの約25%の中に。分類の札はマナの球のすぐ下に小さく
+  normal: { w: 253, h: 382, art: [13, 40, 240.5, 371.25], name: [58, 9, 240, 34], mana: [32, 28, 23], icon: [32, 67, 26], value: [13, 315, 69, 371.25], band: [73, 336, 236, 367] },
+  // 手札：2026-10-29 ユーザー「もう少し縦長にしてOK」で 208×210 → 208×260。分類の札は幅の約18%（37）。マナ・札・ダメージは重なっても見える左35%（x 72.8 まで）に
+  hand: { w: 208, h: 260, art: [8.5, 9.5, 199.5, 250.5], name: null, mana: [31, 31, 23], icon: [31, 76, 37], value: [8.5, 190.5, 68.5, 250.5], band: null },
 };
 
 const FRAME_URLS = import.meta.glob<string>('/assets/images/ui/skillcard_simple/frame_*.webp', { eager: true, query: '?url', import: 'default' });
-const MANA_URLS = import.meta.glob<string>('/assets/images/ui/skillcard_v5/mana_*.png', { eager: true, query: '?url', import: 'default' });
-const ICON_URLS = import.meta.glob<string>('/assets/images/ui/skillcard_v5/icon_*.png', { eager: true, query: '?url', import: 'default' });
+const TILE_URLS = import.meta.glob<string>('/assets/images/ui/skillcard_simple/tile_*.webp', { eager: true, query: '?url', import: 'default' });
+/** 分類の札の縦横比（前の枠から切り出した八角形の札 126×136。tools/art/old_parts_build.py） */
+const TILE_RATIO = 136 / 126;
 
 /** 枠の画像（技＝そのモンスターの色、サポート＝銀） */
 export function frameUrl(size: SkillCardSize, monsterId?: string): string | undefined {
@@ -95,30 +97,25 @@ function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
   return el;
 }
 
-/** マナの玉の絵の大きさ（LAYOUT の mana の丸に対する倍率。玉の絵は外側に金のふちがあるので少し大きく） */
-const MANA_ORB_SCALE = 1.12;
-
 /**
- * マナの玉（2026-10-29 ユーザー「マナとダメージのとこは前のUI使ってね」：前の数字の入った玉の絵 mana_0〜10.png に戻した。
- * 11 以上は絵が無いので、紺の丸に白い数字。真ん中・大きさは新しい形の LAYOUT の mana のまま）
+ * マナの球（2026-10-29 ユーザー「マナとダメージのとこは前のUI使ってね」：前の版〔3cf9050〕の枠のつやのある青い球を切り出した mana_ball.webp に、
+ * 白い太い数字をゲームが重ねる。真ん中・大きさは LAYOUT の mana）
  */
 function manaOrb(l: FrameLayout, cost: number): HTMLElement {
-  const [cx, cy, r0] = l.mana;
-  const r = r0 * MANA_ORB_SCALE;
-  const url = MANA_URLS[`/assets/images/ui/skillcard_v5/mana_${cost}.png`];
-  if (url) return place(h('img', { class: 'skill-card__mana-img', attrs: { src: url, alt: '', draggable: 'false' } }), l, [cx - r, cy - r, cx + r, cy + r]);
-  const el = place(h('span', { class: 'skill-card__mana' }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r0, cy - r0, cx + r0, cy + r0]);
-  // 数字の大きさ：丸の直径の約7割（2桁は少し小さく）
-  el.style.fontSize = cqw(((r0 * 2) / l.w) * 100 * (String(cost).length > 1 ? 0.56 : 0.7));
+  const [cx, cy, r] = l.mana;
+  const el = place(h('span', { class: 'skill-card__mana' }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r, cy - r, cx + r, cy + r]);
+  // 数字の大きさ：球の直径の約6割（2桁は少し小さく）
+  el.style.fontSize = cqw(((r * 2) / l.w) * 100 * (String(cost).length > 1 ? 0.48 : 0.6));
   return el;
 }
 
-/** 分類の印（今の icon_{分類}.png をそのまま縮めて置く）。サポートは印なし */
+/** 分類の札（前の版の枠の八角形の札〔赤い拳・緑の本・青い盾・橙の羽・紫の星〕を切り出した tile_{分類}.webp）。サポートは札なし */
 function categoryIcon(l: FrameLayout, category: SkillCategory | 'support'): HTMLElement | null {
-  const url = category === 'support' ? undefined : ICON_URLS[`/assets/images/ui/skillcard_v5/icon_${category}.png`];
+  const url = category === 'support' ? undefined : TILE_URLS[`/assets/images/ui/skillcard_simple/tile_${category}.webp`];
   if (!url) return null;
   const [cx, cy, side] = l.icon;
-  return place(h('img', { class: 'skill-card__icon', attrs: { src: url, alt: '', draggable: 'false' } }), l, [cx - side / 2, cy - side / 2, cx + side / 2, cy + side / 2]);
+  const hh = (side * TILE_RATIO) / 2;
+  return place(h('img', { class: 'skill-card__icon', attrs: { src: url, alt: '', draggable: 'false' } }), l, [cx - side / 2, cy - hh, cx + side / 2, cy + hh]);
 }
 
 /**
