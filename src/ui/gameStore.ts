@@ -103,9 +103,9 @@ export class GameStore {
     return this.#save;
   }
 
-  /** 最初から（2026-10-28：カードを持たずに始める。初期デッキ3択はなくした） */
-  newGame(gender: 'male' | 'female'): void {
-    this.#save = { ...createNewGameSave(new Date()), player: { gender } };
+  /** 最初から（2026-10-28：カードを持たずに始める。初期デッキ3択はなくした。名前は主人公を選んだすぐあとに決めたもの） */
+  newGame(gender: 'male' | 'female', name: string): void {
+    this.#save = { ...createNewGameSave(new Date()), player: { gender, name } };
     this.persist();
   }
 

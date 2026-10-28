@@ -201,11 +201,11 @@ export const tournamentScreen: ScreenDefinition = {
     };
 
     const board = (t: TournamentDefinition, active: NonNullable<typeof store.save.activeTournament>): HTMLElement => {
-      const gender = store.save.player.gender;
+      const hero = store.save.player;
       return h(
         'div',
         { class: 'tournament__board' },
-        t.format === 'league' ? leagueTable(t, active, gender) : bracketView(t, active, gender, (id) => openEntrant(element, t, id, gender)),
+        t.format === 'league' ? leagueTable(t, active, hero) : bracketView(t, active, hero, (id) => openEntrant(element, t, id, hero)),
         t.format === 'bracket' ? h('p', { class: 'tournament__hint', text: tr('tournament.cardHint') }) : null,
       );
     };
@@ -217,7 +217,7 @@ export const tournamentScreen: ScreenDefinition = {
       const body: (HTMLElement | null)[] = [];
       if (!active || !t) {
         body.push(
-          h('div', { class: 'tournament__desk' }, h('img', { class: 'tournament__clerk shop-menu__face', attrs: { src: faceReceptionist, alt: tr('tournament.clerk'), draggable: 'false' } }), h('p', { class: 'shop-menu__bubble', text: tr('tournament.welcome', { rank: save.rank }) })),
+          h('div', { class: 'tournament__desk' }, h('img', { class: 'tournament__clerk shop-menu__face', attrs: { src: faceReceptionist, alt: tr('tournament.clerk'), draggable: 'false' } }), h('p', { class: 'shop-menu__bubble', text: save.player.name ? tr('tournament.welcomeName', { name: save.player.name, rank: save.rank }) : tr('tournament.welcome', { rank: save.rank }) })),
           ...TOURNAMENTS.map(tournamentCard),
         );
       } else if (active.status === 'inProgress') {
@@ -255,7 +255,7 @@ export const tournamentScreen: ScreenDefinition = {
             h('p', { class: 'tournament__result-sub', text: won ? tr('tournament.wonSub') : lostSub }),
           ),
           // 3試合が終わったら順位表（総当たり）・埋まったトーナメント表
-          t.format === 'league' ? standingsTable(t, active, save.player.gender) : board(t, active),
+          t.format === 'league' ? standingsTable(t, active, save.player) : board(t, active),
           button(tr('tournament.claim'), claim, 'btn btn--primary btn--large'),
         );
       }

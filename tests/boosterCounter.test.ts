@@ -21,7 +21,7 @@ import {
 
 /** ブースターとカウンター（2026-10-28 ユーザー決定。design-parts/booster-decision-20261028/） */
 const NOW = new Date('2026-10-28T00:00:00Z');
-const newGame = (): SaveData => ({ ...createNewGameSave(NOW), player: { gender: 'male' } });
+const newGame = (): SaveData => ({ ...createNewGameSave(NOW), player: { gender: 'male', name: 'テスト' } });
 const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginExam(setIntroV2State(startIntroV2OnTown(s), 'schoolArrival')), true), 'packSelection');
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 

@@ -7,6 +7,7 @@ export const BOOK = {
   // ---------- 名刺図鑑 ----------
   'peopleBook.title': { ja: '名刺図鑑', en: 'Card File' },
   'peopleBook.count': { ja: '登録 {n}／{total}人', en: 'Registered {n}/{total}' },
+  'peopleBook.owner': { ja: '{name}の名刺ファイル', en: "{name}'s Card File" },
   'peopleBook.no': { ja: 'No.{n}', en: 'No.{n}' },
   'peopleBook.unmet': { ja: 'まだ会っていない', en: 'Not met yet' },
   'peopleBook.record': { ja: '対戦成績', en: 'Record' },

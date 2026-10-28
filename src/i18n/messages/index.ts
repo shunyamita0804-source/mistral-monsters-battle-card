@@ -10,6 +10,7 @@ import { BOOK } from './book.ts';
 import { WALK_LAB } from './walkLab.ts';
 import { PUKARIM_LAB } from './pukarimLab.ts';
 import { WORLD } from './world.ts';
+import { NAME_MESSAGES } from './name.ts';
 
 /**
  * 画面の文字の辞書（固定キー → ja/en）。分野ごとのファイルに分け、ここでまとめる。
@@ -28,6 +29,7 @@ export const MESSAGE_GROUPS = {
   book: BOOK,
   walkLab: WALK_LAB,
   pukarimLab: PUKARIM_LAB,
+  name: NAME_MESSAGES,
 } as const;
 
 export const MESSAGES = {
@@ -43,6 +45,7 @@ export const MESSAGES = {
   ...BOOK,
   ...WALK_LAB,
   ...PUKARIM_LAB,
+  ...NAME_MESSAGES,
 };
 
 export type MessageKey = keyof typeof MESSAGES;

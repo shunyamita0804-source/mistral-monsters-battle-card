@@ -82,6 +82,7 @@ import {
 } from '../../game/story/intro.ts';
 import {
   beginExam,
+  boosterDeck,
   examLoanDeck,
   claimBooster,
   finishExam,
@@ -96,6 +97,7 @@ import { playScene } from '../components/dialogue.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { showOpeningIntro } from '../components/openingIntro.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
+import { openCardList } from '../components/cardListView.ts';
 import { button, h } from '../dom.ts';
 import maleSheet from '@assets/images/characters/player_male_sheet.webp';
 import femaleSheet from '@assets/images/characters/player_female_sheet.webp';
@@ -2271,7 +2273,16 @@ export class WorldView {
           def ? h('img', { class: 'booster-got__box', attrs: { src: boosterArtUrl(def), alt: '', draggable: 'false' } }) : null,
           h('div', { class: 'booster-got__monsters' }, ...(def?.monsters ?? []).map((id) => createCardView(getMonster(id), 86, true))),
         );
-        messageModal(this.#root, t('introV2.pack.got', { name: boosterName(key) }), () => this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit')), undefined, got, 'ok');
+        // 閉じたら「取得カード」の画面（2026-10-28 ユーザー決定。もらったカードの一覧と、押したカードの効果）
+        const deck = boosterDeck(key);
+        messageModal(
+          this.#root,
+          t('introV2.pack.got', { name: boosterName(key) }),
+          () => openCardList(this.#root, { cardIds: [...deck.monsters, ...deck.skills], onClose: () => this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit')) }),
+          undefined,
+          got,
+          'ok',
+        );
       }, BOOSTER_DECIDED_MS);
     };
     const view = h(
@@ -2457,11 +2468,10 @@ export class WorldView {
       return;
     }
     this.#busy = true;
-    const gender = this.#store.save.player.gender;
     const handle = openModal(this.#root, {
       title: tournamentName(now.tour),
       className: 'league-board-modal',
-      body: [leagueTable(now.tour, now.active, gender)],
+      body: [leagueTable(now.tour, now.active, this.#store.save.player)],
       actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
       onClose: () => {
         this.#busy = false;
@@ -2479,7 +2489,7 @@ export class WorldView {
       'div',
       { class: 'world__league-board', attrs: { 'aria-hidden': 'true' } },
       h('p', { class: 'world__league-board-title', text: now ? tournamentName(now.tour) : t('world.leagueBoard.title') }),
-      now ? leagueTable(now.tour, now.active, this.#store.save.player.gender) : null,
+      now ? leagueTable(now.tour, now.active, this.#store.save.player) : null,
     );
     Object.assign(el.style, { left: `${board.x * k}px`, top: `${board.y * k}px`, width: `${board.w * k}px`, height: `${board.h * k}px`, transform: `skewY(${board.skewDeg}deg)` });
     el.style.setProperty('--board-w', `${board.w * k}px`);

@@ -260,3 +260,18 @@ OtoLogic は設定画面のクレジットに前から表記している）。
 前の `card_deal.mp3`（効果音ラボ「カードを配る」）は使わなくなった（ファイルは残している）。
 - 2026-10-26（同じ日の2回目）：ユーザー指示「カードの音はこれ1つで1枚に1度鳴らすように」で、届いた `Motion-Swish07-5.mp3` だけにした
   （`assets/audio/se/card_deal/swish.mp3`。切り出しは同じ。7種類から選ぶのはやめた）
+
+## 2026-10-28 ボタンの音（進行が合成した音）
+
+ZIP「Mistral_Name_CardList_UISound_20261028」の `se/`（指示書「進行が合成した音なので使ってよい」）。原本（.wav）とゲーム用（.mp3）は
+`design-parts/name-cardlist-uisound-20261028/se/` に無改変。ゲームでは届いた .mp3 をそのまま `assets/audio/se/ui/` に置いた。
+`ref/ui_se_samples_all.m4a`（聞き比べ用）はゲームに入れていない。どのボタンに何を鳴らすかは `docs/name-cardlist-uisound.md` の3章。
+
+| 場面（SE_REGISTRY） | ファイル | 加工 |
+| --- | --- | --- |
+| `uiTap`：ふつうのボタン・メニュー・タブ・一覧の行（①） | `ui/ui_tap.mp3` | なし（音量は 0.4 倍） |
+| `uiDecide`：決める（決定・はい・買う・出発など）（④） | `ui/ui_decide.mp3` | なし（0.4 倍） |
+| `uiCancel`：戻る・いいえ・閉じる（⑤） | `ui/ui_cancel.mp3` | なし（0.4 倍） |
+| `uiDisabled`：押せない（灰色の）ボタン（⑥） | `ui/ui_disabled.mp3` | なし（0.48 倍） |
+
+- それまでの「ボタンを押すと鳴る小さな『コッ』（素材ファイルを使わずその場で作った音。2026-10-23）」はやめ、`sound.tap()` も `uiTap` を鳴らすようにした

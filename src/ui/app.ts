@@ -6,6 +6,7 @@ import { GameStore } from './gameStore.ts';
 import { SCREENS } from './screens/registry.ts';
 import type { ScreenContext, ScreenInstance } from './screens/types.ts';
 import { bgm } from './bgm.ts';
+import { installButtonSound } from './buttonSound.ts';
 import { sound } from './sound.ts';
 import { mountStage } from './stage.ts';
 
@@ -24,15 +25,8 @@ export function startApp(root: HTMLElement, store: GameStore = GameStore.fromBro
   // iPhone は最初のタップまで音を鳴らせないので、タップで効果音・BGM を使えるようにする
   sound.installUnlock();
   bgm.installUnlock();
-  // ボタンを押したときの小さな音（2026-10-23。押せないボタン・カードの手札は除く）
-  document.addEventListener(
-    'pointerdown',
-    (e) => {
-      const target = e.target instanceof Element ? e.target.closest('button') : null;
-      if (target && !target.disabled && !target.closest('.battle__hand')) sound.tap();
-    },
-    { passive: true },
-  );
+  // ボタンの音（2026-10-28：ui_tap・ui_decide・ui_cancel・ui_disabled。どのボタンに何を鳴らすかは buttonSound.ts）
+  installButtonSound();
   const router = new Router<ScreenId>(initialScreen(store.qa, typeof window === 'undefined' ? '' : window.location.search));
   let current: ScreenInstance | null = null;
 

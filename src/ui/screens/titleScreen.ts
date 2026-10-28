@@ -1,6 +1,7 @@
 import { APP_INFO } from '../../config/app.ts';
 import { getLanguage, t } from '../../i18n/i18n.ts';
 import { confirmModal } from '../components/modal.ts';
+import { openNamePrompt } from '../components/namePrompt.ts';
 import { bgm } from '../bgm.ts';
 import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
@@ -28,7 +29,18 @@ export const titleScreen: ScreenDefinition = {
       }
     };
     // ボタンの絵（2026-10-26 デザイン第11弾）：続きから＝金、最初から＝紺、設定＝小さな紺
-    const continueBtn = button(t('title.continue'), () => ctx.reset('world'), 'btn btn--primary btn--large title__btn title__btn--continue');
+    // つづきから：名前がまだ無い前のセーブ（2026-10-28 より前）は、1回だけ名前を決めてから
+    const resume = (): void => {
+      if (store.hasSave && store.save.player.name === null) {
+        openNamePrompt(element, (name) => {
+          store.update((s) => ({ ...s, player: { ...s.player, name } }));
+          ctx.reset('world');
+        });
+        return;
+      }
+      ctx.reset('world');
+    };
+    const continueBtn = button(t('title.continue'), resume, 'btn btn--primary btn--large title__btn title__btn--continue');
     continueBtn.disabled = !store.hasSave;
     const en = getLanguage() === 'en';
 

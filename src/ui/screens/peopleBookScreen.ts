@@ -98,7 +98,9 @@ export const peopleBookScreen: ScreenDefinition = {
 
     element.append(
       createScreenHeader({ title: t('peopleBook.title'), back: { label: t('common.back'), onTap: () => ctx.back('world') } }),
-      h('p', { class: 'people-book__count', text: t('peopleBook.count', { n: metCount(save), total: PEOPLE_TOTAL }) }),
+      // 持ち主の名前（2026-10-28。名前を決める前の古いセーブでは出さない）
+      save.player.name ? h('p', { class: 'people-book__owner', text: t('peopleBook.owner', { name: save.player.name }) }) : '',
+      h('p', { class: `people-book__count${save.player.name ? ' has-owner' : ''}`, text: t('peopleBook.count', { n: metCount(save), total: PEOPLE_TOTAL }) }),
       pageEl,
       h('div', { class: 'people-book__nav' }, prev, pageNo, next),
     );

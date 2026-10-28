@@ -404,3 +404,40 @@
 .league-board-modal .league {
   margin: 0 auto;
 }
+
+/* 長い名前（6文字以上。主人公の名前は8文字まで。2026-10-28）：文字を小さくして、前半・後半の2行（tournamentBoards.ts の boardName） */
+.league__name.is-long,
+.bracket__card-name.is-long {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.league__name.is-long {
+  font-size: 7.5px;
+}
+
+/* 2行の名前の欄は、顔を少し小さくして名前の2行目が切れないように */
+.league__head:has(.league__name.is-long) .league__face {
+  height: 48%;
+}
+
+.world__league-board .league__name.is-long {
+  font-size: calc(var(--board-w) * 0.025);
+}
+
+.bracket__card-name.is-long {
+  font-size: 8.5px;
+}
+
+.board-name__line {
+  display: block;
+}
+
+.standings__who > span:last-child {
+  min-width: 0;
+  word-break: break-all;
+}

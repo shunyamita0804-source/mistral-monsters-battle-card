@@ -19,6 +19,11 @@ export interface CardDetailOptions {
   readonly extra?: readonly string[];
 }
 
+/** カードの効果・説明の文（技＝効果、サポート＝効果、モンスター＝説明） */
+export function cardEffectText(card: CardDefinition): string {
+  return card.kind === 'skill' ? describeSkill(card) : card.kind === 'support' ? describeSupport(card) : cardDescription(card);
+}
+
 /** カードの拡大表示と詳細（分類・効果・数値・所持枚数・収録パック） */
 export function openCardDetail(parent: HTMLElement, card: CardDefinition, options: CardDetailOptions = {}): ModalHandle {
   const rows: [string, string | HTMLElement][] = [[t('card.detail.kind'), t('card.kindCard', { kind: kindLabel(card.kind) })]];
@@ -51,7 +56,7 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
   ]);
   if (options.owned !== undefined) rows.push([t('card.detail.owned'), t('common.cardCount', { n: options.owned })]);
 
-  const description = card.kind === 'skill' ? describeSkill(card) : card.kind === 'support' ? describeSupport(card) : cardDescription(card);
+  const description = cardEffectText(card);
 
   const handle = openModal(parent, {
     className: 'card-detail',

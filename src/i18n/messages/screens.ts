@@ -391,6 +391,7 @@ export const SCREENS = {
   'tournament.issueSeparator': { ja: ' / ', en: ' / ' },
   'tournament.clerk': { ja: '受付', en: 'Desk' },
   'tournament.welcome': { ja: '大会会場へようこそ。あなたのランクは {rank} です。', en: 'Welcome to the hall! Your rank is {rank}.' },
+  'tournament.welcomeName': { ja: '{name}さん、大会会場へようこそ。ランクは {rank} です。', en: 'Welcome to the hall, {name}! Your rank is {rank}.' },
   'tournament.inProgress': { ja: '{name} 参加中', en: 'In the {name}' },
   'tournament.opponents': { ja: '相手のモンスター：{names}', en: 'Opponent’s monsters: {names}' },
   'tournament.fight': { ja: '{round}を戦う', en: 'Fight: {round}' },

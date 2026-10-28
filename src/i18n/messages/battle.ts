@@ -35,6 +35,11 @@ export const BATTLE = {
   'battle.log.heal': { ja: '{name}のライフが{n}回復。', en: '{name} recovered {n} Life.' },
   'battle.log.deckToMana': { ja: '山札の上から{n}枚をマナにした。', en: 'Turned the top {n} deck {n|card|cards} into mana.' },
   'battle.log.draw': { ja: 'カードを{n}枚引いた。', en: 'Drew {n} {n|card|cards}.' },
+  // 手札の上限（2026-10-28）：引く効果で上限を超える分は山札の上をマナに
+  'battle.log.handFullMana': {
+    ja: '手札がいっぱい（{max}枚）なので、山札の上から{n}枚をマナにした。',
+    en: 'Hand is full ({max} cards), so the top {n} deck {n|card|cards} became mana.',
+  },
   'battle.log.support': { ja: '{side}はサポート「{card}」を使った！', en: '{side} used Support: {card}!' },
   'battle.log.fieldDiscard': { ja: '場の「{card}」は捨て札へ。', en: '{card} left the field for the discard pile.' },
   'battle.log.fieldEnter': { ja: '「{card}」が場に出た。', en: '{card} entered the field.' },
