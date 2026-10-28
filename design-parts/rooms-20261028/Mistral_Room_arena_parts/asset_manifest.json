@@ -1,0 +1,79 @@
+[
+  {
+    "file": "arena_shell.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "1804b8a1b843dd5018c4bf45000a95c7376e580858fae33130c225ba849c7539"
+  },
+  {
+    "file": "arena_01_stage.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "f1352a66b07c0a3118d9cd234d4ae71676a58bc52a31f3b8f2f648016ac5ed3b"
+  },
+  {
+    "file": "arena_02_battle_table.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "9c29afca3bced182610efc2daf41f95e8f50438303a866ceee3f43579341be46"
+  },
+  {
+    "file": "arena_03_bench_left_back.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "20934894c6e02b911f28c570c2cfc3dbb7e98030e36314766dadd7a7477f5e15"
+  },
+  {
+    "file": "arena_04_bench_left_front.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "4e268eff293d4f96624a2378dbbeabaf999b32408951d3f1e05b40e4802aa475"
+  },
+  {
+    "file": "arena_05_reception.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "615bccc3bc76a0a6670d484a81910303aa31083397996d243b793494427a75f2"
+  },
+  {
+    "file": "arena_front.png",
+    "width": 1536,
+    "height": 1024,
+    "mode": "RGBA",
+    "origin": [
+      0,
+      0
+    ],
+    "sha256": "c625c99f9fa23bf7c9f2d98a025fff7d18e3bf7e4d207a8a4530554a8b408780"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "practice_shell.png",
+    "practice_01_table_center.png",
+    "practice_02_table_right_back.png",
+    "practice_03_table_right_front.png",
+    "practice_04_left_counter.png",
+    "practice_05_stool.png",
+    "practice_front.png"
+  ]
+}

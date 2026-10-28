@@ -1,6 +1,6 @@
 import type { Direction } from '../game/save/saveData.ts';
-import { BUREAU_ART as BUREAU_WORLD_ART, BUREAU_CLERK_DRAW_DY } from './bureauArt.generated.ts';
 import { BUREAU_MAP_ID } from './introV2.ts';
+import { ROOMS4_ART, ROOMS4_DRAW_OFFSET } from './rooms4Art.generated.ts';
 import type { CardReward } from './tournaments.ts';
 import { WORLD_ART, type ArtMap, type CellRect } from './worldArt.generated.ts';
 
@@ -137,6 +137,8 @@ export interface NpcObject extends Rect {
   readonly action?: InteractAction;
   /** 絵だけを縦にずらすマスの数（負＝奥へ）。カウンターの後ろに立つ店員のように、話しかけるマスと見た目の立ち位置が違うとき */
   readonly drawDy?: number;
+  /** 絵だけを横にずらすマスの数（負＝左へ）。大会会場の受付のように、カウンターの横から話しかけるとき（2026-10-28） */
+  readonly drawDx?: number;
 }
 
 export type MapObject = InteractObject | WarpObject | EnemyObject | ChestObject | NpcObject;
@@ -186,7 +188,7 @@ const enemy = (id: string, x: number, y: number, encounterId: string, boss = fal
   boss,
 });
 
-const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAction, drawDy?: number): NpcObject => ({
+const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAction, drawDy?: number, drawDx?: number): NpcObject => ({
   type: 'npc',
   id,
   x,
@@ -196,6 +198,7 @@ const npc = (id: string, x: number, y: number, npcId: NpcId, action?: InteractAc
   npcId,
   ...(action ? { action } : {}),
   ...(drawDy ? { drawDy } : {}),
+  ...(drawDx ? { drawDx } : {}),
 });
 
 const chest = (
@@ -248,10 +251,16 @@ const entryOf = (art: ArtMap): { x: number; y: number; dir: Direction } => ({ x:
 
 const TOWN_ART = artOf('town');
 
-/** 地図 ID → 部屋の絵 */
+/** 地図 ID → 部屋の絵（worldArt.generated.ts） */
 const ROOM_ART_OF: Readonly<Record<string, string>> = {
-  home: 'player', neighbor: 'guide', shop: 'shop', lab: 'lab', hall: 'arena', practice: 'training',
+  home: 'player', neighbor: 'guide', shop: 'shop',
   'house-a': 'house', 'house-b': 'house', 'house-d': 'house', 'house-e': 'house',
+};
+/** 地図 ID → 2026-10-28 の新しい部屋の絵（rooms4Art.generated.ts。tools/design/rooms4_build.py） */
+const ROOMS4_OF: Readonly<Record<string, keyof typeof ROOMS4_ART>> = { hall: 'arena', [BUREAU_MAP_ID]: 'bureau', practice: 'practice', lab: 'lab' };
+const roomArtOf = (mapId: string): ArtMap => {
+  const r4 = ROOMS4_OF[mapId];
+  return r4 ? ROOMS4_ART[r4] : artOf(ROOM_ART_OF[mapId] ?? '');
 };
 
 /** 街の建物（設計図の ID）→ 入る部屋 */
@@ -317,8 +326,7 @@ export const TOWN: MapDefinition = artMap(
   [
     ...TOWN_DOORS.map((d) => {
       const door = doorOf(TOWN_ART, d.building);
-      // 管理局の部屋の絵は別のファイル（bureauArt.generated.ts）
-      const room = d.mapId === BUREAU_MAP_ID ? BUREAU_WORLD_ART : artOf(ROOM_ART_OF[d.mapId] ?? '');
+      const room = roomArtOf(d.mapId);
       return warp(d.id, door.x, door.y, door.w, d.label, { kind: 'map', mapId: d.mapId, ...entryOf(room) });
     }),
     // 14 南の門の扉の前。踏むと既存のダンジョン選択（家の壁の地図と同じ画面）へ
@@ -373,66 +381,74 @@ export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'inte
   roomExit('shop-exit', SHOP_ART, 'SHOP'),
 ], entryOf(SHOP_ART));
 
-const LAB_ART = artOf('lab');
-/** カード研究所。図鑑（集めたカード）への入り口。研究所だけの新しい仕組みは作らない */
+const LAB_ART = ROOMS4_ART.lab;
+/** カウンターの奥などに立つ人（話しかけるマスは家具の手前。見た目だけ奥にずらす） */
+const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: number; readonly dy: number } | undefined, npcId: NpcId, action?: InteractAction): NpcObject => {
+  const p = spotOf(art, spot);
+  return npc(id, p.x, p.y, npcId, action, offset?.dy, offset?.dx);
+};
+/**
+ * カード研究所（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥の壁の本棚＝図鑑、左奥のガラスの飾り棚＝標本棚、中央の机（研究員ルーカスはその奥）、
+ * 右奥の機械＝記録の投影機、右の実験台＝解析台、右の壁の黒板。前の絵にあった水晶の台・資料棚・閲覧テーブル・薬品の作業台・標本ケースは外した
+ */
 export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior', LAB_ART, [
   interactAt('lab-shelf', itemOf(LAB_ART, 'BIG_SHELF'), '図鑑の本棚', 'collection'),
-  interactAt('lab-crystal', itemOf(LAB_ART, 'CRYSTAL'), '水晶の台', 'message', '水晶が静かに光っている。'),
-  interactAt('lab-specimen', itemOf(LAB_ART, 'SPECIMEN'), 'カード標本ケース', 'message', 'めずらしいカードが標本のように並んでいる。'),
-  interactAt('lab-desk', itemOf(LAB_ART, 'DESK'), '研究机', 'message', '研究の資料が広げてある。'),
-  interactAt('lab-shelf2', itemOf(LAB_ART, 'SHELF2'), '資料棚', 'message', '資料がぎっしり詰まっている。'),
-  interactAt('lab-table', itemOf(LAB_ART, 'TABLE'), '閲覧テーブル', 'message', '本を読むためのテーブル。'),
-  // 2026-10-27 に届いた新しい家具5つ（調べたときのひと言は仮）
-  interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '黒板', 'message', '星と円の図がびっしり描かれている。'),
   interactAt('lab-cabinet', itemOf(LAB_ART, 'CABINET'), '標本棚', 'message', '結晶や羽根が、標本のように並んでいる。'),
+  interactAt('lab-desk', itemOf(LAB_ART, 'DESK'), '研究机', 'message', '研究の資料が広げてある。'),
   interactAt('lab-projector', itemOf(LAB_ART, 'PROJECTOR'), '記録の投影機', 'message', '光の板に、昔の対戦の記録が映っている。'),
   interactAt('lab-analysis', itemOf(LAB_ART, 'ANALYSIS'), '解析台', 'message', 'カードを調べるための大きなレンズがある。'),
-  interactAt('lab-chem', itemOf(LAB_ART, 'CHEM'), '薬品の作業台', 'message', '色とりどりの薬品が並んでいる。'),
-  // 研究員：設計図の立ち位置（研究机の奥）では机の絵に全身が隠れるので、机の右どなり（天球儀と標本ケースの間）に立つ
-  npc('lab-researcher', spotOf(LAB_ART, 'RESEARCHER_SPOT', 9).x, spotOf(LAB_ART, 'RESEARCHER_SPOT').y, 'researcher', 'collection'),
+  interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '黒板', 'message', '星と円の図がびっしり描かれている。'),
+  spotNpc('lab-researcher', LAB_ART, 'RESEARCHER_SPOT', ROOMS4_DRAW_OFFSET.lab.RESEARCHER_SPOT, 'researcher', 'collection'),
   roomExit('lab-exit', LAB_ART, 'LAB'),
 ], entryOf(LAB_ART));
 
-const HALL_ART = artOf('arena');
-/** 大会会場（屋根付きのカード大会の会場。中央に対戦テーブル） */
+const HALL_ART = ROOMS4_ART.arena;
+/**
+ * 大会会場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥に観客席、中央の円形の段に対戦台、右手前に受付。
+ * 受付のセリアはカウンターの奥（話しかけるのはカウンターの左から）。左の壁の大きな紺の板は空（大会の総当たり表を描く予定。位置は HALL_ART.items.BOARD）
+ */
 export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HALL_ART, [
   interactAt('hall-desk', itemOf(HALL_ART, 'RECEPTION'), '受付カウンター', 'tournamentDesk'),
-  interactAt('hall-table', itemOf(HALL_ART, 'STAGE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
+  interactAt('hall-table', itemOf(HALL_ART, 'TABLE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
   interactAt('hall-seats-l', itemOf(HALL_ART, 'SEATS_L'), '客席', 'message', '観客席。'),
   interactAt('hall-seats-r', itemOf(HALL_ART, 'SEATS_R'), '客席', 'message', '観客席。'),
-  npc('hall-receptionist', spotOf(HALL_ART, 'RECEPTIONIST_SPOT').x, spotOf(HALL_ART, 'RECEPTIONIST_SPOT').y, 'receptionist', 'tournamentDesk'),
+  spotNpc('hall-receptionist', HALL_ART, 'RECEPTIONIST_SPOT', ROOMS4_DRAW_OFFSET.arena.RECEPTIONIST_SPOT, 'receptionist', 'tournamentDesk'),
   roomExit('hall-exit', HALL_ART, 'ARENA'),
 ], entryOf(HALL_ART));
 
-const PRACTICE_ART = artOf('training');
-/** カード練習場。初心者がカードを学ぶ場所。練習テーブルで練習試合ができる */
+const PRACTICE_ART = ROOMS4_ART.practice;
+/**
+ * カード練習場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
+ * 奥の黒板・左の壁ぞいの教材の棚。ベンチは無くなった
+ */
 export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 'interior', PRACTICE_ART, [
   interactAt('practice-shelf', itemOf(PRACTICE_ART, 'SHELF'), '教材の棚', 'message', '練習用のカードがきちんと並んでいる。'),
   interactAt('practice-board', itemOf(PRACTICE_ART, 'BOARD'), '黒板', 'message', 'カードの並べ方の図が描いてある。'),
   interactAt('practice-table-1', itemOf(PRACTICE_ART, 'TABLE_1'), '練習テーブル', 'practiceTable'),
   interactAt('practice-table-2', itemOf(PRACTICE_ART, 'TABLE_2'), '練習テーブル', 'practiceTable'),
-  interactAt('practice-bench-l', itemOf(PRACTICE_ART, 'BENCH_L'), 'ベンチ', 'message', '順番を待つ人のためのベンチ。'),
-  interactAt('practice-bench-r', itemOf(PRACTICE_ART, 'BENCH_R'), 'ベンチ', 'message', '順番を待つ人のためのベンチ。'),
-  // 先生は黒板の前。案内役は最初の練習試合が終わるまで、先生の右どなりにいる
+  interactAt('practice-table-3', itemOf(PRACTICE_ART, 'TABLE_3'), '練習テーブル', 'practiceTable'),
+  // ガレス先生は真ん中の机のすぐ手前。案内役は最初の練習試合が終わるまで、先生の右どなりにいる
   npc('practice-teacher', spotOf(PRACTICE_ART, 'TEACHER_SPOT').x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y, 'teacher', 'practiceTable'),
   npc('guide-practice', spotOf(PRACTICE_ART, 'TEACHER_SPOT', 5).x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y + 1, 'neighbor_guide'),
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
 
-const BUREAU_ART = BUREAU_WORLD_ART;
-/** 管理局の受付の前（主人公が受付と話すために止まる所。tools/design/bureau_v01.py の PLAYER_SPOT） */
-export const BUREAU_DESK_FRONT: { readonly x: number; readonly y: number } = itemOf(BUREAU_ART, 'PLAYER_SPOT');
+const BUREAU_ART = ROOMS4_ART.bureau;
+/** 管理局の受付の前（主人公が受付と話すために止まる所。tools/design/rooms4_build.py の PLAYER_SPOT） */
+export const BUREAU_DESK_FRONT: { readonly x: number; readonly y: number } = spotOf(BUREAU_ART, 'PLAYER_SPOT');
 /**
- * カードバトラー管理局の中（2026-10-27 素材 v01：床と壁・奥の書類棚・受付のカウンター。tools/design/bureau_v01.py）。
- * 入口は扉のない開いた通り道（v01 の提案）。受付の人は大会会場の受付の絵を流用（暫定。正式な受付の絵は未納品）。
+ * カードバトラー管理局の中（2026-10-28 新しい絵。tools/design/rooms4_build.py）。中央に受付のカウンター（エレノアはその奥）、
+ * 左奥にランクの板、右奥にメダルの棚、左右に長いす、左手前に掲示板。入口は扉のない開いた通り道。
  * 街では北東の、もとの住宅C の所（2026-10-27 ユーザー指示）
  */
 export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラー管理局', 'interior', BUREAU_ART, [
   interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
-  interactAt('bureau-shelves', itemOf(BUREAU_ART, 'SHELVES'), '書類棚', 'message', '登録の書類がきちんと並んでいる。'),
-  npc('bureau-clerk', spotOf(BUREAU_ART, 'CLERK_SPOT').x, spotOf(BUREAU_ART, 'CLERK_SPOT').y, 'bureau_clerk', 'bureauDesk', BUREAU_CLERK_DRAW_DY),
+  interactAt('bureau-rank-board', itemOf(BUREAU_ART, 'RANK_BOARD'), 'ランクの板', 'message', 'カードバトラーのランクの一覧。E から S まで、6つの段がある。'),
+  interactAt('bureau-medal-case', itemOf(BUREAU_ART, 'MEDAL_CASE'), 'メダルの棚', 'message', '歴代の優勝者のメダルが、ガラスの中で光っている。'),
+  interactAt('bureau-notice-board', itemOf(BUREAU_ART, 'NOTICE_BOARD'), '掲示板', 'message', '大会のお知らせが貼ってある。「ランクを上げて、次の大会に挑もう！」'),
+  spotNpc('bureau-clerk', BUREAU_ART, 'CLERK_SPOT', ROOMS4_DRAW_OFFSET.bureau.CLERK_SPOT, 'bureau_clerk', 'bureauDesk'),
   // 幼馴染（ミレイユ）：導入イベントでパックを選ぶ間だけ、受付の前の主人公の右に立つ（2026-10-27 パック選びで幼馴染が説明する）
-  npc('guide-bureau', itemOf(BUREAU_ART, 'PLAYER_SPOT').x + 4, itemOf(BUREAU_ART, 'PLAYER_SPOT').y, 'neighbor_guide'),
+  npc('guide-bureau', BUREAU_DESK_FRONT.x + 4, BUREAU_DESK_FRONT.y, 'neighbor_guide'),
   roomExit('bureau-exit', BUREAU_ART, 'BUREAU'),
 ], entryOf(BUREAU_ART));
 

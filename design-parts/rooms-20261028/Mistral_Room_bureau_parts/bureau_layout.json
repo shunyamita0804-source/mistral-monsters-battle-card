@@ -1,0 +1,20 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "bureau_shell.png",
+    "bureau_01_counter.png",
+    "bureau_02_rank_board.png",
+    "bureau_03_medal_case.png",
+    "bureau_04_bench_left.png",
+    "bureau_05_notice_board.png",
+    "bureau_06_bench_right.png",
+    "bureau_front.png"
+  ]
+}
