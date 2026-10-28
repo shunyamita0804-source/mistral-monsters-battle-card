@@ -215,6 +215,8 @@ export function showGachaOpen(root: HTMLElement, options: GachaOpenOptions): voi
     let sx: number | null = null;
     let sy = 0;
     table.addEventListener('pointerdown', (e) => {
+      // 台の外で指を離しても受け取れるように（外へ大きくスライドしたとき）
+      table.setPointerCapture(e.pointerId);
       sx = e.clientX;
       sy = e.clientY;
     });
