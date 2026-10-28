@@ -210,10 +210,19 @@ function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[
   if (!wind) return null;
   const user = availableUsers(state, side, wind.def).find((m) => !m.charge && !canKill(m));
   if (!user) return null;
-  const manaAfter = manaOf(state.sides[side]) - wind.def.cost;
-  const ally = tailwindTargets(state, side, wind.def).find(
-    (m) => !m.acted && !m.tailwind && attacks.some((o) => o.def.cost <= manaAfter && availableUsers(state, side, o.def).some((u) => u.uid === m.uid)),
-  );
+  // おいかぜは「次の自分のターン」の攻撃だけ＋1 なので、次の自分のターンに攻撃できそうな味方にかける（2026-10-29 ユーザー指示）。
+  // 攻撃できそう＝その味方の攻撃技が手札にあり、次のターンに払えそうなマナ（おいかぜを払った残り＋この手番の終わりにマナにできる残りの手札）で足りる。
+  // 今の手番で動いたかどうかは関係ない（次のターンには動ける）
+  const mine = state.sides[side];
+  const nextTurn = state.turn + 2;
+  const manaNext = manaOf(mine) - wind.def.cost + Math.max(0, mine.hand.length - 2);
+  const canAttackNext = (m: BattleMonster): boolean =>
+    mine.hand.some((c) => {
+      if (c.uid === wind.card.uid) return false;
+      const card = getPlayCard(c.cardId);
+      return card.kind === 'skill' && card.effect.type === 'attack' && card.monsterId === m.cardId && card.cost <= manaNext;
+    });
+  const ally = tailwindTargets(state, side, wind.def).find((m) => m.tailwind?.turn !== nextTurn && canAttackNext(m));
   return ally ? { type: 'useCard', side, cardUid: wind.card.uid, userUid: user.uid, targetUid: ally.uid } : null;
 }
 

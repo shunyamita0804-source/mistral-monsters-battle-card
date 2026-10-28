@@ -35,7 +35,7 @@ export const GAUUL_MONSTER: MonsterCard = {
   rarity: null,
   life: 6,
   themeColor: themeColors.monsters.gauul.hex,
-  description: 'ガウル（モンスターランクC）。',
+  description: 'ガウル。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'gauul_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'gauul_battle.webp', layout: 'full' },

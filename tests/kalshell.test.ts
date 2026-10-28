@@ -28,9 +28,9 @@ describe('カルシェル正式14技：データ（2026-10-27。届いた JSON�
   const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 特殊技: 'special', 防御技: 'defense', 回避技: 'evade' } as const;
 
   it('保管した JSON・CSV は ZIP の原本と同じバイト列', () => {
-    expect(readFileSync('src/data/official/kalshell14_skills_OFFICIAL_20261027.json')).toEqual(readFileSync(`${ORIGINAL_DIR}/03_DATA/03_正式技データと初期配布_UTF8.json`));
-    expect(readFileSync('src/data/official/kalshell14_skills_OFFICIAL_20261027.csv')).toEqual(readFileSync(`${ORIGINAL_DIR}/03_DATA/01_正式技一覧_UTF8.csv`));
-    expect(readFileSync('src/data/official/kalshell14_initial_OFFICIAL_20261027.csv')).toEqual(readFileSync(`${ORIGINAL_DIR}/03_DATA/02_初期配布16枚_UTF8.csv`));
+    expect(readFileSync('src/data/official/kalshell14_skills_OFFICIAL_20261027.json').equals(readFileSync(`${ORIGINAL_DIR}/03_DATA/03_正式技データと初期配布_UTF8.json`))).toBe(true);
+    expect(readFileSync('src/data/official/kalshell14_skills_OFFICIAL_20261027.csv').equals(readFileSync(`${ORIGINAL_DIR}/03_DATA/01_正式技一覧_UTF8.csv`))).toBe(true);
+    expect(readFileSync('src/data/official/kalshell14_initial_OFFICIAL_20261027.csv').equals(readFileSync(`${ORIGINAL_DIR}/03_DATA/02_初期配布16枚_UTF8.csv`))).toBe(true);
   });
 
   it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
