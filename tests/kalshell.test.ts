@@ -102,7 +102,7 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
     expect(existsSync('assets/images/ui/battlecard/frame_kalshell.png')).toBe(true);
     for (const size of ['normal', 'hand'])
       for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade'])
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_kalshell.png`)).toBe(true);
+        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_kalshell.webp`)).toBe(true);
   });
 });
 

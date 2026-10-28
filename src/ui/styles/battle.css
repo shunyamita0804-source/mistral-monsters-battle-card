@@ -39,6 +39,7 @@
   z-index: 30;
   flex: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: center;
   padding: 2px;

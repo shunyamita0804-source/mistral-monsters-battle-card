@@ -126,7 +126,7 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
   it('技カード新UI（v5）のガウルの色（オレンジ）の枠が全分類にある', () => {
     for (const size of ['normal', 'hand']) {
       for (const cat of ['force', 'wisdom', 'special', 'defense', 'evade']) {
-        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_gauul.png`)).toBe(true);
+        expect(existsSync(`assets/images/ui/skillcard_v5/frame_${size}_${cat}_gauul.webp`)).toBe(true);
       }
     }
   });

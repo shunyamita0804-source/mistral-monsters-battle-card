@@ -120,7 +120,7 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     expect(readFileSync('assets/images/cards/monsters/nobiton_battlecard.png').equals(original)).toBe(true);
     expect([original.readUInt32BE(16), original.readUInt32BE(20)]).toEqual([1179, 1334]);
     // ノビトン専用の技カードの枠は作らない（黄色はモンスターカードだけ）
-    expect(existsSync('assets/images/ui/skillcard_v5/frame_normal_force_nobiton.png')).toBe(false);
+    expect(existsSync('assets/images/ui/skillcard_v5/frame_normal_force_nobiton.webp')).toBe(false);
     expect(existsSync('assets/images/ui/battlecard/frame_nobiton.png')).toBe(true);
   });
 

@@ -88,7 +88,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 11cqw;
+  font-size: 15.4cqw;
   font-weight: 900;
   -webkit-text-stroke: 0.6cqw #0b2a3a;
   paint-order: stroke fill;
@@ -141,14 +141,15 @@
 
 .skill-card__value-num {
   font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
-  font-size: 15cqw;
+  /* 大きさは skillCard.ts の VALUE_FONT（2026-10-28：1.4倍の 21cqw・手札用 22cqw。はみ出すときは収まる大きさまで下げる） */
+  font-size: 21cqw;
   font-weight: 900;
   -webkit-text-stroke: 0.4cqw #000;
   paint-order: stroke fill;
 }
 
 .skill-card--hand .skill-card__value-num {
-  font-size: 18cqw;
+  font-size: 22cqw;
 }
 
 .skill-card__value-guard {
@@ -159,14 +160,15 @@
 
 .skill-card__value-shield {
   display: flex;
-  width: 6cqw;
-  height: 6cqw;
+  flex: none;
+  width: 8.4cqw;
+  height: 8.4cqw;
   color: #9cc8ff;
 }
 
 .skill-card--hand .skill-card__value-shield {
-  width: 7cqw;
-  height: 7cqw;
+  width: 9.8cqw;
+  height: 9.8cqw;
 }
 
 .skill-card__value-shield svg {
@@ -182,24 +184,20 @@
 }
 
 .skill-card__value-word {
-  font-size: 6.5cqw;
+  /* 大きさは skillCard.ts の VALUE_FONT（2026-10-28：約1.3倍の 8.5cqw・手札用 9.5cqw。「サポート」など長い語は欄に収まる大きさまで下げる） */
+  font-size: 8.5cqw;
   font-weight: 900;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
-/* サポートの区分（「サポート」「全体」）は4文字まで入るように小さく */
+/* サポートの区分（「サポート」「全体」）：字の間を詰める（大きさは欄に収まるように skillCard.ts で決める） */
 .skill-card--support .skill-card__value-word {
-  font-size: 5.2cqw;
   letter-spacing: 0;
 }
 
 .skill-card--hand .skill-card__value-word {
-  font-size: 7.5cqw;
-}
-
-.skill-card--hand.skill-card--support .skill-card__value-word {
-  font-size: 5.6cqw;
+  font-size: 9.5cqw;
 }
 
 .skill-card__value[data-badge='effect'] .skill-card__value-word {

@@ -37,6 +37,7 @@ import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutori
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { summarizeBattle } from '../../game/battle/simulate.ts';
 import { knockTalk } from '../../game/battle/talk.ts';
+import { handOverlap } from '../components/handLayout.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, localText, opponentName } from '../../i18n/content.ts';
 import { personOfOpponent, type LocalText } from '../../data/people.ts';
@@ -147,15 +148,17 @@ const OFFICIAL_CARD_DETAIL_W = 250;
 /**
  * 手札のカードの幅（論理px）。2026-10-25 リデザイン パートB：上下の空の帯をなくした表面（battleCard.ts）にして 66→70。
  * 2026-10-26 ユーザー指示「手札もう少し大きく」で 70→82（入りきらないときは少し重ねる：handRow の --hand-overlap）。
+ * 2026-10-28 手札の大きさの指示書（design-parts/handsize-20261028/）で 90。枚数が多くてもカードは小さくせず、重ねる量を増やして1列に入れる。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
-const HAND_CARD_W = 80;
-/** 幅の狭い画面では手札を少し小さくする（下限）。それでも入りきらない分は重ねる */
-const HAND_CARD_MIN_W = 70;
+const HAND_CARD_W = 90;
+/**
+ * 重ねても残す、1枚ずつの見える幅（論理px）。目安はカードの左はし（マナの玉と数値の欄）が見える幅＝カードの幅の 35%。
+ * 枚数がさらに多いときはそれより重ねてよいが、指で1枚ずつ選べる HAND_MIN_STEP は残す
+ */
+const HAND_MIN_STEP = 28;
 /** 相手の手札（裏向き）の高さを決める幅（2026-10-26 自分の手札を縦長にしたが、相手の裏向きの列は高さを増やさないよう前の大きさのまま） */
 const OPP_HAND_BASE_W = 82;
-/** 小さくするのは、5枚がこの幅だけ重なってもまだ入らないとき（論理px） */
-const HAND_SOFT_OVERLAP = 8;
 /** 手札の列の左右の余白とカードの間（論理px。battlePs.css の .battle__hand と同じ値） */
 const HAND_ROW_PAD = 6;
 const HAND_GAP = 3;
@@ -1492,12 +1495,9 @@ export const battleScreen: ScreenDefinition = {
     const handRow = (s: BattleState): HTMLElement => {
       const myTurnMain = s.phase === 'main' && s.active === 'player';
       const myMana = s.phase === 'mana' && s.active === 'player' && !auto;
-      // カードの大きさ：5枚が少し重なって入る大きさ（HAND_CARD_W〜HAND_CARD_MIN_W）。枚数が減っても大きさは変えない
+      // カードの大きさはいつも HAND_CARD_W（2026-10-28：枚数が多くても小さくしない。入りきらない分は下で重ねる）
       const room = (element.offsetWidth || 390) - HAND_ROW_PAD * 2;
-      const slots = Math.max(5, s.sides.player.hand.length);
-      const cardW = Math.max(HAND_CARD_MIN_W, Math.min(HAND_CARD_W, Math.floor((room - (slots - 1) * (HAND_GAP - HAND_SOFT_OVERLAP)) / slots) - 4));
-      element.style.setProperty('--hand-card-w', `${cardW}px`);
-      element.style.setProperty('--hand-card-h', `${battleCardHeight(cardW, 'tall').toFixed(2)}px`);
+      const cardW = HAND_CARD_W;
       // 新しく来たカード：1枚ずつ裏向きで配り、配り終えたら左から1枚ずつ表に返す（時刻を決めて handDeal に覚える）
       const now = Date.now();
       const fresh = s.sides.player.hand.filter((c) => !shownHand.has(c.uid));
@@ -1571,10 +1571,9 @@ export const battleScreen: ScreenDefinition = {
         // 空の手札の台（2026-10-26 デザイン第11弾）の上に「手札なし」
         s.sides.player.hand.length === 0 ? h('span', { class: 'battle-hand__empty battle-hand__empty--tray', text: t('battle.hand.empty') }) : null,
       );
-      // 入りきらないときは少しずつ重ねる（2026-10-26 手札を大きくしたため。横に送らずに全部見えるように）
-      const n = s.sides.player.hand.length;
-      const need = n * (cardW + 4) + (n - 1) * HAND_GAP;
-      if (n > 1 && need > room) row.style.setProperty('--hand-overlap', `${((room - need) / (n - 1)).toFixed(1)}px`);
+      // 入りきらないときは重ねる（右のカードが左のカードの右側に重なる。横に送らずに全部見えるように）
+      const overlap = handOverlap(s.sides.player.hand.length, cardW + 4, HAND_GAP, room, HAND_MIN_STEP);
+      if (overlap < 0) row.style.setProperty('--hand-overlap', `${overlap.toFixed(1)}px`);
       return row;
     };
 
@@ -1780,6 +1779,14 @@ export const battleScreen: ScreenDefinition = {
             button(t('battle.qa.lose'), () => {
               if (!state) return;
               state = { ...state, phase: 'ended', winner: 'opponent', endReason: 'knockout' };
+              render();
+            }, 'btn btn--small'),
+            // 手札が多いとき（7枚・10枚）の並び方を確かめる（2026-10-28 手札の大きさ）：山札の上から1枚を手札へ
+            button(t('battle.qa.draw'), () => {
+              const p = state?.sides.player;
+              if (!state || !p || p.deck.length === 0) return;
+              const card = { uid: `c${state.nextUid}`, cardId: p.deck[0] as string };
+              state = { ...state, nextUid: state.nextUid + 1, sides: { ...state.sides, player: { ...p, deck: p.deck.slice(1), hand: [...p.hand, card] } } };
               render();
             }, 'btn btn--small'),
           )
