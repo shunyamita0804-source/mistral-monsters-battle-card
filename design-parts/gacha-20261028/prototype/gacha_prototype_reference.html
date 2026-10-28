@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>ガチャのお試し：シリーズとつまみ</title>
+<style>
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, sans-serif;
+    color: #f6e7b8;
+    background: #0b0f1f url(img/turn_bg.webp) center / cover no-repeat fixed;
+    overflow: hidden;
+    user-select: none; -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  body::before { content: ""; position: fixed; inset: 0; background: linear-gradient(rgb(6 7 12 / .35), rgb(6 7 12 / .6)); pointer-events: none; }
+  #app { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 8px 12px 12px; gap: 6px; }
+
+  /* 正面のラインナップ */
+  .lineup { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; width: 100%; max-width: 340px; padding: 5px; border-radius: 8px; background: rgb(8 12 30 / .72); border: 1px solid #6d5a2c; }
+  .lu { position: relative; aspect-ratio: .75; border-radius: 3px; overflow: hidden; background: #1a2142; }
+  .lu img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; }
+  .lu.has img { opacity: 1; }
+  .lu.sr { outline: 1.5px solid #ffd76a; }
+  .lu .q { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: #7f88b5; font-weight: 800; }
+  .lu.has .q { display: none; }
+  .lineup-note { grid-column: 1 / -1; font-size: 11px; text-align: center; color: #d9cfae; }
+
+  .hint { min-height: 38px; margin: 0; padding: 6px 14px; border-radius: 10px; background: rgb(8 12 30 / .6); font-size: 15px; font-weight: 800; text-align: center; text-shadow: 0 2px 4px rgb(0 0 0 / .8); line-height: 1.3; }
+
+  /* 機械（ゲームと同じ部品・同じ位置） */
+  .machine { position: relative; width: min(290px, 72vw, 44vh); aspect-ratio: 900 / 1300; flex: none; }
+  .machine.shake { animation: shake .35s ease-in-out; }
+  @keyframes shake { 20% { transform: translate(-3px, 1px) rotate(-.6deg); } 40% { transform: translate(3px, -1px) rotate(.6deg); } 60% { transform: translate(-2px, 1px); } 80% { transform: translate(2px, 0); } }
+  .layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .window { position: absolute; left: 30.667%; top: 23.769%; width: 38.333%; height: 31.385%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; background: radial-gradient(circle at 50% 75%, #24346b, #0f1731 70%); }
+  .stock { width: 34%; margin: 0 -7% -10%; filter: drop-shadow(0 3px 4px rgb(0 0 0 / .6)); transition: transform .42s cubic-bezier(.5,0,.9,.5), opacity .42s ease-in; }
+  .stock:nth-child(1) { transform: rotate(-12deg); }
+  .stock:nth-child(2) { z-index: 1; transform: translateY(-10%) rotate(3deg); }
+  .stock:nth-child(3) { transform: rotate(14deg); }
+  .turned .stock:nth-child(2) { opacity: 0; transform: translateY(90%) rotate(3deg); }
+  .outlet-open { opacity: 0; transition: opacity .2s; }
+  .open .outlet-open { opacity: 1; }
+  .open .outlet-closed { opacity: 0; }
+  .outlet-closed { transition: opacity .2s; }
+
+  /* 出てきたパック：取り出し口の床に寝て、手前のふちから少しはみ出す（奥は暗がり） */
+  .out { position: absolute; left: 18%; top: 77.4%; width: 36%; height: 19%; padding: 0; border: 0; background: none; perspective: 320px; perspective-origin: 50% -40%; pointer-events: none; overflow: visible; clip-path: inset(0 -60% -80% -60%); }
+  .out .lie { position: absolute; left: 50%; bottom: 4%; width: 66%; aspect-ratio: 240 / 432; transform-origin: 50% 100%; transform: translateX(-50%) rotateX(58deg) translateY(-70%); opacity: 0; }
+  .out .lie img { width: 100%; height: 100%; display: block; }
+  .out .lie::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgb(0 0 0 / .7) 0%, rgb(0 0 0 / .2) 25%, transparent 45%); pointer-events: none; }
+  .out .shadow { position: absolute; left: 50%; bottom: 0; width: 70%; height: 22%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(rgb(0 0 0 / .55), transparent 70%); opacity: 0; }
+  .out.is-out { pointer-events: auto; cursor: pointer; }
+  .out.is-out .lie { animation: slide-out .5s cubic-bezier(.2,.9,.3,1.25) forwards; }
+  .out.is-out .shadow { animation: fade-in .5s forwards; }
+  .out.is-out.landed .lie { filter: drop-shadow(0 0 6px rgb(255 226 140 / .9)); animation: none; opacity: 1; transform: translateX(-50%) rotateX(58deg) translateY(14%); }
+  .out.is-out.landed .lie img { animation: shimmer 1.6s ease-in-out infinite; }
+  @keyframes slide-out { 0% { opacity: 1; transform: translateX(-50%) rotateX(58deg) translateY(-70%); } 100% { opacity: 1; transform: translateX(-50%) rotateX(58deg) translateY(14%); } }
+  @keyframes fade-in { to { opacity: 1; } }
+  @keyframes shimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.35); } }
+
+  /* 操作の部品（ハンドルの座のところ。中心 72.2% 76.9%） */
+  .ctrl { position: absolute; }
+  .handle { left: calc(72.222% - 19.667%); top: calc(76.923% - 13.615%); width: 39.333%; aspect-ratio: 1; cursor: grab; touch-action: none; }
+  .handle::before { content: ""; position: absolute; inset: -22%; border-radius: 50%; }
+  .handle img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .crank { transform-origin: 50% 50%; filter: drop-shadow(2px 4px 3px rgb(0 0 0 / .45)); }
+
+  /* ① つまみ（機械に合わせた金と紺。4つの玉は象牙色に金のふち、真ん中に青い宝石） */
+  .knob { left: calc(72.222% - 15%); top: calc(76.923% - 10.4%); width: 30%; aspect-ratio: 1; touch-action: none; cursor: grab; }
+  .knob::before { content: ""; position: absolute; inset: -35%; border-radius: 50%; }
+  .knob .bezel { position: absolute; inset: -6%; border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, #8a6420 0 3deg, #f3d27a 3deg 15deg), #c9a24b;
+    box-shadow: 0 4px 8px rgb(0 0 0 / .55), inset 0 0 0 2px #fff2c0; }
+  .knob .bezel::after { content: ""; position: absolute; inset: 9%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #2b3f8f, #0d1740 75%); box-shadow: inset 0 3px 8px #000; }
+  .knob .dial { position: absolute; inset: 6%; border-radius: 50%; }
+  .knob .dial::before { content: ""; position: absolute; inset: 22%; border-radius: 50%; background: radial-gradient(circle at 40% 32%, #fffaf0, #efe4c9 55%, #b9a477); box-shadow: 0 0 0 2px #c9a24b, 0 3px 5px rgb(0 0 0 / .5); }
+  .knob .dial i { position: absolute; width: 36%; height: 36%; border-radius: 50%; background: radial-gradient(circle at 36% 30%, #fffaf0, #efe4c9 50%, #a8936a); box-shadow: 0 0 0 2px #d9b45a, 0 3px 4px rgb(0 0 0 / .5); }
+  .knob .dial i:nth-child(1) { left: 32%; top: -4%; } .knob .dial i:nth-child(2) { left: 68%; top: 32%; } .knob .dial i:nth-child(3) { left: 32%; top: 68%; } .knob .dial i:nth-child(4) { left: -4%; top: 32%; }
+  .knob .gem { position: absolute; left: 50%; top: 50%; width: 22%; height: 22%; transform: translate(-50%, -50%) rotate(45deg); background: linear-gradient(135deg, #bfe0ff, #2d63e0 45%, #0a2a80); box-shadow: 0 0 0 2px #f3d27a, 0 0 8px rgb(80 150 255 / .8); border-radius: 3px; }
+  .knob .arrow { position: absolute; inset: -26%; border-radius: 50%; border: 3px dashed rgb(255 233 168 / .65); border-left-color: transparent; border-bottom-color: transparent; animation: spin 3s linear infinite; pointer-events: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 開ける画面 */
+  .open-view { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 14px; background: radial-gradient(circle at 50% 42%, rgb(40 56 120 / .85), rgb(4 6 16 / .96) 70%); touch-action: none; }
+  .open-view.is-on { display: flex; }
+  .ov-hint { margin: 0; min-height: 44px; font-size: 16px; font-weight: 900; text-align: center; text-shadow: 0 2px 4px #000; }
+  .table { position: relative; width: min(250px, 64vw); aspect-ratio: .72; }
+  .big-pack { position: absolute; inset: -6% -2%; z-index: 30; }
+  .big-pack .body, .big-pack .lid { position: absolute; inset: 0; background: url(img/pack_sealed.webp) center / 100% 100% no-repeat; filter: drop-shadow(0 8px 14px rgb(0 0 0 / .6)); }
+  .big-pack .body { clip-path: inset(17% 0 0 0); transition: transform .6s ease-in, opacity .6s ease-in; }
+  .big-pack .lid { clip-path: inset(0 0 83% 0); transition: transform .5s ease-out, opacity .5s; }
+  .big-pack .tearline { position: absolute; left: 0; top: 17%; height: 4px; width: 0; background: linear-gradient(90deg, #fff, #ffe9a8); box-shadow: 0 0 10px #ffe9a8; border-radius: 2px; }
+  .big-pack.torn .lid { transform: translate(30%, -60%) rotate(18deg); opacity: 0; }
+  .big-pack.torn .body { transform: translateY(70%); opacity: 0; }
+  .stack { position: absolute; inset: 0; perspective: 900px; }
+  .card { position: absolute; inset: 0; border-radius: 5%; transform-style: preserve-3d; transition: transform .45s cubic-bezier(.3,.8,.4,1), opacity .45s; }
+  .card .f, .card .b { position: absolute; inset: 0; border-radius: 5%; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 6px 14px rgb(0 0 0 / .55); }
+  .card .b img, .card .f img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .f { transform: rotateY(180deg); background: #101733; border: 3px solid #c9a24b; }
+  .rar { position: absolute; left: 6%; top: 4%; padding: 2px 8px; border-radius: 10px; font-size: 13px; font-weight: 900; background: #1c2550; color: #fff; border: 1px solid #fff6; }
+  .rar.U { background: #2f7d4a; } .rar.R { background: #b8402f; } .rar.SR { background: linear-gradient(#ffe48a, #c78a1e); color: #2a1a00; }
+  .card.shine .f::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / .55) 45%, transparent 60%); background-size: 250% 100%; animation: sweep 1.6s ease-in-out infinite; }
+  @keyframes sweep { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+  .flash { position: fixed; inset: 0; z-index: 20; background: #fff; opacity: 0; pointer-events: none; }
+  .flash.go { animation: flash .7s ease-out; }
+  @keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
+  .big-word { position: fixed; left: 0; right: 0; top: 16%; z-index: 21; text-align: center; font-size: 30px; font-weight: 900; color: #ffe48a; text-shadow: 0 0 12px #c78a1e, 0 3px 0 #5a3500; opacity: 0; pointer-events: none; }
+  .big-word.go { animation: word 1.3s ease-out; }
+  @keyframes word { 0% { opacity: 0; transform: scale(.6); } 20% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+  .tray { display: flex; gap: 6px; min-height: 76px; align-items: flex-end; }
+  .mini { position: relative; width: 50px; aspect-ratio: .72; border-radius: 4px; overflow: hidden; border: 2px solid #c9a24b; animation: drop .35s ease-out; }
+  .mini img { width: 100%; height: 100%; object-fit: cover; }
+  .mini .new { position: absolute; right: -2px; top: -2px; padding: 0 3px; font-size: 9px; font-weight: 900; background: #e33; color: #fff; border-radius: 3px; }
+  @keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
+  .ov-actions { display: flex; gap: 8px; min-height: 44px; }
+  .note { position: fixed; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 10px; color: #9a94b8; pointer-events: none; }
+
+  .actions { display: flex; gap: 8px; min-height: 50px; align-items: center; }
+  .btn { min-width: 150px; min-height: 44px; border-radius: 22px; border: 2px solid #ffe9a8; background: linear-gradient(#f3d27a, #c4932f); color: #1a1430; font-weight: 900; font-size: 15px; padding: 0 16px; }
+  .btn.sub { background: rgb(10 16 40 / .8); color: #e9d9a6; border-color: #b8913a; }
+  .btn[hidden] { display: none; }
+
+  /* シリーズのパック（仮の絵：今のパックの枠＋モンスターの絵＋色の帯） */
+  .spack { position: relative; aspect-ratio: 240 / 432; }
+  .spack * { pointer-events: none; }
+  .spack > img.frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .spack .art { position: absolute; left: 17%; top: 16%; width: 66%; height: 62%; box-shadow: 0 0 0 2px #d9b45a, inset 0 0 12px rgb(0 0 0 / .5); overflow: hidden; border-radius: 3px; background: var(--c); }
+  .spack .art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; mix-blend-mode: normal; }
+  .spack .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, color-mix(in srgb, var(--c) 85%, #000) 100%); }
+  .spack .band { position: absolute; left: 8%; right: 8%; top: 82%; height: 7%; border-radius: 2px; background: var(--c); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .5); }
+
+  /* シリーズを選ぶ画面 */
+  .select { position: fixed; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 14px 20px; overflow-y: auto; background: radial-gradient(circle at 50% 30%, rgb(40 56 120 / .85), rgb(4 6 16 / .97) 75%); }
+  .select[hidden] { display: none; }
+  .select h1 { margin: 6px 0 0; font-size: 20px; color: #ffe7a0; text-shadow: 0 2px 4px #000; }
+  .select p { margin: 0; font-size: 13px; color: #c9c1a2; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px; width: 100%; max-width: 380px; }
+  .tile { border: 0; padding: 6px 4px 8px; border-radius: 12px; background: rgb(255 255 255 / .04); color: #f6e7b8; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform .15s, background .15s; }
+  .tile .spack { width: 78%; filter: drop-shadow(0 6px 8px rgb(0 0 0 / .6)); transition: transform .25s; }
+  .tile b { font-size: 14px; }
+  .tile small { font-size: 11px; color: #c9c1a2; }
+  .tile.is-picked { background: rgb(255 228 138 / .16); outline: 2px solid #ffe48a; }
+  .tile.is-picked .spack { transform: translateY(-6px) scale(1.06) rotate(-2deg); }
+
+  /* 機械の上に出す、選んだシリーズの名前 */
+  .series-bar { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 360px; }
+  .series-bar .name { flex: 1; font-weight: 900; font-size: 15px; color: #ffe7a0; text-shadow: 0 2px 3px #000; }
+  .series-bar .chip { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); }
+  .back { min-height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid #8a7440; background: rgb(10 16 40 / .75); color: #e9d9a6; font-size: 12px; font-weight: 700; }
+
+  /* ガラスの中・出てくるパックをシリーズの絵に */
+  .window .stock.spack { width: 34%; }
+  .out .lie .spack { width: 100%; height: 100%; }
+
+  /* 出た瞬間に取り出し口へ寄る */
+  .stage { position: relative; overflow: hidden; border-radius: 12px; flex: none; }
+  .machine { transition: transform .6s cubic-bezier(.3,.8,.3,1); transform-origin: 33% 96%; }
+  .machine.zoom { transform: scale(2.2) translateY(-6%); }
+  .machine.zoom .ctrl { opacity: 0; transition: opacity .2s; }
+  .tap-hint { position: absolute; left: 0; right: 0; top: 5%; z-index: 3; text-align: center; font-weight: 900; font-size: 15px; color: #fff; text-shadow: 0 2px 4px #000; opacity: 0; pointer-events: none; animation: none; }
+  .stage.zoomed .tap-hint { opacity: 1; animation: blink 1.2s ease-in-out .6s infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .big-pack .spack { position: absolute; inset: 0; }
+
+  .big-pack .body, .big-pack .lid { background: none !important; }
+</style>
+</head>
+<body>
+<div class="select" id="select">
+  <h1>どのパックをまわす？</h1>
+  <p>1つ選んで、もう1回押すと決定</p>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div id="app">
+  <div class="series-bar"><span class="chip" id="chip"></span><span class="name" id="sname"></span><button class="back" id="back">パックを選び直す</button></div>
+  <div class="lineup" id="lineup"></div>
+  <p class="hint" id="hint"></p>
+  <div class="stage" id="stage">
+    <div class="machine" id="machine">
+      <div class="window" id="window"></div>
+      <img class="layer" src="img/machine_front.webp" alt="">
+      <img class="layer" src="img/machine_glass.webp" alt="">
+      <img class="layer outlet-closed" src="img/outlet_closed.webp" alt="">
+      <img class="layer outlet-open" src="img/outlet_open.webp" alt="">
+      <img class="layer" src="img/outlet_front.webp" alt="">
+      <button class="out" id="out" aria-label="取り出す"><div class="shadow"></div><div class="lie" id="lie"></div></button>
+      <div id="ctrlHost"></div>
+    </div>
+    <div class="tap-hint">タップして取り出す</div>
+  </div>
+</div>
+
+<div class="open-view" id="ov">
+  <p class="ov-hint" id="ovHint"></p>
+  <div class="table" id="table"></div>
+  <div class="tray" id="tray"></div>
+  <div class="ov-actions">
+    <button class="btn sub" id="again" hidden>もう1回</button>
+  </div>
+</div>
+<div class="flash" id="flash"></div>
+<div class="big-word" id="word"></div>
+<div class="note">お試し用：パックの絵は仮（今のパックの枠＋モンスターの絵）。モンスターは1パックに3％。技は強いほど出にくい（内部の確率だけ・表示なし）</div>
+<script>
+(() => {
+  // ===== シリーズ（1シリーズ＝1モンスター。色はゲームの枠の色） =====
+  const SERIES = [
+    { id: 'soramo', name: 'ソラモ', color: '#E4D2AC', pre: 'sor14v2' },
+    { id: 'gauul', name: 'ガウル', color: '#E68A46', pre: 'gau14' },
+    { id: 'lazuck', name: 'ラズック', color: '#844DC5', pre: 'laz14' },
+    { id: 'nobiton', name: 'ノビトン', color: '#FFD400', pre: 'nob14' },
+    { id: 'myurol', name: 'ミュロル', color: '#84E5FA', pre: 'myu14' },
+    { id: 'kalshell', name: 'カルシェル', color: '#DFF2F6', pre: 'kal' },
+  ];
+  const RANK = { C: 0, U: 1, R: 2, SR: 3 };
+  const W = { C: 10, U: 5, R: 2 };
+  const PER = 5, MON_RATE = 0.03;
+  SERIES.forEach(s => {
+    s.cards = [];
+    for (let i = 1; i <= 14; i++) s.cards.push({ id: s.id + i, img: `img/${s.pre}_${String(i).padStart(2, '0')}.webp`, r: i <= 6 ? 'C' : i <= 11 ? 'U' : 'R' });
+    s.mon = { id: s.id + '-mon', img: `img/mon_${s.id}.webp`, r: 'SR' };
+    s.all = [...s.cards, s.mon];
+    s.owned = new Set(); s.pulls = 0;
+  });
+  let S = SERIES[5];
+  const pick = () => { const tot = S.cards.reduce((a, c) => a + W[c.r], 0); let x = Math.random() * tot; for (const c of S.cards) { x -= W[c.r]; if (x < 0) return c; } return S.cards[0]; };
+  const draw = () => { const cs = []; for (let i = 0; i < PER; i++) cs.push(pick()); if (Math.random() < MON_RATE) cs[Math.floor(Math.random() * PER)] = S.mon; return cs.sort((a, b) => RANK[a.r] - RANK[b.r]); };
+  const packHTML = (s, cls = '') => `<div class="spack ${cls}" style="--c:${s.color}"><img class="frame" src="img/pack_sealed.webp" alt=""><div class="art"><img src="img/mon_${s.id}.webp" alt=""></div><div class="band"></div></div>`;
+
+  // ===== 音 =====
+  let ac = null;
+  const actx = () => { try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); } catch (e) {} return ac; };
+  const tone = (f, d, type = 'sine', v = .18, when = 0, f2) => { const a = actx(); if (!a) return; const o = a.createOscillator(), g = a.createGain(); o.type = type; const t = a.currentTime + when; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d); o.connect(g).connect(a.destination); o.start(t); o.stop(t + d); };
+  const noise = (d, v = .2, hp = 1500) => { const a = actx(); if (!a) return; const n = a.createBuffer(1, Math.max(1, a.sampleRate * d), a.sampleRate), ch = n.getChannelData(0); for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / ch.length); const s = a.createBufferSource(); s.buffer = n; const f = a.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp; const g = a.createGain(); g.gain.value = v; s.connect(f).connect(g).connect(a.destination); s.start(); };
+  const FILES = { unlock: 'se/chest_unlock.mp3', slide: 'se/card_slide.mp3', tear: 'se/pack_open.mp3', flip: 'se/card_flip.mp3', reveal: 'se/card_reveal.mp3', reward: 'se/reward.mp3', swish: 'se/swish.mp3' };
+  const BUF = {};
+  const loadAll = () => { const a = actx(); if (!a || loadAll.done) return; loadAll.done = true; Object.entries(FILES).forEach(([k, u]) => fetch(u).then(r => r.arrayBuffer()).then(b => a.decodeAudioData(b)).then(d => BUF[k] = d).catch(() => {})); };
+  const play = (k, v = 1, fb) => { const a = actx(); if (a && BUF[k]) { const s = a.createBufferSource(), g = a.createGain(); s.buffer = BUF[k]; g.gain.value = v; s.connect(g).connect(a.destination); s.start(); } else if (fb) fb(); };
+  const snd = {
+    grind: () => { tone(2400, .02, 'square', .06); tone(520, .045, 'square', .05, .004, 380); noise(.035, .16, 1800); },
+    clunk: () => { play('unlock', 1, () => noise(.1, .22, 300)); tone(110, .18, 'triangle', .25); },
+    slideOut: () => play('slide', 1, () => noise(.2, .15, 1200)),
+    tear: () => play('tear', 1, () => noise(.35, .35, 2500)),
+    card: () => play('flip', 1, () => noise(.06, .2, 2000)),
+    fling: () => play('swish', .8),
+    pick: () => tone(880, .06, 'triangle', .1),
+    rare: () => play('reveal', 1, () => [660, 880, 1320].forEach((f, i) => tone(f, .35, 'triangle', .14, i * .08))),
+    sr: () => play('reward', 1, () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .6, 'triangle', .15, i * .09))),
+  };
+  document.addEventListener('pointerdown', () => loadAll(), { capture: true });
+
+  const $ = id => document.getElementById(id);
+  const hint = $('hint'), win = $('window'), machine = $('machine'), out = $('out'), lie = $('lie'), host = $('ctrlHost'), stage = $('stage');
+  const ov = $('ov'), ovHint = $('ovHint'), table = $('table'), tray = $('tray'), again = $('again');
+
+  // ===== シリーズを選ぶ =====
+  let picked = null;
+  const renderSelect = () => {
+    $('grid').innerHTML = SERIES.map(s => `<button class="tile ${picked === s ? 'is-picked' : ''}" data-id="${s.id}">${packHTML(s)}<b>${s.name}のパック</b><small>${s.owned.size} / ${s.all.length} そろった</small></button>`).join('');
+    $('grid').querySelectorAll('.tile').forEach(b => b.addEventListener('click', () => {
+      actx(); const s = SERIES.find(x => x.id === b.dataset.id);
+      if (picked === s) { choose(s); return; }
+      picked = s; snd.pick(); renderSelect();
+    }));
+  };
+  const choose = (s) => {
+    S = s; picked = null; snd.clunk();
+    $('select').hidden = true;
+    $('sname').textContent = `${s.name}のパック`; $('chip').style.setProperty('--c', s.color);
+    resetMachine();
+  };
+  $('back').addEventListener('click', () => { if (ov.classList.contains('is-on')) return; renderSelect(); $('select').hidden = false; });
+
+  const renderLineup = () => {
+    $('lineup').innerHTML = S.all.map(c => `<div class="lu ${c.r === 'SR' ? 'sr' : ''} ${S.owned.has(c.id) ? 'has' : ''}"><img src="${c.img}" alt=""><span class="q">?</span></div>`).join('') +
+      `<div class="lineup-note">${S.owned.size} / ${S.all.length} そろった　・　${S.pulls}回</div>`;
+  };
+
+  // ===== 機械 =====
+  let finished = false, busy = false;
+  const fitStage = () => { const r = machine.getBoundingClientRect(); stage.style.width = machine.offsetWidth + 'px'; stage.style.height = machine.offsetHeight + 'px'; };
+  const finish = () => {
+    if (finished) return; finished = true;
+    snd.clunk(); machine.classList.remove('shake'); void machine.offsetWidth; machine.classList.add('shake', 'turned');
+    setTimeout(() => {
+      machine.classList.add('open', 'zoom'); stage.classList.add('zoomed');
+      setTimeout(() => { out.classList.add('is-out'); snd.slideOut(); setTimeout(() => out.classList.add('landed'), 520); }, 350);
+      hint.textContent = 'パックが出てきた！';
+    }, 420);
+  };
+  const buildKnob = () => {
+    host.innerHTML = '<div class="ctrl knob" id="c"><div class="bezel"></div><div class="dial"><i></i><i></i><i></i><i></i><span class="gem"></span></div><div class="arrow"></div></div>';
+    const el = $('c'), dial = el.querySelector('.dial');
+    let turned = 0, clicks = 0, last = null;
+    const ang = e => { const r = el.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; };
+    el.addEventListener('pointerdown', e => { if (finished) return; actx(); el.setPointerCapture(e.pointerId); last = ang(e); });
+    el.addEventListener('pointermove', e => {
+      if (last === null || finished) return;
+      const a = ang(e); let d = a - last; if (d > 180) d -= 360; if (d < -180) d += 360; last = a;
+      if (d > 0) { turned = Math.min(360, turned + Math.min(d, 70)); dial.style.transform = `rotate(${turned}deg)`; el.querySelector('.arrow').style.display = 'none'; const n = Math.floor(turned / 18); if (n > clicks) { clicks = n; snd.grind(); } if (turned >= 360) { last = null; finish(); } }
+    });
+    const up = () => { last = null; }; el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  };
+  const resetMachine = () => {
+    finished = false; busy = false;
+    machine.classList.remove('open', 'turned', 'shake', 'zoom'); stage.classList.remove('zoomed'); out.classList.remove('is-out', 'landed');
+    win.innerHTML = packHTML(S, 'stock') + packHTML(S, 'stock') + packHTML(S, 'stock');
+    lie.innerHTML = packHTML(S);
+    hint.textContent = 'つまみをつかんで、ガリガリ1周まわそう';
+    renderLineup(); buildKnob(); requestAnimationFrame(fitStage);
+  };
+  window.addEventListener('resize', fitStage);
+
+  // ===== 開ける =====
+  let cards = [], idx = 0, stackCards = [];
+  const openView = () => {
+    if (busy || !finished || !out.classList.contains('is-out')) return; busy = true;
+    S.pulls++; cards = draw(); idx = 0;
+    tray.innerHTML = ''; again.hidden = true; table.innerHTML = '';
+    ov.classList.add('is-on');
+    const stack = document.createElement('div'); stack.className = 'stack'; stack.style.visibility = 'hidden';
+    stackCards = cards.map((c, i) => {
+      const el = document.createElement('div'); el.className = 'card' + (c.r === 'R' || c.r === 'SR' ? ' shine' : '');
+      el.style.zIndex = String(10 - i); el.style.transform = `translate(${i * 1.2}%, ${i * 1.2}%)`;
+      el.innerHTML = `<div class="b"><img src="img/card_back.webp" alt=""></div><div class="f"><img src="${c.img}" alt="">${c.r === 'SR' ? '<span class="rar SR">★モンスター</span>' : ''}</div>`;
+      stack.appendChild(el); return el;
+    });
+    table.appendChild(stack);
+    openPack(stack); renderLineup();
+  };
+  out.addEventListener('click', openView); stage.addEventListener('click', openView);
+
+  const openPack = (stack) => {
+    ovHint.textContent = 'パックの上のほうを、横に指でなぞって開けよう';
+    const p = document.createElement('div'); p.className = 'big-pack';
+    p.innerHTML = `<div class="body">${packHTML(S)}</div><div class="lid">${packHTML(S)}</div><div class="tearline"></div>`;
+    table.appendChild(p);
+    const line = p.querySelector('.tearline');
+    let sx = null, maxX = 0, done = false;
+    p.addEventListener('pointerdown', e => { actx(); p.setPointerCapture(e.pointerId); const r = p.getBoundingClientRect(); sx = e.clientX - r.left; maxX = 0; });
+    p.addEventListener('pointermove', e => {
+      if (sx === null || done) return;
+      const r = p.getBoundingClientRect(); const dx = Math.abs(e.clientX - r.left - sx);
+      if (dx > maxX) { if (Math.floor(dx / 25) > Math.floor(maxX / 25)) noise(.03, .12, 3500); maxX = dx; }
+      line.style.width = Math.min(100, maxX / r.width * 100 / .6) + '%';
+      if (maxX > r.width * .6) { done = true; snd.tear(); line.style.opacity = '0'; p.classList.add('torn'); stack.style.visibility = 'visible'; setTimeout(() => { p.remove(); startReveal(stack); }, 550); }
+    });
+    p.addEventListener('pointerup', () => { if (!done) { sx = null; line.style.width = '0'; } });
+  };
+  const startReveal = (stack) => {
+    ovHint.textContent = 'タップ、または好きな方向にスライドして1枚ずつめくろう';
+    setTimeout(flipTop, 120);
+    let sx = null, sy = null;
+    stack.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; });
+    stack.addEventListener('pointerup', e => { if (sx === null) return; next(e.clientX - sx, e.clientY - sy); sx = sy = null; });
+  };
+  const flipTop = () => {
+    const el = stackCards[idx]; if (!el) return;
+    el.style.transform = 'rotateY(180deg)'; snd.card();
+    const c = cards[idx];
+    if (c.r === 'SR') boom('モンスターカード！', true); else if (c.r === 'R') snd.rare();
+  };
+  let lock = false;
+  const next = (dx, dy) => {
+    if (lock || idx >= cards.length) return; lock = true;
+    const el = stackCards[idx], c = cards[idx];
+    const len = Math.hypot(dx, dy);
+    const vx = len > 20 ? dx / len : -.9, vy = len > 20 ? dy / len : -.4;
+    el.style.transform = `rotateY(180deg) translate(${-vx * 140}%, ${vy * 120}%) rotate(${vx * 16}deg)`;
+    el.style.opacity = '0'; snd.fling();
+    const isNew = !S.owned.has(c.id); S.owned.add(c.id);
+    const m = document.createElement('div'); m.className = 'mini';
+    m.innerHTML = `<img src="${c.img}" alt="">${isNew ? '<span class="new">NEW</span>' : ''}`;
+    tray.appendChild(m); renderLineup();
+    idx++;
+    if (idx < cards.length) {
+      const last = idx === cards.length - 1;
+      if (last) ovHint.textContent = '最後の1枚…！';
+      setTimeout(() => { flipTop(); lock = false; }, last ? 450 : 160);
+    } else { ovHint.textContent = '全部めくった！'; again.hidden = false; lock = false; }
+  };
+  const boom = (text, big) => {
+    const f = $('flash'), w = $('word');
+    f.classList.remove('go'); w.classList.remove('go'); void f.offsetWidth;
+    if (big) { f.classList.add('go'); snd.sr(); } else snd.rare();
+    w.textContent = text; w.classList.add('go');
+  };
+  again.addEventListener('click', () => { ov.classList.remove('is-on'); resetMachine(); });
+
+  renderSelect();
+  $('sname').textContent = `${S.name}のパック`;
+  resetMachine();
+})();
+</script>
+</body>
+</html>

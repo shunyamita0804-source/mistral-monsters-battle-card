@@ -44,7 +44,7 @@ const DEFAULT_STATE = (): WorldDevState => ({
 });
 
 /** 本編の見せる倍率（worldScreen.ts の VIEW_ZOOM と同じ値。実寸の表示に使う） */
-const ACTUAL_ZOOM: Readonly<Record<Place, number>> = { town: 0.85, dungeon: 1.5 };
+const ACTUAL_ZOOM: Readonly<Record<Place, number>> = { town: 0.7, dungeon: 1.5 };
 
 /** 広場のマス目（外周と柱が壁） */
 function fieldGrid(): string[] {

@@ -235,9 +235,9 @@ const CAMERA_LOOK_RATE = 2.5;
  * ダンジョン：全体が一度に見えて主人公が小さかった（ユーザーの動画 V1）ので 1.25・1.5・1.75 倍を比べて 1.5 倍（人物の大きさが街と同じ 81 論理px になる）。
  * 街：1.00・1.15・1.30 倍を比べて 1.15 倍（家の入口・道が見えたまま、主人公が少し大きく見える。1.30 倍は先が見えにくい。記録は docs/battle-layout-r2.md）。
  * 2026-10-28 新しい街（建物が大きく街が広い）で、家1軒が画面いっぱいになったので 0.8・0.85・0.9 を比べて 0.85 倍に（ユーザー指示。
- * 比較写真は docs/design/town-20261028/fix/20_zoom_*.jpg）。部屋は画面の高さに合わせて別に決めている（#artScale）
+ * 比較写真は docs/design/town-20261028/fix/20_zoom_*.jpg）。2026-10-28 午後、まだ近いとのことで 0.7 倍に（ユーザー指示）。部屋は画面の高さに合わせて別に決めている（#artScale）
  */
-const VIEW_ZOOM: Readonly<Record<MapDefinition['area'], number>> = { town: 0.85, interior: 1, dungeon: 1.5 };
+const VIEW_ZOOM: Readonly<Record<MapDefinition['area'], number>> = { town: 0.7, interior: 1, dungeon: 1.5 };
 /** スティックの向きを変えるまでの余裕（ラジアン）。4方向の境目（45度）を 8度こえるまで前の向きのまま */
 const STICK_HOLD = Math.PI / 4 + (8 * Math.PI) / 180;
 /**
