@@ -134,17 +134,25 @@ img.skill-card__art {
   text-align: center;
 }
 
-/* ダメージの四角（窓の左下の角にぴったり。右上の角だけ丸い）：ダメージ・軽減値（-3）は大きな数字だけ、回避・特殊・サポートは短い文字 */
+/* ダメージの四角（窓の左下の角）：前の v5 の金のふちの黒い欄（2026-10-29 ユーザー「前のUI使ってね」。value_box.webp を欄の大きさにのばす）。
+   ダメージ・軽減値（-3）は大きな数字だけ、回避・特殊・サポートは短い文字 */
 .skill-card__value {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0 3.2cqw 0 0;
-  background: rgb(30 22 18 / 0.9);
+  box-sizing: border-box;
+  border: 4.6cqw solid transparent;
+  border-image: url('@assets/images/ui/skillcard_simple/value_box.webp') 52 fill / 4.6cqw / 0 stretch;
   color: #fff;
   line-height: 1;
-  overflow: hidden;
+  overflow: visible;
+}
+
+/* マナの玉（前の数字の入った玉の絵） */
+.skill-card__mana-img {
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .skill-card__value-num {
@@ -152,6 +160,8 @@ img.skill-card__art {
   /* 大きさは skillCard.ts の VALUE_FONT（normal 21cqw・手札用 22cqw が上限。はみ出すときは収まる大きさまで下げる） */
   font-size: 21cqw;
   font-weight: 900;
+  -webkit-text-stroke: 0.4cqw #000;
+  paint-order: stroke fill;
 }
 
 .skill-card--hand .skill-card__value-num {

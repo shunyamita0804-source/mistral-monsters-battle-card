@@ -42,8 +42,10 @@ describe('技・サポートカードの枠（新しい形）', () => {
     for (const f of frames) expect(webpSize(`${DIR}/${f}`)).toEqual(f.startsWith('frame_normal') ? [506, 764] : [416, 520]);
   });
 
-  it('前の枠（v5 の分類の色の枠）・数字の入ったマナの玉の絵は残っていない', () => {
-    expect(readdirSync('assets/images/ui/skillcard_v5').filter((f) => f.startsWith('frame_') || f.startsWith('mana_'))).toEqual([]);
+  it('前の枠（v5 の分類の色の枠）は残っていない。マナの玉（mana_0〜10）とダメージの欄は前の見た目を使う（2026-10-29 ユーザー指示）', () => {
+    expect(readdirSync('assets/images/ui/skillcard_v5').filter((f) => f.startsWith('frame_'))).toEqual([]);
+    for (let n = 0; n <= 10; n++) expect(existsSync(`assets/images/ui/skillcard_v5/mana_${n}.png`)).toBe(true);
+    expect(existsSync(`${DIR}/value_box.webp`)).toBe(true);
   });
 
   it('合計の重さは前の枠（約4.6MB）よりずっと小さい', () => {
