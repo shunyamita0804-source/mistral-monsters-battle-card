@@ -16,6 +16,7 @@ import { soramoSkillId } from '../src/data/soramo.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, attackPower, cardUsability, createBattle, targetsFor, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
+import { BOOSTERS } from '../src/data/introV2.ts';
 import { createNewGameSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
@@ -28,6 +29,7 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 const puk = (n: number): string => pukarimSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
 const ORIGINAL_DIR = 'design-parts/cards-original/pukarim';
+const FINAL_DIR = 'design-parts/cards-original/pukarim/final-20261028';
 
 function csvRows(path: string): string[][] {
   const text = readFileSync(path, 'utf8').replace(/^﻿/, '');
@@ -70,14 +72,29 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_pukarim.webp`)).toBe(true);
   });
 
-  it('ふつうに遊んでいる人には出ない：カードの一覧・初期配布・新しいセーブには入らない（台帳と適合技にはある）', () => {
-    expect(MONSTERS.some((m) => m.id === PUKARIM_MONSTER_ID)).toBe(false);
-    expect(SKILLS.some((s) => s.monsterId === PUKARIM_MONSTER_ID)).toBe(false);
+  it('ふつうのカードの一覧に入る（図鑑・デッキ編集・所持カード）。初期配布・ブースターの箱・新しいセーブには入らない（2026-10-29 最終）', () => {
+    expect(MONSTERS.some((m) => m.id === PUKARIM_MONSTER_ID)).toBe(true);
+    expect(SKILLS.filter((s) => s.monsterId === PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(PUKARIM_SKILLS.map((s) => s.id));
     expect(INITIAL_DISTRIBUTION.some((d) => d.monsterId === PUKARIM_MONSTER_ID)).toBe(false);
+    for (const b of BOOSTERS) expect(b.monsters).not.toContain(PUKARIM_MONSTER_ID);
     expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('pukarim'))).toBe(false);
-    expect(QA_MONSTERS.map((m) => m.id)).toEqual([PUKARIM_MONSTER_ID]);
+    expect(QA_MONSTERS).toEqual([]);
     expect(cardCatalog.get(PUKARIM_MONSTER_ID)?.kind).toBe('monster');
     expect(skillsOf(PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(PUKARIM_SKILLS.map((s) => s.id));
+  });
+
+  it('絵：技14枚・正式モンスターカードがあり、原本は無改変で保管。レアリティ未定の印は外した', () => {
+    for (let n = 1; n <= 14; n++) {
+      const skill = getSkill(puk(n));
+      expect(skill.art?.file).toBe(`puk_sk_${String(n).padStart(2, '0')}.webp`);
+      expect(existsSync(`assets/images/cards/skills/puk_sk_${String(n).padStart(2, '0')}.webp`)).toBe(true);
+      expect(existsSync(`${FINAL_DIR}/art/skills/pukarim_sk_${String(n).padStart(2, '0')}.png`)).toBe(true);
+      expect(skill.pendingSpec ?? []).toEqual([]);
+    }
+    expect(PUKARIM_MONSTER.art?.file).toBe('pukarim_official.webp');
+    expect(existsSync('assets/images/cards/monsters/pukarim_official.webp')).toBe(true);
+    expect(PUKARIM_MONSTER.pendingSpec ?? []).toEqual([]);
+    expect(existsSync(`${FINAL_DIR}/art/monster_card/pukarim_official_monstercard_LIFE6.png`)).toBe(true);
   });
 
   it('試遊用の16枚（Claude の仮）：14種から、同じカード3枚まで、16枚。7・9・10 を入れる', () => {

@@ -20,6 +20,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-25：ノビトンと技16種を src/data/nobiton.ts から足した。
  * 2026-10-25：ミュロルと技16種を src/data/myurol.ts から足した。2026-10-27 に正式14技・バトル用カード（水色の枠）に。
  * 2026-10-27：カルシェルと技14種を src/data/kalshell.ts から足した。
+ * 2026-10-29：プカリムと技14種を確認用の一覧からふつうの一覧へ移した（src/data/pukarim.ts）。
  */
 
 interface MonsterSeed {
@@ -156,6 +157,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   NOBITON_MONSTER,
   MYUROL_MONSTER,
   KALSHELL_MONSTER,
+  PUKARIM_MONSTER,
   ...TMP_BOSS_MONSTERS,
 ];
 
@@ -168,6 +170,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...NOBITON_SKILLS,
   ...MYUROL_SKILLS,
   ...KALSHELL_SKILLS,
+  ...PUKARIM_SKILLS,
   ...TMP_BOSS_SKILLS,
 ];
 
@@ -191,11 +194,12 @@ export const SUPPORTS: readonly SupportCard[] = [
 ].map(({ no, ...rest }) => ({ ...rest, kind: 'support', id: supportId(no), isPlaceholder: true }) as SupportCard);
 
 /**
- * 確認用（?qa=1）だけで使うカード（2026-10-28：試遊中のプカリム）。カードの一覧（MONSTERS・SKILLS）には入れないので、
- * 図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）
+ * 確認用（?qa=1）だけで使うカード。カードの一覧（MONSTERS・SKILLS）には入れないので、図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。
+ * 台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）。
+ * 2026-10-28 に試遊中のプカリムを入れていたが、2026-10-29 の最終でふつうの一覧へ移した（いまは空）
  */
-export const QA_MONSTERS: readonly MonsterCard[] = [PUKARIM_MONSTER];
-export const QA_SKILLS: readonly SkillCard[] = [...PUKARIM_SKILLS];
+export const QA_MONSTERS: readonly MonsterCard[] = [];
+export const QA_SKILLS: readonly SkillCard[] = [];
 
 export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
 

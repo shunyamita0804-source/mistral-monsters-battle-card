@@ -3,19 +3,21 @@ import pukarimData from './official/pukarim14_skills_DRAFT_20261028.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
- * 【試遊中・2026-10-28】プカリム（新モンスター制作の手順 4「仮の絵で入れて試遊する」。指示書 design-parts/cards-original/pukarim/00_instructions_for_claude_code.txt）。
- * 正本は src/data/official/pukarim14_skills_DRAFT_20261028.json（届いた JSON を無改変。同じ内容の CSV も無改変で並べて置く）。
+ * 【正式・2026-10-29】プカリム（新モンスター制作の手順 8「最終」。指示書 design-parts/cards-original/pukarim/final-20261028/00_instructions_for_claude_code.txt）。
+ * 2026-10-28 の試遊（手順 4）で数字は確定。正本は src/data/official/pukarim14_skills_DRAFT_20261028.json（届いた JSON を無改変。同じ内容の CSV も無改変で並べて置く）。
  * 技名・分類・マナ・ダメージ・効果の文・ライフは JSON からそのまま読む（tests/pukarim.test.ts で CSV とも照らし合わせる）。
  *
- * ふつうに遊んでいる人には出さない（確認用の ?qa=1 のときだけ使う）：カードの一覧（cards.ts の MONSTERS・SKILLS）には入れず、
- * カードを引く台帳（cardCatalog）と QA 用の一覧（QA_MONSTERS・QA_SKILLS）にだけ入れる。図鑑・デッキ編集・ガチャ・初期配布・敵の編成には出ない。
- * 遊ぶ人の入手の流れ（街のピート・ガチャのシリーズ・ダンジョンのバトラー）は、絵がそろってから別の指示書で入れる。
+ * ふつうのカードの一覧（cards.ts の MONSTERS・SKILLS）に入れる：図鑑・デッキ編集・所持カードに出る。初期配布・ブースターの箱には入れない。
+ * 手に入れる流れ：カードショップの前のピートに勝つ（初回はモンスターカード、2回目からは技カード）→ ショップのガチャにプカリムのシリーズが並ぶ（src/game/story/pete.ts）。
+ * 最初の2つのダンジョンのバトラー・見えない番人と、大会 E・D の相手のチームにも入る（勝つとプカリムの技がもらえる）。
  *
  * ゲーム内 ID：mon-pukarim（ライフ6・内部ランク C は画面に出さない）、skl-pukarim-01〜14（JSON の no）
- * 絵：バトル用 pukarim_battlecard.png（届いた art/pukarim_battleart.png を無改変。1169×1345。カルシェルと同じく表示のときに縮める）。
- *   技カードの絵・名前と LIFE の入った正式モンスターカードはまだ無い（技カードは「絵が無いとき」の見た目）
+ * 絵（原本は design-parts/cards-original/pukarim/final-20261028/ に無改変）：
+ * - 技 puk_sk_01〜14.webp（届いた art/skills/pukarim_sk_NN.png を tools/art/card_art_webp.py で幅 827 の WebP に。番号＝技番号）
+ * - 正式モンスターカード pukarim_official.webp（届いた art/monster_card/pukarim_official_monstercard_LIFE6.png を幅 508 に縮めただけ。ソラモ・ガウル・ノビトンと同じ）
+ * - バトル用 pukarim_battlecard.png（2026-10-28 に届いた art/pukarim_battleart.png を無改変。1169×1345）
  * 色：ミント #A8DCC4（モンスターカード枠・技カード枠とも）
- * ガチャの枠（JSON の gacha_slot）：レア＝7 ぷはーっ・14 ぷかぷか。今回はガチャに入れない（PUKARIM_GACHA_RARE にデータとして持つだけ）
+ * ガチャのレアの枠（JSON の gacha_slot）：7 ぷはーっ・14 ぷかぷか（economy.ts の GACHA_SERIES）
  */
 export const PUKARIM_MONSTER_ID = 'mon-pukarim';
 export const pukarimSkillId = (no: number): string => `skl-pukarim-${twoDigits(no)}`;
@@ -30,10 +32,11 @@ export const PUKARIM_MONSTER: MonsterCard = {
   rarity: null,
   life: pukarimData.life,
   themeColor: PUKARIM_COLOR,
-  description: 'プカリム（試遊中）。',
+  description: 'プカリム。',
   isPlaceholder: false,
+  // 図鑑・ショップなどのカード：名前と LIFE 入りの正式モンスターカード（ソラモ・ガウル・ノビトンと同じ使い方）
+  art: { category: 'monsterCards', file: 'pukarim_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'pukarim_battlecard.png', layout: 'full' },
-  pendingSpec: ['rarity'],
 };
 
 export interface PukarimRow {
@@ -70,8 +73,8 @@ const SPECIAL_EFFECTS: Readonly<Record<number, SkillEffect>> = {
   14: { type: 'evade', against: 'all' },
 };
 
-/** 技の絵のファイル名（まだ無い。届いたら assets/images/cards/skills/ に置き、toSkill で art を戻す） */
-export const pukarimArtFile = (no: number): string => `puk_sk_${twoDigits(no)}.png`;
+/** 技の絵のファイル名（assets/images/cards/skills/。番号＝技番号） */
+export const pukarimArtFile = (no: number): string => `puk_sk_${twoDigits(no)}.webp`;
 
 function toSkill(row: PukarimRow): SkillCard {
   const category = CATEGORY[row.category];
@@ -94,15 +97,15 @@ function toSkill(row: PukarimRow): SkillCard {
     { label: 'プカリム', monsterId: PUKARIM_MONSTER_ID, skillId: pukarimSkillId, artFile: pukarimArtFile, specialEffects: {} },
     { displayNo: row.no, ...(SPECIAL_EFFECTS[row.no] ? { effect: SPECIAL_EFFECTS[row.no] } : {}) },
   );
-  // 技の絵はまだ無い（pendingSpec の 'art'。届くまでは「絵が無いとき」の見た目。届いたら art を戻す）
-  const { art: _pending, ...rest } = skill;
-  return { ...rest, pendingSpec: ['art', 'rarity'] };
+  // ガチャの枠（レア＝7・14）は正式に決まったので「レアリティ未定」の印は付けない（2026-10-29 指示書）
+  const { pendingSpec: _decided, ...rest } = skill;
+  return rest;
 }
 
 /** プカリムの技14種（JSON の番号の順） */
 export const PUKARIM_SKILLS: readonly SkillCard[] = PUKARIM_ROWS.map(toSkill);
 
-/** ガチャのレアの枠（JSON の gacha_slot が「レア」。今回はガチャに入れない） */
+/** ガチャのレアの枠（JSON の gacha_slot が「レア」：7 ぷはーっ・14 ぷかぷか） */
 export const PUKARIM_GACHA_RARE: readonly string[] = PUKARIM_ROWS.filter((r) => r.gacha_slot === 'レア').map((r) => r.id);
 
 /**

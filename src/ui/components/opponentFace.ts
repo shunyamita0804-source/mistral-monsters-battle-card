@@ -9,6 +9,7 @@ import faceBattler2 from '@assets/images/characters/face_battler_2.webp';
 import faceBattler3 from '@assets/images/characters/face_battler_3.webp';
 import faceGuardian from '@assets/images/characters/face_guardian.webp';
 import faceTeacher from '@assets/images/characters/face_teacher.webp';
+import facePete from '@assets/images/characters/face_resident_b.webp';
 import faceTobias from '@assets/images/characters/face_entrant_tobias.webp';
 import faceMarie from '@assets/images/characters/face_entrant_marie.webp';
 import faceJean from '@assets/images/characters/face_entrant_jean.webp';
@@ -90,6 +91,8 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'battler-mina': faceMina,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
+  // 街のピート（2026-10-29 プカリムの最終：カードショップの前で勝負できる）。名刺図鑑と同じ顔
+  pete: facePete,
 };
 
 /** 相手の顔の絵を探すときのキー（face があればそれ、無ければ ID） */

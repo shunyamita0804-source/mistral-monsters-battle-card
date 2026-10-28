@@ -102,7 +102,7 @@ export const PEOPLE: readonly Person[] = [
   p(5, 'gareth', 'town', ['ガレス', 'Gareth'], ['練習場の先生・元大会選手', 'Practice Hall instructor, former tournament player'], ['負けた数だけ、強くなれるぞ。', 'Every loss makes you stronger.'], { speaker: 'teacher' }),
   p(6, 'eleanor', 'town', ['エレノア', 'Eleanor'], ['カードバトラー管理局の職員', 'Card Battler Bureau officer'], ['登録の手続きは、こちらで承ります。', 'Registration procedures are handled here.'], { speaker: 'bureau_clerk' }),
   p(7, 'martha', 'town', ['マルタ', 'Martha'], ['花屋のおかみさん', 'Florist'], ['今日もいい花が咲いたわ。', 'Lovely flowers bloomed again today.'], { speaker: 'resident_a' }),
-  p(8, 'pete', 'town', ['ピート', 'Pete'], ['カード集めが趣味の青年', 'Young card collector'], ['図鑑、どこまで埋まった？', "How far along is your card book?"], { speaker: 'resident_b' }),
+  p(8, 'pete', 'town', ['ピート', 'Pete'], ['カード集めが趣味の青年', 'Young card collector'], ['図鑑、どこまで埋まった？', "How far along is your card book?"], { speaker: 'resident_b', opponentIds: ['town-pete'] }),
   // ブルーノ（もと住人C）：2026-10-27 に住宅C をカードバトラー管理局に置き換えたので、いまはゲームに出てこない（データだけ）
   p(9, 'bruno', 'town', ['ブルーノ', 'Bruno'], ['街の大工', 'Town carpenter'], ['大会会場の観客席は、おれが建てたんだ。', 'I built the stands in the Tournament Hall.'], { inGame: false }),
   p(10, 'rosalie', 'town', ['ロザリー', 'Rosalie'], ['仕立て屋', 'Tailor'], ['勝負服、仕立ててあげましょうか？', 'Shall I tailor you an outfit for battle?'], { speaker: 'resident_d' }),

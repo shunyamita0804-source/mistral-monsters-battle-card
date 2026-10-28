@@ -6,8 +6,9 @@ import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
 import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
+import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
-import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
+import { TEST_TEAM } from './testTeams.ts';
 import type { OpponentDefinition } from './tournaments.ts';
 
 const LAZ = LAZUCK_MONSTER_ID;
@@ -90,12 +91,12 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   // 太古の遺跡（最初から）：いまのまま
   'dungeon-01': {
     floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [TEST_TEAM, TEST_TEAM_ALT], guardianTeam: [LAZ, LAZ, SOR], bossId: 'enc-b3-boss',
+    guardianLifeBonus: 0, npcTeams: [[PUK, LAZ, SOR], [SOR, PUK, GAU]], guardianTeam: [PUK, PUK, LAZ], bossId: 'enc-b3-boss',
   },
   // 精霊の森（最初から）：固定のマップをやめて、遺跡と同じランダム生成（2026-10-27）
   'dungeon-02': {
     floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [TEST_TEAM, TEST_TEAM_ALT], guardianTeam: [LAZ, LAZ, SOR], bossId: 'enc-forest-boss',
+    guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, PUK], bossId: 'enc-forest-boss',
   },
   // 水の神殿（D ランク）：水路
   'dungeon-03': {

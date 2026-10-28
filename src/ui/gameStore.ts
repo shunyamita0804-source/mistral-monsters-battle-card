@@ -66,6 +66,8 @@ export class GameStore {
   practiceResult: PracticeResult | null = null;
   /** 導入イベントV2の試験の対戦の結果（歩行画面に戻ったとき、合格・再挑戦の会話に使う） */
   introV2Result: 'won' | 'lost' | null = null;
+  /** ピートとの勝負の結果（2026-10-29。歩行画面に戻ったとき、ピートのひと言ともらったカードを出す） */
+  peteResult: { readonly first: boolean; readonly cardId: string } | 'lost' | null = null;
   /** QA用の機能を出すか（URL に ?qa=1） */
   readonly qa: boolean;
   /** 最後に保存できたか */
@@ -139,6 +141,7 @@ export class GameStore {
     this.flashKeeper = null;
     this.practiceResult = null;
     this.introV2Result = null;
+    this.peteResult = null;
     this.lastSaveOk = true;
     return true;
   }
