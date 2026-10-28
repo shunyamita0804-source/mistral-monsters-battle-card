@@ -134,7 +134,7 @@ img.skill-card__art {
   text-align: center;
 }
 
-/* ダメージの四角（窓の左下の角にぴったり。右上の角だけ丸い）：ダメージ・軽減値は大きな数字、回避・特殊・サポートは短い文字 */
+/* ダメージの四角（窓の左下の角にぴったり。右上の角だけ丸い）：ダメージ・軽減値（-3）は大きな数字だけ、回避・特殊・サポートは短い文字 */
 .skill-card__value {
   display: flex;
   flex-direction: column;
@@ -156,30 +156,6 @@ img.skill-card__art {
 
 .skill-card--hand .skill-card__value-num {
   font-size: 22cqw;
-}
-
-.skill-card__value-guard {
-  display: flex;
-  align-items: center;
-  gap: 0.5cqw;
-}
-
-.skill-card__value-shield {
-  display: flex;
-  flex: none;
-  width: 8.4cqw;
-  height: 8.4cqw;
-  color: #9cc8ff;
-}
-
-.skill-card--hand .skill-card__value-shield {
-  width: 9.8cqw;
-  height: 9.8cqw;
-}
-
-.skill-card__value-shield svg {
-  width: 100%;
-  height: 100%;
 }
 
 .skill-card__value-word {
