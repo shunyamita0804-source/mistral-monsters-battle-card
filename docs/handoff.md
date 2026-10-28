@@ -1,23 +1,61 @@
-# 引き継ぎメモ（2026-10-28 深夜：セッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-28 深夜〜29：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-28 深夜〜：プカリムの試遊）
+### まず読む：いまの状態（2026-10-28 深夜〜29 のセッション終わり）
 
-- **最新の作業：新モンスター「プカリム」を仮の絵で入れて試遊（手順 4。公開済み・公開ページで確認済み）**（報告書 `docs/report-2026-10-28-pukarim.md`。作業ブランチ `claude/pukarim-step4-20261028`。記録 `docs/pukarim.md`、
-  裁定 `docs/battle-rules.md`「プカリム（試遊中）」、写真と生の数字 `docs/design/pukarim-20261028/`）。
-  **確認用（?qa=1）だけ**：設定の「QA用」→「プカリムの試遊」（`?qa=1&lab=pukarim` でも開く）。カードの一覧（MONSTERS・SKILLS）には入れず `QA_MONSTERS`・`QA_SKILLS`。
-  新しい効果 `charge`（ほっぺにためる）・`tailwind`（おいかぜ）・攻撃の `undodgeableWhenCharged`（ぷはーっ）。試遊は `npm run playtest:pukarim`（200 回ずつ。数字は変えずに報告）
-- その前：お金の入る側（ユーザー確認で合格。水の神殿の合計は iPhone での試遊のあとで直すか決める。記録 `docs/money-income-20261028.md`）
-- その前：手札の大きさ・数字 1.4倍・手札の印・枠の2倍（ユーザー確認で合格。記録 `docs/handsize-20261028.md`）
-- その前：カードの見た目3点 v3・試験の先生のデッキ（ユーザー確認で合格。記録 `docs/cardlook-v3-20261028.md`）
-- 前の報告書の「Claude が決めたこと」（`docs/report-2026-10-28-evening.md` 2章・`docs/report-2026-10-28-cardlook-v3.md` 2章）は、ユーザーが「すべてそのままで構わない」と回答（2026-10-28）
-- **セーブ version 21**（`lastLeague`。今回は変えていない）
-- 作業の順番の約束：指示どおり作業 → `npm run check` → main に取り込み → 公開（`deploy-pages.yml`）→ 公開ページで写真 → 報告。ユーザーは毎回「main に取り込んで公開し、画面写真で報告」を求めている
+- **公開中：`main` の `1e99e13` 以降**（最後の公開はプカリムの試遊。公開ページで確認済み）。**セーブ version 21**（`lastLeague`。このセッションでは変えていない）。テスト 693件。
+  作業ブランチはすべて main に取り込み済み
+- **次のセッションへ**：ユーザーはプカリムの試遊の報告（勝率 平均 51.6%）を読んで、直し方を進行チャットで決めてから新しい指示を送ってくる。
+  **数字（ライフ・技）は指示があるまで変えない**。返事が来るまで「Claude が決めたこと」（下の表の報告書 4章）も推測で変えない
+- **ユーザーは iPhone で作業している。ファイル（ZIP・.md）はダウンロードできない** → 報告書は **Artifact の Web ページ** にしてリンクで渡す
+  （プカリムの報告：https://claude.ai/artifact/JubpTGTyZ6RVs53iQG2DjD 。中身は `docs/report-2026-10-28-pukarim.md` と同じ。元のファイルはリポジトリに入れていない）。
+  画面写真も同じページに入れる。ZIP を作る場合も、スクラッチパッドでなく作業フォルダ（`downloads/`。`.git/info/exclude` で git に入れない）に置く
+- 作業の順番の約束：指示どおり作業 → `npm run check` → main に取り込み → 公開 → 公開ページで写真 → 報告（日本語・短く・専門用語なし）。ユーザーは毎回「main に取り込んで公開し、画面写真で報告」を求めている
+- **公開のしかた**：`gh` は使えない（ログインできない）。GitHub の MCP の `actions_run_trigger`（`run_workflow`・`deploy-pages.yml`・ref `main`）で動かし、
+  公開ページの `static/index-*.js` に新しい文字（例：新しいメッセージのキー）が入るまで curl で待つ（約2分）
 
-#### このセッションでしたこと（記録の場所）
+#### このセッション（2026-10-28 深夜〜29）でしたこと：すべて公開済み
+
+| 内容 | ユーザーの確認 | 記録・報告書 | 道具・テスト |
+| --- | --- | --- | --- |
+| カードの見た目3点 v3（技カードの枠・裏面の獅子・場のモンスターの二重の枠）・試験の先生のデッキ（ラズック・カルシェル・ノビトン）・倒れたときのひと言 | 合格 | `docs/cardlook-v3-20261028.md`・`docs/report-2026-10-28-cardlook-v3.md` | `src/game/battle/talk.ts`・`tests/battleTalk.test.ts` |
+| 手札の大きさ（幅90・小さくせず重ねる）・マナの玉と数字 1.4倍・手札の印（色と光）・技カードの枠を2倍の webp | 合格（「縦が足りない画面だけ80」は作らなくてよい） | `docs/handsize-20261028.md`・`docs/report-2026-10-28-handsize.md` | `handLayout.ts`・`valueFit.ts`・`npm run art:skillframes`・`tests/skillFrames.test.ts` |
+| お金の入る側（ダンジョンの1勝ごと・宝箱の中身・ボス） | 合格（水の神殿の合計が見込みより多めな点は、iPhone での試遊のあとで直すか決める） | `docs/money-income-20261028.md`・`docs/report-2026-10-28-money.md` | `economy.ts` の `DUNGEON_MONEY`・`CHEST_RULES`・`run.ts` の `rollChest`・`tests/moneyIncome.test.ts` |
+| 新モンスター「プカリム」の試遊（確認用 ?qa=1 だけ） | **報告済み・返事待ち** | `docs/pukarim.md`・`docs/report-2026-10-28-pukarim.md`・裁定 `docs/battle-rules.md`「プカリム（試遊中）」 | `src/data/pukarim.ts`・`src/game/battle/playtest.ts`・`npm run playtest:pukarim`・`tests/pukarim*.test.ts` |
+
+前の報告書の「Claude が決めたこと」（`report-2026-10-28-evening.md` 2章・`report-2026-10-28-cardlook-v3.md` 2章）は「すべてそのままで構わない」とユーザーが回答済み。
+
+#### プカリムの仕組み（次に触るとき）
+
+- ふつうに遊ぶ人には出さない：`cards.ts` の `MONSTERS`・`SKILLS` には入れず `QA_MONSTERS`・`QA_SKILLS`（台帳 `cardCatalog` と `skillsOf` には入る）。
+  入口は設定の「QA用」→「プカリムの試遊」（`pukarimLabScreen.ts`。`?qa=1&lab=pukarim` でも開く。`?qa=1` が無いとタイトル）
+- 新しい効果：`charge`（ほっぺにためる。`BattleMonster.charge`）・`tailwind`（おいかぜ。`BattleMonster.tailwind`）・攻撃の `undodgeableWhenCharged`（ぷはーっ。`PendingAttack.undodgeable`）。
+  CPU は `ai.ts` の `chooseChargeOrTailwind`。場の印は `battleScreen.ts` の `statusBadges`（仮の見た目。`uiParts9.css`）
+- 技の絵はまだ無い（`pendingSpec: ['art']`）。届いたら `assets/images/cards/skills/puk_sk_NN.png` に置き、`pukarim.ts` の `toSkill` で art を戻す
+- 試遊用の16枚 `PUKARIM_PLAYTEST_16`（Claude の仮）・効果を確かめる用 `PUKARIM_EFFECT_CHECK_16`（画面写真用）。対戦の依頼に相手のデッキを渡せる `BattleRequest.opponentDeck` を足した
+- 遊ぶ人の入手の流れ（ピート・ガチャ・ダンジョンのバトラー）・正式モンスターカードは「絵がそろってから別の指示書」
+
+#### 作業環境（このセッションで分かったこと）
+
+- 始めは Node 22・`node_modules` なし → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → `export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH` → `npm install`。
+  絵の道具は `pip install scipy`
+- Playwright は Node 24 からは見えない → `NODE_PATH=/opt/node22/lib/node_modules /opt/node22/bin/node スクリプト.cjs`。画面確認は `npx vite build` → `npx vite preview --port 4173 --host 127.0.0.1`
+- 画面写真の道具は `tools/e2e/`（README の最後の章に、このセッションで足したもの）。セーブは Vitest の一時テスト `tests/zz-*.test.ts` で作って消す
+- 長い撮影は `timeout` を付けて動かし、ログをファイルに書いて途中を見る（止まったら画面写真を1枚撮って原因を見る）
+
+#### ユーザーの判断待ち・未完了（いま）
+
+- プカリムの試遊の結果（報告書 3〜4章）：直し方と、Claude が決めたこと（試遊用の16枚・おいかぜを同じ手番にも効かせる・ためる の重ね方・印の仮の見た目）
+- 水の神殿を1回まわったときのお金（約 723G。見込み 500〜600G）：iPhone での試遊のあとで直すか決める
+- 前からの判断待ち：【仮】スキップのボタンを消す時期（販売前）・前のセーブの対戦成績・道具の値段と歩数（すべて仮）・すなをほるで隠れたカルシェルを特殊の技で狙えるか・
+  図鑑のカードの1枚絵・レアリティと正式英語（`docs/review-2026-10-27-answer.md`）
+- 未完了：iPhone 実機での確認（このセッションの作業すべて）。マナの玉の数字の絵（57px）は大きな絵を頼むとくっきりする（報告済み）
+- 気になる所（前から）：店の中の入口から出るとき、一瞬だけ主人公の頭が戸枠の上の横木に隠れる
+
+#### 前のセッション（2026-10-28 夕方〜深夜）でしたこと（記録の場所）
 
 | 内容 | 記録 | 道具・テスト |
 | --- | --- | --- |
@@ -29,7 +67,7 @@
 | 街の建物7つを正面向きに | `docs/design/town-20261028/10_受け取り結果_UTF8.txt` の最後 | `tools/design/town2026_build.py`（原本 `design-parts/town-20261028/front-facing-20261028/`） |
 | 仮パックの名残（大会の景品・特別復元の説明・カードを見る） | `docs/booster-select.md` の最後の章 | — |
 
-#### 大事な仕組み（このセッションで変わったところ）
+#### 大事な仕組み（前のセッションで変わったところ）
 
 - 新しく始めたときのセーブは `createNewGameSave`（カードなし）。`createNewSave` はテストや読み込みの土台としてこれまでどおり（初期デッキ入り）
 - 試験は `BattleRequest.playerDeck`（先生の貸しデッキ。`examLoanDeck`）。所持カードには入らない
@@ -43,7 +81,7 @@
   街の入口11か所の出入り `node tools/e2e/town_doors.cjs URL 出力 セーブ.json`
 - 作業環境：セッションの始めは Node 22・`node_modules` なしのことがある → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → `export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH` → `npm install`
 
-#### ユーザーの判断待ち・未完了
+#### 前のセッションの判断待ち（上の「いま」が正しい）
 
 - Claude が決めたこと（報告書 2章）：ガチャの数字（仮）・部屋の人の立ち位置と調べたときの文・カウンターからガチャの札を外した・【仮】スキップで旅立ちのきらめきを配る・研究員の選択の窓・植木鉢と木箱の位置
 - 前からの判断待ち：試験の先生のデッキとライフ・【仮】スキップのボタンを消す時期（販売前）・前のセーブの対戦成績・道具の値段と歩数（すべて仮）・

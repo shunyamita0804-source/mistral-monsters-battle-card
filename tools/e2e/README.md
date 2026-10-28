@@ -29,3 +29,17 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 - `town_shot.cjs`：街・部屋の好きな場所の画面写真（390×844）。使い方はファイルの先頭
 - `town_doors.cjs`：街の11か所の入口を全部ためす（入る → 部屋 → 外へ → 扉の前に戻ったか）
 - どちらもセーブの JSON が要る（`docs/handoff.md`「画面写真の撮り方」）
+
+## 2026-10-28 夜〜深夜に足した道具（いま動く。Playwright は `NODE_PATH=/opt/node22/lib/node_modules /opt/node22/bin/node` で動かす）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `exam_shot.cjs` | 導入の試験の対戦（手で操作／QA オートで合格まで／即敗北→再挑戦） |
+| `screen_steps.cjs` | 調べる→手順（押す・なぞる・遅くする・連写）を JSON で渡して撮る。ガチャ・デッキ編集 |
+| `hand_shot.cjs` | 手札の大きさ（手札5/7/10枚・印・大きなカード）。390×844 と 375×667 |
+| `money_shot.cjs` | ダンジョンの宝箱3通り・バトラーに勝った報酬・ボス初回クリア |
+| `pukarim_lab_shot.cjs`・`pukarim_effects_shot.cjs` | プカリムの試遊の画面と、新しい効果（おいかぜ・ためている・ぷはーっ） |
+
+- どれもセーブの JSON が要る（Vitest の一時テスト `tests/zz-*.test.ts` で作って、終わったら消す）
+- 対戦中の確認の窓（「まだ使えるカードがあります…」）は `.modal` ではないので、ボタンの文字（マナ化へ進む）で押す
+- 手札が多すぎる（12枚以上）と列が画面からはみ出し、ボタンが押しにくくなる
