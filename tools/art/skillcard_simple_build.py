@@ -23,7 +23,11 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'design-parts/ui-skillcard-simple-20261028/frames'
 OUT = ROOT / 'assets/images/ui/skillcard_simple'
-GAME_SIZE = {'normal': (253, 382), 'hand': (208, 210)}
+GAME_SIZE = {'normal': (253, 382), 'hand': (208, 260)}
+# 手札の枠：届いた絵は 208×210（ほぼ正方形）。2026-10-29 ユーザー「もう少し縦長にしてOK」で 208×260 にする。
+# 角の飾りは変えず、上下の角のあいだのまっすぐなふち（原本の y HAND_STRETCH）だけを縦にのばす（描き直しはしない）
+HAND_SRC_H = 210
+HAND_STRETCH = (120, 720)
 SCALE = 2
 WEBP_QUALITY = 90
 
@@ -75,14 +79,28 @@ def shrink(arr: np.ndarray, size: tuple[int, int]) -> Image.Image:
     return Image.fromarray(np.clip(arr, 0, 255).astype('uint8'), 'RGBA').convert('RGBa').resize(size, Image.LANCZOS).convert('RGBA')
 
 
+def stretch_middle(im: Image.Image, height: int, band: tuple[int, int]) -> Image.Image:
+    """上下の端（角の飾り）はそのままに、band の行だけを縦にのばして height にする"""
+    a, b = band
+    mid = im.crop((0, a, im.width, b)).resize((im.width, b - a + height - im.height), Image.BICUBIC)
+    out = Image.new('RGBA', (im.width, height))
+    out.alpha_composite(im.crop((0, 0, im.width, a)), (0, 0))
+    out.alpha_composite(mid, (0, a))
+    out.alpha_composite(im.crop((0, b, im.width, im.height)), (0, a + mid.height))
+    return out
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob('frame_*.webp'):
         old.unlink()
     for kind, (w, h) in GAME_SIZE.items():
         src_im = Image.open(SRC / f'frame_{kind}_simple.png').convert('RGBA')
-        if src_im.size != (w * 4, h * 4):
-            raise SystemExit(f'frame_{kind}_simple.png の大きさが {src_im.size}。ゲームの4倍 {(w * 4, h * 4)} であるはず')
+        src_h = HAND_SRC_H if kind == 'hand' else h
+        if src_im.size != (w * 4, src_h * 4):
+            raise SystemExit(f'frame_{kind}_simple.png の大きさが {src_im.size}。ゲームの4倍 {(w * 4, src_h * 4)} であるはず')
+        if kind == 'hand' and h != src_h:
+            src_im = stretch_middle(src_im, h * 4, HAND_STRETCH)
         src = np.array(src_im).astype(float)
         size = (w * SCALE, h * SCALE)
         shrink(src, size).save(OUT / f'frame_{kind}_support.webp', quality=WEBP_QUALITY, method=6)

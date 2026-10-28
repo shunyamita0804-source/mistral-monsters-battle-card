@@ -15,7 +15,7 @@ import { fitValueFont } from './valueFit.ts';
  * 重ね順：イラスト（窓いっぱい・はみ出しは切る）→ 枠 → マナの丸・分類の印・ダメージの四角・技名・効果の帯（ゲーム側で描く。画像に焼き込まない）
  * - 枠：assets/images/ui/skillcard_simple/frame_{size}_{モンスター}.webp（モンスターごとに1枚。サポートは frame_{size}_support.webp の銀）。
  *   LAYOUT の2倍の大きさ。npm run art:skillframes（tools/art/skillcard_simple_build.py）で作り直す
- * - 'normal'（縦長 253×382）：図鑑・詳しい表示・大きなカード。'hand'（ほぼ正方形 208×210）：対戦の手札・守備のカードなど小さな表示。
+ * - 'normal'（縦長 253×382）：図鑑・詳しい表示・大きなカード。'hand'（少し縦長 208×260）：対戦の手札・守備のカードなど小さな表示。
  *   手札は名前・効果の帯を出さず、マナ・印・ダメージを重ねたときに見える左35%に置く
  * - ダメージの四角：攻撃＝大きな数字だけ、防御＝軽減値の数字だけ（-3）、回避＝「回避」、特殊＝「効果」（skillValueBadge）、サポート＝区分
  * - 効果の帯：防御・回避・特殊・サポートは説明の文、攻撃は追加の効果のときだけ（skillBandText）
@@ -53,7 +53,8 @@ interface FrameLayout {
 /** 枠の中の位置（枠の絵の 1/4 の画素。design-parts/ui-skillcard-simple-20261028/ref/layout_positions.png） */
 const LAYOUT: Readonly<Record<SkillCardSize, FrameLayout>> = {
   normal: { w: 253, h: 382, art: [13, 40, 240.5, 371.25], name: [58, 9, 240, 34], mana: [31, 26, 24], icon: [31, 63, 21], value: [13, 315, 69, 371.25], band: [73, 336, 236, 367] },
-  hand: { w: 208, h: 210, art: [8.5, 9.5, 199.5, 200.5], name: null, mana: [34, 34, 27], icon: [34, 84, 37], value: [8.5, 140.5, 68.5, 200.5], band: null },
+  // 手札：2026-10-29 ユーザー「もう少し縦長にしてOK」で 208×210 → 208×260（下のふちの位置を 50 下げただけ。マナ・印は今のまま）
+  hand: { w: 208, h: 260, art: [8.5, 9.5, 199.5, 250.5], name: null, mana: [34, 34, 27], icon: [34, 84, 37], value: [8.5, 190.5, 68.5, 250.5], band: null },
 };
 
 const FRAME_URLS = import.meta.glob<string>('/assets/images/ui/skillcard_simple/frame_*.webp', { eager: true, query: '?url', import: 'default' });

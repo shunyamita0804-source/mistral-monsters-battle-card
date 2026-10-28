@@ -25,7 +25,7 @@ function pngSize(path: string): [number, number] {
 }
 
 describe('技・サポートカードの枠（新しい形）', () => {
-  it('原本は LAYOUT（253×382・208×210）のちょうど4倍。届いたままの絵も保管してある', () => {
+  it('原本は 253×382・208×210 のちょうど4倍（手札は 208×260 に縦にのばして使う）。届いたままの絵も保管してある', () => {
     expect(pngSize(`${ORIGINAL}/frame_normal_simple.png`)).toEqual([1012, 1528]);
     expect(pngSize(`${ORIGINAL}/frame_hand_simple.png`)).toEqual([832, 840]);
     for (const k of ['normal', 'hand']) expect(existsSync(`${ORIGINAL}/original/frame_${k}_simple_as_delivered.png`)).toBe(true);
@@ -38,8 +38,8 @@ describe('技・サポートカードの枠（新しい形）', () => {
     for (const size of ['normal', 'hand']) expect(existsSync(`${DIR}/frame_${size}_support.webp`)).toBe(true);
   });
 
-  it('大きさは LAYOUT の2倍（506×764・416×420）', () => {
-    for (const f of frames) expect(webpSize(`${DIR}/${f}`)).toEqual(f.startsWith('frame_normal') ? [506, 764] : [416, 420]);
+  it('大きさは LAYOUT の2倍（506×764・416×520）', () => {
+    for (const f of frames) expect(webpSize(`${DIR}/${f}`)).toEqual(f.startsWith('frame_normal') ? [506, 764] : [416, 520]);
   });
 
   it('前の枠（v5 の分類の色の枠）・数字の入ったマナの玉の絵は残っていない', () => {
