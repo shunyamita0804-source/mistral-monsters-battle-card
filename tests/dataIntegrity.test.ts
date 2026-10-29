@@ -35,6 +35,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-kalshell',
       'mon-pukarim',
       'mon-geol',
+      'mon-flune',
       ...skillIds('soramo14', all.slice(0, 14)),
       ...lazuck,
       ...skillIds('gauul14', all.slice(0, 14)),
@@ -48,6 +49,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...skillIds('pukarim', all.slice(0, 14)),
       // ジオル（2026-10-29 最終）：01〜14
       ...skillIds('geol', all.slice(0, 14)),
+      // フルーネ（2026-10-29 最終）：01〜14
+      ...skillIds('flune', all.slice(0, 14)),
     ]);
   });
 
@@ -84,6 +87,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-nobiton',
       'mon-pukarim',
       'mon-geol',
+      'mon-flune',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);

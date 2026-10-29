@@ -43,6 +43,7 @@ MONSTER_COLORS = {
     'kalshell': '#DFF2F6',
     'pukarim': '#A8DCC4',
     'geol': '#9A7B5C',  # 試遊中（2026-10-29）。確認用の画面だけで使う
+    'flune': '#9CBF5A',  # 2026-10-29 フルーネ（若葉色）
 }
 
 

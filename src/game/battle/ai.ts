@@ -108,6 +108,15 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const selfHeal = options.filter(isSkillOption).find((o) => o.def.effect.type === 'healSelf');
   const selfHealer = selfHeal ? availableUsers(state, side, selfHeal.def).find((m) => m.life <= m.maxLife / 2) : undefined;
   if (selfHeal && selfHealer) return { type: 'useCard', side, cardUid: selfHeal.card.uid, userUid: selfHealer.uid };
+  // いやしのみつ（フルーネ。2026-10-29 指示書）：その手番に相手を倒せる攻撃が無く、味方（フルーネを含む）が最大から2以上減っているとき。
+  // いちばん倒れそうな味方（残りライフの少ない順・同じなら最大に対する割合の少ない順）を選ぶ
+  const nectar = options.filter(isSkillOption).find((o) => o.def.effect.type === 'healAlly');
+  if (nectar && !canKillThisTurn(state, side, options)) {
+    const ally = targetsFor(state, side, nectar.def)
+      .filter((m) => m.maxLife - m.life >= 2)
+      .sort((a, b) => a.life - b.life || a.life / a.maxLife - b.life / b.maxLife)[0];
+    if (ally) return { type: 'useCard', side, cardUid: nectar.card.uid, targetUid: ally.uid };
+  }
 
   // 2. 全体カード：いまの場より自分に得になるときだけ出す（入れ替え合いでマナを無駄にしない）
   const current = state.field ? fieldScore(state, side, getSupport(state.field.cardId)) : 0;
@@ -168,10 +177,42 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   return { type: 'endAttack', side };
 }
 
+/** その手番に、手札の攻撃技で倒せる相手がいるか */
+function canKillThisTurn(state: BattleState, side: Side, options: Option[]): boolean {
+  return options
+    .filter(isSkillOption)
+    .filter((o) => o.def.effect.type === 'attack')
+    .some((o) => availableUsers(state, side, o.def).some((u) => targetsFor(state, side, o.def, u).some((e) => e.life <= attackPower(state, o.def, u))));
+}
+
+/**
+ * フラワードレイン（フルーネ。2026-10-29 指示書）：マナが足りる（6以上）とき、相手を倒せるならその相手（ライフの多い順）へ、
+ * 倒せなくてもフルーネのライフが最大から2以上減っていれば、ふつうの攻撃と同じ選び方の相手へ、ほかの攻撃より先に使う
+ */
+function chooseDrain(state: BattleState, side: Side, attacks: SkillOption[], style: AiStyle): BattleAction | null {
+  const drain = attacks.find((o) => o.def.effect.type === 'attack' && o.def.effect.drain);
+  if (!drain) return null;
+  for (const user of availableUsers(state, side, drain.def)) {
+    const reach = targetsFor(state, side, drain.def, user);
+    const power = attackPower(state, drain.def, user);
+    const kill = reach.filter((e) => e.life <= power).sort((a, b) => b.life - a.life)[0];
+    if (kill) return { type: 'useCard', side, cardUid: drain.card.uid, userUid: user.uid, targetUid: kill.uid };
+    if (user.maxLife - user.life >= 2) {
+      const weakFirst = (a: BattleMonster, b: BattleMonster): number => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || a.life - b.life;
+      const pinnedFirst = (a: BattleMonster, b: BattleMonster): number => Number(isPinned(state, b)) - Number(isPinned(state, a));
+      const target = [...reach].sort((a, b) => pinnedFirst(a, b) || weakFirst(a, b))[0];
+      if (target) return { type: 'useCard', side, cardUid: drain.card.uid, userUid: user.uid, targetUid: target.uid };
+    }
+  }
+  return null;
+}
+
 /** 攻撃（倒せる相手がいれば倒す。癖で技の順・狙う相手が変わる）。攻撃できなければ null */
 function chooseAttack(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle): BattleAction | null {
   const attacks = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack');
   if (attacks.length === 0 || enemies.length === 0) return null;
+  const drained = chooseDrain(state, side, attacks, style);
+  if (drained) return drained;
   const power = (o: SkillOption): number => attackPower(state, o.def, availableUsers(state, side, o.def)[0]);
   // ためているときのぷはーっ（回避されない）は、少し強いものとして先に考える（試遊中：プカリム）
   const rank = (o: SkillOption): number => power(o) + (undodgeableNow(o.def, availableUsers(state, side, o.def)[0]) ? 1.5 : 0);

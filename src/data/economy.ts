@@ -121,7 +121,7 @@ export interface GachaSeries {
   readonly rareSkillNames: readonly string[];
   /**
    * この記録（セーブの storyFlags）があるときだけ並ぶ（無ければ最初から並ぶ）。プカリム＝ピートに勝ったあと（src/game/story/pete.ts の PETE_BEATEN_FLAG）、
-   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）
+   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）、フルーネ＝精霊の森のセラに初めて勝ったあと（SERA_BEATEN_FLAG）
    */
   readonly unlockFlag?: string;
 }
@@ -141,6 +141,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ['ぷはーっ', 'ぷかぷか'], unlockFlag: 'pete-beaten' },
   // ジオル（2026-10-29 夜。パック専用の絵と一緒に）：レア枠は JSON の gacha_slot のとおり（03・05・10・14）。グラントに初めて勝ったあとに並ぶ
   { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', '地ひびき', 'エネルギーをためる', 'うけとめる'], unlockFlag: 'grant-beaten' },
+  // フルーネ（2026-10-29 フルーネの最終）：レア枠は JSON の gacha_slot のとおり（09）。セラに初めて勝ったあとに並ぶ
+  { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['フラワードレイン'], unlockFlag: 'sera-beaten' },
 ];
 
 /** いまのセーブで選べるシリーズ（unlockFlag の記録がまだ無いものは並ばない） */

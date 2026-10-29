@@ -91,6 +91,11 @@ export type SkillEffect =
       readonly undodgeableWhenCharged?: boolean;
       /** 相手全体への攻撃（試遊中：ジオルの地ひびき 2026-10-29）。生きている相手全員に。守り（防御・回避）は1体ずつ順に */
       readonly allTargets?: boolean;
+      /**
+       * 攻撃のあと、相手のライフが実際に減った量だけ、使ったモンスターのライフを回復する（正式：フルーネのフラワードレイン 2026-10-29）。
+       * 最大ライフを超えない。回避されたら・防御で0なら回復しない
+       */
+      readonly drain?: boolean;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -149,6 +154,8 @@ export type SkillEffect =
   | { readonly type: 'hide' }
   /** 特殊（正式：ミュロルのみずあび 2026-10-25）：使ったモンスターのライフを amount 回復する（最大ライフまで） */
   | { readonly type: 'healSelf'; readonly amount: number }
+  /** 特殊（正式：フルーネのいやしのみつ 2026-10-29）：選んだ味方1体（使ったモンスターも選べる。倒れた味方は選べない）のライフを amount 回復する（最大ライフまで） */
+  | { readonly type: 'healAlly'; readonly amount: number }
   /**
    * 特殊（試遊中：プカリムのほっぺにためる 2026-10-28）：使ったモンスターが次に使う攻撃技のダメージを amount 増やす。
    * 使うまで続く（ターンをまたいでも消えない）。重ねない。次に攻撃技を使ったら（当たっても・守られても・回避されても）消える。倒れたら消える
@@ -344,8 +351,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'cover';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'cover'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'cover';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'cover'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

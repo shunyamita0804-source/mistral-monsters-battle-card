@@ -6,10 +6,11 @@
 
 ### まず読む：いまの状態（2026-10-29 深夜のセッション終わり。⑦のあと）
 
-- **公開中：`main`（⑧ 花屋・仕立て屋の新しい部屋まで）**。セーブ version 24
-- ⑧ 済み：花屋・仕立て屋の中を新しい部屋に（`florist`・`tailor`。記録 `docs/shop-rooms-20261029.md`・道具 `tools/design/rooms_shop_build.py`）
-- ⑨ 作業中：新モンスター「フルーネ」を正式に（ZIP `Mistral_Flune_Final_Part1・2`）
-- 届いたが指示の無いもの：`Mistral_Room_lab_v2_parts.zip`（研究所の部屋の描き直し）。まだ何もしていない
+- **公開中：`main`（⑨ フルーネの最終まで）**。セーブ version 25。テスト 821件。**次の指示を待っている（⑧⑨は返事待ち）**
+- ⑧ 済み：花屋・仕立て屋の中を新しい部屋に（`florist`・`tailor`。記録 `docs/shop-rooms-20261029.md`・道具 `tools/design/rooms_shop_build.py`。セーブ version 24）
+- ⑨ 済み：新モンスター「フルーネ」を正式に（記録 `docs/flune-final-20261029.md`・ルール `docs/battle-rules.md`「フルーネの効果の扱い」。セーブ version 25）。
+  精霊の森のセラの切り札・祭壇・ガチャのシリーズ（sera-beaten のあと）・ショップの棚・フラワードレイン（drain）・いやしのみつ（healAlly）。対戦の写真は `tools/e2e/flune_battle_shot.cjs`
+- 届いたが指示の無いもの：`Mistral_Room_lab_v2_parts.zip`（研究所の部屋の描き直し）。まだ何もしていない（ZIP は新しいセッションには無い）
 - ⑦ 済み・**返事待ち**：カードに書く効果の文を短くした（36枚。記録 `docs/card-text-short-20261029.md`。表 `src/data/skillCardText.ts`）。報告 https://claude.ai/artifact/1qLDxip2CvnDj9nRWG2W8q
   （ユーザーの返事は「ありがとう」。合格かどうかはまだ聞いていない）
   - 短い文を足す・変えるとき：`skillCardText.ts` に1行（日本語）と `contentEnOfficialDraft.ts` の英語。決まりはそのファイルの先頭と記録の文書

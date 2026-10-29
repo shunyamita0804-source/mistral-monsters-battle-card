@@ -4,6 +4,7 @@ import { GAUUL_MONSTER, GAUUL_SKILLS } from './gauul.ts';
 import { KALSHELL_MONSTER, KALSHELL_SKILLS } from './kalshell.ts';
 import { PUKARIM_MONSTER, PUKARIM_SKILLS } from './pukarim.ts';
 import { GEOL_MONSTER, GEOL_SKILLS } from './geol.ts';
+import { FLUNE_MONSTER, FLUNE_SKILLS } from './flune.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -23,6 +24,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-27：カルシェルと技14種を src/data/kalshell.ts から足した。
  * 2026-10-29：プカリムと技14種を確認用の一覧からふつうの一覧へ移した（src/data/pukarim.ts）。
  * 2026-10-29：ジオルと技14種も確認用の一覧からふつうの一覧へ移した（src/data/geol.ts。ジオルの最終）。仮ジオル（tmp-geol）はゲームから外した
+ * 2026-10-29：フルーネと技14種を足した（src/data/flune.ts。フルーネの最終）。仮フルーネ（tmp-flune）はゲームから外した
  */
 
 interface MonsterSeed {
@@ -131,28 +133,16 @@ const HIDDEN_SKILLS: SkillCard[] = makeSkills('hidden', 'wisdom', [
 ]).map((s) => ({ ...s, name: s.name.replace('仮技HIDDEN', '隠し技（未確定）') }));
 
 /**
- * 【仮】ダンジョンのボスのモンスター（2026-10-26 ユーザー指示：遺跡のボスはジオル、森のボスはフルーネを使い、勝つとそのカードが少しもらえる。
- * 「ジオルとフルーネの情報は後々送ります。今は仮で適当でいいです」）。名前・ライフ・技はすべて仮。
- * 正式データが届いたら新しい ID で足し、この仮カードは残す（docs/card-data-policy.md 2章）。
- * 仮ジオル（tmp-geol）は 2026-10-29 ジオルの最終でゲームから外した（ユーザー指示：発売前なので、セーブの仮ジオルのモンスターカードは mon-geol に置きかえ、
- * 技カードは消す。セーブ version 23。ID は REMOVED_CARD_IDS の TMP_GEOL_REMOVED_IDS）
+ * 【仮】ダンジョンのボスのモンスター（2026-10-26 ユーザー指示：遺跡のボスはジオル、森のボスはフルーネを使い、勝つとそのカードが少しもらえる）は、
+ * 正式データが届いたのでどちらもゲームから外した（ユーザー指示：発売前なので、セーブの仮のモンスターカードは正式なモンスターに置きかえ、技カードは消す）。
+ * - 仮ジオル（tmp-geol）：2026-10-29 ジオルの最終。セーブ version 23
+ * - 仮フルーネ（tmp-flune）：2026-10-29 フルーネの最終。セーブ version 25
+ * ID は前のセーブ・バックアップの読み込みで使う（REMOVED_CARD_IDS）
  */
-const TMP_BOSS_SEEDS: readonly (MonsterSeed & { readonly name: string })[] = [
-  { key: 'tmp-flune', name: 'フルーネ', life: 8, color: '#5fa86a', main: 'wisdom' },
-];
-/** ゲームから外した仮ジオルのモンスターカードと技6種の ID（前のセーブ・バックアップの読み込みで使う） */
 export const TMP_GEOL_ID = monsterId('tmp-geol');
 export const TMP_GEOL_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-geol', no));
 export const TMP_FLUNE_ID = monsterId('tmp-flune');
-const TMP_BOSS_MONSTERS: MonsterCard[] = TMP_BOSS_SEEDS.map((seed) => ({
-  ...makeMonster(seed),
-  name: `仮${seed.name}`,
-  description: `ダンジョンのボスが使う仮の${seed.name}です。正式なモンスターデータではありません。`,
-}));
-// 技の数値の並び（skillSeeds）は、仮ジオルを外す前の番号のまま（フルーネは 1）
-const TMP_BOSS_SKILLS: SkillCard[] = TMP_BOSS_SEEDS.flatMap((seed, i) =>
-  makeSkills(seed.key, seed.main, skillSeeds(i + 1)).map((s, n) => ({ ...s, name: `仮${seed.name}の技${n + 1}` })),
-);
+export const TMP_FLUNE_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-flune', no));
 
 export const MONSTERS: readonly MonsterCard[] = [
   ...MONSTER_SEEDS.map(makeMonster),
@@ -165,7 +155,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   KALSHELL_MONSTER,
   PUKARIM_MONSTER,
   GEOL_MONSTER,
-  ...TMP_BOSS_MONSTERS,
+  FLUNE_MONSTER,
 ];
 
 export const SKILLS: readonly SkillCard[] = [
@@ -179,7 +169,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...KALSHELL_SKILLS,
   ...PUKARIM_SKILLS,
   ...GEOL_SKILLS,
-  ...TMP_BOSS_SKILLS,
+  ...FLUNE_SKILLS,
 ];
 
 /**

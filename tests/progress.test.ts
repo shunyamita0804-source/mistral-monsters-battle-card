@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { HIDDEN_MONSTER_ID, TMP_FLUNE_ID } from '../src/data/cards.ts';
+import { HIDDEN_MONSTER_ID } from '../src/data/cards.ts';
+import { FLUNE_MONSTER_ID } from '../src/data/flune.ts';
 import { GEOL_MONSTER_ID } from '../src/data/geol.ts';
 import { dungeonMoney } from '../src/data/economy.ts';
 import { FRAGMENTS } from '../src/data/fragments.ts';
@@ -163,7 +164,7 @@ describe('ダンジョン', () => {
     expect(again.save.dungeons['dungeon-01']?.clears).toBe(2);
   });
 
-  it('ボスを初めて倒したときだけ、そのダンジョンのボスのカードがもらえる（遺跡＝ジオル・森＝仮フルーネ）', () => {
+  it('ボスを初めて倒したときだけ、そのダンジョンのボスのカードがもらえる（遺跡＝ジオル・森＝フルーネ）', () => {
     const ruins = defeatEnemy(startDungeon(createNewSave(), 'dungeon-01'), 'b3-boss', true);
     expect(ruins.cards.map((c) => c.cardId)).toEqual([GEOL_MONSTER_ID]);
     expect(ruins.save.collection[GEOL_MONSTER_ID]).toBe(1);
@@ -172,7 +173,8 @@ describe('ダンジョン', () => {
     expect(again.save.collection[GEOL_MONSTER_ID]).toBe(1);
     const forest = defeatEnemy(startDungeon(createNewSave(), 'dungeon-02'), 'forest-b3-boss', true);
     expect(forest).toMatchObject({ cleared: true, firstClear: true });
-    expect(forest.save.collection[TMP_FLUNE_ID]).toBe(1);
+    expect(forest.cards.map((c) => c.cardId)).toEqual([FLUNE_MONSTER_ID]);
+    expect(forest.save.collection[FLUNE_MONSTER_ID]).toBe(1);
   });
 
   it('宝箱は1度だけ開けられる', () => {

@@ -26,8 +26,8 @@ describe('カードデータ（仮）', () => {
   it('仮データであることが明示されている（正式カードはソラモ・ラズック・ガウルだけ）', () => {
     for (const c of [...MONSTERS, ...SKILLS, ...SUPPORTS]) {
       const official =
-        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol'].includes(c.id) ||
-        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-'].some((p) => c.id.startsWith(p));
+        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune'].includes(c.id) ||
+        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-'].some((p) => c.id.startsWith(p));
       expect(c.isPlaceholder).toBe(!official);
     }
   });

@@ -1,4 +1,5 @@
-import { skillId, skillsOf, TMP_FLUNE_ID } from './cards.ts';
+import { skillsOf } from './cards.ts';
+import { FLUNE_MONSTER_ID } from './flune.ts';
 import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
 import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
@@ -34,12 +35,6 @@ export interface DungeonDefinition {
   readonly isPlaceholder: boolean;
 }
 
-/** 【仮】ボスのモンスターのカードを少し：モンスターカード1枚と、技1〜3を1枚ずつ */
-const bossCards = (monsterId: string, key: string): CardReward[] => [
-  { cardId: monsterId, count: 1 },
-  ...[1, 2, 3].map((no) => ({ cardId: skillId(key, no), count: 1 })),
-];
-
 /** 【仮】正式モンスターのボス：モンスターカード1枚と、そのモンスターの最初の技3種を1枚ずつ（遺跡・森と同じ量） */
 const officialBossCards = (monsterId: string): CardReward[] => [
   { cardId: monsterId, count: 1 },
@@ -56,6 +51,8 @@ const officialBossCards = (monsterId: string): CardReward[] => [
  */
 /** 太古の遺跡のグラントに初めて勝った（2026-10-29 夜：ジオルのガチャのシリーズが並ぶ。プカリムの pete-beaten と同じ形） */
 export const GRANT_BEATEN_FLAG = 'grant-beaten';
+/** 精霊の森のセラに初めて勝った（2026-10-29 フルーネの最終：フルーネのガチャのシリーズが並ぶ。GRANT_BEATEN_FLAG と同じ形） */
+export const SERA_BEATEN_FLAG = 'sera-beaten';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -74,7 +71,10 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     name: '精霊の森',
     description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成は仮）',
     floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
-    firstClearCards: bossCards(TMP_FLUNE_ID, 'tmp-flune'),
+    // 2026-10-29 フルーネの最終：初回クリアは最奥の祭壇でフルーネのモンスターカード1枚。2回目からはフルーネの技カード1枚（遺跡のジオルと同じ形）
+    firstClearCards: [{ cardId: FLUNE_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: SERA_BEATEN_FLAG,
     isPlaceholder: true,
   },
   // 2026-10-27 指示書「ダンジョン7つ」：ランクで開放する5つ。名前・ボス・編成はすべて仮（仕掛け・階・開放は src/data/dungeonRun.ts の RUN_DUNGEONS）
@@ -99,8 +99,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
   'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], lifeScale: 1.2 },
-  // 森のボス：仮のフルーネを真ん中に
-  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
+  // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終。lifeScale は今の 0.85 のまま）
+  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [LAZUCK_MONSTER_ID, FLUNE_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
   'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
   'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },

@@ -42,6 +42,7 @@ MONSTER_COLORS = {
     'kalshell': '#DFF2F6',
     'pukarim': '#A8DCC4',
     'geol': '#9A7B5C',  # 試遊中（2026-10-29）。確認用の画面だけで使う
+    'flune': '#9CBF5A',  # 2026-10-29 フルーネ（若葉色）
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

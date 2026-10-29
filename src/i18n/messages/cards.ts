@@ -38,6 +38,7 @@ export const CARDS = {
   'card.effect.revealHand': { ja: '特殊', en: 'Special' },
   'card.effect.shield': { ja: '特殊', en: 'Special' },
   'card.effect.healSelf': { ja: '特殊', en: 'Special' },
+  'card.effect.healAlly': { ja: '特殊', en: 'Special' },
   'card.effect.hide': { ja: '特殊', en: 'Special' },
   'card.effect.charge': { ja: '特殊', en: 'Special' },
   'card.effect.tailwind': { ja: '特殊', en: 'Special' },

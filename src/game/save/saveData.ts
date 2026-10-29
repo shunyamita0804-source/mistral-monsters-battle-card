@@ -1,5 +1,6 @@
 import { readSavedName } from '../player/playerName.ts';
-import { cardCatalog, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
+import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
+import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
@@ -39,7 +40,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 24;
+export const SAVE_VERSION = 25;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -411,6 +412,8 @@ export const REMOVED_CARD_IDS: readonly string[] = [
   ...MYUROL_REMOVED_14_IDS,
   TMP_GEOL_ID,
   ...TMP_GEOL_SKILL_IDS,
+  TMP_FLUNE_ID,
+  ...TMP_FLUNE_SKILL_IDS,
 ];
 
 /**
@@ -591,13 +594,21 @@ function migrateTown2026V20(raw: RawObject): RawObject {
  * 太古の遺跡が開いている・クリアしたセーブはそのまま（閉じない。unlockedDungeonsFor は記録にあるダンジョンを残す）
  */
 function migrateTmpGeolV23(raw: RawObject): RawObject {
-  const swap = (id: string): string => (id === TMP_GEOL_ID ? GEOL_MONSTER_ID : id);
-  const dropped = new Set(TMP_GEOL_SKILL_IDS);
+  return replaceTmpMonster(raw, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS, GEOL_MONSTER_ID);
+}
+
+/**
+ * 仮のモンスター（tmpId）を正式なモンスター（realId）に置きかえる（ジオル v23・フルーネ v25 で共通）。
+ * モンスターカードは同じ枚数の正式なモンスターに、仮の技カード（tmpSkillIds）は消す。デッキ・名刺図鑑の記録・挑戦中の獲得も同じ
+ */
+function replaceTmpMonster(raw: RawObject, tmpId: string, tmpSkillIds: readonly string[], realId: string): RawObject {
+  const swap = (id: string): string => (id === tmpId ? realId : id);
+  const dropped = new Set(tmpSkillIds);
   const fix = (v: unknown): unknown => (Array.isArray(v) ? [...new Set(v.filter((id) => !(typeof id === 'string' && dropped.has(id))).map((id) => (typeof id === 'string' ? swap(id) : id)))] : v);
   const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
-  const tmp = collection[TMP_GEOL_ID] ?? 0;
-  if (typeof tmp === 'number' && tmp > 0) collection[GEOL_MONSTER_ID] = (typeof collection[GEOL_MONSTER_ID] === 'number' ? collection[GEOL_MONSTER_ID] : 0) + tmp;
-  delete collection[TMP_GEOL_ID];
+  const tmp = collection[tmpId] ?? 0;
+  if (typeof tmp === 'number' && tmp > 0) collection[realId] = (typeof collection[realId] === 'number' ? collection[realId] : 0) + tmp;
+  delete collection[tmpId];
   for (const id of dropped) delete collection[id];
   let next: RawObject = { ...raw, collection };
   const book = raw.peopleBook;
@@ -607,7 +618,7 @@ function migrateTmpGeolV23(raw: RawObject): RawObject {
     );
     next = { ...next, peopleBook: { ...book, records } };
   }
-  if (Array.isArray(raw.cardsSeen)) next = { ...next, cardsSeen: (raw.cardsSeen as unknown[]).filter((id) => id !== TMP_GEOL_ID && !(typeof id === 'string' && dropped.has(id))) };
+  if (Array.isArray(raw.cardsSeen)) next = { ...next, cardsSeen: (raw.cardsSeen as unknown[]).filter((id) => id !== tmpId && !(typeof id === 'string' && dropped.has(id))) };
   const run = raw.dungeonRun;
   if (isObject(run)) {
     const sealed = typeof run.sealedCard === 'string' && dropped.has(run.sealedCard) ? null : run.sealedCard;
@@ -633,6 +644,15 @@ function migrateShopRoomsV24(raw: RawObject): RawObject {
   if (!to) return raw;
   const { x, y } = SHOP_ROOMS_ART[to].spawn;
   return { ...raw, location: { mapId: to, x, y, dir: 'up' } };
+}
+
+/**
+ * v24 → v25（2026-10-29 フルーネの最終）：仮フルーネ（mon-tmp-flune・skl-tmp-flune-1〜6）をゲームから外した（ジオルの v23 と同じ）。
+ * 仮フルーネのモンスターカードは同じ枚数の mon-flune に、技カードは消す。デッキの仮フルーネはフルーネに（抜けた技の分は持っているカードで埋める）。
+ * 名刺図鑑の記録・挑戦中の獲得も同じ。精霊の森のセラに勝った記録（sera-beaten）は、クリアの記録から normalizeSave の withBossFlags で付く
+ */
+function migrateTmpFluneV25(raw: RawObject): RawObject {
+  return replaceTmpMonster(raw, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, FLUNE_MONSTER_ID);
 }
 
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
@@ -661,6 +681,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   21: (raw) => ({ ...raw, player: { ...(isObject(raw.player) ? raw.player : {}), name: null } }),
   22: migrateTmpGeolV23,
   23: migrateShopRoomsV24,
+  24: migrateTmpFluneV25,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
