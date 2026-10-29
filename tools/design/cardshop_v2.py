@@ -48,9 +48,10 @@ GACHA_FORWARD = 30
 # gachaMachine.ts と同じ重ね順）から作る。ガラスの奥は紺（前の販売機の窓の色。パックは入れない）。描き直し・色の変更・引きのばしはしない（縮めるだけ）。
 # 大きさ：前の 1.5 倍の販売機と同じ高さ（絵の y 85〜520）・同じ足元（下のはし y 520。真ん中は前の本体の真ん中 x 1156。前の絵は右にハンドルがあった）
 GACHA_UI = os.path.join(ROOT, 'assets/images/ui/gacha')
-GACHA_LAYERS = ['machine_front', 'machine_glass', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
-GACHA_WINDOW = (276, 309, 621, 717)     # ガラスの窓（900×1300 の px。gacha.css の .gacha-machine__window と同じ）
-GACHA_WINDOW_COLOR = ((20, 24, 58), (24, 40, 112))   # 窓の奥の紺：上（奥の壁）→ 下（床）
+# 2026-10-30（指示書 J。ユーザー「ガラスじゃないのがいい。現実世界のカードダスみたいに」）：窓（ガラスと奥行きのある内側の壁）をやめ、
+# モンスターの絵を印刷した平らなパネル（panel_shop。tools/design/gacha_panel_build.py が作る）でおおう。窓の四すみの星（machine_stars）はパネルの上
+GACHA_LAYERS = ['machine_front', 'panel_shop', 'machine_stars', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
+GACHA_PANEL_AT = (212, 268)              # パネルの左上（900×1300 の px。gacha_panel_build.PANEL_BOX と同じ）
 GACHA_BOX = (1156, 85, 520)              # 店の中の機械の真ん中の x・上のはし・下のはし（絵の px）
 RIGHT_DISPLAY_SHIFT = -130
 GLOW = dict(rx=190, ry=58, color=(255, 214, 120))
@@ -128,14 +129,9 @@ def _cells(box: tuple[float, float, float, float]) -> dict:
 def _gacha_machine() -> dict:
     """店の中の販売機：ガチャの画面の機械の絵（GACHA_LAYERS）を重ねて、GACHA_BOX の高さ・足元に縮めて置く"""
     full = Image.new('RGBA', (900, 1300))
-    x1, y1, x2, y2 = GACHA_WINDOW
-    (r0, g0, b0), (r1, g1, b1) = GACHA_WINDOW_COLOR
-    win = ImageDraw.Draw(full)
-    for y in range(y1, y2):
-        k = (y - y1) / (y2 - y1 - 1)
-        win.line([(x1, y), (x2 - 1, y)], fill=(round(r0 + (r1 - r0) * k), round(g0 + (g1 - g0) * k), round(b0 + (b1 - b0) * k), 255))
     for name in GACHA_LAYERS:
-        full.alpha_composite(Image.open(os.path.join(GACHA_UI, f'{name}.webp')).convert('RGBA'))
+        im = Image.open(os.path.join(GACHA_UI, f'{name}.webp')).convert('RGBA')
+        full.alpha_composite(im, GACHA_PANEL_AT if name.startswith('panel_') else (0, 0))
     full = full.crop(full.getbbox())
     cx, top, bottom = GACHA_BOX
     k = (bottom - top) / full.height
