@@ -1,28 +1,48 @@
-# 引き継ぎメモ（2026-10-29 夜：セッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-29 深夜：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 夜のセッション終わり）
+### まず読む：いまの状態（2026-10-29 深夜のセッション終わり）
 
-- **公開中：`main` の `3bf46e8` 以降**（公開ページで確認済み）。作業ブランチはすべて main に取り込み済み。報告は Artifact https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 （**返事待ち**）。
-  ZIP は `downloads/作業報告書_20261029.zip`（git に入れない。`.git/info/exclude` に downloads/ を足した）
-- このセッションでしたこと（どれも main・公開済み。テスト 732件）
-  1. 小さな直し：モンスターの説明から「（モンスターランクC）」を消した・CPU のおいかぜを「次のターンに攻撃できそうな味方」に（`docs/pukarim.md` 7章）
-  2. 技カードの新しい形（`docs/cardshape-20261029.md`）：枠は `assets/images/ui/skillcard_simple/`（`npm run art:skillframes`＝`tools/art/skillcard_simple_build.py`）。手札も正方形の枠
-  3. プカリムの最終（`docs/pukarim-final-20261029.md`）：ふつうの一覧へ・ピートとの勝負（`src/game/story/pete.ts`。記録 `storyFlags` の `pete-beaten`）・ガチャのシリーズ（`unlockFlag`）・相手のチーム
-  4. iPhone の試遊の直し（`docs/polish-20261029.md`）：街は `tools/design/town2026_build.py`（小川・門・石垣・噴水・小物）を `seimon_world_build.py` で作り直す（約5分）。部屋は `rooms4_build.py`・`cardshop_v2.py`。
-     人物は街で 1.2 倍（`worldScreen.ts` の `TOWN_FIGURE_BOOST`）。押す所は `tapSize.css`。確認用 `?qa=1&hit=1`（当たり判定）・`&fig=1.15`（人の大きさ）
-  5. 依頼文7つ：`docs/design-requests-20261028/`（一覧 `00_README.md`）
-- **そのあとの追加の直し（2026-10-29 夜〜深夜。どれも main・公開済み。いまの公開は `51b5fd4` 以降）**。報告 https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz （**返事待ち**）・ZIP `downloads/作業報告書_20261029_追加.zip`
-  - 防御の数字は盾の印なし（-3 だけ）／手札の枠は 208×260（`skillcard_simple_build.py` の HAND_STRETCH）
-  - マナ・分類・ダメージは前の版（3cf9050）の見た目：`mana_ball.webp`（数字はゲーム）・`tile_{分類}.webp`・`value_box.webp`
-    （`tools/art/old_parts_build.py`・`value_box_build.py`。原本 `design-parts/ui-skillcard-simple-20261028/old-v5-frames-c57b589/`）。置き場所は `skillCard.ts` の LAYOUT の mana・icon
-  - 対戦の場のモンスターのカードは右上のライフの札なし（`battleMonsterCard.ts`。life を渡したとき）
-- 未完了：iPhone 実機・依頼文の絵・ダンジョン7つと対戦の全画面の点検の続き・絵が切れる技（ソラモ04・カルシェル02・13）の直し方はユーザー判断
-- 写真の道具：`tools/e2e/card_gallery_shot.cjs`（開発サーバーでカードを並べる）・`gacha_shot.cjs`・`pete_shot.cjs`・`town_shot.cjs`（W・H・qs）・`screen_steps.cjs`（W・H・`small` で 44 未満のボタンを書き出す）
-- 作業環境：最初に `nvm install 24`・`npm install`・`pip install scipy matplotlib`。ローカルの main が古いことがある → `git checkout -B main origin/main`
+- **公開中：`main` の `51b5fd4` 以降**（公開ページで確認済み）。作業ブランチはすべて main に取り込み済み。テスト 732件。**次の指示を待っている**
+- 報告（どちらも**返事待ち**）
+  - 本体：https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 （小さな直し2つ・ZIP 3つ）
+  - 追加の直し：https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz （防御の数字・手札の形・マナと分類とダメージ・場のライフ）
+  - ZIP は `downloads/`（git に入れない。新しいセッションの作業フォルダには無い。要るときは作り直す）
+- **ユーザーの判断待ち**
+  - 手札のマナの球と分類の札は縦に並べていて、絵の高さの約35%まで来る（もっと上に収めるなら札を小さくする）
+  - 大きなカードで絵が切れる技：ソラモ04・カルシェル02・カルシェル13 の直し方（進行が決める）
+  - ピートの台詞（進行の案をほぼそのまま。`src/i18n/messages/story.ts` の `story.pete.*`）
+  - 依頼文7つ（`docs/design-requests-20261028/00_README.md`）の絵が届いたら入れる：プカリムのパック・研究所の床・ショップの棚の商品・研究所／管理局／練習場の外観（正面向き）・大会会場の受付カウンター
+  - 前からの判断待ち：台本の台詞・ダンジョンの人の「あなた」・ベッドの冒険の記録の板にも名前を出すか、水の神殿のお金（約723G）、【仮】スキップのボタンを消す時期 など（下の「前のセッション」）
+- **未完了**：iPhone 実機での確認（この日の作業すべて）・ダンジョン7つと対戦の全画面の点検の続き（街・ショップ・大会会場・研究所・練習場・デッキ編集・図鑑・ガチャは済み）・
+  取得カードの画面をダンジョンの勝ち・宝箱・ガチャにつなぐ
+- ユーザーが合格としたもの：名前の入力・取得カード・ボタンの音・手札の上限9枚（2026-10-29）
+
+#### このセッション（2026-10-29 夕方〜深夜）でしたこと（どれも main・公開済み）
+
+| 内容 | 記録 | 主な所 |
+| --- | --- | --- |
+| モンスターの説明からランクを消す・CPU のおいかぜは「次のターンに攻撃できそうな味方」へ | `docs/pukarim.md` 7章 | `ai.ts` の `chooseChargeOrTailwind` |
+| 技カードの新しい形（平らな名前の帯＋大きな絵の窓・モンスターごとの色の枠） | `docs/cardshape-20261029.md` | `skillCard.ts`・`npm run art:skillframes` |
+| ↑のあとの直し：防御は数字だけ・手札は 208×260・マナ／分類／ダメージは前の版（3cf9050）の見た目（青い球・八角形の札・金のふちの札） | 同じ文書の最後の章 | `tools/art/old_parts_build.py`・`value_box_build.py`・`skillCard.ts` の LAYOUT |
+| プカリムの最終（ふつうの一覧へ・ピートとの勝負・ガチャのシリーズ・相手のチーム） | `docs/pukarim-final-20261029.md` | `src/game/story/pete.ts`（記録 `storyFlags` の `pete-beaten`。セーブの形式は変えていない） |
+| iPhone の試遊の直し18項目＋全体の点検 | `docs/polish-20261029.md` | 街 `town2026_build.py`（`seimon_world_build.py` で約5分）・部屋 `rooms4_build.py`・`cardshop_v2.py`・`tapSize.css`・`TOWN_FIGURE_BOOST` |
+| 対戦の場のモンスターのカードの右上のライフの札を消す | — | `battleMonsterCard.ts` |
+
+#### 作業のしかた（このセッションで分かったこと）
+
+- 作業の順番：指示どおり作業 → `npm run check` → main に取り込み（`git merge --no-ff`）→ push → 公開（GitHub の MCP の `actions_run_trigger`・`deploy-pages.yml`・ref `main`。`gh` は使えない）
+  → 公開ページの CSS／JS に新しい文字が出るまで curl で待つ（約2〜3分。キャッシュで古いことがあるので、写真の前にもう一度確かめる）→ 公開ページで写真 → 報告
+- 報告は Artifact のページ（写真入り）＋ `downloads/` の ZIP（SendUserFile）。日本語・短く・専門用語なし
+- 作業環境：最初に `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24`・`export PATH=/opt/nvm/versions/node/v24.22.1/bin:$PATH`・`npm install`・`pip install scipy matplotlib`。
+  ローカルの main が古いことがある → `git fetch origin main && git checkout -B main origin/main`
+- 写真：Playwright は `NODE_PATH=/opt/node22/lib/node_modules /opt/node22/bin/node`。道具は `tools/e2e/`
+  - `card_gallery_shot.cjs`（開発サーバー `npx vite --port 5173` でカードIDを並べる）・`hand_shot.cjs`（試験の対戦で手札5/7/10枚）・`gacha_shot.cjs`・`pete_shot.cjs`
+  - `town_shot.cjs`（W・H・qs。`&hit=1` で当たり判定・`&fig=1.15` で人の大きさ）・`screen_steps.cjs`（W・H・`small` で 44 未満のボタンを書き出す）
+  - セーブは Vitest の一時テスト `tests/zz-*.test.ts` で作って消す（`createNewSave`・`createNewGameSave`・`enterTournament`・`startRun` など）
 
 ### 前のセッション（2026-10-29 昼）の「いまの状態」
 
