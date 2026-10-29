@@ -1,5 +1,6 @@
 import { cardCatalog } from '../../data/cards.ts';
 import type { GachaSeries } from '../../data/economy.ts';
+import { skillArtX } from '../../data/skillArtPosition.ts';
 import { canReselectSeries, seriesLineup } from '../../game/economy/gachaSeries.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -61,6 +62,13 @@ export interface GachaMachineHandle {
   close(): void;
 }
 
+/** ラインナップの枠の絵（技の絵の横の位置は大きなカードと同じ。src/data/skillArtPosition.ts） */
+function lineupArt(url: string, x: number): HTMLElement {
+  const img = h('img', { attrs: { src: url, alt: '', draggable: 'false' } });
+  img.style.objectPosition = `${x}% 50%`;
+  return img;
+}
+
 /** ラインナップ15枠と「○ / 15 そろった」 */
 function lineupView(series: GachaSeries, collection: Readonly<Record<string, number>>): HTMLElement {
   const { all, monsterId } = seriesLineup(series);
@@ -73,7 +81,7 @@ function lineupView(series: GachaSeries, collection: Readonly<Record<string, num
     return h(
       'div',
       { class: `gacha-lineup__cell${has ? ' is-owned' : ''}${id === monsterId ? ' is-monster' : ''}`, attrs: { role: 'img', 'aria-label': has && card ? cardName(card) : '?' } },
-      url ? h('img', { attrs: { src: url, alt: '', draggable: 'false' } }) : h('span', { class: 'gacha-lineup__q', text: '?' }),
+      url ? lineupArt(url, card?.kind === 'skill' ? skillArtX(id) : 50) : h('span', { class: 'gacha-lineup__q', text: '?' }),
     );
   });
   return h(

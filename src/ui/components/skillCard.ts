@@ -1,4 +1,5 @@
 import { getMonster } from '../../data/cards.ts';
+import { skillArtX } from '../../data/skillArtPosition.ts';
 import { skillCardFace, skillValueBadge, skillValueBadgeText } from '../../game/cards/cardFace.ts';
 import { skillBandText, skillCategory, supportShortText, type PlayCard, type SkillCard, type SkillCategory, type SupportCard } from '../../game/cards/cardTypes.ts';
 import { cardName } from '../../i18n/content.ts';
@@ -187,8 +188,11 @@ function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, 
   return box;
 }
 
-/** イラスト：窓いっぱいに広げる（縦横比を保ち、はみ出した所を切る＝cover・真ん中合わせ）。窓の角の丸みは枠が隠す */
-function artLayer(l: FrameLayout, url: string | undefined, mark: string, support: boolean): HTMLElement {
+/**
+ * イラスト：窓いっぱいに広げる（縦横比を保ち、はみ出した所を切る＝cover・縦は真ん中合わせ）。窓の角の丸みは枠が隠す。
+ * 横の見せる所は技ごと（src/data/skillArtPosition.ts。決めていない技は真ん中）
+ */
+function artLayer(l: FrameLayout, url: string | undefined, mark: string, support: boolean, skillId: string | null): HTMLElement {
   const el = url
     ? h('img', { class: 'skill-card__art', attrs: { src: url, alt: '', draggable: 'false' } })
     : h(
@@ -197,6 +201,7 @@ function artLayer(l: FrameLayout, url: string | undefined, mark: string, support
         h('span', { class: 'skill-card__art-mark', text: mark }),
         h('span', { class: 'skill-card__art-note', text: t('common.placeholderTag') }),
       );
+  if (url && skillId) el.style.objectPosition = `${skillArtX(skillId)}% 50%`;
   return place(el, l, l.art);
 }
 
@@ -265,7 +270,7 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
   const card = h(
     'div',
     { class: `skill-card skill-card--${size}${f.skill ? '' : ' skill-card--support'}`, dataset: { category: f.category }, attrs: { role: 'img', 'aria-label': f.aria } },
-    artLayer(l, f.art, f.mark, !f.skill),
+    artLayer(l, f.art, f.mark, !f.skill, f.skill?.id ?? null),
     frame ? h('img', { class: 'skill-card__frame', attrs: { src: frame, alt: '', draggable: 'false' } }) : null,
     valueBox(l, size, f.skill, f.supportLabel),
     band,
