@@ -15,7 +15,7 @@
 - **新モンスター「ジオル」の試遊（手順 4・G4）**：?qa=1 の確認用の画面「ジオルの試遊」だけで遊べる（QA_MONSTERS・QA_SKILLS）。記録 `docs/geol.md`・裁定 `docs/battle-rules.md`「ジオル（試遊中）」
   - 新しい効果6つ（いわくだき・地ひびき・じならし・エネルギーをためる・かばう・うけとめる）。テスト `tests/geol.test.ts`。試遊 `npm run playtest:geol`
   - **試遊の結果：強すぎ**（ジオル入りの平均 75.6%・27 組すべて 60% 超え）。原因の見立て：ナックル（マナ3で5）とライフ9。**数字は変えていない**（直し方は進行チャットで）
-  - 報告（返事待ち）：このセッションのチャットのリンク（Artifact）
+  - 報告（返事待ち）：https://claude.ai/artifact/LQa7h5Ayw8UnCwB9kHHuuM （ZIP は downloads/作業報告書_ジオルの試遊_20261029.zip。git に入れない）
 - 前の報告（返事待ち）：https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 ・ https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz
 - 判断待ち（前から）：手札のマナの球と分類の札の高さ・大きなカードで絵が切れる技（ソラモ04・カルシェル02・カルシェル13）・ピートの台詞・
   台本の台詞・ダンジョンの人の「あなた」など（下の「前のセッション」）
