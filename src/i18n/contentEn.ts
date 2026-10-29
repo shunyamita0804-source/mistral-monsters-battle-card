@@ -197,7 +197,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:lab-shelf:label': 'Card catalog shelf',
   'object:lab-desk:label': 'Research desk',
   'object:lab-desk:message': 'Research notes are spread out.',
-  'object:lab-blackboard:label': 'Blackboard',
+  'object:lab-blackboard:label': 'Diagram board',
   'object:lab-blackboard:message': 'It is covered with drawings of stars and circles.',
   'object:lab-cabinet:label': 'Specimen Cabinet',
   'object:lab-cabinet:message': 'Crystals and feathers are lined up like specimens.',
