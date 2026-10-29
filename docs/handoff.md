@@ -7,7 +7,7 @@
 ### まず読む：いまの状態（2026-10-29 深夜。⑦のあと）
 
 - **公開中：`main`（⑦ カードの効果の文まで）**。テスト 784件。**次の指示を待っている**
-- ⑦ 済み・**返事待ち**：カードに書く効果の文を短くした（36枚。記録 `docs/card-text-short-20261029.md`。表 `src/data/skillCardText.ts`）。報告は下の行
+- ⑦ 済み・**返事待ち**：カードに書く効果の文を短くした（36枚。記録 `docs/card-text-short-20261029.md`。表 `src/data/skillCardText.ts`）。報告 https://claude.ai/artifact/1qLDxip2CvnDj9nRWG2W8q
 - 合格（ユーザー）：①〜⑥すべて
 - ⑥ 済み・合格：https://claude.ai/artifact/D4E4Qhvf1j9nm6JYBA4sV7 （記録 `docs/fixes-20261029b.md`）
   - 管理局の掲示板＝右の壁の白い枠の額（立てる掲示板の絵は使わない）・カードの効果の文を文節で改行（`src/ui/phraseText.ts`。BudouX）・
