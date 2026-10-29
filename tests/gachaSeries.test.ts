@@ -1,17 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
-import { availableGachaSeries, GACHA, GACHA_SERIES, gachaSeenFlag, isNewGachaSeries } from '../src/data/economy.ts';
+import { GACHA, GACHA_SERIES, gachaSeenFlag } from '../src/data/economy.ts';
+import { BOOSTERS } from '../src/data/introV2.ts';
 import {
+  availableGachaSeriesFor,
   canReselectSeries,
+  isNewGachaSeries,
   drawSeriesPack,
   markGachaSeriesSeen,
   purchaseSeriesPack,
   seriesLineup,
   seriesOwned,
+  startingGachaMonsters,
   tierOf,
 } from '../src/game/economy/gachaSeries.ts';
-import { createNewSave, normalizeSave, SAVE_VERSION } from '../src/game/save/saveData.ts';
-import { PETE_BEATEN_FLAG } from '../src/game/story/pete.ts';
+import { addCards, createNewGameSave, createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
+import { PETE_BEATEN_FLAG, winPete } from '../src/game/story/pete.ts';
 
 const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
@@ -135,12 +139,14 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     }
   });
 
-  it('プカリムはピートに勝ったあと（記録 pete-beaten）だけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
+  it('プカリムはモンスターカード（ピートに勝つと受け取る）を手に入れたあとだけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
     const before = { ...createNewSave(), coins: 150 };
-    expect(availableGachaSeries(before.storyFlags).map((s) => s.id)).not.toContain('pukarim');
+    expect(availableGachaSeriesFor(before).map((s) => s.id)).not.toContain('pukarim');
     expect(purchaseSeriesPack(before, 'pukarim', 'tx-p', 3).status).toBe('error');
-    const after = { ...before, storyFlags: [PETE_BEATEN_FLAG] };
-    expect(availableGachaSeries(after.storyFlags).map((s) => s.id)).toContain('pukarim');
+    // ピートに勝った記録だけ（カードなし）では並ばない（2026-10-30 指示書 K）
+    expect(availableGachaSeriesFor({ ...before, storyFlags: [PETE_BEATEN_FLAG] }).map((s) => s.id)).not.toContain('pukarim');
+    const after = addCards(before, [{ cardId: 'mon-pukarim', count: 1 }]);
+    expect(availableGachaSeriesFor(after).map((s) => s.id)).toContain('pukarim');
     expect(purchaseSeriesPack(after, 'pukarim', 'tx-p', 3).status).toBe('ok');
     const pukarim = GACHA_SERIES.find((s) => s.id === 'pukarim');
     if (!pukarim) throw new Error('pukarim');
@@ -161,21 +167,96 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
   });
 });
 
+/** 管理局で箱を選んだセーブ（新しく始めた人） */
+function boxSave(key: 'booster-1' | 'booster-2' | 'booster-3'): SaveData {
+  const base = createNewGameSave();
+  const box = BOOSTERS.find((b) => b.key === key);
+  if (!box) throw new Error(key);
+  const withCards = addCards(base, box.monsters.map((cardId) => ({ cardId, count: 1 })));
+  return { ...withCards, coins: 1000, story: { ...withCards.story, introV2: { ...withCards.story.introV2, state: 'completed', selectedBoosterKey: key, boosterClaimed: true } } };
+}
+const ids = (save: SaveData): string[] => availableGachaSeriesFor(save).map((s) => s.id);
+const series = (id: string) => {
+  const g = GACHA_SERIES.find((x) => x.id === id);
+  if (!g) throw new Error(id);
+  return g;
+};
+
+describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決定）', () => {
+  it('最初から並ぶのは、管理局で選んだ箱の3体のシリーズだけ', () => {
+    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'gauul', 'myurol']);
+    expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton']);
+    expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell']);
+    // 箱の3体には NEW を出さない
+    const s = boxSave('booster-1');
+    for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
+  });
+
+  it('並んでいないシリーズは買えない（箱の外のモンスター）', () => {
+    expect(purchaseSeriesPack(boxSave('booster-1'), 'kalshell', 'tx-k', 1).status).toBe('error');
+    expect(purchaseSeriesPack(boxSave('booster-1'), 'soramo', 'tx-s', 1).status).toBe('ok');
+  });
+
+  it('そのモンスターのモンスターカードを初めて手に入れたら開き、NEW が出る（ショップで箱を買った・ボスから受け取った など）', () => {
+    const s = addCards(boxSave('booster-1'), [{ cardId: 'mon-kalshell', count: 1 }, { cardId: 'mon-geol', count: 1 }]);
+    expect(ids(s)).toEqual(['soramo', 'gauul', 'myurol', 'kalshell', 'geol']);
+    expect(isNewGachaSeries(s, series('kalshell'))).toBe(true);
+    expect(isNewGachaSeries(s, series('geol'))).toBe(true);
+    // 技カードだけでは開かない
+    const skill = addCards(boxSave('booster-1'), [{ cardId: 'skl-kalshell-01', count: 1 }]);
+    expect(ids(skill)).not.toContain('kalshell');
+  });
+
+  it('ピートに勝つ（プカリムのカードを受け取る）とプカリムのシリーズが開き、NEW。一度選ぶと NEW は消える', () => {
+    const won = winPete(boxSave('booster-2'), 'tx-pete', () => 0.1).save;
+    expect(ids(won)).toContain('pukarim');
+    expect(isNewGachaSeries(won, series('pukarim'))).toBe(true);
+    const seen = markGachaSeriesSeen(won, series('pukarim'));
+    expect(isNewGachaSeries(seen, series('pukarim'))).toBe(false);
+    expect(ids(seen)).toContain('pukarim');
+  });
+
+  it('一度開いた（選んだ）シリーズは、カードがなくても閉じない', () => {
+    const s = { ...boxSave('booster-1'), storyFlags: [gachaSeenFlag('flune')] };
+    expect(ids(s)).toContain('flune');
+    expect(isNewGachaSeries(s, series('flune'))).toBe(false);
+  });
+
+  it('チュートリアルをスキップした（箱を選んでいない）セーブは、今のまま6つ並ぶ', () => {
+    const skipped = { ...createNewGameSave(), story: { ...createNewGameSave().story, introV2: { ...createNewGameSave().story.introV2, state: 'skipped' as const } } };
+    expect(startingGachaMonsters(skipped)).toHaveLength(6);
+    expect(ids(skipped)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell']);
+    for (const g of availableGachaSeriesFor(skipped)) expect(isNewGachaSeries(skipped, g)).toBe(false);
+  });
+
+  it('前のセーブ（v27）で、もう並んでいるシリーズは閉じない・NEW も出さない（箱を選んだセーブでも6つのまま）', () => {
+    const box = boxSave('booster-1');
+    const old = { ...box, version: 27, storyFlags: [PETE_BEATEN_FLAG] };
+    const s = normalizeSave(JSON.parse(JSON.stringify(old)));
+    if (!s) throw new Error('load');
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(SAVE_VERSION).toBe(28);
+    expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']);
+    for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
+  });
+});
+
 describe('新しく並んだシリーズの NEW の印（2026-10-29 夜）', () => {
   const PUKARIM = GACHA_SERIES.find((s) => s.id === 'pukarim');
   if (!PUKARIM) throw new Error('pukarim');
 
   it('並んだばかりのシリーズだけ NEW。最初から並ぶシリーズ・まだ並ばないシリーズには出さない', () => {
-    expect(isNewGachaSeries([PETE_BEATEN_FLAG], PUKARIM)).toBe(true);
-    expect(isNewGachaSeries([], PUKARIM)).toBe(false);
-    expect(isNewGachaSeries([PETE_BEATEN_FLAG], SORAMO)).toBe(false);
+    const base = createNewSave();
+    expect(isNewGachaSeries(addCards(base, [{ cardId: 'mon-pukarim', count: 1 }]), PUKARIM)).toBe(true);
+    expect(isNewGachaSeries(base, PUKARIM)).toBe(false);
+    expect(isNewGachaSeries(addCards(base, [{ cardId: 'mon-pukarim', count: 1 }]), SORAMO)).toBe(false);
   });
 
   it('一度選ぶと消える（記録は1回だけ付く）', () => {
-    const save = { ...createNewSave(), storyFlags: [PETE_BEATEN_FLAG] };
+    const save = addCards({ ...createNewSave(), storyFlags: [PETE_BEATEN_FLAG] }, [{ cardId: 'mon-pukarim', count: 1 }]);
     const seen = markGachaSeriesSeen(save, PUKARIM);
     expect(seen.storyFlags).toEqual([PETE_BEATEN_FLAG, gachaSeenFlag('pukarim')]);
-    expect(isNewGachaSeries(seen.storyFlags, PUKARIM)).toBe(false);
+    expect(isNewGachaSeries(seen, PUKARIM)).toBe(false);
     expect(markGachaSeriesSeen(seen, PUKARIM)).toBe(seen);
   });
 
@@ -194,6 +275,6 @@ describe('新しく並んだシリーズの NEW の印（2026-10-29 夜）', () 
     expect(s.storyFlags).toContain(gachaSeenFlag('serephine'));
     expect(s.storyFlags).not.toContain(gachaSeenFlag('geol'));
     expect(s.storyFlags).not.toContain(gachaSeenFlag('flune'));
-    for (const g of GACHA_SERIES) expect(isNewGachaSeries(s.storyFlags, g)).toBe(false);
+    for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
   });
 });

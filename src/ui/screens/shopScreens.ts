@@ -1,4 +1,4 @@
-import { availableGachaSeries, GACHA, isNewGachaSeries, type GachaSeries } from '../../data/economy.ts';
+import { GACHA, type GachaSeries } from '../../data/economy.ts';
 import { ITEMS } from '../../data/items.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
 import { boosterShelf as boosterShelfOf, buyBooster } from '../../game/story/introV2.ts';
@@ -6,7 +6,7 @@ import type { SaveData } from '../../game/save/saveData.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
 import { isNewItem } from '../../game/items/items.ts';
-import { markGachaSeriesSeen, purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
+import { availableGachaSeriesFor, isNewGachaSeries, markGachaSeriesSeen, purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
 
 import { randomSeed } from '../../game/rng.ts';
 import { cardName } from '../../i18n/content.ts';
@@ -270,8 +270,8 @@ export const gachaScreen: ScreenDefinition = {
 
     const render = (): void => {
       const save = store.save;
-      // 並ぶシリーズ：プカリムはピートに勝ったあと（2026-10-29）
-      const tiles = availableGachaSeries(save.storyFlags).map((series) => {
+      // 並ぶシリーズ（2026-10-30 指示書 K）：最初は管理局で選んだ箱の3体。ほかはそのモンスターのカードを初めて手に入れたら
+      const tiles = availableGachaSeriesFor(save).map((series) => {
         const { owned, total } = seriesOwned(save, series);
         const on = picked === series.id;
         return h(
@@ -297,7 +297,7 @@ export const gachaScreen: ScreenDefinition = {
             },
           },
           h('img', { class: 'gacha-select__pack', attrs: { src: seriesPackUrl(series), alt: '', draggable: 'false' } }),
-          isNewGachaSeries(save.storyFlags, series) ? h('span', { class: 'gacha-select__new', text: t('items.new') }) : null,
+          isNewGachaSeries(save, series) ? h('span', { class: 'gacha-select__new', text: t('items.new') }) : null,
           h('b', { class: 'gacha-select__name', text: seriesName(series) }),
           h('small', { class: 'gacha-select__owned', text: t('gacha.series.owned', { n: owned, total }) }),
         );

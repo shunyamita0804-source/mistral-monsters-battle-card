@@ -1,5 +1,6 @@
 import { skillsOf } from '../../data/cards.ts';
-import { GACHA, gachaSeenFlag, getGachaSeries, isNewGachaSeries, type GachaSeries } from '../../data/economy.ts';
+import { GACHA, GACHA_SERIES, gachaSeenFlag, getGachaSeries, SKIP_GACHA_SERIES_IDS, type GachaSeries } from '../../data/economy.ts';
+import { BOOSTERS } from '../../data/introV2.ts';
 import { t } from '../../i18n/i18n.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
@@ -35,6 +36,35 @@ export function seriesLineup(series: GachaSeries): SeriesLineup & { readonly err
   });
   const skillIds = skills.map((s) => s.id);
   return { monsterId: series.monsterId, skillIds, rareIds, all: [...skillIds, series.monsterId], errors };
+}
+
+/**
+ * 最初から並ぶシリーズのモンスター（2026-10-30 指示書 K。ユーザー決定）：管理局で選んだ箱の3体。
+ * 箱を選んでいないセーブ（チュートリアルをスキップした・前の形式）は、今までどおり6つ（SKIP_GACHA_SERIES_IDS）
+ */
+export function startingGachaMonsters(save: SaveData): readonly string[] {
+  const box = BOOSTERS.find((b) => b.key === save.story.introV2.selectedBoosterKey);
+  if (box) return box.monsters;
+  return GACHA_SERIES.filter((s) => SKIP_GACHA_SERIES_IDS.includes(s.id)).map((s) => s.monsterId);
+}
+
+/**
+ * いま並ぶシリーズ（2026-10-30 指示書 K。ユーザー決定）：
+ * - 最初から並ぶ：startingGachaMonsters のシリーズ
+ * - ほかは、そのモンスターのモンスターカードを初めて手に入れたら開く（ショップで箱を買った・ピートに勝った・ボスから受け取った など。手に入れ方は問わない）
+ * - 一度選んだシリーズ（gachaSeenFlag）は閉じない（前のセーブで並んでいたシリーズは、v27→v28 の変換でこの記録が付く）
+ */
+export function availableGachaSeriesFor(save: SaveData): readonly GachaSeries[] {
+  const start = startingGachaMonsters(save);
+  return GACHA_SERIES.filter(
+    (s) => start.includes(s.monsterId) || (save.collection[s.monsterId] ?? 0) > 0 || save.storyFlags.includes(gachaSeenFlag(s.id)),
+  );
+}
+
+/** NEW の印を出すシリーズか（あとから開いて、まだ一度も選んでいない。最初から並ぶシリーズには出さない） */
+export function isNewGachaSeries(save: SaveData, series: GachaSeries): boolean {
+  if (startingGachaMonsters(save).includes(series.monsterId) || save.storyFlags.includes(gachaSeenFlag(series.id))) return false;
+  return availableGachaSeriesFor(save).includes(series);
 }
 
 /** カードの枠 */
@@ -102,8 +132,8 @@ export type SeriesPurchaseResult =
 export function purchaseSeriesPack(save: SaveData, seriesId: string, transactionId: string, seed: number): SeriesPurchaseResult {
   if (hasProcessed(save, transactionId)) return { status: 'duplicate', save };
   const series = getGachaSeries(seriesId);
-  // まだ並んでいないシリーズ（プカリム：ピートに勝つ前）は買えない
-  if (!series || (series.unlockFlag && !save.storyFlags.includes(series.unlockFlag))) return { status: 'error', save, message: t('gacha.error.noPack') };
+  // まだ並んでいないシリーズ（そのモンスターのカードをまだ持っていない）は買えない
+  if (!series || !availableGachaSeriesFor(save).includes(series)) return { status: 'error', save, message: t('gacha.error.noPack') };
   if (save.coins < GACHA.price) return { status: 'error', save, message: t('gacha.error.coins') };
   const { cards } = drawSeriesPack(series, seed);
   let next = addCards(
@@ -124,6 +154,6 @@ export function canReselectSeries(paid: boolean): boolean {
 
 /** シリーズを一度選んだ記録を付ける（NEW の印を消す）。NEW でなければそのまま返す */
 export function markGachaSeriesSeen(save: SaveData, series: GachaSeries): SaveData {
-  if (!isNewGachaSeries(save.storyFlags, series)) return save;
+  if (!isNewGachaSeries(save, series)) return save;
   return { ...save, storyFlags: [...save.storyFlags, gachaSeenFlag(series.id)] };
 }
