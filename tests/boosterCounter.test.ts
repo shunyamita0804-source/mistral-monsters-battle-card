@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
-import contents from '../src/data/official/booster_contents_20261028.json';
-import { countCards, isDeckValid } from '../src/game/deck/deck.ts';
+import contents from '../src/data/official/booster_contents_20261029.json';
+import before from '../src/data/official/booster_contents_20261028.json';
+import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
 import {
   beginExam,
@@ -49,6 +50,36 @@ describe('ブースターの箱＝初期配布', () => {
       expect(countCards(skills)).toEqual(want);
       expect(isDeckValid(deck, boosterCardCounts(key))).toBe(true);
     }
+  });
+});
+
+describe('烈火の猛攻の入れかえ（2026-10-29 夜 ユーザー決定：案3）', () => {
+  const ids = (key: BoosterKey): Record<string, number> => countCards(boosterDeck(key).skills);
+  it('旅立ちのきらめき・蒼海の守りは前と同じ（並びも）。資料の行も前の版と同じ', () => {
+    expect(boosterDeck('booster-1')).toEqual(createStarterDeckFor('balance'));
+    expect(boosterDeck('booster-3')).toEqual(createStarterDeckFor('defense'));
+    for (const key of ['booster-1', 'booster-3']) {
+      expect(contents.booster_groups.find((g) => g.booster_key === key)?.card_rows).toEqual(before.booster_groups.find((g) => g.booster_key === key)?.card_rows);
+    }
+  });
+
+  it('烈火の猛攻：ラズック ひっかき1・かみつき2・とびかかり2・みだれづめ2・トリックショット1・シャドウバースト2（ちょうはつ・ダストキックなし）、ノビトン くしゃみ1・ミラージュノーズ2。ガウルは同じ', () => {
+    const c = ids('booster-2');
+    const laz = (n: string): number => c[n] ?? 0;
+    expect([1, 2, 3, 4, 9, 10, 7, 8].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([1, 2, 2, 2, 1, 2, 0, 0]);
+    expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([1, 2]);
+    const gauul = (d: Record<string, number>): [string, number][] => Object.entries(d).filter(([id]) => id.startsWith('skl-gauul')).sort();
+    expect(gauul(c)).toEqual(gauul(countCards(createStarterDeckFor('attack').skills)));
+  });
+
+  it('前の中身で箱を開けたセーブは、所持カード・デッキを変えない（読み込み直しても同じ）', () => {
+    const old = { ...claimBooster(throughExam(newGame()), 'booster-2', 'tx-old') };
+    const oldDeck = createStarterDeckFor('attack');
+    const opened: SaveData = { ...old, collection: countCards([...oldDeck.monsters, ...oldDeck.skills]), deck: oldDeck };
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(opened)));
+    expect(loaded?.collection).toEqual(opened.collection);
+    expect(loaded?.deck).toEqual(opened.deck);
+    expect(claimBooster(loaded as SaveData, 'booster-1', 'tx-2')).toBe(loaded);
   });
 });
 

@@ -10,8 +10,8 @@ import { buildOpponentDeck, countCards, isDeckValid, type Deck } from '../src/ga
 import { boosterDeck } from '../src/game/story/introV2.ts';
 
 /**
- * 「烈火の猛攻」（booster-2）が弱いのを直す試遊（2026-10-29 夜 ユーザー指示。まだゲームには入れない。表を見てから決める）。
- * 箱の技の中身を資料の JSON（今＝booster_contents_20261028.json、案＝booster_contents_20261029_draft.json）から作り、
+ * 「烈火の猛攻」（booster-2）が弱いのを直す試遊（2026-10-29 夜 ユーザー指示）。表を見て、ユーザーが案3 に決めた（ゲームの箱＝booster_contents_20261029.json）。
+ * 箱の技の中身を資料の JSON（前＝booster_contents_20261028.json、案・案3＝booster_contents_20261029_draft.json）から作り、
  * 仮サポート12枚・モンスターは今の箱のまま。両方とも相手の CPU と同じ思考で最後まで自動で対戦する（flunePlaytest.ts の playFluneMatch）。
  * ふだん（npm run check）は少ない回数で動くことだけ確かめる。npm run playtest:rekka（PLAYTEST=200）で各 200 回（先攻・後攻は半分ずつ）
  */
@@ -73,8 +73,8 @@ function series(a: Deck, b: Deck, games: number, seedBase: number, options: Flun
 }
 
 describe('烈火の猛攻の試遊（自動の対戦）', () => {
-  it('今の資料から作ったデッキは今の箱と同じ。案は技48枚・同じカード3枚まで・ルールに合う。ほかの箱の行は変えない', () => {
-    expect(countCards(REKKA.now?.skills ?? [])).toEqual(countCards(boosterDeck('booster-2').skills));
+  it('案3 はゲームの今の箱と同じ（前の資料は record として残す）。どれも技48枚・同じカード3枚まで・ルールに合う。ほかの箱の行は変えない', () => {
+    expect(countCards(REKKA.plan3?.skills ?? [])).toEqual(countCards(boosterDeck('booster-2').skills));
     for (const [id, deck] of Object.entries(REKKA)) {
       const skills = deck.skills.filter((c) => cardCatalog.get(c)?.kind === 'skill');
       expect(skills, id).toHaveLength(48);
