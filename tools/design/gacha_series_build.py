@@ -6,7 +6,9 @@
 
 原本（ZIP「Mistral_Gacha_ClaudeCode_20261028」の art/。ユーザーと進行チャットで検品・承認済み）は描き直さない。
 形式を変える・大きさをそろえるだけ。
-- pack_{モンスター}.png：2026-10-29 新しいパック（ZIP「Mistral_Packs7_Shop_Status」。紺のナイロン＋金の線＋縁＋窓の共通の型、
+- pack_{モンスター}.png：2026-10-29 夜からはパック専用の絵（ZIP「Mistral_PackArt8_Part1」。窓の中がモンスターのアップ。型・縁の色・大きさは前と同じ 935×1683。
+  前の正式モンスターカードの絵の版は design-parts/gacha-20261029/art_cardart/ に残す。原本の窓の絵は pack_art/〔ゲームでは使わない〕）。
+  その前は 2026-10-29 の新しいパック（ZIP「Mistral_Packs7_Shop_Status」。紺のナイロン＋金の線＋縁＋窓の共通の型、
   窓は正式モンスターカードの絵、縁はモンスターの色。935×1683）を 600×1080 に縮める。
   新しい型は上下の紺がもともと短いので、前の「上の封を切りとる」処理（SEAL_CUT）はかけない（切ると金の線と縁が切れる）
 - knob_base.png・knob_dial.png（900×1300。機械の部品と同じキャンバス・同じ原点。回る中心は (650,1000)）：そのまま
@@ -22,7 +24,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / 'assets' / 'images' / 'ui' / 'gacha'
-PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']
+PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol']
 PACK_SIZE = (600, 1080)
 PARTS = ['knob_base', 'knob_dial', 'outlet_zoom_back', 'outlet_zoom_front', 'open_burst']
 

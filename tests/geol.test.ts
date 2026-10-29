@@ -8,6 +8,8 @@ import { nobitonSkillId } from '../src/data/nobiton.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
 import { GACHA_SERIES } from '../src/data/economy.ts';
+import { GRANT_BEATEN_FLAG } from '../src/data/dungeons.ts';
+import { seriesLineup } from '../src/game/economy/gachaSeries.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, attackPower, cardUsability, createBattle, energyOf, isPinned, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
@@ -72,7 +74,11 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
     expect(GEOL_MONSTER).toMatchObject({ id: 'mon-geol', life: 9, name: 'ジオル' });
     expect(GEOL_COLOR).toBe('#9A7B5C');
     expect(GEOL_GACHA_RARE).toEqual([geo(3), geo(5), geo(10), geo(14)]);
-    expect(GACHA_SERIES.some((s) => s.monsterId === GEOL_MONSTER_ID)).toBe(false);
+    // ガチャのシリーズ（2026-10-29 夜）：レア枠は JSON の gacha_slot と同じ。グラントに初めて勝ったあとに並ぶ
+    const series = GACHA_SERIES.find((s) => s.monsterId === GEOL_MONSTER_ID);
+    expect(series).toMatchObject({ id: 'geol', unlockFlag: GRANT_BEATEN_FLAG });
+    if (!series) throw new Error('series');
+    expect(seriesLineup(series).rareIds).toEqual(GEOL_GACHA_RARE);
     expect(BATTLE_CARDS[GEOL_MONSTER_ID]?.frame).toBe('geol');
     expect(existsSync('assets/images/ui/battlecard/frame_geol.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_geol.webp`)).toBe(true);
@@ -383,5 +389,31 @@ describe('ジオルの最終：前のセーブの仮ジオル（セーブ versio
     const s = normalizeSave(JSON.parse(JSON.stringify({ ...base, version: 22 })));
     expect(s?.collection).toEqual(base.collection);
     expect(s?.deck).toEqual(base.deck);
+  });
+});
+
+describe('ジオルのガチャのシリーズ（2026-10-29 夜）', () => {
+  it('グラントに初めて勝つまでは並ばず、勝つと並ぶ。前にグラントに勝っているセーブは読み込むと並ぶ', async () => {
+    const { availableGachaSeries } = await import('../src/data/economy.ts');
+    const { startRun, winRunBattle, runFloor } = await import('../src/game/dungeon/run.ts');
+    const base = createNewSave();
+    expect(availableGachaSeries(base.storyFlags).map((s) => s.id)).not.toContain('geol');
+    const s = startRun(base, 'dungeon-01', 77);
+    const run = s.dungeonRun;
+    if (!run) throw new Error('run');
+    const last = { ...run, floor: 3 };
+    const boss = runFloor(last).entities.find((e) => e.kind === 'boss');
+    if (!boss) throw new Error('boss');
+    const w = winRunBattle({ ...s, dungeonRun: last }, { kind: 'boss', id: boss.id }, null);
+    expect(w.save.storyFlags).toEqual([GRANT_BEATEN_FLAG]);
+    expect(availableGachaSeries(w.save.storyFlags).map((s) => s.id)).toContain('geol');
+    // 2回目に勝っても記録は1つだけ
+    const again = startRun(w.save, 'dungeon-01', 78);
+    const w2 = winRunBattle({ ...again, dungeonRun: { ...(again.dungeonRun as NonNullable<typeof again.dungeonRun>), floor: 3 } }, { kind: 'boss', id: boss.id }, null);
+    expect(w2.save.storyFlags).toEqual([GRANT_BEATEN_FLAG]);
+    // 前のセーブ：遺跡のボスに勝った記録があれば、読み込むと並ぶ
+    const old = normalizeSave(JSON.parse(JSON.stringify({ ...base, dungeons: { 'dungeon-01': { openedChests: [], bossDefeated: true, clears: 1 } } })));
+    expect(old?.storyFlags).toContain(GRANT_BEATEN_FLAG);
+    expect(normalizeSave(JSON.parse(JSON.stringify(base)))?.storyFlags).not.toContain(GRANT_BEATEN_FLAG);
   });
 });

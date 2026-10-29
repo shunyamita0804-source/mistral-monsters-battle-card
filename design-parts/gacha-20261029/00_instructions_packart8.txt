@@ -1,0 +1,30 @@
+ミスモンBC｜ガチャのパックを「パック専用の絵」に差し替え（2026-10-29）
+
+今のパック7つ（窓の中が正式モンスターカードの絵）を、パックのために新しく描いた絵に替えます。
+ユーザーの希望：パックは個性を出し、小さく並べてもすぐ分かるように、モンスターのアップ（全身は描かない）にする。
+デザイン担当が描いた8枚を、進行とユーザーが検品して合格にし、進行が型に入れて縁の色を付けた完成品です。描き直さないでください。
+型・縁の色の付け方・大きさは今のパックと同じです（935×1683。前の pack_tint.py と同じ作り方）。
+
+■ ZIP は3つ（どれにもこの指示書が入っている）
+Part1：完成のパック8枚 pack_{名前}.png（935×1683・透過）・ショップの商品 shop_pack_{名前}.png（120×210）と shop_card_{名前}.png（144×192）×8・一覧 packs8_review.jpg
+Part2・Part3：原本の窓の絵 pack_art_{名前}.png（1042×1826・不透明）8枚（Part2＝soramo・gauul・lazuck・nobiton、Part3＝myurol・kalshell・pukarim・geol）
+{名前}：soramo・gauul・lazuck・nobiton・myurol・kalshell・pukarim・geol
+
+■ 置き場所
+- 今の design-parts/gacha-20261029/art/ の7枚は、design-parts/gacha-20261029/art_cardart/ へ移して残す（前の版）
+- Part1 の pack_*.png 8枚 → design-parts/gacha-20261029/art/
+- Part1 の shop_*.png 16枚 → design-parts/gacha-20261029/shop/（上書き。shop_card は nobiton だけ少しきれいになった〔元の絵を大きいほうから作り直した〕。ほかの shop_card は前と同じ）
+- Part2・3 の pack_art_*.png 8枚 → design-parts/gacha-20261029/pack_art/（原本。ゲームでは使わない）
+
+■ やること
+1. python3 -I tools/design/gacha_series_build.py …（今と同じ使い方）でパック7つを作り直す。7つの画面（選ぶ・値段の確認・販売機・取り出し口・開ける）は今のまま新しい絵になるはず
+2. cardshop_v2.py（shop_goods_20261029.py）でショップの棚を作り直す
+3. ジオル（geol）の pack・shop は、ファイルを置くだけ。ジオルはまだゲームに出ていないので、PACKS・ショップの並びには足さない（ジオルの最終のときに足す）
+4. 開ける画面の破れる線（TEAR_AT 0.075）は型が同じなので変えなくてよいはず。念のため写真で確かめる
+
+■ やらないこと
+- 絵の描き直し・色の変更。パックの値段・確率・シリーズの開放の条件
+
+■ 終わったら
+npm run check → main に取り込んで公開 → 公開ページで写真（390×844）を撮って報告：
+シリーズを選ぶ画面（7つ）／プカリムのシリーズの機械と取り出し口と開ける画面／カードショップの棚（全体と近づいた所）

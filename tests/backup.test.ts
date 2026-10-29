@@ -29,6 +29,8 @@ function progressedSave(): SaveData {
     tournaments: { 'tournament-e': { entries: 2, wins: 1, firstWinClaimed: true } },
     claimedEntries: ['entry-1'],
     dungeons: { 'dungeon-01': { openedChests: ['chest-b2-a'], bossDefeated: true, clears: 1 } },
+    // 遺跡のボスに勝っているので、グラントに勝った記録もある（読み込むときに足すものと同じ）
+    storyFlags: ['grant-beaten'],
     fragments: ['fragment-01', 'fragment-05'],
     location: { mapId: 'shop', x: 4, y: 6, dir: 'up' },
     processedTransactions: ['purchase-1'],

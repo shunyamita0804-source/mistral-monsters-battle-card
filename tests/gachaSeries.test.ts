@@ -16,8 +16,8 @@ const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
-  it('7シリーズ（2026-10-29 にプカリム）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']);
+  it('8シリーズ（2026-10-29 にプカリム、夜にジオル）。どれも 150G・5枚', () => {
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -119,8 +119,8 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(r.save.coins).toBe(149);
   });
 
-  it('プカリム以外は最初から選べる（新しいセーブでも買える）', () => {
-    for (const series of GACHA_SERIES.filter((s) => s.id !== 'pukarim')) {
+  it('プカリム・ジオル以外は最初から選べる（新しいセーブでも買える）', () => {
+    for (const series of GACHA_SERIES.filter((s) => s.id !== 'pukarim' && s.id !== 'geol')) {
       const r = purchaseSeriesPack({ ...createNewSave(), coins: 150 }, series.id, `tx-${series.id}`, 3);
       expect(r.status).toBe('ok');
     }
