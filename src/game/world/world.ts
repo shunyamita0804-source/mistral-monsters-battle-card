@@ -47,21 +47,32 @@ export function isBlocked(map: MapDefinition, x: number, y: number, isVisible: (
   return objectsAt(map, x, y, isVisible).some((o) => o.type === 'enemy' || o.type === 'chest' || o.type === 'npc');
 }
 
-/**
- * 人のまわりのマス（2026-10-24 改訂R2 フェーズ1）。正式な絵の街・部屋では人の絵がマスよりずっと大きく、
- * となりのマスまで近づくと主人公と人の絵が大きく重なった（ユーザーの動画 V3）。人から radius マス以内（たて・よこ・ななめ）を通れないことにする
- */
-export function isNearNpc(map: MapDefinition, x: number, y: number, isVisible: (obj: MapObject) => boolean, radius: number): boolean {
-  if (radius <= 0) return false;
-  return map.objects.some((o) => o.type === 'npc' && isVisible(o) && Math.max(Math.abs(o.x - x), Math.abs(o.y - y)) <= radius);
+/** 人のまわりの範囲（マス）。数1つならたて・よこ同じ、{ x, y } ならよこ x マス・たて y マス */
+export type NpcReach = number | { readonly x: number; readonly y: number };
+
+/** (dx, dy) が範囲 r の中か */
+export function inReach(dx: number, dy: number, r: NpcReach): boolean {
+  const rx = typeof r === 'number' ? r : r.x;
+  const ry = typeof r === 'number' ? r : r.y;
+  return Math.abs(dx) <= rx && Math.abs(dy) <= ry;
 }
 
-/** p から range マス以内（たて・よこ・ななめ）にいる、いちばん近い人。同じ近さなら向いている方の人 */
+/**
+ * 人のまわりのマス（2026-10-24 改訂R2 フェーズ1）。正式な絵の街・部屋では人の絵がマスよりずっと大きく、
+ * となりのマスまで近づくと主人公と人の絵が大きく重なった（ユーザーの動画 V3）。人から radius マス以内（たて・よこ・ななめ）を通れないことにする。
+ * 2026-10-29 深夜（指示書 F）：人の絵の幅は約3マスあり、よこ1マスあけるだけでは横に並ぶと半分重なった。よことたてを別に決められる（NpcReach）
+ */
+export function isNearNpc(map: MapDefinition, x: number, y: number, isVisible: (obj: MapObject) => boolean, radius: NpcReach): boolean {
+  if (typeof radius === 'number' ? radius <= 0 : radius.x <= 0 && radius.y <= 0) return false;
+  return map.objects.some((o) => o.type === 'npc' && isVisible(o) && inReach(o.x - x, o.y - y, radius));
+}
+
+/** p から range の中（たて・よこ・ななめ）にいる、いちばん近い人。同じ近さなら向いている方の人 */
 export function nearestNpc(
   map: MapDefinition,
   p: Point,
   isVisible: (obj: MapObject) => boolean,
-  range: number,
+  range: NpcReach,
   facing?: Direction,
 ): NpcObject | null {
   let best: NpcObject | null = null;
@@ -70,8 +81,8 @@ export function nearestNpc(
     if (o.type !== 'npc' || !isVisible(o)) continue;
     const dx = o.x - p.x;
     const dy = o.y - p.y;
+    if (!inReach(dx, dy, range)) continue;
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
-    if (dist > range) continue;
     // 向いている方の人を少し優先（同じ近さのとき）
     const f = facing ? DIR_DELTA[facing] : { x: 0, y: 0 };
     const score = dist * 10 + Math.hypot(dx, dy) - (dx * f.x + dy * f.y > 0 ? 0.5 : 0);

@@ -31,6 +31,7 @@ import {
   DIR_DELTA,
   findPathCentered,
   findPathWhere,
+  inReach,
   isBlocked,
   isNearNpc,
   mapSize,
@@ -268,11 +269,13 @@ const STICK_HOLD = Math.PI / 4 + (8 * Math.PI) / 180;
 const TURN_IN_PLACE_MS = 220;
 /**
  * 人のまわり（2026-10-24 改訂R2 フェーズ1。ユーザーの動画 V3 で主人公と人の絵が大きく重なった）：
- * 正式な絵の街・部屋では、人から NPC_SPACE マス以内は通れない。話せるのは NPC_TALK_RANGE マス以内。
+ * 正式な絵の街・部屋では、人から NPC_SPACE（よこ・たて）マス以内は通れない。話せるのは NPC_TALK_RANGE マス以内。
  * 主人公が NPC_GAZE_RANGE マス以内に来ると、その人は主人公の方を向く（控えめな反応。離れると元の向きに戻る）
  */
-const NPC_SPACE = 1;
-const NPC_TALK_RANGE = 2;
+// 2026-10-29 深夜（指示書 F）：人の絵の幅は約3マス（街の人は高さ 約268 単位・幅 約95 単位）。よこ1マスだと横に並んだとき半分重なったので、
+// よこは2マス（3マス目で止まる＝絵の幅ぶん離れる）。たては今までどおり1マス（手前・奥に立つのは前後の重なりとして見える）
+const NPC_SPACE = { x: 2, y: 1 } as const;
+const NPC_TALK_RANGE = { x: 3, y: 2 } as const;
 const NPC_GAZE_RANGE = 3;
 /** 宝箱の絵（ミスモンの正式素材）：閉じた絵と、開く動きの4コマ（4コマ目が開いたあとの絵） */
 const CHEST_ART: Readonly<Record<ChestObject['look'], { readonly closed: string; readonly opening: readonly string[] }>> = {
@@ -1355,7 +1358,7 @@ export class WorldView {
       const target = this.#afterPath;
       if (target.type === 'npc' && this.#map.art) {
         this.#afterPath = null;
-        if (this.#nearNpc()?.id === target.id || Math.max(Math.abs(target.x - this.#tile.x), Math.abs(target.y - this.#tile.y)) <= NPC_TALK_RANGE) this.#talkTo(target);
+        if (this.#nearNpc()?.id === target.id || inReach(target.x - this.#tile.x, target.y - this.#tile.y, NPC_TALK_RANGE)) this.#talkTo(target);
         return;
       }
       const cell = adjacentCellOf(this.#afterPath, this.#tile);
@@ -1762,7 +1765,7 @@ export class WorldView {
     // 話せる範囲の人・となりの家具だけ、その場で話す・調べる（向きだけ変える）。移動はスティック（画面をなぞる）だけ
     if (this.#move) return;
     if (person && this.#map.art) {
-      if (Math.max(Math.abs(this.#tile.x - person.x), Math.abs(this.#tile.y - person.y)) > NPC_TALK_RANGE) return;
+      if (!inReach(this.#tile.x - person.x, this.#tile.y - person.y, NPC_TALK_RANGE)) return;
       // 押したことが分かるよう小さな音（ボタンと同じ音）
       sound.tap();
       this.#talkTo(person);
@@ -2168,8 +2171,8 @@ export class WorldView {
   #teacherFrontPath(): Point[] | null {
     const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
     if (!teacher) return null;
-    const near = (x: number, y: number): boolean => Math.max(Math.abs(teacher.x - x), Math.abs(teacher.y - y)) <= NPC_TALK_RANGE && x === teacher.x;
-    return findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ?? findPathWhere(this.#map, this.#tile, (x, y) => Math.max(Math.abs(teacher.x - x), Math.abs(teacher.y - y)) <= NPC_TALK_RANGE, this.#blocked, 40000, STEPS_4);
+    const near = (x: number, y: number): boolean => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE) && x === teacher.x;
+    return findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ?? findPathWhere(this.#map, this.#tile, (x, y) => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE), this.#blocked, 40000, STEPS_4);
   }
 
   #walkToTeacher(done: () => void): void {
