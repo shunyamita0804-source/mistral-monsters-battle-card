@@ -19,6 +19,7 @@ import homeMp3 from '@assets/audio/bgm/bgm_home.mp3';
 import houseMp3 from '@assets/audio/bgm/bgm_house.mp3';
 import neighborMp3 from '@assets/audio/bgm/bgm_neighbor.mp3';
 import bureauMp3 from '@assets/audio/bgm/bgm_bureau.mp3';
+import prologueMp3 from '@assets/audio/bgm/bgm_prologue.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -52,6 +53,7 @@ export type BgmId =
   | 'house'
   | 'neighbor'
   | 'bureau'
+  | 'prologue'
   | 'battle'
   | 'bossBattle';
 
@@ -59,6 +61,8 @@ interface BgmEntry {
   readonly src: string;
   /** 曲ごとの音量合わせ（ミスモンの曲は audio-registry.js と同じ値。ユーフルカの曲は測って合わせた。約 -18.5 LUFS にそろう） */
   readonly gain: number;
+  /** false：くり返さず1回だけ（プロローグ。2026-10-30） */
+  readonly loop?: false;
 }
 
 export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
@@ -104,6 +108,8 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   neighbor: { src: neighborMp3, gain: 1.07 },
   // カードバトラー管理局：白銀の城 / マニーラ（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供）
   bureau: { src: bureauMp3, gain: 0.51 },
+  // プロローグ（1回だけ。約12秒）：Shy Love / チョコミント（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供・指示書 M）
+  prologue: { src: prologueMp3, gain: 0.77, loop: false },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
@@ -208,12 +214,15 @@ class BgmPlayer {
     const id = this.#wanted;
     if (!id || !this.#unlocked || this.#volume <= 0 || this.#playing) return;
     const track = this.#takeTrack();
-    track.el.src = BGM_REGISTRY[id].src;
+    const entry = BGM_REGISTRY[id];
+    track.el.src = entry.src;
+    track.el.loop = entry.loop !== false;
     track.el.currentTime = 0;
     this.#playing = { id, track };
     this.#setLevel(track, 0, 0);
     void track.el.play().catch(() => undefined);
-    this.#setLevel(track, BGM_REGISTRY[id].gain * this.#volume, FADE_IN_S);
+    // 1回だけの曲は頭から聞こえるよう、すぐ大きくする
+    this.#setLevel(track, entry.gain * this.#volume, entry.loop === false ? 0.05 : FADE_IN_S);
   }
 
   #stop(fadeS: number): void {

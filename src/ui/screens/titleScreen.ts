@@ -20,12 +20,13 @@ export const titleScreen: ScreenDefinition = {
           element,
           t('title.confirmNew'),
           [h('p', { class: 'modal__text', text: t('title.confirmNewText') })],
-          () => ctx.navigate('newGame'),
+          () => ctx.navigate('prologue'),
           undefined,
           'warn',
         );
       } else {
-        ctx.navigate('newGame');
+        // 2026-10-30（指示書 M）：主人公を選ぶ前にプロローグ（src/ui/screens/prologueScreen.ts）
+        ctx.navigate('prologue');
       }
     };
     // ボタンの絵（2026-10-26 デザイン第11弾）：続きから＝金、最初から＝紺、設定＝小さな紺

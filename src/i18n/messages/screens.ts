@@ -20,6 +20,13 @@ export const SCREENS = {
 
   // 主人公の選択
   'newGame.title': { ja: '主人公の選択', en: 'Choose Your Hero' },
+  // プロローグ（2026-10-30 指示書 M。文はユーザー決定の物語の資料。英語は仮の訳）
+  'prologue.title': { ja: 'プロローグ', en: 'Prologue' },
+  'prologue.skip': { ja: 'スキップ', en: 'Skip' },
+  'prologue.1a': { ja: '人と聖獣が、ともに暮らす時代。', en: 'An age when people and sacred beasts live side by side.' },
+  'prologue.1b': { ja: '聖獣をモチーフにしたカードバトルは、\n世界中で人気を集めていた。', en: 'Card battles inspired by the sacred beasts\nwere loved all over the world.' },
+  'prologue.2a': { ja: 'これは、プロのカードバトラーを目指す\nひとりの若者の物語。', en: 'This is the story of a young person\nwho dreams of becoming a pro card battler.' },
+  'prologue.2b': { ja: '新しい冒険は、\nこの日から始まる――', en: 'A new adventure\nbegins on this day—' },
   'newGame.heading': { ja: '主人公を選んでください', en: 'Choose your hero' },
   'newGame.male': { ja: '男性', en: 'Man' },
   'newGame.female': { ja: '女性', en: 'Woman' },
@@ -160,8 +167,8 @@ export const SCREENS = {
   },
   'options.credits': { ja: '素材のクレジット', en: 'Credits' },
   'options.creditsText': {
-    ja: '効果音：OtoLogic（https://otologic.jp/）・効果音ラボ（https://soundeffect-lab.info/）\nBGM：「放浪者の街」「神獣の試練」「己と仲間を信じて」「Conflict」「月の廃墟」「古代エルフの聖域」「開かれし封印の扉」ユーフルカ（Wingless Seraph）・「セールストーク」「無心になれる作業」BGMer・「Battle - スタンバイフェイズ」lei（DOVA-SYNDROME）・「Bon Voyage!」HarumachiMusic（Pixabay）・「Spirits Forest」HydroGene\n「白銀の城」作曲：マニーラ\n「異世界へようこそ」作曲：蒲鉾さちこ\n音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/',
-    en: 'Sound effects: OtoLogic (https://otologic.jp/), Sound Effect Lab (https://soundeffect-lab.info/)\nMusic: "Hourousha no Machi", "Shinju no Shiren", "Onore to Nakama wo Shinjite", "Conflict", "Tsuki no Haikyo", "Kodai Elf no Seiiki", "Hirakareshi Fuuin no Tobira" by Yufuruka (Wingless Seraph), "Sales Talk", "Mushin ni Nareru Sagyou" by BGMer, "Battle - Standby Phase" by lei (DOVA-SYNDROME), "Bon Voyage!" by HarumachiMusic (Pixabay), "Spirits Forest" by HydroGene\n"Hakugin no Shiro" composed by Maniira\n"Isekai e Youkoso" composed by Kamaboko Sachiko\nMusic provided by OpenTracks (formerly DOVA-SYNDROME) https://opentracks.com/',
+    ja: '効果音：OtoLogic（https://otologic.jp/）・効果音ラボ（https://soundeffect-lab.info/）\nBGM：「放浪者の街」「神獣の試練」「己と仲間を信じて」「Conflict」「月の廃墟」「古代エルフの聖域」「開かれし封印の扉」ユーフルカ（Wingless Seraph）・「セールストーク」「無心になれる作業」BGMer・「Battle - スタンバイフェイズ」lei（DOVA-SYNDROME）・「Bon Voyage!」HarumachiMusic（Pixabay）・「Spirits Forest」HydroGene\n「白銀の城」作曲：マニーラ\n「異世界へようこそ」作曲：蒲鉾さちこ\n「Shy Love」作曲：チョコミント\n音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/',
+    en: 'Sound effects: OtoLogic (https://otologic.jp/), Sound Effect Lab (https://soundeffect-lab.info/)\nMusic: "Hourousha no Machi", "Shinju no Shiren", "Onore to Nakama wo Shinjite", "Conflict", "Tsuki no Haikyo", "Kodai Elf no Seiiki", "Hirakareshi Fuuin no Tobira" by Yufuruka (Wingless Seraph), "Sales Talk", "Mushin ni Nareru Sagyou" by BGMer, "Battle - Standby Phase" by lei (DOVA-SYNDROME), "Bon Voyage!" by HarumachiMusic (Pixabay), "Spirits Forest" by HydroGene\n"Hakugin no Shiro" composed by Maniira\n"Isekai e Youkoso" composed by Kamaboko Sachiko\n"Shy Love" composed by Chocomint\nMusic provided by OpenTracks (formerly DOVA-SYNDROME) https://opentracks.com/',
   },
   'options.battleLocked': { ja: '対戦中は言語を変えられません。', en: 'You cannot change the language during a battle.' },
 
