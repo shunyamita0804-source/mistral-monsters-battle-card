@@ -328,6 +328,10 @@ PROP_BLOCK = {
     'crate': (0.95, 80), 'banner': (0.5, 32), 'sign': (0.8, 40),
     'conifer_e': (0.35, 64), 'tree_e': (0.30, 64), 'bush_e': (0.9, 80),
 }
+# 2026-10-29 夜 iPhone の点検（指示書 D。docs/angle-audit-20261029.md）：ななめ上から見た角度・遠近で描かれていて、
+# 正面向きの街の中でななめ・下り坂に見える小物。新しい正面向きの絵（依頼文 docs/design-requests-20261030/）が届くまで置かない。
+# 置き場所は PROPS・道の飾りに残してある（絵が届いたら、ここから名前を外すだけで戻る）
+ANGLE_OFF = {'bench', 'bench_plaza', 'bench_side', 'crate', 'planter', 'drain'}
 STALLS = [((6, 181, 526, 844), 5240), ((539, 183, 1042, 849), 5600), ((1043, 183, 1536, 853), 5960)]
 STALL_BASE, STALL_S = 3880, 0.6
 
@@ -683,6 +687,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     t.paved |= ((xs[None, :] - PLAZA['cx']) ** 2 + (ys[:, None] - PLAZA['cy']) ** 2) <= PLAZA['r'] ** 2
     # 道の飾り（マンホール・排水口。地面に描く）
     for name, ux, uy in [('manhole', 3200, 2280), ('drain', 4300, 3220), ('drain', 2500, 3220), ('manhole', 3200, 4560), ('manhole', 3200, 5980)]:
+        if name in ANGLE_OFF:
+            continue
         src, box, s = PROP_PARTS[name]
         im = resize(cut(src, box), s * K)
         base.alpha_composite(im, (P(ux) - im.width // 2, P(uy) - im.height // 2))
@@ -1031,6 +1037,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     # ── 木・小物 ──
     cache: dict[str, Image.Image] = {}
     for name, ux, uy in PROPS + forest_edge(rng):
+        if name in ANGLE_OFF:
+            continue
         if name not in cache:
             src, box, s = PROP_PARTS[name]
             cache[name] = resize(cut(src, box), s * K)
@@ -1085,6 +1093,8 @@ def check_props(rects) -> None:
     """小物の置き方の点検（2026-10-29「ベンチや花を雑に置きすぎ」）：道の上にはみ出した物・ほかの小物と重なる物を書き出す（街灯は道のふちに置くので除く）"""
     boxes = []
     for name, ux, uy in PROPS:
+        if name in ANGLE_OFF:
+            continue
         src, box, sc = PROP_PARTS[name]
         w = (box[2] - box[0]) * sc * 0.8
         boxes.append((name, ux, uy, (ux - w / 2, uy - 60, ux + w / 2, uy)))
