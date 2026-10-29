@@ -305,9 +305,10 @@ const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   lab: 'lab',
   home: 'home',
   neighbor: 'neighbor',
-  'house-a': 'house',
+  // 花屋・仕立て屋（2026-10-29 新しい部屋）は民家と同じ
+  florist: 'house',
   'house-b': 'house',
-  'house-d': 'house',
+  tailor: 'house',
   'house-e': 'house',
 };
 /**
@@ -841,7 +842,7 @@ export class WorldView {
     WorldView.#preloaded = true;
     setTimeout(() => {
       const urls = new Set<string>();
-      for (const id of ['town', 'home', 'neighbor', 'shop', 'lab', 'hall', 'practice', 'house-a', 'bureau']) {
+      for (const id of ['town', 'home', 'neighbor', 'shop', 'lab', 'hall', 'practice', 'florist', 'tailor', 'bureau']) {
         const art = getMap(id)?.art;
         for (const img of [...(art?.tiles ?? []), ...(art?.sprites ?? [])]) urls.add(img.file);
         for (const loop of art?.loops ?? []) for (const f of loop.frames) urls.add(f);

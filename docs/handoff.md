@@ -6,7 +6,10 @@
 
 ### まず読む：いまの状態（2026-10-29 深夜のセッション終わり。⑦のあと）
 
-- **公開中：`main`（⑦ カードの効果の文まで）**。テスト 784件。**次の指示を待っている**
+- **公開中：`main`（⑧ 花屋・仕立て屋の新しい部屋まで）**。セーブ version 24
+- ⑧ 済み：花屋・仕立て屋の中を新しい部屋に（`florist`・`tailor`。記録 `docs/shop-rooms-20261029.md`・道具 `tools/design/rooms_shop_build.py`）
+- ⑨ 作業中：新モンスター「フルーネ」を正式に（ZIP `Mistral_Flune_Final_Part1・2`）
+- 届いたが指示の無いもの：`Mistral_Room_lab_v2_parts.zip`（研究所の部屋の描き直し）。まだ何もしていない
 - ⑦ 済み・**返事待ち**：カードに書く効果の文を短くした（36枚。記録 `docs/card-text-short-20261029.md`。表 `src/data/skillCardText.ts`）。報告 https://claude.ai/artifact/1qLDxip2CvnDj9nRWG2W8q
   （ユーザーの返事は「ありがとう」。合格かどうかはまだ聞いていない）
   - 短い文を足す・変えるとき：`skillCardText.ts` に1行（日本語）と `contentEnOfficialDraft.ts` の英語。決まりはそのファイルの先頭と記録の文書

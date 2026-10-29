@@ -1,0 +1,20 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "florist_shell.png",
+    "florist_01_counter.png",
+    "florist_02_flower_steps_left.png",
+    "florist_03_flower_steps_right.png",
+    "florist_04_plant_stand.png",
+    "florist_05_floor_plant_left.png",
+    "florist_06_floor_plant_right.png",
+    "florist_front.png"
+  ]
+}
