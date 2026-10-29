@@ -157,9 +157,11 @@ CURB_STONE = 30
 # 2026-10-29 iPhone の試遊「小川の石垣が斜めの段々で安っぽい」：斜めをやめて「まっすぐ＋直角の曲がり」に。
 # 西はピート・ハロルドの家の道の南（y 4840）、となりの家の東（x 2660）で直角に南へ曲がり、東は石の橋の下（y 5500）をまっすぐ。
 # 中心線は水平・垂直の線だけ（STREAM の点は順に、x か y のどちらかだけが変わる）
-STREAM = [(-300, 4840), (2660, 4840), (2660, 5500), (6700, 5500)]
+# 2026-10-29 点検の直し：石の橋の床（欄干の間）の下を小川が通るように、橋の西で南へ曲げて橋の床の下を通し、橋の東でもう一度南へ曲げる
+# （前は橋の西で南へ曲がり、橋の下の2本の塔の足もとを通っていた。橋は動かさない＝BRIDGE_STONE の bank）
+STREAM = [(-300, 4840), (2450, 4840), (2450, 5015), (3800, 5015), (3800, 5500), (6700, 5500)]
 STREAM_W = 240
-BRIDGE_STONE = dict(cx=3200, s=1.1)       # 石の橋：アーチの下の端を小川の下の岸に合わせる
+BRIDGE_STONE = dict(cx=3200, s=1.1, bank=5620)  # 石の橋：アーチの下の端（シートの y 905）を y＝bank に（前の小川の下の岸。2026-10-29 から小川とは別に決める）
 # 石の橋の手前（南）のアーチの面と水は使わない（2026-10-28 ユーザー「橋の下の水の上を歩いてしまう」）。
 # シートの y 518（デッキの南の端＝アーチの上のふち）より下は、左右の柱（x 895 より左・1265 より右）だけ残す。
 # そこから南は道（tile_street）がデッキにそのままつながる。小川は柱の左右に見える
@@ -198,7 +200,8 @@ PROPS = [
     ('conifer', 330, 3330),
     # 2026-10-29：小川をまっすぐにしたので、東の南側の木は小川の南へ
     ('tree_big', 5650, 5800), ('conifer', 5300, 5950),
-    ('tree_big', 3950, 6420), ('tree_mid', 4550, 6440), ('conifer', 5100, 6420), ('tree_big', 5700, 6440), ('tree_mid', 6150, 6200),
+    # 2026-10-29 点検の直し：公園（南東）のベンチ（3780, 5920）が手前の木に半分隠れていたので、木を東へ（前は 3950）
+    ('tree_big', 4260, 6430), ('tree_mid', 4550, 6440), ('conifer', 5100, 6420), ('tree_big', 5700, 6440), ('tree_mid', 6150, 6200),
     ('tree_mid', 4450, 1720), ('conifer', 6120, 760), ('tree_mid', 6110, 1500), ('conifer', 4400, 820),
     ('tree_mid', 4300, 5900), ('tree_big', 4800, 6050),
     ('conifer', 330, 4300),
@@ -228,9 +231,10 @@ PROPS = [
     ('lamp', 1250, 4690), ('lamp', 2700, 4700), ('planter', 4950, 4300), ('lamp', 3600, 4700),
     # 南の大通り（14 南の門のまえ・20 ★）
     # 2026-10-29：石の橋の南のはしの街灯2本は、橋の柱の街灯と重なって見えたので外した
-    ('sign', 2760, 6440), ('bench', 3850, 5920),
+    ('sign', 2760, 6440), ('bench', 3780, 5920),
     # 2026-10-29：東の道・商店街のはし（林の手前）の花壇。道がここで終わる理由になるように、道のはしにそろえて同じ間で
-    ('planter', 6040, 3130), ('planter', 6040, 3420), ('planter', 6040, 3700), ('planter', 6040, 3980),
+    # 2026-10-29 点検の直し：花壇の間に街灯も（「ここで道が終わり」が分かるように）。林の木はこの所だけ奥へ下げた（forest_edge の EAST_CLEAR）
+    ('planter', 6040, 3130), ('lamp', 6040, 3275), ('planter', 6040, 3420), ('lamp', 6040, 3560), ('planter', 6040, 3700), ('lamp', 6040, 3840), ('planter', 6040, 3980),
     # 西の高台の石垣の角（階段の右。上の段の石垣とのつなぎ目）を植え込みで
     ('bush_big', 2215, 1905),
     ('flowerbowl', 3700, 6120),
@@ -248,7 +252,8 @@ PROPS = [
     # 商店街の南
     ('flowerbowl', 5000, 4110), ('bench', 5300, 4130), ('lamp', 5600, 4020),
     # 東の南側（2026-10-29 並べ直し：小川の南の岸に沿って、ベンチと街灯を同じ間で交互に。23 ★のベンチもここ）
-    ('bench', 4000, 5150), ('lamp', 4350, 5110), ('bench', 4700, 5150), ('lamp', 5050, 5110), ('bench', 5400, 5150),
+    # 2026-10-29：小川が橋の東で南へ曲がる（x 3800）ので、いちばん西のベンチを少し東へ（前は 4000）
+    ('bench', 4100, 5150), ('lamp', 4350, 5110), ('bench', 4700, 5150), ('lamp', 5050, 5110), ('bench', 5400, 5150),
     ('bush_big', 4200, 6220), ('bush_small', 5100, 6230), ('flowerbowl', 5000, 5800),
     # となりの家と石の橋の間・主人公の家の西
     ('bush_big', 2420, 5450), ('bush_small', 470, 5420), ('flowerbowl', 570, 5760),
@@ -463,13 +468,17 @@ def _paste(base: Image.Image, im: Image.Image, xy: tuple[int, int]) -> None:
         base.alpha_composite(im.crop((l, t_, r, b)), (x + l, y + t_))
 
 
+# 2026-10-29 点検の直し：東の林の手前の列・植え込みを置かない y の範囲（花屋の右〜東の道・商店街のはし。木が花屋の窓・植木鉢にかぶさっていた）
+EAST_CLEAR = (2250, 4100)
+
+
 def forest_edge(rng: random.Random) -> list[tuple[str, float, float]]:
     """東西のはしの林のへり（2026-10-28 ユーザー「塀をやめて、木と植え込みをすき間なく並べる」）。
     奥の列・手前の列の木を互い違いに、その手前に植え込み。建物・見晴らし台・高台の石垣の前は手前の列を置かない"""
     out = []
     # 手前の列・植え込みを置かない y の範囲（西・東）
     # 2026-10-29：東の道・商店街のはしは花壇で終わるので、東の手前の列は道のはしでも置く（前は道の幅だけ空けていて、道が林の中へ入って見えた）
-    skip = {'w': [(1640, 1900), (1880, 2070)], 'e': []}
+    skip = {'w': [(1640, 1900), (1880, 2070)], 'e': [EAST_CLEAR]}
     for side in ('w', 'e'):
         def X(v: float) -> float:
             return v if side == 'w' else W - v
@@ -479,7 +488,9 @@ def forest_edge(rng: random.Random) -> list[tuple[str, float, float]]:
         for i, y in enumerate(range(540, 6470, 170)):
             yy = y + rng.randint(-20, 20)
             if not (1880 <= yy <= 2070 and side == 'w') and not (skip[side][-1][0] <= yy <= skip[side][-1][1]):
-                out.append(('conifer_e' if (i + (side == 'e')) % 2 else 'tree_e', X(95), yy))
+                # 花屋の右・東の道のはし（EAST_CLEAR）では、奥の列も林の奥へ下げる（花屋に1マス以上かからないように）
+                back = 55 if side == 'e' and EAST_CLEAR[0] <= yy <= EAST_CLEAR[1] else 95
+                out.append(('conifer_e' if (i + (side == 'e')) % 2 else 'tree_e', X(back), yy))
             fy = y + 85 + rng.randint(-15, 15)
             if fy < 6460 and not any(a <= fy <= b for a, b in skip[side]):
                 out.append(('tree_e' if (i + (side == 'e')) % 2 else 'conifer_e', X(245 + rng.randint(-20, 20)), fy))
@@ -576,13 +587,15 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     g[..., :3] *= (1 + 0.07 * big)[..., None]
     base = Image.fromarray(np.clip(g, 0, 255).astype(np.uint8))
     # 高台の上の草は少しだけ明るく（一段高い所に見えるように）
-    terr = mask_rects(size, [TERRACE_W, TERRACE_N])
+    # 2026-10-29：高台の東のふちの石の帯をやめたので、明るさの境目はぼかす（草の色が線にならないように）
+    terr = mask_rects(size, [TERRACE_W, TERRACE_N]).filter(ImageFilter.GaussianBlur(P(60)))
     bright = Image.fromarray(np.clip(np.array(base).astype(np.float32) * np.array([1.06, 1.06, 1.03, 1]), 0, 255).astype(np.uint8))
     base.paste(bright, (0, 0), terr)
 
     # ── 道・広場 ──
-    # 石の橋の下（デッキの北の端 〜 小川の南の岸）も道。小川を描いたあとで塗る（橋の柱の間に見える）
-    bridge_gap = (2944, 4880, 3456, 5660)
+    # 石の橋の下（デッキの南の端 〜 南の大通り）も道。小川を描いたあとで塗る（橋の柱の間に見える）。
+    # 2026-10-29：小川は橋の床の下を通るので、道はデッキの南の端（y 約 5190）より下だけ（小川の南の岸 5135 より下）
+    bridge_gap = (2944, 5150, 3456, 5660)
     rects = STREETS + door_paths()
     streets = mask_rects(size, rects)
     gap_mask = mask_rects(size, [bridge_gap])
@@ -693,7 +706,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
             v_run(a + hw, b + hw, x1 - hw, True)
             v_run(a - hw, b - hw, x1 + hw, False)
     pads = [cut('stream_parts', b) for b in [(910, 736, 1151, 939), (1174, 778, 1358, 930), (1385, 811, 1518, 922)]]
-    for ux in (700, 1150, 2250, 3900, 4700, 5300, 5900):
+    for ux in (700, 1150, 2250, 3500, 4300, 4700, 5300, 5900):
         im = resize(rng.choice(pads), 0.4 * K)
         base.alpha_composite(im, (P(ux) - im.width // 2, P(stream_y(ux) + rng.randint(-20, 40)) - im.height // 2))
     sblock = np.array(stream_mask(size, 60).resize((t.cols, t.rows), Image.BILINEAR)) > 40
@@ -710,7 +723,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     s = BRIDGE_STONE['s']
     bim = resize(br, s * K)
     # アーチの下の端（シートの y 905）を小川の下の岸に合わせる。橋の板（シートの x 880〜1260）を道の真ん中に
-    by = stream_y(BRIDGE_STONE['cx']) + STREAM_W / 2 - (905 - boy_) * s
+    by = BRIDGE_STONE['bank'] - (905 - boy_) * s
     bx = BRIDGE_STONE['cx'] - (1070 - box_) * s
     soft_shadow(base, bim, (P(bx), P(by)), 18, 10, 10, 60)
     base.alpha_composite(bim, (P(bx), P(by)))
@@ -769,7 +782,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
             y += bar.height - P(6)
 
     tw, tn = TERRACE_W, TERRACE_N
-    side(tn[2], tn[1], tn[3])
+    # 2026-10-29 点検の直し：北の高台の東のふち（大工の小屋の左。x 4300）の縦の細い石の帯は白い線に見えたので描かない（当たりも外した）
     # 2026-10-29 iPhone の試遊「高台の階段の横の壁の端に細い白い切れはし」：西の高台の東のふち（上の段の石垣の下〜西の石垣）の縦の帯は描かない。
     # つなぎ目は植え込み（PROPS の bush_big 2215,1905）で隠す。当たりは今までどおり
     # 西の高台の石垣は林のへりの手前で止める（はしは林の木で隠れる）
@@ -780,7 +793,6 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     # 当たり：壁の面と縦の辺。階段の段の所だけ通れる
     t.block_rect(tw[0], tw[3] - 20, tw[2] + 40, tw[3] + TERRACE_FACE)
     t.block_rect(tn[0], tn[3] - 20, tn[2], tn[3] + TERRACE_FACE)
-    t.block_rect(tn[2] - 30, tn[1], tn[2] + 40, tn[3] + TERRACE_FACE)
     t.block_rect(tw[2] - 30, tn[3], tw[2] + 40, tw[3] + TERRACE_FACE)
     t.block_rect(STAIRS_N['cx'] - 240, STAIRS_N['top'], STAIRS_N['cx'] + 240, STAIRS_N['top'] + big_stairs.height * STAIRS_N['s'] + 10, False)
     t.block_rect(STAIRS_W['cx'] - 90, STAIRS_W['top'], STAIRS_W['cx'] + 90, STAIRS_W['top'] + small_stairs.height * STAIRS_W['s'] + 10, False)

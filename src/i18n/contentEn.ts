@@ -179,9 +179,9 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:sign-fountain:message': 'The fountain in the middle of town. The sound of the water is soothing.',
   'object:door-neighbor:label': 'Neighbor\'s House',
   'object:door-lab:label': 'Card Lab',
-  'object:door-house-a:label': 'House',
+  'object:door-house-a:label': 'Florist',
   'object:door-house-b:label': 'House',
-  'object:door-house-d:label': 'House',
+  'object:door-house-d:label': 'Tailor',
   'object:door-house-e:label': 'House',
   // 家
   'object:home-bed:label': 'Bed',
