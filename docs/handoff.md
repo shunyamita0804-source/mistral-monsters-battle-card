@@ -6,8 +6,8 @@
 
 ### まず読む：いまの状態（2026-10-29 深夜 E〜G のセッション終わり）
 
-- **公開中：`main`（G まで）**。セーブ version 27。テスト 870件。**作業報告書の ZIP で報告ずみ・返事待ち**
-- A〜D はユーザー合格。作業ブランチ `claude/fixes-20261029-late` は main に取り込み済み。新しい作業は新しいブランチで
+- **公開中：`main`（G まで）**。セーブ version 27。テスト 870件。**次の指示を待っている**
+- A〜D・E〜G はユーザー合格（E〜G の返事は「OK」）。作業ブランチ `claude/fixes-20261029-late` は main に取り込み済み。新しい作業は新しいブランチで
 - このセッションでしたこと（ZIP「Mistral_Fixes_20261029_late」の指示書。どれも main・公開済み。記録 `docs/fixes-20261029-night.md` の「E〜G」）
   | # | 内容 |
   | --- | --- |
@@ -15,7 +15,17 @@
   | F | 人と主人公が横に並ぶと半分重なった → 人のまわりの通れない範囲をよこ2マス（たて1マス）、話せる範囲をよこ3マス（たて2マス）に（`worldScreen.ts` の `NPC_SPACE`・`NPC_TALK_RANGE`、`world.ts` の `inReach`） |
   | G | 部屋の家具は外さない（描き直しに決定。絵が届くまで今のまま）。部屋の依頼文は進行のチャットで決めてから（`docs/angle-audit-20261029.md` 3章） |
 - **未完了・判断待ち**：部屋の家具の描き直しの範囲（進行のチャット）・屋台・大工の小屋・石の橋・階段などの新しい絵（依頼文 `docs/design-requests-20261030/`）・iPhone 実機での確認
-- 公開のしかた：`gh` は使えない。GitHub の道具（MCP）の actions_run_trigger で `deploy-pages.yml` を main で動かす
+- 公開のしかた：`gh` は使えない（ログインできない）。`git fetch origin main && git checkout -B deploy-main origin/main && git merge --no-ff 作業ブランチ` → `git push origin deploy-main:main` →
+  GitHub の道具（MCP）の actions_run_trigger で `deploy-pages.yml` を main で動かす → 公開ページの `static/index-*.js` に変更が入ったかを curl で確かめる
+- 作業環境のこつ（このセッションで分かったこと）
+  - セッションを再開すると `vite preview` が止まっている。撮影の前に `npx vite preview --port 4173 --host 127.0.0.1` を起こし直す（`npm run check` で dist も作り直される）
+  - 街・部屋の作り直し（`python3 -I tools/design/seimon_world_build.py design-parts/seimon-world`）は約5分。待つときに `pgrep -f seimon_world_build` を until で使うと自分自身に当たって終わらない（`run_in_background` の終わりの知らせを待つ）
+  - カードショップの家具の絵だけなら `python3 -I -c "import sys; sys.path.insert(0,'tools/design'); import cardshop_v2; cardshop_v2.build_shop_room()"` で速い（当たり・位置を変えたら全部の作り直しが要る）
+  - 撮影用のセーブ：`tests/zz-*.test.ts` で `createNewSave` を JSON に書き出す（`player.name` を入れないと名前の入力で止まる・`story.intro: 'skipped'`・`introV2: LEGACY_INTRO_V2`）。
+    v26 のままのセーブを読むと v27 の変換でガチャの NEW が消えるので、NEW を撮るときは `version: 27` にする
+  - 写真：街・部屋 `tools/e2e/town_shot.cjs`（keys で歩かせる・`qa` と `qs:"&hit=1"` で当たり）、ピート `tools/e2e/pete_shot.cjs`（勝負の前のひと言も撮る）、ガチャ `tools/e2e/gacha_shot.cjs`（`g-03-landed` が取り出し口）
+  - 外した街の小物は `town2026_build.py` の `ANGLE_OFF`。新しい絵が届いたら `PROP_PARTS` を替えて名前を外すだけで、もとの置き場所に戻る（使わなくなった `t2_bench*.webp` などは消した。作り直しでまたできる）
+  - 報告の写真・ZIP はスクラッチに作った（git に入れない・新しいセッションには無い）
 
 ### その前（2026-10-29 夜 A〜D のセッション終わり）
 
