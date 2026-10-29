@@ -1,0 +1,24 @@
+{
+ "games": 200,
+ "monsters": [
+  "mon-lazuck",
+  "mon-tmp-flune",
+  "mon-soramo"
+ ],
+ "lifeScale": 0.85,
+ "booster-1": {
+  "wins": 28,
+  "losses": 172,
+  "draws": 0
+ },
+ "booster-2": {
+  "wins": 16,
+  "losses": 184,
+  "draws": 0
+ },
+ "booster-3": {
+  "wins": 30,
+  "losses": 170,
+  "draws": 0
+ }
+}

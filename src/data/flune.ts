@@ -107,3 +107,12 @@ export const FLUNE_SKILLS: readonly SkillCard[] = FLUNE_ROWS.map(toSkill);
 
 /** ガチャのレアの枠（JSON の gacha_slot が「レア」：09 フラワードレイン） */
 export const FLUNE_GACHA_RARE: readonly string[] = FLUNE_ROWS.filter((r) => r.gacha_slot === 'レア').map((r) => r.id);
+
+/**
+ * 【試遊用・Claude の仮】フルーネの16枚（2026-10-29 追加の指示「自動の試遊の表だけ出す」。初期配布はまだ無いので、試遊のデッキの入れ替えにだけ使う。山札60枚に合わせる）。
+ * ジオルの試遊（GEOL_PLAYTEST_16）と同じ割り合い：攻撃11（つたはたき2・ねっこづき1・ねっこムチ2・ねっこラッシュ1・たねとばし1・はなびらシュート1・かふん1・
+ * はなびらストーム1・フラワードレイン1）、特殊2（いやしのみつ2）、守り3（はっぱのたて1・はなびらのまく1・つるのかべ1）。はっぱにかくれるは入れない
+ */
+export const FLUNE_PLAYTEST_16: readonly { readonly id: string; readonly copies: number }[] = [
+  [1, 2], [2, 1], [3, 2], [4, 1], [5, 1], [6, 1], [7, 1], [8, 1], [9, 1], [10, 2], [11, 1], [12, 1], [13, 1],
+].map(([no, copies]) => ({ id: fluneSkillId(no as number), copies: copies as number }));
