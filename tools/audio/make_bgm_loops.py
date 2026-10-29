@@ -8,7 +8,7 @@
 - MP3（128kbps・ステレオ）。どのブラウザでも鳴る
 - 音量はファイルでは変えない（ゲームの BGM_REGISTRY の gain で合わせる）
 - 2026-10-26 から town・tournament_battle・battle・boss_battle はユーフルカの曲（make_bgm_loops_wingless.py）。
-  このスクリプトをそのまま流すとミスモンの曲で上書きするので、残りの3曲（title・tournament・dungeon）だけを作るときは TRACKS を絞る
+  このスクリプトをそのまま流すとミスモンの曲で上書きするので、残りの3曲（departure・tournament・dungeon）だけを作るときは TRACKS を絞る
 """
 import os
 import subprocess
@@ -19,7 +19,8 @@ import numpy as np
 SR = 44100
 # id: (元ファイル, ループの始め, ループの終わり（None＝最後まで）, つなぎの秒数)
 TRACKS = {
-    'title': ('licensed_20261007/06_prologue_departure.ogg', 0.3, None, 1.5),
+    # 2026-10-30：タイトルは「異世界へようこそ」（make_bgm_loops_bgmer.py）に替えたので、この曲は bgm_departure.mp3（主人公を選ぶ場面の候補）
+    'departure': ('licensed_20261007/06_prologue_departure.ogg', 0.3, None, 1.5),
     'town': ('licensed_20261008/town_bouken_e_no_izanai.ogg', 0.0, 178.6, 1.2),
     'tournament': ('licensed_20261007/08_tournament_table_start17s.ogg', 17.0, 135.2, 1.0),
     'tournament_battle': ('licensed_20261007/14_official_rank_battle.ogg', 0.0, 233.4, 0.5),

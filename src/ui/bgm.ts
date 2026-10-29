@@ -18,6 +18,7 @@ import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
 import homeMp3 from '@assets/audio/bgm/bgm_home.mp3';
 import houseMp3 from '@assets/audio/bgm/bgm_house.mp3';
 import neighborMp3 from '@assets/audio/bgm/bgm_neighbor.mp3';
+import bureauMp3 from '@assets/audio/bgm/bgm_bureau.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -50,6 +51,7 @@ export type BgmId =
   | 'home'
   | 'house'
   | 'neighbor'
+  | 'bureau'
   | 'battle'
   | 'bossBattle';
 
@@ -60,8 +62,9 @@ interface BgmEntry {
 }
 
 export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
-  // タイトル：Bon Voyage! / HarumachiMusic（Pixabay）
-  title: { src: titleMp3, gain: 0.68 },
+  // タイトル：異世界へようこそ / 蒲鉾さちこ（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供）。
+  // 前のタイトル曲（Bon Voyage! / HarumachiMusic・gain 0.68）は bgm_departure.mp3 に残した（主人公を選ぶ場面の候補。まだ鳴らさない）
+  title: { src: titleMp3, gain: 1.2 },
   // 街・部屋：放浪者の街 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   town: { src: townMp3, gain: 0.39 },
   // 大会の受付：Battle - スタンバイフェイズ / lei（DOVA-SYNDROME）
@@ -99,6 +102,8 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   house: { src: houseMp3, gain: 0.72 },
   // 案内人（となりの家の女性）の家
   neighbor: { src: neighborMp3, gain: 1.07 },
+  // カードバトラー管理局：白銀の城 / マニーラ（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供）
+  bureau: { src: bureauMp3, gain: 0.51 },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）

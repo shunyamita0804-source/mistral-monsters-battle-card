@@ -59,7 +59,7 @@
 
 | 場面（BGM_REGISTRY） | ファイル | 曲名 / 作者 | 出典 | 本編のファイル |
 | --- | --- | --- | --- | --- |
-| `title`：タイトル | bgm_title.mp3 | Bon Voyage! / HarumachiMusic | Pixabay | licensed_20261007/06_prologue_departure.ogg |
+| `title`：タイトル（2026-10-30 から bgm_departure.mp3。下の「2026-10-30 追加の3曲」） | bgm_title.mp3 | Bon Voyage! / HarumachiMusic | Pixabay | licensed_20261007/06_prologue_departure.ogg |
 | `tournament`：大会の受付 | bgm_tournament.mp3 | Battle - スタンバイフェイズ / lei | DOVA-SYNDROME | licensed_20261007/08_tournament_table_start17s.ogg（17秒から） |
 | `dungeon`：ダンジョンの探索 | bgm_dungeon.mp3 | Spirits Forest / HydroGene（CC0） | itch.io | hydrogene_16bit_rpg/07_spirits_forest_full.ogg（前奏を除いたループ部） |
 
@@ -131,6 +131,23 @@ gain は約 -18.5 LUFS にそろえるための値（入れるときにそのま
 | `home`：主人公の家 | bgm_home.mp3 | 1cabd91a-______BGM.mp3（65.8 秒） | 2.75〜46.41 秒 |
 | `house`：住人の家（民家A〜E 共通） | bgm_house.mp3 | c25c0923-_____BGM.mp3（127.6 秒） | 4.65〜112.65 秒 |
 | `neighbor`：案内人（となりの家）の家 | bgm_neighbor.mp3 | 1e2adb29-_____BGM.mp3（145.9 秒） | 2.80〜115.69 秒 |
+
+### 2026-10-30 追加の3曲（タイトル・カードバトラー管理局・プロローグ。指示書 I）
+
+ユーザー提供の MP3 3つ。3曲とも **OpenTracks（旧 DOVA-SYNDROME）のフリー素材**で、ゲームで使えることはユーザーが確認済み。
+クレジット（ユーザー確定）：「白銀の城」作曲：マニーラ／「異世界へようこそ」作曲：蒲鉾さちこ／「Shy Love」作曲：チョコミント／音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/
+ゲームのクレジット（設定 → 素材のクレジット）には、鳴らしている2曲（白銀の城・異世界へようこそ）と OpenTracks を出した。「Shy Love」はプロローグで鳴らすようになってから足す。
+元のファイルはリポジトリに入れていない（作り直すときはユーザーから受け取った ZIP「Mistral_Parts_BGM_Panel_ClaudeCode_20261030」の bgm_*_source.mp3 を使う）。
+音量（LUFS）は ffmpeg の ebur128 で測った。gain は約 -18.5 LUFS にそろえる値。
+
+| 場面（BGM_REGISTRY） | ファイル | 曲名 / 作曲 | 届いたファイル | ループ・切り方 | 測った音量 → gain |
+| --- | --- | --- | --- | --- | --- |
+| `title`：タイトル | bgm_title.mp3 | 異世界へようこそ / 蒲鉾さちこ | bgm_title_source.mp3（68.9 秒・約 56 秒からフェードアウト） | 0.40〜41.47 秒（テンポ 約94 の 16 小節・41.1 秒）。`find_loop.py` で探し `make_bgm_loops_bgmer.py` で切り出し | -20.1 LUFS → 1.2 |
+| `bureau`：カードバトラー管理局（前は街の曲） | bgm_bureau.mp3 | 白銀の城 / マニーラ | bgm_bureau_source.mp3（83.7 秒・128kbps） | 6.85〜64.72 秒（57.9 秒）。曲の終わりは最後の音が約 1.4 秒かけて消える形で、頭へはそのままつながらないので `find_loop.py` で探した | -12.7 LUFS → 0.51 |
+| （まだ鳴らさない）プロローグ | bgm_prologue.mp3 | Shy Love / チョコミント | bgm_prologue_source.mp3（13.0 秒） | 最後の無音だけ切った（12.45 秒まで。音は形式を変えずにそのまま切り出し・320kbps）。ループしない・1回だけ流す予定 | -16.2 LUFS → 0.77（入れるときに使う） |
+
+- 前のタイトル曲（Bon Voyage! / HarumachiMusic）は `bgm_departure.mp3` に名前を変えて残した（主人公を選ぶ場面で使う候補。まだ鳴らさない。gain は前と同じ 0.68 で約 -18.5 LUFS）
+- 英語の曲名・作曲者名はローマ字の仮表記（Hakugin no Shiro / Maniira・Isekai e Youkoso / Kamaboko Sachiko）
 
 ## ミスモンの画像（2026-10-22 追加）
 
