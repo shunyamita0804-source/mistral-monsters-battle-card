@@ -94,6 +94,8 @@ export interface InteractObject extends Rect {
   readonly label: string;
   readonly action: InteractAction;
   readonly message?: string;
+  /** 名前の札を出す高さのずれ（マス。負なら上へ）。調べる範囲より上に名札を出したい大きな家具（販売機など） */
+  readonly labelDy?: number;
 }
 
 export interface WarpObject extends Rect {
@@ -380,10 +382,13 @@ const SHOP_ART = artOf('shop');
  * 話しかけるマスに立たせるとカウンターに隠れて頭しか見えない）
  */
 const SHOP_CLERK_DRAW_DY = -4;
+/** 販売機の名札：調べる範囲の上のはし（絵の y 420＝16 マス目）から、機械の屋根の下（7 マス目＝絵の y 約 180）へ */
+const SHOP_GACHA_LABEL_DY = -9;
 /** カードショップ。主役はカードの購入（店員のカウンター）とカードパックの販売機（いまのガチャ。カプセルではない） */
 export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'interior', SHOP_ART, [
   interactAt('shop-counter', itemOf(SHOP_ART, 'COUNTER'), 'カウンター', 'shopClerk'),
-  interactAt('shop-gacha', itemOf(SHOP_ART, 'PACK_MACHINE'), 'カードパック販売機', 'gacha'),
+  // 2026-10-29 夜 iPhone「主人公が名札と機械の間に挟まる」：名札は機械の上（屋根の下・絵の y 約 180）に出す
+  { ...interactAt('shop-gacha', itemOf(SHOP_ART, 'PACK_MACHINE'), 'カードパック販売機', 'gacha'), labelDy: SHOP_GACHA_LABEL_DY },
   interactAt('shop-shelf', itemOf(SHOP_ART, 'SHELF_WALL'), '商品棚', 'message', 'カードとパックがきれいに並んでいる。'),
   interactAt('shop-case-l', itemOf(SHOP_ART, 'CASE_L'), 'ショーケース', 'message', '珍しいカードが飾ってある。'),
   interactAt('shop-case-r', itemOf(SHOP_ART, 'CASE_R'), 'ショーケース', 'message', '珍しいカードが飾ってある。'),

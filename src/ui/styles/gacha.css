@@ -70,6 +70,7 @@
 }
 
 .gacha-select__tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -111,6 +112,23 @@
 }
 
 /* 1回目：光って少し浮く（同じパックをもう1回で決定） */
+/* 新しく並んだパックの印（一度選ぶと消える。2026-10-29 夜） */
+.gacha-select__new {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #d9483b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+}
+
 .gacha-select__tile.is-picked {
   outline: 2px solid #ffe48a;
   background: rgb(255 228 138 / 0.18);
@@ -488,7 +506,9 @@
   pointer-events: none;
 }
 
-/* 出てきたパック：床に寝た形（奥へ倒した遠近）で、奥から手前へすべり出て、手前のふちからはみ出して止まる */
+/* 出てきたパック：床に寝た形（奥へ倒した遠近）で、奥から手前へすべり出て、受け皿の床の上に止まる。
+   2026-10-29 夜 iPhone「受け皿からはみ出し、手前の金の棒がパックの真ん中を横切る」：受け皿の床（寄った絵の y 530〜720・左右の柱のあいだ）に収まる大きさにし、
+   手前のふちを金の棒（y 約 700〜860）の上のふちのすぐ奥に置く（棒の後ろに寝かせる。手前のふちが少し棒に隠れる） */
 .gacha-machine__out {
   position: absolute;
   inset: 0;
@@ -502,12 +522,12 @@
 
 .gacha-machine__lie {
   position: absolute;
-  left: 27%;
-  bottom: 6%;
-  width: 46%;
+  left: 34%;
+  bottom: 32%;
+  width: 32%;
   aspect-ratio: 600 / 1080;
   transform-origin: 50% 100%;
-  transform: rotateX(62deg) translateY(-62%);
+  transform: rotateX(74deg) translateY(-40%);
   opacity: 0;
 }
 
@@ -522,16 +542,16 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(rgb(0 0 0 / 0.65) 0%, rgb(0 0 0 / 0.15) 30%, transparent 50%);
+  background: linear-gradient(rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.12) 30%, transparent 50%);
   pointer-events: none;
 }
 
 .gacha-machine__out-shadow {
   position: absolute;
-  left: 26%;
-  bottom: 4%;
-  width: 48%;
-  height: 8%;
+  left: 32%;
+  bottom: 31%;
+  width: 36%;
+  height: 5%;
   border-radius: 50%;
   background: radial-gradient(rgb(0 0 0 / 0.5), transparent 70%);
   opacity: 0;
@@ -548,12 +568,12 @@
 @keyframes gacha-slide-out {
   0% {
     opacity: 1;
-    transform: rotateX(62deg) translateY(-62%);
+    transform: rotateX(74deg) translateY(-40%);
   }
 
   100% {
     opacity: 1;
-    transform: rotateX(62deg) translateY(0);
+    transform: rotateX(74deg) translateY(0);
   }
 }
 
@@ -575,7 +595,7 @@
 .gacha-machine__stage.is-landed .gacha-machine__lie {
   animation: none;
   opacity: 1;
-  transform: rotateX(62deg) translateY(0);
+  transform: rotateX(74deg) translateY(0);
 }
 
 .gacha-machine__stage.is-landed .gacha-machine__lie-art {

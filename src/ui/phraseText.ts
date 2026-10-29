@@ -12,12 +12,37 @@ import { h } from './dom.ts';
 let parser: Parser | undefined;
 const JA = /[぀-ヿ㐀-鿿＀-￯]/;
 
+/**
+ * 途中で区切らない語（2026-10-29 夜 ユーザー：BudouX の結果に関係なく、この語の中では改行しない）。
+ * 「ちから｜技」のように、技の種類の名前の途中で改行されていた（ウェーブダンス・星影ステップ・高速飛行の大きなカード）
+ */
+export const KEEP_WORDS: readonly string[] = ['ちから技', 'かしこさ技'];
+
+/** 区切りの位置のうち、KEEP_WORDS の語の中にあるものを消す（となりの文節とつなげる） */
+function keepWords(line: string, parts: string[]): string[] {
+  const inside = new Set<number>();
+  for (const w of KEEP_WORDS) {
+    for (let i = line.indexOf(w); i >= 0; i = line.indexOf(w, i + 1)) {
+      for (let k = i + 1; k < i + w.length; k += 1) inside.add(k);
+    }
+  }
+  if (inside.size === 0) return parts;
+  const out: string[] = [];
+  let at = 0;
+  for (const p of parts) {
+    if (out.length > 0 && inside.has(at)) out[out.length - 1] += p;
+    else out.push(p);
+    at += p.length;
+  }
+  return out;
+}
+
 /** 文を文節に区切る（日本語の字のない行はそのまま1つ） */
 export function phrases(text: string): string[] {
   if (!JA.test(text)) return [text];
   parser ??= new Parser(jaModel);
   return text.split('\n').flatMap((line, i) => {
-    const parts = JA.test(line) ? parser!.parse(line) : [line];
+    const parts = JA.test(line) ? keepWords(line, parser!.parse(line)) : [line];
     return i === 0 ? parts : ['\n', ...parts];
   });
 }

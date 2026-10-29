@@ -78,6 +78,12 @@ CARD_SLOTS = {
     ]),
 }
 
+# 2026-10-29 夜 iPhone「手前の額のカード（カルシェル・プカリム）が横に引きのばされている」：額は正方形に近いので、
+# 四すみいっぱいに合わせると横にのびる。カードの縦横の比（CARD_ASPECT。ガラスの展示台の置き場所と同じ 0.7）より横長の置き場所は、
+# 上下はそのままに、上の辺・下の辺をそれぞれ真ん中へ縮めた台形に置く（額の左右には元の紺の板が見える）。
+# 小さな箱（card）・細長い箱（pack）も、縦横の比を変えずに箱の中に収める（あまりは元の箱の色）
+CARD_ASPECT = 0.7
+
 _cache: dict[str, Image.Image] = {}
 
 
@@ -199,20 +205,43 @@ def _bluish(a: np.ndarray) -> np.ndarray:
     return ndimage.binary_fill_holes(m)
 
 
+def _fit_quad(pts: list[tuple[int, int]]) -> list[tuple[float, float]]:
+    """置き場所の四すみ（左上・右上・右下・左下）が CARD_ASPECT より横長なら、上の辺・下の辺を真ん中へ縮める"""
+    p = [np.array(q, float) for q in pts]
+    w = (np.linalg.norm(p[1] - p[0]) + np.linalg.norm(p[2] - p[3])) / 2
+    h = (np.linalg.norm(p[3] - p[0]) + np.linalg.norm(p[2] - p[1])) / 2
+    f = min(1.0, CARD_ASPECT * h / w)
+    out = []
+    for a, b in ((p[0], p[1]), (p[3], p[2])):
+        m = (a + b) / 2
+        out.append((m + (a - m) * f, m + (b - m) * f))
+    (tl, tr), (bl, br) = out
+    return [tuple(tl), tuple(tr), tuple(br), tuple(bl)]
+
+
+def _fit_box(src: Image.Image, x1: int, y1: int, x2: int, y2: int) -> tuple[Image.Image, int, int, list[tuple[int, int]]]:
+    """箱（x1, y1, x2, y2）の中に、縦横の比を変えずに収める（真ん中に置く）。絵・左上・描く範囲を返す"""
+    bw, bh = x2 - x1 + 2, y2 - y1 + 2
+    k = min(bw / src.width, bh / src.height)
+    pw, ph = max(1, round(src.width * k)), max(1, round(src.height * k))
+    px, py = x1 - 1 + (bw - pw) // 2, y1 - 1 + (bh - ph) // 2
+    return src.resize((pw, ph), Image.LANCZOS), px, py, _r(px, py, px + pw, py + ph)
+
+
 def _card_slots(a: np.ndarray, out: np.ndarray, cfg: dict, cyc: _Cycle) -> None:
     h, w = a.shape[:2]
     blue = _bluish(a)
     for kind, pts in cfg['slots']:
         if kind == 'quad':
             card = _dim(_product('card', cyc.next()), cfg['light'])
-            coeffs = _persp_coeffs(_card_corners(card), [(float(x), float(y)) for x, y in pts])
+            fit = _fit_quad(pts)
+            coeffs = _persp_coeffs(_card_corners(card), fit)
             piece, x0, y0 = card.transform((w, h), Image.PERSPECTIVE, coeffs, resample=Image.BICUBIC), 0, 0
-            poly = pts
+            poly = [(round(x), round(y)) for x, y in fit]
         else:
             x1, y1, x2, y2 = pts
             src = _product('card' if kind == 'card' else 'pack', cyc.next())
-            piece, x0, y0 = _dim(src, cfg['light']).resize((x2 - x1 + 2, y2 - y1 + 2), Image.LANCZOS), x1 - 1, y1 - 1
-            poly = _r(x1, y1, x2, y2)
+            piece, x0, y0, poly = _fit_box(_dim(src, cfg['light']), x1, y1, x2, y2)
         area = Image.new('L', (w, h), 0)
         ImageDraw.Draw(area).polygon(poly, fill=255)
         inside = np.array(area) > 0 if cfg.get('whole') else ndimage.binary_dilation(np.array(area) > 0, iterations=2)

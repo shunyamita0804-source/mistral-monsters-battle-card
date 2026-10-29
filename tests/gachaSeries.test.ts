@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
-import { availableGachaSeries, GACHA, GACHA_SERIES } from '../src/data/economy.ts';
+import { availableGachaSeries, GACHA, GACHA_SERIES, gachaSeenFlag, isNewGachaSeries } from '../src/data/economy.ts';
 import {
   canReselectSeries,
   drawSeriesPack,
+  markGachaSeriesSeen,
   purchaseSeriesPack,
   seriesLineup,
   seriesOwned,
   tierOf,
 } from '../src/game/economy/gachaSeries.ts';
-import { createNewSave } from '../src/game/save/saveData.ts';
+import { createNewSave, normalizeSave, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { PETE_BEATEN_FLAG } from '../src/game/story/pete.ts';
 
 const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
@@ -157,5 +158,42 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(seriesOwned(save, SORAMO)).toEqual({ owned: 0, total: 15 });
     const some = { ...save, collection: { [lineup.skillIds[0] ?? '']: 3, [lineup.monsterId]: 1 } };
     expect(seriesOwned(some, SORAMO)).toEqual({ owned: 2, total: 15 });
+  });
+});
+
+describe('新しく並んだシリーズの NEW の印（2026-10-29 夜）', () => {
+  const PUKARIM = GACHA_SERIES.find((s) => s.id === 'pukarim');
+  if (!PUKARIM) throw new Error('pukarim');
+
+  it('並んだばかりのシリーズだけ NEW。最初から並ぶシリーズ・まだ並ばないシリーズには出さない', () => {
+    expect(isNewGachaSeries([PETE_BEATEN_FLAG], PUKARIM)).toBe(true);
+    expect(isNewGachaSeries([], PUKARIM)).toBe(false);
+    expect(isNewGachaSeries([PETE_BEATEN_FLAG], SORAMO)).toBe(false);
+  });
+
+  it('一度選ぶと消える（記録は1回だけ付く）', () => {
+    const save = { ...createNewSave(), storyFlags: [PETE_BEATEN_FLAG] };
+    const seen = markGachaSeriesSeen(save, PUKARIM);
+    expect(seen.storyFlags).toEqual([PETE_BEATEN_FLAG, gachaSeenFlag('pukarim')]);
+    expect(isNewGachaSeries(seen.storyFlags, PUKARIM)).toBe(false);
+    expect(markGachaSeriesSeen(seen, PUKARIM)).toBe(seen);
+  });
+
+  it('前のセーブ（v26）で、もう並んでいるシリーズは選んだことにする（ボスのダンジョンのクリアで並ぶものも）', () => {
+    const base = createNewSave();
+    const old = {
+      ...base,
+      version: 26,
+      storyFlags: [PETE_BEATEN_FLAG],
+      dungeons: { ...base.dungeons, 'dungeon-03': { ...(base.dungeons['dungeon-03'] ?? {}), bossDefeated: true } },
+    };
+    const s = normalizeSave(JSON.parse(JSON.stringify(old)));
+    if (!s) throw new Error('load');
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.storyFlags).toContain(gachaSeenFlag('pukarim'));
+    expect(s.storyFlags).toContain(gachaSeenFlag('serephine'));
+    expect(s.storyFlags).not.toContain(gachaSeenFlag('geol'));
+    expect(s.storyFlags).not.toContain(gachaSeenFlag('flune'));
+    for (const g of GACHA_SERIES) expect(isNewGachaSeries(s.storyFlags, g)).toBe(false);
   });
 });

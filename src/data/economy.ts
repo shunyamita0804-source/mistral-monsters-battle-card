@@ -154,6 +154,17 @@ export function availableGachaSeries(storyFlags: readonly string[]): readonly Ga
   return GACHA_SERIES.filter((s) => !s.unlockFlag || storyFlags.includes(s.unlockFlag));
 }
 
+/**
+ * 新しく並んだシリーズの「NEW」の印（2026-10-29 夜 ユーザー）：一度選ぶ（1回タップ）と、この記録（storyFlags）を付けて消す。
+ * 最初から並ぶシリーズには出さない（unlockFlag のあるシリーズだけ）
+ */
+export const gachaSeenFlag = (seriesId: string): string => `gacha-seen-${seriesId}`;
+
+/** NEW の印を出すシリーズか（並んでいて、まだ一度も選んでいない） */
+export function isNewGachaSeries(storyFlags: readonly string[], series: GachaSeries): boolean {
+  return !!series.unlockFlag && storyFlags.includes(series.unlockFlag) && !storyFlags.includes(gachaSeenFlag(series.id));
+}
+
 export function getGachaSeries(id: string): GachaSeries | undefined {
   return GACHA_SERIES.find((s) => s.id === id);
 }
