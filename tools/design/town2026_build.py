@@ -146,7 +146,10 @@ STREETS = [
     (900, 5930, 2944, 6170),      # 主人公の家・となりの家の前（主人公の家の扉の前で終わる）
     (2420, 1330, 3980, 1560),     # 大会会場の前（高台の上。建物の幅だけ）
     (1050, 1560, 2060, 1830),     # 研究所の扉の前 → 西の高台の階段（高台の上。2026-10-29：階段の幅いっぱい・階段の上の端まで）
-    (1535, 4990, 1695, 5930),     # 木の橋 → 主人公の家・となりの家の前の道（2026-10-28 点検。橋の先の行き止まりをなくす）
+    # 木の橋 → 主人公の家・となりの家の前の道（2026-10-28 点検。橋の先の行き止まりをなくす）。
+    # 2026-10-29 夜：縁石（幅 30）の外のふちを橋の板のはし（x 1527〜1703）にそろえた。上のはしは橋の板の下に入れる（すき間なし）
+    (1557, 4975, 1673, 5930),
+    (1565, 4600, 1665, 4690),     # 北の道 → 木の橋の板の上のはし（2026-10-29 夜。縁石の外のふちが板の上のはしの幅 160）
 ]
 # 扉の前の小道：扉の敷居から下の道まで（幅。BUILDINGS の扉の真ん中に合わせる）
 DOOR_PATH_W = 200
@@ -174,13 +177,18 @@ BRIDGE_PILLARS = (895, 1265)
 # deskew はしない（左右の欄干がまっすぐ）。縦横同じ倍率 s。橋の板の上のはし（絵の y 265）を北の道（ピート・ハロルドの家の前。下のはし y 4600）に、
 # 板の幅（欄干の内側 x 295〜625。真ん中 x 460）を南の小道（x 1535〜1695。幅 160）に合わせた（s 0.485 で板の幅 約160）。
 # 絵は細長い（横：縦＝0.42）ので、板の幅を主人公が無理なく通れる幅にすると、前の橋より約140 単位長くなる（南の小道の上に少し長くのびる）
-BRIDGE_WOOD = dict(cx=1615, top=4600, s=0.485)
-WOOD_FILE = 'wood_bridge_front.png'
-WOOD_DECK = (265, 1555)        # 絵の中の橋の板の上のはし・下のはし（px）
-WOOD_DECK_X = (295, 625)       # 絵の中の橋の板の左右（欄干の内側。px）
-WOOD_BODY = (143, 97, 776, 1600)  # 絵の中の橋の本体（欄干の柱の外のはしまで。px）
+# 2026-10-29 夜 iPhone「道路側に伸びすぎ・境目が不自然」（指示書 A）：真ん中の板を何枚か抜いて短くした版（wood_bridge_front_short.png。
+# tools/design/wood_bridge_shorten.py が原本から作る。幅・はしの柱・はしの板・倍率はそのまま）に替えた。
+# 4本の柱の足元を両岸の石垣のすぐ外（北：石垣の上のふち y 約 4707 の手前・南：石のふち y 約 4966 の先）に。
+# 南の小道は縁石の外のふちを板の左右のはし（x 1527〜1703）にそろえ、北は板の上のはしから北の道まで短い小道でつなぐ（STREETS）
+BRIDGE_WOOD = dict(cx=1615, foot_n=4700, s=0.485)   # foot_n：北の柱の足元（絵の y 345）の y
+WOOD_FILE = 'wood_bridge_front_short.png'
+WOOD_DECK = (265, 963)         # 絵の中の橋の板の上のはし・下のはし（px）
+WOOD_DECK_X = (295, 625)       # 絵の中の橋の板の左右（欄干の内側。上のはしの所。px）
+WOOD_BODY = (143, 97, 776, 1008)  # 絵の中の橋の本体（欄干の柱の外のはしまで。px）
+WOOD_FOOT_N = 345              # 絵の中の北の柱の足元（px）
 # 四すみの柱（絵の px。左・上・右・下。下＝柱の足元）
-WOOD_POSTS = {'post_nw': (143, 90, 300, 345), 'post_ne': (620, 90, 776, 345), 'post_sw': (143, 1290, 300, 1600), 'post_se': (620, 1290, 776, 1600)}
+WOOD_POSTS = {'post_nw': (143, 90, 300, 345), 'post_ne': (620, 90, 776, 345), 'post_sw': (143, 698, 300, 1008), 'post_se': (620, 698, 776, 1008)}
 # 噴水（13）：水の輪の中心・柱（輪の穴より上。水の上に描き直す）・しぶきの下の端（どれもシートの px）
 FOUNTAIN_WATER = (328, 682)
 FOUNTAIN_PILLAR = [(230, 200), (432, 200), (432, 515), (393, 515), (393, 600), (397, 600), (397, 642),
@@ -786,20 +794,21 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     t.block_rect(BRIDGE_STONE['cx'] - 150, by, BRIDGE_STONE['cx'] + 150, deck_bot + 40, False)
     t.paved[np.ix_((ys >= deck_top) & (ys < deck_bot), (xs >= BRIDGE_STONE['cx'] - 150) & (xs < BRIDGE_STONE['cx'] + 150))] = True
     t.extra['bridge_stone'] = (bx, by, deck_top, deck_bot)
-    # 木の橋：届いた絵をそのまま（縦横同じ倍率で縮めるだけ）。板の上のはしを北の道の下のはしに、板の真ん中を cx に。
+    # 木の橋：短くした絵をそのまま（縦横同じ倍率で縮めるだけ）。北の柱の足元を foot_n に、板の真ん中を cx に。
     # 小川は先に描いてあるので、橋の板・欄干の下を通る（欄干の外は透明なので小川が見える。石の橋と同じ）
     wb = Image.open(os.path.join(SRC, WOOD_FILE)).convert('RGBA')
     s = BRIDGE_WOOD['s']
     wim = resize(wb, s * K)
     deck_mid = (WOOD_DECK_X[0] + WOOD_DECK_X[1]) / 2
-    wx, wy = BRIDGE_WOOD['cx'] - deck_mid * s, BRIDGE_WOOD['top'] - WOOD_DECK[0] * s
+    wx, wy = BRIDGE_WOOD['cx'] - deck_mid * s, BRIDGE_WOOD['foot_n'] - WOOD_FOOT_N * s
     soft_shadow(base, wim, (P(wx), P(wy)), 14, 8, 8, 60)
     base.alpha_composite(wim, (P(wx), P(wy)))
-    # 当たり：左右の欄干（柱の外のはし〜板のふち）は歩けない。板の上（真ん中の4マス）は北の道から南の小道まで歩ける
-    bx1, by1, bx2, by2 = WOOD_BODY
-    t.block_rect(wx + bx1 * s, wy + by1 * s, wx + WOOD_DECK_X[0] * s, wy + by2 * s)
-    t.block_rect(wx + WOOD_DECK_X[1] * s, wy + by1 * s, wx + bx2 * s, wy + by2 * s)
-    t.block_rect(BRIDGE_WOOD['cx'] - 64, BRIDGE_WOOD['top'] - 40, BRIDGE_WOOD['cx'] + 64, wy + WOOD_DECK[1] * s + 30, False)
+    # 当たり：左右の欄干（板の上のはし〜柱の足元。柱の外のはし〜板のふち）は歩けない。柱の上の方は宙なので、北の道の上は当たりにしない。
+    # 板の上（真ん中の4マス）は北の道から南の小道まで歩ける
+    bx1, _, bx2, by2 = WOOD_BODY
+    t.block_rect(wx + bx1 * s, wy + WOOD_DECK[0] * s, wx + WOOD_DECK_X[0] * s, wy + by2 * s)
+    t.block_rect(wx + WOOD_DECK_X[1] * s, wy + WOOD_DECK[0] * s, wx + bx2 * s, wy + by2 * s)
+    t.block_rect(BRIDGE_WOOD['cx'] - 64, wy + WOOD_DECK[0] * s - 80, BRIDGE_WOOD['cx'] + 64, wy + WOOD_DECK[1] * s + 30, False)
     t.extra['bridge_wood'] = (wx, wy, wx + wb.width * s, wy + wb.height * s)
     # 四すみの柱（金の飾り）は前後を比べる部品にも（地面の絵の上に同じ絵を重ねる）。足元＝柱の下のはし。
     # 北の柱：北の道にいる主人公より手前、橋の上の主人公より奥。南の柱：橋の上の主人公より手前、南の小道にいる主人公より奥
