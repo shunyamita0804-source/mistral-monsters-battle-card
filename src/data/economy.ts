@@ -160,7 +160,8 @@ export interface DungeonMoney {
 }
 
 export const DUNGEON_MONEY: Readonly<Record<string, DungeonMoney>> = {
-  'dungeon-01': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
+  // 太古の遺跡：2026-10-29 ジオルの最終で氷の洞窟と同じ段に（C ランクで開く・地下4階）
+  'dungeon-01': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
   'dungeon-02': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
   'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
   'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },

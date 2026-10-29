@@ -1,5 +1,6 @@
 import { readSavedName } from '../player/playerName.ts';
-import { cardCatalog } from '../../data/cards.ts';
+import { cardCatalog, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
+import { GEOL_MONSTER_ID } from '../../data/geol.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
@@ -36,7 +37,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 22;
+export const SAVE_VERSION = 23;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -406,6 +407,8 @@ export const REMOVED_CARD_IDS: readonly string[] = [
   ...LAZUCK_REMOVED_14_IDS,
   ...NOBITON_REMOVED_14_IDS,
   ...MYUROL_REMOVED_14_IDS,
+  TMP_GEOL_ID,
+  ...TMP_GEOL_SKILL_IDS,
 ];
 
 /**
@@ -577,6 +580,47 @@ function migrateTown2026V20(raw: RawObject): RawObject {
   return raw;
 }
 
+/**
+ * v22 → v23（2026-10-29 ジオルの最終）：仮ジオル（mon-tmp-geol・skl-tmp-geol-1〜6）をゲームから外した。
+ * ユーザー指示「発売前なので、セーブにある仮ジオルのモンスターカードは mon-geol に置きかえ、仮ジオルの技カードは消す」。
+ * - 所持カード：仮ジオルのモンスターカードの枚数をジオルに足す。仮ジオルの技は消す
+ * - デッキ：仮ジオルはジオルに替える。仮ジオルの技を外した分は持っているカードで埋める（足りなければ足りないまま。デッキ編集で直せる）
+ * - 名刺図鑑の「使っていたモンスター・もらったカード」・挑戦中のダンジョンの獲得：同じように替える／消す
+ * 太古の遺跡が開いている・クリアしたセーブはそのまま（閉じない。unlockedDungeonsFor は記録にあるダンジョンを残す）
+ */
+function migrateTmpGeolV23(raw: RawObject): RawObject {
+  const swap = (id: string): string => (id === TMP_GEOL_ID ? GEOL_MONSTER_ID : id);
+  const dropped = new Set(TMP_GEOL_SKILL_IDS);
+  const fix = (v: unknown): unknown => (Array.isArray(v) ? [...new Set(v.filter((id) => !(typeof id === 'string' && dropped.has(id))).map((id) => (typeof id === 'string' ? swap(id) : id)))] : v);
+  const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
+  const tmp = collection[TMP_GEOL_ID] ?? 0;
+  if (typeof tmp === 'number' && tmp > 0) collection[GEOL_MONSTER_ID] = (typeof collection[GEOL_MONSTER_ID] === 'number' ? collection[GEOL_MONSTER_ID] : 0) + tmp;
+  delete collection[TMP_GEOL_ID];
+  for (const id of dropped) delete collection[id];
+  let next: RawObject = { ...raw, collection };
+  const book = raw.peopleBook;
+  if (isObject(book) && isObject(book.records)) {
+    const records = Object.fromEntries(
+      Object.entries(book.records).map(([id, r]) => [id, isObject(r) ? { ...r, monsters: fix(r.monsters), cards: fix(r.cards) } : r]),
+    );
+    next = { ...next, peopleBook: { ...book, records } };
+  }
+  if (Array.isArray(raw.cardsSeen)) next = { ...next, cardsSeen: (raw.cardsSeen as unknown[]).filter((id) => id !== TMP_GEOL_ID && !(typeof id === 'string' && dropped.has(id))) };
+  const run = raw.dungeonRun;
+  if (isObject(run)) {
+    const sealed = typeof run.sealedCard === 'string' && dropped.has(run.sealedCard) ? null : run.sealedCard;
+    next = { ...next, dungeonRun: { ...run, gained: Array.isArray(run.gained) ? (run.gained as unknown[]).filter((id) => !(typeof id === 'string' && dropped.has(id))) : run.gained, sealedCard: sealed } };
+  }
+  const deck = raw.deck;
+  if (!isObject(deck) || !Array.isArray(deck.skills) || !Array.isArray(deck.monsters)) return next;
+  const monsters = (deck.monsters as unknown[]).map((id) => (typeof id === 'string' ? swap(id) : id)) as string[];
+  const skills = (deck.skills as unknown[]).filter((id) => !(typeof id === 'string' && dropped.has(id))) as string[];
+  if (skills.length === deck.skills.length) return { ...next, deck: { ...deck, monsters } };
+  const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
+  const filled = topUpDeck({ monsters, skills }, counts);
+  return { ...next, deck: { ...deck, monsters, skills: filled.skills } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -601,6 +645,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   20: (raw) => ({ ...raw, lastLeague: null }),
   // 2026-10-28：主人公の名前。前のセーブは名前なし（つづきからで始めたとき1回だけ名前を決める）
   21: (raw) => ({ ...raw, player: { ...(isObject(raw.player) ? raw.player : {}), name: null } }),
+  22: migrateTmpGeolV23,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

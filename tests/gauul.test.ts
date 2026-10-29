@@ -143,8 +143,9 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     expect(starter.monsters).not.toContain('mon-gauul');
     expect(starter.skills.some((id) => id.includes('gauul'))).toBe(false);
     // 2026-10-27 からは、ランクで開放するダンジョンのボス・大会の常連にガウルが出る（ユーザー指示「今ある正式モンスターから仮で」）。
-    // それより前からある相手（練習・遺跡・森）には入れない
-    for (const id of ['enc-practice', 'enc-run-npc', 'enc-run-guardian', 'enc-b3-boss', 'enc-forest-boss']) expect(ENCOUNTERS[id]?.monsters).not.toContain('mon-gauul');
+    // それより前からある相手（練習・森）には入れない。遺跡のボスのグラントは 2026-10-29 ジオルの最終でガウル・ジオル・ラズックに
+    expect(ENCOUNTERS['enc-b3-boss']?.monsters).toEqual(['mon-gauul', 'mon-geol', 'mon-lazuck']);
+    for (const id of ['enc-practice', 'enc-run-npc', 'enc-run-guardian', 'enc-forest-boss']) expect(ENCOUNTERS[id]?.monsters).not.toContain('mon-gauul');
     // 2026-10-29 指示書「プカリムの最終」で、大会 E のヴィクトル・D のゴードンにガウルが入った（それ以外の E・D の相手には入らない）
     for (const t of TOURNAMENTS) for (const r of t.rounds) if (!['e-2', 'd-3'].includes(r.id)) expect(r.monsters).not.toContain('mon-gauul');
   });

@@ -62,10 +62,11 @@ describe('ピートとの勝負', () => {
 });
 
 describe('相手のチームの入れ替え（プカリムを入れる）', () => {
-  it('太古の遺跡：バトラー［プカリム・ラズック・ソラモ］［ソラモ・プカリム・ガウル］、番人［プカリム・プカリム・ラズック］', () => {
-    expect(runNpcOpponent(0, 0, 'dungeon-01').monsters).toEqual([PUK, 'mon-lazuck', SOR]);
-    expect(runNpcOpponent(0, 1, 'dungeon-01').monsters).toEqual([SOR, PUK, 'mon-gauul']);
-    expect(runGuardianOpponent(0, 'dungeon-01').monsters).toEqual([PUK, PUK, 'mon-lazuck']);
+  it('太古の遺跡（2026-10-29 ジオルの最終で氷の洞窟と同じ編成に。プカリムを使うのは精霊の森のバトラーだけ）', () => {
+    for (const n of [0, 1]) expect(runNpcOpponent(0, n, 'dungeon-01').monsters).toEqual(runNpcOpponent(0, n, 'dungeon-04').monsters);
+    expect(runGuardianOpponent(0, 'dungeon-01').monsters).toEqual(runGuardianOpponent(0, 'dungeon-04').monsters);
+    for (const n of [0, 1]) expect(runNpcOpponent(0, n, 'dungeon-01').monsters).not.toContain(PUK);
+    expect(runGuardianOpponent(0, 'dungeon-01').monsters).not.toContain(PUK);
   });
 
   it('精霊の森：バトラー［プカリム・ミュロル・ノビトン］［ノビトン・プカリム・ソラモ］、番人［プカリム・ラズック・プカリム］', () => {

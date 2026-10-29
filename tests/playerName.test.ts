@@ -76,9 +76,9 @@ describe('主人公の名前の決まり（2026-10-28）', () => {
   });
 });
 
-describe('名前のセーブ（SAVE_VERSION 22）', () => {
+describe('名前のセーブ（SAVE_VERSION 22 で足した）', () => {
   it('新しいセーブは名前なし（主人公を選んだあとに決める）', () => {
-    expect(SAVE_VERSION).toBe(22);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(22);
     expect(createNewSave().player).toEqual({ gender: null, name: null });
     expect(createNewGameSave().player.name).toBeNull();
   });
@@ -86,7 +86,7 @@ describe('名前のセーブ（SAVE_VERSION 22）', () => {
   it('前のセーブ（version 21）は name: null を足して読む。ほかの中身はそのまま', () => {
     const v21 = { ...createNewSave(), version: 21, player: { gender: 'female' }, coins: 4321 } as Record<string, unknown>;
     const migrated = migrate(v21);
-    expect(migrated?.version).toBe(22);
+    expect(migrated?.version).toBe(SAVE_VERSION);
     expect(migrated?.player).toEqual({ gender: 'female', name: null });
     const save = normalizeSave(v21);
     expect(save?.player).toEqual({ gender: 'female', name: null });

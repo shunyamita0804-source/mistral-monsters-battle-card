@@ -16,7 +16,7 @@ import {
   viewRadiusOf,
 } from '../src/game/dungeon/run.ts';
 import { claimTournamentRewards, enterTournament, recordMatch } from '../src/game/progress/tournament.ts';
-import { createNewSave, normalizeSave, SAVE_VERSION, type Direction, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
+import { createNewSave, normalizeSave, SAVE_VERSION, unlockedDungeonsFor, type Direction, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
 
 const fresh = (): SaveData => createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance');
 const runOf = (s: SaveData): DungeonRun => {
@@ -29,7 +29,8 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
   it('7つ：階・仕掛け・開放のランク', () => {
     expect(DUNGEONS.map((d) => d.id)).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07']);
     expect(DUNGEONS.map((d) => [d.name, runConfig(d.id).floors, runConfig(d.id).gimmick, runConfig(d.id).unlockRank])).toEqual([
-      ['太古の遺跡', 3, 'none', null],
+      // 2026-10-29 ジオルの最終：遺跡は C ランクで開く地下4階（氷の洞窟と同じ段）
+      ['太古の遺跡', 4, 'none', 'C'],
       ['精霊の森', 3, 'none', null],
       ['水の神殿', 4, 'water', 'D'],
       ['氷の洞窟', 4, 'ice', 'C'],
@@ -44,8 +45,11 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
     }
   });
 
-  it('強さは 遺跡・森 ＜ 水 ＜ 氷 ＜ 火 ＜ 機械 ＜ 聖域（最後の階・ボス）', () => {
-    const ids = ['dungeon-01', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
+  it('強さは 森 ＜ 水 ＜ 氷・遺跡 ＜ 火 ＜ 機械 ＜ 聖域（最後の階・ボス）', () => {
+    // 太古の遺跡は 2026-10-29 から氷の洞窟と同じ段（階ごとの強さが同じ）
+    expect(runConfig('dungeon-01').floorLife).toEqual(runConfig('dungeon-04').floorLife);
+    expect(runBossOpponent('dungeon-01').lifeScale).toBe(1.2);
+    const ids = ['dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
     const last = ids.map((id) => runConfig(id).floorLife.at(-1) ?? 0);
     const boss = ids.map((id) => runBossOpponent(id).lifeScale);
     for (let i = 1; i < ids.length; i++) {
@@ -68,8 +72,17 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
 });
 
 describe('開放', () => {
-  it('新しく始めたときは遺跡と森だけ', () => {
-    expect(fresh().unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02']);
+  it('新しく始めたときは精霊の森だけ（2026-10-29 から。太古の遺跡は C ランクで氷の洞窟と同時に開く）', () => {
+    expect(fresh().unlockedDungeons).toEqual(['dungeon-02']);
+    expect(unlockedDungeonsFor('D', [])).toEqual(['dungeon-02', 'dungeon-03']);
+    expect(unlockedDungeonsFor('C', [])).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-04']);
+  });
+
+  it('すでに遺跡が開いている・クリアしたセーブは、そのまま（閉じない）', () => {
+    const old = { ...fresh(), version: 22, rank: 'E', unlockedDungeons: ['dungeon-01', 'dungeon-02'], dungeons: { 'dungeon-01': { openedChests: [], bossDefeated: true, clears: 1 } } };
+    const s = normalizeSave(JSON.parse(JSON.stringify(old)));
+    expect(s?.unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02']);
+    expect(s?.dungeons['dungeon-01']?.bossDefeated).toBe(true);
   });
 
   it('前のセーブ（version 18）：ランクに合わせて開放する。森の固定のマップを探索中なら家に戻す', () => {

@@ -149,6 +149,8 @@ function showcaseSound(card: PlayCard): SoundId {
 /** 相手の1手ごとの間（ミリ秒） */
 /** 2026-10-26 ユーザー指示「相手がカード使った時の処理が早すぎる。何したのか追うのが難しい」で 1100→1500 */
 const AI_STEP_MS = 1500;
+/** 説明の枠の文が入りきらないときの段階（battlePs.css。1＝文を少し小さく・「タップで次へ」を隠す・2＝名前と数値を1行に・3＝もっと小さく） */
+const SPOT_FIT_STEPS = ['is-fit-1', 'is-fit-2', 'is-fit-3'] as const;
 /**
  * 場のモンスターの幅（論理px。指示書の目安 72〜80）。2026-10-25 ユーザー指示「ずっと出ているカードが新しいデザインの方」：
  * バトル用カード（800×920）のあるモンスターはそのカードで、まだ無いモンスターは同じ縦横比に切り抜いたアイコンで出す
@@ -2074,6 +2076,21 @@ export const battleScreen: ScreenDefinition = {
       }
     };
 
+    /**
+     * 説明の枠（技を使った演出・守備の選択の左の欄）：効果の文が枠に入りきらないときは、字を段階的に小さくし、
+     * それでも入らなければ枠の中を縦にすべらせて読めるようにする（2026-10-29：地ひびきの文が「防御・」で切れていた）
+     */
+    const fitSpotTexts = (): void => {
+      for (const box of element.querySelectorAll<HTMLElement>('.battle-spot__info')) {
+        box.classList.remove(...SPOT_FIT_STEPS, 'is-fit-scroll');
+        for (const step of SPOT_FIT_STEPS) {
+          if (box.scrollHeight <= box.clientHeight + 1) break;
+          box.classList.add(step);
+        }
+        if (box.scrollHeight > box.clientHeight + 1) box.classList.add('is-fit-scroll');
+      }
+    };
+
     const render = (): void => {
       element.dataset.stage = state ? 'play' : 'order';
       if (!state) {
@@ -2111,6 +2128,10 @@ export const battleScreen: ScreenDefinition = {
       );
       replaceView(header(s), qaBar() ?? '', camera, detailPanel(s), hand, commandPanel(s, blocked));
       fitFocusCards();
+      fitSpotTexts();
+      // 文字の形（フォント）やカードの大きさが描いたあとで決まることがあるので、少しあとにもう一度測る
+      requestAnimationFrame(() => !destroyed && fitSpotTexts());
+      setTimeout(() => !destroyed && fitSpotTexts(), 400);
       const overlays = [talkOverlay(s), menu, resultOverlay(s), phaseBanner(s), hintOverlay(s)].filter((o): o is HTMLElement => o !== null);
       element.append(...overlays);
       const handEl = element.querySelector('.battle__hand');

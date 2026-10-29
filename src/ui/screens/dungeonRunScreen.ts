@@ -14,6 +14,7 @@ import { floorDecorations } from '../../game/dungeon/decor.ts';
 import { isWalkableTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
+  bossRewardCandidates,
   chooseRunReward,
   descend,
   doorsOpen,
@@ -1236,9 +1237,10 @@ function groundOf(dungeonId: string): 'grass' | 'gravel' {
   return dungeonId === 'dungeon-02' ? 'grass' : 'gravel';
 }
 
-/** 勝った：相手のモンスターの技から1枚（ランダム）。ボスならクリアして街へ */
+/** 勝った：相手のモンスターの技から1枚（ランダム。太古の遺跡のボスは bossRewardCandidates）。ボスならクリアして街へ */
 function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent: OpponentDefinition): void {
-  const candidates = rewardCandidates(opponent.monsters, skillsOf);
+  const run = store.save.dungeonRun;
+  const candidates = kind === 'boss' && run ? bossRewardCandidates(store.save, run.dungeonId, opponent.monsters) : rewardCandidates(opponent.monsters, skillsOf);
   // 幸運のコイン：バトラー・番人なら、別々の2枚の候補から選ぶ（選ぶのはダンジョンの画面に戻ってから。中断しても残る）
   if (usesLuckyCoin(store.save.dungeonRun, kind, candidates)) {
     const choices = pickRewardChoices(candidates, ITEM_RULES.luckyCoinChoices, Math.random);

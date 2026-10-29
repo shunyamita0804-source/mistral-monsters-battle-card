@@ -419,6 +419,15 @@ export function loseRunBattle(save: SaveData, target: { kind: BattleTargetKind; 
   return { save: { ...save, collection, dungeonRun: null }, expelled: true, lostCards: lost, lossesLeft: 0, charmSaved: false, keptCard };
 }
 
+/**
+ * ボスに勝ったときにもらう技カードの候補。ふつうは相手が使っていたモンスターの技（rewardCandidates）。
+ * 切り札の報酬のダンジョン（dungeons.ts の trumpReward：太古の遺跡）は、初めてのクリアでは無し（祭壇のモンスターカードだけ）、2回目からは切り札のモンスターの技
+ */
+export function bossRewardCandidates(save: SaveData, dungeonId: string, monsterIds: readonly string[]): string[] {
+  if (!getDungeon(dungeonId)?.trumpReward) return rewardCandidates(monsterIds, skillsOf);
+  return save.dungeons[dungeonId]?.bossDefeated ? bossTrumpSkills(dungeonId) : [];
+}
+
 /** 勝ったときにもらう技カードの候補（相手が使っていたモンスターの技） */
 export function rewardCandidates(monsterIds: readonly string[], skillsOf: (monsterId: string) => readonly { id: string }[]): string[] {
   return [...new Set(monsterIds)].flatMap((m) => skillsOf(m).map((s) => s.id));

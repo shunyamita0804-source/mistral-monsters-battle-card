@@ -25,6 +25,8 @@ const waitFor = async (page, sel, ms) => {
     const page = await ctx.newPage();
     page.on('pageerror', (e) => console.log('PAGEERROR', name, e.message));
     await page.goto(base + '?qa=1');
+    // 画面の大きさの診断の文字と、対戦の QA ボタンは写真に写さない（2026-10-29）
+    await page.addStyleTag({ content: '.stage-diag{display:none!important}' }).catch(() => {});
     await page.waitForTimeout(800);
     await page.locator('text=続きから').first().click();
     await page.waitForTimeout(3500);
@@ -39,7 +41,10 @@ const waitFor = async (page, sel, ms) => {
     await page.mouse.click(115, 585);
     await waitFor(page, '.battle__talk', 8000);
     await page.waitForTimeout(1800);
+    await page.addStyleTag({ content: '.stage-diag{display:none!important}' }).catch(() => {});
+    await page.evaluate(() => document.querySelectorAll('.battle__qa').forEach((e) => (e.style.visibility = 'hidden')));
     await page.screenshot({ path: `${out}/${name}_5start.png` });
+    await page.evaluate(() => document.querySelectorAll('.battle__qa').forEach((e) => (e.style.visibility = '')));
     if (mode === 'win' && name.startsWith('boss_')) {
       await page.locator('text=QA:即勝利').first().click();
       await page.waitForTimeout(2800);

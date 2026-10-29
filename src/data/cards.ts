@@ -22,6 +22,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-25：ミュロルと技16種を src/data/myurol.ts から足した。2026-10-27 に正式14技・バトル用カード（水色の枠）に。
  * 2026-10-27：カルシェルと技14種を src/data/kalshell.ts から足した。
  * 2026-10-29：プカリムと技14種を確認用の一覧からふつうの一覧へ移した（src/data/pukarim.ts）。
+ * 2026-10-29：ジオルと技14種も確認用の一覧からふつうの一覧へ移した（src/data/geol.ts。ジオルの最終）。仮ジオル（tmp-geol）はゲームから外した
  */
 
 interface MonsterSeed {
@@ -132,21 +133,25 @@ const HIDDEN_SKILLS: SkillCard[] = makeSkills('hidden', 'wisdom', [
 /**
  * 【仮】ダンジョンのボスのモンスター（2026-10-26 ユーザー指示：遺跡のボスはジオル、森のボスはフルーネを使い、勝つとそのカードが少しもらえる。
  * 「ジオルとフルーネの情報は後々送ります。今は仮で適当でいいです」）。名前・ライフ・技はすべて仮。
- * 正式データが届いたら新しい ID で足し、この仮カードは残す（docs/card-data-policy.md 2章）
+ * 正式データが届いたら新しい ID で足し、この仮カードは残す（docs/card-data-policy.md 2章）。
+ * 仮ジオル（tmp-geol）は 2026-10-29 ジオルの最終でゲームから外した（ユーザー指示：発売前なので、セーブの仮ジオルのモンスターカードは mon-geol に置きかえ、
+ * 技カードは消す。セーブ version 23。ID は REMOVED_CARD_IDS の TMP_GEOL_REMOVED_IDS）
  */
 const TMP_BOSS_SEEDS: readonly (MonsterSeed & { readonly name: string })[] = [
-  { key: 'tmp-geol', name: 'ジオル', life: 9, color: '#8a6d4b', main: 'force' },
   { key: 'tmp-flune', name: 'フルーネ', life: 8, color: '#5fa86a', main: 'wisdom' },
 ];
+/** ゲームから外した仮ジオルのモンスターカードと技6種の ID（前のセーブ・バックアップの読み込みで使う） */
 export const TMP_GEOL_ID = monsterId('tmp-geol');
+export const TMP_GEOL_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-geol', no));
 export const TMP_FLUNE_ID = monsterId('tmp-flune');
 const TMP_BOSS_MONSTERS: MonsterCard[] = TMP_BOSS_SEEDS.map((seed) => ({
   ...makeMonster(seed),
   name: `仮${seed.name}`,
   description: `ダンジョンのボスが使う仮の${seed.name}です。正式なモンスターデータではありません。`,
 }));
+// 技の数値の並び（skillSeeds）は、仮ジオルを外す前の番号のまま（フルーネは 1）
 const TMP_BOSS_SKILLS: SkillCard[] = TMP_BOSS_SEEDS.flatMap((seed, i) =>
-  makeSkills(seed.key, seed.main, skillSeeds(i)).map((s, n) => ({ ...s, name: `仮${seed.name}の技${n + 1}` })),
+  makeSkills(seed.key, seed.main, skillSeeds(i + 1)).map((s, n) => ({ ...s, name: `仮${seed.name}の技${n + 1}` })),
 );
 
 export const MONSTERS: readonly MonsterCard[] = [
@@ -159,6 +164,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   MYUROL_MONSTER,
   KALSHELL_MONSTER,
   PUKARIM_MONSTER,
+  GEOL_MONSTER,
   ...TMP_BOSS_MONSTERS,
 ];
 
@@ -172,6 +178,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...MYUROL_SKILLS,
   ...KALSHELL_SKILLS,
   ...PUKARIM_SKILLS,
+  ...GEOL_SKILLS,
   ...TMP_BOSS_SKILLS,
 ];
 
@@ -198,10 +205,10 @@ export const SUPPORTS: readonly SupportCard[] = [
  * 確認用（?qa=1）だけで使うカード。カードの一覧（MONSTERS・SKILLS）には入れないので、図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。
  * 台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）。
  * 2026-10-28 に試遊中のプカリムを入れていたが、2026-10-29 の最終でふつうの一覧へ移した。
- * 2026-10-29：試遊中のジオル（src/data/geol.ts）を入れた
+ * 2026-10-29：試遊中のジオル（src/data/geol.ts）を入れていたが、同じ日のジオルの最終でふつうの一覧へ移した。いまは空
  */
-export const QA_MONSTERS: readonly MonsterCard[] = [GEOL_MONSTER];
-export const QA_SKILLS: readonly SkillCard[] = [...GEOL_SKILLS];
+export const QA_MONSTERS: readonly MonsterCard[] = [];
+export const QA_SKILLS: readonly SkillCard[] = [];
 
 export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
 

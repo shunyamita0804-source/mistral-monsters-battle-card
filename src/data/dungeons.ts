@@ -1,5 +1,6 @@
-import { skillId, skillsOf, TMP_FLUNE_ID, TMP_GEOL_ID } from './cards.ts';
+import { skillId, skillsOf, TMP_FLUNE_ID } from './cards.ts';
 import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
+import { GEOL_MONSTER_ID } from './geol.ts';
 import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
@@ -22,6 +23,12 @@ export interface DungeonDefinition {
   readonly floors: readonly string[];
   /** 最奥のボスを初めて倒したときにもらえるカード（2026-10-26。1回だけ） */
   readonly firstClearCards?: readonly CardReward[];
+  /**
+   * ボスに勝ったときの技カードを、切り札のモンスター（firstClearCards のモンスター）の技からだけ選び、初めてのクリアでは技カードを出さない
+   * （2026-10-29 ジオルの最終：太古の遺跡。初回はジオルのモンスターカード、2回目からはジオルの技カード1枚。プカリムのピートと同じ形）。
+   * 無いダンジョンはいままでどおり（相手の3体の技からランダムに1枚＋初回の firstClearCards）
+   */
+  readonly trumpReward?: boolean;
   readonly isPlaceholder: boolean;
 }
 
@@ -43,6 +50,7 @@ const officialBossCards = (monsterId: string): CardReward[] => [
  * 初めて倒したときに1回だけもらえる（ユーザー「今は仮で適当でいい」）。
  * 細かい設計はこれから。いまは森も遺跡（dungeon-01）の写し。
  * 2026-10-26 名前が決まった（ユーザー）：太古の遺跡（ジオルのボス。遺跡に少し草や木、壊れた遺跡の建物）・精霊の森（フルーネのボス。ピンクの花や蝶）
+ * 2026-10-29 ジオルの最終：最初からあるダンジョンは精霊の森だけ。太古の遺跡は C ランクで開く（階・強さ・開放は src/data/dungeonRun.ts）
  */
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -50,7 +58,9 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     name: '太古の遺跡',
     description: '草や木に覆われ、壊れた建物が残る遺跡。最奥のボスを倒すとクリア。（敵編成・マップは仮）',
     floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
-    firstClearCards: bossCards(TMP_GEOL_ID, 'tmp-geol'),
+    // 2026-10-29 ジオルの最終：初回クリアは最奥の祭壇でジオルのモンスターカード1枚（仮ジオルはもう使わない）
+    firstClearCards: [{ cardId: GEOL_MONSTER_ID, count: 1 }],
+    trumpReward: true,
     isPlaceholder: true,
   },
   {
@@ -81,8 +91,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b2-c': { id: 'enc-b2-c', name: '階段の番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.8 },
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
-  // 遺跡のボス：仮のジオルを真ん中に（正式データが届いたら入れ替える）
-  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 },
+  // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
+  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], lifeScale: 1.2 },
   // 森のボス：仮のフルーネを真ん中に
   'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [LAZUCK_MONSTER_ID, TMP_FLUNE_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
