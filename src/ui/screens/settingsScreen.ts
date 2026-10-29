@@ -113,6 +113,8 @@ export const settingsScreen: ScreenDefinition = {
                 button(t('pukarimLab.title'), () => ctx.navigate('pukarimLab'), 'btn btn--small'),
                 // 試遊中のジオル（2026-10-29）：ふつうに遊んでいる人には出さない
                 button(t('geolLab.title'), () => ctx.navigate('geolLab'), 'btn btn--small'),
+                // イベントのダンジョン3つの絵（2026-10-29）：まだダンジョンとしては足していない
+                button(t('eventLab.title'), () => ctx.navigate('eventDungeonLab'), 'btn btn--small'),
               )
             : null,
         ),

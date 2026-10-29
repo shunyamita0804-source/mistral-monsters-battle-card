@@ -9,6 +9,7 @@
 - ユーザーの順番：①ジオルの最終＋太古の遺跡を初期から外す → ②パック専用の絵8つ（ZIP `Mistral_PackArt8_Part1〜3`）＋ジオルのシリーズ → ③イベントのダンジョン3つの絵（ZIP `Mistral_EventDungeons_Part1〜3`）→ ④技の絵の左右の位置（ソラモ04・カルシェル02・13）。1つずつ main に取り込み・公開・報告
 - ① 済み：`docs/geol-final-20261029.md`。**セーブ version 23**（仮ジオル → mon-geol）。初期のダンジョンは精霊の森だけ・遺跡は C ランク・地下4階。説明の枠の文が切れる不具合を直した（`fitSpotTexts`）
 - ② 済み：`docs/packart8-20261029.md`。パック8つ（ジオルを足した）・ショップの棚・ジオルのシリーズ（グラントに初めて勝つと開く。記録 `grant-beaten`）
+- ③ 済み：`docs/design/event-dungeons3-20261029/10_受け取り結果_UTF8.txt`。イベントのダンジョン3つの絵（仮の ID event-mist-mine など。ふつうの人には出さない。?qa=1&lab=event）
 - ZIP は `/root/.claude/uploads/` にある（新しいセッションには無い）
 
 ### 前のセッション（2026-10-29 夜）の「いまの状態」

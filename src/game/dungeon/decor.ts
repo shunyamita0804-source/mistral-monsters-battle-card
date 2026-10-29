@@ -6,7 +6,22 @@ import { floorSeed, type DungeonFloor } from './generate.ts';
  * 階を作るときの乱数（generate.ts の Rng）とは別の決まった並び（マスの位置から作る数）で選ぶので、同じ階はいつも同じ見た目になり、
  * 飾りを足しても階の作りは変わらない
  */
-export type FloorDecorKind = 'crack' | 'feather' | 'candle' | 'light';
+export type FloorDecorKind =
+  | 'crack'
+  | 'feather'
+  | 'candle'
+  | 'light'
+  // 2026-10-29 イベントのダンジョン3つ（まだダンジョンとしては足していない。src/ui/components/eventDungeonArt.ts）
+  | 'rail'
+  | 'ore'
+  | 'fog'
+  | 'rug'
+  | 'books'
+  | 'slab'
+  | 'candlestand'
+  | 'lantern'
+  | 'emblem'
+  | 'pillar';
 
 export interface FloorDecor {
   readonly x: number;
@@ -34,6 +49,35 @@ const DECOR_RULES: Readonly<Record<string, DecorRule>> = {
       { kind: 'feather', variants: 3, weight: 2 },
       { kind: 'candle', variants: 2, weight: 1 },
       { kind: 'light', variants: 2, weight: 1 },
+    ],
+  },
+  // イベントのダンジョン3つ（2026-10-29。ID は仮で、まだどの階にも出ない。src/ui/components/eventDungeonArt.ts）
+  // 霧の廃坑：レールの切れはし2・鉱石のかたまり2・床をはう霧2
+  'event-mist-mine': {
+    rate: 0.06,
+    kinds: [
+      { kind: 'rail', variants: 2, weight: 1 },
+      { kind: 'ore', variants: 2, weight: 1 },
+      { kind: 'fog', variants: 2, weight: 2 },
+    ],
+  },
+  // 忘れられた書庫：じゅうたんの切れはしは少しだけ（指示書）。本と巻物の山2・石板のかけら2・燭台1
+  'event-archive': {
+    rate: 0.06,
+    kinds: [
+      { kind: 'rug', variants: 3, weight: 1 },
+      { kind: 'books', variants: 2, weight: 2 },
+      { kind: 'slab', variants: 2, weight: 1 },
+      { kind: 'candlestand', variants: 1, weight: 1 },
+    ],
+  },
+  // 静かなる祭壇：石の灯籠2・床の銀の紋章1・くずれた柱のかけら2
+  'event-altar': {
+    rate: 0.05,
+    kinds: [
+      { kind: 'lantern', variants: 2, weight: 2 },
+      { kind: 'emblem', variants: 1, weight: 1 },
+      { kind: 'pillar', variants: 2, weight: 2 },
     ],
   },
 };

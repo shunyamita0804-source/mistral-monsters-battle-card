@@ -28,7 +28,7 @@ describe('床の上の飾り', () => {
   });
 
   it('何もない床で、まわりも床のマスだけ。階段・置いてあるもの・始まりの場所には置かない。種類と絵の番号は決まった範囲', () => {
-    const variants = { crack: 4, feather: 3, candle: 2, light: 2 } as const;
+    const variants: Partial<Record<string, number>> = { crack: 4, feather: 3, candle: 2, light: 2 };
     for (const id of ['dungeon-05', 'dungeon-07']) {
       for (let seed = 1; seed <= 60; seed++) {
         for (let floor = 0; floor < 5; floor++) {
@@ -37,7 +37,7 @@ describe('床の上の飾り', () => {
           for (const d of floorDecorations(f, seed, id)) {
             for (const [dx, dy] of [[0, 0], [0, -1], [0, 1], [-1, 0], [1, 0]] as const) expect(f.tiles[d.y + dy]?.[d.x + dx]).toBe('.');
             expect(taken.has(`${d.x},${d.y}`)).toBe(false);
-            expect(d.variant).toBeLessThan(variants[d.kind]);
+            expect(d.variant).toBeLessThan(variants[d.kind] ?? 0);
             expect(id === 'dungeon-05' ? d.kind === 'crack' : d.kind !== 'crack').toBe(true);
           }
         }

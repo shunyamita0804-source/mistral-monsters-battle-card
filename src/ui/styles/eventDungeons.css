@@ -1,0 +1,191 @@
+/*
+ * イベントのダンジョン3つ（霧の廃坑・忘れられた書庫・静かなる祭壇）の床・壁・階段・ボスのしるし・床の上の飾り（2026-10-29 届いた正式な絵。
+ * 切り出し tools/design/event_dungeons3_build.py・割り当て src/ui/components/eventDungeonArt.ts）。
+ * まだダンジョンとしては足していない（ID は仮）。ランダム生成のダンジョンの画面がルートに付ける .drun--{ID} と同じ形で書いておき、
+ * いまは ?qa=1 の確認用の画面（eventDungeonLabScreen.ts）の見本の部屋だけが使う。今のダンジョン7つの見た目は変えない（dungeonRun.css）。
+ * 床の石の大きさは新しい5つ（水の神殿など。512px の遺跡の絵を 192px で敷く見え方）と同じ縮め方：480px の絵を 134px くらいに
+ */
+.drun--event-mist-mine {
+  --ev-floor: url('@assets/images/maps/dungeon/mist_mine_floor.webp');
+  --ev-top: url('@assets/images/maps/dungeon/mist_mine_wall_top.webp');
+  --ev-face: url('@assets/images/maps/dungeon/mist_mine_wall_face.webp');
+  --ev-stairs: url('@assets/images/maps/dungeon/mist_mine_stairs_down.webp');
+  --ev-boss: url('@assets/images/maps/dungeon/boss_mark_mist_mine.webp');
+}
+
+.drun--event-archive {
+  --ev-floor: url('@assets/images/maps/dungeon/archive_floor.webp');
+  --ev-top: url('@assets/images/maps/dungeon/archive_wall_top.webp');
+  --ev-face: url('@assets/images/maps/dungeon/archive_wall_face.webp');
+  --ev-stairs: url('@assets/images/maps/dungeon/archive_stairs_down.webp');
+  --ev-boss: url('@assets/images/maps/dungeon/boss_mark_archive.webp');
+}
+
+.drun--event-altar {
+  --ev-floor: url('@assets/images/maps/dungeon/altar_floor.webp');
+  --ev-top: url('@assets/images/maps/dungeon/altar_wall_top.webp');
+  --ev-face: url('@assets/images/maps/dungeon/altar_wall_face.webp');
+  --ev-stairs: url('@assets/images/maps/dungeon/altar_stairs_down.webp');
+  --ev-boss: url('@assets/images/maps/dungeon/boss_mark_altar.webp');
+}
+
+/* 3つとも同じ大きさの絵（床 482×480・壁の上面 459×480・壁の正面 663×310） */
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) {
+  --ev-floor-size: 135px 134px;
+  --ev-top-size: 128px 134px;
+  --ev-face-size: 103px 48px;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--floor.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)),
+    var(--ev-floor) var(--ax, 0) var(--ay, 0) / var(--ev-floor-size) repeat;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--floor.is-lit {
+  background:
+    linear-gradient(rgb(255 236 200 / 0.08), rgb(255 236 200 / 0.08)),
+    var(--ev-floor) var(--ax, 0) var(--ay, 0) / var(--ev-floor-size) repeat;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--wall.is-seen {
+  background:
+    linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
+    var(--ev-top) var(--ax, 0) var(--ay, 0) / var(--ev-top-size) repeat;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--wall.is-lit {
+  background:
+    linear-gradient(rgb(6 7 10 / 0.5), rgb(6 7 10 / 0.5)),
+    var(--ev-top) var(--ax, 0) var(--ay, 0) / var(--ev-top-size) repeat;
+}
+
+/* 下が床の壁：壁の正面の絵をマスの高さいっぱいに横に並べる */
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--face.is-seen {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)),
+    var(--ev-face) var(--ax, 0) 100% / var(--ev-face-size) repeat-x;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--face.is-lit {
+  background: var(--ev-face) var(--ax, 0) 100% / var(--ev-face-size) repeat-x;
+}
+
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__tile--stairs.is-seen::after {
+  background-image: var(--ev-stairs);
+}
+
+/* ボスの間のしるし（今のダンジョンと同じ使い方・同じ大きさ） */
+:is(.drun--event-mist-mine, .drun--event-archive, .drun--event-altar) .drun__entity--boss {
+  background-image: var(--ev-boss);
+  scale: 1.9;
+}
+
+/* ===== 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts。絵は 192px の高さに縮めたもの） ===== */
+
+/* 霧の廃坑：トロッコのレールの切れはし・鉱石のかたまり・床をはう霧（半透明。少しはみ出す） */
+.drun__decor--rail-1::after { inset: 2px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_1.webp'); }
+.drun__decor--rail-2::after { inset: 2px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_2.webp'); }
+.drun__decor--ore-1::after { inset: 4px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_3.webp'); }
+.drun__decor--ore-2::after { inset: 4px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_4.webp'); }
+.drun__decor--fog-1::after { inset: -6px -18px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_5.webp'); opacity: 0.85; }
+.drun__decor--fog-2::after { inset: -6px -18px; background-image: url('@assets/images/maps/dungeon/mist_mine_deco_6.webp'); opacity: 0.85; }
+
+/* 忘れられた書庫：じゅうたんの切れはし（床に敷く。ほかの飾りより下）・本と巻物の山・石板のかけら・燭台（床に立てる） */
+.drun__decor:is(.drun__decor--rug-1, .drun__decor--rug-2, .drun__decor--rug-3) { z-index: 0; }
+.drun__decor--rug-1::after { inset: -16px; background-image: url('@assets/images/maps/dungeon/archive_rug_1.webp'); }
+.drun__decor--rug-2::after { inset: -14px; background-image: url('@assets/images/maps/dungeon/archive_rug_2.webp'); }
+.drun__decor--rug-3::after { inset: -10px; background-image: url('@assets/images/maps/dungeon/archive_rug_3.webp'); }
+.drun__decor--books-1::after { inset: 3px; background-image: url('@assets/images/maps/dungeon/archive_deco_1.webp'); }
+.drun__decor--books-2::after { inset: 6px 2px; background-image: url('@assets/images/maps/dungeon/archive_deco_2.webp'); }
+.drun__decor--slab-1::after { inset: 6px; background-image: url('@assets/images/maps/dungeon/archive_deco_3.webp'); }
+.drun__decor--slab-2::after { inset: 8px; background-image: url('@assets/images/maps/dungeon/archive_deco_4.webp'); }
+
+/* 床に立てるもの（燭台・灯籠・立っている柱）：足元をマスの下の方に、上のマスに少しはみ出す */
+:is(.drun__decor--candlestand-1, .drun__decor--lantern-1, .drun__decor--lantern-2, .drun__decor--pillar-2)::after {
+  inset: auto auto 4px 50%;
+  translate: -50% 0;
+  background-position: center bottom;
+}
+
+.drun__decor--candlestand-1::after { width: 26px; height: 52px; background-image: url('@assets/images/maps/dungeon/archive_deco_5.webp'); }
+
+/* 静かなる祭壇：石の灯籠・床の銀の紋章・くずれた柱のかけら（1＝倒れた柱・2＝立っている柱の根もと） */
+.drun__decor--lantern-1::after { width: 30px; height: 62px; background-image: url('@assets/images/maps/dungeon/altar_deco_1.webp'); }
+.drun__decor--lantern-2::after { width: 30px; height: 62px; background-image: url('@assets/images/maps/dungeon/altar_deco_2.webp'); }
+.drun__decor--emblem-1::after { inset: -4px; background-image: url('@assets/images/maps/dungeon/altar_deco_3.webp'); }
+.drun__decor--pillar-1::after { inset: 4px; background-image: url('@assets/images/maps/dungeon/altar_deco_4.webp'); }
+.drun__decor--pillar-2::after { width: 36px; height: 44px; background-image: url('@assets/images/maps/dungeon/altar_deco_5.webp'); }
+
+/* ===== ?qa=1 の確認用の画面（eventDungeonLabScreen.ts） ===== */
+.event-lab__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 12px 24px;
+  overflow-y: auto;
+}
+
+.event-lab__tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.event-lab__tabs .btn {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 6px;
+}
+
+.event-lab__tabs .btn.is-active {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.event-lab__heading {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-accent);
+}
+
+/* 見本の部屋：ランダム生成の階と同じ 1マス 48px（7×8マス） */
+.event-lab__room {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 336px;
+  height: 384px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--color-line);
+}
+
+.event-lab__pics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.event-lab__pic {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--color-sub);
+}
+
+.event-lab__pic img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--color-line);
+}
+
+/* ボスの間のしるしは透過の絵なので、マゼンタの上に置いて透過の残りを目で見る（指示書 4） */
+.event-lab__pic--mark img {
+  background: #ff00ff;
+  object-fit: contain;
+  aspect-ratio: 2 / 3;
+}
