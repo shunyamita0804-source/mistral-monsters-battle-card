@@ -1,5 +1,5 @@
 import { skillsOf } from '../../data/cards.ts';
-import { GACHA, getGachaSeries, type GachaSeries } from '../../data/economy.ts';
+import { GACHA, gachaSeenFlag, getGachaSeries, isNewGachaSeries, type GachaSeries } from '../../data/economy.ts';
 import { t } from '../../i18n/i18n.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
@@ -120,4 +120,10 @@ export function purchaseSeriesPack(save: SaveData, seriesId: string, transaction
  */
 export function canReselectSeries(paid: boolean): boolean {
   return !paid;
+}
+
+/** シリーズを一度選んだ記録を付ける（NEW の印を消す）。NEW でなければそのまま返す */
+export function markGachaSeriesSeen(save: SaveData, series: GachaSeries): SaveData {
+  if (!isNewGachaSeries(save.storyFlags, series)) return save;
+  return { ...save, storyFlags: [...save.storyFlags, gachaSeenFlag(series.id)] };
 }

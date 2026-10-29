@@ -3,7 +3,7 @@ import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_S
 import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
-import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
+import { CURRENCY, GACHA_SERIES, gachaSeenFlag, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
@@ -41,7 +41,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 26;
+export const SAVE_VERSION = 27;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -673,6 +673,19 @@ function migrateSerephineAltarV26(raw: RawObject): RawObject {
   return flags.includes(LUCIA_ALTAR_OWED_FLAG) ? raw : { ...raw, storyFlags: [...flags, LUCIA_ALTAR_OWED_FLAG] };
 }
 
+/**
+ * v26 → v27（2026-10-29 夜 ガチャの NEW の印）：新しく並んだシリーズに NEW を出し、一度選ぶと「選んだ」記録（gachaSeenFlag）で消す。
+ * 前のセーブで、もう並んでいるシリーズ（unlockFlag の記録があるか、そのボスのダンジョンをクリアしている）は選んだことにする（NEW を出さない）
+ */
+function migrateGachaSeenV27(raw: RawObject): RawObject {
+  const flags = Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]).filter((f): f is string => typeof f === 'string') : [];
+  const dungeons = isObject(raw.dungeons) ? raw.dungeons : {};
+  const cleared = DUNGEONS.filter((d) => d.bossFlag && isObject(dungeons[d.id]) && (dungeons[d.id] as RawObject).bossDefeated === true).map((d) => d.bossFlag as string);
+  const open = new Set([...flags, ...cleared]);
+  const seen = GACHA_SERIES.filter((g) => g.unlockFlag && open.has(g.unlockFlag)).map((g) => gachaSeenFlag(g.id)).filter((f) => !flags.includes(f));
+  return seen.length === 0 ? raw : { ...raw, storyFlags: [...flags, ...seen] };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -701,6 +714,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   23: migrateShopRoomsV24,
   24: migrateTmpFluneV25,
   25: migrateSerephineAltarV26,
+  26: migrateGachaSeenV27,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

@@ -1165,7 +1165,8 @@ export class WorldView {
         : map.art
           ? h('div', { class: `world__label world__label--${obj.type}` }, h('span', { class: 'world__label-text', text: objectLabel(obj) }))
           : h('div', { class: `world__label world__label--${obj.type}`, text: objectLabel(obj) });
-      Object.assign(el.style, { left: `${obj.x * cell}px`, top: `${obj.y * cell}px`, width: `${obj.w * cell}px`, height: `${obj.h * cell}px` });
+      const labelDy = obj.type === 'interact' ? (obj.labelDy ?? 0) : 0;
+      Object.assign(el.style, { left: `${obj.x * cell}px`, top: `${(obj.y + labelDy) * cell}px`, width: `${obj.w * cell}px`, height: `${obj.h * cell}px` });
       this.#mapLayer.append(el);
     }
   }

@@ -311,7 +311,8 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
 
   it('ルシアに初めて勝つと lucia-beaten（1つだけ）', () => {
     const w = beatLucia(createNewSave(), 41);
-    expect(w.save.storyFlags).toEqual([LUCIA_BEATEN_FLAG]);
+    // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く
+    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
     expect(beatLucia(w.save, 42).save.storyFlags).toEqual([LUCIA_BEATEN_FLAG]);
   });
 
@@ -320,15 +321,16 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
     const old = { ...base, version: 25, dungeons: { 'dungeon-03': { openedChests: [], bossDefeated: true, clears: 2 } } };
     const s = normalizeSave(JSON.parse(JSON.stringify(old)));
     if (!s) throw new Error('load');
-    expect(SAVE_VERSION).toBe(26);
-    expect(s.version).toBe(26);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(26);
+    expect(s.version).toBe(SAVE_VERSION);
     expect(s.storyFlags).toEqual(expect.arrayContaining([LUCIA_BEATEN_FLAG, LUCIA_ALTAR_OWED_FLAG]));
     expect(bossRewardCandidates(s, 'dungeon-03', LUCIA_TEAM)).toEqual([]);
     const w = beatLucia(s, 51);
     expect(w.firstClear).toBe(false);
     expect(w.clearCards).toEqual([{ cardId: SEREPHINE_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[SEREPHINE_MONSTER_ID]).toBe(1);
-    expect(w.save.storyFlags).toEqual([LUCIA_BEATEN_FLAG]);
+    // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く
+    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
     // その次からはふつうの2回目と同じ（セレフィーンの技カード）
     expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(SEREPHINE_SKILLS.map((k) => k.id));
     expect(beatLucia(w.save, 52).clearCards).toEqual([]);
@@ -345,7 +347,7 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
       collection: { ...base.collection, [SEREPHINE_MONSTER_ID]: 1 },
       dungeons: { 'dungeon-03': { openedChests: [], bossDefeated: true, clears: 1 } },
     };
-    expect(normalizeSave(JSON.parse(JSON.stringify(has)))?.storyFlags).toEqual([LUCIA_BEATEN_FLAG]);
+    expect(normalizeSave(JSON.parse(JSON.stringify(has)))?.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
   });
 });
 

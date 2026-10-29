@@ -1,4 +1,4 @@
-import { availableGachaSeries, GACHA, type GachaSeries } from '../../data/economy.ts';
+import { availableGachaSeries, GACHA, isNewGachaSeries, type GachaSeries } from '../../data/economy.ts';
 import { ITEMS } from '../../data/items.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
 import { boosterShelf as boosterShelfOf, buyBooster } from '../../game/story/introV2.ts';
@@ -6,7 +6,7 @@ import type { SaveData } from '../../game/save/saveData.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
 import { isNewItem } from '../../game/items/items.ts';
-import { purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
+import { markGachaSeriesSeen, purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
 
 import { randomSeed } from '../../game/rng.ts';
 import { cardName } from '../../i18n/content.ts';
@@ -59,9 +59,11 @@ function boosterShelf(save: SaveData, onBuy: (key: BoosterKey) => void): HTMLEle
 }
 
 /**
- * ショップの店員（カウンター）：カードを見る／売る（価格未確定のため無効）／道具を買う／ブースターの箱。
+ * ショップの店員（カウンター）：カードを買う（ブースターの箱の画面）／道具を買う／売る（価格未確定のため無効）。
  * 2026-10-28 ユーザー決定：カウンターで買えるのはブースターの箱と道具だけ（カードはふだんは販売機のガチャで）。
- * ガチャの札と欠片の特別復元（研究所へ移した）はここから外した
+ * ガチャの札と欠片の特別復元（研究所へ移した）はここから外した。
+ * 2026-10-29 夜 ユーザー（指示書 C4）：「カードを見る」はなくし、上から「カードを買う」→「道具を買う」→「売る」。
+ * 「カードを買う」を押すと、前はメニューの下にあったブースターの箱の棚を開く（戻るでメニューへ）
  */
 export const shopMenuScreen: ScreenDefinition = {
   id: 'shopMenu',
@@ -69,33 +71,56 @@ export const shopMenuScreen: ScreenDefinition = {
   create(ctx) {
     const store = ctx.store;
     const element = h('main', { class: 'screen shop-menu' });
+    let view: 'menu' | 'boxes' = 'menu';
     const render = (): void => {
       const save = store.save;
+      const header = (onBack: () => void) => createScreenHeader({ title: t('shop.title'), back: { label: t('common.back'), onTap: onBack } });
+      const clerk = h(
+        'div',
+        { class: 'shop-menu__clerk' },
+        h('img', { class: 'shop-menu__clerk-figure shop-menu__face', attrs: { src: faceClerk, alt: t('shop.clerk'), draggable: 'false' } }),
+        h('p', { class: 'shop-menu__bubble', text: t('shop.greeting') }),
+      );
+      const coins = h('p', { class: 'shop-menu__coins' }, coinIcon(), t('shop.coins', { n: save.coins }));
+      if (view === 'boxes') {
+        element.replaceChildren(
+          header(() => {
+            view = 'menu';
+            render();
+          }),
+          clerk,
+          coins,
+          boosterShelf(save, buyBox) ?? h('p', { class: 'shop-menu__note', text: t('shop.noBoxes') }),
+        );
+        return;
+      }
       const sell = button(t('shop.sell'), () => undefined, 'shop-menu__item shop-menu__item--sell');
       sell.disabled = true;
+      const buyCards = button(
+        t('shop.buyCards'),
+        () => {
+          view = 'boxes';
+          render();
+        },
+        'shop-menu__item shop-menu__item--browse',
+      );
       element.replaceChildren(
-        createScreenHeader({ title: t('shop.title'), back: { label: t('common.back'), onTap: () => ctx.back('world') } }),
-        h(
-          'div',
-          { class: 'shop-menu__clerk' },
-          h('img', { class: 'shop-menu__clerk-figure shop-menu__face', attrs: { src: faceClerk, alt: t('shop.clerk'), draggable: 'false' } }),
-          h('p', { class: 'shop-menu__bubble', text: t('shop.greeting') }),
-        ),
-        h('p', { class: 'shop-menu__coins' }, coinIcon(), t('shop.coins', { n: save.coins })),
+        header(() => ctx.back('world')),
+        clerk,
+        coins,
         h(
           'nav',
           { class: 'shop-menu__items' },
-          button(t('shop.viewCards'), () => ctx.navigate('cardList'), 'shop-menu__item shop-menu__item--browse'),
-          h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
-          // 4つ目の札「道具を買う」（2026-10-27。札の絵はデザイン33点の 15。新しく並んだ道具があれば NEW）
+          buyCards,
+          // 「道具を買う」（2026-10-27。札の絵はデザイン33点の 15。新しく並んだ道具があれば NEW）
           h(
             'button',
             { class: 'shop-menu__item shop-menu__item--items', attrs: { type: 'button' }, on: { click: () => ctx.navigate('itemShop') } },
             t('items.shopButton'),
             ITEMS.some((i) => isNewItem(save, i.id)) ? h('span', { class: 'shop-menu__item-new', text: t('items.new') }) : null,
           ),
+          h('div', { class: 'shop-menu__disabled' }, sell, h('span', { class: 'shop-menu__note', text: t('shop.sellNote') })),
         ),
-        boosterShelf(save, buyBox) ?? '',
       );
     };
 
@@ -265,11 +290,14 @@ export const gachaScreen: ScreenDefinition = {
                 }
                 picked = series.id;
                 sound.tap();
+                // 新しく並んだパックの NEW は、一度選ぶと消える
+                store.update((sv) => markGachaSeriesSeen(sv, series));
                 render();
               },
             },
           },
           h('img', { class: 'gacha-select__pack', attrs: { src: seriesPackUrl(series), alt: '', draggable: 'false' } }),
+          isNewGachaSeries(save.storyFlags, series) ? h('span', { class: 'gacha-select__new', text: t('items.new') }) : null,
           h('b', { class: 'gacha-select__name', text: seriesName(series) }),
           h('small', { class: 'gacha-select__owned', text: t('gacha.series.owned', { n: owned, total }) }),
         );

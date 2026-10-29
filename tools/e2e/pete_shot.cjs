@@ -34,6 +34,13 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
   await shot('choice');
   if (mode === 'talk') { await browser.close(); return; }
   await page.locator('.talk__choices button').first().click();
+  // 2026-10-29 夜：勝負の前のひと言（story.pete.before）を撮って送る
+  await page.waitForTimeout(1600);
+  if (await page.$('.talk')) await shot('before');
+  for (let i = 0; i < 6 && (await page.$('.talk')) && !(await page.locator('.battle-order__card').count()); i++) {
+    await page.click('.talk__window').catch(() => {});
+    await page.waitForTimeout(600);
+  }
   await page.waitForSelector('.battle-order__card', { timeout: 20000 });
   await page.waitForTimeout(800);
   await shot('battle-order');

@@ -287,7 +287,7 @@ export const SCENES: Readonly<Record<SceneId, Scene>> = {
   },
   // 【仮】導入イベントのあとに受付を調べたとき（地の文）
   v2BureauAfter: { id: 'v2BureauAfter', steps: [system('introV2.bureau.after')], skipEffects: [] },
-  // ---------- ピートとの勝負（2026-10-29 プカリムの最終。台詞は進行の案を元にした仮。src/i18n/messages/story.ts の story.pete.*） ----------
+  // ---------- ピートとの勝負（2026-10-29 プカリムの最終。台詞は 2026-10-29 夜 ユーザー決定。src/i18n/messages/story.ts の story.pete.*） ----------
   peteAsk: {
     id: 'peteAsk',
     steps: [pete('story.pete.ask'), { kind: 'choice', options: [{ label: 'story.pete.yes', next: 'peteGo' }, { label: 'story.pete.no', next: null }] }],
@@ -298,8 +298,10 @@ export const SCENES: Readonly<Record<SceneId, Scene>> = {
     steps: [pete('story.pete.again'), { kind: 'choice', options: [{ label: 'story.pete.yes', next: 'peteGo' }, { label: 'story.pete.no', next: null }] }],
     skipEffects: [],
   },
-  peteGo: { id: 'peteGo', steps: [], effects: [{ kind: 'battle', id: 'pete' }] },
-  peteFirstWin: { id: 'peteFirstWin', steps: [pete('story.pete.firstWin1'), pete('story.pete.firstWin2')], skipEffects: [] },
+  // 2026-10-29 夜 ユーザーの台詞（指示書 C5）：勝負の前のひと言のあとに勝負
+  peteGo: { id: 'peteGo', steps: [pete('story.pete.before')], effects: [{ kind: 'battle', id: 'pete' }] },
+  // 「ショップにプカリムが並んでいる」の台詞はなくした（2026-10-29 夜。ガチャのシリーズを選ぶ画面の NEW の印で知らせる）
+  peteFirstWin: { id: 'peteFirstWin', steps: [pete('story.pete.firstWin')], skipEffects: [] },
   peteWinAgain: { id: 'peteWinAgain', steps: [pete('story.pete.winAgain')], skipEffects: [] },
   peteLose: { id: 'peteLose', steps: [pete('story.pete.lose')], skipEffects: [] },
   ...residentScenes(),
