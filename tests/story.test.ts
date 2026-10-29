@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getMap, HALL, HOUSES, LAB, NEIGHBOR, PRACTICE, SHOP, TOWN, type MapDefinition, type NpcObject } from '../src/data/maps.ts';
+import { FLORIST, getMap, HALL, HOUSES, LAB, NEIGHBOR, PRACTICE, SHOP, TAILOR, TOWN, type MapDefinition, type NpcObject } from '../src/data/maps.ts';
 import { INTRO_STATES, residentScene, SCENES, type IntroState, type Scene, type SceneId, type SceneStep } from '../src/data/storyScenes.ts';
 import { LEGACY_INTRO_V2 } from '../src/game/story/introV2.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
@@ -229,11 +229,12 @@ describe('街の人', () => {
 
   it('住人A・D は店の中、B・E は街の外にだけいて（二重にならない）、話しかけるたびに2つの話を交互にする（住宅C は管理局に置き換えた）', () => {
     // 2026-10-28 ユーザー：マルタ（花屋＝住宅A）・ロザリー（仕立て屋＝住宅D）は店の中だけ、ピート（住宅B）・ハロルド（住宅E）は外だけ
-    const inside = HOUSES.map((m) => m.objects.find((o): o is NpcObject => o.type === 'npc')?.npcId);
-    expect(inside).toEqual(['resident_a', undefined, 'resident_d', undefined]);
+    // 2026-10-29：花屋・仕立て屋は店の新しい部屋（FLORIST・TAILOR）。民家は住宅B・E だけ
+    const inside = [FLORIST, ...HOUSES, TAILOR].map((m) => m.objects.find((o): o is NpcObject => o.type === 'npc')?.npcId);
+    expect(inside).toEqual(['resident_a', undefined, undefined, 'resident_d']);
     const outside = TOWN.objects.filter((o): o is NpcObject => o.type === 'npc' && o.npcId.startsWith('resident_')).map((o) => o.npcId);
     expect(outside.sort()).toEqual(['resident_b', 'resident_e']);
-    const residents = [...HOUSES, TOWN].flatMap((m) => m.objects.filter((o): o is NpcObject => o.type === 'npc' && o.npcId.startsWith('resident_')));
+    const residents = [FLORIST, TAILOR, ...HOUSES, TOWN].flatMap((m) => m.objects.filter((o): o is NpcObject => o.type === 'npc' && o.npcId.startsWith('resident_')));
     expect(residents.map((r) => r.npcId).sort()).toEqual(['resident_a', 'resident_b', 'resident_d', 'resident_e']);
     expect(getMap('house-c')).toBeUndefined();
     expect([0, 1, 2].map((n) => residentScene('resident_d', n))).toEqual(['resident_d_1', 'resident_d_2', 'resident_d_1']);

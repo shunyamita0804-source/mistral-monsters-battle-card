@@ -1,6 +1,7 @@
 import type { Direction } from '../game/save/saveData.ts';
 import { BUREAU_MAP_ID } from './introV2.ts';
 import { ROOMS4_ART, ROOMS4_DRAW_OFFSET } from './rooms4Art.generated.ts';
+import { SHOP_ROOMS_ART, SHOP_ROOMS_DRAW_OFFSET } from './shopRoomsArt.generated.ts';
 import type { CardReward } from './tournaments.ts';
 import { WORLD_ART, type ArtMap, type CellRect } from './worldArt.generated.ts';
 
@@ -260,13 +261,15 @@ const TOWN_ART = artOf('town');
 /** 地図 ID → 部屋の絵（worldArt.generated.ts） */
 const ROOM_ART_OF: Readonly<Record<string, string>> = {
   home: 'player', neighbor: 'guide', shop: 'shop',
-  'house-a': 'house', 'house-b': 'house', 'house-d': 'house', 'house-e': 'house',
+  'house-b': 'house', 'house-e': 'house',
 };
 /** 地図 ID → 2026-10-28 の新しい部屋の絵（rooms4Art.generated.ts。tools/design/rooms4_build.py） */
 const ROOMS4_OF: Readonly<Record<string, keyof typeof ROOMS4_ART>> = { hall: 'arena', [BUREAU_MAP_ID]: 'bureau', practice: 'practice', lab: 'lab' };
 const roomArtOf = (mapId: string): ArtMap => {
   const r4 = ROOMS4_OF[mapId];
-  return r4 ? ROOMS4_ART[r4] : artOf(ROOM_ART_OF[mapId] ?? '');
+  if (r4) return ROOMS4_ART[r4];
+  if (mapId === 'florist' || mapId === 'tailor') return SHOP_ROOMS_ART[mapId];
+  return artOf(ROOM_ART_OF[mapId] ?? '');
 };
 
 /** 街の建物（設計図の ID）→ 入る部屋 */
@@ -277,12 +280,12 @@ const TOWN_DOORS: readonly { readonly id: string; readonly building: string; rea
   { id: 'door-neighbor', building: 'GUIDE_HOME', mapId: 'neighbor', label: 'となりの家' },
   { id: 'door-shop', building: 'SHOP', mapId: 'shop', label: 'カードショップ' },
   { id: 'door-lab', building: 'LAB', mapId: 'lab', label: 'カード研究所' },
-  // 2026-10-29 点検の直し：住宅A は花屋（マルタ）、住宅D は仕立て屋（ロザリー）なので入口の名前を合わせた（中の部屋は今のまま「民家」の絵）
-  { id: 'door-house-a', building: 'HOUSE_A', mapId: 'house-a', label: '花屋' },
+  // 住宅A は花屋（マルタ）、住宅D は仕立て屋（ロザリー）。2026-10-29 中を店の新しい部屋にした（florist・tailor）
+  { id: 'door-house-a', building: 'HOUSE_A', mapId: 'florist', label: '花屋' },
   { id: 'door-house-b', building: 'HOUSE_B', mapId: 'house-b', label: '民家' },
   // 2026-10-27 ユーザー指示：住宅C の所をカードバトラー管理局に置き換えた（住宅C と住人C はなくした）
   { id: 'door-bureau', building: 'BUREAU', mapId: BUREAU_MAP_ID, label: 'カードバトラー管理局' },
-  { id: 'door-house-d', building: 'HOUSE_D', mapId: 'house-d', label: '仕立て屋' },
+  { id: 'door-house-d', building: 'HOUSE_D', mapId: 'tailor', label: '仕立て屋' },
   { id: 'door-house-e', building: 'HOUSE_E', mapId: 'house-e', label: '民家' },
 ];
 
@@ -478,22 +481,49 @@ export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラ�
 
 const HOUSE_ART = artOf('house');
 /**
- * 部屋の中に住人がいる民家（2026-10-28 ユーザー：マルタ〔花屋＝住宅A〕とロザリー〔仕立て屋＝住宅D〕は店番で中だけ。
- * ピート〔住宅B〕とハロルド〔住宅E〕は外だけなので、家の中は空）
+ * 民家（住宅B・E。部屋の絵は共通）。ピート〔住宅B〕とハロルド〔住宅E〕は外だけなので、家の中は空（2026-10-28 ユーザー）。
+ * 住宅A（花屋）・住宅D（仕立て屋）は 2026-10-29 に店の新しい部屋にした（下の FLORIST・TAILOR）
  */
-const RESIDENT_INSIDE: ReadonlySet<'a' | 'b' | 'd' | 'e'> = new Set(['a', 'd'] as const);
-/** 民家（住宅A・B・D・E。部屋の絵は共通） */
-const house = (key: 'a' | 'b' | 'd' | 'e'): MapDefinition =>
+const house = (key: 'b' | 'e'): MapDefinition =>
   artMap(`house-${key}`, '民家', 'interior', HOUSE_ART, [
     interactAt(`house-${key}-shelf`, itemOf(HOUSE_ART, 'SHELF'), '棚', 'message', '食器がきちんと並んでいる。'),
     interactAt(`house-${key}-table`, itemOf(HOUSE_ART, 'TABLE'), 'テーブル', 'message', 'テーブルクロスがかかっている。'),
-    ...(RESIDENT_INSIDE.has(key)
-      ? [npc(`house-${key}-resident`, spotOf(HOUSE_ART, 'RESIDENT_SPOT').x, spotOf(HOUSE_ART, 'RESIDENT_SPOT').y, `resident_${key}`)]
-      : []),
     roomExit(`house-${key}-exit`, HOUSE_ART, `HOUSE_${key.toUpperCase()}`),
   ], entryOf(HOUSE_ART));
 // 住宅C は 2026-10-27 にカードバトラー管理局に置き換えた（住人C もなくした）
-export const HOUSES: readonly MapDefinition[] = (['a', 'b', 'd', 'e'] as const).map(house);
+export const HOUSES: readonly MapDefinition[] = (['b', 'e'] as const).map(house);
+
+const FLORIST_ART = SHOP_ROOMS_ART.florist;
+/**
+ * 花屋の中（住宅A。2026-10-29 新しい絵。tools/design/rooms_shop_build.py）。奥の作りつけの棚（花・包み紙・リボン）、左右の花の段、
+ * 左右の壁の吊り花かご、真ん中のカウンター（マルタはその奥。話しかけるのはカウンターの手前の床から）
+ */
+export const FLORIST: MapDefinition = artMap('florist', '花屋', 'interior', FLORIST_ART, [
+  // 吊り花かごは花の段の上の壁にある（範囲が重なるので先に並べる）
+  interactAt('florist-basket-l', itemOf(FLORIST_ART, 'BASKET_L'), '吊り花かご', 'message', '吊るしたかごから、白と黄色の花がこぼれている。'),
+  interactAt('florist-basket-r', itemOf(FLORIST_ART, 'BASKET_R'), '吊り花かご', 'message', '吊るしたかごから、白と黄色の花がこぼれている。'),
+  interactAt('florist-steps-l', itemOf(FLORIST_ART, 'STEPS_L'), '花の段', 'message', '段の上に、色とりどりの花の鉢がずらりと並んでいる。'),
+  interactAt('florist-steps-r', itemOf(FLORIST_ART, 'STEPS_R'), '花の段', 'message', '青い花が気持ちよさそうに咲いている。じょうろも置いてある。'),
+  interactAt('florist-shelf', itemOf(FLORIST_ART, 'SHELF'), '奥の棚', 'message', '花束を包む紙とリボンが、色ごとに巻いてしまってある。'),
+  spotNpc('florist-keeper', FLORIST_ART, 'KEEPER_SPOT', SHOP_ROOMS_DRAW_OFFSET.florist.KEEPER_SPOT, 'resident_a'),
+  roomExit('florist-exit', FLORIST_ART, 'HOUSE_A'),
+], entryOf(FLORIST_ART));
+
+const TAILOR_ART = SHOP_ROOMS_ART.tailor;
+/**
+ * 仕立て屋の中（住宅D。2026-10-29 新しい絵。tools/design/rooms_shop_build.py）。奥の布の棚、右奥の試着の囲い、右の姿見、左右のトルソー、
+ * 左の布の台、真ん中の作業カウンター（ロザリーはその奥。話しかけるのはカウンターの手前の床から）
+ */
+export const TAILOR: MapDefinition = artMap('tailor', '仕立て屋', 'interior', TAILOR_ART, [
+  interactAt('tailor-cloth-shelf', itemOf(TAILOR_ART, 'CLOTH_SHELF'), '布の棚', 'message', '巻いた布が色ごとに並んでいる。紺と赤が多い。'),
+  interactAt('tailor-fitting', itemOf(TAILOR_ART, 'FITTING'), '試着の囲い', 'message', '紺のカーテンが閉まっている。中で着替えができるようだ。'),
+  interactAt('tailor-mirror', itemOf(TAILOR_ART, 'MIRROR'), '姿見', 'message', '大きな鏡に、自分の姿が映っている。'),
+  interactAt('tailor-torso-l', itemOf(TAILOR_ART, 'TORSO_L'), 'トルソー', 'message', '紺と白の上着が着せてある。仕立てたばかりのようだ。'),
+  interactAt('tailor-torso-r', itemOf(TAILOR_ART, 'TORSO_R'), 'トルソー', 'message', '緑のドレスが着せてある。すそのししゅうがきれいだ。'),
+  interactAt('tailor-cloth-table', itemOf(TAILOR_ART, 'CLOTH_TABLE'), '布の台', 'message', 'たたんだ服と布が、きちんと積んである。'),
+  spotNpc('tailor-keeper', TAILOR_ART, 'KEEPER_SPOT', SHOP_ROOMS_DRAW_OFFSET.tailor.KEEPER_SPOT, 'resident_d'),
+  roomExit('tailor-exit', TAILOR_ART, 'HOUSE_D'),
+], entryOf(TAILOR_ART));
 
 export const DUNGEON_B1: MapDefinition = {
   id: 'dungeon-01-b1',
@@ -627,6 +657,8 @@ export const MAPS: readonly MapDefinition[] = [
   HALL,
   PRACTICE,
   ...HOUSES,
+  FLORIST,
+  TAILOR,
   BUREAU,
   DUNGEON_B1,
   DUNGEON_B2,

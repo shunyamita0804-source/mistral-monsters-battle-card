@@ -6,6 +6,7 @@ import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/i
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
 import { DUNGEONS } from '../../data/dungeons.ts';
+import { SHOP_ROOMS_ART } from '../../data/shopRoomsArt.generated.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
   buildDeckFromCollection,
@@ -38,7 +39,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 23;
+export const SAVE_VERSION = 24;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -622,6 +623,18 @@ function migrateTmpGeolV23(raw: RawObject): RawObject {
   return { ...next, deck: { ...deck, monsters, skills: filled.skills } };
 }
 
+/**
+ * v23 → v24（2026-10-29 花屋・仕立て屋の新しい部屋）：住宅A・D の中（house-a・house-d）を店の部屋（florist・tailor）にした。
+ * その中にいたら、新しい部屋の入口（入ったときに立つ所。奥を向く）に移す
+ */
+function migrateShopRoomsV24(raw: RawObject): RawObject {
+  const loc = raw.location;
+  const to = isObject(loc) ? ({ 'house-a': 'florist', 'house-d': 'tailor' } as const)[loc.mapId as string] : undefined;
+  if (!to) return raw;
+  const { x, y } = SHOP_ROOMS_ART[to].spawn;
+  return { ...raw, location: { mapId: to, x, y, dir: 'up' } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -647,6 +660,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   // 2026-10-28：主人公の名前。前のセーブは名前なし（つづきからで始めたとき1回だけ名前を決める）
   21: (raw) => ({ ...raw, player: { ...(isObject(raw.player) ? raw.player : {}), name: null } }),
   22: migrateTmpGeolV23,
+  23: migrateShopRoomsV24,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

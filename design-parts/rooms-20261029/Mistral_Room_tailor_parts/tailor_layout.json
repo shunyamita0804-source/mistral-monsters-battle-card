@@ -1,0 +1,24 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "tailor_shell.png",
+    "tailor_01_counter.png",
+    "tailor_02_torso_left.png",
+    "tailor_03_cloth_table.png",
+    "tailor_04_fitting_room.png",
+    "tailor_05_torso_right.png",
+    "tailor_06_mirror.png",
+    "tailor_07_left_cabinet.png",
+    "tailor_08_rear_cabinet.png",
+    "tailor_09_floor_plant_right.png",
+    "tailor_10_plant_stand.png",
+    "tailor_front.png"
+  ]
+}

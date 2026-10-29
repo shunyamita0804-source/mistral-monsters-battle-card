@@ -65,8 +65,9 @@ describe('新しい街（2026-10-28）', () => {
       expect(npc, id).toBeDefined();
       expect(isBlocked(TOWN, npc!.x, npc!.y, () => false), id).toBe(false);
     }
-    expect(getMap('house-a')?.objects.some((o) => o.type === 'npc')).toBe(true);
-    expect(getMap('house-d')?.objects.some((o) => o.type === 'npc')).toBe(true);
+    // マルタ・ロザリーは店（2026-10-29 新しい部屋 florist・tailor）の中
+    expect(getMap('florist')?.objects.some((o) => o.type === 'npc' && o.npcId === 'resident_a')).toBe(true);
+    expect(getMap('tailor')?.objects.some((o) => o.type === 'npc' && o.npcId === 'resident_d')).toBe(true);
   });
 
   it('2026-10-28 直し：石の橋は道の幅だけ歩ける（橋の下の水の上は歩けない）・東西のはしは林で通れない・欠片の場所へ歩いて行ける', () => {

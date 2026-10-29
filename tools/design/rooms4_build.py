@@ -175,7 +175,7 @@ ROOMS: dict[str, dict] = {
 
 
 def _load(room: dict, name: str) -> Image.Image:
-    return Image.open(os.path.join(SRC, room['dir'], f"{room['prefix']}_{name}.png")).convert('RGBA')
+    return Image.open(os.path.join(room.get('src', SRC), room['dir'], f"{room['prefix']}_{name}.png")).convert('RGBA')
 
 
 def _save(im: Image.Image, name: str) -> dict:
@@ -205,8 +205,9 @@ def _draw_shape(d: ImageDraw.ImageDraw, shape, fill: int) -> None:
         d.rectangle(shape, fill=fill)
 
 
-def build_room(key: str, check: str | None) -> tuple[dict, dict]:
-    room = ROOMS[key]
+def build_room(key: str, check: str | None, rooms: dict[str, dict] | None = None, pre: str | None = None) -> tuple[dict, dict]:
+    """rooms・pre は別の道具（rooms_shop_build.py）から使うとき。部屋の設定に src（原本の置き場所）を書ける"""
+    room = (rooms or ROOMS)[key]
     u = ROOM_UNIT
     cols, rows = ROOM_W // CELL, ROOM_H // CELL
 
@@ -228,7 +229,7 @@ def build_room(key: str, check: str | None) -> tuple[dict, dict]:
         return 0 <= y < rows and 0 <= x < cols and grid[y][x] == '.'
 
     # 部屋の箱（透明な所は部屋の外の暗い色）
-    pre = f'room4_{key}'
+    pre = pre or f'room4_{key}'
     shell = Image.new('RGBA', (1536, 1024), BG + (255,))
     shell.alpha_composite(_load(room, 'shell'))
     os.makedirs(OUT_ROOMS, exist_ok=True)
@@ -271,7 +272,7 @@ def build_room(key: str, check: str | None) -> tuple[dict, dict]:
     sx, sy = _cell_of(room['spawn'])
     assert walkable(sx, sy), (key, 'spawn')
     art = dict(
-        id=f'room4_{key}', cols=cols, rows=rows, width=ROOM_W, height=ROOM_H, cell=CELL, fitHeight=FIT_HEIGHT,
+        id=pre, cols=cols, rows=rows, width=ROOM_W, height=ROOM_H, cell=CELL, fitHeight=FIT_HEIGHT,
         grid=grid, tiles=tiles, sprites=sprites, items=items,
         exit=dict(x=exit_cols[0], y=exit_row, w=len(exit_cols), h=1),
         spawn=dict(x=sx, y=sy),
@@ -283,7 +284,7 @@ def build_room(key: str, check: str | None) -> tuple[dict, dict]:
 
 def _check_image(key: str, room: dict, art: dict, offsets: dict, out: str) -> None:
     """確認画像：見本に、歩けるマス（緑）・調べる物（黄の枠）・人の所（話す＝赤、見た目＝水色）を重ねる"""
-    im = Image.open(os.path.join(SRC, room['dir'], f"{room['prefix']}_preview.png")).convert('RGBA')
+    im = Image.open(os.path.join(room.get('src', SRC), room['dir'], f"{room['prefix']}_preview.png")).convert('RGBA')
     ov = Image.new('RGBA', im.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     for y, row in enumerate(art['grid']):
