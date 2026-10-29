@@ -209,13 +209,21 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
     expect(lifeOf(s, 'o-m2')).toBe(6); // みだれづめ 2 − しっぽいなし 3 → 0
   });
 
+  it('6 トリックショット・7 シャドウバースト：2026-10-29 夜の数字（2マナ2・3マナ4）。効果の文・絵は同じ', () => {
+    expect([getSkill(laz(9)).cost, getSkill(laz(9)).stat?.value]).toEqual([2, 2]);
+    expect([getSkill(laz(10)).cost, getSkill(laz(10)).stat?.value]).toEqual([3, 4]);
+    // 元の版（2026-10-26）は残す
+    const old = JSON.parse(readFileSync('src/data/official/lazuck14_skills_OFFICIAL_20261026.json', 'utf8')) as { skill_cards: { number: number; mana: number; damage: number }[] };
+    expect(old.skill_cards.filter((r) => r.number === 6 || r.number === 7).map((r) => [r.mana, r.damage])).toEqual([[2, 3], [4, 5]]);
+  });
+
   it('11 しっぽいなし（マナ2・ちから技だけ−3）・12 シャドウガード（マナ2・かしこさ技だけ−3）。0 未満にならない', () => {
     expect([getSkill(laz(11)).cost, getSkill(laz(12)).cost]).toEqual([2, 2]);
     expect(getSkill(laz(11)).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
     expect(getSkill(laz(12)).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
-    // とびかかり：ちから3 → 0、シャドウバースト：かしこさ5 → 2、トリックショット：かしこさ3 → 0
+    // とびかかり：ちから3 → 0、シャドウバースト：かしこさ4 → 1、トリックショット：かしこさ2 → 0（2026-10-29 夜の数字）
     expect(lifeOf(attackAndGuard(laz(3), 'o-m2', [laz(11)]), 'o-m2')).toBe(6);
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(12)]), 'o-m2')).toBe(4);
+    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(12)]), 'o-m2')).toBe(5);
     expect(lifeOf(attackAndGuard(laz(9), 'o-m2', [laz(12)]), 'o-m2')).toBe(6);
     // 効かない種類の攻撃には使えない
     let s = scene({ player: [laz(10)], opponent: [laz(11)] });
@@ -228,7 +236,7 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
 
   it('13 シャドウスリップ（マナ2）：相手の消費マナ2以上のちから技・かしこさ技を回避。マナ0〜1 の攻撃は回避しない', () => {
     expect(getSkill(laz(15)).cost).toBe(2);
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // シャドウバースト（マナ4・かしこさ）
+    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // シャドウバースト（マナ3・かしこさ）
     expect(lifeOf(attackAndGuard(laz(3), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // とびかかり（マナ2・ちから）＝境目の2は回避できる
     for (const cheap of [laz(1), laz(2)]) {
       // ひっかき（マナ0）・かみつき（マナ1）には使えず、理由が出る
@@ -243,7 +251,7 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
     expect(getSkill(laz(14)).effect).toEqual({ type: 'evade', against: 'all' });
     expect(lifeOf(attackAndGuard(laz(1), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // ひっかき（マナ0・ちから）
     expect(lifeOf(attackAndGuard(laz(6), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // しっぷうタックル（マナ4・ちから）
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // シャドウバースト（マナ4・かしこさ）
+    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // シャドウバースト（マナ3・かしこさ）
     expect(lifeOf(attackAndGuard(laz(9), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // トリックショット（マナ2・かしこさ）
   });
 

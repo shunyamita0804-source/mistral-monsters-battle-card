@@ -62,6 +62,7 @@
 | （モンスター） | `mon-myurol` | ミュロル（ライフ7。2026-10-25 に技16種が届き、正式へ。モンスターカードの絵はまだ無い） |
 | myurol_01〜16 | `skl-myurol-01`〜`skl-myurol-16`（番号は同じ） | たいあたり〜すべってよける |
 
+**2026-10-29 夜**：ラズックの 6 トリックショット（2マナ2）・7 シャドウバースト（3マナ4）を直した版 `lazuck14_skills_OFFICIAL_20261029.json` をゲームで読む（ユーザー決定。元の版は残す）。
 **2026-10-26 からラズックは正式14技**：正本 `src/data/official/lazuck14_skills_OFFICIAL_20261026.json`（無改変）、ZIP の中身は `design-parts/cards-original/lazuck14-20261026/`、
 絵 `laz14_sk_NN.png`（827×937 の PNG を無改変）、枠は紫（#844DC5）。初期配布16枚（JSON の initial_copies のまま）。性能が変わった技も ID は同じ（しっぽいなしマナ2・シャドウガード−3・フェイントステップは両方の技）。
 以下はそれまでの記録。ラズックの正本は `src/data/official/lazuck_cards_OFFICIAL.json`（無改変）、読み込みは `src/data/lazuck.ts`（ソラモと同じ作り方 `src/data/officialSkills.ts`）。

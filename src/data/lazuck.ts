@@ -1,7 +1,7 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
 import officialSkills from './official/lazuck_cards_OFFICIAL.json';
 import latestSkills from './official/lazuck_cards_LATEST_20261024.json';
-import lazuck14 from './official/lazuck14_skills_OFFICIAL_20261026.json';
+import lazuck14 from './official/lazuck14_skills_OFFICIAL_20261029.json';
 import themeColors from './official/monster_theme_colors.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
@@ -75,6 +75,8 @@ export const LAZUCK_REMOVED_14_IDS: readonly string[] = [lazuckSkillId(5), lazuc
 /**
  * 【正式データ・2026-10-26】ラズックの技14種と初期配布16枚（Razuk_Claude_Official14_Starter16_COMPLETE_20261026）。
  * 正本は src/data/official/lazuck14_skills_OFFICIAL_20261026.json（届いた 01_RAZUK_FINAL_14_SKILLS_STARTER16.json を無改変）。
+ * 2026-10-29 夜（ユーザー決定）：6 トリックショット 2マナ3→2マナ2・7 シャドウバースト 4マナ5→3マナ4。数字だけ直した新しい版
+ * lazuck14_skills_OFFICIAL_20261029.json を読む（効果の文・絵・枚数は同じ。元の版は残す）。
  * ZIP の中身はすべて design-parts/cards-original/lazuck14-20261026/ に無改変で保管。
  * 技名・分類・マナ・ダメージ・効果の文・初期配布の枚数は、ここで書き換えずに JSON からそのまま読む。
  *
