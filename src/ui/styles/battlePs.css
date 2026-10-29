@@ -416,8 +416,12 @@
   font-weight: 800;
   line-height: 1.35;
   color: #fff;
-  white-space: nowrap;
+  /* 2026-10-29 夜の点検：長い技の名前で切れていたので、2行まで折り返す */
+  white-space: normal;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   text-overflow: ellipsis;
 }
 
@@ -884,6 +888,20 @@
   padding: 0 2px;
 }
 
+/* 経過の帯の押せる所（2026-10-29 夜：押せる高さ 44px。見た目の帯は中の .battle__ticker） */
+.battle__ticker-hit {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  margin-block: -7px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
 .battle__ticker {
   flex: 1;
   min-width: 0;
@@ -1271,6 +1289,9 @@
 }
 
 .battle-opp-spot .battle-spot__line {
+  /* 相手の技の文は全部出す（2行までの切りつめをかけると、3行目が下の名前に重なる） */
+  display: block;
+  -webkit-line-clamp: unset;
   overflow: visible;
   white-space: normal;
   text-overflow: clip;

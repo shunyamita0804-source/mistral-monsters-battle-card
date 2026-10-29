@@ -383,6 +383,11 @@ export const battleScreen: ScreenDefinition = {
     let busyUntil = 0;
     /** 前回描画時のライフ（ダメージ・回復の演出に使う） */
     const prevLife = new Map<string, number>();
+    /**
+     * ダメージ・回復を見せはじめる時刻（2026-10-29 夜 ユーザー指示「攻撃の流れが唐突」）。使ったカード（守りのカードも）を大きく見せている間は、
+     * ライフを減らさず・当たる演出も出さずに待ち、見せ終わってから 当たる演出（ゆれ・光）→ ダメージの数字とライフが減る の順にする
+     */
+    let damageHoldUntil = 0;
     /** 技・サポートの対象に選ばれたモンスター（指のマークを出す。until まで） */
     /** 技の対象に出す矢印（side＝技を使った側。自分の技＝青、相手の技＝赤） */
     let pointed: { uid: string; until: number; side: Side } | null = null;
@@ -589,6 +594,10 @@ export const battleScreen: ScreenDefinition = {
         setTimeout(() => !destroyed && render(), until - Date.now() + 20);
       }
       queueHitFx(before, next, action, played, played ? revealDelay + hold : 0);
+      if (played) {
+        damageHoldUntil = Math.max(damageHoldUntil, Date.now() + revealDelay + hold);
+        setTimeout(() => !destroyed && render(), revealDelay + hold + 15);
+      }
       // 大きく見せる欄を先に出し（相手のカードは着くまで隠しておく）、そこへ相手のカードを飛ばす
       if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null, flyIn ? OPP_CARD_FLY_MS : 0);
       render();
@@ -1127,6 +1136,21 @@ export const battleScreen: ScreenDefinition = {
         dispatch({ type: 'useCard', side: 'player', cardUid: targeting.cardUid, targetUid: monster.uid });
         return;
       }
+      // 2026-10-29 夜 ユーザー指示「相手を押した瞬間に相手の正式な絵が大きく出てダメージが入るので唐突」：
+      // 技のカードを選んでいて、押したモンスターがその技の相手にできるなら、そのまま使う（正式な絵は出さない）
+      if (state && !targeting && selectedUid && state.phase === 'main' && state.active === 'player' && cardUsability(state, 'player', selectedUid).usable) {
+        const sel = state.sides.player.hand.find((c) => c.uid === selectedUid);
+        const card = sel ? getPlayCard(sel.cardId) : null;
+        if (sel && card && targetsFor(state, 'player', card).some((m) => m.uid === monster.uid)) {
+          dispatch({ type: 'useCard', side: 'player', cardUid: sel.uid, targetUid: monster.uid });
+          return;
+        }
+      }
+      // 攻撃の流れの途中（カードを見せている・守りを選んでいる・ダメージを見せている）は、正式な絵を出さない
+      if (state && (state.phase === 'defense' || Date.now() < damageHoldUntil || (spotlight && Date.now() < spotlight.until))) {
+        skipSpotlight();
+        return;
+      }
       const extra = [
         t(`battle.monster.owner.${side}`),
         t(monster.acted ? 'battle.monster.lifeActed' : 'battle.monster.life', { life: monster.life, max: monster.maxLife }),
@@ -1243,18 +1267,21 @@ export const battleScreen: ScreenDefinition = {
         ...s.sides[side].monsters.map((m) => {
           const isTarget = targeting?.targets.includes(m.uid) ?? false;
           const before = prevLife.get(m.uid) ?? m.life;
-          const diff = m.life - before;
+          // カードを見せている間（damageHoldUntil まで）は、ライフの変化をまだ見せない
+          const holdingLife = Date.now() < damageHoldUntil;
+          const diff = holdingLife ? 0 : m.life - before;
+          const barLife = holdingLife ? before : m.life;
           const isPendingTarget = s.pending?.targetUid === m.uid;
           // 使ったカードを大きく見せている間は出さない（2026-10-24 ユーザー指示）。見せ終わってから
           const isPointed = m.life > 0 && Date.now() >= showcaseUntil && (isPendingTarget || (pointed?.uid === m.uid && Date.now() < pointed.until));
-          const down = m.life <= 0;
+          const down = barLife <= 0;
           // 技の演出の間：使った側と対象のアイコンを光らせる（つながりが分かるように）
           const spot = spotlight && Date.now() < spotlight.until ? spotlight : null;
           const spotClass = spot?.userUid === m.uid ? ' is-spot-user' : spot?.targetUid === m.uid ? ' is-spot-target' : '';
           // ライフのゲージ（2026-10-26 デザイン第9弾）：1/3 以下＝赤、1/2 以下＝黄土色、それより多い＝緑
-          const lifeLevel = m.life * 3 <= m.maxLife ? ' is-low' : m.life * 2 <= m.maxLife ? ' is-mid' : '';
+          const lifeLevel = barLife * 3 <= m.maxLife ? ' is-low' : barLife * 2 <= m.maxLife ? ' is-mid' : '';
           const bar = h('span', { class: `battle__monster-bar${lifeLevel}` }, h('span', { class: 'battle__monster-bar-fill' }));
-          (bar.firstElementChild as HTMLElement).style.width = `${Math.max(0, (m.life / m.maxLife) * 100)}%`;
+          (bar.firstElementChild as HTMLElement).style.width = `${Math.max(0, (barLife / m.maxLife) * 100)}%`;
           return h(
             'button',
             {
@@ -1269,7 +1296,7 @@ export const battleScreen: ScreenDefinition = {
               'span',
               { class: 'battle__monster-icon' },
               hasBattleCard(m.cardId)
-                ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? m.life, max: m.maxLife })
+                ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? barLife, max: m.maxLife })
                 : createMonsterPortrait(getMonster(m.cardId), MONSTER_ICON, MONSTER_ICON_H),
               // 戦闘不能の印・行動済の印（2026-10-26 デザイン第9弾。文字も残す）
               down
@@ -1281,15 +1308,16 @@ export const battleScreen: ScreenDefinition = {
               !down ? cornerMarks(s, m) : null,
               diff < 0 ? h('span', { class: 'battle__burst', attrs: { 'aria-hidden': 'true' } }) : null,
               ...hitFxOn(m.uid),
-              // 回復だけ「+2」のように出す。ダメージは数字を出さず、ライフを1ずつ減らして音で数える（2026-10-24 ユーザー指示）
-              diff > 0 ? battleDigits(diff, 'battle__float') : null,
+              // 回復は「+2」、ダメージは「-3」のように出す（2026-10-29 夜 ユーザー指示「ダメージの数字とライフが減る」。前はダメージの数字を出さなかった）。
+              // ライフは1ずつ減らして音で数える（2026-10-24）
+              diff !== 0 ? battleDigits(diff, 'battle__float') : null,
             ),
             bar,
             // いまのライフ／最大（最大はカードのデータから。バーと同じ値）
             h(
               'span',
-              { class: `battle__monster-life${down ? ' is-down' : m.life * 3 <= m.maxLife ? ' is-low' : ''}` },
-              h('span', { class: 'battle__monster-life-now', text: String(lifeShown.get(m.uid) ?? m.life) }),
+              { class: `battle__monster-life${down ? ' is-down' : barLife * 3 <= m.maxLife ? ' is-low' : ''}` },
+              h('span', { class: 'battle__monster-life-now', text: String(lifeShown.get(m.uid) ?? barLife) }),
               h('span', { class: 'battle__monster-life-max', text: `/${m.maxLife}` }),
             ),
             // 技の対象の矢印（2026-10-26 デザイン第9弾。それまでは絵文字の👇）。色は技を使った側：自分の技＝青、相手の技＝赤
@@ -1801,10 +1829,11 @@ export const battleScreen: ScreenDefinition = {
       const textEl = h('span', { class: 'battle__ticker-text', text });
       textEl.style.animationDuration = `${seconds.toFixed(2)}s`;
       textEl.style.animationDelay = `${-(((Date.now() - tickerState.start) / 1000) % seconds).toFixed(2)}s`;
+      // 押せる所は帯の上下に広げて 44px の高さに（2026-10-29 夜の点検。見た目の帯は 30px のまま）
       return h(
         'button',
-        { class: 'battle__ticker', attrs: { type: 'button', 'aria-label': `${text}（${t('battle.log.open')}）` }, on: { click: () => s && showLog() } },
-        textEl,
+        { class: 'battle__ticker-hit', attrs: { type: 'button', 'aria-label': `${text}（${t('battle.log.open')}）` }, on: { click: () => s && showLog() } },
+        h('span', { class: 'battle__ticker' }, textEl),
       );
     };
 
@@ -2099,10 +2128,14 @@ export const battleScreen: ScreenDefinition = {
       for (const uid of [...manaPicks]) if (!s.sides.player.hand.some((c) => c.uid === uid)) manaPicks.delete(uid);
       // ダメージを受けたモンスター：ライフを1ずつ減らして数える（数え終わる時刻。倒れた音はそのあと）
       const countEnds = new Map<string, number>();
+      const holding = Date.now() < damageHoldUntil;
       for (const side of ['player', 'opponent'] as const) {
         for (const m of s.sides[side].monsters) {
           const before = prevLife.get(m.uid);
-          if (before !== undefined && m.life < before) countEnds.set(m.uid, countLifeDown(m.uid, lifeShown.get(m.uid) ?? before, m.life));
+          if (before === undefined || m.life === before) continue;
+          // カードを見せている間は、前のライフのまま見せておく（見せ終わったら描き直して減らす）
+          if (holding) continue;
+          if (m.life < before) countEnds.set(m.uid, countLifeDown(m.uid, lifeShown.get(m.uid) ?? before, m.life));
         }
       }
       const handScroll = element.querySelector('.battle__hand')?.scrollLeft ?? 0;
@@ -2138,7 +2171,7 @@ export const battleScreen: ScreenDefinition = {
         for (const m of s.sides[side].monsters) {
           // 倒れた・回復した瞬間の音（描き直しでは鳴らさない：前回のライフと比べる）
           const before = prevLife.get(m.uid);
-          if (before !== undefined && before > 0 && m.life === 0) {
+          if (before !== undefined && before > 0 && m.life === 0 && !holding) {
             sound.play('knockout', (countEnds.get(m.uid) ?? 0) + 200);
             // 相手のひと言（【仮】台詞）：自分のモンスターが倒れた／こちらのモンスターを倒した。
             // 何体目かで言葉を変える（2026-10-28：2体目・3体目でも「まず1体」と言っていた）。最後の1体のときは何も言わない（勝ち・負けのひと言が出る）
@@ -2146,7 +2179,7 @@ export const battleScreen: ScreenDefinition = {
             if (line) say(`battle.talk.${line}`);
           }
           else if (before !== undefined && m.life > before) sound.play('heal');
-          prevLife.set(m.uid, m.life);
+          if (!holding || before === undefined) prevLife.set(m.uid, m.life);
         }
       }
       element.classList.toggle('is-defending', canChooseDefense(s) && !(spotlight && Date.now() < spotlight.until));

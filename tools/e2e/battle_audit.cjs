@@ -59,16 +59,29 @@ const save = fs.readFileSync(saveFile, 'utf8');
           const clipY = el.scrollHeight > el.clientHeight + 2 && (st.overflow === 'hidden' || st.overflowY === 'hidden');
           if (clipX || clipY) out.push(`切れ ${el.className.split(' ')[0]} 「${name(el)}」`);
         }
+        // 説明の枠の中で、文字の行どうしが重なっていないか（Range で実際の文字の箱を測る）
+        for (const box of document.querySelectorAll('.battle-spot__info, .battle__defense')) {
+          if (!vis(box)) continue;
+          const leaves = [...box.querySelectorAll('*')].filter((el) => vis(el) && el.children.length === 0 && el.textContent.trim());
+          const rects = leaves.map((el) => { const rg = document.createRange(); rg.selectNodeContents(el); return [el, rg.getBoundingClientRect()]; });
+          for (let a = 0; a < rects.length; a++) for (let b = a + 1; b < rects.length; b++) {
+            const [ea, ra] = rects[a]; const [eb, rb] = rects[b];
+            if (ea.contains(eb) || eb.contains(ea)) continue;
+            const w = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
+            const h = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
+            if (w > 4 && h > 4) out.push(`重なり 「${name(ea)}」と「${name(eb)}」`);
+          }
+        }
         return out;
       });
       for (const s of issues) if (!found.has(s)) {
         found.set(s, `r${r}_${String(i).padStart(3, '0')}`);
+        console.log('見つけた', found.get(s), s);
         await page.screenshot({ path: `${out}/r${r}_${String(i).padStart(3, '0')}.png` });
       }
       if (await page.$('.battle__result, .battle-result')) break;
     }
     await ctx.close();
   }
-  for (const [s, shot] of found) console.log(shot, s);
   await browser.close();
 })();
