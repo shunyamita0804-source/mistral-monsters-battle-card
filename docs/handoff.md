@@ -4,10 +4,14 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 深夜。⑦のあと）
+### まず読む：いまの状態（2026-10-29 深夜のセッション終わり。⑦のあと）
 
 - **公開中：`main`（⑦ カードの効果の文まで）**。テスト 784件。**次の指示を待っている**
 - ⑦ 済み・**返事待ち**：カードに書く効果の文を短くした（36枚。記録 `docs/card-text-short-20261029.md`。表 `src/data/skillCardText.ts`）。報告 https://claude.ai/artifact/1qLDxip2CvnDj9nRWG2W8q
+  （ユーザーの返事は「ありがとう」。合格かどうかはまだ聞いていない）
+  - 短い文を足す・変えるとき：`skillCardText.ts` に1行（日本語）と `contentEnOfficialDraft.ts` の英語。決まりはそのファイルの先頭と記録の文書
+  - 字の大きさの確かめ方：開発用サーバーで `createPlayCard(カード, { width: 176, size: 'normal' })` を描き、`.skill-card__band-text` の style.fontSize を読む
+    （いちばん大きいのは 4.6cqw。`card_gallery_shot.cjs` で写真）。手札の大きさのカードには効果の文は出ない
 - 合格（ユーザー）：①〜⑥すべて
 - ⑥ 済み・合格：https://claude.ai/artifact/D4E4Qhvf1j9nm6JYBA4sV7 （記録 `docs/fixes-20261029b.md`）
   - 管理局の掲示板＝右の壁の白い枠の額（立てる掲示板の絵は使わない）・カードの効果の文を文節で改行（`src/ui/phraseText.ts`。BudouX）・
@@ -17,7 +21,7 @@
 - **未完了**：iPhone 実機での確認（この日の作業すべて）
 - 作業報告書の ZIP：`downloads/作業報告書_20261029.zip`（①〜⑤）・`downloads/作業報告書_直し7つ_20261029.zip`（⑥）。git に入れない・新しいセッションには無い
 - カードの詳しい画面の写真：`tools/e2e/card_detail_shot.cjs`（開発用サーバーで）。世界地図はセーブの場所を街の南の出口 (99,192) にして下へ1歩（town_shot.cjs。精霊の森だけの地図はセーブの rank を E・unlockedDungeons を dungeon-02 だけに）
-- 作業ブランチ `claude/town-fix-20261029`（⑤）・`claude/fixes-20261029b`（⑥）は main に取り込み済み。新しい作業は新しいブランチで。
+- 作業ブランチ `claude/town-fix-20261029`（⑤）・`claude/fixes-20261029b`（⑥）・`claude/card-text-short-20261029`（⑦）は main に取り込み済み。新しい作業は新しいブランチで。
 - ⑥で足した部品：BudouX 0.7.0（package.json。文節の区切り。セッション開始のときに自動で入る）。
 - 街と部屋を直すときのこつ（⑤・⑥）：
   - 街の物の置き場所は `tools/design/town2026_build.py` の `PROPS`（単位。32 単位＝1マス）。川は `STREAM`・橋は `BRIDGE_STONE`・東の森のあけ方は `EAST_CLEAR`・管理局の前の道のはしは `NE_CLEAR`。作り直しは約5〜8分
@@ -25,7 +29,7 @@
   - 作り直すと中身が同じでも .webp が書きかわることがある（差分を見て、絵が同じものは元に戻すとよい）
   - 写真は `town_shot.cjs` に歩けるマスを渡す（管理局の掲示板＝右の壁の額は (53,21) で右向き・大工の小屋の左は (138,16) が使える）
 
-- ユーザーの順番：①ジオルの最終＋太古の遺跡を初期から外す → ②パック専用の絵8つ（ZIP `Mistral_PackArt8_Part1〜3`）＋ジオルのシリーズ → ③イベントのダンジョン3つの絵（ZIP `Mistral_EventDungeons_Part1〜3`）→ ④技の絵の左右の位置（ソラモ04・カルシェル02・13）→ ⑤街と部屋の点検で見つけた所の直し → ⑥直し7つ。1つずつ main に取り込み・公開・報告
+- ユーザーの順番：①ジオルの最終＋太古の遺跡を初期から外す → ②パック専用の絵8つ（ZIP `Mistral_PackArt8_Part1〜3`）＋ジオルのシリーズ → ③イベントのダンジョン3つの絵（ZIP `Mistral_EventDungeons_Part1〜3`）→ ④技の絵の左右の位置（ソラモ04・カルシェル02・13）→ ⑤街と部屋の点検で見つけた所の直し → ⑥直し7つ → ⑦カードに書く効果の文を短く（一覧を2回見せて承認のあと直した）。1つずつ main に取り込み・公開・報告
 - ① 済み：`docs/geol-final-20261029.md`。**セーブ version 23**（仮ジオル → mon-geol）。初期のダンジョンは精霊の森だけ・遺跡は C ランク・地下4階。説明の枠の文が切れる不具合を直した（`fitSpotTexts`）
 - ② 済み：`docs/packart8-20261029.md`。パック8つ（ジオルを足した）・ショップの棚・ジオルのシリーズ（グラントに初めて勝つと開く。記録 `grant-beaten`）
 - ③ 済み：`docs/design/event-dungeons3-20261029/10_受け取り結果_UTF8.txt`。イベントのダンジョン3つの絵（仮の ID event-mist-mine など。ふつうの人には出さない。?qa=1&lab=event）
