@@ -451,6 +451,10 @@
   font-size: 14px;
   font-weight: 700;
   border-width: 4px 12px;
+  /* 2026-10-30 点検 L：名前の札を押すと、札の下にある「となりの印」が反応していた（精霊の森の札の右半分 → 水の神殿 など）。
+     札もその印のボタンの一部として押せるようにし、ほかの印より手前に */
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .world-map__pin:active .world-map__dot {

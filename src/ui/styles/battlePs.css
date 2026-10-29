@@ -1355,3 +1355,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+/* 2026-10-30 点検 L：自分の技の文（「ソラモの「スターダイブ」！ → 相手の…」）が、右の大きなカードの下に隠れて読めなかった。
+   文の帯をカードより手前に出す（カードの上のはしに少しかかるが、文が読める） */
+.battle-spot__line {
+  position: relative;
+  z-index: 2;
+}

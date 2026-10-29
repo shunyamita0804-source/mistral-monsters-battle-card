@@ -34,3 +34,14 @@
 .deck__status {
   min-height: 44px;
 }
+
+/* 対戦の上の帯の「場のカード」（2026-10-30 点検 L：76×24px で押しにくかった）。見た目の札は 24px のまま、押せる範囲を上下に広げて 40px に */
+.battle-turn__field {
+  position: relative;
+}
+
+.battle-turn__field::before {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
