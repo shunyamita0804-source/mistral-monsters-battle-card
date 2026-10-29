@@ -35,6 +35,7 @@ import { packCardRates } from '../src/game/economy/gacha.ts';
 import { createNewSave, migrate, normalizeSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const laz = (n: number): string => lazuckSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
@@ -71,7 +72,7 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
       expect(s.cost).toBe(r.mana);
       expect(s.stat?.value ?? null).toBe(r.damage);
       expect(s.category).toBe(r.category);
-      expect(s.effectTextJa).toBe(r.effect_ja);
+      expect(s.effectTextJa).toBe(SKILL_CARD_TEXT[s.id] ?? r.effect_ja);
       expect(s.displayNo).toBe(r.number);
       expect(s.availability).toBe(r.initial_copies > 0 ? 'initial' : 'collect');
       expect(s.monsterId).toBe('mon-lazuck');
@@ -325,10 +326,10 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
 });
 
 describe('ラズックの技カードの面と日英', () => {
-  it('日本語：効果の文はそのまま。回避に余計な但し書きを足さない', () => {
+  it('日本語：カードに書く短い文（skillCardText.ts）。回避に余計な但し書きを足さない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(laz(14))).description).toBe('相手のちから技・かしこさ技を、消費マナに関係なく回避する。');
-    expect(skillCardFace(getSkill(laz(15))).description).toBe('相手の消費マナ2以上のちから技・かしこさ技を回避する。');
+    expect(skillCardFace(getSkill(laz(14))).description).toBe('マナに関係なく、ちから技・かしこさ技を回避');
+    expect(skillCardFace(getSkill(laz(15))).description).toBe('マナ2以上のちから技・かしこさ技を回避');
     expect(skillCardFace(getSkill(laz(7))).value).toBeNull();
     expect(skillCardFace(getSkill(laz(8))).mana).toBe(0);
   });

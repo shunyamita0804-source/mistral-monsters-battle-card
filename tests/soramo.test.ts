@@ -15,6 +15,7 @@ import { buildAutoDeck, countCards, createStarterDeck, STARTER_SUPPORT_COUNT, ST
 import { createNewSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const ids = (n: number): string => soramoSkillId(n);
 const ORIGINAL = 'design-parts/cards-original/soramo14-artv2-20261026';
@@ -63,7 +64,7 @@ describe('ソラモ14技：正式データ（2026-10-26 Art Ver.2。届いた JS
       expect(s.category).toBe(CAT[category as keyof typeof CAT]);
       expect(s.cost).toBe(Number(mana));
       expect(s.stat?.value ?? null).toBe(damage === '' ? null : Number(damage));
-      expect(s.effectTextJa ?? '').toBe(effect);
+      expect(s.effectTextJa ?? '').toBe(SKILL_CARD_TEXT[s.id] ?? effect);
       expect(s.monsterId).toBe('mon-soramo');
       expect(s.isPlaceholder).toBe(false);
       expect(s.availability).toBe(Number(copies) > 0 ? 'initial' : 'collect');
