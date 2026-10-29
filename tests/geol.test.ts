@@ -395,10 +395,10 @@ describe('ジオルの最終：前のセーブの仮ジオル（セーブ versio
 
 describe('ジオルのガチャのシリーズ（2026-10-29 夜）', () => {
   it('グラントに初めて勝つまでは並ばず、勝つと並ぶ。前にグラントに勝っているセーブは読み込むと並ぶ', async () => {
-    const { availableGachaSeries } = await import('../src/data/economy.ts');
+    const { availableGachaSeriesFor } = await import('../src/game/economy/gachaSeries.ts');
     const { startRun, winRunBattle, runFloor } = await import('../src/game/dungeon/run.ts');
     const base = createNewSave();
-    expect(availableGachaSeries(base.storyFlags).map((s) => s.id)).not.toContain('geol');
+    expect(availableGachaSeriesFor(base).map((s) => s.id)).not.toContain('geol');
     const s = startRun(base, 'dungeon-01', 77);
     const run = s.dungeonRun;
     if (!run) throw new Error('run');
@@ -407,7 +407,8 @@ describe('ジオルのガチャのシリーズ（2026-10-29 夜）', () => {
     if (!boss) throw new Error('boss');
     const w = winRunBattle({ ...s, dungeonRun: last }, { kind: 'boss', id: boss.id }, null);
     expect(w.save.storyFlags).toEqual([GRANT_BEATEN_FLAG]);
-    expect(availableGachaSeries(w.save.storyFlags).map((s) => s.id)).toContain('geol');
+    // 2026-10-30（指示書 K）：ジオルのモンスターカードを受け取ったら並ぶ
+    expect(availableGachaSeriesFor(w.save).map((s) => s.id)).toContain('geol');
     // 2回目に勝っても記録は1つだけ
     const again = startRun(w.save, 'dungeon-01', 78);
     const w2 = winRunBattle({ ...again, dungeonRun: { ...(again.dungeonRun as NonNullable<typeof again.dungeonRun>), floor: 3 } }, { kind: 'boss', id: boss.id }, null);

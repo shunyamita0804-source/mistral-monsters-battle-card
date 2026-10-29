@@ -120,9 +120,10 @@ export interface GachaSeries {
   /** レア枠の技（ユーザー決定。技の名前で指定し、ID は今のデータから引く） */
   readonly rareSkillNames: readonly string[];
   /**
-   * この記録（セーブの storyFlags）があるときだけ並ぶ（無ければ最初から並ぶ）。プカリム＝ピートに勝ったあと（src/game/story/pete.ts の PETE_BEATEN_FLAG）、
-   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）、フルーネ＝精霊の森のセラに初めて勝ったあと（SERA_BEATEN_FLAG）、
-   * セレフィーン＝水の神殿のルシアに初めて勝ったあと（LUCIA_BEATEN_FLAG）
+   * 2026-10-29 までの並ぶ条件（この記録があるときだけ並んだ）。プカリム＝ピートに勝ったあと（PETE_BEATEN_FLAG）、ジオル＝グラント（GRANT_BEATEN_FLAG）、
+   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）。
+   * 2026-10-30（指示書 K）から並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor（モンスターカードを初めて手に入れたら開く）。
+   * ここは前のセーブの変換（src/game/save/saveData.ts の v26→v27・v27→v28）でだけ使う
    */
   readonly unlockFlag?: string;
 }
@@ -149,21 +150,24 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' },
 ];
 
-/** いまのセーブで選べるシリーズ（unlockFlag の記録がまだ無いものは並ばない） */
-export function availableGachaSeries(storyFlags: readonly string[]): readonly GachaSeries[] {
+/**
+ * 2026-10-29 までの並ぶ条件（unlockFlag の記録がまだ無いものは並ばない）。前のセーブの変換でだけ使う。
+ * 今の並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor
+ */
+export function legacyAvailableGachaSeries(storyFlags: readonly string[]): readonly GachaSeries[] {
   return GACHA_SERIES.filter((s) => !s.unlockFlag || storyFlags.includes(s.unlockFlag));
 }
 
 /**
- * 新しく並んだシリーズの「NEW」の印（2026-10-29 夜 ユーザー）：一度選ぶ（1回タップ）と、この記録（storyFlags）を付けて消す。
- * 最初から並ぶシリーズには出さない（unlockFlag のあるシリーズだけ）
+ * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）
+ */
+export const SKIP_GACHA_SERIES_IDS: readonly string[] = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell'];
+
+/**
+ * シリーズを一度選んだ記録（2026-10-29 夜 ユーザー：NEW の印は一度選ぶと消える）。
+ * 2026-10-30 から「一度開いたシリーズ」の記録も兼ねる（この記録があれば、カードを持っていなくても並ぶ。前のセーブで並んでいたシリーズを閉じない）
  */
 export const gachaSeenFlag = (seriesId: string): string => `gacha-seen-${seriesId}`;
-
-/** NEW の印を出すシリーズか（並んでいて、まだ一度も選んでいない） */
-export function isNewGachaSeries(storyFlags: readonly string[], series: GachaSeries): boolean {
-  return !!series.unlockFlag && storyFlags.includes(series.unlockFlag) && !storyFlags.includes(gachaSeenFlag(series.id));
-}
 
 export function getGachaSeries(id: string): GachaSeries | undefined {
   return GACHA_SERIES.find((s) => s.id === id);

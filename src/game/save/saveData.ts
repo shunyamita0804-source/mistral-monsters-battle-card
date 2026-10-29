@@ -3,7 +3,7 @@ import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_S
 import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
-import { CURRENCY, GACHA_SERIES, gachaSeenFlag, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
+import { CURRENCY, GACHA_SERIES, gachaSeenFlag, legacyAvailableGachaSeries, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
@@ -41,7 +41,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 27;
+export const SAVE_VERSION = 28;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -686,6 +686,17 @@ function migrateGachaSeenV27(raw: RawObject): RawObject {
   return seen.length === 0 ? raw : { ...raw, storyFlags: [...flags, ...seen] };
 }
 
+/**
+ * v27 → v28（2026-10-30 指示書 K。ガチャのシリーズの開く条件をユーザー決定に）：最初は箱の3体、ほかはモンスターカードを初めて手に入れたら開く。
+ * 前のセーブで、もう並んでいるシリーズ（2026-10-29 までの条件：最初からの6つ＋unlockFlag の記録があるもの）は閉じないよう、
+ * 「選んだ」記録（gachaSeenFlag。一度開いた記録も兼ねる）を付ける（NEW も出さない）
+ */
+function migrateGachaOpenV28(raw: RawObject): RawObject {
+  const flags = Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]).filter((f): f is string => typeof f === 'string') : [];
+  const add = legacyAvailableGachaSeries(flags).map((g) => gachaSeenFlag(g.id)).filter((f) => !flags.includes(f));
+  return add.length === 0 ? raw : { ...raw, storyFlags: [...flags, ...add] };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -715,6 +726,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   24: migrateTmpFluneV25,
   25: migrateSerephineAltarV26,
   26: migrateGachaSeenV27,
+  27: migrateGachaOpenV28,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

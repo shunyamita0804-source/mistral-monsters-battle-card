@@ -5,7 +5,8 @@ import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
 import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { DUNGEONS, ENCOUNTERS, LUCIA_ALTAR_OWED_FLAG, LUCIA_BEATEN_FLAG } from '../src/data/dungeons.ts';
 import { RUN_DUNGEONS } from '../src/data/dungeonRun.ts';
-import { availableGachaSeries, GACHA_SERIES } from '../src/data/economy.ts';
+import { GACHA_SERIES } from '../src/data/economy.ts';
+import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
 import serephineJson from '../src/data/official/serephine14_skills_OFFICIAL_20261029.json';
 import {
   SEREPHINE_COLOR,
@@ -362,8 +363,10 @@ describe('セレフィーンのガチャのシリーズとショップ', () => {
     expect(lineup.errors).toEqual([]);
     expect(lineup.rareIds).toEqual([ser(7), ser(9), ser(14)]);
     expect(lineup.all).toHaveLength(15);
-    expect(availableGachaSeries([]).map((s) => s.id)).not.toContain('serephine');
-    expect(availableGachaSeries([LUCIA_BEATEN_FLAG]).map((s) => s.id)).toContain('serephine');
+    // 2026-10-30（指示書 K）：セレフィーンのモンスターカードを初めて手に入れたら並ぶ
+    const base = createNewSave();
+    expect(availableGachaSeriesFor(base).map((s) => s.id)).not.toContain('serephine');
+    expect(availableGachaSeriesFor({ ...base, collection: { ...base.collection, 'mon-serephine': 1 } }).map((s) => s.id)).toContain('serephine');
   });
 
   it('パックの絵の色（pack_tint.py）・ショップの棚（shop_goods_20261029.py）にセレフィーンがある', () => {

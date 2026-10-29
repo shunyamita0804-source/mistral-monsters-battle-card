@@ -4,7 +4,8 @@ import { BATTLE_CARDS } from '../src/data/battleCards.ts';
 import { cardCatalog, getSkill, MONSTERS, SKILLS, skillsOf, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS } from '../src/data/cards.ts';
 import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { DUNGEONS, ENCOUNTERS, SERA_BEATEN_FLAG } from '../src/data/dungeons.ts';
-import { availableGachaSeries, GACHA_SERIES } from '../src/data/economy.ts';
+import { GACHA_SERIES } from '../src/data/economy.ts';
+import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
 import { FLUNE_COLOR, FLUNE_GACHA_RARE, FLUNE_MONSTER, FLUNE_MONSTER_ID, FLUNE_SKILLS, fluneSkillId } from '../src/data/flune.ts';
 import { geolSkillId } from '../src/data/geol.ts';
 import fluneJson from '../src/data/official/flune14_skills_OFFICIAL_20261029.json';
@@ -353,8 +354,10 @@ describe('フルーネのガチャのシリーズとショップ', () => {
     expect(lineup.errors).toEqual([]);
     expect(lineup.rareIds).toEqual([flu(8), flu(9), flu(10)]);
     expect(lineup.all).toHaveLength(15);
-    expect(availableGachaSeries([]).map((s) => s.id)).not.toContain('flune');
-    expect(availableGachaSeries([SERA_BEATEN_FLAG]).map((s) => s.id)).toContain('flune');
+    // 2026-10-30（指示書 K）：フルーネのモンスターカードを初めて手に入れたら並ぶ
+    const base = createNewSave();
+    expect(availableGachaSeriesFor(base).map((s) => s.id)).not.toContain('flune');
+    expect(availableGachaSeriesFor({ ...base, collection: { ...base.collection, 'mon-flune': 1 } }).map((s) => s.id)).toContain('flune');
   });
 
   it('パックの絵の色（pack_tint.py）・ショップの棚（shop_goods_20261029.py）にフルーネがある', () => {
