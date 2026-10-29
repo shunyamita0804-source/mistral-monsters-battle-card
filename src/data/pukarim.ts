@@ -1,5 +1,5 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
-import pukarimData from './official/pukarim14_skills_DRAFT_20261028.json';
+import pukarimData from './official/pukarim14_skills_DRAFT_20261029.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
@@ -17,7 +17,8 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - 正式モンスターカード pukarim_official.webp（届いた art/monster_card/pukarim_official_monstercard_LIFE6.png を幅 508 に縮めただけ。ソラモ・ガウル・ノビトンと同じ）
  * - バトル用 pukarim_battlecard.png（2026-10-28 に届いた art/pukarim_battleart.png を無改変。1169×1345）
  * 色：ミント #A8DCC4（モンスターカード枠・技カード枠とも）
- * ガチャのレアの枠（JSON の gacha_slot）：7 ぷはーっ・14 ぷかぷか（economy.ts の GACHA_SERIES）
+ * ガチャのレアの枠（JSON の gacha_slot）：7 ぷはーっ・8 おおつむじ・14 ぷかぷか（economy.ts の GACHA_SERIES）。
+ * 2026-10-29 夜（ユーザー決定）にレアを3つにそろえた新しい版 pukarim14_skills_DRAFT_20261029.json を読む（gacha_slot だけ違う。元の版は残す）
  */
 export const PUKARIM_MONSTER_ID = 'mon-pukarim';
 export const pukarimSkillId = (no: number): string => `skl-pukarim-${twoDigits(no)}`;
@@ -105,7 +106,7 @@ function toSkill(row: PukarimRow): SkillCard {
 /** プカリムの技14種（JSON の番号の順） */
 export const PUKARIM_SKILLS: readonly SkillCard[] = PUKARIM_ROWS.map(toSkill);
 
-/** ガチャのレアの枠（JSON の gacha_slot が「レア」：7 ぷはーっ・14 ぷかぷか） */
+/** ガチャのレアの枠（JSON の gacha_slot が「レア」：7 ぷはーっ・8 おおつむじ・14 ぷかぷか） */
 export const PUKARIM_GACHA_RARE: readonly string[] = PUKARIM_ROWS.filter((r) => r.gacha_slot === 'レア').map((r) => r.id);
 
 /**

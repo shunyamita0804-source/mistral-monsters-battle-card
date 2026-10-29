@@ -40,12 +40,19 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       const lineup = seriesLineup(series);
       return skillsOf(series.monsterId).filter((s) => lineup.rareIds.includes(s.id)).map((s) => s.name);
     };
-    expect(names('soramo')).toEqual(['ソラモビーム', '星影ステップ']);
-    expect(names('gauul')).toEqual(['聖なる炎', '炎の壁', '高速飛行']);
-    expect(names('lazuck').sort()).toEqual(['とびかかり', 'トリックショット', 'シャドウバースト', 'フェイントステップ'].sort());
-    expect(names('nobiton').sort()).toEqual(['まきつく', 'ダウナーミスト', 'のびのびガード', '必死によける'].sort());
-    expect(names('myurol')).toEqual(['スリップガード']);
-    expect(names('kalshell')).toEqual(['てっぺきシェル']);
+    // 2026-10-29 夜：「いちばん大きい攻撃はレア」を足し、どのモンスターもレア3つ
+    const want: Record<string, string[]> = {
+      soramo: ['ソラモビーム', 'スターフォール', '星影ステップ'],
+      gauul: ['スパイラルダイブ', '聖なる炎', '高速飛行'],
+      lazuck: ['とびかかり', 'シャドウバースト', 'フェイントステップ'],
+      nobiton: ['まきつく', 'ギガントノーズ', 'ダウナーミスト'],
+      myurol: ['アクアテール', 'スリップガード', 'すべってよける'],
+      kalshell: ['シェルブレイカー', 'タイダルクラッシュ', 'てっぺきシェル'],
+      pukarim: ['ぷはーっ', 'おおつむじ', 'ぷかぷか'],
+      geol: ['ナックル', 'グランドハンマー', 'うけとめる'],
+      flune: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'],
+    };
+    for (const s of GACHA_SERIES) expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
   });
 
   it('1パック5枚。シリーズのカードだけが出て、開ける順はノーマル → レア → モンスター', () => {
@@ -126,7 +133,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     }
   });
 
-  it('プカリムはピートに勝ったあと（記録 pete-beaten）だけ並び、買える。レア枠は 7 ぷはーっ・14 ぷかぷか', () => {
+  it('プカリムはピートに勝ったあと（記録 pete-beaten）だけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
     const before = { ...createNewSave(), coins: 150 };
     expect(availableGachaSeries(before.storyFlags).map((s) => s.id)).not.toContain('pukarim');
     expect(purchaseSeriesPack(before, 'pukarim', 'tx-p', 3).status).toBe('error');
@@ -135,7 +142,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(purchaseSeriesPack(after, 'pukarim', 'tx-p', 3).status).toBe('ok');
     const pukarim = GACHA_SERIES.find((s) => s.id === 'pukarim');
     if (!pukarim) throw new Error('pukarim');
-    expect(seriesLineup(pukarim).rareIds).toEqual(['skl-pukarim-07', 'skl-pukarim-14']);
+    expect(seriesLineup(pukarim).rareIds).toEqual(['skl-pukarim-07', 'skl-pukarim-08', 'skl-pukarim-14']);
   });
 
   it('「パックを選び直す」は払う前だけ', () => {

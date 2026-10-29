@@ -1,5 +1,5 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
-import fluneData from './official/flune14_skills_OFFICIAL_20261029.json';
+import fluneData from './official/flune14_skills_OFFICIAL_20261029_rare3.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
@@ -19,7 +19,8 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - 正式モンスターカード flune_official.webp（届いた flune_official_monstercard_LIFE10.png を幅 508 に縮めただけ。ジオルと同じ）
  * - バトル用 flune_battlecard.png（届いた flune_battleart.png を無改変。1169×1346）
  * 色：若葉色 #9CBF5A（モンスターカード枠・技カード枠とも）
- * ガチャのレアの枠（JSON の gacha_slot）：09 フラワードレイン（FLUNE_GACHA_RARE）
+ * ガチャのレアの枠（JSON の gacha_slot）：08 はなびらストーム・09 フラワードレイン・10 いやしのみつ（FLUNE_GACHA_RARE）。
+ * 2026-10-29 夜（ユーザー決定）にレアを3つにそろえた新しい版 flune14_skills_OFFICIAL_20261029_rare3.json を読む（gacha_slot だけ違う。元の版は残す）
  */
 export const FLUNE_MONSTER_ID = 'mon-flune';
 export const fluneSkillId = (no: number): string => `skl-flune-${twoDigits(no)}`;
@@ -105,7 +106,7 @@ function toSkill(row: FluneRow): SkillCard {
 /** フルーネの技14種（JSON の番号の順） */
 export const FLUNE_SKILLS: readonly SkillCard[] = FLUNE_ROWS.map(toSkill);
 
-/** ガチャのレアの枠（JSON の gacha_slot が「レア」：09 フラワードレイン） */
+/** ガチャのレアの枠（JSON の gacha_slot が「レア」：08 はなびらストーム・09 フラワードレイン・10 いやしのみつ） */
 export const FLUNE_GACHA_RARE: readonly string[] = FLUNE_ROWS.filter((r) => r.gacha_slot === 'レア').map((r) => r.id);
 
 /**

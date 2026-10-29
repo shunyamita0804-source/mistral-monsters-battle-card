@@ -1,0 +1,167 @@
+{
+  "revision": "2026-10-29 夜 ユーザー決定：ガチャのレア枠を3つにそろえた（gacha_slot だけ変更。元の版 flune14_skills_OFFICIAL_20261029.json は残す）",
+  "monster": "フルーネ",
+  "monster_id": "mon-flune",
+  "life": 10,
+  "monster_rank": "C",
+  "frame_color_name": "若葉色",
+  "frame_color_hex": "#9CBF5A",
+  "habitat": "精霊の森",
+  "status": "正式（2026-10-29）。G3 承認・LIFE 10 確定（試遊はユーザー判断でなし）。絵はすべて正式（技14・モンスターカード・バトル用・パック）",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-flune-01",
+      "name": "つたはたき",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_01.png"
+    },
+    {
+      "no": 2,
+      "id": "skl-flune-02",
+      "name": "ねっこづき",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_02.png"
+    },
+    {
+      "no": 3,
+      "id": "skl-flune-03",
+      "name": "ねっこムチ",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_03.png"
+    },
+    {
+      "no": 4,
+      "id": "skl-flune-04",
+      "name": "ねっこラッシュ",
+      "category": "ちから技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_04.png"
+    },
+    {
+      "no": 5,
+      "id": "skl-flune-05",
+      "name": "たねとばし",
+      "category": "かしこさ技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_05.png"
+    },
+    {
+      "no": 6,
+      "id": "skl-flune-06",
+      "name": "はなびらシュート",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_06.png"
+    },
+    {
+      "no": 7,
+      "id": "skl-flune-07",
+      "name": "かふん",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "1",
+      "effect": "相手のマナを1減らす",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_07.png"
+    },
+    {
+      "no": 8,
+      "id": "skl-flune-08",
+      "name": "はなびらストーム",
+      "category": "かしこさ技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "レア",
+      "art": "flune_sk_08.png"
+    },
+    {
+      "no": 9,
+      "id": "skl-flune-09",
+      "name": "フラワードレイン",
+      "category": "かしこさ技",
+      "mana": 6,
+      "damage": "3",
+      "effect": "与えたダメージぶん、フルーネのライフを回復",
+      "gacha_slot": "レア",
+      "art": "flune_sk_09.png"
+    },
+    {
+      "no": 10,
+      "id": "skl-flune-10",
+      "name": "いやしのみつ",
+      "category": "特殊技",
+      "mana": 3,
+      "damage": "―",
+      "effect": "味方1体（フルーネも可）のライフを2回復",
+      "gacha_slot": "レア",
+      "art": "flune_sk_10.png"
+    },
+    {
+      "no": 11,
+      "id": "skl-flune-11",
+      "name": "はっぱのたて",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_11.png"
+    },
+    {
+      "no": 12,
+      "id": "skl-flune-12",
+      "name": "はなびらのまく",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "かしこさ技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_12.png"
+    },
+    {
+      "no": 13,
+      "id": "skl-flune-13",
+      "name": "つるのかべ",
+      "category": "防御技",
+      "mana": 3,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技のダメージを2軽減",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_13.png"
+    },
+    {
+      "no": 14,
+      "id": "skl-flune-14",
+      "name": "はっぱにかくれる",
+      "category": "回避技",
+      "mana": 3,
+      "damage": "―",
+      "effect": "ちから技を回避",
+      "gacha_slot": "ノーマル",
+      "art": "flune_sk_14.png"
+    }
+  ]
+}

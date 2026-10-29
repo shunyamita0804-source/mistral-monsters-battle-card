@@ -78,7 +78,7 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
   it('モンスター：ライフ10・若葉色・ID mon-flune。レアの枠は 09。枠の絵がある。仮フルーネはゲームから外した', () => {
     expect(FLUNE_MONSTER).toMatchObject({ id: 'mon-flune', life: 10, name: 'フルーネ', isPlaceholder: false });
     expect(FLUNE_COLOR).toBe('#9CBF5A');
-    expect(FLUNE_GACHA_RARE).toEqual([flu(9)]);
+    expect(FLUNE_GACHA_RARE).toEqual([flu(8), flu(9), flu(10)]);
     expect(BATTLE_CARDS[FLUNE_MONSTER_ID]?.frame).toBe('flune');
     expect(existsSync('assets/images/ui/battlecard/frame_flune.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_flune.webp`)).toBe(true);
@@ -343,15 +343,15 @@ describe('精霊の森のボス（セラ）・入手の流れ', () => {
 });
 
 describe('フルーネのガチャのシリーズとショップ', () => {
-  it('ジオルのあとに1行。レア枠はフラワードレイン。sera-beaten のあとだけ並ぶ', () => {
+  it('ジオルのあとに1行。レア枠ははなびらストーム・フラワードレイン・いやしのみつ。sera-beaten のあとだけ並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('flune')).toBe(ids.indexOf('geol') + 1);
     const series = GACHA_SERIES.find((s) => s.id === 'flune');
-    expect(series).toEqual({ id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['フラワードレイン'], unlockFlag: 'sera-beaten' });
+    expect(series).toEqual({ id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' });
     if (!series) throw new Error('series');
     const lineup = seriesLineup(series);
     expect(lineup.errors).toEqual([]);
-    expect(lineup.rareIds).toEqual([flu(9)]);
+    expect(lineup.rareIds).toEqual([flu(8), flu(9), flu(10)]);
     expect(lineup.all).toHaveLength(15);
     expect(availableGachaSeries([]).map((s) => s.id)).not.toContain('flune');
     expect(availableGachaSeries([SERA_BEATEN_FLAG]).map((s) => s.id)).toContain('flune');
