@@ -102,6 +102,7 @@ import { button, h } from '../dom.ts';
 import { once, type BattleRequest } from '../gameStore.ts';
 import { sound, type SoundId } from '../sound.ts';
 import type { ScreenDefinition } from './types.ts';
+import { phraseText } from '../phraseText.ts';
 
 /** ルール上のきっかけ → 効果音 */
 const FX_SOUND: Readonly<Record<BattleFxKind, SoundId>> = {
@@ -735,7 +736,7 @@ export const battleScreen: ScreenDefinition = {
             inInfo ? line : null,
             h('p', { class: 'battle-spot__name', text: cardName(card) }),
             h('p', { class: 'battle-spot__power', text: power }),
-            h('p', { class: 'battle-spot__desc', text: describePlayCard(card) }),
+            h('p', { class: 'battle-spot__desc' }, phraseText(describePlayCard(card))),
             h('p', { class: 'battle-spot__skip', text: t('battle.spot.tapToSkip') }),
           ),
           h(
@@ -1493,7 +1494,7 @@ export const battleScreen: ScreenDefinition = {
                   : t('battle.prompt.manaFirstDone'),
           }),
           h('p', { class: 'battle-text__ok', text: t('battle.prompt.picked', { n: manaPicks.size }) }),
-          card ? h('p', { class: 'battle-text__desc', text: t('battle.prompt.nameDesc', { name: cardName(card), desc: describePlayCard(card) }) }) : null,
+          card ? h('p', { class: 'battle-text__desc' }, phraseText(t('battle.prompt.nameDesc', { name: cardName(card), desc: describePlayCard(card) }))) : null,
         ];
       } else if (card && hand) {
         const usability = cardUsability(s, 'player', hand.uid);
@@ -1506,7 +1507,7 @@ export const battleScreen: ScreenDefinition = {
         body = [
           h('p', { class: 'battle-text__name', text: cardName(card) }),
           h('p', { class: 'battle-text__owner', text: owner }),
-          h('p', { class: 'battle-text__desc', text: describePlayCard(card) }),
+          h('p', { class: 'battle-text__desc' }, phraseText(describePlayCard(card))),
           usability.usable
             ? h('p', { class: 'battle-text__ok', text: t('battle.prompt.usable') })
             : h('p', { class: 'battle-text__ng', text: usability.reason ?? t('battle.prompt.unusable') }),
@@ -1885,7 +1886,7 @@ export const battleScreen: ScreenDefinition = {
           on: { click: () => openCardDetail(element, card, { extra: [t(`battle.field.by.${s.field?.owner ?? 'player'}`)] }) },
         },
         h('span', { class: 'battle-turn__field-label', text: t('battle.field.label') }),
-        h('span', { class: 'battle-turn__field-text', text: withoutFieldPrefix(supportShortText(card)) }),
+        h('span', { class: 'battle-turn__field-text' }, phraseText(withoutFieldPrefix(supportShortText(card)))),
       );
     };
 

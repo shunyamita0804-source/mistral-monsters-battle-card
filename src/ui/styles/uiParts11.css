@@ -478,6 +478,13 @@
   color: #c9c3b6;
 }
 
+/* 2026-10-29：行ける所（街・ダンジョン）の印と名前の札は、まだ行けない場所の霧より手前（霧で名前の札が暗く見えないように） */
+.world-map__pin--here,
+.world-map__pin--dungeon,
+.world-map__pin--cleared {
+  z-index: 2;
+}
+
 .world-map__seal {
   position: absolute;
   right: -2px;

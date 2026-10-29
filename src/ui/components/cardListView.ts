@@ -8,6 +8,7 @@ import { button, h } from '../dom.ts';
 import { cardEffectText } from './cardDetail.ts';
 import { createCardView } from './cardView.ts';
 import { createMonsterPortrait } from './monsterPortrait.ts';
+import { phraseText } from '../phraseText.ts';
 
 export interface CardListOptions {
   /** もらったカードの ID（同じ ID は何回あってもよい。並びは receivedCardList がそろえる） */
@@ -58,7 +59,7 @@ export function openCardList(parent: HTMLElement, options: CardListOptions): { c
     bigName.textContent = cardName(card);
     bigCount.textContent = t('received.count', { n: count });
     bigMeta.textContent = metaText(card);
-    bigText.textContent = cardEffectText(card);
+    bigText.replaceChildren(phraseText(cardEffectText(card)));
     bigText.scrollTop = 0;
   };
 

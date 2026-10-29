@@ -11,6 +11,7 @@ import { h } from '../dom.ts';
 import { createCardView } from './cardView.ts';
 import { openModal, type ModalHandle } from './modal.ts';
 import { rarityBadge } from './rarityBadge.ts';
+import { phraseText } from '../phraseText.ts';
 
 export interface CardDetailOptions {
   /** 所持枚数（指定すると表示） */
@@ -64,7 +65,7 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
       h('div', { class: 'card-detail__card' }, createCardView(card, 180, true)),
       h('h2', { class: 'card-detail__name', text: cardName(card) }),
       ...(options.extra ?? []).map((t) => h('p', { class: 'card-detail__extra', text: t })),
-      h('p', { class: 'card-detail__description', text: description }),
+      h('p', { class: 'card-detail__description' }, phraseText(description)),
       h(
         'dl',
         { class: 'card-detail__rows' },

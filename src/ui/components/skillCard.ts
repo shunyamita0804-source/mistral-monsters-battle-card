@@ -7,6 +7,7 @@ import { t } from '../../i18n/i18n.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
 import { fitValueFont } from './valueFit.ts';
+import { phrases, phraseText } from '../phraseText.ts';
 
 /**
  * 技カード・サポートカード（2026-10-29 新しい形：平らな名前の帯＋大きな絵の窓だけの枠。
@@ -89,12 +90,40 @@ function fitText(el: HTMLElement, text: string, base: number, fit: number, min: 
   return el;
 }
 
-/** 効果の帯の文字：2行に収まる大きさ（上限 4.6cqw）。帯の中の幅（cqw）と、折り返しのむだを見た目安で決める */
+/** 字の幅の目安（全角1・半角0.55。字の大きさを1としたとき） */
+const roughEm = (text: string): number => [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : 0.55), 0);
+
+/**
+ * 効果の帯の文字：2行に収まる大きさ（上限 4.6cqw・下限 2.2cqw）。帯の中の幅（cqw）に、文節（phraseText と同じ区切り）を
+ * 前から詰めていって2行に入る大きさを探す（2026-10-29 文節で改行するようにしたので、行の終わりのむだも数に入れる）
+ */
 function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
-  const el = h('span', { class: 'skill-card__band-text', text });
-  const len = [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : 0.55), 0);
+  const el = phraseText(text, 'skill-card__band-text');
   const inner = ((band[2] - band[0]) / l.w) * 100 - 5;
-  el.style.fontSize = cqw(Math.max(2.2, Math.min(4.6, (2 * inner * 0.9) / Math.max(1, len))));
+  // 英語は単語（と後ろの空白）ごと
+  const parts = phrases(text)
+    .flatMap((p) => (p === '\n' ? [] : /\s/.test(p) ? p.split(/(?<=\s)/) : [p]))
+    .map(roughEm);
+  const lines = (size: number): number => {
+    const cap = (inner * 0.96) / size;
+    let n = 1;
+    let used = 0;
+    for (const w of parts) {
+      if (used + w <= cap) {
+        used += w;
+        continue;
+      }
+      if (used > 0) n += 1;
+      // 1行より長い文節は、その中で改行する
+      const extra = Math.max(0, Math.ceil(w / cap) - 1);
+      n += extra;
+      used = w - extra * cap;
+    }
+    return n;
+  };
+  let size = 4.6;
+  while (size > 2.2 && lines(size) > 2) size -= 0.1;
+  el.style.fontSize = cqw(Math.max(2.2, size));
   return el;
 }
 

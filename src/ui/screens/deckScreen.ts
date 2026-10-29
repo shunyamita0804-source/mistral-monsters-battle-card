@@ -13,6 +13,7 @@ import { createScreenHeader } from '../components/screenHeader.ts';
 import { createPlayCard } from '../components/skillCard.ts';
 import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
+import { phraseText } from '../phraseText.ts';
 
 /** 技カードの組「サポート」の印（モンスターIDと重ならない値） */
 const SUPPORT_GROUP = '__support';
@@ -262,7 +263,7 @@ export const deckScreen: ScreenDefinition = {
           { class: 'deck-preview__info' },
           h('p', { class: 'deck-preview__name', text: cardName(m) }),
           h('p', { class: 'deck-preview__meta', text: t('deck.monsterInfo', { life: m.life, n: skillsOf(m.id).length, owned: coll[m.id] ?? 0 }) }),
-          h('p', { class: 'deck-preview__text', text: cardDescription(m) }),
+          h('p', { class: 'deck-preview__text' }, phraseText(cardDescription(m))),
         );
       const put = button(t('deck.put'), () => monster && putMonster(monster.id), 'btn btn--primary btn--small');
       put.disabled = !monster || draft.monsters[slot] === monster.id;
@@ -357,7 +358,7 @@ export const deckScreen: ScreenDefinition = {
               { class: 'deck-preview__info' },
               h('p', { class: 'deck-preview__name', text: cardName(card) }),
               h('p', { class: 'deck-preview__meta', text: meta(card) }),
-              h('p', { class: 'deck-preview__text', text: describePlayCard(card) }),
+              h('p', { class: 'deck-preview__text' }, phraseText(describePlayCard(card))),
             )
           : h('div', { class: 'deck-preview__info' }, h('p', { class: 'deck-preview__text', text: t(card ? 'deck.previewUnknown' : 'deck.previewEmpty') })),
       );

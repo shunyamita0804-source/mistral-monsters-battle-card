@@ -310,3 +310,10 @@
   object-fit: contain;
   filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.5));
 }
+
+/* 文節の区切りで改行する文字（ui/phraseText.ts。<wbr> の所でだけ改行。長すぎる文節だけ中で改行） */
+.phrase-text {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
