@@ -29,6 +29,7 @@ import town_tone_20261028 as town_tone
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/town-20261028')
 # 2026-10-28 夜：建物7つは正面向きの新しい絵（front-facing-20261028。同じファイル名なので先に探す。前の斜めの原本は part1_buildings に残す）
+# 2026-10-29：研究所・管理局・練習場も front-facing-20261028 に（指示書は town3-20261029/）
 SHEET_DIRS = [os.path.join(SRC, 'front-facing-20261028'), os.path.join(SRC, 'part1_buildings'), os.path.join(SRC, 'part2_terrain_props'), os.path.join(SRC, 'instructions/cardshop')]
 OUT_TOWN = os.path.join(ROOT, 'assets/images/maps/town')
 
@@ -99,12 +100,13 @@ def resize(im: Image.Image, s: float) -> Image.Image:
 # 建物：部品・扉（シートの px：扉の中心 x・扉の上・扉の下＝敷居）・扉の高さ（単位）・街の扉の位置（中心 x・敷居の y）
 #  扉の高さ：家・店 215（主人公 約194 より少し高い）、公共の建物は少し大きく、大会会場はいちばん大きく 290
 # 2026-10-28 夜：6〜12 の扉の位置は正面向きの新しい絵で測り直した（扉の石のアーチの上・扉の下の段の上）
+# 2026-10-29：2 管理局・3 研究所・4 練習場も正面向きの新しい絵に。扉を測り直した（扉の高さ・街の扉の位置はそのまま）
 BUILDINGS = [
     # 番号  ID              部品                      扉 cx, 上, 下     扉の高さ  街の扉 x, 敷居 y
     dict(no=1, id='ARENA', file='building_arena', door=(762, 735, 945), door_h=290, at=(3200, 1330), door_w=236),
-    dict(no=2, id='BUREAU', file='building_bureau', door=(468, 670, 905), door_h=240, at=(5420, 1830), door_w=150),
-    dict(no=3, id='LAB', file='building_lab', door=(462, 750, 912), door_h=215, at=(1150, 1520), door_w=150),
-    dict(no=4, id='TRAINING', file='building_practice', door=(685, 585, 850), door_h=240, at=(1100, 2960), door_w=170),
+    dict(no=2, id='BUREAU', file='building_bureau', door=(511, 669, 874), door_h=240, at=(5420, 1830), door_w=150),
+    dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1520), door_w=150),
+    dict(no=4, id='TRAINING', file='building_practice', door=(768, 585, 824), door_h=240, at=(1100, 2960), door_w=170),
     dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=200),
     dict(no=6, id='HOUSE_A', file='building_florist', door=(516, 575, 828), door_h=215, at=(5800, 2890), door_w=100),
     dict(no=7, id='HOUSE_D', file='building_tailor', door=(480, 606, 848), door_h=215, at=(4500, 4240), door_w=100),

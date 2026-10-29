@@ -5,7 +5,7 @@ const fs = require('fs');
 const [base, outDir, saveFile, onlyArg] = process.argv.slice(2);
 
 const save0 = JSON.parse(fs.readFileSync(saveFile, 'utf8'));
-save0.player = { gender: 'male' };
+save0.player = { gender: 'male', name: 'ユウ' }; // 名前が無いと名前の窓が出て進まない（2026-10-29）
 const src = fs.readFileSync(__dirname + '/../../src/data/worldArt.generated.ts', 'utf8');
 const ti = src.indexOf('"town"'); const di = src.indexOf('"doors"', ti);
 let depth = 0, j = src.indexOf('{', di), start = j;

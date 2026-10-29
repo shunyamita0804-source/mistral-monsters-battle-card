@@ -1,0 +1,38 @@
+ミスモンBC｜街の建物3つ（正面向き）・研究所の床・大会会場の受付カウンターの差し替え（2026-10-29）
+
+docs/design-requests-20261028/ の依頼文 12_building_lab・12_building_bureau・12_building_practice・06_lab_floor・15_hall_reception の絵が届きました。
+進行（Claude のチャット）が検品して合格にしたものです。原本は無改変です。
+（09_shop_display＝ショップの商品はまだ入れません。新しいガチャのパックができてから、別の指示で入れます）
+
+■ 入っているファイルと置き場所
+1. building_lab.png（1024×1024・透過）→ design-parts/town-20261028/front-facing-20261028/building_lab.png
+2. building_bureau.png（1024×1024・透過）→ design-parts/town-20261028/front-facing-20261028/building_bureau.png
+3. building_practice.png（1536×1024・透過）→ design-parts/town-20261028/front-facing-20261028/building_practice.png
+4. lab_shell.png（1536×1024・不透明）→ design-parts/rooms-20261028/Mistral_Room_lab_parts/lab_shell.png を置き換え
+   （床だけ描き直し。壁・窓・本棚は元の絵とピクセルまで同じ。進行が確認済み）
+5. arena_05_reception.png（1536×1024・透過）→ design-parts/rooms-20261028/Mistral_Room_arena_parts/arena_05_reception.png を置き換え
+   （カウンターは x 1203〜1496・y 609〜776。前の 1103〜1509 から小さくなった）
+
+■ 街の建物3つ
+- tools/design/town2026_build.py の BUILDINGS の LAB・BUREAU・TRAINING が新しい絵（front-facing-20261028）を使うようにして、door（扉の中心 x・扉の上・敷居）を測り直してください。
+  進行が測った目安（自分で測り直すこと）：
+  - LAB：扉の中心 x 約 510・扉のアーチの上 約 711・敷居 約 861（扉の高さ 約 150）
+  - BUREAU：中心 x 約 511・上 約 669・敷居 約 874（約 205）
+  - TRAINING：中心 x 約 768・上 約 585・敷居 約 824（約 240）。扉は建物の真ん中になった → 扉の前の道が建物の真ん中から下へまっすぐのびるように
+- door_h（街の中の扉の高さ）は今のまま（215・240・240）。進行の計算では、街の中の大きさは前の絵とほぼ同じ（研究所は横で約1割小さくなる）。並べて見て、ほかの建物と比べて小さすぎ・大きすぎに見えたら報告してください（勝手に変えない）
+- 当たり判定・入口・前後の重なりを新しい形に合わせる。前の iPhone 試遊で「当たり判定」の指摘があったので、3つとも建物の絵のふちと当たり判定がずれていないか、&hit=1 の写真で確かめる
+- seimon_world_build.py で街を作り直す
+
+■ 研究所の床
+- rooms4_build.py で研究所を作り直すだけ（家具・当たり判定・調べる物は今のまま）
+
+■ 大会会場の受付カウンター
+- rooms4_build.py の arena の 05_reception の当たり判定（blocks）・調べる物（RECEPTION）・受付の人（セリア）の立つ所を、新しいカウンターに合わせて直す。セリアはカウンターの内側（奥）に立ち、カウンターに体がめりこまないように
+- 390×844 の画面で、受付の前に立ったときカウンター全体が画面に収まるか確かめる
+
+■ 終わったら
+npm run check → main に取り込んで公開 → 公開ページで画面写真を撮って報告してください。写真（390×844）：
+1. 街：研究所・管理局・練習場のそれぞれ前（ふつうの写真と &hit=1 の写真）
+2. 研究所の中（全体が分かる所）
+3. 大会会場の受付の前（セリアが映る所）
+4. 前の絵と新しい絵を並べた比べ（3つの建物）
