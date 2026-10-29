@@ -23,6 +23,7 @@ import machineIntroTitle from '@assets/images/ui/dungeon_intro/machine_title.web
 import holyIntroArt from '@assets/images/ui/dungeon_intro/holy_art.webp';
 import holyIntroOverlay from '@assets/images/ui/dungeon_intro/holy_overlay.webp';
 import holyIntroTitle from '@assets/images/ui/dungeon_intro/holy_title.webp';
+import { EVENT_DUNGEON_ART } from './eventDungeonArt.ts';
 
 /**
  * ダンジョンに入ったときの挿絵・ダンジョン名の絵・重ねる部品（2026-10-26 ユーザー指示「ダンジョン入った時に挿絵とダンジョン名を入れたい」。
@@ -30,6 +31,7 @@ import holyIntroTitle from '@assets/images/ui/dungeon_intro/holy_title.webp';
  * 挿絵は横長なので、画面いっぱいに切り抜いて真ん中を見せる（artX＝横のどこを見せるか）。絵が無いダンジョンは名前を文字で。
  * 2026-10-28：新しい5つ（水の神殿〜天の聖域）の挿絵と重ねる輪（tools/design/dungeons5_build.py）。挿絵は縦長で、真ん中を基準に上下左右を少しだけ切る。
  * 同じ日に5つのダンジョン名の絵も届いた（tools/design/dungeon_titles_build.py。遺跡・森と同じ大きさ・位置）
+ * 2026-10-29：イベントのダンジョン3つ（仮の ID。まだダンジョンとしては足していない。eventDungeonArt.ts）
  * 歩行画面（固定のマップのダンジョン）と、ランダム生成のダンジョンの画面の両方で使う。見た目は world.css の .world__dungeon-intro
  */
 const DUNGEON_INTRO: Readonly<Record<string, { readonly art: string; readonly title?: string; readonly overlay: string; readonly artX: string }>> = {
@@ -40,6 +42,7 @@ const DUNGEON_INTRO: Readonly<Record<string, { readonly art: string; readonly ti
   'dungeon-05': { art: fireIntroArt, title: fireIntroTitle, overlay: fireIntroOverlay, artX: '50%' },
   'dungeon-06': { art: machineIntroArt, title: machineIntroTitle, overlay: machineIntroOverlay, artX: '50%' },
   'dungeon-07': { art: holyIntroArt, title: holyIntroTitle, overlay: holyIntroOverlay, artX: '50%' },
+  ...Object.fromEntries(EVENT_DUNGEON_ART.map((d) => [d.id, d.intro])),
 };
 /** 絵の読み込みを待つ長さの上限（ミリ秒。遅い回線でも札がいつまでも残らないように） */
 const DUNGEON_INTRO_LOAD_WAIT_MS = 1500;

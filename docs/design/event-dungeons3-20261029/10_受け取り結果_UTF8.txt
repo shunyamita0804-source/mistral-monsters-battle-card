@@ -1,0 +1,45 @@
+イベントのダンジョン3つの絵（霧の廃坑・忘れられた書庫・静かなる祭壇）の受け取り結果（2026-10-29）
+
+■ 届いたもの
+- ZIP 3つ（Mistral_EventDungeons_Part1_mist_mine・Part2_archive・Part3_altar_20261029.zip）。3つとも同じ指示書が入っていた（同じ中身を確かめて1つだけ保管）
+- ZIP の中のファイルの名前はふつうの「/」区切りで、フォルダは無かった（「\」区切りではなかった）
+- 原本は無改変で design-parts/event-dungeons3-20261029/{mist_mine,archive,altar}/ に保管。指示書は design-parts/event-dungeons3-20261029/00_instructions_for_claude_code.txt
+  - 各ダンジョン：tiles・parts・battle_bg・boss_mark・art・overlay・title・review（確認用。ゲームでは使わない）。書庫だけ archive_rugs も
+
+■ 切り出し（tools/design/event_dungeons3_build.py。新しいダンジョン5つの tools/design/dungeons5_build.py の関数をそのまま使う。作り直しても同じ結果）
+- 使い方：python3 -I tools/design/event_dungeons3_build.py design-parts/event-dungeons3-20261029 assets/images
+- 床・壁の上面・壁の正面：{d}_floor.webp（482×480）・{d}_wall_top.webp（459×480）・{d}_wall_face.webp（663×310）。継ぎ目の加工は5つと同じ
+- 下り階段：{d}_stairs_down.webp（高さ 256）。上り階段は作らない（ランダム生成のダンジョンでは使わないので。5つと同じ）
+  - 静かなる祭壇は、シートの中で下り階段と上り階段がくっついていたので、見える所のいちばん少ない縦の列で左右に分けた
+- 飾り：{d}_deco_1〜（高さ 192。指示書の parts の順）
+  - mist_mine：1・2 レールの切れはし／3・4 鉱石のかたまり／5・6 床をはう霧（半透明のまま）
+  - archive：1・2 本と巻物の山／3・4 石板のかけら／5 燭台
+  - altar：1・2 石の灯籠／3 床の銀の紋章／4 倒れた柱・5 立っている柱の根もと
+- じゅうたんの切れはし：archive_rug_1〜3.webp（幅 384）
+- ボスの間のしるし：boss_mark_{d}.webp（高さ 320。今の boss_mark_ruins と同じ）
+- 対戦の背景：backgrounds/battle_{d}.webp（1024×1536 のまま）
+- 入ったときの挿絵・重ねる輪・名前の絵：ui/dungeon_intro/{d}_art.webp（1080×2340 のまま）・{d}_overlay.webp（幅 1200）・{d}_title.webp（幅 1000 まで）
+- 床の縮尺：新しいダンジョン5つ（水の神殿など）と同じ縮め方（480px の絵を 134px くらいで敷く＝太古の遺跡の石の見え方）
+
+■ 透過の確認（指示書 4）
+- 透過のはずの絵（tiles・parts・rugs・boss_mark・overlay・title と、切り出したもの全部）をマゼンタの上に置いて目で見た。市松模様・黒い背景の残りは無かった
+
+■ ゲームへの入れ方（ふつうに遊ぶ人には出さない）
+- ダンジョンの一覧・ランダム生成のダンジョン・世界地図には足していない（tests/eventDungeons3.test.ts で確かめる）
+- 見た目の割り当て（使われていない状態）：
+  - 仮の ID：event-mist-mine・event-archive・event-altar（src/ui/components/eventDungeonArt.ts）
+  - 床・壁・階段・ボスのしるし・飾りの絵：src/ui/styles/eventDungeons.css の .drun--{ID}・.drun__decor--{種類}-{番号}（今のダンジョンの画面がルートに付けるクラスと同じ形）
+  - 飾りの置き方の決まり：src/game/dungeon/decor.ts の DECOR_RULES（{ID}）
+  - 挿絵・名前の絵・輪：src/ui/components/dungeonIntro.ts の DUNGEON_INTRO（{ID}）
+  - 対戦の背景：src/ui/screens/dungeonRunScreen.ts の RUN_BATTLE_BG（{ID}）
+  - 名前：world.eventDungeon.mistMine・archive・altar（英語は仮訳 Misty Mine・Forgotten Archive・Silent Altar）
+- 確認用の画面：?qa=1 のときだけ、設定の「QA用」の欄の「イベントのダンジョンの絵（確認用）」（?qa=1&lab=event でも開く。src/ui/screens/eventDungeonLabScreen.ts）
+  - 3つを切り替えて：入ったときの挿絵＋名前の絵＋輪の演出（今のダンジョンに入ったときと同じ動き）・見本の部屋（7×8マス。1マス 48px。
+    床・壁・壁の正面・下り階段・ボスのしるし・飾りを1つずつ）・対戦の背景・ボスの間のしるし（マゼンタの上）
+
+■ やっていないこと（指示書のとおり）
+- ダンジョンの仕掛け・階の数・ボス・物語・世界地図・開放の条件
+- 絵の描き直し・色の変更。今のダンジョン7つの見た目は変えていない
+
+■ 未完了
+- iPhone 実機での確認

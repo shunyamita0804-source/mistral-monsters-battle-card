@@ -46,6 +46,7 @@ import { t } from '../../i18n/i18n.ts';
 import { cardName, dungeonName, itemName, localText, opponentName } from '../../i18n/content.ts';
 import { bgm, type BgmId } from '../bgm.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
+import { EVENT_DUNGEON_ART } from '../components/eventDungeonArt.ts';
 import { itemArtUrl, itemIcon, itemMark } from '../components/itemIcon.ts';
 import { itemGetWindow } from '../components/rewardGlow.ts';
 import { confirmModal, messageModal, openModal, type ModalEmblem, type ModalHandle } from '../components/modal.ts';
@@ -172,6 +173,8 @@ const RUN_BGM: Readonly<Record<string, BgmId>> = {
  * 新しい5つは 2026-10-28 に届いた正式な絵（tools/design/dungeons5_build.py）
  */
 const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
+  // イベントのダンジョン3つ（2026-10-29。仮の ID で、まだダンジョンとしては足していない。eventDungeonArt.ts）
+  ...Object.fromEntries(EVENT_DUNGEON_ART.map((d) => [d.id, d.battleBg])),
   'dungeon-02': forestBattleBg,
   'dungeon-03': waterBattleBg,
   'dungeon-04': iceBattleBg,
