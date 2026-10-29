@@ -1,16 +1,34 @@
-# 引き継ぎメモ（2026-10-29 深夜：セッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-29：⑯⑰ のセッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 次のセッション。⑯ セレフィーン → ⑰ 木の橋）
+### まず読む：いまの状態（2026-10-29 ⑯⑰ のセッション終わり）
 
-- ユーザー合格：⑦（効果の文の短縮）・⑮（烈火の猛攻の案3）も合格。てっぺきシェルの顔・手札のマナの球と札の高さは**ユーザーが iPhone で見てから決める（今のまま）**。ピートの台詞は進行チャットが案を作る
-- ⑯ セレフィーン（水の神殿のルシアの切り札）を正式に：**セーブ version 26**・テスト 865件。記録 `docs/serephine-final-20261029.md`。作業ブランチ `claude/claude-md-handoff-review-3lzll0`
-- ⑰ 木の橋を正面向きの新しい絵に（指示書 ZIP「Mistral_WoodBridge_ClaudeCode_20261029」）：記録 `docs/wood-bridge-20261029.md`。前の「木の橋の絵の依頼」は済み
-- ⑯⑰ どちらも main に取り込んで公開。**次の指示を待っている**
-- 未完了：iPhone 実機での確認
+- **公開中：`main`（⑰ 木の橋まで。公開ページで確認済み）**。セーブ version 26。テスト 865件。**次の指示を待っている**
+- 作業ブランチ `claude/claude-md-handoff-review-3lzll0` は main に取り込み済み。新しい作業は新しいブランチで
+- ユーザー合格：①〜⑮ すべて（⑦ 効果の文の短縮・⑮ 烈火の猛攻の案3 もこのセッションで合格）。⑯⑰ は報告ずみ（返事は「OK」）
+- このセッションでしたこと（どれも main・公開済み）
+  | # | 内容 | 記録 |
+  | --- | --- | --- |
+  | ⑯ | セレフィーンを正式に（水の神殿のルシアの切り札。ルシア＝カルシェル・セレフィーン・ミュロル 1.2。みちしお・かしこさ技だけの回避・ガチャのシリーズ〔lucia-beaten のあと〕・ショップの棚。セーブ v26＝前にクリアしたセーブは次に勝つと祭壇で受け取る） | `docs/serephine-final-20261029.md`・`docs/battle-rules.md`「セレフィーンの効果の扱い」 |
+  | ⑰ | 街の木の橋を正面向きの新しい絵に（deskew なし・板の幅を南の小道に合わせた・前より約4マス長い・四すみの柱は前後を比べる部品） | `docs/wood-bridge-20261029.md` |
+- **未完了・判断待ち**
+  - iPhone 実機での確認（⑯⑰ と前の日の作業。特に「攻撃の途中で相手の正式な絵が出る」がまだ出るか・攻撃の流れの速さ）
+  - てっぺきシェルの顔の位置・手札のマナの球と分類の札の高さ：**ユーザーが iPhone で見てから決める。今のまま**
+  - ピートの台詞：**進行チャットが案を作る**（今の台詞は場面ごとに報告ずみ。`src/i18n/messages/story.ts` の `story.pete.*`・箱の前は住人の `story.residentB.*`。場面は `src/data/storyScenes.ts` の peteAsk など）。案が届いたら差し替え
+  - 気づいたこと（直していない）：ウェーブダンス・星影ステップ・高速飛行の「マナに関係なく、ちから技・かしこさ技を回避」は大きなカードで「ちから｜技」と改行される（同じ文なので3枚とも同じ）
+- 道具（このセッションで足したもの）
+  - `tools/e2e/serephine_battle_shot.cjs`（対戦の画面でみちしお・ゆらりとかわす）・`tools/e2e/album_shot.cjs`（図鑑の好きな番号の区切り）
+  - ボスに勝って祭壇の写真：`tools/e2e/dungeon_people_shot.cjs URL セーブのフォルダ 出力 win`（フォルダに `boss_dungeon-0N.json` だけ置く）
+  - ショップの中の歩けるマスは `worldArt.generated.ts` の shop の grid で確かめる（例 (6,22)・(30,21)・(50,24)・(20,25)）
+- 作業環境のこつ
+  - node_modules が無いことがある：`npm ci`。テストとビルドは Node 24（`. /opt/nvm/nvm.sh && nvm install 24 && nvm use 24`）
+  - 絵の道具は `pip install scipy matplotlib` が要る。街の作り直しは `python3 -I tools/design/seimon_world_build.py design-parts/seimon-world`（約4分半）
+- 公開のしかた（このセッションのやり方）：`git fetch origin main && git checkout -B deploy-main origin/main && git merge --no-ff 作業ブランチ` → `git push origin deploy-main:main` →
+  `gh workflow run deploy-pages.yml --ref main -R shunyamita0804-source/mistral-monsters-battle-card` → `gh run watch 番号` → 公開ページの `static/index-*.js` に変更が入ったかを確かめる
+- 報告の写真はスクラッチに作ってユーザーに渡した（git に入れない・新しいセッションには無い）
 
 ### 前のセッションの終わり（2026-10-29 深夜。⑮のあと）
 
