@@ -6,6 +6,7 @@ import { dungeonRunScreen } from './dungeonRunScreen.ts';
 import { dungeonSelectScreen } from './dungeonSelectScreen.ts';
 import { peopleBookScreen } from './peopleBookScreen.ts';
 import { newGameScreen } from './newGameScreen.ts';
+import { prologueScreen } from './prologueScreen.ts';
 import { optionsScreen } from './optionsScreen.ts';
 import { settingsScreen } from './settingsScreen.ts';
 import { itemShopScreen } from './itemShopScreen.ts';
@@ -25,6 +26,7 @@ import { worldScreen } from './worldScreen.ts';
  */
 export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   title: titleScreen,
+  prologue: prologueScreen,
   newGame: newGameScreen,
   world: worldScreen,
   deck: deckScreen,

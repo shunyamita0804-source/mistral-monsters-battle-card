@@ -306,3 +306,102 @@
   justify-content: center;
   gap: 6px;
 }
+
+/* ===== プロローグ（2026-10-30 指示書 M。src/ui/screens/prologueScreen.ts） ===== */
+.prologue {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background: #000;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.prologue.is-leaving .prologue__slide {
+  opacity: 0;
+  transition-duration: 700ms;
+}
+
+/* 1枚：画面いっぱい（はみ出す左右を切る）。切り替えはクロスフェード */
+.prologue__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+}
+
+.prologue__slide.is-active {
+  opacity: 1;
+}
+
+.prologue__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  transform: scale(1);
+  transform-origin: 50% 60%;
+}
+
+/* ゆっくり少しだけ寄る（動きは控えめ） */
+.prologue__slide.is-active .prologue__art {
+  transform: scale(1.06);
+  transition: transform 7500ms linear;
+}
+
+/* 文字：絵の上の約3分の1（空の所）に白い字＋やわらかい影 */
+.prologue__text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 11%;
+  padding: 0 14px;
+  text-align: center;
+  color: #fff;
+  font-family: var(--font-base);
+  font-weight: 700;
+  text-shadow:
+    0 1px 3px rgb(0 0 0 / 0.75),
+    0 0 14px rgb(0 0 0 / 0.55),
+    0 0 28px rgb(0 20 60 / 0.45);
+}
+
+.prologue__line {
+  margin: 0 0 1.4em;
+  font-size: 17.5px;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+  white-space: pre-line;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 1400ms ease,
+    transform 1400ms ease;
+}
+
+.prologue__line.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+.prologue__skip {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: 12px;
+  z-index: 2;
+  min-height: 40px;
+  padding: 0 16px;
+  background: rgb(10 16 40 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.5);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prologue__slide.is-active .prologue__art {
+    transform: none;
+    transition: none;
+  }
+}

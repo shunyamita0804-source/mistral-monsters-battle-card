@@ -11,7 +11,7 @@ import { sound } from './sound.ts';
 import { mountStage } from './stage.ts';
 
 /** セーブがなくても開ける画面（歩きの確認画面は自分用の仮セーブで動く） */
-const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'newGame', 'options', 'walkLab'];
+const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'prologue', 'newGame', 'options', 'walkLab'];
 
 /** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）を直接開ける */
 export function initialScreen(qa: boolean, search: string): ScreenId {
