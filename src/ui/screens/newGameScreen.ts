@@ -22,8 +22,9 @@ export const newGameScreen: ScreenDefinition = {
     const element = h('main', { class: 'screen new-game' });
     const start = once((gender: Gender, name: string) => {
       ctx.store.newGame(gender, name);
-      // 家の中の画面の上に、物語の始まりの挿絵を1回だけ（2026-10-27 デザイン第13弾。src/ui/components/openingIntro.ts）
-      ctx.store.openingIntro = true;
+      // 家の中の画面の上の物語の始まりの挿絵（2026-10-27。src/ui/components/openingIntro.ts）は、
+      // 2026-10-30 から「最初から」のあとのプロローグ（src/ui/screens/prologueScreen.ts）に置きかわったので出さない
+      ctx.store.openingIntro = false;
       ctx.reset('world');
     });
 

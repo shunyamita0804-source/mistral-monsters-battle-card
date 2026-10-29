@@ -102,18 +102,15 @@ import img98 from '@assets/images/maps/rooms/cardshop_front_left.webp';
 import img99 from '@assets/images/maps/rooms/cardshop_right_wall.webp';
 import img100 from '@assets/images/maps/rooms/cardshop_right_display.webp';
 import img101 from '@assets/images/maps/rooms/cardshop_plant_counter_left.webp';
-import img102 from '@assets/images/maps/rooms/cardshop_plant_back_left.webp';
-import img103 from '@assets/images/maps/rooms/cardshop_plant_counter_right.webp';
-import img104 from '@assets/images/maps/rooms/cardshop_plant_right.webp';
-import img105 from '@assets/images/maps/rooms/cardshop_plant_left.webp';
-import img106 from '@assets/images/maps/rooms/cardshop_gacha_glow.webp';
-import img107 from '@assets/images/maps/rooms/cardshop_gacha_machine.webp';
-import img108 from '@assets/images/maps/rooms/cardshop_door_pocket_left.webp';
-import img109 from '@assets/images/maps/rooms/cardshop_door_pocket_right.webp';
-import img110 from '@assets/images/maps/rooms/cardshop_door_frame.webp';
-import img111 from '@assets/images/maps/rooms/cardshop_front.webp';
-import img112 from '@assets/images/maps/rooms/cardshop_door_left.webp';
-import img113 from '@assets/images/maps/rooms/cardshop_door_right.webp';
+import img102 from '@assets/images/maps/rooms/cardshop_plant_left.webp';
+import img103 from '@assets/images/maps/rooms/cardshop_gacha_glow.webp';
+import img104 from '@assets/images/maps/rooms/cardshop_gacha_machine.webp';
+import img105 from '@assets/images/maps/rooms/cardshop_door_pocket_left.webp';
+import img106 from '@assets/images/maps/rooms/cardshop_door_pocket_right.webp';
+import img107 from '@assets/images/maps/rooms/cardshop_door_frame.webp';
+import img108 from '@assets/images/maps/rooms/cardshop_front.webp';
+import img109 from '@assets/images/maps/rooms/cardshop_door_left.webp';
+import img110 from '@assets/images/maps/rooms/cardshop_door_right.webp';
 
 export interface ArtImage { readonly file: string; readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z?: number }
 export interface CellRect { readonly x: number; readonly y: number; readonly w: number; readonly h: number }
@@ -3465,27 +3462,27 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    "############################################################",
    "############################################################",
    "############################################################",
-   "##############...###########################################",
-   "##############...###########################################",
+   "##############..############################################",
+   "##############..############################################",
    "#########........###########################################",
    "#########........###########################################",
    "#########........###########################################",
    "#########........###########################################",
-   "#########........##################################.########",
-   "########................................###########.########",
-   "########..##########....................###########.########",
-   "#######...##########...............####.###########.########",
-   "#######...##########...............####.###########.########",
-   "######....##########...............####.###########..#######",
-   "######....##########.................................#######",
-   "#####.....##########..................................######",
-   "#####.................................................######",
-   "###....................................................#####",
-   "#################......................................#####",
-   "#################.......................................####",
-   "#################.......................................####",
-   "#################.######.............######.............####",
-   "#################.######.............######..............###",
+   "#########........###########################################",
+   "#########..............................#####################",
+   "#########..............................#####################",
+   "#########..............................#####################",
+   "#########..............................#####################",
+   "#########.######.......................#####################",
+   "#########.##########...............####.............########",
+   "#########.......####...............####.............########",
+   "#...................................................########",
+   "#...................................................########",
+   "#...................................................########",
+   "#################...................................########",
+   "#################.................................##.......#",
+   "#################.######.............######.......##.......#",
+   "#################.######.............######................#",
    "########################.............#######################",
    "########################.............#######################",
    "########################.............#######################",
@@ -3528,116 +3525,92 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "file": img92,
     "x": 366,
     "y": 54,
-    "w": 145,
-    "h": 194,
-    "z": 248
+    "w": 142,
+    "h": 185,
+    "z": 239
    },
    {
     "file": img93,
     "x": 302,
     "y": 188,
     "w": 140,
-    "h": 144,
-    "z": 331
+    "h": 126,
+    "z": 314
    },
    {
     "file": img94,
     "x": 556,
-    "y": 118,
-    "w": 1125,
-    "h": 370,
-    "z": 488
+    "y": 312,
+    "w": 700,
+    "h": 188,
+    "z": 500
    },
    {
     "file": img95,
-    "x": 50,
-    "y": 208,
-    "w": 248,
-    "h": 508,
-    "z": 715
+    "x": 56,
+    "y": 231,
+    "w": 219,
+    "h": 470,
+    "z": 701
    },
    {
     "file": img96,
     "x": 306,
-    "y": 421,
-    "w": 212,
-    "h": 269,
-    "z": 690
+    "y": 425,
+    "w": 200,
+    "h": 235,
+    "z": 660
    },
    {
     "file": img97,
-    "x": 498,
+    "x": 519,
     "y": 475,
-    "w": 150,
+    "w": 134,
     "h": 215,
     "z": 690
    },
    {
     "file": img98,
     "x": 62,
-    "y": 688,
+    "y": 702,
     "w": 481,
-    "h": 244,
-    "z": 931
+    "h": 225,
+    "z": 928
    },
    {
     "file": img99,
     "x": 1675,
-    "y": 219,
-    "w": 231,
-    "h": 700,
-    "z": 919
+    "y": 238,
+    "w": 219,
+    "h": 594,
+    "z": 831
    },
    {
     "file": img100,
-    "x": 1116,
-    "y": 384,
+    "x": 1125,
+    "y": 519,
     "w": 129,
-    "h": 245,
-    "z": 629
+    "h": 174,
+    "z": 692
    },
    {
     "file": img101,
-    "x": 518,
-    "y": 104,
+    "x": 514,
+    "y": 144,
     "w": 62,
     "h": 161,
-    "z": 265
+    "z": 305
    },
    {
     "file": img102,
-    "x": 225,
-    "y": 112,
-    "w": 56,
-    "h": 100,
-    "z": 212
+    "x": 1579,
+    "y": 728,
+    "w": 88,
+    "h": 162,
+    "z": 890
    },
    {
     "file": img103,
-    "x": 1256,
-    "y": 148,
-    "w": 62,
-    "h": 138,
-    "z": 285
-   },
-   {
-    "file": img104,
-    "x": 1581,
-    "y": 319,
-    "w": 75,
-    "h": 119,
-    "z": 438
-   },
-   {
-    "file": img105,
-    "x": 35,
-    "y": 560,
-    "w": 88,
-    "h": 162,
-    "z": 722
-   },
-   {
-    "file": img106,
     "x": 1134,
     "y": 491,
     "w": 624,
@@ -3645,7 +3618,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 412
    },
    {
-    "file": img107,
+    "file": img104,
     "x": 1268,
     "y": 106,
     "w": 354,
@@ -3653,7 +3626,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 650
    },
    {
-    "file": img108,
+    "file": img105,
     "x": 530,
     "y": 812,
     "w": 220,
@@ -3661,7 +3634,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img109,
+    "file": img106,
     "x": 1190,
     "y": 812,
     "w": 220,
@@ -3669,7 +3642,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img110,
+    "file": img107,
     "x": 631,
     "y": 771,
     "w": 675,
@@ -3677,7 +3650,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img111,
+    "file": img108,
     "x": 0,
     "y": 781,
     "w": 1920,
@@ -3689,7 +3662,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    "COUNTER": {
     "x": 17,
     "y": 9,
-    "w": 26,
+    "w": 23,
     "h": 7
    },
    "PACK_MACHINE": {
@@ -3700,21 +3673,21 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    },
    "SHELF_WALL": {
     "x": 1,
-    "y": 6,
-    "w": 9,
-    "h": 17
+    "y": 7,
+    "w": 8,
+    "h": 15
    },
    "CASE_L": {
     "x": 9,
-    "y": 15,
-    "w": 8,
-    "h": 7
+    "y": 13,
+    "w": 7,
+    "h": 8
    },
    "CASE_R": {
-    "x": 15,
-    "y": 16,
-    "w": 6,
-    "h": 6
+    "x": 16,
+    "y": 14,
+    "w": 5,
+    "h": 8
    },
    "CLERK_SPOT": {
     "x": 29,
@@ -3743,14 +3716,14 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
      "h": 176
     },
     "left": {
-     "file": img112,
+     "file": img109,
      "x": 750,
      "y": 850,
      "w": 220,
      "h": 176
     },
     "right": {
-     "file": img113,
+     "file": img110,
      "x": 970,
      "y": 850,
      "w": 220,

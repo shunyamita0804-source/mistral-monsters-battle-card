@@ -6,6 +6,8 @@
  */
 export const SCREEN_IDS = [
   'title',
+  /** プロローグ（「最初から」のあと・主人公を選ぶ前の挿絵2枚。2026-10-30） */
+  'prologue',
   'newGame',
   'world',
   'deck',

@@ -15,10 +15,13 @@ import os
 
 from PIL import Image, ImageDraw
 
-import shop_goods_20261029 as shop_goods
+import shop_goods_20261030 as shop_goods
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/cardshop-assets-20261027/assets')
+# 2026-10-30（指示書 N）：正面向きに描き直した床と壁・家具 10枚（左右の壁がまっすぐ・家具に遠近なし。進行の検品で合格）。同じ名前なので先に探す。
+# 奥の棚・在庫の棚・入口と手前の壁・戸・販売機は前のまま（SRC）
+SRC_FRONT = os.path.join(ROOT, 'design-parts/cardshop-frontfacing-20261030')
 OUT_ROOMS = os.path.join(ROOT, 'assets/images/maps/rooms')
 WEBP_Q = 88
 
@@ -29,12 +32,20 @@ ROOM_W, ROOM_H = 1920, 1280
 FIT_HEIGHT = 1024
 FRONT_Z = 99999           # 手前の壁・入口の柱：いつも人より手前
 
-# 家具：ファイル名（shop_furniture_ を除く）→ 足元の y（素材の「家具と組み込み」の足元の線）
+# 家具：ファイル名（shop_furniture_ を除く）→ 足元の y（家具が床に接している下のはし。人と前後を比べる）
+# 2026-10-30（指示書 N）：正面向きの新しい家具の下のはしで測り直した
 FURNITURE = {
-    'back_shelves': 245, 'stockroom': 190, 'back_left_shelf': 198, 'back_left': 265, 'counter': 390,
-    'left_wall': 572, 'center_left': 552, 'center_right': 552, 'front_left': 745, 'right_wall': 735,
-    'right_display': 503, 'plant_counter_left': 212, 'plant_back_left': 170,
-    'plant_counter_right': 228, 'plant_right': 350, 'plant_left': 578,
+    'back_shelves': 245, 'stockroom': 190, 'back_left_shelf': 191, 'back_left': 251, 'counter': 400,
+    'left_wall': 561, 'center_left': 528, 'center_right': 552, 'front_left': 742, 'right_wall': 665,
+    'right_display': 554,
+}
+# 植木（2026-10-30 指示書 N）：新しい家具の絵には植木を描いていないので、前の植木の絵を、商品や通り道をふさがない所へ置き直す。
+# 絵の名前（shop_furniture_ を除く）→ 置く所（足元の真ん中の x・足元の y。絵の px）。入口の左右の植木は手前の壁の絵にある
+PLANTS = {
+    # カウンターの左のはしの奥（奥左の段の棚と奥の棚のあいだ）
+    'plant_counter_left': (436, 244),
+    # 販売機の右下・右の壁ぞいの棚の手前（販売機の前と棚の前の通り道はあける）
+    'plant_left': (1298, 712),
 }
 GACHA_FOOT = 490
 # 2026-10-29 iPhone の試遊「販売機をもっと大きく・存在感を。棚と重なっている」：
@@ -53,46 +64,46 @@ GACHA_UI = os.path.join(ROOT, 'assets/images/ui/gacha')
 GACHA_LAYERS = ['machine_front', 'panel_shop', 'machine_stars', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
 GACHA_PANEL_AT = (212, 268)              # パネルの左上（900×1300 の px。gacha_panel_build.PANEL_BOX と同じ）
 GACHA_BOX = (1156, 85, 520)              # 店の中の機械の真ん中の x・上のはし・下のはし（絵の px）
-RIGHT_DISPLAY_SHIFT = -130
 GLOW = dict(rx=190, ry=58, color=(255, 214, 120))
 
 # 入口の戸（素材の「内側の自動ドア E」）：開口・戸1枚の幅・戸の足元
 DOOR_OPENING = (600, 680, 352, 141)
 DOOR_FOOT = 821
 
-# 歩ける所（絵の px）。床：奥の壁の下〜手前の壁の上。左右の壁は斜め
-FLOOR = [(205, 205), (1335, 205), (1490, 740), (45, 740)]
+# 歩ける所（絵の px）。2026-10-30（指示書 N）：左右の壁がまっすぐになり、床が左右のはし（x 約35〜1500）まで広がった。
+# 床：奥の壁の下（腰板・柱の下 y 200）〜手前の壁の上。左右の壁の帯の上は歩けない
+FLOOR = [(36, 200), (1500, 200), (1500, 742), (36, 742)]
 # 入口の通り道（戸を抜けて外の敷居まで）
 PASSAGE = (612, 700, 940, 872)
-# 家具の足元（歩けない）。四角 (x1, y1, x2, y2) か多角形
+# 家具の足元（歩けない）。四角 (x1, y1, x2, y2)。家具は絵の足元（床に接している面）にだけ当てる（上の面の奥までは当てない）。
+# 奥へ回りこむと人が家具に隠れるだけなので、奥の家具のうしろ（カウンターの中・販売機のうしろ）は当てる
 BLOCKS = [
-    (445, 190, 1100, 392),                                    # カウンターと奥の棚（店員の場所も）
-    (1095, 190, 1345, 300),                                   # 右奥の間仕切り・在庫棚
-    (242, 195, 354, 266),                                     # 奥左の小展示台
-    (414, 190, 464, 214),                                     # カウンター左の植木
-    [(40, 166), (240, 166), (240, 335), (120, 578), (40, 578)],  # 左の壁の棚・左の植木
-    (245, 408, 415, 553),                                     # 中央左のガラス展示台
-    (398, 418, 518, 553),                                     # 中央右の展示台
-    (50, 605, 435, 745),                                      # 手前左の展示台
-    [(1340, 175), (1530, 175), (1530, 745), (1462, 745), (1340, 470)],  # 右の壁の棚
-    (893, 440, 996, 504),                                     # 販売機の左の小展示台（2026-10-29 左へずらした）
-    # 店の中の販売機（2026-10-29 1.5 倍）。2026-10-29 夜 iPhone「機械の後ろを歩ける」：絵の左右のはしと、
-    # 奥は右奥の間仕切り・カウンターの下のふち（y 300）まで（機械と奥の家具のあいだに入れない）。
-    # 2026-10-29 深夜：ガチャの画面の機械の絵にしたので、左右は新しい絵のはし（x 1014〜1298）
-    (1014, 300, 1298, 522),
-    (1265, 300, 1325, 351),                                   # 右の植木
-    # 2026-10-29 夜 iPhone の点検「青い仕切りのまわりの当たりが絵とずれている」：柱の当たりが柱の絵より奥（y 618）まであり、
-    # 柱の上の見えている床に入れなかった。柱の上のふち（y 690）から下だけにし、左の柱は絵の左のふち（x 456）から
-    (456, 690, 602, 760),                                     # 入口の左の柱と植木
-    (948, 690, 1090, 760),                                    # 入口の右の柱と植木
+    (36, 192, 224, 562),                                      # 左の壁ぞいの棚3台（壁にくっついている。棚どうしのすき間も通れない）
+    (1338, 192, 1500, 666),                                   # 右の壁ぞいの棚3台
+    (242, 205, 356, 252),                                     # 奥左の小さなガラスの台
+    (300, 192, 408, 205),                                     # 奥左の段の棚の足元
+    # カウンターの下のはしは y 400。マスの真ん中が 396.8 の行（カウンターの前）は歩けるよう、少しだけ手前（395。四角は下のはしの行もふさぐ）で止める（店員と話せる）
+    (445, 192, 1008, 395),                                    # カウンターと奥の棚（店員の場所も）
+    (245, 474, 406, 529),                                     # 中央左のガラスの台
+    (415, 500, 523, 553),                                     # 中央右のガラスの台
+    (36, 632, 436, 742),                                      # 手前左の額の台（左の壁とのすき間も）
+    (900, 508, 1004, 555),                                    # 販売機の左の小さな展示台
+    # 店の中の販売機：絵の左右のはし（x 1014〜1298）。奥はカウンターの右〜右の壁の棚まで（機械のうしろに入れない）
+    (1008, 192, 1300, 522),
+    (1300, 192, 1338, 522),                                   # 販売機と右の棚のあいだ（細い行き止まりにしない）
+    (1270, 668, 1328, 714),                                   # 販売機の右下の植木
+    (402, 205, 470, 246),                                     # カウンターの左のはしの奥の植木
+    # 入口の左右の柱と植木（手前の壁の絵。前と同じ）
+    (456, 690, 602, 760),
+    (948, 690, 1090, 760),
 ]
 # 調べる物（絵の px の範囲）。maps.ts の ID と同じ
 ITEMS = {
-    'COUNTER': (445, 240, 1100, 392),
+    'COUNTER': (445, 250, 1008, 400),
     'PACK_MACHINE': (1014, 420, 1298, 522),
-    'SHELF_WALL': (40, 166, 240, 578),
-    'CASE_L': (245, 400, 415, 553),
-    'CASE_R': (398, 410, 518, 553),
+    'SHELF_WALL': (36, 185, 224, 562),
+    'CASE_L': (245, 340, 406, 529),
+    'CASE_R': (415, 380, 523, 553),
 }
 # 店員の立つ所（足元）。カウンターの絵より奥（カウンターが腰から下を隠す）で、カウンターの前の床のすぐ隣のマス
 # （話しかけられる・テストの「人に行ける」を満たす）
@@ -104,7 +115,17 @@ SPAWN_Y = 630
 
 
 def _load(name: str) -> Image.Image:
-    return Image.open(os.path.join(SRC, f'{name}.png')).convert('RGBA')
+    front = os.path.join(SRC_FRONT, f'{name}.png')
+    return Image.open(front if os.path.exists(front) else os.path.join(SRC, f'{name}.png')).convert('RGBA')
+
+
+def _moved_plant(name: str, foot: tuple[int, int]) -> Image.Image:
+    """前の植木の絵を、足元の真ん中が foot に来るように動かした 1536×1024 の絵（描き直さない）"""
+    im = _load(f'shop_furniture_{name}')
+    piece = im.crop(im.getbbox())
+    canvas = Image.new('RGBA', im.size)
+    canvas.alpha_composite(piece, (round(foot[0] - piece.width / 2), foot[1] - piece.height))
+    return canvas
 
 
 def _save_cropped(im: Image.Image, name: str, box: tuple[int, int, int, int] | None = None) -> dict:
@@ -185,14 +206,13 @@ def build_shop_room() -> dict:
     tiles = [dict(file='maps/rooms/cardshop_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
     sprites = []
     for name, foot in FURNITURE.items():
-        # 2026-10-29：棚・ショーケースの無地の紺のカード・パックの上に商品を重ねる（tools/design/shop_goods_20261029.py）
+        # 棚・ガラスの台・額の無地の紺のカード・パックの上に商品を重ねる（2026-10-30 正面向きの家具：tools/design/shop_goods_20261030.py）
         im = shop_goods.dress(name, _load(f'shop_furniture_{name}'))
-        if name == 'right_display':
-            moved = Image.new('RGBA', im.size)
-            moved.alpha_composite(im, (RIGHT_DISPLAY_SHIFT, 0))
-            im = moved
         s = _save_cropped(im, f'cardshop_{name}.webp')
         sprites.append({**s, 'z': round(foot * u)})
+    for name, foot_xy in PLANTS.items():
+        s = _save_cropped(_moved_plant(name, foot_xy), f'cardshop_{name}.webp')
+        sprites.append({**s, 'z': round(foot_xy[1] * u)})
     sprites.append({**_gacha_glow(), 'z': round(GACHA_FOOT * u) - 200})
     sprites.append({**_gacha_machine(), 'z': round((GACHA_FOOT + GACHA_FORWARD) * u)})
     # 戸袋・戸枠は戸の足元の高さで（店の中にいる人より手前・敷居の外に出た人より奥）。手前の壁はいつも手前
