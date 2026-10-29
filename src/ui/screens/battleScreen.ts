@@ -71,6 +71,8 @@ import targetPlayerArt from '@assets/images/ui/battle/target_player.webp';
 import targetOpponentArt from '@assets/images/ui/battle/target_opponent.webp';
 import knockoutArt from '@assets/images/ui/battle/knockout_mark.webp';
 import statusSealedArt from '@assets/images/ui/battle/status_sealed.webp';
+import statusChargedArt from '@assets/images/ui/battle/status_charged.webp';
+import statusTailwindArt from '@assets/images/ui/battle/status_tailwind.webp';
 import statusStunnedArt from '@assets/images/ui/battle/status_stunned.webp';
 import statusTauntArt from '@assets/images/ui/battle/status_taunt.webp';
 import statusShieldArt from '@assets/images/ui/battle/status_shield.webp';
@@ -1276,6 +1278,7 @@ export const battleScreen: ScreenDefinition = {
               m.acted && !down ? h('span', { class: 'battle__acted' }, statusIcon(statusActedArt), h('span', { text: t('battle.monster.acted') })) : null,
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印
               !down ? statusBadges(s, m) : null,
+              !down ? cornerMarks(s, m) : null,
               diff < 0 ? h('span', { class: 'battle__burst', attrs: { 'aria-hidden': 'true' } }) : null,
               ...hitFxOn(m.uid),
               // 回復だけ「+2」のように出す。ダメージは数字を出さず、ライフを1ずつ減らして音で数える（2026-10-24 ユーザー指示）
@@ -1340,11 +1343,21 @@ export const battleScreen: ScreenDefinition = {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
         items.push(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
       }
-      // 試遊中：プカリムのほっぺにためる（相手からも見える。ふくらんだほっぺの印は仮の見た目）・おいかぜ（かけてから、＋1 が効く次の自分のターンまで出す）
-      if (m.charge && m.life > 0) items.push(h('span', { class: 'battle__status-text battle__status-text--charged' }, h('span', { class: 'battle__status-puff', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.charged') })));
-      if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) items.push(h('span', { class: 'battle__status-text battle__status-text--tailwind' }, h('span', { class: 'battle__status-wind', attrs: { 'aria-hidden': 'true' } }), h('span', { text: t('battle.status.tailwind', { n: m.tailwind.amount }) })));
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
+    };
+
+    /**
+     * 場のカードの右上の角の印（2026-10-29 正式の絵。ライフの札を消して空いた所。顔に重ならない）：
+     * プカリムのほっぺにためる（相手からも見える）・おいかぜ（かけてから、＋1 が効く次の自分のターンまで出す）。手札・大きなカードには出さない
+     */
+    const cornerMarks = (s: BattleState, m: BattleMonster): HTMLElement | null => {
+      const marks: HTMLElement[] = [];
+      const mark = (src: string, label: string, kind: string): HTMLElement =>
+        h('img', { class: `battle__corner-mark battle__corner-mark--${kind}`, attrs: { src, alt: label, title: label, draggable: 'false' } });
+      if (m.charge && m.life > 0) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
+      if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
+      return marks.length ? h('span', { class: 'battle__corner-marks' }, ...marks) : null;
     };
 
     /**

@@ -90,45 +90,24 @@
   margin-right: 1px;
 }
 
-/* 試遊中：プカリムの「ためている」（ふくらんだほっぺの丸い印）・「おいかぜ」（風の筋）。仮の見た目（絵は届いてから） */
-.battle__status-text--charged {
-  border-color: #8fe6c4;
-  color: #e6fff4;
+/* 場のカードの右上の角の印（2026-10-29 正式の絵：ためている・おいかぜ＋1）。ライフの札を消して空いた所。カードの幅の約28%。2つのときは縦に並べる */
+.battle__corner-marks {
+  position: absolute;
+  top: 5%;
+  right: 7%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 28%;
+  pointer-events: none;
 }
 
-.battle__status-puff {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff 0 22%, #c9f5e2 38%, #7fd9b3 70%, #3f9d7a 100%);
-  box-shadow: 0 0 5px rgb(143 230 196 / 0.9);
-  animation: puff-breath 1.2s ease-in-out infinite alternate;
-}
-
-@keyframes puff-breath {
-  to { transform: scale(1.18); }
-}
-
-.battle__status-text--tailwind {
-  border-color: #9fd8ff;
-  color: #eaf7ff;
-}
-
-.battle__status-wind {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background:
-    linear-gradient(transparent 28%, #bfe8ff 28% 38%, transparent 38% 52%, #bfe8ff 52% 62%, transparent 62% 76%, #bfe8ff 76% 86%, transparent 86%),
-    #2c5d86;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .battle__status-puff {
-    animation: none;
-  }
+.battle__corner-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6));
 }
 
 .battle__monster .battle__acted {

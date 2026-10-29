@@ -15,6 +15,8 @@ import os
 
 from PIL import Image, ImageDraw
 
+import shop_goods_20261029 as shop_goods
+
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/cardshop-assets-20261027/assets')
 OUT_ROOMS = os.path.join(ROOT, 'assets/images/maps/rooms')
@@ -164,7 +166,8 @@ def build_shop_room() -> dict:
     tiles = [dict(file='maps/rooms/cardshop_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
     sprites = []
     for name, foot in FURNITURE.items():
-        im = _load(f'shop_furniture_{name}')
+        # 2026-10-29：棚・ショーケースの無地の紺のカード・パックの上に商品を重ねる（tools/design/shop_goods_20261029.py）
+        im = shop_goods.dress(name, _load(f'shop_furniture_{name}'))
         if name == 'right_display':
             moved = Image.new('RGBA', im.size)
             moved.alpha_composite(im, (RIGHT_DISPLAY_SHIFT, 0))
