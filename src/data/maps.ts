@@ -277,11 +277,12 @@ const TOWN_DOORS: readonly { readonly id: string; readonly building: string; rea
   { id: 'door-neighbor', building: 'GUIDE_HOME', mapId: 'neighbor', label: 'となりの家' },
   { id: 'door-shop', building: 'SHOP', mapId: 'shop', label: 'カードショップ' },
   { id: 'door-lab', building: 'LAB', mapId: 'lab', label: 'カード研究所' },
-  { id: 'door-house-a', building: 'HOUSE_A', mapId: 'house-a', label: '民家' },
+  // 2026-10-29 点検の直し：住宅A は花屋（マルタ）、住宅D は仕立て屋（ロザリー）なので入口の名前を合わせた（中の部屋は今のまま「民家」の絵）
+  { id: 'door-house-a', building: 'HOUSE_A', mapId: 'house-a', label: '花屋' },
   { id: 'door-house-b', building: 'HOUSE_B', mapId: 'house-b', label: '民家' },
   // 2026-10-27 ユーザー指示：住宅C の所をカードバトラー管理局に置き換えた（住宅C と住人C はなくした）
   { id: 'door-bureau', building: 'BUREAU', mapId: BUREAU_MAP_ID, label: 'カードバトラー管理局' },
-  { id: 'door-house-d', building: 'HOUSE_D', mapId: 'house-d', label: '民家' },
+  { id: 'door-house-d', building: 'HOUSE_D', mapId: 'house-d', label: '仕立て屋' },
   { id: 'door-house-e', building: 'HOUSE_E', mapId: 'house-e', label: '民家' },
 ];
 

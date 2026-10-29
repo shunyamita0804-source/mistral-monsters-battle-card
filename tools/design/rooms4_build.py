@@ -83,7 +83,11 @@ ROOMS: dict[str, dict] = {
     # 管理局：奥に書類棚、中央に受付のカウンター、左奥にランクの板、右奥にメダルの棚、左右に長いす、左手前に掲示板
     'bureau': dict(
         dir='Mistral_Room_bureau_parts', prefix='bureau',
-        furniture={'01_counter': 555, '02_rank_board': 300, '03_medal_case': 430, '04_bench_left': 790, '05_notice_board': 942, '06_bench_right': 790},
+        furniture={'01_counter': 555, '02_rank_board': 300, '03_medal_case': 430, '04_bench_left': 790, '05_notice_board': 738, '06_bench_right': 790},
+        # 2026-10-29 点検の直し：左手前の掲示板が左の長いすの真ん前に重なり、床のふちから外へはみ出していた。
+        # 床の中で家具に重ならない所（入口の左の柱の上・左の長いすの右・カウンターの手前）へ動かす。そのままの大きさでは入る所が無いので 0.7 倍
+        # 掲示板の絵には、まわりの長いすの背・床のふち・植木の葉の切れはしが入っているので、掲示板の形（keep）だけを動かす
+        moves={'05_notice_board': dict(scale=0.7, foot=(538, 738), keep=[(156, 683), (396, 717), (389, 770), (389, 838), (408, 880), (408, 944), (375, 944), (141, 905), (141, 856), (156, 850)])},
         floor=[(205, 300), (1340, 300), (1370, 470), (1430, 600), (1445, 790), (90, 790), (95, 600), (120, 500), (205, 445)],
         passage=(540, 780, 1000, 975),
         blocks=[
@@ -95,6 +99,7 @@ ROOMS: dict[str, dict] = {
             (1302, 440, 1375, 505),                                  # 右の植木
             (52, 628, 434, 790),                                     # 左の長いす
             (1108, 628, 1486, 790),                                  # 右の長いす
+            (444, 700, 632, 740),                                    # 掲示板の足もと（2026-10-29 に動かした）
             (428, 740, 540, 990),                                    # 入口の左の柱
             (1000, 740, 1108, 990),                                  # 入口の右の柱
         ],
@@ -103,8 +108,8 @@ ROOMS: dict[str, dict] = {
             'COUNTER': (470, 470, 1068, 555),
             'RANK_BOARD': (205, 68, 420, 452),
             'MEDAL_CASE': (1112, 100, 1340, 470),
-            # 掲示板は長いすの手前で床に接していないので、入口の通り道（左の柱の右）から調べる
-            'NOTICE_BOARD': (140, 790, 535, 945),
+            # 掲示板（2026-10-29 に入口の左の柱の上へ動かした）：手前の床から調べる
+            'NOTICE_BOARD': (444, 560, 632, 740),
         },
         marks={},
         # エレノア：見た目はカウンターの奥。話しかけるマスはカウンターの一番手前の行。主人公はその2つ手前（導入イベントのブースター選びもここ）
@@ -176,6 +181,22 @@ def _load(room: dict, name: str) -> Image.Image:
     return Image.open(os.path.join(SRC, room['dir'], f"{room['prefix']}_{name}.png")).convert('RGBA')
 
 
+def _move(im: Image.Image, scale: float, foot: tuple[int, int], keep: list | None = None) -> Image.Image:
+    """家具を動かす：絵を scale 倍にして、足もと（下のふちの真ん中）が foot に来るように置き直す（描き直しはしない）。
+    keep（絵の px の多角形）があれば、その中だけを動かす（となりの家具の切れはしを持っていかない）"""
+    if keep:
+        mask = Image.new('L', im.size, 0)
+        ImageDraw.Draw(mask).polygon(keep, fill=255)
+        cut = Image.new('RGBA', im.size, (0, 0, 0, 0))
+        cut.paste(im, (0, 0), mask)
+        im = cut
+    part = im.crop(im.getbbox())
+    part = part.resize((round(part.width * scale), round(part.height * scale)), Image.LANCZOS)
+    out = Image.new('RGBA', im.size, (0, 0, 0, 0))
+    out.alpha_composite(part, (round(foot[0] - part.width / 2), foot[1] - part.height))
+    return out
+
+
 def _save(im: Image.Image, name: str) -> dict:
     box = im.getbbox()
     os.makedirs(OUT_ROOMS, exist_ok=True)
@@ -234,7 +255,10 @@ def build_room(key: str, check: str | None) -> tuple[dict, dict]:
     tiles = [dict(file=f'maps/rooms/{pre}_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
     sprites = []
     for name, foot in room['furniture'].items():
-        sprites.append({**_save(_load(room, name), f'{pre}_{name[3:]}.webp'), 'z': round(foot * u)})
+        im = _load(room, name)
+        if name in room.get('moves', {}):
+            im = _move(im, **room['moves'][name])
+        sprites.append({**_save(im, f'{pre}_{name[3:]}.webp'), 'z': round(foot * u)})
     sprites.append({**_save(_load(room, 'front'), f'{pre}_front.webp'), 'z': FRONT_Z})
 
     # 調べる物：となりに歩けるマスが無ければ、あるまで下へ広げる
