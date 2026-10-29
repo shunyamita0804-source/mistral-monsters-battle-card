@@ -1,11 +1,13 @@
 import { getPlayCard, getSupport, skillsOf } from '../../data/cards.ts';
-import { guardReduction, skillValue, type PlayCard, type SkillCard, type StatType, type SupportCard } from '../cards/cardTypes.ts';
+import { guardAgainst, guardReduction, skillValue, type PlayCard, type SkillCard, type StatType, type SupportCard } from '../cards/cardTypes.ts';
 import {
   aliveMonsters,
   attackPower,
   availableUsers,
   canConvertToMana,
   cardUsability,
+  coverUser,
+  isPinned,
   manaOf,
   otherSide,
   incomingDamage,
@@ -118,6 +120,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.5 試遊中：プカリム（2026-10-28）。その手番に倒せる相手がいなければ、ほっぺにためる（次の手番に大きな攻撃）か、おいかぜ
   const puff = chooseChargeOrTailwind(state, side, options, enemies);
   if (puff) return puff;
+  // 2.6 試遊中：ジオル（2026-10-29）。エネルギーをためる・じならし
+  const geol = chooseEnergyOrPin(state, side, options, enemies);
+  if (geol) return geol;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃をライフの少ない相手へ
   const attack = chooseAttack(state, side, options, enemies, style);
@@ -183,9 +188,62 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
       if (kill) return attackAction(state, side, option, kill.uid);
     }
   }
-  const strongest = byPower[0];
-  const target = strongest ? [...reachable(strongest)].sort(weakFirst)[0] : undefined;
+  // 試遊中：ジオルの地ひびき（相手全体）。倒せる相手がいなければ、相手が2体以上生きているときに使う（2026-10-29 指示書）
+  const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets);
+  if (quake && reachable(quake).length >= 2) return attackAction(state, side, quake, reachable(quake)[0]?.uid ?? '');
+  // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える
+  const strongest = byPower.find((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && reachable(o).length >= 2));
+  // じならしをかけた相手（この手番に回避できない）がいれば、そこを狙う
+  const pinnedFirst = (a: BattleMonster, b: BattleMonster): number => Number(isPinned(state, b)) - Number(isPinned(state, a));
+  const target = strongest ? [...reachable(strongest)].sort((a, b) => pinnedFirst(a, b) || weakFirst(a, b))[0] : undefined;
   return target && strongest ? attackAction(state, side, strongest, target.uid) : null;
+}
+
+/**
+ * 試遊中：ジオル（2026-10-29。指示書の CPU の考え方）。
+ * - エネルギーをためる：ジオルがその手番に相手を倒せず、次の手番にクリスタルショット・クリスタルレイ（ジオルのかしこさ技）を使えそうなとき
+ * - じならし：同じ手番に、まだ動いていない味方が攻撃技（ダメージ3以上）を使えそうなとき。狙うのはその味方が攻撃する相手
+ */
+function chooseEnergyOrPin(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[]): BattleAction | null {
+  const skills = options.filter(isSkillOption);
+  const special = skills.filter((o) => o.def.effect.type === 'energy' || o.def.effect.type === 'pin');
+  if (special.length === 0 || enemies.length === 0) return null;
+  const mine = state.sides[side];
+  const attacks = skills.filter((o) => o.def.effect.type === 'attack');
+  const canKill = (user: BattleMonster): boolean =>
+    attacks.some((o) => availableUsers(state, side, o.def).some((u) => u.uid === user.uid) && targetsFor(state, side, o.def, user).some((e) => e.life <= attackPower(state, o.def, user)));
+  const energy = special.find((o) => o.def.effect.type === 'energy');
+  if (energy) {
+    const nextTurn = state.turn + 2;
+    const manaNext = manaOf(mine) - energy.def.cost + Math.max(0, mine.hand.length - 2);
+    const user = availableUsers(state, side, energy.def).find((m) => m.energy?.turn !== nextTurn && !canKill(m));
+    const wisdomNext =
+      user &&
+      mine.hand.some((c) => {
+        if (c.uid === energy.card.uid) return false;
+        const card = getPlayCard(c.cardId);
+        return card.kind === 'skill' && card.effect.type === 'attack' && card.monsterId === user.cardId && card.stat?.type === 'wisdom' && card.cost <= manaNext;
+      });
+    if (user && wisdomNext) return { type: 'useCard', side, cardUid: energy.card.uid, userUid: user.uid };
+  }
+  const pin = special.find((o) => o.def.effect.type === 'pin');
+  if (!pin) return null;
+  const user = availableUsers(state, side, pin.def)[0];
+  if (!user) return null;
+  const manaAfter = manaOf(mine) - pin.def.cost;
+  // まだ動いていない味方（じならしを使うモンスター以外）の、払える攻撃技（ダメージ3以上）で一番強いもの
+  const followUps = attacks
+    .filter((o) => o.def.cost <= manaAfter)
+    .flatMap((o) => availableUsers(state, side, o.def).filter((u) => u.uid !== user.uid).map((ally) => ({ o, ally, power: attackPower(state, o.def, ally) })))
+    .filter((f) => f.power >= 3)
+    .sort((a, b) => b.power - a.power);
+  const follow = followUps[0];
+  if (!follow) return null;
+  // その味方が攻撃する相手：倒せる相手がいればそれ（ライフの多い順）、いなければライフの少ない相手（chooseAttack と同じ選び方）
+  const reach = targetsFor(state, side, follow.o.def, follow.ally);
+  const victim = reach.filter((e) => e.life <= follow.power).sort((a, b) => b.life - a.life)[0] ?? [...reach].sort((a, b) => a.life - b.life)[0];
+  if (!victim || isPinned(state, victim)) return null;
+  return { type: 'useCard', side, cardUid: pin.card.uid, userUid: user.uid, targetUid: victim.uid };
 }
 
 /**
@@ -234,13 +292,14 @@ function chooseSpecial(state: BattleState, side: Side, options: Option[], enemie
   return special && strongestEnemy ? attackAction(state, side, special, strongestEnemy.uid) : null;
 }
 
-/** 防御・回避カードか */
-const isGuard = (c: HandCard): boolean => ['defense', 'evade'].includes(getPlayCard(c.cardId).effect.type);
+/** 防御・回避・かばうのカードか */
+const isGuard = (c: HandCard): boolean => ['defense', 'evade', 'cover'].includes(getPlayCard(c.cardId).effect.type);
 
-/** 守備カードの強さ（並べ替え用） */
+/** 守備カードの強さ（並べ替え用。かばうは −2 の防御くらいに数える） */
 const guardValue = (c: HandCard): number => {
   const card = getPlayCard(c.cardId);
   if (card.kind !== 'skill') return 0;
+  if (card.effect.type === 'cover') return 2;
   return card.effect.type === 'defense' ? guardReduction(card) : skillValue(card);
 };
 
@@ -277,9 +336,12 @@ function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal'
   if (damage === 0) return end;
   const target = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
   const lethal = target !== undefined && damage >= target.life;
+  const options = usableOptions(state, side).filter(isSkillOption);
+  // 試遊中：ジオルのかばう（2026-10-29 指示書）。味方が倒れそうでジオルは倒れないとき、またはジオルの防御で大きく減らせるとき
+  const coverOpt = options.find((o) => o.def.effect.type === 'cover');
+  if (coverOpt && target && shouldCover(state, side, coverOpt, damage, lethal, options)) return { type: 'defend', side, cardUid: coverOpt.card.uid };
   // いつも攻撃（aggressive）は、倒されそうなときだけ守る
   if (style === 'aggressive' && !lethal) return end;
-  const options = usableOptions(state, side).filter(isSkillOption);
   const evade = options.filter((o) => o.def.effect.type === 'evade').sort((a, b) => a.def.cost - b.def.cost)[0];
   if (evade && (damage >= (style === 'guard' ? 2 : 3) || lethal)) {
     return { type: 'defend', side, cardUid: evade.card.uid };
@@ -287,6 +349,32 @@ function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal'
   const defense = options.filter((o) => o.def.effect.type === 'defense').sort((a, b) => guardReduction(b.def) - guardReduction(a.def))[0];
   if (defense) return { type: 'defend', side, cardUid: defense.card.uid };
   return end;
+}
+
+/**
+ * かばうを使うか（試遊中：ジオル）。ジオルが受けるダメージ＝攻撃の威力−ジオルのしめったはだ等−ジオルの防御（かばうを払った残りのマナで使える一番強いもの）。
+ * - 味方が倒れそうで（その味方に使える回避が無い）、ジオルは倒れない
+ * - または、ジオルの防御（いわのうで・すいしょうのたて・うけとめる）でダメージを3以上減らせる
+ */
+function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage: number, lethal: boolean, options: SkillOption[]): boolean {
+  const pending = state.pending;
+  const geol = coverUser(state, side, cover.def);
+  if (!pending || !geol) return false;
+  const mana = manaOf(state.sides[side]) - cover.def.cost;
+  const guards = state.sides[side].hand
+    .filter((c) => c.uid !== cover.card.uid)
+    .map((c) => getPlayCard(c.cardId))
+    .filter((k): k is SkillCard => k.kind === 'skill' && k.effect.type === 'defense' && k.monsterId === geol.cardId && k.cost <= mana)
+    .filter((k) => {
+      const against = guardAgainst(k);
+      return against === 'all' || against === pending.stat;
+    });
+  const bestGuard = Math.max(0, ...guards.map((k) => guardReduction(k)));
+  const toGeol = Math.max(0, pending.power - shieldOf(state, geol, pending.stat) - bestGuard);
+  const geolSurvives = toGeol < geol.life;
+  const allyCanEvade = options.some((o) => o.def.effect.type === 'evade');
+  if (lethal && !allyCanEvade && geolSurvives) return true;
+  return geolSurvives && damage >= 3 && Math.min(bestGuard, pending.power) >= 3;
 }
 
 function attackAction(state: BattleState, side: Side, option: SkillOption, targetUid: string): BattleAction {

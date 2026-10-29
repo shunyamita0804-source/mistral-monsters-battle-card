@@ -78,7 +78,7 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     expect(INITIAL_DISTRIBUTION.some((d) => d.monsterId === PUKARIM_MONSTER_ID)).toBe(false);
     for (const b of BOOSTERS) expect(b.monsters).not.toContain(PUKARIM_MONSTER_ID);
     expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('pukarim'))).toBe(false);
-    expect(QA_MONSTERS).toEqual([]);
+    expect(QA_MONSTERS.some((m) => m.id === 'mon-pukarim')).toBe(false);
     expect(cardCatalog.get(PUKARIM_MONSTER_ID)?.kind).toBe('monster');
     expect(skillsOf(PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(PUKARIM_SKILLS.map((s) => s.id));
   });

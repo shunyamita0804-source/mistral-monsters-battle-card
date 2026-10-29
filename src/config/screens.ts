@@ -28,6 +28,8 @@ export const SCREEN_IDS = [
   'walkLab',
   /** プカリムの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-28） */
   'pukarimLab',
+  /** ジオルの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-29） */
+  'geolLab',
 ] as const;
 
 export type ScreenId = (typeof SCREEN_IDS)[number];

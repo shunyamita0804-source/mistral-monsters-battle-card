@@ -14,6 +14,7 @@ import { titleScreen } from './titleScreen.ts';
 import { tournamentScreen } from './tournamentScreen.ts';
 import { walkLabScreen } from './walkLabScreen.ts';
 import { pukarimLabScreen } from './pukarimLabScreen.ts';
+import { geolLabScreen } from './geolLabScreen.ts';
 import type { ScreenDefinition } from './types.ts';
 import { worldScreen } from './worldScreen.ts';
 
@@ -40,4 +41,5 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   options: optionsScreen,
   walkLab: walkLabScreen,
   pukarimLab: pukarimLabScreen,
+  geolLab: geolLabScreen,
 };

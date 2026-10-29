@@ -20,13 +20,21 @@ const OTSUMUJI = pukarimSkillId(8);
  * そのモンスターの技16枚を抜き、プカリムの試遊用の16枚（PUKARIM_PLAYTEST_16）を入れる（山札は60枚のまま）
  */
 export function pukarimSwapDeck(key: BoosterKey, slot: number, pukarimCards: readonly { readonly id: string; readonly copies: number }[] = PUKARIM_PLAYTEST_16): Deck {
+  return swapDeck(key, slot, PUKARIM_MONSTER_ID, pukarimCards);
+}
+
+/**
+ * ブースターの箱のデッキの slot 番目のモンスターを monsterId に入れ替える（2026-10-29 ジオルでも使うように分けた）。
+ * そのモンスターの技を抜き、cards（入れるモンスターの16枚）を入れる（山札は60枚のまま）
+ */
+export function swapDeck(key: BoosterKey, slot: number, monsterId: string, cards: readonly { readonly id: string; readonly copies: number }[]): Deck {
   const base = boosterDeck(key);
   const out = base.monsters[slot];
   if (!out) throw new Error(`入れ替えるモンスターがいません: ${key} ${slot}`);
   const removed = new Set(skillsOf(out).map((s) => s.id));
   const kept = base.skills.filter((id) => !removed.has(id));
-  const added = pukarimCards.flatMap((c) => Array<string>(c.copies).fill(c.id));
-  return { monsters: base.monsters.map((m, i) => (i === slot ? PUKARIM_MONSTER_ID : m)), skills: [...kept, ...added] };
+  const added = cards.flatMap((c) => Array<string>(c.copies).fill(c.id));
+  return { monsters: base.monsters.map((m, i) => (i === slot ? monsterId : m)), skills: [...kept, ...added] };
 }
 
 /**

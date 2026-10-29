@@ -89,6 +89,8 @@ export type SkillEffect =
       readonly stunTarget?: boolean;
       /** 使ったモンスターが「ほっぺにためる」でためているときに使うと、回避されない（試遊中：プカリムのぷはーっ 2026-10-28） */
       readonly undodgeableWhenCharged?: boolean;
+      /** 相手全体への攻撃（試遊中：ジオルの地ひびき 2026-10-29）。生きている相手全員に。守り（防御・回避）は1体ずつ順に */
+      readonly allTargets?: boolean;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -100,6 +102,8 @@ export type SkillEffect =
       readonly against?: StatType | 'all';
       /** 受ける攻撃カードに印字された必要マナがこの値以上のときだけ使える（正式：ミュロルのスリップガード 2026-10-25。いまのマナの残りではない） */
       readonly minCost?: number;
+      /** ダメージを0にする（試遊中：ジオルのうけとめる 2026-10-29）。回避ではないので「回避されない」攻撃にも使える */
+      readonly nullify?: boolean;
     }
   /**
    * 回避：ダメージを0に。正式カードは against（'all'＝攻撃すべて）。仮カードは stat の種類。
@@ -155,6 +159,21 @@ export type SkillEffect =
    * 次のそのモンスターの攻撃技のダメージを amount 増やす。1回使うか、次の自分の手番が終わったら消える
    */
   | { readonly type: 'tailwind'; readonly amount: number }
+  /**
+   * 特殊（試遊中：ジオルのじならし 2026-10-29）：選んだ相手1体は、このターンに受ける次の攻撃1回を回避できない（防御はできる）。
+   * ターンの終わりか、攻撃を1回受けたら消える。1ターンに1回
+   */
+  | { readonly type: 'pin' }
+  /**
+   * 特殊（試遊中：ジオルのエネルギーをためる 2026-10-29）：次の自分のターンに、使ったモンスターが最初に使うかしこさ技1回だけダメージ2倍。
+   * 使わなかったらそのターンの終わりに消える。重ねない。ちから技を使っても消えない
+   */
+  | { readonly type: 'energy' }
+  /**
+   * 守り（試遊中：ジオルのかばう 2026-10-29）：使ったモンスター以外の味方が攻撃で狙われたとき、使ったモンスターが代わりに受ける。
+   * 「防御されない」攻撃・相手全体への攻撃には使えない
+   */
+  | { readonly type: 'cover' }
   | { readonly type: 'heal' }
   | { readonly type: 'mana' }
   | { readonly type: 'draw' };
@@ -198,9 +217,13 @@ export function skillValue(skill: SkillCard): number {
   return skill.stat?.value ?? 0;
 }
 
-/** 防御で減らす量 */
+/** ダメージを0にする防御（うけとめる）が減らす量として使う大きな値（ダメージの計算は 0 で止まる） */
+export const NULLIFY_REDUCE = 99;
+
+/** 防御で減らす量（ダメージを0にする防御は NULLIFY_REDUCE） */
 export function guardReduction(skill: SkillCard): number {
-  return skill.effect.type === 'defense' ? (skill.effect.reduce ?? skillValue(skill)) : 0;
+  if (skill.effect.type !== 'defense') return 0;
+  return skill.effect.nullify ? NULLIFY_REDUCE : (skill.effect.reduce ?? skillValue(skill));
 }
 
 /** 防御・回避が効く攻撃の種類（'all'＝攻撃すべて）。仮カードは stat の種類 */
@@ -229,7 +252,7 @@ export function guardMaxCost(skill: SkillCard): number | null {
 /** 相手モンスター1体を選んで使う技か（攻撃・特殊） */
 export function targetsEnemy(skill: SkillCard): boolean {
   const type = skill.effect.type;
-  return type === 'attack' || type === 'weaken' || type === 'seal' || type === 'taunt';
+  return type === 'attack' || type === 'weaken' || type === 'seal' || type === 'taunt' || type === 'pin';
 }
 
 /**
@@ -321,8 +344,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide' | 'charge' | 'tailwind';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide', 'charge', 'tailwind'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'cover';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'cover'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }
@@ -334,7 +357,8 @@ export function describeSkill(card: SkillCard): string {
   const v = skillValue(card);
   if (card.effect.type === 'attack') {
     // 正式カードの効果テキスト（「回避されない」など）があるときは、攻撃の印の説明を足さない（同じ文が2回出ないように）
-    const base = card.stat ? t('card.skill.attack', { stat, v, note: official ? '' : attackNote(card.effect) }).trim() : '';
+    const key = card.effect.allTargets ? 'card.skill.attackAll' : 'card.skill.attack';
+    const base = card.stat ? t(key, { stat, v, note: official ? '' : attackNote(card.effect) }).trim() : '';
     return official ? `${base}${getLanguage() === 'en' ? ' ' : ''}${official}`.trim() : base;
   }
   if (official) return official;

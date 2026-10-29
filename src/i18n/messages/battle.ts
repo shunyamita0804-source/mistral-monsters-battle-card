@@ -57,6 +57,13 @@ export const BATTLE = {
   // 試遊中：プカリム（2026-10-28）
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
   'battle.log.tailwind': { ja: '{name}においかぜ。次のターンの攻撃技のダメージ＋{n}。', en: 'A tailwind for {name}. Its attack next turn deals +{n}.' },
+  // 試遊中：ジオル（2026-10-29）
+  'battle.log.allTargets': { ja: '{name}の攻撃は相手全体へ！ 1体ずつ守りを選ぶ。', en: "{name}'s attack hits all enemies! Each one guards separately." },
+  'battle.log.pin': { ja: '{name}はじならしで足もとを固められた。このターンに受ける次の攻撃は回避できない。', en: "{name}'s footing was leveled. It can't dodge the next attack it takes this turn." },
+  'battle.log.energy': { ja: '{name}はエネルギーをためた。次のターンに最初に使うかしこさ技のダメージ2倍。', en: "{name} stored energy. Its first INT skill next turn deals double damage." },
+  'battle.log.energyDouble': { ja: '{name}はためたエネルギーを放った！ ダメージ2倍！', en: '{name} released its stored energy! Double damage!' },
+  'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
+  'battle.log.nullify': { ja: '{side}は「{skill}」でうけとめた（ダメージ0）！', en: '{side} caught it with {skill} (no damage)!' },
   'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',
@@ -133,6 +140,13 @@ export const BATTLE = {
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
   'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
+  'battle.defense.cover': { ja: 'かばう', en: 'Cover' },
+  'battle.defense.nullify': { ja: '0に', en: 'To 0' },
+  'battle.ng.pinned': { ja: 'じならしで、この攻撃は回避できません', en: "Leveled footing: this attack can't be dodged" },
+  'battle.ng.coverAllTargets': { ja: '相手全体への攻撃にはかばうを使えません', en: "Cover can't be used against attacks that hit all" },
+  'battle.ng.coverOnce': { ja: 'もうかばっています', en: 'Already covering' },
+  'battle.ng.coverFirst': { ja: 'ほかの守りを使ったあとは、かばえません', en: "Can't cover after another guard was used" },
+  'battle.ng.coverSelf': { ja: 'かばえるのはほかの味方だけです', en: 'Can only cover another ally' },
   'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },
 
   // 先攻・後攻を決める

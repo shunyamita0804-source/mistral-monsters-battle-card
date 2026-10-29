@@ -54,3 +54,9 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 | `card_list_shot.cjs` | 管理局で箱を選ぶ → 取得カード（一覧・行を押す・スクロール・閉じる）。セーブは introV2.state 'packSelection' |
 | `hand_full_shot.cjs` | 試験の対戦（?qa=1）で手札10枚から「2枚引く」を使い、「手札がいっぱい」の記録を撮る |
 | `se_probe.cjs` | いくつかのボタンを押して、鳴った音の名前を書き出す |
+
+## 2026-10-29 ジオルの試遊（`docs/geol.md`）
+
+- `geol_shot.cjs URL セーブ.json 出力`：`?qa=1&lab=geol` の確認用の画面（カード15枚）と、効果を確かめる用どうしの QA:オート の対戦（地ひびきが出た所）
+- `geol_effects_shot.cjs URL セーブ.json 出力`：自分で エネルギーをためる（場の「ためている」の印）・地ひびき・相手の攻撃を かばう を使って撮る（`DEBUG=1` で使う前後の写真も）
+- 技カードの大きな絵：`card_gallery_shot.cjs`（開発用サーバー）に `skl-geol-01`〜`14`

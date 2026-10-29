@@ -41,10 +41,15 @@ export const CARDS = {
   'card.effect.hide': { ja: '特殊', en: 'Special' },
   'card.effect.charge': { ja: '特殊', en: 'Special' },
   'card.effect.tailwind': { ja: '特殊', en: 'Special' },
+  'card.effect.pin': { ja: '特殊', en: 'Special' },
+  'card.effect.energy': { ja: '特殊', en: 'Special' },
+  'card.effect.cover': { ja: '防御', en: 'Guard' },
   'card.supportKind.field': { ja: '全体', en: 'Field' },
 
   // 技の効果説明（ゲーム側で描く文字）
   'card.skill.attack': { ja: '相手モンスター1体に{stat}で{v}ダメージ。{note}', en: 'Deal {v} {stat} damage to 1 enemy monster. {note}' },
+  /** 相手全体への攻撃（試遊中：ジオルの地ひびき）。相手の数は効果の文（「相手全体に」）で書く */
+  'card.skill.attackAll': { ja: '{stat}で{v}ダメージ。{note}', en: 'Deal {v} {stat} damage. {note}' },
   'card.skill.defense': {
     ja: 'このモンスターが{stat}攻撃を受けたときに使う。ダメージを{v}減らす。',
     en: 'Use when this monster takes a {stat} attack. Reduce the damage by {v}.',
@@ -121,6 +126,8 @@ export const CARDS = {
   'card.pending.rarity': { ja: 'レアリティ', en: 'rarity' },
   // 数値の欄（ダメージのない技）：回避＝「回避」、特殊＝「効果」（2026-10-25）
   'card.badge.evade': { ja: '回避', en: 'Dodge' },
+  'card.badge.nullify': { ja: '0に', en: 'To 0' },
+  'card.badge.cover': { ja: 'かばう', en: 'Cover' },
   'card.badge.damage': { ja: 'ダメージ', en: 'DMG' },
   'card.badge.guard': { ja: '軽減', en: 'Guard' },
   'card.badge.effect': { ja: '効果', en: 'Effect' },

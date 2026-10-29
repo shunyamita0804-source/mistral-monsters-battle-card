@@ -30,11 +30,16 @@ export type SkillValueBadge =
   | { readonly kind: 'damage'; readonly value: number }
   | { readonly kind: 'guard'; readonly value: number }
   | { readonly kind: 'evade' }
-  | { readonly kind: 'effect' };
+  | { readonly kind: 'effect' }
+  /** 試遊中：ジオル（2026-10-29）。うけとめる（ダメージを0にする防御）＝「0に」、かばう＝「かばう」の文字 */
+  | { readonly kind: 'nullify' }
+  | { readonly kind: 'cover' };
 
 export function skillValueBadge(skill: SkillCard): SkillValueBadge {
   const category = skillCategory(skill);
   if (skill.stat && (category === 'force' || category === 'wisdom')) return { kind: 'damage', value: skill.stat.value };
+  if (skill.effect.type === 'cover') return { kind: 'cover' };
+  if (skill.effect.type === 'defense' && skill.effect.nullify) return { kind: 'nullify' };
   if (category === 'defense') return { kind: 'guard', value: guardReduction(skill) };
   if (category === 'evade') return { kind: 'evade' };
   return { kind: 'effect' };
@@ -44,7 +49,7 @@ export function skillValueBadge(skill: SkillCard): SkillValueBadge {
 export function skillValueBadgeText(badge: SkillValueBadge): string {
   if (badge.kind === 'damage') return String(badge.value);
   if (badge.kind === 'guard') return `-${badge.value}`;
-  return t(badge.kind === 'evade' ? 'card.badge.evade' : 'card.badge.effect');
+  return t(badge.kind === 'evade' ? 'card.badge.evade' : badge.kind === 'nullify' ? 'card.badge.nullify' : badge.kind === 'cover' ? 'card.badge.cover' : 'card.badge.effect');
 }
 
 export function skillCardFace(skill: SkillCard): SkillCardFace {
