@@ -54,58 +54,62 @@ import img50 from '@assets/images/maps/town/t2_stall3.webp';
 import img51 from '@assets/images/maps/town/t2_house_d.webp';
 import img52 from '@assets/images/maps/town/t2_house_b.webp';
 import img53 from '@assets/images/maps/town/t2_house_e.webp';
-import img54 from '@assets/images/maps/town/t2_player_home.webp';
-import img55 from '@assets/images/maps/town/t2_guide_home.webp';
-import img56 from '@assets/images/maps/town/t2_bench_side.webp';
-import img57 from '@assets/images/maps/town/t2_sign.webp';
-import img58 from '@assets/images/maps/town/t2_gate.webp';
-import img59 from '@assets/images/maps/town/t2_shop_door_left.webp';
-import img60 from '@assets/images/maps/town/t2_shop_door_right.webp';
-import img61 from '@assets/images/maps/town/t2_fountain_spray1.webp';
-import img62 from '@assets/images/maps/town/t2_fountain_spray2.webp';
-import img63 from '@assets/images/maps/town/t2_fountain_spray3.webp';
-import img64 from '@assets/images/maps/rooms/player_shell.webp';
-import img65 from '@assets/images/maps/rooms/player_bed.webp';
-import img66 from '@assets/images/maps/rooms/player_wall_map.webp';
-import img67 from '@assets/images/maps/rooms/player_bookshelf.webp';
-import img68 from '@assets/images/maps/rooms/player_desk.webp';
-import img69 from '@assets/images/maps/rooms/player_rug.webp';
-import img70 from '@assets/images/maps/rooms/player_plant.webp';
-import img71 from '@assets/images/maps/rooms/guide_shell.webp';
-import img72 from '@assets/images/maps/rooms/guide_fireplace.webp';
-import img73 from '@assets/images/maps/rooms/guide_kitchen.webp';
-import img74 from '@assets/images/maps/rooms/guide_bookshelf.webp';
-import img75 from '@assets/images/maps/rooms/guide_round_table.webp';
-import img76 from '@assets/images/maps/rooms/guide_flower_stand.webp';
-import img77 from '@assets/images/maps/rooms/house_shell.webp';
-import img78 from '@assets/images/maps/rooms/house_shelf.webp';
-import img79 from '@assets/images/maps/rooms/house_plant.webp';
-import img80 from '@assets/images/maps/rooms/house_table.webp';
-import img81 from '@assets/images/maps/rooms/cardshop_shell.webp';
-import img82 from '@assets/images/maps/rooms/cardshop_back_shelves.webp';
-import img83 from '@assets/images/maps/rooms/cardshop_stockroom.webp';
-import img84 from '@assets/images/maps/rooms/cardshop_back_left_shelf.webp';
-import img85 from '@assets/images/maps/rooms/cardshop_back_left.webp';
-import img86 from '@assets/images/maps/rooms/cardshop_counter.webp';
-import img87 from '@assets/images/maps/rooms/cardshop_left_wall.webp';
-import img88 from '@assets/images/maps/rooms/cardshop_center_left.webp';
-import img89 from '@assets/images/maps/rooms/cardshop_center_right.webp';
-import img90 from '@assets/images/maps/rooms/cardshop_front_left.webp';
-import img91 from '@assets/images/maps/rooms/cardshop_right_wall.webp';
-import img92 from '@assets/images/maps/rooms/cardshop_right_display.webp';
-import img93 from '@assets/images/maps/rooms/cardshop_plant_counter_left.webp';
-import img94 from '@assets/images/maps/rooms/cardshop_plant_back_left.webp';
-import img95 from '@assets/images/maps/rooms/cardshop_plant_counter_right.webp';
-import img96 from '@assets/images/maps/rooms/cardshop_plant_right.webp';
-import img97 from '@assets/images/maps/rooms/cardshop_plant_left.webp';
-import img98 from '@assets/images/maps/rooms/cardshop_gacha_glow.webp';
-import img99 from '@assets/images/maps/rooms/cardshop_gacha_machine.webp';
-import img100 from '@assets/images/maps/rooms/cardshop_door_pocket_left.webp';
-import img101 from '@assets/images/maps/rooms/cardshop_door_pocket_right.webp';
-import img102 from '@assets/images/maps/rooms/cardshop_door_frame.webp';
-import img103 from '@assets/images/maps/rooms/cardshop_front.webp';
-import img104 from '@assets/images/maps/rooms/cardshop_door_left.webp';
-import img105 from '@assets/images/maps/rooms/cardshop_door_right.webp';
+import img54 from '@assets/images/maps/town/t2_wood_bridge_post_nw.webp';
+import img55 from '@assets/images/maps/town/t2_wood_bridge_post_ne.webp';
+import img56 from '@assets/images/maps/town/t2_wood_bridge_post_sw.webp';
+import img57 from '@assets/images/maps/town/t2_wood_bridge_post_se.webp';
+import img58 from '@assets/images/maps/town/t2_player_home.webp';
+import img59 from '@assets/images/maps/town/t2_guide_home.webp';
+import img60 from '@assets/images/maps/town/t2_bench_side.webp';
+import img61 from '@assets/images/maps/town/t2_sign.webp';
+import img62 from '@assets/images/maps/town/t2_gate.webp';
+import img63 from '@assets/images/maps/town/t2_shop_door_left.webp';
+import img64 from '@assets/images/maps/town/t2_shop_door_right.webp';
+import img65 from '@assets/images/maps/town/t2_fountain_spray1.webp';
+import img66 from '@assets/images/maps/town/t2_fountain_spray2.webp';
+import img67 from '@assets/images/maps/town/t2_fountain_spray3.webp';
+import img68 from '@assets/images/maps/rooms/player_shell.webp';
+import img69 from '@assets/images/maps/rooms/player_bed.webp';
+import img70 from '@assets/images/maps/rooms/player_wall_map.webp';
+import img71 from '@assets/images/maps/rooms/player_bookshelf.webp';
+import img72 from '@assets/images/maps/rooms/player_desk.webp';
+import img73 from '@assets/images/maps/rooms/player_rug.webp';
+import img74 from '@assets/images/maps/rooms/player_plant.webp';
+import img75 from '@assets/images/maps/rooms/guide_shell.webp';
+import img76 from '@assets/images/maps/rooms/guide_fireplace.webp';
+import img77 from '@assets/images/maps/rooms/guide_kitchen.webp';
+import img78 from '@assets/images/maps/rooms/guide_bookshelf.webp';
+import img79 from '@assets/images/maps/rooms/guide_round_table.webp';
+import img80 from '@assets/images/maps/rooms/guide_flower_stand.webp';
+import img81 from '@assets/images/maps/rooms/house_shell.webp';
+import img82 from '@assets/images/maps/rooms/house_shelf.webp';
+import img83 from '@assets/images/maps/rooms/house_plant.webp';
+import img84 from '@assets/images/maps/rooms/house_table.webp';
+import img85 from '@assets/images/maps/rooms/cardshop_shell.webp';
+import img86 from '@assets/images/maps/rooms/cardshop_back_shelves.webp';
+import img87 from '@assets/images/maps/rooms/cardshop_stockroom.webp';
+import img88 from '@assets/images/maps/rooms/cardshop_back_left_shelf.webp';
+import img89 from '@assets/images/maps/rooms/cardshop_back_left.webp';
+import img90 from '@assets/images/maps/rooms/cardshop_counter.webp';
+import img91 from '@assets/images/maps/rooms/cardshop_left_wall.webp';
+import img92 from '@assets/images/maps/rooms/cardshop_center_left.webp';
+import img93 from '@assets/images/maps/rooms/cardshop_center_right.webp';
+import img94 from '@assets/images/maps/rooms/cardshop_front_left.webp';
+import img95 from '@assets/images/maps/rooms/cardshop_right_wall.webp';
+import img96 from '@assets/images/maps/rooms/cardshop_right_display.webp';
+import img97 from '@assets/images/maps/rooms/cardshop_plant_counter_left.webp';
+import img98 from '@assets/images/maps/rooms/cardshop_plant_back_left.webp';
+import img99 from '@assets/images/maps/rooms/cardshop_plant_counter_right.webp';
+import img100 from '@assets/images/maps/rooms/cardshop_plant_right.webp';
+import img101 from '@assets/images/maps/rooms/cardshop_plant_left.webp';
+import img102 from '@assets/images/maps/rooms/cardshop_gacha_glow.webp';
+import img103 from '@assets/images/maps/rooms/cardshop_gacha_machine.webp';
+import img104 from '@assets/images/maps/rooms/cardshop_door_pocket_left.webp';
+import img105 from '@assets/images/maps/rooms/cardshop_door_pocket_right.webp';
+import img106 from '@assets/images/maps/rooms/cardshop_door_frame.webp';
+import img107 from '@assets/images/maps/rooms/cardshop_front.webp';
+import img108 from '@assets/images/maps/rooms/cardshop_door_left.webp';
+import img109 from '@assets/images/maps/rooms/cardshop_door_right.webp';
 
 export interface ArtImage { readonly file: string; readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z?: number }
 export interface CellRect { readonly x: number; readonly y: number; readonly w: number; readonly h: number }
@@ -306,11 +310,11 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    "#########,,,,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
    "#########,,,,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########",
    "##########,,,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########",
-   "##########,,,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "############,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "############,,,,,,,,,,,,,=======================================================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,###,,,,####,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
+   "##########,,,,,,,,,,,,,,,=====================##=====##=========================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "############,,,,,,,,,,,,,=====================##=====##=========================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "############,,,,,,,,,,,,,=====================##=====##=========================================================================================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##,,,,,##,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##,,,,,##,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
    "################################################,,,,#############################,,###,,,,,,================,,,###,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
    "################################################,,,,##############################,,,,,,,,,,================,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
    "################################################,,,,##############################,,,##########==========###########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
@@ -321,14 +325,14 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    "################################################,,,,###########################################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
    "################################################,,,,###########################################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
    "################################################,,,,###########################################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,###====####,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########",
-   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,###====####,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,###====####,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,########################==========############################,,##,,,,,#########,,,,,,##,,,,,#########,,,,,,,,,,,,,,#############",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,########################==========############################,,,,,,,,,#########,,,,,,,,,,,,,#########,,,,,,,,,,,,,,,,,,#########",
-   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,#######################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
-   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
-   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########",
+   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,########################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,########################==========############################,,##,,,,,#########,,,,,,##,,,,,#########,,,,,,,,,,,,,,#############",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,########################==========############################,,,,,,,,,#########,,,,,,,,,,,,,#########,,,,,,,,,,,,,,,,,,#########",
+   "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,,#######################==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
+   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
+   "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##=====##,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
    "#############,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#############",
    "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
    "#########,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,=====,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,##########==========###################,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#########",
@@ -2022,6 +2026,22 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 4625
    },
    {
+    "file": img54,
+    "x": 1461,
+    "y": 4515,
+    "w": 76,
+    "h": 124,
+    "z": 4639
+   },
+   {
+    "file": img55,
+    "x": 1693,
+    "y": 4515,
+    "w": 76,
+    "h": 124,
+    "z": 4639
+   },
+   {
     "file": img32,
     "x": 1205,
     "y": 4375,
@@ -2190,6 +2210,22 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 5219
    },
    {
+    "file": img56,
+    "x": 1461,
+    "y": 5097,
+    "w": 76,
+    "h": 151,
+    "z": 5247
+   },
+   {
+    "file": img57,
+    "x": 1693,
+    "y": 5097,
+    "w": 76,
+    "h": 151,
+    "z": 5247
+   },
+   {
     "file": img20,
     "x": 231,
     "y": 5102,
@@ -2350,7 +2386,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 5790
    },
    {
-    "file": img54,
+    "file": img58,
     "x": 626,
     "y": 5047,
     "w": 748,
@@ -2358,7 +2394,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 5800
    },
    {
-    "file": img55,
+    "file": img59,
     "x": 1704,
     "y": 5106,
     "w": 691,
@@ -2438,7 +2474,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 5940
    },
    {
-    "file": img56,
+    "file": img60,
     "x": 3501,
     "y": 5709,
     "w": 119,
@@ -2718,7 +2754,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 6430
    },
    {
-    "file": img57,
+    "file": img61,
     "x": 2638,
     "y": 6237,
     "w": 244,
@@ -2734,7 +2770,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 6449
    },
    {
-    "file": img58,
+    "file": img62,
     "x": 2846,
     "y": 6037,
     "w": 711,
@@ -2944,14 +2980,14 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
      "h": 230
     },
     "left": {
-     "file": img59,
+     "file": img63,
      "x": 4489,
      "y": 2658,
      "w": 115,
      "h": 233
     },
     "right": {
-     "file": img60,
+     "file": img64,
      "x": 4599,
      "y": 2658,
      "w": 112,
@@ -2970,9 +3006,9 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   "loops": [
    {
     "frames": [
-     img61,
-     img62,
-     img63
+     img65,
+     img66,
+     img67
     ],
     "x": 2934,
     "y": 2784,
@@ -3018,7 +3054,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img64,
+    "file": img68,
     "x": 0,
     "y": 0,
     "w": 768,
@@ -3027,7 +3063,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img65,
+    "file": img69,
     "x": 64,
     "y": 132,
     "w": 192,
@@ -3035,7 +3071,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 416
    },
    {
-    "file": img66,
+    "file": img70,
     "x": 295,
     "y": 56,
     "w": 178,
@@ -3043,7 +3079,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 0
    },
    {
-    "file": img67,
+    "file": img71,
     "x": 576,
     "y": 136,
     "w": 128,
@@ -3051,7 +3087,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 297
    },
    {
-    "file": img68,
+    "file": img72,
     "x": 64,
     "y": 430,
     "w": 192,
@@ -3059,7 +3095,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 608
    },
    {
-    "file": img69,
+    "file": img73,
     "x": 288,
     "y": 394,
     "w": 224,
@@ -3067,7 +3103,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 0
    },
    {
-    "file": img70,
+    "file": img74,
     "x": 640,
     "y": 556,
     "w": 64,
@@ -3165,7 +3201,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img71,
+    "file": img75,
     "x": 0,
     "y": 0,
     "w": 768,
@@ -3174,7 +3210,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img72,
+    "file": img76,
     "x": 308,
     "y": 31,
     "w": 153,
@@ -3182,7 +3218,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 0
    },
    {
-    "file": img73,
+    "file": img77,
     "x": 64,
     "y": 144,
     "w": 192,
@@ -3190,7 +3226,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 264
    },
    {
-    "file": img74,
+    "file": img78,
     "x": 576,
     "y": 103,
     "w": 128,
@@ -3198,7 +3234,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 264
    },
    {
-    "file": img75,
+    "file": img79,
     "x": 224,
     "y": 347,
     "w": 224,
@@ -3206,7 +3242,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 494
    },
    {
-    "file": img76,
+    "file": img80,
     "x": 64,
     "y": 501,
     "w": 64,
@@ -3300,7 +3336,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img77,
+    "file": img81,
     "x": 0,
     "y": 0,
     "w": 640,
@@ -3309,7 +3345,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img78,
+    "file": img82,
     "x": 64,
     "y": 155,
     "w": 128,
@@ -3317,7 +3353,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 229
    },
    {
-    "file": img79,
+    "file": img83,
     "x": 512,
     "y": 154,
     "w": 64,
@@ -3325,7 +3361,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 229
    },
    {
-    "file": img80,
+    "file": img84,
     "x": 192,
     "y": 195,
     "w": 256,
@@ -3428,7 +3464,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "tiles": [
    {
-    "file": img81,
+    "file": img85,
     "x": 0,
     "y": 0,
     "w": 1920,
@@ -3437,7 +3473,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
   ],
   "sprites": [
    {
-    "file": img82,
+    "file": img86,
     "x": 650,
     "y": 0,
     "w": 612,
@@ -3445,7 +3481,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 306
    },
    {
-    "file": img83,
+    "file": img87,
     "x": 1362,
     "y": 0,
     "w": 205,
@@ -3453,7 +3489,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 238
    },
    {
-    "file": img84,
+    "file": img88,
     "x": 366,
     "y": 54,
     "w": 145,
@@ -3461,7 +3497,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 248
    },
    {
-    "file": img85,
+    "file": img89,
     "x": 302,
     "y": 188,
     "w": 140,
@@ -3469,7 +3505,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 331
    },
    {
-    "file": img86,
+    "file": img90,
     "x": 556,
     "y": 118,
     "w": 1125,
@@ -3477,7 +3513,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 488
    },
    {
-    "file": img87,
+    "file": img91,
     "x": 50,
     "y": 208,
     "w": 248,
@@ -3485,7 +3521,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 715
    },
    {
-    "file": img88,
+    "file": img92,
     "x": 306,
     "y": 421,
     "w": 212,
@@ -3493,7 +3529,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 690
    },
    {
-    "file": img89,
+    "file": img93,
     "x": 498,
     "y": 475,
     "w": 150,
@@ -3501,7 +3537,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 690
    },
    {
-    "file": img90,
+    "file": img94,
     "x": 62,
     "y": 688,
     "w": 481,
@@ -3509,7 +3545,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 931
    },
    {
-    "file": img91,
+    "file": img95,
     "x": 1675,
     "y": 219,
     "w": 231,
@@ -3517,7 +3553,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 919
    },
    {
-    "file": img92,
+    "file": img96,
     "x": 1116,
     "y": 384,
     "w": 129,
@@ -3525,7 +3561,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 629
    },
    {
-    "file": img93,
+    "file": img97,
     "x": 518,
     "y": 104,
     "w": 62,
@@ -3533,7 +3569,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 265
    },
    {
-    "file": img94,
+    "file": img98,
     "x": 225,
     "y": 112,
     "w": 56,
@@ -3541,7 +3577,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 212
    },
    {
-    "file": img95,
+    "file": img99,
     "x": 1256,
     "y": 148,
     "w": 62,
@@ -3549,7 +3585,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 285
    },
    {
-    "file": img96,
+    "file": img100,
     "x": 1581,
     "y": 319,
     "w": 75,
@@ -3557,7 +3593,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 438
    },
    {
-    "file": img97,
+    "file": img101,
     "x": 35,
     "y": 560,
     "w": 88,
@@ -3565,7 +3601,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 722
    },
    {
-    "file": img98,
+    "file": img102,
     "x": 1176,
     "y": 491,
     "w": 624,
@@ -3573,7 +3609,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 412
    },
    {
-    "file": img99,
+    "file": img103,
     "x": 1314,
     "y": 102,
     "w": 348,
@@ -3581,7 +3617,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 650
    },
    {
-    "file": img100,
+    "file": img104,
     "x": 530,
     "y": 812,
     "w": 220,
@@ -3589,7 +3625,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img101,
+    "file": img105,
     "x": 1190,
     "y": 812,
     "w": 220,
@@ -3597,7 +3633,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img102,
+    "file": img106,
     "x": 631,
     "y": 771,
     "w": 675,
@@ -3605,7 +3641,7 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "z": 1027
    },
    {
-    "file": img103,
+    "file": img107,
     "x": 0,
     "y": 781,
     "w": 1920,
@@ -3671,14 +3707,14 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
      "h": 176
     },
     "left": {
-     "file": img104,
+     "file": img108,
      "x": 750,
      "y": 850,
      "w": 220,
      "h": 176
     },
     "right": {
-     "file": img105,
+     "file": img109,
      "x": 970,
      "y": 850,
      "w": 220,
