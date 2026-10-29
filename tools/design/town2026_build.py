@@ -30,7 +30,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/town-20261028')
 # 2026-10-28 夜：建物7つは正面向きの新しい絵（front-facing-20261028。同じファイル名なので先に探す。前の斜めの原本は part1_buildings に残す）
 # 2026-10-29：研究所・管理局・練習場も front-facing-20261028 に（指示書は town3-20261029/）
-SHEET_DIRS = [os.path.join(SRC, 'front-facing-20261028'), os.path.join(SRC, 'part1_buildings'), os.path.join(SRC, 'part2_terrain_props'), os.path.join(SRC, 'instructions/cardshop')]
+# 2026-10-30：正面向きの街の部品14枚（指示書 H。依頼文 docs/design-requests-20261030/ の 01〜07）は front-facing-20261030（大工の小屋は同じ名前なので先に探す）
+SHEET_DIRS = [os.path.join(SRC, 'front-facing-20261030'), os.path.join(SRC, 'front-facing-20261028'), os.path.join(SRC, 'part1_buildings'), os.path.join(SRC, 'part2_terrain_props'), os.path.join(SRC, 'instructions/cardshop')]
 OUT_TOWN = os.path.join(ROOT, 'assets/images/maps/town')
 
 CELL = 32
@@ -114,8 +115,9 @@ BUILDINGS = [
     dict(no=9, id='HOUSE_E', file='building_house_harold', door=(512, 630, 872), door_h=215, at=(2000, 4240), door_w=100),
     dict(no=10, id='PLAYER_HOME', file='building_home', door=(512, 630, 862), door_h=215, at=(1000, 5800), door_w=100),
     dict(no=11, id='GUIDE_HOME', file='building_neighbor', door=(513, 615, 872), door_h=215, at=(2050, 5800), door_w=100),
-    # 12 大工の作業小屋：入れない（見た目だけ）
-    dict(no=12, id='SHED', file='building_shed', door=(555, 477, 735), door_h=215, at=(4700, 1000), door_w=0),
+    # 12 大工の作業小屋：入れない（見た目だけ）。2026-10-30：正面向きの新しい絵（front-facing-20261030。戸を測り直した）。
+    # 前より横に広いので、北の高台の東のふち（x 4300）にかからないよう少し東へ（前は 4700）
+    dict(no=12, id='SHED', file='building_shed', door=(505, 357, 562), door_h=215, at=(4820, 1000), door_w=0),
 ]
 # カードショップの自動ドア（instructions/cardshop/cardshop_layout.json。シートの px）
 SHOP_DOORS = dict(left=(646, 546), right=(766, 546), clip=(648, 548, 238, 250), travel=120)
@@ -124,9 +126,12 @@ SHOP_DOORS = dict(left=(646, 546), right=(766, 546), clip=(648, 548, 238, 250), 
 TERRACE_FACE = 200
 TERRACE_W = (140, 300, 2160, 1860)       # 西の高台（研究所・見晴らし台）
 TERRACE_N = (2160, 300, 4300, 1560)      # 北の高台（大会会場）。西の高台と同じ高さでつながる
-STAIRS_N = dict(cx=3200, top=1505, s=0.9)   # 15 大階段（terrace_parts の大きい階段）
-STAIRS_W = dict(cx=1960, top=1812, s=0.9)   # 16 西の高台への階段（小さい階段）
-STAIR_TUCK = 140                            # 階段のわきの石垣を、階段の外のふちから内へ差しこむ長さ
+# 2026-10-30：正面向きの新しい絵（stairs_big_front・stairs_small_front。上と下で同じ幅）に替えた。
+# step：段の左右（手すりの柱の内側。絵の px）。この間だけ歩ける
+STAIRS_N = dict(file='stairs_big_front', cx=3200, top=1505, s=0.9, step=(86, 742))   # 15 大階段
+STAIRS_W = dict(file='stairs_small_front', cx=1960, top=1812, s=0.9, step=(87, 337))  # 16 西の高台への階段（小さい階段）
+# 階段のわきの石垣を、階段の外のふちから内へ差しこむ長さ。新しい階段は左右がまっすぐなので、柱の下に少しだけ（前は下ほど広がる形で 140）
+STAIR_TUCK = 30
 
 # 道（石畳 tile_street）：長方形。噴水のまわりは円い広場（tile_plaza）
 # 2026-10-28 直し（ユーザー「行き止まりの四角い道を残さない」）：道の端は扉の前の小道（DOOR_PATH_W）か別の道で終わる
@@ -164,12 +169,20 @@ CURB_STONE = 30
 # （前は橋の西で南へ曲がり、橋の下の2本の塔の足もとを通っていた。橋は動かさない＝BRIDGE_STONE の bank）
 STREAM = [(-300, 4840), (2450, 4840), (2450, 5015), (3800, 5015), (3800, 5500), (6700, 5500)]
 STREAM_W = 240
-BRIDGE_STONE = dict(cx=3200, s=1.1, bank=5620)  # 石の橋：アーチの下の端（シートの y 905）を y＝bank に（前の小川の下の岸。2026-10-29 から小川とは別に決める）
-# 石の橋の手前（南）のアーチの面と水は使わない（2026-10-28 ユーザー「橋の下の水の上を歩いてしまう」）。
-# シートの y 518（デッキの南の端＝アーチの上のふち）より下は、左右の柱（x 895 より左・1265 より右）だけ残す。
-# そこから南は道（tile_street）がデッキにそのままつながる。小川は柱の左右に見える
-BRIDGE_DECK_S = 518
-BRIDGE_PILLARS = (895, 1265)
+# 2026-10-30：正面向きの新しい絵（front-facing-20261030/stone_bridge_front.png。1000×1050。指示書 H 01）に替えた（前は bridges.png の右の遠近の橋）。
+# 床（欄干の内側）の幅を南の大通りの幅（512）に合わせる。ただし絵ごと床が 512 になるまで大きくすると、橋の長さが約2000（前の約2倍）になり、
+# 北の十字路（ピート・ハロルドの家の前の道）から南の門の近くまでふさがる。そこで絵を左右の半分（欄干・塔・街灯）に切り分け、
+# 塔は主人公とつり合う大きさ（倍率 s。塔の高さ 約380＝主人公の約2倍）のまま、左右の半分を床の幅 512 だけ離して置く（描き直し・引きのばしはしない）。
+# 床は絵の床を使わず、街の石畳（tile_street）を道と同じ大きさで敷く（南北の大通りと石がそのまま続く。指示書「床の石だけ道と同じに」）。
+# 小川は橋の下を通る（北の塔の足元が北の岸、南の塔が南の岸）。4本の塔は前後を比べる部品
+STONE_FILE = 'stone_bridge_front'
+BRIDGE_STONE = dict(cx=3200, s=1.0, water=5015)   # water：絵の STONE_MID を合わせる y（橋の下の小川の真ん中）
+STONE_DECK_X = (380, 636)      # 絵の床の左右（欄干の内側の線のすぐ内。px）。左の半分はこれより左、右の半分はこれから右
+STONE_DECK_Y = (119, 988)      # 絵の床の上のはし・下のはし（px）
+STONE_MID = 515                # 絵の北の塔の足元（約 392）と南の塔の上（約 640）のまん中（px）
+STONE_FOOT_N = 392             # 絵の北の塔の足元（px）
+# 4本の塔（街灯も。絵の px。左・上・右・下。下＝塔の足元）
+STONE_TOWERS = {'nw': (180, 0, 380, 392), 'ne': (636, 0, 836, 392), 'sw': (180, 630, 380, 1046), 'se': (636, 630, 836, 1046)}
 # 木の橋（24）：2026-10-28 点検（ユーザー「斜めだから歩くと違和感」）。部品は上ほど右へずれた斜めの絵なので、
 # 下の端はそのままに上を左へずらしてまっすぐにする（WOOD_DESKEW＝高さ1あたりのずれ。シートの橋板の真ん中は上下で約155px ずれていた）。
 # 渡った先は主人公の家ととなりの家のあいだ。そこから南の道まで小道（STREETS の最後）でつなぐ（前は草地で行き止まりだった）
@@ -309,13 +322,16 @@ PROP_PARTS = {
     'bush_small': ('props_nature', (344, 780, 572, 983), 0.7), 'hedge': ('props_nature', (585, 828, 881, 982), 0.85),
     'fence': ('props_nature', (895, 809, 1157, 983), 0.7), 'telescope': ('props_nature', (1174, 710, 1517, 1003), 0.85),
     'lamp': ('props_street', (100, 1, 216, 400), 0.8), 'lamp2': ('props_street', (319, 2, 582, 397), 0.8),
-    'bench': ('props_street', (625, 122, 1078, 404), 0.7), 'bench_side': ('props_street', (1228, 42, 1403, 391), 0.7),
+    # 2026-10-30：ベンチ・排水溝・木箱・四角い花壇・立て札は正面向きの新しい絵（front-facing-20261030。1枚に1つ）。
+    # 倍率は、前の部品と同じくらいの幅になるように（ベンチ 約313・広場のベンチ 約277・縦のベンチ 高さ 約250・排水溝 約145・木箱 約167・花壇 約204・立て札 約244）
+    # 縦向きのベンチは、南の大通りの東の芝生に置くので、座る面が道（西）を向く bench_side_left
+    'bench': ('bench_front', (0, 0, 320, 200), 1.12), 'bench_side': ('bench_side_left', (0, 0, 130, 250), 1.1),
     # 広場の中のベンチ（2026-10-29 夜。丸い石畳のふちにかからない大きさ）
-    'bench_plaza': ('props_street', (625, 122, 1078, 404), 0.62),
-    'planter': ('props_street', (66, 415, 399, 699), 0.62), 'flowerbowl': ('props_street', (468, 414, 778, 691), 0.62),
-    'barrel': ('props_street', (861, 429, 1057, 706), 0.6), 'crate': ('props_street', (1163, 415, 1473, 704), 0.55),
-    'banner': ('props_street', (56, 652, 239, 1024), 0.8), 'sign': ('props_street', (368, 721, 721, 1016), 0.7),
-    'manhole': ('props_street', (821, 736, 1121, 976), 0.45), 'drain': ('props_street', (1163, 779, 1492, 967), 0.45),
+    'bench_plaza': ('bench_front', (0, 0, 320, 200), 0.99),
+    'planter': ('planter_front', (0, 0, 330, 280), 0.73), 'flowerbowl': ('props_street', (468, 414, 778, 691), 0.62),
+    'barrel': ('props_street', (861, 429, 1057, 706), 0.6), 'crate': ('crate_front', (0, 0, 300, 290), 0.6),
+    'banner': ('props_street', (56, 652, 239, 1024), 0.8), 'sign': ('sign_front', (0, 0, 350, 290), 0.72),
+    'manhole': ('props_street', (821, 736, 1121, 976), 0.45), 'drain': ('drain_front', (0, 0, 320, 150), 0.57),
     # 林のへり用（少し小さく）
     'conifer_e': ('props_nature', (1174, 36, 1517, 686), 0.8), 'tree_e': ('props_nature', (661, 137, 1159, 691), 0.78),
     'bush_e': ('props_nature', (23, 718, 329, 985), 0.62),
@@ -324,16 +340,18 @@ PROP_PARTS = {
 PROP_BLOCK = {
     'tree_big': (0.30, 70), 'tree_mid': (0.30, 64), 'conifer': (0.35, 64), 'bush_big': (0.9, 90), 'bush_small': (0.9, 70),
     'hedge': (0.95, 64), 'fence': (0.9, 40), 'telescope': (0.9, 120), 'lamp': (0.9, 32), 'lamp2': (0.6, 32),
-    'bench': (0.9, 70), 'bench_side': (0.9, 120), 'bench_plaza': (0.9, 64), 'planter': (0.95, 90), 'flowerbowl': (0.9, 80), 'barrel': (0.9, 64),
+    'bench': (0.9, 70), 'bench_side': (0.9, 170), 'bench_plaza': (0.9, 64), 'planter': (0.95, 90), 'flowerbowl': (0.9, 80), 'barrel': (0.9, 64),
     'crate': (0.95, 80), 'banner': (0.5, 32), 'sign': (0.8, 40),
     'conifer_e': (0.35, 64), 'tree_e': (0.30, 64), 'bush_e': (0.9, 80),
 }
 # 2026-10-29 夜 iPhone の点検（指示書 D。docs/angle-audit-20261029.md）：ななめ上から見た角度・遠近で描かれていて、
 # 正面向きの街の中でななめ・下り坂に見える小物。新しい正面向きの絵（依頼文 docs/design-requests-20261030/）が届くまで置かない。
 # 置き場所は PROPS・道の飾りに残してある（絵が届いたら、ここから名前を外すだけで戻る）
-ANGLE_OFF = {'bench', 'bench_plaza', 'bench_side', 'crate', 'planter', 'drain'}
-STALLS = [((6, 181, 526, 844), 5240), ((539, 183, 1042, 849), 5600), ((1043, 183, 1536, 853), 5960)]
-STALL_BASE, STALL_S = 3880, 0.6
+# 2026-10-30（指示書 H）：ベンチ・木箱・花壇・排水溝の正面向きの絵が届いたので、全部もとの置き場所に戻した（いま外している物はない）
+ANGLE_OFF: set[str] = set()
+# 屋台（22）：2026-10-30 正面向きの新しい絵（左から果物・花・雑貨。前は stalls.png のななめの絵）。3つとも同じ倍率・同じ足元の高さ
+STALLS = [('stall_fruit_front', 5240), ('stall_flower_front', 5600), ('stall_goods_front', 5960)]
+STALL_BASE, STALL_S = 3880, 0.62
 
 
 # ───────────── 地面 ─────────────
@@ -654,9 +672,10 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     base.paste(bright, (0, 0), terr)
 
     # ── 道・広場 ──
-    # 石の橋の下（デッキの南の端 〜 南の大通り）も道。小川を描いたあとで塗る（橋の柱の間に見える）。
-    # 2026-10-29：小川は橋の床の下を通るので、道はデッキの南の端（y 約 5190）より下だけ（小川の南の岸 5135 より下）
-    bridge_gap = (2944, 5150, 3456, 5660)
+    # 石の橋の床（欄干のあいだ）も道。小川を描いたあとで、小川の上に塗る（2026-10-30：床の北のはし〜南の大通りまで）
+    sb = BRIDGE_STONE['s']
+    stone_y0 = BRIDGE_STONE['water'] - STONE_MID * sb
+    bridge_gap = (BRIDGE_STONE['cx'] - 256, round(stone_y0 + STONE_DECK_Y[0] * sb), BRIDGE_STONE['cx'] + 256, 5660)
     rects = STREETS + door_paths()
     streets = mask_rects(size, rects)
     gap_mask = mask_rects(size, [bridge_gap])
@@ -783,23 +802,31 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     base.paste(st_img, (0, 0), gap_mask)
 
     # ── 石の橋（19）・木の橋（24） ──
-    br, (box_, boy_) = cut_at('bridges', (629, 14, 1535, 954))
-    # デッキの南の端より下は、左右の柱だけ残す（アーチの面と、その下の水は使わない）
-    ba = np.array(br)
-    ba[BRIDGE_DECK_S - boy_:, BRIDGE_PILLARS[0] - box_:BRIDGE_PILLARS[1] - box_, 3] = 0
-    br = Image.fromarray(ba)
+    # 石の橋：左右の半分を、床（道）の左右のはしに欄干の内側の線が来るように置く。床は上で道として塗ってある
+    sbr = sheet(STONE_FILE)
     s = BRIDGE_STONE['s']
-    bim = resize(br, s * K)
-    # アーチの下の端（シートの y 905）を小川の下の岸に合わせる。橋の板（シートの x 880〜1260）を道の真ん中に
-    by = BRIDGE_STONE['bank'] - (905 - boy_) * s
-    bx = BRIDGE_STONE['cx'] - (1070 - box_) * s
-    soft_shadow(base, bim, (P(bx), P(by)), 18, 10, 10, 60)
-    base.alpha_composite(bim, (P(bx), P(by)))
-    deck_top, deck_bot = by + (200 - boy_) * s, by + br.height * s
-    t.block_rect(bx, by + 80 * s, bx + br.width * s, deck_bot)
-    t.block_rect(BRIDGE_STONE['cx'] - 150, by, BRIDGE_STONE['cx'] + 150, deck_bot + 40, False)
-    t.paved[np.ix_((ys >= deck_top) & (ys < deck_bot), (xs >= BRIDGE_STONE['cx'] - 150) & (xs < BRIDGE_STONE['cx'] + 150))] = True
-    t.extra['bridge_stone'] = (bx, by, deck_top, deck_bot)
+    dl, dr = STONE_DECK_X
+    halves = [(sbr.crop((0, 0, dl, sbr.height)), BRIDGE_STONE['cx'] - 256 - dl * s, 0),
+              (sbr.crop((dr, 0, sbr.width, sbr.height)), BRIDGE_STONE['cx'] + 256, dr)]
+    by = stone_y0
+    for half, hx, _ in halves:
+        him = resize(half, s * K)
+        soft_shadow(base, him, (P(hx), P(by)), 18, 10, 10, 60)
+        base.alpha_composite(him, (P(hx), P(by)))
+    # 当たり：欄干と塔（左右の半分の、北の塔の足元より下）。北の塔の上の方は宙なので、北の十字路の上は当たりにしない。
+    # 床（道の幅）は小川の上も歩ける
+    deck_top, deck_bot = by + STONE_DECK_Y[0] * s, by + sbr.height * s
+    for half, hx, _ in halves:
+        t.block_alpha(resize(half, s * K), hx, by, 1 / K, by + (STONE_FOOT_N - 70) * s, deck_bot + 4)
+    t.block_rect(BRIDGE_STONE['cx'] - 256, deck_top - 40, BRIDGE_STONE['cx'] + 256, deck_bot + 40, False)
+    # 床と、床の南のはし〜南の大通りのあいだ（bridge_gap）は石畳（足音）
+    t.paved[np.ix_((ys >= bridge_gap[1]) & (ys < bridge_gap[3]), (xs >= bridge_gap[0]) & (xs < bridge_gap[2]))] = True
+    # 4本の塔は前後を比べる部品にも（地面の絵の上に同じ絵を重ねる）。足元＝塔の下のはし
+    for name, (px1, py1, px2, py2) in STONE_TOWERS.items():
+        left = name.endswith('w')
+        ox_ = BRIDGE_STONE['cx'] - 256 - dl * s if left else BRIDGE_STONE['cx'] + 256 - dr * s
+        piece = sbr.crop((px1, py1, px2, py2))
+        t.add_sprite(resize(piece, s * K), f'stone_bridge_{name}', ox_ + px1 * s, by + py1 * s, by + py2 * s)
     # 木の橋：短くした絵をそのまま（縦横同じ倍率で縮めるだけ）。北の柱の足元を foot_n に、板の真ん中を cx に。
     # 小川は先に描いてあるので、橋の板・欄干の下を通る（欄干の外は透明なので小川が見える。石の橋と同じ）
     wb = Image.open(os.path.join(SRC, WOOD_FILE)).convert('RGBA')
@@ -826,8 +853,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     wall = cut('terrace_parts', (40, 39, 630, 353))
     ws = TERRACE_FACE / (wall.height * 0.86)
     wall = resize(wall, ws * K)
-    big_stairs = cut('terrace_parts', (66, 594, 900, 1012))
-    small_stairs = cut('terrace_parts', (1037, 666, 1431, 1011))
+    big_stairs, (bsx, _) = cut_at(STAIRS_N['file'])
+    small_stairs, (ssx, _) = cut_at(STAIRS_W['file'])
     sn = resize(big_stairs, STAIRS_N['s'] * K)
     sw = resize(small_stairs, STAIRS_W['s'] * K)
     sn_x = STAIRS_N['cx'] - big_stairs.width * STAIRS_N['s'] / 2
@@ -844,7 +871,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
                 base.alpha_composite(wall.crop((0, 0, min(wall.width, right - x), wall.height)), (x, P(top) - round(wall.height * 0.14)))
             x += stepw
         # 壁のすき間（階段のわき）は壁を詰めて置く。2026-10-29 iPhone の試遊「石垣が角ですき間（草が見える）」：
-        # 階段は下ほど広がる形なので、石垣を階段の上の柱の内側（STAIR_TUCK）まで差しこむ（はみ出しは階段の絵で隠れる）
+        # 石垣を階段の外のふちから内へ STAIR_TUCK だけ差しこむ（はみ出しは階段の柱の絵で隠れる）
         for g1, g2 in gaps:
             for gx in (g1 - wall.width / K + STAIR_TUCK, g2 - STAIR_TUCK):
                 if x1 - 20 <= gx and P(gx) < right:
@@ -875,13 +902,13 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     t.block_rect(tw[0], tw[3] - 20, tw[2] + 40, tw[3] + TERRACE_FACE)
     t.block_rect(tn[0], tn[3] - 20, tn[2], tn[3] + TERRACE_FACE)
     t.block_rect(tw[2] - 30, tn[3], tw[2] + 40, tw[3] + TERRACE_FACE)
-    t.block_rect(STAIRS_N['cx'] - 240, STAIRS_N['top'], STAIRS_N['cx'] + 240, STAIRS_N['top'] + big_stairs.height * STAIRS_N['s'] + 10, False)
-    t.block_rect(STAIRS_W['cx'] - 90, STAIRS_W['top'], STAIRS_W['cx'] + 90, STAIRS_W['top'] + small_stairs.height * STAIRS_W['s'] + 10, False)
-    # 階段の手すり（左右の柱）は通れない
-    for cxs, half, top, hgt in ((STAIRS_N['cx'], 375, STAIRS_N['top'], big_stairs.height * STAIRS_N['s']),
-                                (STAIRS_W['cx'], 178, STAIRS_W['top'], small_stairs.height * STAIRS_W['s'])):
-        t.block_rect(cxs - half, top, cxs - half + (half - 240 if half > 200 else half - 90), top + hgt + 10)
-        t.block_rect(cxs + (240 if half > 200 else 90), top, cxs + half, top + hgt + 10)
+    # 段（手すりの柱の内側）だけ通れる。左右の手すりの柱は通れない（2026-10-30：新しい階段の柱の位置で）
+    for st, im, x0, sx in ((STAIRS_N, big_stairs, sn_x, bsx), (STAIRS_W, small_stairs, sw_x, ssx)):
+        hgt = im.height * st['s']
+        s1, s2 = x0 + (st['step'][0] - sx) * st['s'], x0 + (st['step'][1] - sx) * st['s']
+        t.block_rect(s1 + 8, st['top'], s2 - 8, st['top'] + hgt + 10, False)
+        t.block_rect(x0, st['top'], s1 + 8, st['top'] + hgt + 10)
+        t.block_rect(s2 - 8, st['top'], x0 + im.width * st['s'], st['top'] + hgt + 10)
     t.paved[np.ix_((ys >= STAIRS_N['top']) & (ys < STAIRS_N['top'] + 380), (xs >= 2950) & (xs < 3450))] = True
 
     # ── 街のまわりの塀（wall_gate）・南の門（14） ──
@@ -1027,8 +1054,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
                           w=int(fpart.width / K // CELL) + 1, h=int((fpart.height / K - (wcy - 150 - fby) * fs) // CELL) + 1)
 
     # ── 屋台（22） ──
-    for i, (box, cxs) in enumerate(STALLS):
-        im = resize(cut('stalls', box), STALL_S * K)
+    for i, (name, cxs) in enumerate(STALLS):
+        im = resize(cut(name), STALL_S * K)
         x, y = cxs - im.width / K / 2, STALL_BASE - im.height / K
         soft_shadow(base, im, (P(x), P(y)), 18, 10, 10, 70)
         t.add_sprite(im, f'stall{i + 1}', x, y, STALL_BASE - 20)
