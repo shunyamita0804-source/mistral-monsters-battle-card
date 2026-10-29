@@ -1,6 +1,6 @@
 // ジオルの試遊の画面写真（2026-10-29）。?qa=1&lab=geol の確認用の画面のカード15枚と、
 // 効果を確かめる用のデッキどうしの対戦（QA:オート）で、地ひびき・かばう・場の「ためている」の印が出た所を撮る（約2〜4分）。
-// 使い方: node tools/e2e/geol_shot.cjs URL セーブ.json 出力フォルダ
+// 使い方: node tools/e2e/geol_shot.cjs URL セーブ.json 出力フォルダ（LAB_ONLY=1 で確認用の画面だけ）
 const { chromium } = require('playwright');
 const fs = require('fs');
 const [base, saveFile, out] = process.argv.slice(2);
@@ -35,6 +35,7 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
     if (!more) break;
     await page.waitForTimeout(500);
   }
+  if (process.env.LAB_ONLY) { await browser.close(); return; }
   // 効果を確かめる用どうしで対戦
   await page.locator('.pukarim-lab__choice', { hasText: /^効果を確かめる用/ }).click();
   await page.locator('.pukarim-lab__choice', { hasText: /（効果を確かめる用）$/ }).click();
