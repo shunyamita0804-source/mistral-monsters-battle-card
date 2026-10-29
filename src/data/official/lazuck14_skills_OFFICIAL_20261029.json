@@ -1,0 +1,182 @@
+{
+  "revision": "2026-10-29 夜 ユーザー決定：6 トリックショット 2マナ3→2マナ2・7 シャドウバースト 4マナ5→3マナ4（数字だけ変更。効果の文・絵・枚数はそのまま。元の版 lazuck14_skills_OFFICIAL_20261026.json は残す）",
+  "game": "ミストラルモンスターズ バトルカード",
+  "monster": "ラズック",
+  "border_color": "purple",
+  "art_size": [
+    827,
+    937
+  ],
+  "initial_total": 16,
+  "final_order": "attack 01-07 > special 08-10 > defense 11-12 > evade 13-14",
+  "skill_cards": [
+    {
+      "number": 1,
+      "name_ja": "ひっかき",
+      "category": "force",
+      "mana": 0,
+      "damage": 1,
+      "effect_ja": null,
+      "initial_copies": 3,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_01.png",
+      "source_old_art_number": "01",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-01"
+    },
+    {
+      "number": 2,
+      "name_ja": "かみつき",
+      "category": "force",
+      "mana": 1,
+      "damage": 1,
+      "effect_ja": null,
+      "initial_copies": 3,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_02.png",
+      "source_old_art_number": "02",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-02"
+    },
+    {
+      "number": 3,
+      "name_ja": "とびかかり",
+      "category": "force",
+      "mana": 2,
+      "damage": 3,
+      "effect_ja": null,
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_03.png",
+      "source_old_art_number": "03",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-03"
+    },
+    {
+      "number": 4,
+      "name_ja": "みだれづめ",
+      "category": "force",
+      "mana": 3,
+      "damage": 2,
+      "effect_ja": "回避されない",
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_04.png",
+      "source_old_art_number": "04",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-04"
+    },
+    {
+      "number": 5,
+      "name_ja": "しっぷうタックル",
+      "category": "force",
+      "mana": 4,
+      "damage": 4,
+      "effect_ja": null,
+      "initial_copies": 3,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_05.png",
+      "source_old_art_number": "06",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-06"
+    },
+    {
+      "number": 6,
+      "name_ja": "トリックショット",
+      "category": "wisdom",
+      "mana": 2,
+      "damage": 2,
+      "effect_ja": null,
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_06.png",
+      "source_old_art_number": "07",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-09"
+    },
+    {
+      "number": 7,
+      "name_ja": "シャドウバースト",
+      "category": "wisdom",
+      "mana": 3,
+      "damage": 4,
+      "effect_ja": null,
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_07.png",
+      "source_old_art_number": "08",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-10"
+    },
+    {
+      "number": 8,
+      "name_ja": "ちょうはつ",
+      "category": "special",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "指定した相手モンスターは次のターン、ラズックにしか攻撃できない。",
+      "initial_copies": 2,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_08.png",
+      "source_old_art_number": "09",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-07"
+    },
+    {
+      "number": 9,
+      "name_ja": "ダストキック",
+      "category": "special",
+      "mana": 0,
+      "damage": null,
+      "effect_ja": "指定した相手の次のターンのちから技ダメージ−1。",
+      "initial_copies": 2,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_09.png",
+      "source_old_art_number": "10",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-08"
+    },
+    {
+      "number": 10,
+      "name_ja": "いたずら",
+      "category": "special",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "相手の手札からランダムに1枚を相手の山札へ戻してシャッフルする。相手はカードを補充しない。",
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_10.png",
+      "source_old_art_number": "11",
+      "existing_id_hint_verify_in_repo": "REPO_VERIFY_EXISTING_ID"
+    },
+    {
+      "number": 11,
+      "name_ja": "しっぽいなし",
+      "category": "defense",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "相手のちから技から受けるダメージを3軽減する。",
+      "initial_copies": 1,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_11.png",
+      "source_old_art_number": "12",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-11"
+    },
+    {
+      "number": 12,
+      "name_ja": "シャドウガード",
+      "category": "defense",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "相手のかしこさ技から受けるダメージを3軽減する。",
+      "initial_copies": 1,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_12.png",
+      "source_old_art_number": "13",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-12"
+    },
+    {
+      "number": 13,
+      "name_ja": "シャドウスリップ",
+      "category": "evade",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "相手の消費マナ2以上のちから技・かしこさ技を回避する。",
+      "initial_copies": 1,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_13.png",
+      "source_old_art_number": "NEW_JPEG",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-15"
+    },
+    {
+      "number": 14,
+      "name_ja": "フェイントステップ",
+      "category": "evade",
+      "mana": 2,
+      "damage": null,
+      "effect_ja": "相手のちから技・かしこさ技を、消費マナに関係なく回避する。",
+      "initial_copies": 0,
+      "asset_path": "02_FINAL_ART_01-14/Razuk_ArtV2_Skill_14.png",
+      "source_old_art_number": "14",
+      "existing_id_hint_verify_in_repo": "skl-lazuck-14"
+    }
+  ]
+}

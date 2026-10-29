@@ -1,0 +1,87 @@
+{
+ "games": 200,
+ "boxes": {
+  "booster-1": {
+   "booster-2": {
+    "wins": 136,
+    "losses": 64,
+    "draws": 0,
+    "turns": 6091
+   },
+   "booster-3": {
+    "wins": 97,
+    "losses": 103,
+    "draws": 0,
+    "turns": 6414
+   }
+  },
+  "booster-2": {
+   "booster-1": {
+    "wins": 63,
+    "losses": 137,
+    "draws": 0,
+    "turns": 6055
+   },
+   "booster-3": {
+    "wins": 67,
+    "losses": 133,
+    "draws": 0,
+    "turns": 6303
+   }
+  },
+  "booster-3": {
+   "booster-1": {
+    "wins": 112,
+    "losses": 88,
+    "draws": 0,
+    "turns": 6329
+   },
+   "booster-2": {
+    "wins": 120,
+    "losses": 80,
+    "draws": 0,
+    "turns": 6269
+   }
+  }
+ },
+ "grant": {
+  "booster-1": {
+   "wins": 37,
+   "losses": 163,
+   "draws": 0,
+   "turns": 5860
+  },
+  "booster-2": {
+   "wins": 31,
+   "losses": 169,
+   "draws": 0,
+   "turns": 5679
+  },
+  "booster-3": {
+   "wins": 45,
+   "losses": 155,
+   "draws": 0,
+   "turns": 6228
+  }
+ },
+ "exam": {
+  "1": {
+   "wins": 200,
+   "losses": 0,
+   "draws": 0,
+   "turns": 2760
+  },
+  "2": {
+   "wins": 200,
+   "losses": 0,
+   "draws": 0,
+   "turns": 2338
+  },
+  "3": {
+   "wins": 200,
+   "losses": 0,
+   "draws": 0,
+   "turns": 1932
+  }
+ }
+}
