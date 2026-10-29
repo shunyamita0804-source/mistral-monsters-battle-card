@@ -64,13 +64,14 @@ export const WORLD = {
   'world.bossBattle': { ja: 'ボス戦', en: 'Boss Battle' },
   'world.dungeonBattle': { ja: 'ダンジョン戦', en: 'Dungeon Battle' },
   'world.victory': { ja: '勝利！ {coins} を手に入れた。', en: 'Victory! Got {coins}.' },
+  // 2026-10-30 点検 L：クリアのあとは街の南の門の前に戻るので「家に」→「街に」
   'world.dungeonCleared': {
-    ja: 'ボスを倒した！ダンジョンクリア！\n{coins} を手に入れた。\n家に帰ってきた。',
-    en: 'You beat the boss! Dungeon cleared!\nGot {coins}.\nYou returned home.',
+    ja: 'ボスを倒した！ダンジョンクリア！\n{coins} を手に入れた。\n街に帰ってきた。',
+    en: 'You beat the boss! Dungeon cleared!\nGot {coins}.\nYou returned to town.',
   },
   'world.dungeonClearedFirst': {
-    ja: 'ボスを倒した！ダンジョンクリア！\n{coins} を手に入れた。（初回クリア報酬）\n家に帰ってきた。',
-    en: 'You beat the boss! Dungeon cleared!\nGot {coins}. (First-clear reward)\nYou returned home.',
+    ja: 'ボスを倒した！ダンジョンクリア！\n{coins} を手に入れた。（初回クリア報酬）\n街に帰ってきた。',
+    en: 'You beat the boss! Dungeon cleared!\nGot {coins}. (First-clear reward)\nYou returned to town.',
   },
   // 2026-10-28：カードはボスから奪うのではなく、最奥の祭壇から受け取る（ボスが認めてくれる）
   'world.bossCards': { ja: '最奥の祭壇から、カードを受け取った！\n{cards}', en: 'Received cards from the innermost altar!\n{cards}' },
