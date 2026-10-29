@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { cardCatalog, getSkill, MONSTERS, QA_MONSTERS, QA_SKILLS, SKILLS, skillsOf, TMP_GEOL_ID } from '../src/data/cards.ts';
-import { GEOL_COLOR, GEOL_GACHA_RARE, GEOL_MONSTER, GEOL_MONSTER_ID, GEOL_PLAYTEST_16, GEOL_SKILLS, geolSkillId } from '../src/data/geol.ts';
+import { cardCatalog, getSkill, MONSTERS, QA_MONSTERS, QA_SKILLS, SKILLS, skillsOf, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../src/data/cards.ts';
+import { GEOL_CARD_TEXT, GEOL_COLOR, GEOL_GACHA_RARE, GEOL_MONSTER, GEOL_MONSTER_ID, GEOL_PLAYTEST_16, GEOL_SKILLS, geolSkillId } from '../src/data/geol.ts';
 import geolJson from '../src/data/official/geol14_skills_DRAFT_20261029.json';
 import { nobitonSkillId } from '../src/data/nobiton.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
@@ -11,13 +11,13 @@ import { GACHA_SERIES } from '../src/data/economy.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, attackPower, cardUsability, createBattle, energyOf, isPinned, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
-import { createNewGameSave } from '../src/game/save/saveData.ts';
+import { createNewGameSave, createNewSave, normalizeSave, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
 /**
- * ジオル（2026-10-29 試遊中。新モンスター制作の手順 4・G4。指示書 design-parts/cards-original/geol/00_instructions_for_claude_code.txt）
- * 細かい裁定は docs/battle-rules.md「ジオル（試遊中）」
+ * ジオル（2026-10-29。新モンスター制作の手順 4・G4 の試遊のあと、手順 8 の最終でふつうの一覧へ。指示書 design-parts/cards-original/geol/00_instructions_for_claude_code.txt）
+ * 細かい裁定は docs/battle-rules.md「ジオル」
  */
 
 const geo = (n: number): string => geolSkillId(n);
@@ -53,12 +53,22 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
       expect(skill.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
       expect(skill.cost).toBe(Number(mana));
       expect(skill.stat?.value ?? '―').toBe(damage === '―' ? '―' : Number(damage));
-      expect(skill.effectTextJa ?? 'なし').toBe(effect);
+      // 大きなカードに書く文は 05・09・10・11 だけ短い文（GEOL_CARD_TEXT）。JSON・CSV の文は変えない
+      expect(json.effect).toBe(effect);
+      expect(skill.effectTextJa ?? 'なし').toBe(GEOL_CARD_TEXT[i + 1] ?? effect);
       expect(json.gacha_slot).toBe(slot);
     });
   });
 
-  it('モンスター：ライフ9・色は岩の茶・ID mon-geol（仮ジオルとは別）。ガチャのレアの枠は 3・5・10・14（ガチャにはまだ入れない）', () => {
+  it('大きなカードの短い文（05・09・10・11。2026-10-29 ユーザー指示）', () => {
+    expect(getSkill(geo(5)).effectTextJa).toBe('相手全員に当たる（守りは1体ずつ）');
+    expect(getSkill(geo(9)).effectTextJa).toBe('選んだ相手1体は、このターン次の攻撃を回避できない');
+    expect(getSkill(geo(10)).effectTextJa).toBe('次のターン、最初のかしこさ技のダメージ2倍');
+    expect(getSkill(geo(11)).effectTextJa).toBe('味方への攻撃を代わりに受ける');
+    expect(Object.keys(GEOL_CARD_TEXT).map(Number)).toEqual([5, 9, 10, 11]);
+  });
+
+  it('モンスター：ライフ9・色は岩の茶・ID mon-geol。ガチャのレアの枠は 3・5・10・14。仮ジオルはゲームから外した', () => {
     expect(GEOL_MONSTER).toMatchObject({ id: 'mon-geol', life: 9, name: 'ジオル' });
     expect(GEOL_COLOR).toBe('#9A7B5C');
     expect(GEOL_GACHA_RARE).toEqual([geo(3), geo(5), geo(10), geo(14)]);
@@ -66,17 +76,19 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
     expect(BATTLE_CARDS[GEOL_MONSTER_ID]?.frame).toBe('geol');
     expect(existsSync('assets/images/ui/battlecard/frame_geol.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_geol.webp`)).toBe(true);
-    expect(cardCatalog.get(TMP_GEOL_ID)?.kind).toBe('monster');
+    expect(cardCatalog.get(TMP_GEOL_ID)).toBeUndefined();
+    for (const id of TMP_GEOL_SKILL_IDS) expect(cardCatalog.get(id)).toBeUndefined();
+    expect(REMOVED_CARD_IDS).toEqual(expect.arrayContaining([TMP_GEOL_ID, ...TMP_GEOL_SKILL_IDS]));
   });
 
-  it('ふつうに遊んでいる人には出さない：カードの一覧・初期配布・ブースターの箱・新しいセーブには入らず、確認用の一覧（QA）にだけ入る', () => {
-    expect(MONSTERS.some((m) => m.id === GEOL_MONSTER_ID)).toBe(false);
-    expect(SKILLS.some((s) => s.monsterId === GEOL_MONSTER_ID)).toBe(false);
+  it('ふつうの一覧（図鑑・デッキ編集・敵の編成）に入る。初期配布・ブースターの箱・新しいセーブには入らない。確認用の一覧（QA）は空', () => {
+    expect(MONSTERS.some((m) => m.id === GEOL_MONSTER_ID)).toBe(true);
+    expect(SKILLS.filter((s) => s.monsterId === GEOL_MONSTER_ID).map((s) => s.id)).toEqual(GEOL_SKILLS.map((s) => s.id));
     expect(INITIAL_DISTRIBUTION.some((d) => d.monsterId === GEOL_MONSTER_ID)).toBe(false);
     for (const b of BOOSTERS) expect(b.monsters).not.toContain(GEOL_MONSTER_ID);
-    expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('geol') && !id.includes('tmp-geol'))).toBe(false);
-    expect(QA_MONSTERS.map((m) => m.id)).toEqual([GEOL_MONSTER_ID]);
-    expect(QA_SKILLS.map((s) => s.id)).toEqual(GEOL_SKILLS.map((s) => s.id));
+    expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('geol'))).toBe(false);
+    expect(QA_MONSTERS).toEqual([]);
+    expect(QA_SKILLS).toEqual([]);
     expect(skillsOf(GEOL_MONSTER_ID).map((s) => s.id)).toEqual(GEOL_SKILLS.map((s) => s.id));
   });
 
@@ -339,5 +351,37 @@ describe('相手の CPU（ジオル）', () => {
     // ジオルも倒れてしまうときは使わない
     const both = applyAction(withMonster(withMonster(giveOpponent(scene({ player: [sor(5)] }, { opponent: 2 }), [geo(11)]), 'o-m2', { life: 3 }), 'o-m1', { life: 2 }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(chooseAction(both, 'opponent')).toEqual({ type: 'defend', side: 'opponent', cardUid: null });
+  });
+});
+
+describe('ジオルの最終：前のセーブの仮ジオル（セーブ version 23）', () => {
+  it('仮ジオルのモンスターカードは mon-geol に置きかえ、技カードは消す。デッキの仮ジオルもジオルに', () => {
+    const base = createNewSave();
+    const tmpSkills = TMP_GEOL_SKILL_IDS;
+    const deck = { monsters: [base.deck.monsters[0] as string, TMP_GEOL_ID, base.deck.monsters[2] as string], skills: [...base.deck.skills.slice(0, 57), tmpSkills[0], tmpSkills[1], tmpSkills[1]] };
+    const old = {
+      ...base,
+      version: 22,
+      collection: { ...base.collection, [TMP_GEOL_ID]: 2, [tmpSkills[0] as string]: 1, [tmpSkills[1] as string]: 3 },
+      deck,
+      peopleBook: { met: ['grant'], records: { grant: { wins: 1, losses: 0, monsters: [TMP_GEOL_ID, 'mon-soramo'], cards: [tmpSkills[2], 'skl-lazuck-01'] } } },
+      cardsSeen: [TMP_GEOL_ID, tmpSkills[0], 'mon-soramo'],
+    };
+    const s = normalizeSave(JSON.parse(JSON.stringify(old)));
+    if (!s) throw new Error('load');
+    expect(s.version).toBe(SAVE_VERSION);
+    expect(s.collection[GEOL_MONSTER_ID]).toBe(2);
+    expect(Object.keys(s.collection).some((id) => id.includes('tmp-geol'))).toBe(false);
+    expect(s.deck.monsters[1]).toBe(GEOL_MONSTER_ID);
+    expect(s.deck.skills.some((id) => id.includes('tmp-geol'))).toBe(false);
+    expect(s.peopleBook.records.grant).toMatchObject({ monsters: [GEOL_MONSTER_ID, 'mon-soramo'], cards: ['skl-lazuck-01'] });
+    expect(s.cardsSeen).toEqual(['mon-soramo']);
+  });
+
+  it('仮ジオルを持っていないセーブは変わらない', () => {
+    const base = createNewSave();
+    const s = normalizeSave(JSON.parse(JSON.stringify({ ...base, version: 22 })));
+    expect(s?.collection).toEqual(base.collection);
+    expect(s?.deck).toEqual(base.deck);
   });
 });

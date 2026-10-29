@@ -31,8 +31,8 @@ describe('ダンジョンの人物12人（2026-10-28）', () => {
       expect(person?.lines?.after?.ja).toContain('祭壇');
       expect(boss.monsters).toHaveLength(3);
     });
-    // 遺跡・森のボスのモンスターは仮のジオル・フルーネのまま
-    expect(runBossOpponent('dungeon-01').monsters[1]).toBe('mon-tmp-geol');
+    // 遺跡のボスのモンスターはジオル（2026-10-29 から）、森は仮のフルーネのまま
+    expect(runBossOpponent('dungeon-01').monsters[1]).toBe('mon-geol');
     expect(runBossOpponent('dungeon-02').monsters[1]).toBe('mon-tmp-flune');
     expect(DUNGEONS).toHaveLength(7);
   });

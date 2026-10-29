@@ -31,7 +31,8 @@ function inRun(dungeonId: string, seed = 777): SaveData {
 describe('ダンジョンごとのお金の表（src/data/economy.ts の DUNGEON_MONEY）', () => {
   it('指示書の表のとおり', () => {
     expect(DUNGEON_MONEY).toEqual({
-      'dungeon-01': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
+      // 太古の遺跡：2026-10-29 ジオルの最終で氷の洞窟と同じ段
+      'dungeon-01': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
       'dungeon-02': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
       'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
       'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
@@ -121,8 +122,8 @@ describe('宝箱の中身（【仮】お金 70％・道具 25％・技カード 
     const myurolSkills = skillsOf('mon-myurol').map((k) => k.id);
     expect(bossTrumpSkills('dungeon-03')).toEqual(myurolSkills);
     for (const c of cards) expect(myurolSkills).toContain(c);
-    // 遺跡・森のボスの切り札は仮のジオル・フルーネ
-    expect(bossTrumpSkills('dungeon-01')).toEqual(skillsOf('mon-tmp-geol').map((k) => k.id));
+    // 遺跡のボスの切り札はジオル（2026-10-29 から）、森は仮のフルーネ
+    expect(bossTrumpSkills('dungeon-01')).toEqual(skillsOf('mon-geol').map((k) => k.id));
     expect(bossTrumpSkills('dungeon-02')).toEqual(skillsOf('mon-tmp-flune').map((k) => k.id));
   });
 

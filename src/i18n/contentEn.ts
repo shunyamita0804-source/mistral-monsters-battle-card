@@ -33,14 +33,7 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   [`card:${HIDDEN_MONSTER_ID}:description`]:
     'A hidden monster you can restore by collecting 10 shards. Its official name, art and abilities are not decided yet.',
   // 【仮】ダンジョンのボスのモンスター（2026-10-26）
-  'card:mon-tmp-geol:name': 'Temp Geol',
   'card:mon-tmp-flune:name': 'Temp Flune',
-  'card:skl-tmp-geol-1:name': 'Temp Geol skill 1',
-  'card:skl-tmp-geol-2:name': 'Temp Geol skill 2',
-  'card:skl-tmp-geol-3:name': 'Temp Geol skill 3',
-  'card:skl-tmp-geol-4:name': 'Temp Geol skill 4',
-  'card:skl-tmp-geol-5:name': 'Temp Geol skill 5',
-  'card:skl-tmp-geol-6:name': 'Temp Geol skill 6',
   'card:skl-tmp-flune-1:name': 'Temp Flune skill 1',
   'card:skl-tmp-flune-2:name': 'Temp Flune skill 2',
   'card:skl-tmp-flune-3:name': 'Temp Flune skill 3',

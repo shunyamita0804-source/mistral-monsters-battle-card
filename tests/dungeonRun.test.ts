@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { skillsOf, TMP_GEOL_ID } from '../src/data/cards.ts';
+import { skillsOf } from '../src/data/cards.ts';
+import { GEOL_MONSTER_ID } from '../src/data/geol.ts';
 import { DUNGEON_RUN, runBattlerLook, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../src/data/dungeonRun.ts';
 import { DUNGEON_MONEY } from '../src/data/economy.ts';
 import { bfs, blocksWay, generateFloor, isFloorReachable, type DungeonFloor } from '../src/game/dungeon/generate.ts';
 import {
   activeEntities,
+  bossRewardCandidates,
   descend,
   entityAt,
+  floorsOf,
   isVisible,
   loseRunBattle,
   move,
@@ -159,14 +162,16 @@ describe('ダンジョンの挑戦', () => {
     }
   });
 
-  it('下りると次の階のスタート。上り階段はなく、最後の階より下へは行かない', () => {
+  it('下りると次の階のスタート。上り階段はなく、最後の階より下へは行かない（太古の遺跡は 2026-10-29 から地下4階）', () => {
     const run = runOf(started(1));
     const r1 = descend(run);
     expect(r1.floor).toBe(1);
     expect({ x: r1.x, y: r1.y }).toEqual(runFloor(r1).start);
     const r2 = descend(r1);
     expect(r2.floor).toBe(2);
-    expect(descend(r2)).toBe(r2);
+    const r3 = descend(r2);
+    expect(r3.floor).toBe(3);
+    expect(descend(r3)).toBe(r3);
   });
 
   it('宝箱は1度だけ開く（2回目は中身なし）', () => {
@@ -231,25 +236,33 @@ describe('ダンジョンの挑戦', () => {
     expect(last.save.location).toEqual(save.location);
   });
 
-  it('ボスを倒すとクリア：挑戦が終わり、ボスのお金（遺跡は初回 300G・2回目から 90G）と初めてのときのカード（仮のジオル）', () => {
+  it('ボスを倒すとクリア：挑戦が終わり、ボスのお金（遺跡は初回 600G・2回目から 180G）と初めてのときのカード（ジオルのモンスターカード）', () => {
     let s = started(5);
-    s = { ...s, dungeonRun: descend(descend(runOf(s))) };
+    s = { ...s, dungeonRun: descend(descend(descend(runOf(s)))) };
     const boss = runFloor(runOf(s)).entities.find((e) => e.kind === 'boss');
     if (!boss) throw new Error('ボスがいない');
-    expect(runBossOpponent().monsters).toContain(TMP_GEOL_ID);
+    expect(runBossOpponent().monsters).toEqual(['mon-gauul', GEOL_MONSTER_ID, 'mon-lazuck']);
+    // 初めてのクリア：技カードは無し（祭壇でジオルのモンスターカードだけ）
+    expect(bossRewardCandidates(s, 'dungeon-01', runBossOpponent().monsters)).toEqual([]);
     const coins = s.coins;
     const w = winRunBattle(s, { kind: 'boss', id: boss.id }, null);
     expect(w.cleared).toBe(true);
     expect(w.firstClear).toBe(true);
     expect(w.save.dungeonRun).toBeNull();
-    expect(w.save.coins).toBe(coins + 300);
-    expect(w.save.collection[TMP_GEOL_ID]).toBe((s.collection[TMP_GEOL_ID] ?? 0) + 1);
+    expect(w.save.coins).toBe(coins + 600);
+    expect(w.clearCards).toEqual([{ cardId: GEOL_MONSTER_ID, count: 1 }]);
+    expect(w.save.collection[GEOL_MONSTER_ID]).toBe((s.collection[GEOL_MONSTER_ID] ?? 0) + 1);
     expect(w.save.dungeons['dungeon-01']?.bossDefeated).toBe(true);
-    // 2回目は初めてのカードなし
-    const again = winRunBattle({ ...startRun(w.save, 'dungeon-01', 6), dungeonRun: { ...runOf(startRun(w.save, 'dungeon-01', 6)), floor: 2 } }, { kind: 'boss', id: boss.id }, null);
+    // 2回目は初めてのカードなし。技カードはジオルの技から1枚
+    expect(bossRewardCandidates(w.save, 'dungeon-01', runBossOpponent().monsters)).toEqual(skillsOf(GEOL_MONSTER_ID).map((k) => k.id));
+    const again = winRunBattle({ ...startRun(w.save, 'dungeon-01', 6), dungeonRun: { ...runOf(startRun(w.save, 'dungeon-01', 6)), floor: 3 } }, { kind: 'boss', id: boss.id }, 'skl-geol-03');
     expect(again.firstClear).toBe(false);
-    expect(again.coins).toBe(90);
-    expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 300, bossRepeat: 90 });
+    expect(again.coins).toBe(180);
+    expect(again.clearCards).toEqual([]);
+    expect(again.save.collection['skl-geol-03']).toBe((w.save.collection['skl-geol-03'] ?? 0) + 1);
+    expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 600, bossRepeat: 180 });
+    // ほかのダンジョンはいままでどおり（相手の3体の技から）
+    expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
   });
 });
 
@@ -275,7 +288,7 @@ describe('ダンジョンの挑戦のセーブ', () => {
     // 壁の上にいる → その階のスタートへ
     expect(sanitizeRun({ ...run, x: 0, y: 0 })).toMatchObject({ x: runFloor(run).start.x, y: runFloor(run).start.y });
     // 階が多すぎる → 最後の階
-    expect(sanitizeRun({ ...run, floor: 9 })?.floor).toBe(DUNGEON_RUN.floors - 1);
+    expect(sanitizeRun({ ...run, floor: 9 })?.floor).toBe(floorsOf('dungeon-01') - 1);
     // 知らないダンジョン → 挑戦をやめる
     expect(sanitizeRun({ ...run, dungeonId: 'dungeon-99' })).toBeNull();
   });

@@ -1,7 +1,7 @@
-import { TMP_GEOL_ID } from './cards.ts';
 import { ENCOUNTERS } from './dungeons.ts';
 import type { RankId } from './economy.ts';
 import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
+import { GEOL_MONSTER_ID } from './geol.ts';
 import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
@@ -86,14 +86,15 @@ export interface RunDungeonConfig {
   readonly bossId: string;
 }
 
-/** 2026-10-27 指示書：ふつうのダンジョンは最大5階。強さは 遺跡・森 ＜ 水 ＜ 氷 ＜ 火 ＜ 機械 ＜ 聖域（すべて仮） */
+/** 2026-10-27 指示書：ふつうのダンジョンは最大5階。強さは 森 ＜ 水 ＜ 氷・遺跡 ＜ 火 ＜ 機械 ＜ 聖域（すべて仮。遺跡は 2026-10-29 に氷の洞窟と同じ段へ） */
 export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
-  // 太古の遺跡（最初から）：いまのまま
+  // 太古の遺跡（C ランク。2026-10-29 ジオルの最終で初期のダンジョンから外した）：地下4階・仕掛けなし。
+  // 強さ・バトラーと見えない番人の編成は氷の洞窟と同じ段（プカリムを使うのは精霊の森のバトラーだけ）
   'dungeon-01': {
-    floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[PUK, LAZ, SOR], [SOR, PUK, GAU]], guardianTeam: [PUK, PUK, LAZ], bossId: 'enc-b3-boss',
+    floors: 4, gimmick: 'none', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, KAL], bossId: 'enc-b3-boss',
   },
-  // 精霊の森（最初から）：固定のマップをやめて、遺跡と同じランダム生成（2026-10-27）
+  // 精霊の森（最初から。2026-10-29 から初期のダンジョンはここだけ）：固定のマップをやめて、ランダム生成（2026-10-27）
   'dungeon-02': {
     floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, PUK], bossId: 'enc-forest-boss',
@@ -183,7 +184,7 @@ export function runGuardianOpponent(floor: number, dungeonId?: string): Opponent
   return { ...base, monsters: c.guardianTeam, lifeScale: Math.round((floorLife(dungeonId, floor) + c.guardianLifeBonus) * 100) / 100, face: 'guardian' };
 }
 
-/** ボス＝そのダンジョンの守り手（src/data/dungeons.ts の ENCOUNTERS・人物は src/data/people.ts。遺跡は仮のジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */
+/** ボス＝そのダンジョンの守り手（src/data/dungeons.ts の ENCOUNTERS・人物は src/data/people.ts。遺跡はジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */
 export function runBossOpponent(dungeonId?: string): OpponentDefinition {
-  return ENCOUNTERS[runConfig(dungeonId).bossId] ?? { id: 'enc-b3-boss', name: 'グラント', monsters: [SORAMO_MONSTER_ID, TMP_GEOL_ID, LAZUCK_MONSTER_ID], lifeScale: 0.85 };
+  return ENCOUNTERS[runConfig(dungeonId).bossId] ?? { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], lifeScale: 1.2 };
 }

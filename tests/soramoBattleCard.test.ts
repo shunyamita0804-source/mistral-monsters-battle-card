@@ -144,7 +144,8 @@ describe('数値の欄のきまり（2026-10-25：特殊は「効果」・回避
       const b = skillValueBadge(s);
       const cat = skillCategory(s);
       if (cat === 'force' || cat === 'wisdom') expect(b).toEqual({ kind: 'damage', value: s.stat?.value });
-      else if (cat === 'defense') expect(b.kind).toBe('guard');
+      // 守りのうち、ジオルのかばう（cover）・うけとめる（nullify）は数値の代わりに「かばう」「0に」（2026-10-29）
+      else if (cat === 'defense') expect(['guard', 'cover', 'nullify']).toContain(b.kind);
       else if (cat === 'evade') expect(skillValueBadgeText(b)).toBe('回避');
       else expect(skillValueBadgeText(b)).toBe('効果');
     }
