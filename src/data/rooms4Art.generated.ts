@@ -178,6 +178,12 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "w": 8,
     "h": 19
    },
+   "COUNTER": {
+    "x": 46,
+    "y": 23,
+    "w": 13,
+    "h": 8
+   },
    "RECEPTIONIST_SPOT": {
     "x": 46,
     "y": 24,

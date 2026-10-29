@@ -1,7 +1,7 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
-import { BUREAU_DESK_FRONT, getMap, HALL_BOARD, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
+import { BUREAU_DESK_FRONT, CAMERA_LEANS, getMap, HALL_BOARD, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
@@ -70,6 +70,7 @@ import {
   type Diagonal,
   type PlayerGender,
 } from '../../game/world/walkAnim.ts';
+import { leanFocus } from '../components/cameraLean.ts';
 import {
   applySceneEffects,
   isNpcPresent,
@@ -547,6 +548,8 @@ export class WorldView {
   #moveTime = 0;
   /** カメラの位置（地図をずらす量。論理px）。null なら次の描画で人物にぴったり合わせる */
   #cam: Point | null = null;
+  /** 画面の中心を寄せる先（マスの範囲。受付の前にいる間だけ。CAMERA_LEANS） */
+  #leanTo: (typeof CAMERA_LEANS)[number]['target'] | null = null;
   #camTime = 0;
   /** カメラが見ている点（遊びの中心。拡大後の地図の座標）と、先読みの量 */
   #focus: Point = { x: 0, y: 0 };
@@ -1037,6 +1040,7 @@ export class WorldView {
     const keepClosed = !fade && this.#fade?.classList.contains('is-on');
     this.#fade = h('div', { class: `world__fade${fade || keepClosed ? ' is-on' : ''}`, attrs: { 'aria-hidden': 'true' } });
     this.#nearKey = '';
+    this.#leanTo = null;
     this.#root.replaceChildren(this.#viewport, hud, examine, hint ?? '', goal ?? '', this.#fade);
     this.#root.dataset.map = map.id;
     this.#root.dataset.intro = save.story.intro;
@@ -1522,7 +1526,10 @@ export class WorldView {
         y: Math.abs(dy) > CAMERA_DEAD_Y ? body.y - Math.sign(dy) * CAMERA_DEAD_Y : this.#focus.y,
       };
     }
-    const fo = this.#focus;
+    // 受付の前（セリアに話しかけられる所）にいる間だけ、主人公とカウンターの真ん中の中間を見る。
+    // それでもカウンターがはみ出すときは、はみ出さない所まで寄せる（カメラが遅れて追うので、なめらかに寄る。部屋の端は下で止める）
+    const lean = this.#leanTo;
+    const fo = lean ? leanFocus(this.#focus, lean, cell * z, vw, vh) : this.#focus;
     const tx = mw <= vw ? (vw - mw) / 2 : -Math.min(Math.max(fo.x - vw / 2, 0), mw - vw);
     const ty = mh <= vh ? (vh - mh) / 2 : -Math.min(Math.max(fo.y - vh / 2, 0), mh - vh);
     // カメラは少し遅れて追う（場所に入ったときはぴったり）
@@ -1785,6 +1792,7 @@ export class WorldView {
     this.#nearKey = key;
     this.#gaze();
     const npc = this.#nearNpc();
+    this.#leanTo = (npc && CAMERA_LEANS.find((l) => l.mapId === this.#map.id && l.npcId === npc.id)?.target) ?? null;
     const near = npc ? { x: npc.x, y: npc.y } : this.#nearTarget();
     this.#examineBtn?.classList.toggle('is-ready', near !== null);
     // 話せる人がいるときは「話す」、それ以外は「調べる」（何ができるかをボタンの文字で見せる）
