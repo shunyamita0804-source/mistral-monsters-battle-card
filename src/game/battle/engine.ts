@@ -464,7 +464,8 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
       }),
     );
   }
-  if (card.effect.type === 'heal') return aliveMonsters(state.sides[side]);
+  // 回復（仮サポート）・いやしのみつ（フルーネ。使ったモンスターも選べる）：生きている味方（倒れた味方は選べない）
+  if (card.effect.type === 'heal' || card.effect.type === 'healAlly') return aliveMonsters(state.sides[side]);
   if (card.kind === 'skill' && card.effect.type === 'tailwind') return tailwindTargets(state, side, card);
   return [];
 }
@@ -653,13 +654,16 @@ function resolvePending(state: BattleState): BattleState {
   const damage = incomingDamage(state, pending);
   const target = findMonster(state, pending.targetUid);
   const evaded = pending.responses.some((id) => getSkill(id).effect.type === 'evade');
+  // 相手のライフが実際に減った量（倒しすぎた分は入らない。フラワードレインの回復に使う）
+  const lost = Math.min(damage, target?.monster.life ?? 0);
   let withFx = next;
   if (damage > 0) withFx = addFx(next, hitKind(pending.cardId), pending.attacker);
   else if (evaded) withFx = addFx(next, 'evade', target?.side ?? otherSide(pending.attacker));
   // じならしは、攻撃を1回受けたら消える（当たっても・守っても）
   const after = clearPin(applyDamage(withFx, pending.targetUid, damage), pending.targetUid);
   const recoiled = damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : after;
-  const done = evaded ? recoiled : attackRiders(recoiled, pending.cardId, pending.attacker, pending.targetUid);
+  const drained = evaded ? recoiled : drainHeal(recoiled, pending.cardId, pending.userUid, lost);
+  const done = evaded ? drained : attackRiders(drained, pending.cardId, pending.attacker, pending.targetUid);
   return nextAllTarget(done, pending);
 }
 
@@ -698,6 +702,18 @@ function selfDamageOnHit(state: BattleState, skillId: string, userUid: string): 
   if (!user || user.monster.life <= 0) return state;
   const next = addLog(addFx(state, 'recoil', user.side), t('battle.log.recoil', { name: nameOf(user.monster.cardId), n: e.selfDamageOnHit }));
   return applyDamage(next, userUid, e.selfDamageOnHit);
+}
+
+/**
+ * フラワードレイン（正式：フルーネ 2026-10-29）：攻撃のあと、相手のライフが実際に減った量（lost）だけ、使ったモンスターのライフを回復する。
+ * 最大ライフ（その対戦での最大。ボスの lifeScale がかかっていればその値）を超えない。0 なら何もしない。勝負がついたあと・使ったモンスターが倒れていれば何もしない
+ */
+function drainHeal(state: BattleState, skillId: string, userUid: string, lost: number): BattleState {
+  const e = getSkill(skillId).effect;
+  if (e.type !== 'attack' || !e.drain || lost <= 0 || state.phase === 'ended') return state;
+  const user = findMonster(state, userUid)?.monster;
+  if (!user || user.life <= 0 || user.life >= user.maxLife) return state;
+  return healMonster(state, user, lost);
 }
 
 /** 命中の音の種類（強攻撃は仮に必要マナ STRONG_ATTACK_COST 以上の技） */
@@ -795,7 +811,7 @@ function useCard(
   if (allTargets) {
     target = targets[0];
     if (!target) return state;
-  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'tailwind') {
+  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'healAlly' || skill.effect.type === 'tailwind') {
     target = targetUid ? targets.find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
@@ -824,8 +840,9 @@ function useCard(
       if (skill.effect.unblockable && skill.effect.undodgeable) {
         // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
         const dealt = Math.max(0, power - shieldOf(state, target, skill.stat.type));
+        const lost = Math.min(dealt, target.life);
         const hit = clearPin(applyDamage(dealt > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, dealt), target.uid);
-        return attackRiders(dealt > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, side, target.uid);
+        return attackRiders(drainHeal(dealt > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, user.uid, lost), skill.id, side, target.uid);
       }
       return {
         ...next,
@@ -851,6 +868,11 @@ function useCard(
       // みずあび：使ったモンスター自身を回復（最大ライフまで）
       const self = findMonster(next, user.uid)?.monster;
       return self ? healMonster(next, self, skill.effect.amount) : state;
+    }
+    case 'healAlly': {
+      // いやしのみつ：選んだ味方1体（使ったモンスターも選べる）を回復（最大ライフまで）。使ったモンスターを選んだときは、払ったあとの今の状態で
+      const ally = target ? findMonster(next, target.uid)?.monster : undefined;
+      return ally ? healMonster(next, ally, skill.effect.amount) : state;
     }
     case 'shield': {
       // しめったはだ：使った手番（turn）を含めて turns 手番のあいだ。重ねがけはせず、もう一度使ったら期限だけ新しく

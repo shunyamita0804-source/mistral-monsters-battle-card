@@ -122,9 +122,10 @@ describe('宝箱の中身（【仮】お金 70％・道具 25％・技カード 
     const myurolSkills = skillsOf('mon-myurol').map((k) => k.id);
     expect(bossTrumpSkills('dungeon-03')).toEqual(myurolSkills);
     for (const c of cards) expect(myurolSkills).toContain(c);
-    // 遺跡のボスの切り札はジオル（2026-10-29 から）、森は仮のフルーネ
+    // 遺跡のボスの切り札はジオル（2026-10-29 から）、森はフルーネ（2026-10-29 フルーネの最終から）
     expect(bossTrumpSkills('dungeon-01')).toEqual(skillsOf('mon-geol').map((k) => k.id));
-    expect(bossTrumpSkills('dungeon-02')).toEqual(skillsOf('mon-tmp-flune').map((k) => k.id));
+    expect(bossTrumpSkills('dungeon-02')).toEqual(skillsOf('mon-flune').map((k) => k.id));
+    expect(bossTrumpSkills('dungeon-02')).toHaveLength(14);
   });
 
   it('同じ挑戦の種と宝箱の ID なら、いつも同じ中身（セーブとロードで選び直せない）', () => {

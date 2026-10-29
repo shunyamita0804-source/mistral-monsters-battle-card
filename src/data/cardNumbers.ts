@@ -1,6 +1,7 @@
 import { HIDDEN_MONSTER_ID, MONSTERS, SKILLS, SUPPORTS, skillsOf } from './cards.ts';
 import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
+import { FLUNE_MONSTER_ID } from './flune.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -25,6 +26,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   PUKARIM_MONSTER_ID,
   // 2026-10-29 ジオルの最終：プカリムのあと（No.106〜120）
   GEOL_MONSTER_ID,
+  // 2026-10-29 フルーネの最終：ジオルのあと（No.121〜135）
+  FLUNE_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（いまは正式なサポートカードが無い。仮サポートは「仮」の区切りへ） */

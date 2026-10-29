@@ -139,6 +139,7 @@ function showcaseSound(card: PlayCard): SoundId {
     case 'discardRandom':
     case 'shield':
     case 'healSelf':
+    case 'healAlly':
       return 'cardSpecial';
     case 'seal':
       return 'cardSeal';
@@ -918,7 +919,7 @@ export const battleScreen: ScreenDefinition = {
       // 相手全体への攻撃（試遊中：ジオルの地ひびき）は相手を選ばない
       const allTargets = card.kind === 'skill' && card.effect.type === 'attack' && !!card.effect.allTargets;
       const enemyTarget = card.kind === 'skill' && targetsEnemy(card) && !allTargets;
-      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'tailwind') {
+      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
           return;

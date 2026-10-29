@@ -3,6 +3,7 @@ import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { PUKARIM_MONSTER_ID } from './pukarim.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
+import { FLUNE_MONSTER_ID } from './flune.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -49,6 +50,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [PUKARIM_MONSTER_ID]: { art: 'pukarim_battlecard.png', frame: 'pukarim', scale: 0.8, offsetY: -0.02 },
   // ジオル（2026-10-29 試遊中）：枠は岩の茶（#9A7B5C）。絵は届いた geol_battleart.png（1169×1345。プカリムと同じ大きさ・縦横比）を無改変
   [GEOL_MONSTER_ID]: { art: 'geol_battlecard.png', frame: 'geol', scale: 0.8, offsetY: -0.02 },
+  // フルーネ（2026-10-29）：枠は若葉色（#9CBF5A）。絵は届いた flune_battleart.png（1169×1346。ジオルとほぼ同じ大きさ・縦横比）を無改変
+  [FLUNE_MONSTER_ID]: { art: 'flune_battlecard.png', frame: 'flune', scale: 0.8, offsetY: -0.02 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },
