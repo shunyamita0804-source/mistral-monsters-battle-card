@@ -317,14 +317,18 @@ export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; i
   const record = next.dungeons[run.dungeonId] ?? { openedChests: [], bossDefeated: false, clears: 0 };
   const firstClear = !record.bossDefeated;
   const coins = firstClear ? money.bossFirst : money.bossRepeat;
-  const clearCards = firstClear ? (getDungeon(run.dungeonId)?.firstClearCards ?? []) : [];
+  const dungeon = getDungeon(run.dungeonId);
+  // 祭壇のモンスターカードをまだ受け取っていない前のセーブ（altarOwedFlag。水の神殿のセレフィーン）も、初めてのクリアと同じく受け取る
+  const owed = altarOwed(save, run.dungeonId);
+  const clearCards = firstClear || owed ? (dungeon?.firstClearCards ?? []) : [];
   next = addCards(addCoins(next, coins), clearCards);
-  const flag = getDungeon(run.dungeonId)?.bossFlag;
+  const flag = dungeon?.bossFlag;
+  const flags = [...next.storyFlags, ...(flag && !next.storyFlags.includes(flag) ? [flag] : [])].filter((f) => !(owed && f === dungeon?.altarOwedFlag));
   next = {
     ...next,
     dungeonRun: null,
     dungeons: { ...next.dungeons, [run.dungeonId]: { ...record, bossDefeated: true, clears: record.clears + 1 } },
-    ...(flag && !next.storyFlags.includes(flag) ? { storyFlags: [...next.storyFlags, flag] } : {}),
+    storyFlags: flags,
   };
   return { save: next, cleared: true, firstClear, coins, clearCards };
 }
@@ -427,7 +431,13 @@ export function loseRunBattle(save: SaveData, target: { kind: BattleTargetKind; 
  */
 export function bossRewardCandidates(save: SaveData, dungeonId: string, monsterIds: readonly string[]): string[] {
   if (!getDungeon(dungeonId)?.trumpReward) return rewardCandidates(monsterIds, skillsOf);
-  return save.dungeons[dungeonId]?.bossDefeated ? bossTrumpSkills(dungeonId) : [];
+  return save.dungeons[dungeonId]?.bossDefeated && !altarOwed(save, dungeonId) ? bossTrumpSkills(dungeonId) : [];
+}
+
+/** 祭壇のモンスターカードをまだ受け取っていない記録（dungeons.ts の altarOwedFlag）があるか */
+function altarOwed(save: SaveData, dungeonId: string): boolean {
+  const flag = getDungeon(dungeonId)?.altarOwedFlag;
+  return !!flag && save.storyFlags.includes(flag);
 }
 
 /** 勝ったときにもらう技カードの候補（相手が使っていたモンスターの技） */

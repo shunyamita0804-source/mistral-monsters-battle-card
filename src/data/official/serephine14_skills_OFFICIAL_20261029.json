@@ -1,0 +1,167 @@
+{
+  "monster": "セレフィーン",
+  "monster_id": "mon-serephine",
+  "life": 6,
+  "monster_rank": "C",
+  "frame_color_name": "月の青紫",
+  "frame_color_hex": "#8FA6E8",
+  "habitat": "水の神殿",
+  "status": "正式（2026-10-29）。G3 承認・LIFE 6 確定（試遊はユーザー判断でなし）。絵はすべて正式（技14・モンスターカード・バトル用・パック）",
+  "source": "本編ミストラルモンスターズのモンスター。かしこさ技・ミストヴェール・ウェーブダンスは本編の技の名前",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-serephine-01",
+      "name": "ビンタ",
+      "category": "ちから技",
+      "mana": 0,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_01.png"
+    },
+    {
+      "no": 2,
+      "id": "skl-serephine-02",
+      "name": "おびれ",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_02.png"
+    },
+    {
+      "no": 3,
+      "id": "skl-serephine-03",
+      "name": "ウォーターウィップ",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_03.png"
+    },
+    {
+      "no": 4,
+      "id": "skl-serephine-04",
+      "name": "みずたま",
+      "category": "かしこさ技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_04.png"
+    },
+    {
+      "no": 5,
+      "id": "skl-serephine-05",
+      "name": "なみ打ち",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "1",
+      "effect": "回避されない",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_05.png"
+    },
+    {
+      "no": 6,
+      "id": "skl-serephine-06",
+      "name": "アクアカッター",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_06.png"
+    },
+    {
+      "no": 7,
+      "id": "skl-serephine-07",
+      "name": "アクアニードル",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "回避されない",
+      "gacha_slot": "レア",
+      "art": "serephine_sk_07.png"
+    },
+    {
+      "no": 8,
+      "id": "skl-serephine-08",
+      "name": "ルナタイド",
+      "category": "かしこさ技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_08.png"
+    },
+    {
+      "no": 9,
+      "id": "skl-serephine-09",
+      "name": "オーシャンウェーブ",
+      "category": "かしこさ技",
+      "mana": 5,
+      "damage": "5",
+      "effect": "なし",
+      "gacha_slot": "レア",
+      "art": "serephine_sk_09.png"
+    },
+    {
+      "no": 10,
+      "id": "skl-serephine-10",
+      "name": "みちしお",
+      "category": "特殊技",
+      "mana": 0,
+      "damage": "―",
+      "effect": "山札の上から1枚を、そのままマナにする",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_10.png"
+    },
+    {
+      "no": 11,
+      "id": "skl-serephine-11",
+      "name": "ミストヴェール",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技のダメージを2軽減",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_11.png"
+    },
+    {
+      "no": 12,
+      "id": "skl-serephine-12",
+      "name": "すいっとよける",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技を回避",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_12.png"
+    },
+    {
+      "no": 13,
+      "id": "skl-serephine-13",
+      "name": "ゆらりとかわす",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "かしこさ技を回避",
+      "gacha_slot": "ノーマル",
+      "art": "serephine_sk_13.png"
+    },
+    {
+      "no": 14,
+      "id": "skl-serephine-14",
+      "name": "ウェーブダンス",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技を、消費マナに関係なく回避",
+      "gacha_slot": "レア",
+      "art": "serephine_sk_14.png"
+    }
+  ]
+}

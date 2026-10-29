@@ -133,6 +133,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const geol = chooseEnergyOrPin(state, side, options, enemies);
   if (geol) return geol;
 
+  // 2.7 セレフィーン（2026-10-29）。みちしお
+  const tide = chooseTide(state, side, options);
+  if (tide) return tide;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃をライフの少ない相手へ
   const attack = chooseAttack(state, side, options, enemies, style);
   if (attack) return attack;
@@ -168,13 +172,42 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const support = options.find((o) => {
     if (mine.deck.length <= deckAmount(o.def) + 15) return false;
     if (o.def.effect.type === 'draw') return style !== 'guard' && mine.hand.length <= 3;
-    if (o.def.effect.type === 'mana') return manaOf(mine) <= 2;
+    // みちしお（amount のある技）は chooseTide だけで考える
+    if (o.def.effect.type === 'mana') return !(o.def.kind === 'skill' && o.def.effect.amount !== undefined) && manaOf(mine) <= 2;
     return false;
   });
   if (support) return { type: 'useCard', side, cardUid: support.card.uid };
 
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
+}
+
+/** みちしおを使うのに要る山札の枚数（これより少なければ山札が残り少ないので使わない） */
+const TIDE_MIN_DECK = 10;
+/** 大きい技（ルナタイド・オーシャンウェーブ）とみなす必要マナ */
+const TIDE_BIG_COST = 4;
+
+/**
+ * みちしお（セレフィーン。2026-10-29 指示書）：その手番に攻撃で相手を倒せず、手札の大きい技（同じモンスターの必要マナ4以上の攻撃）が
+ * 次の手番にマナが足りなくて使えないとき。次の手番のマナ＝いまのマナ＋この手番にマナにできる手札（みちしおと大きい技を除く）。
+ * 山札が残り少ない（TIDE_MIN_DECK より少ない）ときは使わない
+ */
+function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
+  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'mana' && o.def.effect.amount !== undefined);
+  if (!tide) return null;
+  const mine = state.sides[side];
+  if (mine.deck.length < TIDE_MIN_DECK || canKillThisTurn(state, side, options)) return null;
+  const user = availableUsers(state, side, tide.def)[0];
+  if (!user) return null;
+  const big = mine.hand
+    .filter((c) => c.uid !== tide.card.uid)
+    .map((c) => ({ c, def: getPlayCard(c.cardId) }))
+    .filter(({ def }) => def.kind === 'skill' && def.monsterId === tide.def.monsterId && def.effect.type === 'attack' && def.cost >= TIDE_BIG_COST)
+    .sort((a, b) => a.def.cost - b.def.cost)[0];
+  if (!big) return null;
+  const nextMana = manaOf(mine) + mine.hand.length - 2;
+  if (big.def.cost <= nextMana) return null;
+  return { type: 'useCard', side, cardUid: tide.card.uid, userUid: user.uid };
 }
 
 /** その手番に、手札の攻撃技で倒せる相手がいるか */

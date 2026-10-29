@@ -7,6 +7,7 @@ import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
 import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
+import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
@@ -33,6 +34,12 @@ export interface DungeonDefinition {
   readonly trumpReward?: boolean;
   /** ボスに初めて勝ったときに立てる物語の記録（セーブの storyFlags。ガチャのシリーズの開放に使う。太古の遺跡＝GRANT_BEATEN_FLAG） */
   readonly bossFlag?: string;
+  /**
+   * 祭壇のモンスターカードをまだ受け取っていない記録（セーブの storyFlags。2026-10-29 セレフィーンの最終：水の神殿）。
+   * 切り札のモンスターを替える前にクリアしていたセーブに付ける（saveData.ts の v26）。この記録があれば、次にボスに勝ったとき
+   * 初めてのクリアと同じく祭壇で firstClearCards を受け取り（技カードは出さない）、記録を消す
+   */
+  readonly altarOwedFlag?: string;
   readonly isPlaceholder: boolean;
 }
 
@@ -54,6 +61,10 @@ const officialBossCards = (monsterId: string): CardReward[] => [
 export const GRANT_BEATEN_FLAG = 'grant-beaten';
 /** 精霊の森のセラに初めて勝った（2026-10-29 フルーネの最終：フルーネのガチャのシリーズが並ぶ。GRANT_BEATEN_FLAG と同じ形） */
 export const SERA_BEATEN_FLAG = 'sera-beaten';
+/** 水の神殿のルシアに初めて勝った（2026-10-29 セレフィーンの最終：セレフィーンのガチャのシリーズが並ぶ。SERA_BEATEN_FLAG と同じ形） */
+export const LUCIA_BEATEN_FLAG = 'lucia-beaten';
+/** 水の神殿の祭壇のセレフィーンをまだ受け取っていない（前に水の神殿をクリアしていたセーブ。DungeonDefinition の altarOwedFlag） */
+export const LUCIA_ALTAR_OWED_FLAG = 'lucia-altar-owed';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -79,7 +90,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     isPlaceholder: true,
   },
   // 2026-10-27 指示書「ダンジョン7つ」：ランクで開放する5つ。名前・ボス・編成はすべて仮（仕掛け・階・開放は src/data/dungeonRun.ts の RUN_DUNGEONS）
-  { id: 'dungeon-03', name: '水の神殿', description: '水路が行く手をはばむ神殿。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(MYU), isPlaceholder: true },
+  {
+    id: 'dungeon-03',
+    name: '水の神殿',
+    description: '水路が行く手をはばむ神殿。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    // 2026-10-29 セレフィーンの最終：初回クリアは最奥の祭壇でセレフィーンのモンスターカード1枚（前はミュロル）。2回目からはセレフィーンの技カード1枚（森のフルーネと同じ形）
+    firstClearCards: [{ cardId: SEREPHINE_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: LUCIA_BEATEN_FLAG,
+    altarOwedFlag: LUCIA_ALTAR_OWED_FLAG,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-04', name: '氷の洞窟', description: '足元がすべる氷の洞窟。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(KAL), isPlaceholder: true },
   { id: 'dungeon-05', name: '炎の火山', description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(GAU), isPlaceholder: true },
   { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
@@ -104,7 +126,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale は試遊（最初の手持ち3箱 × 200回）で勝つ割合が 45％ にいちばん近い 0.75（0.85＝35.0％・0.75＝43.2％・0.7＝55.2％。docs/flune-final-20261029.md 6章）
   'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], lifeScale: 0.75 },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
-  'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
+  // 水の神殿のボス：セレフィーンを真ん中に（2026-10-29 セレフィーンの最終。ソラモを外した〔ユーザー決定〕。lifeScale は今の 1.2 のまま）
+  'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, SEREPHINE_MONSTER_ID, MYU], lifeScale: 1.2 },
   'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },
   'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], lifeScale: 1.5 },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], lifeScale: 1.6 },

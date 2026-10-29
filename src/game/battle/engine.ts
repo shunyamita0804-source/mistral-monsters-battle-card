@@ -383,6 +383,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'discardRandom' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
     return NO(t('battle.ng.noOpponentHand'));
   }
+  // みちしお（セレフィーン 2026-10-29）：山札が足りないときは使えない（灰色。使って負けにはしない）
+  if (skill.effect.type === 'mana' && skill.effect.amount !== undefined && state.sides[side].deck.length < skill.effect.amount) return NO(t('battle.ng.noDeck'));
   // 考える：このカードのほかに戻す手札がないときは使えない
   if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
@@ -882,7 +884,8 @@ function useCard(
       return addLog(next, t('battle.log.shield', { name: nameOf(user.cardId), stat, n: e.reduce }));
     }
     case 'mana':
-      return deckToMana(next, side, skillValue(skill));
+      // みちしお（セレフィーン）：amount 枚。使えるのは山札が足りるときだけ（skillUsability）
+      return deckToMana(next, side, skill.effect.amount ?? skillValue(skill));
     case 'draw':
       return drawByEffect(next, side, skillValue(skill));
     case 'weaken': {

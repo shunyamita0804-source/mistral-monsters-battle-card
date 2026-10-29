@@ -119,9 +119,10 @@ describe('宝箱の中身（【仮】お金 70％・道具 25％・技カード 
       if (r.kind === 'card') cards.add(r.card);
     }
     expect([...items].sort()).toEqual([...CHEST_RULES.items].sort());
-    const myurolSkills = skillsOf('mon-myurol').map((k) => k.id);
-    expect(bossTrumpSkills('dungeon-03')).toEqual(myurolSkills);
-    for (const c of cards) expect(myurolSkills).toContain(c);
+    // 水の神殿の切り札はセレフィーン（2026-10-29 セレフィーンの最終から。前はミュロル）
+    const serephineSkills = skillsOf('mon-serephine').map((k) => k.id);
+    expect(bossTrumpSkills('dungeon-03')).toEqual(serephineSkills);
+    for (const c of cards) expect(serephineSkills).toContain(c);
     // 遺跡のボスの切り札はジオル（2026-10-29 から）、森はフルーネ（2026-10-29 フルーネの最終から）
     expect(bossTrumpSkills('dungeon-01')).toEqual(skillsOf('mon-geol').map((k) => k.id));
     expect(bossTrumpSkills('dungeon-02')).toEqual(skillsOf('mon-flune').map((k) => k.id));
