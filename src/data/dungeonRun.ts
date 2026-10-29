@@ -97,7 +97,7 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   // 精霊の森（最初から。2026-10-29 から初期のダンジョンはここだけ）：固定のマップをやめて、ランダム生成（2026-10-27）
   'dungeon-02': {
     floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, PUK], bossId: 'enc-forest-boss',
+    guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, SOR], bossId: 'enc-forest-boss',
   },
   // 水の神殿（D ランク）：水路
   'dungeon-03': {

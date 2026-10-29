@@ -20,10 +20,10 @@ const GAMES = Number(process.env.PLAYTEST ?? 4);
 const KEYS = BOOSTERS.map((b) => b.key);
 const fluneDeck = (key: (typeof KEYS)[number], slot: number): Deck => swapDeck(key, slot, FLUNE_MONSTER_ID, FLUNE_PLAYTEST_16);
 
-/** セラの編成の候補（今・案1・案2。ゲームのデッキは変えない） */
+/** セラの編成の候補（2026-10-29 の表：前の編成・案1・案2。2026-10-29 夜に案2 に決めた） */
 const SERA = ENCOUNTERS['enc-forest-boss'];
 const SERA_CANDIDATES: Readonly<Record<string, readonly string[]>> = {
-  now: SERA?.monsters ?? [],
+  now: ['mon-lazuck', FLUNE_MONSTER_ID, 'mon-soramo'],
   plan1: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-nobiton'],
   plan2: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'],
 };
@@ -68,7 +68,7 @@ describe('フルーネの試遊（自動の対戦）', () => {
         expect(isDeckValid(d, countCards([...d.monsters, ...d.skills]))).toBe(true);
       }
     }
-    expect(SERA).toMatchObject({ monsters: ['mon-lazuck', FLUNE_MONSTER_ID, 'mon-soramo'], lifeScale: 0.85 });
+    expect(SERA).toMatchObject({ monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], lifeScale: 0.75 });
   });
 
   it(`各組み合わせ ${GAMES} 回ずつ：勝率の表`, () => {
@@ -94,8 +94,19 @@ describe('フルーネの試遊（自動の対戦）', () => {
       });
     });
     out.sera = sera;
+    // 2026-10-29 夜：セラを案2（プカリム・フルーネ・ミュロル）にするときの lifeScale を決める（0.85・0.75・0.7。勝つ割合が 45％ にいちばん近いもの）
+    const scales: Record<string, Record<string, Tally>> = {};
+    const plan2 = buildOpponentDeck({ monsters: [...(SERA_CANDIDATES.plan2 ?? [])] });
+    [0.85, 0.75, 0.7].forEach((scale, p) => {
+      const row: Record<string, Tally> = {};
+      KEYS.forEach((a, i) => {
+        row[a] = series(boosterDeck(a), plan2, GAMES, 60000 + p * 1000 + i * 10, { bLifeScale: scale });
+      });
+      scales[String(scale)] = row;
+    });
+    out.seraPlan2Scales = scales;
     if (process.env.PLAYTEST_OUT) writeFileSync(process.env.PLAYTEST_OUT, JSON.stringify(out, null, 1));
-    const all = [...Object.values(flune), ...Object.values(sera)].flatMap((row) => Object.values(row));
+    const all = [...Object.values(flune), ...Object.values(sera), ...Object.values(scales)].flatMap((row) => Object.values(row));
     const draws = all.reduce((n, t) => n + t.draws, 0);
     expect(draws).toBeLessThanOrEqual(all.length * GAMES * 0.02);
   }, 1_800_000);

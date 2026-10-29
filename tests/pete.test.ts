@@ -69,10 +69,10 @@ describe('相手のチームの入れ替え（プカリムを入れる）', () =
     expect(runGuardianOpponent(0, 'dungeon-01').monsters).not.toContain(PUK);
   });
 
-  it('精霊の森：バトラー［プカリム・ミュロル・ノビトン］［ノビトン・プカリム・ソラモ］、番人［プカリム・ラズック・プカリム］', () => {
+  it('精霊の森：バトラー［プカリム・ミュロル・ノビトン］［ノビトン・プカリム・ソラモ］、番人［プカリム・ラズック・ソラモ］（2026-10-29 夜）', () => {
     expect(runNpcOpponent(0, 0, 'dungeon-02').monsters).toEqual([PUK, 'mon-myurol', NOB]);
     expect(runNpcOpponent(0, 1, 'dungeon-02').monsters).toEqual([NOB, PUK, SOR]);
-    expect(runGuardianOpponent(0, 'dungeon-02').monsters).toEqual([PUK, 'mon-lazuck', PUK]);
+    expect(runGuardianOpponent(0, 'dungeon-02').monsters).toEqual([PUK, 'mon-lazuck', SOR]);
   });
 
   it('大会 E・D の相手', () => {
