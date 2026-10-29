@@ -56,9 +56,10 @@
   pointer-events: none;
 }
 
+/* 2026-10-30 点検 L：高さ 70% だと帯の金の線が行の真ん中（顔とます）を横切っていたので、行いっぱいに（金の線が行のさかいに来る） */
 .league__band-img {
   width: 100%;
-  height: 70%;
+  height: 100%;
 }
 
 .league__head {

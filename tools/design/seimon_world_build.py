@@ -248,6 +248,16 @@ def build_room(parts: str, room: dict, furn: dict[str, Image.Image], check_dir: 
             while r2 < rows and all(grid[r2][cx] == '#' for cx in range(max(c1, 0), min(c2, cols))):
                 r2 += 1
         items[it['id']] = dict(x=c1, y=rr1, w=c2 - c1, h=max(1, r2 - rr1))
+    # 2026-10-30 点検 L：壁と家具のあいだにできた幅1マスの行き止まり（となりの家の台所の棚の左右など。主人公が棚の上に立って見えた）は
+    # ふさぐ（上と左右が歩けないマスを、上から順に）
+    changed = True
+    while changed:
+        changed = False
+        for ry in range(1, rows - 1):
+            for cx in range(1, cols - 1):
+                if grid[ry][cx] == '.' and grid[ry - 1][cx] == '#' and grid[ry][cx - 1] == '#' and grid[ry][cx + 1] == '#':
+                    grid[ry][cx] = '#'
+                    changed = True
     exit_row = rows - 1
     spawn_row = max(ry for ry in range(rows) if ry * CELL + CELL / 2 <= bottom - 4)
     data = dict(

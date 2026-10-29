@@ -279,10 +279,11 @@
 /* ===== 24 街・ダンジョンの右上の「メニュー」「脱出」（左に本・扉の絵、右に文字） ===== */
 .world__hud .btn--small.world__hud-btn {
   flex: none;
-  width: 78px;
+  /* 2026-10-30 点検 L：「メニュー」の字が左の本の絵と右の飾りにかかっていたので、少し広く（前は 78px・左 31px・右 9px） */
+  width: 86px;
   min-width: 0;
   min-height: 40px;
-  padding: 0 9px 0 31px;
+  padding: 0 10px 0 32px;
   background: url('@assets/images/ui/hud/btn_menu.webp') center / 100% 100% no-repeat;
   font-size: 11px;
   letter-spacing: -0.04em;
@@ -395,6 +396,14 @@
   .world__clear-card {
     animation: none;
   }
+}
+
+/* 長い場所の名前（2026-10-30 点検 L。worldScreen.ts の placeNameIsLong）：字を小さく・左右を詰めて、… で切れないように */
+.world__place-name.is-long {
+  padding-left: 16px;
+  padding-right: 16px;
+  font-size: 12.5px;
+  letter-spacing: 0;
 }
 
 /* 脱出も並ぶとき（ダンジョン）：場所の名前が切れないよう、すき間と名前の札を少し詰める */

@@ -82,7 +82,7 @@ export const INTRO_V2 = {
   },
   'introV2.pack.guide.2': {
     ja: 'これは『烈火の猛攻』！ ガウルたちのパックで、どんどん攻めたい人にぴったりだよ！',
-    en: "This is \"Blazing Onslaught\"! It's Gauul's pack, perfect if you love to attack!",
+    en: "This is \"Blazing Onslaught\"! It's Gaul's pack, perfect if you love to attack!",
   },
   'introV2.pack.guide.3': {
     ja: 'これは『蒼海の守り』！ カルシェルたちのパックで、守りを大切にしたい人におすすめだよ！',

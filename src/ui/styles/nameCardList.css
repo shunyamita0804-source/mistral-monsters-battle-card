@@ -133,12 +133,12 @@
 }
 
 /* 押せない「決定」（aria-disabled。押すと ui_disabled の音） */
+/* 2026-10-30 点検 L：前は地の色を灰色にしていて、ボタンの絵の後ろに四角い灰色の箱が出て、字もほとんど読めなかった。
+   ボタンの絵はそのままで、色を抜いて少し薄くするだけに */
 .name-prompt__ok.is-disabled {
-  border-color: #555;
-  background: #4a4a4f;
-  color: #a5a5aa;
-  filter: grayscale(1);
-  opacity: 0.75;
+  color: #e2e2e6;
+  filter: grayscale(1) brightness(0.85);
+  opacity: 0.8;
 }
 
 .name-prompt__confirm {

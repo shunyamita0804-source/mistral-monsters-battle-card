@@ -75,6 +75,8 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'tournament:tournament-a:description': 'An official Rank A cup (details are temporary). Win 3 in a row in an 8-player bracket to take the title.',
   'tournament:tournament-s:name': 'Rank S Cup',
   'tournament:tournament-s:description': 'An official Rank S cup (details are temporary). Win 3 in a row in an 8-player bracket to take the title.',
+  // 2026-10-30 点検 L：街のピート（英語表示で「ピート」のままだった）
+  'opponent:town-pete:name': 'Pete',
   'opponent:e-1:name': 'Noel',
   'opponent:e-2:name': 'Viktor',
   'opponent:e-3:name': 'Sienna',

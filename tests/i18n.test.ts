@@ -4,6 +4,7 @@ import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { PACKS } from '../src/data/economy.ts';
 import { EXAM_OPPONENT } from '../src/data/introV2.ts';
+import { PETE_OPPONENT } from '../src/game/story/pete.ts';
 import { ITEMS } from '../src/data/items.ts';
 import { MAPS } from '../src/data/maps.ts';
 import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
@@ -177,6 +178,7 @@ describe('data/ の固有名の英語（仮訳）', () => {
       ...DUNGEONS.map((d) => `dungeon:${d.id}`),
       ...Object.values(ENCOUNTERS).map((e) => `opponent:${e.id}`),
       `opponent:${EXAM_OPPONENT.id}`,
+      `opponent:${PETE_OPPONENT.id}`,
       ...MAPS.map((m) => `map:${m.id}`),
       ...MAPS.flatMap((m) => m.objects.map((o) => `object:${o.id}`)),
     ]);

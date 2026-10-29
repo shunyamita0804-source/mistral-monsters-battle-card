@@ -22,6 +22,12 @@ export const formatDateTime = (iso: string): string => {
   return Number.isNaN(d.getTime()) ? t('common.none') : d.toLocaleString(localeOf());
 };
 
+/** 短い日時（月/日 時:分）。記録の板の欄は狭いので、年と秒は出さない（2026-10-30 点検 L：「2026/10/30…」と切れていた） */
+const formatShortDateTime = (iso: string): string => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? t('common.none') : d.toLocaleString(localeOf(), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+};
+
 /** ベッド：休む（セーブ確認）・記録・設定への入口・セーブ削除 */
 export const settingsScreen: ScreenDefinition = {
   id: 'settings',
@@ -37,7 +43,7 @@ export const settingsScreen: ScreenDefinition = {
         [cardBackArt, t('bed.cards'), t('common.cardCount', { n: Object.values(s.collection).reduce((a, b) => a + b, 0) })],
         [medalArt, t('bed.battles'), t('bed.battlesValue', { won: s.stats.battlesWon, lost: s.stats.battlesLost })],
         [packArt, t('bed.packs'), t('bed.packsValue', { n: s.stats.packsOpened })],
-        [bookArt, t('bed.updatedAt'), formatDateTime(s.updatedAt)],
+        [bookArt, t('bed.updatedAt'), formatShortDateTime(s.updatedAt)],
       ];
       const hero = t(s.player.gender === 'female' ? 'newGame.female' : 'newGame.male');
       const record = h(
