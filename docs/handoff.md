@@ -4,7 +4,15 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 深夜のセッション。上から順に作業中）
+### まず読む：いまの状態（2026-10-29 深夜のセッション終わり）
+
+- **公開中：`main`（`2bd8650` 以降。公開ページで確認済み）**。①〜④はすべて main・公開済み。テスト 775件。**次の指示を待っている**
+- 報告（どれも**返事待ち**）：① https://claude.ai/artifact/7fA4eEsJEXt5mikePnLRoo ・② https://claude.ai/artifact/BUWqQUVkw8wbV1DVQmTFvG ・
+  ③ https://claude.ai/artifact/CwVCr6yRz6CaydiYxPe7zc ・④ https://claude.ai/artifact/6xLWDPi5DECqSVSVRtpvdW
+- 判断待ち：④の点検で見つけた、絵が窓の左右で切れている技12枚を直すか（案は `docs/skill-art-position-20261029.md`）・てっぺきシェルは指示の 40% で顔が少し右へ寄る
+- 気づいたこと（前から・直していない）：世界地図で「精霊の森」の名前の札に水の神殿の印が少し重なる
+- **未完了**：iPhone 実機での確認（この日の作業すべて）
+
 
 - ユーザーの順番：①ジオルの最終＋太古の遺跡を初期から外す → ②パック専用の絵8つ（ZIP `Mistral_PackArt8_Part1〜3`）＋ジオルのシリーズ → ③イベントのダンジョン3つの絵（ZIP `Mistral_EventDungeons_Part1〜3`）→ ④技の絵の左右の位置（ソラモ04・カルシェル02・13）。1つずつ main に取り込み・公開・報告
 - ① 済み：`docs/geol-final-20261029.md`。**セーブ version 23**（仮ジオル → mon-geol）。初期のダンジョンは精霊の森だけ・遺跡は C ランク・地下4階。説明の枠の文が切れる不具合を直した（`fitSpotTexts`）
