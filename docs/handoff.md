@@ -1,27 +1,47 @@
-# 引き継ぎメモ（2026-10-29：ジオルの試遊）
+# 引き継ぎメモ（2026-10-29 夜：セッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-29 最後）
+### まず読む：いまの状態（2026-10-29 夜のセッション終わり）
 
-- **公開中：`main`**。テスト 764件。**次の指示を待っている**
+- **公開中：`main`（`f653ec8` 以降。公開ページで確認済み）**。作業ブランチ `claude/nifty-goodall-a0zbf9` は main に取り込み済み。テスト 764件。**次の指示を待っている**
+- **返事待ち：ジオルの試遊の報告** https://claude.ai/artifact/LQa7h5Ayw8UnCwB9kHHuuM （ZIP は `downloads/作業報告書_ジオルの試遊_20261029.zip`。git に入れない・新しいセッションには無い）
+  - 結果は**強すぎ**：ジオル入りの平均 75.6%（目安 50〜56%）・27 組すべて 60% 超え。原因の見立て＝ナックル（マナ3で5）とライフ9（試遊の中だけで、ナックルを抜く→63.2%・ライフ7→65.4%・ライフ6→57.4%）
+  - **数字は変えていない**。直し方は進行チャットで決まり、次の指示（新しい JSON など）で届く見込み。届いたら JSON を差し替えて `npm run playtest:geol` をやり直し、`docs/geol.md` に表を足す
+  - そのあとの予定（指示書より）：入手の流れ（グラントの切り札・最奥の祭壇・ガチャのシリーズ）は「試遊の数字が決まってから別の指示」。プカリムの最終（`docs/pukarim-final-20261029.md`）と同じ形になるはず
 - このセッションでしたこと（どれも main・公開済み）
-  - 街の建物3つ（研究所・管理局・練習場）を正面向きに・研究所の床・大会会場の受付カウンター → **ユーザー合格**（2026-10-29）
-  - 受付の前で画面の中心をカウンターへ寄せる（はみ出すときは全体が入る所まで。**ユーザー了承**）
-  - ガチャのパック7つ（プカリムも）・ショップの棚とショーケースの商品・場の「ためている」「おいかぜ＋1」の印。記録 `docs/packs7-shop-status-20261029.md`
-  - 報告：https://claude.ai/artifact/Egy2Nd7xUg1YgcpqT1TUHi → **ユーザー合格**（パック7つ・棚・場の印・受付の画面。2026-10-29）。街の建物3つの報告 https://claude.ai/artifact/GwYBCbEmYEitNn3YGZE4WD も合格
-- **新モンスター「ジオル」の試遊（手順 4・G4）**：?qa=1 の確認用の画面「ジオルの試遊」だけで遊べる（QA_MONSTERS・QA_SKILLS）。記録 `docs/geol.md`・裁定 `docs/battle-rules.md`「ジオル（試遊中）」
-  - 新しい効果6つ（いわくだき・地ひびき・じならし・エネルギーをためる・かばう・うけとめる）。テスト `tests/geol.test.ts`。試遊 `npm run playtest:geol`
-  - **試遊の結果：強すぎ**（ジオル入りの平均 75.6%・27 組すべて 60% 超え）。原因の見立て：ナックル（マナ3で5）とライフ9。**数字は変えていない**（直し方は進行チャットで）
-  - 報告（返事待ち）：https://claude.ai/artifact/LQa7h5Ayw8UnCwB9kHHuuM （ZIP は downloads/作業報告書_ジオルの試遊_20261029.zip。git に入れない）
-- 前の報告（返事待ち）：https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 ・ https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz
-- 判断待ち（前から）：手札のマナの球と分類の札の高さ・大きなカードで絵が切れる技（ソラモ04・カルシェル02・カルシェル13）・ピートの台詞・
-  台本の台詞・ダンジョンの人の「あなた」など（下の「前のセッション」）
+  | 内容 | ユーザー | 記録 |
+  | --- | --- | --- |
+  | 街の建物3つ（研究所・管理局・練習場）を正面向きに・研究所の床・大会会場の受付カウンター | 合格 | `docs/design/town-20261028/10_受け取り結果_UTF8.txt` の最後・`docs/rooms4-20261028.md` の最後 |
+  | 受付の前で画面の中心をカウンターへ寄せる（はみ出すときは全体が入る所まで） | 合格 | `docs/packs7-shop-status-20261029.md` 4章（`CAMERA_LEANS`・`cameraLean.ts`） |
+  | ガチャのパック7つ・ショップの棚とショーケースの商品・場の「ためている」「おいかぜ＋1」の印 | 合格 | `docs/packs7-shop-status-20261029.md` |
+  | 新モンスター「ジオル」の試遊（?qa=1 の確認用の画面だけ） | **返事待ち** | `docs/geol.md`・裁定 `docs/battle-rules.md`「ジオル（試遊中）」 |
+- 前の報告（返事待ちのまま）：https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 ・ https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz
+- 判断待ち（前から）：手札のマナの球と分類の札の高さ・大きなカードで絵が切れる技（ソラモ04・カルシェル02・カルシェル13）・ピートの台詞・台本の台詞・ダンジョンの人の「あなた」など（下の「前のセッション」）
+- 依頼文の残り：09 ショップの棚の商品は今回のパックの縮小で入れた。プカリムのパックも新しい型で入った（`docs/design-requests-20261028/` の残りは無いはず）
 - **未完了**：iPhone 実機での確認（この日の作業すべて）・ダンジョン7つと対戦の全画面の点検の続き・取得カードの画面をダンジョンの勝ち・宝箱・ガチャにつなぐ
-- 写真の道具で分かったこと：`tools/e2e/town_shot.cjs` は歩けないマスを指定すると入口に戻る（ショップの写真は (7,21)・(17,22)・(52,20)・(5,23) が使える）。
-  プレビューのサーバーは背景で長く動かすと止まることがある（`run_in_background` の timeout を長く）
+
+#### ジオル（試遊中）の仕組み（次に触るとき）
+
+- データ `src/data/geol.ts`（JSON `src/data/official/geol14_skills_DRAFT_20261029.json` を読む。原本 `design-parts/cards-original/geol/`）。`cards.ts` の `QA_MONSTERS`・`QA_SKILLS` にだけ入れている（ふつうの一覧に移すのは最終の指示で。プカリムと同じ）
+- 新しい効果（`cardTypes.ts`）：攻撃の `allTargets`（地ひびき）・防御の `nullify`（うけとめる。`NULLIFY_REDUCE`）・特殊 `pin`（じならし）・`energy`（エネルギーをためる）・守り `cover`（かばう）
+- エンジン（`engine.ts`）：`PendingAttack.queue`（全体攻撃の残り）・`pinned`・`coveredFrom`・`energized`、`BattleMonster.pinTurn`・`energy`、`isPinned`・`energyOf`・`coverUser`・`coverUsability`・`cover`・`nextAllTarget`
+- CPU（`ai.ts`）：`chooseEnergyOrPin`・`chooseAttack`（地ひびき・じならしの相手を狙う）・`shouldCover`
+- 画面：確認用の画面 `geolLabScreen.ts`（`?qa=1&lab=geol`）・場の印 `battleScreen.ts` の `cornerMarks`・カードの欄 `cardFace.ts`（かばう・0に）
+- 試遊：`npm run playtest:geol`（約12秒。`src/game/battle/geolPlaytest.ts`・`tests/geolPlaytest.test.ts`。生の数字 `docs/design/geol-20261029/`）。テスト `tests/geol.test.ts`
+- 写真：`tools/e2e/geol_shot.cjs`（`LAB_ONLY=1` で確認用の画面だけ）・`geol_effects_shot.cjs`（ためる・かばう・地ひびきを手で使う）・カードの見本は `card_gallery_shot.cjs`（開発用サーバー `npx vite --port 5173`）
+
+#### 作業のしかた（このセッションでも同じ）
+
+- 順番：指示どおり作業 → `npm run check` → main に取り込み（`git merge --no-ff`）→ push → 公開（GitHub の MCP の `actions_run_trigger`・`deploy-pages.yml`・ref `main`）
+  → 公開ページの `static/index-*.js` に新しい絵のファイル名が出るまで curl で待つ（約2〜3分）→ 公開ページで写真 → 報告（Artifact のページ＋求められたら `downloads/` の ZIP を SendUserFile）
+- 作業環境：Node は `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` のあと `export PATH=/opt/nvm/versions/node/v24.22.2/bin:$PATH`（版の番号は `node -v` で確かめる）・`npm install`・`pip install scipy matplotlib`
+- Playwright：`NODE_PATH=/opt/node22/lib/node_modules /opt/node22/bin/node スクリプト.cjs`。プレビュー `npx vite preview --port 4173 --host 127.0.0.1` は背景で長く動かすと止まることがある（`run_in_background` の timeout を長く）
+- 写真のセーブは Vitest の一時テスト `tests/zz-*.test.ts` で作って消す。`town_shot.cjs` は歩けないマスを指定すると入口に戻る（ショップは (7,21)・(17,22)・(52,20)・(5,23) が使える）
+- 街と部屋の絵を作り直す：`python3 -I tools/design/seimon_world_build.py design-parts/seimon-world`（約5分）。部屋4つだけなら `python3 -I tools/design/rooms4_build.py`（数秒）
+- ユーザーが「ZIP が届いていない」と言わずに指示だけ送ることがある（添付が外れる）。`/root/.claude/uploads/` に新しい ZIP が無ければ、作らずに聞く
 
 ### 前のセッション（2026-10-29 深夜）の「いまの状態」
 
