@@ -26,6 +26,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-geol': { x: 0.5, y: 0.38, zoom: 1.4 },
   // フルーネ（2026-10-29）：顔は絵の少し右上（花びらの冠の下）
   'mon-flune': { x: 0.57, y: 0.3, zoom: 1.5 },
+  // セレフィーン（2026-10-29）：顔は絵の上のほうの真ん中（体が縦に長いので、ほかより寄せて上へ）
+  'mon-serephine': { x: 0.5, y: 0.22, zoom: 1.9 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

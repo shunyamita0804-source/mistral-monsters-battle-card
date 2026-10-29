@@ -359,7 +359,7 @@ describe('フルーネのガチャのシリーズとショップ', () => {
 
   it('パックの絵の色（pack_tint.py）・ショップの棚（shop_goods_20261029.py）にフルーネがある', () => {
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'flune': '#9CBF5A'");
-    expect(readFileSync('tools/design/shop_goods_20261029.py', 'utf8')).toMatch(/MONSTERS = \[.*'flune'\]/);
+    expect(readFileSync('tools/design/shop_goods_20261029.py', 'utf8')).toMatch(/MONSTERS = \[.*'flune', 'serephine'\]/);
   });
 });
 
@@ -379,7 +379,7 @@ describe('フルーネの最終：前のセーブの仮フルーネ（セーブ 
     const s = normalizeSave(JSON.parse(JSON.stringify(old)));
     if (!s) throw new Error('load');
     expect(s.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(25);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(25);
     expect(s.collection[FLUNE_MONSTER_ID]).toBe(1);
     expect(Object.keys(s.collection).some((id) => id.includes('tmp-flune'))).toBe(false);
     expect(s.deck.monsters[1]).toBe(FLUNE_MONSTER_ID);

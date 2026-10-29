@@ -1,12 +1,13 @@
 import { readSavedName } from '../player/playerName.ts';
 import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
 import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
+import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
 import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
-import { DUNGEONS } from '../../data/dungeons.ts';
+import { DUNGEONS, LUCIA_ALTAR_OWED_FLAG } from '../../data/dungeons.ts';
 import { SHOP_ROOMS_ART } from '../../data/shopRoomsArt.generated.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
@@ -40,7 +41,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 25;
+export const SAVE_VERSION = 26;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -655,6 +656,23 @@ function migrateTmpFluneV25(raw: RawObject): RawObject {
   return replaceTmpMonster(raw, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, FLUNE_MONSTER_ID);
 }
 
+/**
+ * v25 → v26（2026-10-29 セレフィーンの最終）：水の神殿の祭壇の切り札をミュロルからセレフィーンに替えた。
+ * もう水の神殿をクリアしていて、セレフィーンのモンスターカードを持っていないセーブには「祭壇でまだ受け取っていない」記録（LUCIA_ALTAR_OWED_FLAG）を付ける。
+ * 次にルシアに勝ったとき祭壇でセレフィーンを受け取る（src/game/dungeon/run.ts の winRunBattle）。
+ * ルシアに勝った記録（lucia-beaten）は、クリアの記録から normalizeSave の withBossFlags で付く
+ */
+function migrateSerephineAltarV26(raw: RawObject): RawObject {
+  const dungeons = isObject(raw.dungeons) ? raw.dungeons : {};
+  const water = dungeons['dungeon-03'];
+  const cleared = isObject(water) && water.bossDefeated === true;
+  const collection = isObject(raw.collection) ? (raw.collection as Record<string, unknown>) : {};
+  const owned = typeof collection[SEREPHINE_MONSTER_ID] === 'number' && (collection[SEREPHINE_MONSTER_ID] as number) > 0;
+  if (!cleared || owned) return raw;
+  const flags = Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]) : [];
+  return flags.includes(LUCIA_ALTAR_OWED_FLAG) ? raw : { ...raw, storyFlags: [...flags, LUCIA_ALTAR_OWED_FLAG] };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -682,6 +700,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   22: migrateTmpGeolV23,
   23: migrateShopRoomsV24,
   24: migrateTmpFluneV25,
+  25: migrateSerephineAltarV26,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

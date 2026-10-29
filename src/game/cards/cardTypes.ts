@@ -182,7 +182,11 @@ export type SkillEffect =
    */
   | { readonly type: 'cover' }
   | { readonly type: 'heal' }
-  | { readonly type: 'mana' }
+  /**
+   * 山札の上からカードをそのままマナにする（仮カードは stat の値の枚数）。
+   * amount（正式：セレフィーンのみちしお 2026-10-29）＝動かす枚数。山札が足りないときは使えない（負けにはしない）
+   */
+  | { readonly type: 'mana'; readonly amount?: number }
   | { readonly type: 'draw' };
 
 export type SkillEffectType = SkillEffect['type'];

@@ -121,7 +121,8 @@ export interface GachaSeries {
   readonly rareSkillNames: readonly string[];
   /**
    * この記録（セーブの storyFlags）があるときだけ並ぶ（無ければ最初から並ぶ）。プカリム＝ピートに勝ったあと（src/game/story/pete.ts の PETE_BEATEN_FLAG）、
-   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）、フルーネ＝精霊の森のセラに初めて勝ったあと（SERA_BEATEN_FLAG）
+   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）、フルーネ＝精霊の森のセラに初めて勝ったあと（SERA_BEATEN_FLAG）、
+   * セレフィーン＝水の神殿のルシアに初めて勝ったあと（LUCIA_BEATEN_FLAG）
    */
   readonly unlockFlag?: string;
 }
@@ -144,6 +145,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', 'グランドハンマー', 'うけとめる'], unlockFlag: 'grant-beaten' },
   // フルーネ：セラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（flune14_skills_OFFICIAL_20261029_rare3.json）
   { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' },
+  // セレフィーン（2026-10-29 セレフィーンの最終）：ルシアに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（serephine14_skills_OFFICIAL_20261029.json）
+  { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' },
 ];
 
 /** いまのセーブで選べるシリーズ（unlockFlag の記録がまだ無いものは並ばない） */

@@ -8,7 +8,7 @@ tools/design/cardshop_v2.py が家具の絵を書き出す前に dress() を呼�
     段の下の線の傾きに合わせて並べる
   - ガラスの展示台（中央の2つ・奥左の小さな台）・手前の展示台の板（CARD_SLOTS）：測った置き場所1つずつに、寝かせたカード（shop_card_*）を四すみに合わせて重ねる
     （小さな箱の上はそのまま縮めて、細長い箱には立てたパック）。ガラスの映りこみ（白っぽい光の筋）は、元の絵からもう一度上に重ねる
-- 9種類（2026-10-29 夜にジオル、同じ日の深夜にフルーネを足した。商品の絵はパック専用の絵の版）を順に使い、同じものが隣り合わないようにする。明るさは家具に合わせて少しだけ落とす（色は変えない）
+- 10種類（2026-10-29 夜にジオル、同じ日の深夜にフルーネ、そのあとセレフィーンを足した。商品の絵はパック専用の絵の版）を順に使い、同じものが隣り合わないようにする。明るさは家具に合わせて少しだけ落とす（色は変えない）
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from scipy import ndimage
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/gacha-20261029/shop')
-MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune']
+MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine']
 
 # 立てたパックを並べる家具：明るさ・パックの横の縮め（斜めに見える棚は細く）・はぶく所（看板の板など。絵の px の四角）
 PACK_ROWS = {
@@ -90,7 +90,7 @@ def _product(kind: str, name: str) -> Image.Image:
 
 
 class _Cycle:
-    """9種類を順に（同じものが隣り合わない）"""
+    """10種類を順に（同じものが隣り合わない）"""
 
     def __init__(self, start: int) -> None:
         self.i = start

@@ -8,7 +8,7 @@ from PIL import Image
 COLORS = {
     'soramo': '#E4D2AC', 'gauul': '#E68A46', 'lazuck': '#844DC5', 'nobiton': '#E8C654',
     'myurol': '#84E5FA', 'kalshell': '#DFF2F6', 'pukarim': '#A8DCC4', 'geol': '#9A7B5C',
-    'flune': '#9CBF5A',
+    'flune': '#9CBF5A', 'serephine': '#8FA6E8',
 }
 
 def smooth(x, a, b):
