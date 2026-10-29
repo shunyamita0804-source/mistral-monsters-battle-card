@@ -758,5 +758,193 @@
     }
    }
   }
+ },
+ "seraPlan2Scales": {
+  "0.85": {
+   "booster-1": {
+    "wins": 86,
+    "losses": 114,
+    "draws": 0,
+    "turns": 6396,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 71,
+     "drainHeal": 57,
+     "nectars": 114,
+     "nectarHeal": 228,
+     "fluneMatches": 200
+    }
+   },
+   "booster-2": {
+    "wins": 61,
+    "losses": 139,
+    "draws": 0,
+    "turns": 6316,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 61,
+     "drainHeal": 46,
+     "nectars": 102,
+     "nectarHeal": 204,
+     "fluneMatches": 200
+    }
+   },
+   "booster-3": {
+    "wins": 63,
+    "losses": 137,
+    "draws": 0,
+    "turns": 6474,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 58,
+     "drainHeal": 61,
+     "nectars": 96,
+     "nectarHeal": 192,
+     "fluneMatches": 200
+    }
+   }
+  },
+  "0.75": {
+   "booster-1": {
+    "wins": 110,
+    "losses": 90,
+    "draws": 0,
+    "turns": 6011,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 63,
+     "drainHeal": 79,
+     "nectars": 97,
+     "nectarHeal": 194,
+     "fluneMatches": 200
+    }
+   },
+   "booster-2": {
+    "wins": 56,
+    "losses": 144,
+    "draws": 0,
+    "turns": 6198,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 69,
+     "drainHeal": 66,
+     "nectars": 91,
+     "nectarHeal": 182,
+     "fluneMatches": 200
+    }
+   },
+   "booster-3": {
+    "wins": 93,
+    "losses": 107,
+    "draws": 0,
+    "turns": 6169,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 54,
+     "drainHeal": 71,
+     "nectars": 101,
+     "nectarHeal": 202,
+     "fluneMatches": 200
+    }
+   }
+  },
+  "0.7": {
+   "booster-1": {
+    "wins": 133,
+    "losses": 67,
+    "draws": 0,
+    "turns": 5691,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 68,
+     "drainHeal": 84,
+     "nectars": 90,
+     "nectarHeal": 180,
+     "fluneMatches": 200
+    }
+   },
+   "booster-2": {
+    "wins": 87,
+    "losses": 113,
+    "draws": 0,
+    "turns": 5941,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 73,
+     "drainHeal": 78,
+     "nectars": 91,
+     "nectarHeal": 182,
+     "fluneMatches": 200
+    }
+   },
+   "booster-3": {
+    "wins": 111,
+    "losses": 89,
+    "draws": 0,
+    "turns": 5903,
+    "stats": {
+     "drains": 0,
+     "drainHeal": 0,
+     "nectars": 0,
+     "nectarHeal": 0,
+     "fluneMatches": 0
+    },
+    "bStats": {
+     "drains": 61,
+     "drainHeal": 96,
+     "nectars": 90,
+     "nectarHeal": 180,
+     "fluneMatches": 200
+    }
+   }
+  }
  }
 }

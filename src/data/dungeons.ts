@@ -6,6 +6,7 @@ import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
 import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
+import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
@@ -99,8 +100,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
   'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], lifeScale: 1.2 },
-  // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終。lifeScale は今の 0.85 のまま）
-  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [LAZUCK_MONSTER_ID, FLUNE_MONSTER_ID, SORAMO_MONSTER_ID], lifeScale: 0.85 },
+  // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終）。2026-10-29 夜 ユーザー指示：プカリム・フルーネ・ミュロル（案2）。
+  // lifeScale は試遊（最初の手持ち3箱 × 200回）で勝つ割合が 45％ にいちばん近い 0.75（0.85＝35.0％・0.75＝43.2％・0.7＝55.2％。docs/flune-final-20261029.md 6章）
+  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], lifeScale: 0.75 },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
   'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, MYU, SORAMO_MONSTER_ID], lifeScale: 1.2 },
   'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, KAL, NOB], lifeScale: 1.3 },

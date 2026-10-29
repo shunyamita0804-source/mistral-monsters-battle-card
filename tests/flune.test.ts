@@ -311,8 +311,8 @@ function beatSera(save: SaveData, seed: number): ReturnType<typeof winRunBattle>
 }
 
 describe('精霊の森のボス（セラ）・入手の流れ', () => {
-  it('セラのデッキはラズック・フルーネ・ソラモ。lifeScale 0.85 のまま', () => {
-    expect(ENCOUNTERS['enc-forest-boss']).toMatchObject({ name: 'セラ', monsters: ['mon-lazuck', FLUNE_MONSTER_ID, 'mon-soramo'], lifeScale: 0.85 });
+  it('セラのデッキはプカリム・フルーネ・ミュロル・lifeScale 0.75（2026-10-29 夜 ユーザー指示・試遊で決めた）', () => {
+    expect(ENCOUNTERS['enc-forest-boss']).toMatchObject({ name: 'セラ', monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], lifeScale: 0.75 });
     expect(DUNGEONS.find((d) => d.id === 'dungeon-02')).toMatchObject({ trumpReward: true, bossFlag: SERA_BEATEN_FLAG, firstClearCards: [{ cardId: FLUNE_MONSTER_ID, count: 1 }] });
     expect(SERA_BEATEN_FLAG).toBe('sera-beaten');
   });
