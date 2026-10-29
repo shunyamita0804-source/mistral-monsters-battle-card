@@ -119,7 +119,10 @@ export interface GachaSeries {
   readonly monsterId: string;
   /** レア枠の技（ユーザー決定。技の名前で指定し、ID は今のデータから引く） */
   readonly rareSkillNames: readonly string[];
-  /** この記録（セーブの storyFlags）があるときだけ並ぶ（無ければ最初から並ぶ）。プカリム＝ピートに勝ったあと（src/game/story/pete.ts の PETE_BEATEN_FLAG） */
+  /**
+   * この記録（セーブの storyFlags）があるときだけ並ぶ（無ければ最初から並ぶ）。プカリム＝ピートに勝ったあと（src/game/story/pete.ts の PETE_BEATEN_FLAG）、
+   * ジオル＝太古の遺跡のグラントに初めて勝ったあと（src/data/dungeons.ts の GRANT_BEATEN_FLAG）
+   */
   readonly unlockFlag?: string;
 }
 
@@ -136,6 +139,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ['てっぺきシェル'] },
   // プカリム（2026-10-29 最終）：レア枠は JSON の gacha_slot のとおり。ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ['ぷはーっ', 'ぷかぷか'], unlockFlag: 'pete-beaten' },
+  // ジオル（2026-10-29 夜。パック専用の絵と一緒に）：レア枠は JSON の gacha_slot のとおり（03・05・10・14）。グラントに初めて勝ったあとに並ぶ
+  { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', '地ひびき', 'エネルギーをためる', 'うけとめる'], unlockFlag: 'grant-beaten' },
 ];
 
 /** いまのセーブで選べるシリーズ（unlockFlag の記録がまだ無いものは並ばない） */

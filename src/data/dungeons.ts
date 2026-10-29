@@ -29,6 +29,8 @@ export interface DungeonDefinition {
    * 無いダンジョンはいままでどおり（相手の3体の技からランダムに1枚＋初回の firstClearCards）
    */
   readonly trumpReward?: boolean;
+  /** ボスに初めて勝ったときに立てる物語の記録（セーブの storyFlags。ガチャのシリーズの開放に使う。太古の遺跡＝GRANT_BEATEN_FLAG） */
+  readonly bossFlag?: string;
   readonly isPlaceholder: boolean;
 }
 
@@ -52,6 +54,9 @@ const officialBossCards = (monsterId: string): CardReward[] => [
  * 2026-10-26 名前が決まった（ユーザー）：太古の遺跡（ジオルのボス。遺跡に少し草や木、壊れた遺跡の建物）・精霊の森（フルーネのボス。ピンクの花や蝶）
  * 2026-10-29 ジオルの最終：最初からあるダンジョンは精霊の森だけ。太古の遺跡は C ランクで開く（階・強さ・開放は src/data/dungeonRun.ts）
  */
+/** 太古の遺跡のグラントに初めて勝った（2026-10-29 夜：ジオルのガチャのシリーズが並ぶ。プカリムの pete-beaten と同じ形） */
+export const GRANT_BEATEN_FLAG = 'grant-beaten';
+
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
     id: 'dungeon-01',
@@ -61,6 +66,7 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     // 2026-10-29 ジオルの最終：初回クリアは最奥の祭壇でジオルのモンスターカード1枚（仮ジオルはもう使わない）
     firstClearCards: [{ cardId: GEOL_MONSTER_ID, count: 1 }],
     trumpReward: true,
+    bossFlag: GRANT_BEATEN_FLAG,
     isPlaceholder: true,
   },
   {

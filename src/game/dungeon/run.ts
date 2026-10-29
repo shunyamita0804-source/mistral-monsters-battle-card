@@ -319,10 +319,12 @@ export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; i
   const coins = firstClear ? money.bossFirst : money.bossRepeat;
   const clearCards = firstClear ? (getDungeon(run.dungeonId)?.firstClearCards ?? []) : [];
   next = addCards(addCoins(next, coins), clearCards);
+  const flag = getDungeon(run.dungeonId)?.bossFlag;
   next = {
     ...next,
     dungeonRun: null,
     dungeons: { ...next.dungeons, [run.dungeonId]: { ...record, bossDefeated: true, clears: record.clears + 1 } },
+    ...(flag && !next.storyFlags.includes(flag) ? { storyFlags: [...next.storyFlags, flag] } : {}),
   };
   return { save: next, cleared: true, firstClear, coins, clearCards };
 }

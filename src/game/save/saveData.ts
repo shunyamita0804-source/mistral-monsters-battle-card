@@ -5,6 +5,7 @@ import { CURRENCY, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../dat
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
+import { DUNGEONS } from '../../data/dungeons.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
   buildDeckFromCollection,
@@ -837,6 +838,15 @@ export function unlockedDungeonsFor(rank: RankId, saved: readonly string[]): str
     .map(([id]) => id);
 }
 
+/**
+ * ボスに勝った記録（dungeons.ts の bossFlag）：前のセーブで、もうそのボスに勝っているなら記録を足す
+ * （2026-10-29 夜：太古の遺跡のグラントに勝ったことのあるセーブは、ジオルのガチャのシリーズが並ぶ。形式は変えない）
+ */
+function withBossFlags(flags: string[], dungeons: Readonly<Record<string, DungeonRecord>>): string[] {
+  const more = DUNGEONS.filter((d) => d.bossFlag && dungeons[d.id]?.bossDefeated && !flags.includes(d.bossFlag)).map((d) => d.bossFlag as string);
+  return more.length > 0 ? [...flags, ...more] : flags;
+}
+
 /** 生データ（JSON.parse の結果）を検証してセーブデータにする。読めない場合は null */
 export function normalizeSave(raw: unknown): SaveData | null {
   if (!isObject(raw)) return null;
@@ -885,7 +895,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     },
     peopleBook: normalizePeopleBook(migrated.peopleBook),
     cardsSeen: unique(asStringArray(migrated.cardsSeen)),
-    storyFlags: unique(asStringArray(migrated.storyFlags)),
+    storyFlags: withBossFlags(unique(asStringArray(migrated.storyFlags)), normalizeDungeons(migrated.dungeons)),
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
     story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };
