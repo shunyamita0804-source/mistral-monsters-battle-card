@@ -1,0 +1,18 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "composite_order": [
+    "lab_shell.png",
+    "lab_01_glass_cabinet.png",
+    "lab_02_desk.png",
+    "lab_03_machine.png",
+    "lab_04_lab_counter.png",
+    "lab_front.png"
+  ]
+}

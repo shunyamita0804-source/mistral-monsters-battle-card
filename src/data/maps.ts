@@ -399,16 +399,17 @@ const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: n
 };
 /**
  * カード研究所（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥の壁の本棚＝図鑑、左奥のガラスの飾り棚＝標本棚、中央の机（研究員ルーカスはその奥）、
- * 右奥の機械＝記録の投影機、右の実験台＝解析台、右の壁の黒板。前の絵にあった水晶の台・資料棚・閲覧テーブル・薬品の作業台・標本ケースは外した
+ * 右奥の機械＝記録の投影機、右の実験台＝解析台、右の壁の図形の板（黒板）。2026-10-29 夜に白い研究施設の絵（v2）へ。前の絵にあった水晶の台・資料棚・閲覧テーブル・薬品の作業台・標本ケースは外した
  */
 export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior', LAB_ART, [
   interactAt('lab-shelf', itemOf(LAB_ART, 'BIG_SHELF'), '図鑑の本棚', 'collection'),
   interactAt('lab-cabinet', itemOf(LAB_ART, 'CABINET'), '標本棚', 'message', '結晶や羽根が、標本のように並んでいる。'),
   interactAt('lab-desk', itemOf(LAB_ART, 'DESK'), '研究机', 'message', '研究の資料が広げてある。'),
   interactAt('lab-projector', itemOf(LAB_ART, 'PROJECTOR'), '記録の投影機', 'message', '光の板に、昔の対戦の記録が映っている。'),
+  // 図形の板（右の壁）は解析台の奥の上で範囲が重なるので、先に並べる（2026-10-29 夜 v2）
+  interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '図形の板', 'message', '星と円の図がびっしり描かれている。'),
   // 解析台で欠片の特別復元（2026-10-28 ユーザー決定：カードショップから研究所へ）
   interactAt('lab-analysis', itemOf(LAB_ART, 'ANALYSIS'), '解析台', 'restore'),
-  interactAt('lab-blackboard', itemOf(LAB_ART, 'BLACKBOARD'), '黒板', 'message', '星と円の図がびっしり描かれている。'),
   spotNpc('lab-researcher', LAB_ART, 'RESEARCHER_SPOT', ROOMS4_DRAW_OFFSET.lab.RESEARCHER_SPOT, 'researcher', 'researcher'),
   roomExit('lab-exit', LAB_ART, 'LAB'),
 ], entryOf(LAB_ART));
