@@ -60,7 +60,8 @@ export interface BoosterDefinition {
 /**
  * 管理局で選ぶブースターパック3種（2026-10-27 ユーザー承認の箱デザイン「BoosterPack_Claude_Request」）。並び・名前・種類・箱のモンスターは確定。
  * 中身は 2026-10-28 に決定：その種類の初期デッキ（src/game/deck/deck.ts の createStarterDeckFor。モンスター3＋山札60）。
- * 技の枚数の出典は src/data/official/booster_contents_20261028.json（tests/boosterSelect.test.ts で照合）
+ * 技の枚数の出典は src/data/official/booster_contents_20261029.json（2026-10-29 夜に烈火の猛攻だけ入れかえ。前の版 _20261028 は残す。
+ * src/game/story/introV2.ts の boosterDeck が資料から作る。tests/boosterCounter.test.ts で照合）
  */
 export const BOOSTERS: readonly BoosterDefinition[] = [
   { key: 'booster-1', name: '旅立ちのきらめき', art: 'booster_tabidachi', category: 'balance', monsters: [SORAMO_MONSTER_ID, GAUUL_MONSTER_ID, MYUROL_MONSTER_ID] },

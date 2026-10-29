@@ -6,10 +6,13 @@
 
 ### まず読む：いまの状態（2026-10-29 深夜のセッション終わり。⑦のあと）
 
-- **公開中：`main`（⑭ ラズックの数字まで）**。セーブ version 25。⑧⑨はユーザー合格
+- **公開中：`main`（⑮ 烈火の猛攻の中身＝案3 まで）**。セーブ version 25。⑧⑨はユーザー合格
 - 作業中（2026-10-29 夜の指示。この順に1つずつ main・公開）：⑩ 研究所の描き直し（済み。`docs/lab-v2-20261029.md`）→ ⑪ 精霊の森の相手（済み。セラ＝プカリム・フルーネ・ミュロル・0.75、番人＝プカリム・ラズック・ソラモ。`docs/flune-final-20261029.md` 6章）→
   ⑫ ゲーム全体の点検と直し（済み。`docs/audit-20261029-night.md`。木の橋は絵の依頼文 `docs/design-requests-20261029-night/`）→
-  ⑬ ガチャのレア枠を3つにそろえる（済み。`docs/gacha-20261028.md`。JSON は新しい版 pukarim…_20261029・geol…_rare3・flune…_rare3）→ ⑭ ラズックの数字（済み。6＝2マナ2・7＝3マナ4。`docs/lazuck-numbers-20261029.md`）。⑬⑭は同じ日の追加の指示。**次の指示を待っている**
+  ⑬ ガチャのレア枠を3つにそろえる（済み。`docs/gacha-20261028.md`。JSON は新しい版 pukarim…_20261029・geol…_rare3・flune…_rare3）→ ⑭ ラズックの数字（済み。6＝2マナ2・7＝3マナ4。`docs/lazuck-numbers-20261029.md`）。⑬⑭は同じ日の追加の指示。⑩〜⑭ はユーザー合格
+- ⑮ 烈火の猛攻を強くする試遊（表だけ。**ゲームにはまだ入れていない**。`docs/rekka-playtest-20261029.md`・試す中身 `src/data/official/booster_contents_20261029_draft.json`）。
+  ユーザーの案は目安に入らず、案3（ちょうはつ2・ダストキック2 → とびかかり2・シャドウバースト2）で 45〜55% に入った。
+  **ユーザーが案3 に決定 → 作業ブランチでゲームに入れた**（箱の資料 `booster_contents_20261029.json`。開けたセーブは変えない）。main に取り込んで公開済み。**次の指示を待っている**
 - ⑧ 済み：花屋・仕立て屋の中を新しい部屋に（`florist`・`tailor`。記録 `docs/shop-rooms-20261029.md`・道具 `tools/design/rooms_shop_build.py`。セーブ version 24）
 - ⑨ 済み：新モンスター「フルーネ」を正式に（記録 `docs/flune-final-20261029.md`・ルール `docs/battle-rules.md`「フルーネの効果の扱い」。セーブ version 25）。
   精霊の森のセラの切り札・祭壇・ガチャのシリーズ（sera-beaten のあと）・ショップの棚・フラワードレイン（drain）・いやしのみつ（healAlly）。対戦の写真は `tools/e2e/flune_battle_shot.cjs`

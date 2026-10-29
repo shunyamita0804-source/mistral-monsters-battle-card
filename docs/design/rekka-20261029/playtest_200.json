@@ -1,0 +1,201 @@
+{
+ "games": 200,
+ "now": {
+  "boxes": {
+   "booster-1": {
+    "booster-2": {
+     "wins": 136,
+     "losses": 64,
+     "draws": 0,
+     "turns": 6091
+    },
+    "booster-3": {
+     "wins": 97,
+     "losses": 103,
+     "draws": 0,
+     "turns": 6414
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "wins": 63,
+     "losses": 137,
+     "draws": 0,
+     "turns": 6055
+    },
+    "booster-3": {
+     "wins": 67,
+     "losses": 133,
+     "draws": 0,
+     "turns": 6303
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "wins": 112,
+     "losses": 88,
+     "draws": 0,
+     "turns": 6329
+    },
+    "booster-2": {
+     "wins": 120,
+     "losses": 80,
+     "draws": 0,
+     "turns": 6269
+    }
+   }
+  },
+  "sera": {
+   "booster-1": {
+    "wins": 103,
+    "losses": 97,
+    "draws": 0,
+    "turns": 6125
+   },
+   "booster-2": {
+    "wins": 69,
+    "losses": 131,
+    "draws": 0,
+    "turns": 6166
+   },
+   "booster-3": {
+    "wins": 87,
+    "losses": 113,
+    "draws": 0,
+    "turns": 6235
+   }
+  }
+ },
+ "draft": {
+  "boxes": {
+   "booster-1": {
+    "booster-2": {
+     "wins": 143,
+     "losses": 57,
+     "draws": 0,
+     "turns": 6054
+    },
+    "booster-3": {
+     "wins": 97,
+     "losses": 103,
+     "draws": 0,
+     "turns": 6414
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "wins": 65,
+     "losses": 135,
+     "draws": 0,
+     "turns": 6066
+    },
+    "booster-3": {
+     "wins": 76,
+     "losses": 124,
+     "draws": 0,
+     "turns": 6290
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "wins": 112,
+     "losses": 88,
+     "draws": 0,
+     "turns": 6329
+    },
+    "booster-2": {
+     "wins": 126,
+     "losses": 74,
+     "draws": 0,
+     "turns": 6228
+    }
+   }
+  },
+  "sera": {
+   "booster-1": {
+    "wins": 103,
+    "losses": 97,
+    "draws": 0,
+    "turns": 6125
+   },
+   "booster-2": {
+    "wins": 62,
+    "losses": 138,
+    "draws": 0,
+    "turns": 6155
+   },
+   "booster-3": {
+    "wins": 87,
+    "losses": 113,
+    "draws": 0,
+    "turns": 6235
+   }
+  }
+ },
+ "plan3": {
+  "boxes": {
+   "booster-1": {
+    "booster-2": {
+     "wins": 109,
+     "losses": 91,
+     "draws": 0,
+     "turns": 5872
+    },
+    "booster-3": {
+     "wins": 97,
+     "losses": 103,
+     "draws": 0,
+     "turns": 6414
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "wins": 105,
+     "losses": 95,
+     "draws": 0,
+     "turns": 5969
+    },
+    "booster-3": {
+     "wins": 106,
+     "losses": 94,
+     "draws": 0,
+     "turns": 6173
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "wins": 112,
+     "losses": 88,
+     "draws": 0,
+     "turns": 6329
+    },
+    "booster-2": {
+     "wins": 92,
+     "losses": 108,
+     "draws": 0,
+     "turns": 6199
+    }
+   }
+  },
+  "sera": {
+   "booster-1": {
+    "wins": 103,
+    "losses": 97,
+    "draws": 0,
+    "turns": 6125
+   },
+   "booster-2": {
+    "wins": 109,
+    "losses": 91,
+    "draws": 0,
+    "turns": 5755
+   },
+   "booster-3": {
+    "wins": 87,
+    "losses": 113,
+    "draws": 0,
+    "turns": 6235
+   }
+  }
+ }
+}
