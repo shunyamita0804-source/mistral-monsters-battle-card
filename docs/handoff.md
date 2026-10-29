@@ -15,6 +15,11 @@
   4. iPhone の試遊の直し（`docs/polish-20261029.md`）：街は `tools/design/town2026_build.py`（小川・門・石垣・噴水・小物）を `seimon_world_build.py` で作り直す（約5分）。部屋は `rooms4_build.py`・`cardshop_v2.py`。
      人物は街で 1.2 倍（`worldScreen.ts` の `TOWN_FIGURE_BOOST`）。押す所は `tapSize.css`。確認用 `?qa=1&hit=1`（当たり判定）・`&fig=1.15`（人の大きさ）
   5. 依頼文7つ：`docs/design-requests-20261028/`（一覧 `00_README.md`）
+- **そのあとの追加の直し（2026-10-29 夜〜深夜。どれも main・公開済み。いまの公開は `51b5fd4` 以降）**。報告 https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz （**返事待ち**）・ZIP `downloads/作業報告書_20261029_追加.zip`
+  - 防御の数字は盾の印なし（-3 だけ）／手札の枠は 208×260（`skillcard_simple_build.py` の HAND_STRETCH）
+  - マナ・分類・ダメージは前の版（3cf9050）の見た目：`mana_ball.webp`（数字はゲーム）・`tile_{分類}.webp`・`value_box.webp`
+    （`tools/art/old_parts_build.py`・`value_box_build.py`。原本 `design-parts/ui-skillcard-simple-20261028/old-v5-frames-c57b589/`）。置き場所は `skillCard.ts` の LAYOUT の mana・icon
+  - 対戦の場のモンスターのカードは右上のライフの札なし（`battleMonsterCard.ts`。life を渡したとき）
 - 未完了：iPhone 実機・依頼文の絵・ダンジョン7つと対戦の全画面の点検の続き・絵が切れる技（ソラモ04・カルシェル02・13）の直し方はユーザー判断
 - 写真の道具：`tools/e2e/card_gallery_shot.cjs`（開発サーバーでカードを並べる）・`gacha_shot.cjs`・`pete_shot.cjs`・`town_shot.cjs`（W・H・qs）・`screen_steps.cjs`（W・H・`small` で 44 未満のボタンを書き出す）
 - 作業環境：最初に `nvm install 24`・`npm install`・`pip install scipy matplotlib`。ローカルの main が古いことがある → `git checkout -B main origin/main`
