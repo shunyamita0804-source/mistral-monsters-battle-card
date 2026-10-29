@@ -44,6 +44,14 @@ GACHA_FOOT = 490
 GACHA_SCALE = 1.5
 GACHA_ANCHOR = (1190, 490)
 GACHA_FORWARD = 30
+# 2026-10-29 深夜（指示書 E。ユーザー決定）：店の中の販売機を、ガチャの画面の機械の絵（assets/images/ui/gacha/ の 900×1300 の6枚。
+# gachaMachine.ts と同じ重ね順）から作る。ガラスの奥は紺（前の販売機の窓の色。パックは入れない）。描き直し・色の変更・引きのばしはしない（縮めるだけ）。
+# 大きさ：前の 1.5 倍の販売機と同じ高さ（絵の y 85〜520）・同じ足元（下のはし y 520。真ん中は前の本体の真ん中 x 1156。前の絵は右にハンドルがあった）
+GACHA_UI = os.path.join(ROOT, 'assets/images/ui/gacha')
+GACHA_LAYERS = ['machine_front', 'machine_glass', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
+GACHA_WINDOW = (276, 309, 621, 717)     # ガラスの窓（900×1300 の px。gacha.css の .gacha-machine__window と同じ）
+GACHA_WINDOW_COLOR = ((20, 24, 58), (24, 40, 112))   # 窓の奥の紺：上（奥の壁）→ 下（床）
+GACHA_BOX = (1156, 85, 520)              # 店の中の機械の真ん中の x・上のはし・下のはし（絵の px）
 RIGHT_DISPLAY_SHIFT = -130
 GLOW = dict(rx=190, ry=58, color=(255, 214, 120))
 
@@ -67,9 +75,10 @@ BLOCKS = [
     (50, 605, 435, 745),                                      # 手前左の展示台
     [(1340, 175), (1530, 175), (1530, 745), (1462, 745), (1340, 470)],  # 右の壁の棚
     (893, 440, 996, 504),                                     # 販売機の左の小展示台（2026-10-29 左へずらした）
-    # 店の中の販売機（2026-10-29 1.5 倍）。2026-10-29 夜 iPhone「機械の後ろを歩ける」：絵の左右のはし（x 1055〜1325）と、
-    # 奥は右奥の間仕切り・カウンターの下のふち（y 300）まで（機械と奥の家具のあいだに入れない）
-    (1055, 300, 1325, 522),
+    # 店の中の販売機（2026-10-29 1.5 倍）。2026-10-29 夜 iPhone「機械の後ろを歩ける」：絵の左右のはしと、
+    # 奥は右奥の間仕切り・カウンターの下のふち（y 300）まで（機械と奥の家具のあいだに入れない）。
+    # 2026-10-29 深夜：ガチャの画面の機械の絵にしたので、左右は新しい絵のはし（x 1014〜1298）
+    (1014, 300, 1298, 522),
     (1265, 300, 1325, 351),                                   # 右の植木
     # 2026-10-29 夜 iPhone の点検「青い仕切りのまわりの当たりが絵とずれている」：柱の当たりが柱の絵より奥（y 618）まであり、
     # 柱の上の見えている床に入れなかった。柱の上のふち（y 690）から下だけにし、左の柱は絵の左のふち（x 456）から
@@ -79,7 +88,7 @@ BLOCKS = [
 # 調べる物（絵の px の範囲）。maps.ts の ID と同じ
 ITEMS = {
     'COUNTER': (445, 240, 1100, 392),
-    'PACK_MACHINE': (1068, 420, 1312, 522),
+    'PACK_MACHINE': (1014, 420, 1298, 522),
     'SHELF_WALL': (40, 166, 240, 578),
     'CASE_L': (245, 400, 415, 553),
     'CASE_R': (398, 410, 518, 553),
@@ -117,19 +126,29 @@ def _cells(box: tuple[float, float, float, float]) -> dict:
 
 
 def _gacha_machine() -> dict:
-    """店の中の販売機を GACHA_SCALE 倍に（足元の真ん中を GACHA_ANCHOR に保ったまま、GACHA_FORWARD だけ手前へ）"""
-    im = _load('shop_gacha_machine')
-    big = im.resize((round(im.width * GACHA_SCALE), round(im.height * GACHA_SCALE)), Image.LANCZOS)
-    ax, ay = GACHA_ANCHOR
-    canvas = Image.new('RGBA', im.size)
-    canvas.alpha_composite(big, (round(ax - ax * GACHA_SCALE), round(ay + GACHA_FORWARD - ay * GACHA_SCALE)))
+    """店の中の販売機：ガチャの画面の機械の絵（GACHA_LAYERS）を重ねて、GACHA_BOX の高さ・足元に縮めて置く"""
+    full = Image.new('RGBA', (900, 1300))
+    x1, y1, x2, y2 = GACHA_WINDOW
+    (r0, g0, b0), (r1, g1, b1) = GACHA_WINDOW_COLOR
+    win = ImageDraw.Draw(full)
+    for y in range(y1, y2):
+        k = (y - y1) / (y2 - y1 - 1)
+        win.line([(x1, y), (x2 - 1, y)], fill=(round(r0 + (r1 - r0) * k), round(g0 + (g1 - g0) * k), round(b0 + (b1 - b0) * k), 255))
+    for name in GACHA_LAYERS:
+        full.alpha_composite(Image.open(os.path.join(GACHA_UI, f'{name}.webp')).convert('RGBA'))
+    full = full.crop(full.getbbox())
+    cx, top, bottom = GACHA_BOX
+    k = (bottom - top) / full.height
+    small = full.resize((round(full.width * k), bottom - top), Image.LANCZOS)
+    canvas = Image.new('RGBA', (1536, 1024))
+    canvas.alpha_composite(small, (round(cx - small.width / 2), top))
     return _save_cropped(canvas, 'cardshop_gacha_machine.webp')
 
 
 def _gacha_glow() -> dict:
     """販売機の足元の光の床（やわらかい金色の楕円。床の上・家具より奥）"""
     from PIL import ImageFilter
-    ax, ay = GACHA_ANCHOR
+    ax, ay = GACHA_BOX[0], GACHA_ANCHOR[1]
     cy = ay + GACHA_FORWARD - 6
     rx, ry = GLOW['rx'], GLOW['ry']
     canvas = Image.new('RGBA', (1536, 1024))
