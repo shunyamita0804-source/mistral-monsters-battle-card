@@ -43,7 +43,8 @@ export const TOWN_SPOT: WorldMapSpot = { x: 0.3, y: 0.37, region: 'ferna' };
 /** ダンジョンの印。ダンジョンを足すときはここに1行。【仮】位置 */
 export const DUNGEON_SPOTS: Readonly<Record<string, WorldMapSpot>> = {
   'dungeon-01': { x: 0.2, y: 0.17, region: 'ferna' },
-  'dungeon-02': { x: 0.14, y: 0.46, region: 'ferna' },
+  // 2026-10-29 ユーザー指示：名前の札が街の印のすぐ左下に重なって見えたので、少し左へ（前は x 0.14）
+  'dungeon-02': { x: 0.12, y: 0.46, region: 'ferna' },
   // 2026-10-27 指示書「ダンジョン7つ」：地方の雰囲気に合わせて Claude が仮に置いた（水＝セイラン地方の湖のそば、氷＝ノルディス地方の雪山、
   // 火＝オルティガ地方の赤い火山、機械＝アステリア地方、聖域＝ネブラシア地方の結晶の島）
   'dungeon-03': { x: 0.21, y: 0.66, region: 'seiran' },

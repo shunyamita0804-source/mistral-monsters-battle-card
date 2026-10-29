@@ -17,6 +17,7 @@ import { createScreenHeader } from '../components/screenHeader.ts';
 import researcherFace from '@assets/images/characters/face_researcher.webp';
 import completeArt from '@assets/images/ui/album/book_complete.webp';
 import type { ScreenDefinition } from './types.ts';
+import { phraseText } from '../phraseText.ts';
 
 /** 詳しい画面のカードの幅（背景の絵の額の内側 149×224 に収まる大きさ） */
 const DETAIL_CARD_W = 134;
@@ -173,7 +174,7 @@ export const collectionScreen: ScreenDefinition = {
             h('h2', { class: 'card-book-detail__name', text: unknown ? t('common.unknownName') : cardName(card) }),
             unknown
               ? h('p', { class: 'card-book-detail__text', text: t('collection.unknownDetail') })
-              : h('dl', { class: 'card-book-detail__rows' }, ...rows.flatMap(([k, v]) => [h('dt', { text: k }), h('dd', { text: v })])),
+              : h('dl', { class: 'card-book-detail__rows' }, ...rows.flatMap(([k, v]) => [h('dt', { text: k }), h('dd', {}, phraseText(v))])),
           ),
           // 前後・閉じるのボタンは羊皮紙の下（背景の絵の下の帯）
           h(
