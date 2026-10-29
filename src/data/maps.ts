@@ -430,6 +430,15 @@ export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HA
   roomExit('hall-exit', HALL_ART, 'ARENA'),
 ], entryOf(HALL_ART));
 
+/**
+ * 人の前に立つと画面の中心を寄せる所（2026-10-29 iPhone の試遊「受付カウンターが画面の外に切れる」）。
+ * その人に話しかけられる所にいる間だけ、画面の中心を「主人公」と target（マス。カウンターの絵の範囲）の真ん中の中間へ寄せる。
+ * それでもカウンターが画面からはみ出すときは、はみ出さない所まで寄せる（worldScreen.ts）
+ */
+export const CAMERA_LEANS: readonly { readonly mapId: string; readonly npcId: string; readonly target: CellRect }[] = [
+  { mapId: 'hall', npcId: 'hall-receptionist', target: itemOf(HALL_ART, 'COUNTER') },
+];
+
 const PRACTICE_ART = ROOMS4_ART.practice;
 /**
  * カード練習場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
