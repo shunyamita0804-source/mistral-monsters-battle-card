@@ -11,7 +11,8 @@
   - 街の建物3つ（研究所・管理局・練習場）を正面向きに・研究所の床・大会会場の受付カウンター → **ユーザー合格**（2026-10-29）
   - 受付の前で画面の中心をカウンターへ寄せる（はみ出すときは全体が入る所まで。**ユーザー了承**）
   - ガチャのパック7つ（プカリムも）・ショップの棚とショーケースの商品・場の「ためている」「おいかぜ＋1」の印。記録 `docs/packs7-shop-status-20261029.md`
-  - 報告（返事待ち）：https://claude.ai/artifact/Egy2Nd7xUg1YgcpqT1TUHi （街の建物3つの報告 https://claude.ai/artifact/GwYBCbEmYEitNn3YGZE4WD は合格）
+  - 報告：https://claude.ai/artifact/Egy2Nd7xUg1YgcpqT1TUHi → **ユーザー合格**（パック7つ・棚・場の印・受付の画面。2026-10-29）。街の建物3つの報告 https://claude.ai/artifact/GwYBCbEmYEitNn3YGZE4WD も合格
+- 次の指示：新モンスター「ジオル」を ?qa=1 の確認用の画面だけで入れて試遊（ZIP の指示書待ち。届いていない）
 - 前の報告（返事待ち）：https://claude.ai/artifact/2hJiq7gmg2XKfXLq9mx9G1 ・ https://claude.ai/artifact/DTuDzvVgaPmQubR33VUeqz
 - 判断待ち（前から）：手札のマナの球と分類の札の高さ・大きなカードで絵が切れる技（ソラモ04・カルシェル02・カルシェル13）・ピートの台詞・
   台本の台詞・ダンジョンの人の「あなた」など（下の「前のセッション」）
