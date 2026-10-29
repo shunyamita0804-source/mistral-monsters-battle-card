@@ -302,6 +302,13 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
+/** 場所の名前の札に入りきらない長さか（全角は1、半角は0.55 と数えて 8.5 より長い） */
+function placeNameIsLong(name: string): boolean {
+  let n = 0;
+  for (const ch of name) n += ch.charCodeAt(0) < 0x2000 ? 0.55 : 1;
+  return n > 8.5;
+}
+
 const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   shop: 'shop',
   practice: 'practice',
@@ -1006,7 +1013,8 @@ export class WorldView {
       h(
         'div',
         { class: 'world__place' },
-        h('span', { class: 'world__place-name', text: title }),
+        // 長い名前（カードバトラー管理局・Card Battler Bureau など）は字を少し小さくして、… で切れないように（2026-10-30 点検 L）
+        h('span', { class: `world__place-name${placeNameIsLong(title) ? ' is-long' : ''}`, text: title }),
         map.art ? null : h('span', { class: 'world__place-note', text: t('world.placeNote') }),
       ),
       h('span', { class: 'world__coins' }, coinIcon(), coins(save.coins)),

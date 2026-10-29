@@ -473,7 +473,8 @@
 
 .card-book-detail__rows {
   display: grid;
-  grid-template-columns: 6.5em 1fr;
+  /* 2026-10-30 点検 L：「持っている枚数」（7文字）が「持っている枚／数」と折れていたので、見出しの列を 7.2em に（前は 6.5em） */
+  grid-template-columns: 7.2em 1fr;
   gap: 6px 8px;
   margin: 0;
   font-size: 13px;

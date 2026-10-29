@@ -16,7 +16,7 @@ export const NAME_MESSAGES = {
   // 取得カード（src/ui/components/cardListView.ts）
   'received.title': { ja: '取得カード', en: 'Cards Received' },
   'received.count': { ja: '×{n}', en: '×{n}' },
-  'received.total': { ja: '全{n}枚', en: '{n} cards in all' },
+  'received.total': { ja: '全{n}枚', en: 'Total: {n}' },
   'received.group.monster': { ja: 'モンスター', en: 'Monsters' },
   'received.group.skill': { ja: '技カード', en: 'Skill Cards' },
   'received.group.support': { ja: 'サポート', en: 'Support' },

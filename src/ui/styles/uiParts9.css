@@ -167,7 +167,20 @@
 }
 
 .battle__ticker-text {
+  -webkit-mask-image: none;
+}
+
+/* 文字の流れる窓：帯の絵の両はしの金の飾りより内側だけ。両はしは文字がふわっと消える（2026-10-30 点検 L） */
+.battle__ticker-window {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin: 0 12px;
+  overflow: hidden;
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 10px), transparent 100%);
 }
 
 .battle__ticker {

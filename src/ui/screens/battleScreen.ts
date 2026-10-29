@@ -1833,7 +1833,8 @@ export const battleScreen: ScreenDefinition = {
       return h(
         'button',
         { class: 'battle__ticker-hit', attrs: { type: 'button', 'aria-label': `${text}（${t('battle.log.open')}）` }, on: { click: () => s && showLog() } },
-        h('span', { class: 'battle__ticker' }, textEl),
+        // 文字は内側の窓（.battle__ticker-window）の中だけを流れる（2026-10-30 点検 L：帯の両はしの金の飾りに字がかからないように）
+        h('span', { class: 'battle__ticker' }, h('span', { class: 'battle__ticker-window' }, textEl)),
       );
     };
 
