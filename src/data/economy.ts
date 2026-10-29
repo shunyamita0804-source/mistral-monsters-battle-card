@@ -131,18 +131,19 @@ export interface GachaSeries {
  * ここに1行足すだけでシリーズが増える
  */
 export const GACHA_SERIES: readonly GachaSeries[] = [
-  { id: 'soramo', monsterId: 'mon-soramo', rareSkillNames: ['ソラモビーム', '星影ステップ'] },
-  { id: 'gauul', monsterId: 'mon-gauul', rareSkillNames: ['聖なる炎', '炎の壁', '高速飛行'] },
-  { id: 'lazuck', monsterId: 'mon-lazuck', rareSkillNames: ['とびかかり', 'トリックショット', 'シャドウバースト', 'フェイントステップ'] },
-  { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ['まきつく', 'ダウナーミスト', 'のびのびガード', '必死によける'] },
-  { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ['スリップガード'] },
-  { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ['てっぺきシェル'] },
-  // プカリム（2026-10-29 最終）：レア枠は JSON の gacha_slot のとおり。ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）
-  { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ['ぷはーっ', 'ぷかぷか'], unlockFlag: 'pete-beaten' },
-  // ジオル（2026-10-29 夜。パック専用の絵と一緒に）：レア枠は JSON の gacha_slot のとおり（03・05・10・14）。グラントに初めて勝ったあとに並ぶ
-  { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', '地ひびき', 'エネルギーをためる', 'うけとめる'], unlockFlag: 'grant-beaten' },
-  // フルーネ（2026-10-29 フルーネの最終）：レア枠は JSON の gacha_slot のとおり（09）。セラに初めて勝ったあとに並ぶ
-  { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['フラワードレイン'], unlockFlag: 'sera-beaten' },
+  // レア枠（2026-10-29 夜 ユーザー決定）：「そのモンスターのいちばん大きい攻撃はレア」を足し、どのモンスターもレアを3つにそろえた
+  { id: 'soramo', monsterId: 'mon-soramo', rareSkillNames: ['ソラモビーム', 'スターフォール', '星影ステップ'] },
+  { id: 'gauul', monsterId: 'mon-gauul', rareSkillNames: ['スパイラルダイブ', '聖なる炎', '高速飛行'] },
+  { id: 'lazuck', monsterId: 'mon-lazuck', rareSkillNames: ['とびかかり', 'シャドウバースト', 'フェイントステップ'] },
+  { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ['まきつく', 'ギガントノーズ', 'ダウナーミスト'] },
+  { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ['アクアテール', 'スリップガード', 'すべってよける'] },
+  { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ['シェルブレイカー', 'タイダルクラッシュ', 'てっぺきシェル'] },
+  // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
+  { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ['ぷはーっ', 'おおつむじ', 'ぷかぷか'], unlockFlag: 'pete-beaten' },
+  // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
+  { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', 'グランドハンマー', 'うけとめる'], unlockFlag: 'grant-beaten' },
+  // フルーネ：セラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（flune14_skills_OFFICIAL_20261029_rare3.json）
+  { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' },
 ];
 
 /** いまのセーブで選べるシリーズ（unlockFlag の記録がまだ無いものは並ばない） */

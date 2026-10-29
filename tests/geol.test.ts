@@ -71,10 +71,10 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
     expect(getSkill(geo(14)).effectTextJa).toBe('ちから技に効く');
   });
 
-  it('モンスター：ライフ9・色は岩の茶・ID mon-geol。ガチャのレアの枠は 3・5・10・14。仮ジオルはゲームから外した', () => {
+  it('モンスター：ライフ9・色は岩の茶・ID mon-geol。ガチャのレアの枠は 3・6・14。仮ジオルはゲームから外した', () => {
     expect(GEOL_MONSTER).toMatchObject({ id: 'mon-geol', life: 9, name: 'ジオル' });
     expect(GEOL_COLOR).toBe('#9A7B5C');
-    expect(GEOL_GACHA_RARE).toEqual([geo(3), geo(5), geo(10), geo(14)]);
+    expect(GEOL_GACHA_RARE).toEqual([geo(3), geo(6), geo(14)]);
     // ガチャのシリーズ（2026-10-29 夜）：レア枠は JSON の gacha_slot と同じ。グラントに初めて勝ったあとに並ぶ
     const series = GACHA_SERIES.find((s) => s.monsterId === GEOL_MONSTER_ID);
     expect(series).toMatchObject({ id: 'geol', unlockFlag: GRANT_BEATEN_FLAG });

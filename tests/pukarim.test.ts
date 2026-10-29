@@ -64,10 +64,10 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('モンスター：ライフ6・色ミント・ID mon-pukarim。ガチャのレアの枠は 7 ぷはーっ・14 ぷかぷか', () => {
+  it('モンスター：ライフ6・色ミント・ID mon-pukarim。ガチャのレアの枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
     expect(PUKARIM_MONSTER).toMatchObject({ id: 'mon-pukarim', life: 6, name: 'プカリム' });
     expect(PUKARIM_COLOR).toBe('#A8DCC4');
-    expect(PUKARIM_GACHA_RARE).toEqual([puk(7), puk(14)]);
+    expect(PUKARIM_GACHA_RARE).toEqual([puk(7), puk(8), puk(14)]);
     expect(BATTLE_CARDS[PUKARIM_MONSTER_ID]?.frame).toBe('pukarim');
     expect(existsSync('assets/images/ui/battlecard/frame_pukarim.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_pukarim.webp`)).toBe(true);

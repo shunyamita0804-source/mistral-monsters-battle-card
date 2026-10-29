@@ -1,5 +1,5 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
-import geolData from './official/geol14_skills_DRAFT_20261029.json';
+import geolData from './official/geol14_skills_DRAFT_20261029_rare3.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
@@ -19,7 +19,8 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - 正式モンスターカード geol_official.webp（届いた geol_official_monstercard_LIFE9.png を幅 508 に縮めただけ。プカリムと同じ）
  * - バトル用 geol_battlecard.png（届いた geol_battleart.png を無改変。1169×1345）
  * 色：岩の茶 #9A7B5C（モンスターカード枠・技カード枠とも）
- * ガチャのレアの枠（JSON の gacha_slot）：3 ナックル・5 地ひびき・10 エネルギーをためる・14 うけとめる（GEOL_GACHA_RARE）
+ * ガチャのレアの枠（JSON の gacha_slot）：3 ナックル・6 グランドハンマー・14 うけとめる（GEOL_GACHA_RARE）。
+ * 2026-10-29 夜（ユーザー決定）にレアを3つにそろえた新しい版 geol14_skills_DRAFT_20261029_rare3.json を読む（gacha_slot だけ違う。元の版は残す）
  */
 export const GEOL_MONSTER_ID = 'mon-geol';
 export const geolSkillId = (no: number): string => `skl-geol-${twoDigits(no)}`;
@@ -108,7 +109,7 @@ function toSkill(row: GeolRow): SkillCard {
 /** ジオルの技14種（JSON の番号の順） */
 export const GEOL_SKILLS: readonly SkillCard[] = GEOL_ROWS.map(toSkill);
 
-/** ガチャのレアの枠（JSON の gacha_slot が「レア」：3 ナックル・5 地ひびき・10 エネルギーをためる・14 うけとめる） */
+/** ガチャのレアの枠（JSON の gacha_slot が「レア」：3 ナックル・6 グランドハンマー・14 うけとめる） */
 export const GEOL_GACHA_RARE: readonly string[] = GEOL_ROWS.filter((r) => r.gacha_slot === 'レア').map((r) => r.id);
 
 /**
