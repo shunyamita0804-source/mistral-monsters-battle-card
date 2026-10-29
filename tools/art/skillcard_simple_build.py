@@ -41,6 +41,7 @@ MONSTER_COLORS = {
     'myurol': '#84E5FA',
     'kalshell': '#DFF2F6',
     'pukarim': '#A8DCC4',
+    'geol': '#9A7B5C',  # 試遊中（2026-10-29）。確認用の画面だけで使う
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
+import { cardCatalog, MONSTERS, QA_SKILLS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { MAPS } from '../src/data/maps.ts';
 import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
@@ -72,7 +72,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
     ]);
   });
 
-  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン・プカリム。ミュロル・カルシェルのモンスターはバトル用の絵を重ねて描く）だけ', () => {
+  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン・プカリム・試遊中のジオル。ミュロル・カルシェルのモンスターはバトル用の絵を重ねて描く）だけ', () => {
     expect(cardCatalog.all().filter((c) => c.art && c.isPlaceholder)).toEqual([]);
     expect(cardCatalog.all().filter((c) => c.art).map((c) => c.id)).toEqual([
       'mon-soramo',
@@ -81,6 +81,9 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-nobiton',
       'mon-pukarim',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
+      // 試遊中のジオル（2026-10-29。確認用の一覧 QA_MONSTERS・QA_SKILLS。絵はすべて届いている）
+      'mon-geol',
+      ...QA_SKILLS.map((s) => s.id),
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);
   });

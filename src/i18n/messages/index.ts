@@ -9,6 +9,7 @@ import { INTRO_V2 } from './introV2.ts';
 import { BOOK } from './book.ts';
 import { WALK_LAB } from './walkLab.ts';
 import { PUKARIM_LAB } from './pukarimLab.ts';
+import { GEOL_LAB } from './geolLab.ts';
 import { WORLD } from './world.ts';
 import { NAME_MESSAGES } from './name.ts';
 
@@ -29,6 +30,7 @@ export const MESSAGE_GROUPS = {
   book: BOOK,
   walkLab: WALK_LAB,
   pukarimLab: PUKARIM_LAB,
+  geolLab: GEOL_LAB,
   name: NAME_MESSAGES,
 } as const;
 
@@ -45,6 +47,7 @@ export const MESSAGES = {
   ...BOOK,
   ...WALK_LAB,
   ...PUKARIM_LAB,
+  ...GEOL_LAB,
   ...NAME_MESSAGES,
 };
 

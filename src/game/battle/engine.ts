@@ -69,6 +69,13 @@ export interface BattleMonster {
    * その手番にそのモンスターが攻撃技を1回使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える
    */
   readonly tailwind?: { readonly amount: number; readonly turn: number } | null;
+  /** この手番（turn）に受ける次の攻撃1回を回避できない（試遊中：ジオルのじならし 2026-10-29）。攻撃を1回受けたら・倒れたら消える */
+  readonly pinTurn?: number | null;
+  /**
+   * 効く手番（turn。かけた側の次の自分の手番）に最初に使うかしこさ技1回だけダメージ2倍（試遊中：ジオルのエネルギーをためる 2026-10-29）。
+   * かしこさ技を使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える。ちから技では消えない
+   */
+  readonly energy?: { readonly turn: number } | null;
 }
 
 export interface HandCard {
@@ -113,6 +120,14 @@ export interface PendingAttack {
   readonly responses: readonly string[];
   /** この攻撃は回避されない（試遊中：ほっぺにためているときのぷはーっ。カードの「回避されない」とは別に、使ったときの状態で決まる） */
   readonly undodgeable?: boolean;
+  /** いま狙われているモンスターは、じならしでこの攻撃を回避できない（試遊中：ジオル 2026-10-29。狙われたモンスターが変わったら決め直す） */
+  readonly pinned?: boolean;
+  /** 相手全体への攻撃（試遊中：ジオルの地ひびき）で、このあとに守りの順が来る相手（uid。左から順） */
+  readonly queue?: readonly string[];
+  /** かばうで狙いが変わったとき、もとの狙われたモンスター（uid。試遊中：ジオルのかばう） */
+  readonly coveredFrom?: string;
+  /** エネルギーをためるで2倍になった攻撃（記録・試遊の数え用） */
+  readonly energized?: boolean;
 }
 
 /** main＝技を使う（攻撃）、defense＝相手の防御待ち、mana＝攻撃のあとのマナ化 */
@@ -334,7 +349,9 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     const pending = state.pending;
     if (!pending || pending.attacker === side) return NO(t('battle.ng.waitDefense'));
     const type = skill.effect.type;
-    if (type !== 'defense' && type !== 'evade') return NO(t('battle.ng.defenseOnly'));
+    if (type !== 'defense' && type !== 'evade' && type !== 'cover') return NO(t('battle.ng.defenseOnly'));
+    // かばう：狙われたほかの味方の代わりに受ける（狙われたモンスターのカードでなくてよい）
+    if (type === 'cover') return coverUsability(state, side, skill, pending);
     // 守備に使えるのは、狙われたモンスターの防御・回避カードだけ
     const target = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
     if (!target || target.cardId !== skill.monsterId) return NO(t('battle.ng.notTarget'));
@@ -345,6 +362,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (attack.type === 'attack' && type === 'defense' && attack.unblockable) return NO(t('battle.ng.unblockable'));
     // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）
     if (attack.type === 'attack' && type === 'evade' && (attack.undodgeable || pending.undodgeable)) return NO(t('battle.ng.undodgeable'));
+    // じならしをかけられたモンスターは、この手番の次の攻撃1回を回避できない（防御はできる）
+    if (type === 'evade' && pending.pinned) return NO(t('battle.ng.pinned'));
     // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
     // 受ける攻撃カードに印字された必要マナで判定（いまのマナの残りではない）
     const minCost = guardMinCost(skill);
@@ -357,7 +376,9 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
 
   if (state.active !== side) return NO(t('battle.ng.opponentTurn'));
   if (state.phase === 'mana') return NO(t('battle.ng.manaPhase'));
-  if (skill.effect.type === 'defense' || skill.effect.type === 'evade') return NO(t('battle.ng.defenseOnAttack'));
+  if (skill.effect.type === 'defense' || skill.effect.type === 'evade' || skill.effect.type === 'cover') return NO(t('battle.ng.defenseOnAttack'));
+  // じならし：1ターンに1回（2026-10-29 指示書）
+  if (skill.effect.type === 'pin' && (state.sides[side].turnUsage[PIN_USAGE] ?? 0) >= 1) return NO(t('battle.ng.usedThisTurn'));
   // いたずら・不思議な嗅覚：相手の手札がないときは使えない（いたずらは 2026-10-24 ユーザー指示。嗅覚も同じ扱い）
   if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'discardRandom' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
     return NO(t('battle.ng.noOpponentHand'));
@@ -379,6 +400,32 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   }
   // すなをほる：相手が全員隠れていれば攻撃の技は使えない
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
+  return YES;
+}
+
+/** じならしの回数を数える turnUsage のキー（1ターンに1回） */
+const PIN_USAGE = 'skill:pin';
+
+/** かばうで代わりに受けるモンスター（狙われたモンスター以外の、生きている同じ種類〔ジオル〕。左から） */
+export function coverUser(state: BattleState, side: Side, skill: SkillCard): BattleMonster | undefined {
+  const targetUid = state.pending?.targetUid;
+  return aliveMonsters(state.sides[side]).find((m) => m.cardId === skill.monsterId && m.uid !== targetUid);
+}
+
+/**
+ * かばうを使えるか（試遊中：ジオル 2026-10-29）。ジオル以外の味方が攻撃で狙われていて、ジオルが生きていて、マナが足りるとき。
+ * 「防御されない」攻撃・相手全体への攻撃には使えない。1回の攻撃に1回だけで、狙われた味方がほかの守りを使う前（最初の守り）だけ【Claude の裁定】
+ */
+function coverUsability(state: BattleState, side: Side, skill: SkillCard, pending: PendingAttack): Usability {
+  const attack = getSkill(pending.cardId).effect;
+  if (attack.type === 'attack' && attack.unblockable) return NO(t('battle.ng.unblockable'));
+  if (attack.type === 'attack' && attack.allTargets) return NO(t('battle.ng.coverAllTargets'));
+  if (pending.coveredFrom) return NO(t('battle.ng.coverOnce'));
+  if (pending.responses.length > 0) return NO(t('battle.ng.coverFirst'));
+  const target = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
+  if (!target || target.cardId === skill.monsterId) return NO(t('battle.ng.coverSelf'));
+  if (!coverUser(state, side, skill)) return NO(t('battle.ng.ownerDown'));
+  if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
   return YES;
 }
 
@@ -438,6 +485,17 @@ export function tailwindOf(state: BattleState, user: BattleMonster | undefined):
   return w && user.life > 0 && state.turn === w.turn ? w.amount : 0;
 }
 
+/** じならしで、この手番に受ける次の攻撃を回避できないか（倒れていれば false） */
+export function isPinned(state: BattleState, monster: BattleMonster | undefined): boolean {
+  return !!monster && monster.life > 0 && monster.pinTurn === state.turn;
+}
+
+/** エネルギーをためるで、この攻撃（かしこさ技）のダメージが2倍になるか（効く手番で、まだかしこさ技を使っていないとき） */
+export function energyOf(state: BattleState, user: BattleMonster | undefined, skill: SkillCard): boolean {
+  const e = user?.energy;
+  return !!e && user.life > 0 && state.turn === e.turn && skill.effect.type === 'attack' && skill.stat?.type === 'wisdom';
+}
+
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
 export function fieldModifier(state: BattleState, stat: StatType): number {
   if (!state.field) return 0;
@@ -459,11 +517,15 @@ export function weakenTurnOf(state: BattleState, user: BattleMonster | undefined
   return w && w.turn === state.turn && skill.stat && w.stat === skill.stat.type ? w.amount : 0;
 }
 
-/** 攻撃の威力（場の増減と、使うモンスターへの「吠える」「ダストキック」「ほっぺにためる」「おいかぜ」を反映。0未満にはならない） */
+/**
+ * 攻撃の威力（場の増減と、使うモンスターへの「吠える」「ダストキック」「ほっぺにためる」「おいかぜ」「エネルギーをためる」を反映。0未満にはならない）。
+ * エネルギーをためるの2倍は「カードのダメージ」にかけ、ほかの＋・−はそのあとに足す（2026-10-29 指示書。防御の軽減はさらにそのあと）
+ */
 export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
   if (!skill.stat) return 0;
+  const base = skill.stat.value * (energyOf(state, user, skill) ? 2 : 1);
   const boost = chargeOf(user) + tailwindOf(state, user);
-  return Math.max(0, skill.stat.value + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
+  return Math.max(0, base + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
 }
 
 /** その攻撃が、使うモンスターの今の状態で「回避されない」か（ぷはーっ：ためているとき） */
@@ -547,8 +609,8 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   const found = findMonster(state, targetUid);
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
-  // 倒れたら、ほっぺにためた分・おいかぜは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null } : { life });
+  // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためるは消える
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -594,9 +656,35 @@ function resolvePending(state: BattleState): BattleState {
   let withFx = next;
   if (damage > 0) withFx = addFx(next, hitKind(pending.cardId), pending.attacker);
   else if (evaded) withFx = addFx(next, 'evade', target?.side ?? otherSide(pending.attacker));
-  const after = applyDamage(withFx, pending.targetUid, damage);
+  // じならしは、攻撃を1回受けたら消える（当たっても・守っても）
+  const after = clearPin(applyDamage(withFx, pending.targetUid, damage), pending.targetUid);
   const recoiled = damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : after;
-  return evaded ? recoiled : attackRiders(recoiled, pending.cardId, pending.attacker, pending.targetUid);
+  const done = evaded ? recoiled : attackRiders(recoiled, pending.cardId, pending.attacker, pending.targetUid);
+  return nextAllTarget(done, pending);
+}
+
+/** じならしを消す（その手番に攻撃を1回受けた） */
+function clearPin(state: BattleState, uid: string): BattleState {
+  const m = findMonster(state, uid)?.monster;
+  return m?.pinTurn != null ? updateMonster(state, uid, { pinTurn: null }) : state;
+}
+
+/**
+ * 相手全体への攻撃（地ひびき）：1体の守りとダメージが終わったら、次の相手（まだ生きている・隠れていない）の守りへ。
+ * 威力は使ったときのまま（ほっぺにためる・おいかぜ などは使ったときに1回だけ数える）。全員終わったら攻撃の手番に戻る
+ */
+function nextAllTarget(state: BattleState, done: PendingAttack): BattleState {
+  if (!done.queue || state.phase === 'ended') return state;
+  const rest = done.queue.filter((uid) => {
+    const m = findMonster(state, uid)?.monster;
+    return !!m && m.life > 0 && m.hiddenTurn !== state.turn;
+  });
+  const [nextUid, ...more] = rest;
+  if (!nextUid) return state;
+  const target = findMonster(state, nextUid)?.monster;
+  const { pinned: _p, coveredFrom: _c, ...base } = done;
+  const pending: PendingAttack = { ...base, targetUid: nextUid, responses: [], queue: more, ...(isPinned(state, target) ? { pinned: true } : {}) };
+  return { ...state, phase: 'defense', pending };
 }
 
 /**
@@ -702,7 +790,12 @@ function useCard(
 
   const targets = targetsFor(state, side, skill, user);
   let target: BattleMonster | undefined;
-  if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'tailwind') {
+  // 相手全体への攻撃（地ひびき）は相手を選ばない。攻撃できる相手の左から順に守りを聞く
+  const allTargets = skill.effect.type === 'attack' && !!skill.effect.allTargets;
+  if (allTargets) {
+    target = targets[0];
+    if (!target) return state;
+  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'tailwind') {
     target = targetUid ? targets.find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
@@ -716,18 +809,22 @@ function useCard(
     case 'attack': {
       if (!target || !skill.stat) return state;
       const power = attackPower(state, skill, user);
+      const energized = energyOf(state, user, skill);
       const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
       // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）。おいかぜは効く手番に使ったときだけ消える
       if (user.charge) next = updateMonster(next, user.uid, { charge: null });
       if (tailwindOf(state, user) > 0) next = updateMonster(next, user.uid, { tailwind: null });
+      // エネルギーをためる：効く手番の最初のかしこさ技で消える（ちから技では消えない）
+      if (energized) next = addLog(updateMonster(next, user.uid, { energy: null }), t('battle.log.energyDouble', { name: nameOf(user.cardId) }));
       if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
+      if (allTargets) next = addLog(next, t('battle.log.allTargets', { name: nameOf(user.cardId) }));
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
         // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
         const dealt = Math.max(0, power - shieldOf(state, target, skill.stat.type));
-        const hit = applyDamage(dealt > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, dealt);
+        const hit = clearPin(applyDamage(dealt > 0 ? addFx(next, hitKind(skill.id), side) : next, target.uid, dealt), target.uid);
         return attackRiders(dealt > 0 ? selfDamageOnHit(hit, skill.id, user.uid) : hit, skill.id, side, target.uid);
       }
       return {
@@ -742,6 +839,9 @@ function useCard(
           power,
           responses: [],
           ...(undodgeable ? { undodgeable: true } : {}),
+          ...(isPinned(state, target) ? { pinned: true } : {}),
+          ...(allTargets ? { queue: targets.slice(1).map((m) => m.uid) } : {}),
+          ...(energized ? { energized: true } : {}),
         },
       };
     }
@@ -809,6 +909,19 @@ function useCard(
       next = updateMonster(next, target.uid, { tailwind: { amount: skill.effect.amount, turn: state.turn + 2 } });
       return addLog(next, t('battle.log.tailwind', { name: nameOf(target.cardId), n: skill.effect.amount }));
     }
+    case 'pin': {
+      // じならし：選んだ相手は、この手番に受ける次の攻撃1回を回避できない。1ターンに1回（turnUsage で数える）
+      if (!target) return state;
+      next = updateMonster(next, target.uid, { pinTurn: state.turn });
+      const usage = next.sides[side].turnUsage;
+      next = updateSide(next, side, { turnUsage: { ...usage, [PIN_USAGE]: (usage[PIN_USAGE] ?? 0) + 1 } });
+      return addLog(next, t('battle.log.pin', { name: nameOf(target.cardId) }));
+    }
+    case 'energy': {
+      // エネルギーをためる：次の自分の手番（turn + 2）に最初に使うかしこさ技1回だけ2倍。重ねない（もう一度使ったら効く手番だけ新しく）
+      next = updateMonster(next, user.uid, { energy: { turn: state.turn + 2 } });
+      return addLog(next, t('battle.log.energy', { name: nameOf(user.cardId) }));
+    }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));
     case 'discardRandom':
@@ -819,6 +932,7 @@ function useCard(
       return revealHand(next, side);
     case 'defense':
     case 'evade':
+    case 'cover':
       return state;
   }
 }
@@ -1001,11 +1115,28 @@ function defend(state: BattleState, side: Side, cardUid: string | null): BattleS
   const hand = findHandCard(state, side, cardUid);
   if (!hand) return state;
   const skill = getSkill(hand.cardId);
+  if (skill.effect.type === 'cover') return cover(state, side, cardUid, skill, pending);
   let next = removeFromHand(state, side, cardUid);
   next = payMana(next, side, skill.cost);
   next = { ...next, pending: { ...pending, responses: [...pending.responses, skill.id] } };
   const params = { side: sideLabel(side), skill: cardName(skill), v: guardReduction(skill) };
-  return addLog(next, t(skill.effect.type === 'evade' ? 'battle.log.evade' : 'battle.log.guard', params));
+  const logKey = skill.effect.type === 'evade' ? 'battle.log.evade' : skill.effect.type === 'defense' && skill.effect.nullify ? 'battle.log.nullify' : 'battle.log.guard';
+  return addLog(next, t(logKey, params));
+}
+
+/**
+ * かばう（試遊中：ジオル 2026-10-29）：攻撃の狙いをジオルに変える。そのあとジオルは自分の防御・回避もふつうに使える（マナがあれば）。
+ * 攻撃に付いた効果（まきつく など）も、代わりに受けたジオルが受ける（resolvePending は狙いの uid に効かせる）
+ */
+function cover(state: BattleState, side: Side, cardUid: string, skill: SkillCard, pending: PendingAttack): BattleState {
+  const user = coverUser(state, side, skill);
+  const ally = findMonster(state, pending.targetUid)?.monster;
+  if (!user || !ally) return state;
+  let next = removeFromHand(state, side, cardUid);
+  next = payMana(next, side, skill.cost);
+  const { pinned: _p, ...base } = pending;
+  next = { ...next, pending: { ...base, targetUid: user.uid, coveredFrom: ally.uid, responses: [], ...(isPinned(next, user) ? { pinned: true } : {}) } };
+  return addLog(next, t('battle.log.cover', { name: nameOf(user.cardId), ally: nameOf(ally.cardId) }));
 }
 
 /** 行動を待っている側（防御待ちなら防御側） */

@@ -1,0 +1,166 @@
+{
+  "monster": "ジオル",
+  "monster_id": "mon-geol",
+  "life": 9,
+  "monster_rank": "C",
+  "frame_color_name": "岩の茶",
+  "frame_color_hex": "#9A7B5C",
+  "habitat": "太古の遺跡",
+  "status": "G3 承認（2026-10-29）。試遊（G4）で数字を直す可能性あり。絵はすべて正式（技14・モンスターカード・バトル用）",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-geol-01",
+      "name": "いしなげ",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_01.png"
+    },
+    {
+      "no": 2,
+      "id": "skl-geol-02",
+      "name": "いわくだき",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "2",
+      "effect": "防御されない",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_02.png"
+    },
+    {
+      "no": 3,
+      "id": "skl-geol-03",
+      "name": "ナックル",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "5",
+      "effect": "なし",
+      "gacha_slot": "レア",
+      "art": "geol_sk_03.png"
+    },
+    {
+      "no": 4,
+      "id": "skl-geol-04",
+      "name": "ぶんまわし",
+      "category": "ちから技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_04.png"
+    },
+    {
+      "no": 5,
+      "id": "skl-geol-05",
+      "name": "地ひびき",
+      "category": "ちから技",
+      "mana": 5,
+      "damage": "2",
+      "effect": "相手全体に。防御・回避は1体ずつ",
+      "gacha_slot": "レア",
+      "art": "geol_sk_05.png"
+    },
+    {
+      "no": 6,
+      "id": "skl-geol-06",
+      "name": "グランドハンマー",
+      "category": "ちから技",
+      "mana": 6,
+      "damage": "6",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_06.png"
+    },
+    {
+      "no": 7,
+      "id": "skl-geol-07",
+      "name": "クリスタルショット",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_07.png"
+    },
+    {
+      "no": 8,
+      "id": "skl-geol-08",
+      "name": "クリスタルレイ",
+      "category": "かしこさ技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_08.png"
+    },
+    {
+      "no": 9,
+      "id": "skl-geol-09",
+      "name": "じならし",
+      "category": "特殊",
+      "mana": 3,
+      "damage": "―",
+      "effect": "指定した相手1体は、このターンに受ける次の攻撃1回を回避できない",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_09.png"
+    },
+    {
+      "no": 10,
+      "id": "skl-geol-10",
+      "name": "エネルギーをためる",
+      "category": "特殊",
+      "mana": 2,
+      "damage": "―",
+      "effect": "次の自分のターン、ジオルが最初に使うかしこさ技のダメージを2倍にする（重ねられない）",
+      "gacha_slot": "レア",
+      "art": "geol_sk_10.png"
+    },
+    {
+      "no": 11,
+      "id": "skl-geol-11",
+      "name": "かばう",
+      "category": "防御",
+      "mana": 2,
+      "damage": "―",
+      "effect": "味方が攻撃されたとき、その攻撃をジオルが代わりに受ける",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_11.png"
+    },
+    {
+      "no": 12,
+      "id": "skl-geol-12",
+      "name": "いわのうで",
+      "category": "防御",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_12.png"
+    },
+    {
+      "no": 13,
+      "id": "skl-geol-13",
+      "name": "すいしょうのたて",
+      "category": "防御",
+      "mana": 2,
+      "damage": "―",
+      "effect": "かしこさ技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "geol_sk_13.png"
+    },
+    {
+      "no": 14,
+      "id": "skl-geol-14",
+      "name": "うけとめる",
+      "category": "防御",
+      "mana": 3,
+      "damage": "―",
+      "effect": "ちから技のダメージを0にする",
+      "gacha_slot": "レア",
+      "art": "geol_sk_14.png"
+    }
+  ]
+}

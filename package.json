@@ -17,7 +17,8 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run test && npm run build",
     "art:skillframes": "python3 -I tools/art/skillcard_simple_build.py && python3 -I tools/art/value_box_build.py && python3 -I tools/art/old_parts_build.py",
-    "playtest:pukarim": "PLAYTEST=200 PLAYTEST_OUT=docs/design/pukarim-20261028/playtest_200.json vitest run tests/pukarimPlaytest.test.ts"
+    "playtest:pukarim": "PLAYTEST=200 PLAYTEST_OUT=docs/design/pukarim-20261028/playtest_200.json vitest run tests/pukarimPlaytest.test.ts",
+    "playtest:geol": "PLAYTEST=200 PLAYTEST_OUT=docs/design/geol-20261029/playtest_200.json vitest run tests/geolPlaytest.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

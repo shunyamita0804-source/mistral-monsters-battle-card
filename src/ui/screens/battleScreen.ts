@@ -912,7 +912,9 @@ export const battleScreen: ScreenDefinition = {
       if (!hand || !cardUsability(state, 'player', cardUid).usable) return;
       const card = getPlayCard(hand.cardId);
       const targets = targetsFor(state, 'player', card);
-      const enemyTarget = card.kind === 'skill' && targetsEnemy(card);
+      // 相手全体への攻撃（試遊中：ジオルの地ひびき）は相手を選ばない
+      const allTargets = card.kind === 'skill' && card.effect.type === 'attack' && !!card.effect.allTargets;
+      const enemyTarget = card.kind === 'skill' && targetsEnemy(card) && !allTargets;
       if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'tailwind') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
@@ -1356,6 +1358,8 @@ export const battleScreen: ScreenDefinition = {
       const mark = (src: string, label: string, kind: string): HTMLElement =>
         h('img', { class: `battle__corner-mark battle__corner-mark--${kind}`, attrs: { src, alt: label, title: label, draggable: 'false' } });
       if (m.charge && m.life > 0) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
+      // 試遊中：ジオルのエネルギーをためる（同じ「ためている」の絵。かけた手番から、効く手番まで出す。相手からも見える）
+      if (m.energy && m.life > 0 && s.turn <= m.energy.turn) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
       if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
       return marks.length ? h('span', { class: 'battle__corner-marks' }, ...marks) : null;
     };
@@ -1626,10 +1630,12 @@ export const battleScreen: ScreenDefinition = {
       if (!canChooseDefense(s) || !s.pending) return null;
       const pending = s.pending;
       const target = s.sides.player.monsters.find((m) => m.uid === pending.targetUid);
-      // 守備に使えるのは狙われたモンスターのカードだけなので、そのカードだけ並べる
+      // 守備に使えるのは狙われたモンスターのカードだけなので、そのカードだけ並べる。かばう（試遊中：ジオル）は、ほかの味方が狙われたときに並べる
       const options = s.sides.player.hand.filter((c) => {
         const card = getPlayCard(c.cardId);
-        return card.kind === 'skill' && ['defense', 'evade'].includes(card.effect.type) && card.monsterId === target?.cardId;
+        if (card.kind !== 'skill') return false;
+        if (card.effect.type === 'cover') return target !== undefined && target.cardId !== card.monsterId;
+        return ['defense', 'evade'].includes(card.effect.type) && card.monsterId === target?.cardId;
       });
       const used = pending.responses.map((id) => cardName(id)).join(t('common.listSeparator'));
       const attacker = findMonster(s, pending.userUid);
@@ -1667,7 +1673,14 @@ export const battleScreen: ScreenDefinition = {
           ...options.map((c) => {
             const usable = cardUsability(s, 'player', c.uid);
             const skill = getSkill(c.cardId);
-            const label = skill.effect.type === 'evade' ? effectLabel('evade') : `-${guardReduction(skill)}`;
+            const label =
+              skill.effect.type === 'evade'
+                ? effectLabel('evade')
+                : skill.effect.type === 'cover'
+                  ? t('battle.defense.cover')
+                  : skill.effect.type === 'defense' && skill.effect.nullify
+                    ? t('battle.defense.nullify')
+                    : `-${guardReduction(skill)}`;
             const b = h(
               'button',
               {

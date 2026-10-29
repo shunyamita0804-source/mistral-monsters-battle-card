@@ -3,6 +3,7 @@ import type { MonsterCard, PlayCard, Rarity, SkillCard, SkillEffect, StatType, S
 import { GAUUL_MONSTER, GAUUL_SKILLS } from './gauul.ts';
 import { KALSHELL_MONSTER, KALSHELL_SKILLS } from './kalshell.ts';
 import { PUKARIM_MONSTER, PUKARIM_SKILLS } from './pukarim.ts';
+import { GEOL_MONSTER, GEOL_SKILLS } from './geol.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -196,10 +197,11 @@ export const SUPPORTS: readonly SupportCard[] = [
 /**
  * 確認用（?qa=1）だけで使うカード。カードの一覧（MONSTERS・SKILLS）には入れないので、図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。
  * 台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）。
- * 2026-10-28 に試遊中のプカリムを入れていたが、2026-10-29 の最終でふつうの一覧へ移した（いまは空）
+ * 2026-10-28 に試遊中のプカリムを入れていたが、2026-10-29 の最終でふつうの一覧へ移した。
+ * 2026-10-29：試遊中のジオル（src/data/geol.ts）を入れた
  */
-export const QA_MONSTERS: readonly MonsterCard[] = [];
-export const QA_SKILLS: readonly SkillCard[] = [];
+export const QA_MONSTERS: readonly MonsterCard[] = [GEOL_MONSTER];
+export const QA_SKILLS: readonly SkillCard[] = [...GEOL_SKILLS];
 
 export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
 

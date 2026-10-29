@@ -305,7 +305,7 @@ export function buildAutoDeck(monsters: readonly string[]): Deck {
 /** 妨害の技（ちょうはつ・すなかけ・ダストキック・いたずら・吠える など） */
 const DISRUPT_EFFECTS = ['seal', 'weaken', 'taunt', 'handToDeck', 'discardRandom'];
 /** 守りの技（防御・回避・しめったはだ・すなをほる・みずあび） */
-const GUARD_EFFECTS = ['defense', 'evade', 'shield', 'hide', 'healSelf'];
+const GUARD_EFFECTS = ['defense', 'evade', 'shield', 'hide', 'healSelf', 'cover'];
 
 /**
  * デッキの組み方ごとの技の点数（高い技から3枚ずつ入れる。0 以下は入れない）。2026-10-27 指示書「大会の新しい形」の常連の性格（仮）
