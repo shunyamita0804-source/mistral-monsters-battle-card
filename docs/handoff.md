@@ -6,10 +6,13 @@
 
 ### まず読む：いまの状態（2026-10-29 深夜のセッション終わり）
 
-- **公開中：`main`（`2bd8650` 以降。公開ページで確認済み）**。①〜④はすべて main・公開済み。テスト 775件。**次の指示を待っている**
+- **公開中：`main`（街と部屋の直し⑤まで。公開ページで確認済み）**。①〜⑤はすべて main・公開済み。テスト 775件。**次の指示を待っている**
 - 報告（どれも**返事待ち**）：① https://claude.ai/artifact/7fA4eEsJEXt5mikePnLRoo ・② https://claude.ai/artifact/BUWqQUVkw8wbV1DVQmTFvG ・
-  ③ https://claude.ai/artifact/CwVCr6yRz6CaydiYxPe7zc ・④ https://claude.ai/artifact/6xLWDPi5DECqSVSVRtpvdW
-- 判断待ち：④の点検で見つけた、絵が窓の左右で切れている技12枚を直すか（案は `docs/skill-art-position-20261029.md`）・てっぺきシェルは指示の 40% で顔が少し右へ寄る
+  ③ https://claude.ai/artifact/CwVCr6yRz6CaydiYxPe7zc ・④ https://claude.ai/artifact/6xLWDPi5DECqSVSVRtpvdW ・⑤ （街と部屋の直し）下の行
+- ⑤ 済み：`docs/town-fix-20261029.md`。入口の名前（花屋・仕立て屋。街には入口の名前は出ない）・管理局の掲示板・大工の小屋の左の白い線・橋の下の川（案A）・東の大通りのはし・公園のベンチ。
+  ほかに見つけた所は一覧と案だけ（直すかは返事待ち）
+- 判断待ち：④の点検で見つけた、絵が窓の左右で切れている技12枚を直すか（案は `docs/skill-art-position-20261029.md`）・てっぺきシェルは指示の 40% で顔が少し右へ寄る・
+  ⑤ 花屋・仕立て屋に街の看板を出すか・⑤の一覧の6か所を直すか
 - 気づいたこと（前から・直していない）：世界地図で「精霊の森」の名前の札に水の神殿の印が少し重なる
 - **未完了**：iPhone 実機での確認（この日の作業すべて）
 
