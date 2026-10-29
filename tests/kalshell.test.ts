@@ -13,6 +13,7 @@ import { getPlayCard } from '../src/data/cards.ts';
 import { createNewSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const kal = (n: number): string => kalshellSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
@@ -48,7 +49,7 @@ describe('カルシェル正式14技：データ（2026-10-27。届いた JSON�
       expect(s.monsterId).toBe('mon-kalshell');
       expect(s.isPlaceholder).toBe(false);
       expect(s.stat).toEqual(damage === 'なし' ? null : { type: s.category, value: Number(damage) });
-      expect(s.effectTextJa).toBe(effect === 'なし' ? null : effect);
+      expect(s.effectTextJa).toBe(SKILL_CARD_TEXT[s.id] ?? (effect === 'なし' ? null : effect));
       expect(s.art).toEqual({ category: 'skillCards', file: `kal_sk_${String(n).padStart(2, '0')}.png`, layout: 'frame' });
     });
     expect(KALSHELL_SKILLS).toHaveLength(14);

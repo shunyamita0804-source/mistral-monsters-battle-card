@@ -19,6 +19,7 @@ import { BACKUP_FORMAT, parseBackup } from '../src/game/save/backup.ts';
 import { createNewSave, normalizeSave, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const gau = (n: number): string => gauulSkillId(n);
 const laz = (n: number): string => lazuckSkillId(n);
@@ -75,7 +76,7 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
       expect(s.category).toBe(CAT[category as keyof typeof CAT]);
       expect(s.cost).toBe(Number(mana));
       expect(s.stat?.value ?? null).toBe(damage === '' ? null : Number(damage));
-      expect(s.effectTextJa ?? '').toBe(effect);
+      expect(s.effectTextJa ?? '').toBe(SKILL_CARD_TEXT[s.id] ?? effect);
       expect(s.monsterId).toBe('mon-gauul');
       expect(s.isPlaceholder).toBe(false);
       expect(s.rarity).toBeNull();
@@ -155,13 +156,13 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     expect(GAUUL_SKILLS.map((s) => skillValueBadgeText(skillValueBadge(s)))).toEqual(['1', '2', '3', '4', '5', '2', '3', '4', '4', '効果', '-3', '-3', '回避', '回避']);
   });
 
-  it('日本語は効果の文のまま。英語は仮訳で、日本語が残らない', () => {
+  it('日本語はカードに書く短い文（skillCardText.ts）か効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
     expect(skillCardFace(getSkill(gau(9))).description).toBe('回避されない');
     // 詳しい表示の説明：「回避されない」は1回だけ（効果テキストと攻撃の印で2回にならない。ラズックのみだれづめも同じ）
     expect(describeSkill(getSkill(gau(9)))).toBe('相手モンスター1体にかしこさで4ダメージ。回避されない');
     expect(describeSkill(getSkill(laz(4))).match(/回避されない/g)).toHaveLength(1);
-    expect(skillCardFace(getSkill(gau(14))).description).toBe('消費マナに関係なく、すべてのちから技・かしこさ技を回避する。');
+    expect(skillCardFace(getSkill(gau(14))).description).toBe('マナに関係なく、ちから技・かしこさ技を回避');
     setLanguage('en');
     expect(cardName(GAUUL_MONSTER)).toBe('Gaul');
     for (const s of GAUUL_SKILLS) {

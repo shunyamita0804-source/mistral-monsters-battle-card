@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
 import { cardCatalog, getSkill, MONSTERS, QA_MONSTERS, QA_SKILLS, SKILLS, skillsOf, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../src/data/cards.ts';
-import { GEOL_CARD_TEXT, GEOL_COLOR, GEOL_GACHA_RARE, GEOL_MONSTER, GEOL_MONSTER_ID, GEOL_PLAYTEST_16, GEOL_SKILLS, geolSkillId } from '../src/data/geol.ts';
+import { GEOL_COLOR, GEOL_GACHA_RARE, GEOL_MONSTER, GEOL_MONSTER_ID, GEOL_PLAYTEST_16, GEOL_SKILLS, geolSkillId } from '../src/data/geol.ts';
 import geolJson from '../src/data/official/geol14_skills_DRAFT_20261029.json';
 import { nobitonSkillId } from '../src/data/nobiton.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
@@ -16,6 +16,7 @@ import { INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 /**
  * ジオル（2026-10-29。新モンスター制作の手順 4・G4 の試遊のあと、手順 8 の最終でふつうの一覧へ。指示書 design-parts/cards-original/geol/00_instructions_for_claude_code.txt）
@@ -55,19 +56,19 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
       expect(skill.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
       expect(skill.cost).toBe(Number(mana));
       expect(skill.stat?.value ?? '―').toBe(damage === '―' ? '―' : Number(damage));
-      // 大きなカードに書く文は 05・09・10・11 だけ短い文（GEOL_CARD_TEXT）。JSON・CSV の文は変えない
+      // 画面に出す文は短い文（skillCardText.ts）。JSON・CSV の文は変えない
       expect(json.effect).toBe(effect);
-      expect(skill.effectTextJa ?? 'なし').toBe(GEOL_CARD_TEXT[i + 1] ?? effect);
+      expect(skill.effectTextJa ?? 'なし').toBe(SKILL_CARD_TEXT[skill.id] ?? effect);
       expect(json.gacha_slot).toBe(slot);
     });
   });
 
-  it('大きなカードの短い文（05・09・10・11。2026-10-29 ユーザー指示）', () => {
+  it('画面に出す短い文（2026-10-29 ユーザー指示）', () => {
     expect(getSkill(geo(5)).effectTextJa).toBe('相手全員に当たる（守りは1体ずつ）');
-    expect(getSkill(geo(9)).effectTextJa).toBe('選んだ相手1体は、このターン次の攻撃を回避できない');
-    expect(getSkill(geo(10)).effectTextJa).toBe('次のターン、最初のかしこさ技のダメージ2倍');
+    expect(getSkill(geo(9)).effectTextJa).toBe('選んだ相手1体は、このターン次の攻撃を回避不可');
+    expect(getSkill(geo(10)).effectTextJa).toBe('次のターン、最初のかしこさ技を2倍に');
     expect(getSkill(geo(11)).effectTextJa).toBe('味方への攻撃を代わりに受ける');
-    expect(Object.keys(GEOL_CARD_TEXT).map(Number)).toEqual([5, 9, 10, 11]);
+    expect(getSkill(geo(14)).effectTextJa).toBe('ちから技に効く');
   });
 
   it('モンスター：ライフ9・色は岩の茶・ID mon-geol。ガチャのレアの枠は 3・5・10・14。仮ジオルはゲームから外した', () => {

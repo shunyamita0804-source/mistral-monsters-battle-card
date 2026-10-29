@@ -6,7 +6,7 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * ジオル（新モンスター制作の手順 4・G4 の試遊のあと、2026-10-29 の手順 8「ジオルの最終」でふつうの一覧へ。指示書 design-parts/cards-original/geol/00_instructions_for_claude_code.txt）。
  * 正本は src/data/official/geol14_skills_DRAFT_20261029.json（届いた JSON を無改変。同じ内容の CSV も無改変で並べて置く）。
  * 数字はユーザー確定「届いている JSON の数字のまま」：技名・分類・マナ・ダメージ・ライフ（9）は JSON からそのまま読む（tests/geol.test.ts で CSV とも照らし合わせる）。
- * 効果の文も JSON のまま。ただし大きなカードに書く文は、05・09・10・11 だけユーザー指示の短い文（GEOL_CARD_TEXT。数字の言い直しはしない）。
+ * 効果の文も JSON のまま。ただし画面に出す文は、ユーザー指示の短い文がある技はそちら（src/data/skillCardText.ts。2026-10-29 に GEOL_CARD_TEXT からまとめた）。
  * ルールの細かい決まりは docs/battle-rules.md「ジオル」と、ルールの画面の説明のまま
  *
  * ふつうに遊ぶ人に出す：cards.ts の MONSTERS・SKILLS（図鑑・デッキ編集・敵の編成）。確認用の画面「ジオルの試遊」（?qa=1）は残す。
@@ -79,17 +79,6 @@ const SPECIAL_EFFECTS: Readonly<Record<number, SkillEffect>> = {
   14: { type: 'defense', against: 'force', nullify: true },
 };
 
-/**
- * 大きなカード（と対戦中の説明）に書く効果の文（2026-10-29 ユーザー指示「大きなカードの効果の文を短くする。数字の言い直しはしない」）。
- * JSON の効果の文（GEOL_ROWS の effect）は変えない。英語は src/i18n/contentEnOfficialDraft.ts
- */
-export const GEOL_CARD_TEXT: Readonly<Record<number, string>> = {
-  5: '相手全員に当たる（守りは1体ずつ）',
-  9: '選んだ相手1体は、このターン次の攻撃を回避できない',
-  10: '次のターン、最初のかしこさ技のダメージ2倍',
-  11: '味方への攻撃を代わりに受ける',
-};
-
 /** 技の絵のファイル名（assets/images/cards/skills/。番号＝技番号） */
 export const geolArtFile = (no: number): string => `geol_sk_${twoDigits(no)}.webp`;
 
@@ -107,7 +96,7 @@ function toSkill(row: GeolRow): SkillCard {
     mana: row.mana,
     damage,
     category,
-    effect_text_ja: GEOL_CARD_TEXT[row.no] ?? (row.effect === 'なし' ? null : row.effect),
+    effect_text_ja: row.effect === 'なし' ? null : row.effect,
   };
   return officialSkill(
     o,

@@ -31,6 +31,7 @@ import { skillCardFace } from '../src/game/cards/cardFace.ts';
 import { createNewSave, migrate, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 /** ゲーム内 ID で引く（それまでの番号。旧14〜16 のスリップガード・ひらりよける・すべってよけるは ID 14〜16 のまま） */
 const myu = (n: number): string => myurolSkillId(n);
@@ -86,7 +87,7 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
       expect(s.isPlaceholder).toBe(false);
       if (damage === 'なし') {
         expect(s.stat).toBeNull();
-        expect(s.effectTextJa).toBe(effect);
+        expect(s.effectTextJa).toBe(SKILL_CARD_TEXT[s.id] ?? effect);
       } else {
         expect(s.stat).toEqual({ type: s.category, value: Number(damage) });
         expect(s.effectTextJa).toBeNull();
@@ -217,10 +218,10 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_myurol.webp`)).toBe(true);
   });
 
-  it('日本語は JSON の効果の文のまま。英語は仮訳で、日本語が残らない', () => {
+  it('日本語はカードに書く短い文（skillCardText.ts）か JSON の効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(m14(8))).description).toBe('発動ターンを含む2ターン、受けるちから技のダメージを1軽減。重複不可');
-    expect(skillCardFace(getSkill(m14(14))).description).toBe('相手のちから技・かしこさ技（攻撃カードの消費マナ2以下）を回避');
+    expect(skillCardFace(getSkill(m14(8))).description).toBe('今と次のターン、ちから技を1軽減（重ねられない）');
+    expect(skillCardFace(getSkill(m14(14))).description).toBe('マナ2以下のちから技・かしこさ技を回避');
     for (const s of MYUROL_SKILLS) expect(skillCardFace(s).mana).toBe(s.cost);
     setLanguage('en');
     expect(cardName(MYUROL_MONSTER)).toBe('Myurol');

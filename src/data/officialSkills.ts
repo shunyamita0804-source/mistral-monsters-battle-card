@@ -1,9 +1,11 @@
 import type { SkillCard, SkillCategory, SkillEffect } from '../game/cards/cardTypes.ts';
+import { SKILL_CARD_TEXT } from './skillCardText.ts';
 
 /**
  * 正式の技カードの JSON（src/data/official/*_cards_OFFICIAL.json）の1件を、ゲームの技カードにする（2026-10-23。ソラモ・ラズック共通）。
  * 技名・マナ・ダメージ・種別・効果テキスト・初期/収集の区分は、書き換えずに JSON からそのまま読む。
- * 効果テキストのある技の「ゲームでの動き」だけを specialEffects で渡す（文は書き換えない）
+ * 効果テキストのある技の「ゲームでの動き」だけを specialEffects で渡す（文は書き換えない）。
+ * 画面に出す効果の文だけ、skillCardText.ts の短い文があればそちらにする（2026-10-29。JSON の文は変えない）
  */
 export interface OfficialSkill {
   readonly design_id: string;
@@ -62,9 +64,10 @@ export function officialSkill(o: OfficialSkill, src: OfficialSkillSource, over: 
   const effect = over.effect ?? src.specialEffects[o.design_id] ?? (attack ? { type: 'attack' } : undefined);
   if (!effect) throw new Error(`${src.label}の技の動きが未定義です: ${o.design_id}`);
   const designId = over.designId === undefined ? o.design_id : over.designId;
+  const id = over.id ?? src.skillId(o.number);
   return {
     kind: 'skill',
-    id: over.id ?? src.skillId(o.number),
+    id,
     ...(designId !== null ? { designId } : {}),
     name: o.name_ja,
     monsterId: src.monsterId,
@@ -72,7 +75,7 @@ export function officialSkill(o: OfficialSkill, src: OfficialSkillSource, over: 
     cost: o.mana,
     stat: attack && o.damage !== null ? { type: category as 'force' | 'wisdom', value: o.damage } : null,
     category,
-    effectTextJa: o.effect_text_ja,
+    effectTextJa: SKILL_CARD_TEXT[id] ?? o.effect_text_ja,
     ...(o.availability !== undefined ? { availability: o.availability === 'initial' ? ('initial' as const) : ('collect' as const) } : {}),
     ...(over.displayNo !== undefined ? { displayNo: over.displayNo } : {}),
     effect,

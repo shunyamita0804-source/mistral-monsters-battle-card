@@ -13,6 +13,7 @@ import { createStarterDeck } from '../src/game/deck/deck.ts';
 import { createNewSave, migrate, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const nob = (n: number): string => nobitonSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
@@ -41,7 +42,7 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
       expect(s.category).toBe(r.category);
       expect(s.cost).toBe(r.mana);
       expect(s.stat?.value ?? null).toBe(r.damage);
-      expect(s.effectTextJa).toBe(r.effect_ja);
+      expect(s.effectTextJa).toBe(SKILL_CARD_TEXT[s.id] ?? r.effect_ja);
       expect(s.displayNo).toBe(r.number);
       expect(s.designId).toBe(`NOB14-SK-${String(r.number).padStart(2, '0')}`);
       expect(s.monsterId).toBe('mon-nobiton');

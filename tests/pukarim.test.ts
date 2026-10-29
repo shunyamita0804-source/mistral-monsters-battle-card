@@ -20,6 +20,7 @@ import { BOOSTERS } from '../src/data/introV2.ts';
 import { createNewGameSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 /**
  * プカリム（2026-10-28 試遊中。新モンスター制作の手順 4。指示書 design-parts/cards-original/pukarim/00_instructions_for_claude_code.txt）
@@ -58,7 +59,7 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
       expect(skill.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
       expect(skill.cost).toBe(Number(mana));
       expect(skill.stat?.value ?? 'なし').toBe(damage === 'なし' ? 'なし' : Number(damage));
-      expect(skill.effectTextJa ?? 'なし').toBe(effect);
+      expect(skill.effectTextJa ?? 'なし').toBe(SKILL_CARD_TEXT[skill.id] ?? effect);
       expect(json.gacha_slot).toBe(slot);
     });
   });
