@@ -271,7 +271,9 @@ export const BATTLE = {
   'battle.defense.damage': { ja: 'いまのダメージ {n}', en: 'Damage now: {n}' },
   'battle.defense.damageUsed': { ja: 'いまのダメージ {n}（使った守備：{used}）', en: 'Damage now: {n} (used: {used})' },
   'battle.defense.cardAria': { ja: '{name}で守備', en: 'Defend with {name}' },
-  'battle.defense.pass': { ja: '守備しない', en: 'Pass' },
+  'battle.defense.pass': { ja: '受ける', en: 'Take it' },
+  /** 2026-10-29 夜：手札に守りのカードが1枚も無いとき（自動では進めず「受ける」を待つ） */
+  'battle.defense.none': { ja: '手札に守りのカード（防御・回避）がありません。「受ける」を押してください', en: 'No Guard/Dodge cards in hand. Tap "Take it".' },
   'battle.defense.done': { ja: '守備を終える', en: 'Done' },
 
   // 結果

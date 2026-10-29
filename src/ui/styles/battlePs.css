@@ -556,6 +556,25 @@
   text-overflow: ellipsis;
 }
 
+/* 2026-10-29 夜：使えない守りのカードは、理由（マナが足りない・この技には効かない など）を切らずに折り返して見せる */
+.battle__defense-card.is-unusable .battle__defense-label {
+  max-width: 78px;
+  font-size: 10px;
+  line-height: 1.25;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* 手札に守りのカードが無いとき */
+.battle__defense-none {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--ps-text-sub, #d8d2c0);
+}
+
 .battle.is-defending .battle__hand {
   display: none;
 }

@@ -212,13 +212,17 @@ PROPS = [
     # 2026-10-28 点検：(1640, 6000) の植木鉢は、木の橋からの小道の出口をふさぐので外した
     ('bush_small', 380, 5800), ('planter', 2700, 5880), ('lamp', 2860, 5900),
     # 西の高台（★：研究所の前）
-    ('flowerbowl', 760, 1640), ('flowerbowl', 1560, 1640), ('lamp', 640, 1580), ('lamp', 1660, 1580),
+    # 2026-10-29 夜の点検：右の街灯が石畳と芝生にまたがっていたので、石畳の上へ（前は 1660, 1580。花鉢に重ならないよう少し右）
+    ('flowerbowl', 760, 1640), ('flowerbowl', 1560, 1640), ('lamp', 640, 1580), ('lamp', 1690, 1630),
     # 2026-10-29 点検の直し：望遠鏡の左が西の林の木にかかっていたので東へ（前は 470）
     ('telescope', 590, 1850),     # 17 見晴らし台
     # 大会会場の前（高台の上）・大階段のわき
-    ('banner', 2460, 1500), ('banner', 3940, 1500), ('lamp', 2780, 1520), ('lamp', 3620, 1520),
+    # 2026-10-29 夜の点検：旗は石畳のはしにまたがっていたので、少し内側の石畳の上へ（前は 2460・3940）
+    ('banner', 2500, 1500), ('banner', 3900, 1500), ('lamp', 2780, 1520), ('lamp', 3620, 1520),
     # 広場（13）のまわり：ベンチ・街灯・花
-    ('bench', 2660, 3700), ('bench', 3740, 3700), ('lamp', 2600, 2700), ('lamp', 3800, 2700),
+    # 2026-10-29 夜 iPhone の点検「ベンチが丸い石畳のふちと芝生にまたがり、向きも地面に合っていない」：前は (2660, 3700)・(3740, 3700)。
+    # 噴水の北の石畳の上（北の道の左右。丸いふちから離す）に、噴水の方（南）を向けて置く。少し小さいベンチ（bench_plaza）
+    ('bench_plaza', 2800, 2830), ('bench_plaza', 3600, 2830), ('lamp', 2600, 2700), ('lamp', 3800, 2700),
     # 2026-10-29：(2480, 3250) の花鉢は西の道の上にはみ出していたので外した
     ('flowerbowl', 3920, 3640),
     # 北東の道・管理局のまわり
@@ -233,12 +237,14 @@ PROPS = [
     # 林の中にぽつんとあった樽2つ（6150, 3920・6180, 3640。1つは木に隠れていた）は消した
     ('lamp', 3620, 3520), ('lamp', 4900, 3520), ('crate', 4955, 3780),
     # 西の道・練習場のまわり
-    ('lamp', 1500, 3460), ('lamp', 2500, 3460), ('planter', 2250, 2400), ('flowerbowl', 2200, 2800),
+    # 2026-10-29 夜の点検：東の街灯が広場の丸いふちにかかっていたので西へ（前は 2500）
+    ('lamp', 1500, 3460), ('lamp', 2440, 3460), ('planter', 2250, 2400), ('flowerbowl', 2200, 2800),
     # ピート・ハロルドの家の前・仕立て屋の前
     ('lamp', 1250, 4690), ('lamp', 2700, 4700), ('planter', 4950, 4300), ('lamp', 3600, 4700),
     # 南の大通り（14 南の門のまえ・20 ★）
     # 2026-10-29：石の橋の南のはしの街灯2本は、橋の柱の街灯と重なって見えたので外した
-    ('sign', 2760, 6440), ('bench', 3780, 5920),
+    # 2026-10-29 夜：南の大通りの東の芝生のベンチは、道の方（西）を向く横向きのベンチに（前は正面向き 3780, 5920 で南を向いていた）
+    ('sign', 2760, 6440), ('bench_side', 3560, 5950),
     # 2026-10-29：東の道・商店街のはし（林の手前）の花壇。道がここで終わる理由になるように、道のはしにそろえて同じ間で
     # 2026-10-29 点検の直し：東の道のはし（花屋の前〜商店街の上）は植え込みでふさぎ、はしの角に街灯（「ここで道が終わり」が分かるように）。
     # 商店街のはしは右の屋台と花壇で終わる。林の木はこの所だけ奥へ下げた（forest_edge の EAST_CLEAR）。前は花壇4つ（3130・3420・3700・3980）
@@ -248,9 +254,11 @@ PROPS = [
     ('flowerbowl', 3700, 6120),
     # 2026-10-28 直し（ユーザー「広く空いた草地に小物を置いて、にぎやかに」。歩く道はふさがない）
     # 西の道の北（西の高台の階段の道と大通りの間）
-    ('tree_mid', 2600, 2330), ('bush_big', 2300, 2620), ('bench', 2400, 2990), ('flowerbowl', 2160, 3010),
+    # 2026-10-29 夜の点検：ベンチの右はしが広場の丸いふちにかかっていたので西へ（前は 2400）。花鉢（前は 2160, 3010）はベンチと西の高台の道の間に入らないので外した
+    ('tree_mid', 2600, 2330), ('bush_big', 2300, 2620), ('bench', 2300, 2990),
     # 北東の道とショップの間
-    ('tree_mid', 3650, 2560), ('bush_small', 3830, 2400),
+    # 2026-10-29 夜の点検：木が広場の丸いふちにかかっていたので北東へ（前は 3650, 2560）
+    ('tree_mid', 3700, 2520), ('bush_small', 3830, 2400),
     # 西の高台の石垣の下（練習場の裏）
     ('hedge', 700, 2190), ('bush_small', 960, 2180), ('hedge', 1250, 2190), ('bush_big', 1600, 2200),
     # ピートの家とハロルドの家の間・ハロルドの家と大通りの間
@@ -259,7 +267,8 @@ PROPS = [
     ('bush_big', 3800, 4060), ('flowerbowl', 3600, 4260),
     # 商店街の南
     # 2026-10-29 点検の直し：真ん中の屋台の前に重なっていた街灯を、左と真ん中の屋台の間へ（前は 5600, 4020）
-    ('flowerbowl', 5000, 4110), ('bench', 5300, 4130), ('lamp', 5423, 4030),
+    # 2026-10-29 夜：商店街の南のベンチは道に背を向けていたので、花壇に替えた（前は bench 5300, 4130）
+    ('flowerbowl', 5000, 4110), ('planter', 5300, 4130), ('lamp', 5423, 4030),
     # 東の南側（2026-10-29 並べ直し：小川の南の岸に沿って、ベンチと街灯を同じ間で交互に。23 ★のベンチもここ）
     # 2026-10-29：小川が橋の東で南へ曲がる（x 3800）ので、いちばん西のベンチを少し東へ（前は 4000）
     ('bench', 4100, 5150), ('lamp', 4350, 5110), ('bench', 4700, 5150), ('lamp', 5050, 5110), ('bench', 5400, 5150),
@@ -284,6 +293,8 @@ PROP_PARTS = {
     'fence': ('props_nature', (895, 809, 1157, 983), 0.7), 'telescope': ('props_nature', (1174, 710, 1517, 1003), 0.85),
     'lamp': ('props_street', (100, 1, 216, 400), 0.8), 'lamp2': ('props_street', (319, 2, 582, 397), 0.8),
     'bench': ('props_street', (625, 122, 1078, 404), 0.7), 'bench_side': ('props_street', (1228, 42, 1403, 391), 0.7),
+    # 広場の中のベンチ（2026-10-29 夜。丸い石畳のふちにかからない大きさ）
+    'bench_plaza': ('props_street', (625, 122, 1078, 404), 0.62),
     'planter': ('props_street', (66, 415, 399, 699), 0.62), 'flowerbowl': ('props_street', (468, 414, 778, 691), 0.62),
     'barrel': ('props_street', (861, 429, 1057, 706), 0.6), 'crate': ('props_street', (1163, 415, 1473, 704), 0.55),
     'banner': ('props_street', (56, 652, 239, 1024), 0.8), 'sign': ('props_street', (368, 721, 721, 1016), 0.7),
@@ -296,7 +307,7 @@ PROP_PARTS = {
 PROP_BLOCK = {
     'tree_big': (0.30, 70), 'tree_mid': (0.30, 64), 'conifer': (0.35, 64), 'bush_big': (0.9, 90), 'bush_small': (0.9, 70),
     'hedge': (0.95, 64), 'fence': (0.9, 40), 'telescope': (0.9, 120), 'lamp': (0.9, 32), 'lamp2': (0.6, 32),
-    'bench': (0.9, 70), 'bench_side': (0.9, 120), 'planter': (0.95, 90), 'flowerbowl': (0.9, 80), 'barrel': (0.9, 64),
+    'bench': (0.9, 70), 'bench_side': (0.9, 120), 'bench_plaza': (0.9, 64), 'planter': (0.95, 90), 'flowerbowl': (0.9, 80), 'barrel': (0.9, 64),
     'crate': (0.95, 80), 'banner': (0.5, 32), 'sign': (0.8, 40),
     'conifer_e': (0.35, 64), 'tree_e': (0.30, 64), 'bush_e': (0.9, 80),
 }
@@ -354,6 +365,24 @@ def stream_mask(size: tuple[int, int], widen: float = 0) -> Image.Image:
     for x1, y1, x2, y2 in stream_rects(widen):
         d.rectangle([P(x1), P(y1), P(x2) - 1, P(y2) - 1], fill=255)
     return m
+
+
+# 小川の石垣（2026-10-29 夜 iPhone の点検「石垣が1列にそろわず、段々でギザギザ」）：部品は両はしに太い角の石がある1つの塀の絵で、
+# 上のふちが右下がり（シートの x 1 あたり y 0.126）。そのまま並べると、角の石と斜めのふちで段々になっていた。
+# 真ん中のまっすぐな所（角の石を除く BANK_MID）だけを使い、上のふちが水平になるよう縦にずらし、上下のふちで切ってそろえる。
+# 並べるときは1つおきに左右を反転して、継ぎ目の石の形をつなげる（同じ間隔・段差なし）
+BANK_MID = (1030, 120, 1372, 430)
+BANK_SLOPE = 0.126
+BANK_TOP, BANK_BOTTOM = 32, 216   # ずらしたあとの上のふち・下のふち（切る所。どの列も石がある）
+
+
+def level_bank() -> Image.Image:
+    """小川の石垣の、上のふちを水平にした帯（シートの px のまま）"""
+    im = sheet('stream_parts').crop(BANK_MID)
+    w, h = im.size
+    pad = int(BANK_SLOPE * w) + 2
+    out = im.transform((w, h + pad), Image.AFFINE, (1, 0, 0, BANK_SLOPE, 1, 0), resample=Image.BICUBIC)
+    return out.crop((0, BANK_TOP, w, BANK_BOTTOM))
 
 
 def deskew(im: Image.Image, k: float) -> Image.Image:
@@ -667,8 +696,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     water = tiled(water_src, size, 0.42, mirror=True)
     sm = stream_mask(size)
     base.paste(water, (0, 0), sm.filter(ImageFilter.GaussianBlur(1)))
-    bank = cut('stream_parts', (892, 127, 1502, 424))
-    bank = resize(bank, 0.34 * K)
+    bank = resize(level_bank(), 0.34 * K)
     cap = bank.crop((0, 0, bank.width, round(bank.height * 0.42)))
     # 縦の岸：石のふち（cap）を 90 度まわして縦に並べる（上から見たふちなので向きを変えても形が合う）。
     # 南の岸の cap は上の辺が水の側なので、西の岸は時計まわり（上の辺が右＝水の側）、東の岸は反時計まわり
@@ -681,18 +709,24 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         im = bank if north else cap
         yy = P(y) - P(14) if north else P(y) - cap.height + P(10)
         x = P(x1)
+        flip = False
         while x < P(x2):
-            base.alpha_composite(im.crop((0, 0, min(im.width, P(x2) - x), im.height)), (x, yy))
-            x += im.width - P(14)
+            part = im.transpose(Image.FLIP_LEFT_RIGHT) if flip else im
+            base.alpha_composite(part.crop((0, 0, min(im.width, P(x2) - x), im.height)), (x, yy))
+            x += im.width
+            flip = not flip
 
     def v_run(y1: float, y2: float, x: float, west_bank: bool) -> None:
         """縦の岸：y1〜y2（単位）。x は水のふち。石のふちは南の岸と同じく、ほとんど水の側に置く"""
         im = vcap_w if west_bank else vcap_e
         xx = P(x) - P(10) if west_bank else P(x) - im.width + P(10)
         y = P(y1)
+        flip = False
         while y < P(y2):
-            base.alpha_composite(im.crop((0, 0, im.width, min(im.height, P(y2) - y))), (xx, y))
-            y += im.height - P(14)
+            part = im.transpose(Image.FLIP_TOP_BOTTOM) if flip else im
+            base.alpha_composite(part.crop((0, 0, im.width, min(im.height, P(y2) - y))), (xx, y))
+            y += im.height
+            flip = not flip
 
     pts = STREAM
     for i, ((x1, y1), (x2, y2)) in enumerate(zip(pts, pts[1:])):
@@ -1025,8 +1059,16 @@ def check_props(rects) -> None:
         w = (box[2] - box[0]) * sc * 0.8
         boxes.append((name, ux, uy, (ux - w / 2, uy - 60, ux + w / 2, uy)))
     cx, cy, r = PLAZA['cx'], PLAZA['cy'], PLAZA['r']
+
+    def paved_at(px: float, py: float) -> bool:
+        return any(a <= px < c and b <= py < d for a, b, c, d in rects) or (px - cx) ** 2 + (py - cy) ** 2 < r * r
+
     for name, ux, uy, (x1, y1, x2, y2) in boxes:
-        if name.startswith('lamp'):
+        # 2026-10-29 夜：足もとの四すみが、石畳と芝生にまたがっていないか（1種類の地面の上に全部のる）
+        corners = [paved_at(px, py) for px in (x1, x2) for py in (y1, y2)]
+        if any(corners) and not all(corners):
+            print('点検：地面をまたぐ', name, ux, uy)
+        if name.startswith('lamp') or name == 'bench_plaza':
             continue
         on_road = any(x1 < c and x2 > a and y1 < d and y2 > b for a, b, c, d in rects) or (ux - cx) ** 2 + (uy - cy) ** 2 < r * r
         if on_road:

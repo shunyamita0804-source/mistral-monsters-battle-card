@@ -813,7 +813,7 @@ export const battleScreen: ScreenDefinition = {
       }
     };
 
-    /** 守備に使えるカードが1枚もないときは、守備の選択を出さずに自動で進める */
+    /** 守備に使えるカードが1枚もないか（2026-10-29 夜から、自動では進めない。文の言い分けとヒントだけに使う） */
     const noDefensePossible = (s: BattleState): boolean =>
       s.phase === 'defense' &&
       s.pending?.attacker === 'opponent' &&
@@ -825,15 +825,9 @@ export const battleScreen: ScreenDefinition = {
       if (!side) return;
       const wait = Math.max(0, busyUntil - Date.now());
       if (side === 'player' && !auto) {
-        if (!noDefensePossible(state)) {
-          // 配り終わったら操作できるように描き直す
-          if (wait > 0) timer = setTimeout(() => ((timer = null), render()), wait);
-          return;
-        }
-        timer = setTimeout(() => {
-          timer = null;
-          if (!destroyed && state && noDefensePossible(state)) dispatch({ type: 'defend', side: 'player', cardUid: null });
-        }, AI_STEP_MS + 250 + wait);
+        // 2026-10-29 夜 ユーザー指示：守りに使えるカードが無くても自動で「受ける」に進めない（どんなときも「受ける」を押すまで待つ。時間切れは作らない）
+        // 配り終わったら操作できるように描き直す
+        if (wait > 0) timer = setTimeout(() => ((timer = null), render()), wait);
         return;
       }
       timer = setTimeout(() => {
@@ -1622,9 +1616,9 @@ export const battleScreen: ScreenDefinition = {
       return row;
     };
 
-    /** 相手の攻撃に守れるか（自分が操作していて、守備に使えるカードがある） */
+    /** 相手の攻撃を受ける所か（自分が操作しているとき。守りに使えるカードが無くても、選ぶ画面を出して「受ける」を待つ。2026-10-29 夜） */
     const canChooseDefense = (s: BattleState): boolean =>
-      !auto && s.phase === 'defense' && !!s.pending && s.pending.attacker === 'opponent' && !noDefensePossible(s);
+      !auto && s.phase === 'defense' && !!s.pending && s.pending.attacker === 'opponent';
 
     /**
      * 守備の選択（2026-10-25 リデザイン パートC：それまでの画面全体の窓をやめ、フォーカスエリアに。働きは同じ）。
@@ -1634,13 +1628,14 @@ export const battleScreen: ScreenDefinition = {
       if (!canChooseDefense(s) || !s.pending) return null;
       const pending = s.pending;
       const target = s.sides.player.monsters.find((m) => m.uid === pending.targetUid);
-      // 守備に使えるのは狙われたモンスターのカードだけなので、そのカードだけ並べる。かばう（試遊中：ジオル）は、ほかの味方が狙われたときに並べる
-      const options = s.sides.player.hand.filter((c) => {
-        const card = getPlayCard(c.cardId);
-        if (card.kind !== 'skill') return false;
-        if (card.effect.type === 'cover') return target !== undefined && target.cardId !== card.monsterId;
-        return ['defense', 'evade'].includes(card.effect.type) && card.monsterId === target?.cardId;
-      });
+      // 手札の守りのカード（防御・回避・かばう）をすべて並べ、使えないカードは理由を出す（2026-10-29 夜：マナが足りない・この技には効かない など）。
+      // 使えるカードを先に
+      const options = s.sides.player.hand
+        .filter((c) => {
+          const card = getPlayCard(c.cardId);
+          return card.kind === 'skill' && ['defense', 'evade', 'cover'].includes(card.effect.type);
+        })
+        .sort((a, b) => Number(cardUsability(s, 'player', b.uid).usable) - Number(cardUsability(s, 'player', a.uid).usable));
       const used = pending.responses.map((id) => cardName(id)).join(t('common.listSeparator'));
       const attacker = findMonster(s, pending.userUid);
       return h(
@@ -1671,6 +1666,7 @@ export const battleScreen: ScreenDefinition = {
           ),
           h('div', { class: 'battle-spot__card' }, createBattleCard(getPlayCard(pending.cardId), { width: DEFENSE_ATTACK_W, size: 'focus' })),
         ),
+        options.length === 0 ? h('p', { class: 'battle__defense-none', text: t('battle.defense.none') }) : null,
         h(
           'div',
           { class: 'battle__defense-cards' },
@@ -1976,8 +1972,6 @@ export const battleScreen: ScreenDefinition = {
         // 守備の選択はフォーカスエリア。「守備しない／守備を終える」は真ん中
         const pass = s.pending.responses.length === 0;
         middle = seDecide(commandButton(t(pass ? 'battle.defense.pass' : 'battle.defense.done'), () => dispatch({ type: 'defend', side: 'player', cardUid: null }), 'cancel'));
-      } else if (s.phase === 'defense' && s.pending?.attacker === 'opponent' && !auto) {
-        middle = statusTag(t('battle.dock.noDefense'), true);
       } else {
         middle = statusTag(t(auto ? 'battle.dock.auto' : 'battle.dock.waiting'), !auto);
       }
