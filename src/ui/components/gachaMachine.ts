@@ -7,11 +7,11 @@ import { t } from '../../i18n/i18n.ts';
 import { button, h } from '../dom.ts';
 import { once } from '../gameStore.ts';
 import { sound } from '../sound.ts';
-import { cardThumbUrl, seriesPackUrl } from './gachaArt.ts';
+import { cardThumbUrl, seriesPackUrl, seriesPanelUrl } from './gachaArt.ts';
 import knobBaseArt from '@assets/images/ui/gacha/knob_base.webp';
 import knobDialArt from '@assets/images/ui/gacha/knob_dial.webp';
 import machineFrontArt from '@assets/images/ui/gacha/machine_front.webp';
-import machineGlassArt from '@assets/images/ui/gacha/machine_glass.webp';
+import machineStarsArt from '@assets/images/ui/gacha/machine_stars.webp';
 import outletClosedArt from '@assets/images/ui/gacha/outlet_closed.webp';
 import outletOpenArt from '@assets/images/ui/gacha/outlet_open.webp';
 import outletFrontArt from '@assets/images/ui/gacha/outlet_front.webp';
@@ -109,15 +109,15 @@ export function showGachaMachine(root: HTMLElement, options: GachaMachineOptions
   const layer = (src: string, cls = ''): HTMLElement =>
     h('img', { class: `gacha-machine__layer${cls ? ` ${cls}` : ''}`, attrs: { src, alt: '', draggable: 'false' } });
   const packImg = (cls: string): HTMLElement => h('img', { class: cls, attrs: { src: packUrl, alt: '', draggable: 'false' } });
-  // ガラスの中に、選んだシリーズのパックが入っている
-  const windowPacks = h('div', { class: 'gacha-machine__window' }, packImg('gacha-machine__stock'), packImg('gacha-machine__stock'), packImg('gacha-machine__stock'));
-  // 機械：ガラスの奥（紺とパック）→ 本体 → ガラスの光 → つまみの台 → 取り出し口（閉・開）→ 受け皿の手前のふち → つまみ（回る）→ つかむ所
+  // 窓は、選んだシリーズのモンスターの絵を印刷した平らなパネル（2026-10-30 指示書 J。前はガラスの中にパックが3つ入っていた）
+  const panel = h('img', { class: 'gacha-machine__panel', attrs: { src: seriesPanelUrl(series), alt: '', draggable: 'false' } });
+  // 機械：本体 → 窓のパネル → 窓の四すみの星 → つまみの台 → 取り出し口（閉・開）→ 受け皿の手前のふち → つまみ（回る）→ つかむ所
   const machine = h(
     'div',
     { class: 'gacha-machine__machine' },
-    windowPacks,
     layer(machineFrontArt),
-    layer(machineGlassArt),
+    panel,
+    layer(machineStarsArt),
     layer(knobBaseArt),
     layer(outletClosedArt, 'gacha-machine__outlet-closed'),
     layer(outletOpenArt, 'gacha-machine__outlet-open'),
