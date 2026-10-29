@@ -308,6 +308,8 @@ const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   lab: 'lab',
   home: 'home',
   neighbor: 'neighbor',
+  // カードバトラー管理局（2026-10-30。前は街の曲）
+  bureau: 'bureau',
   // 花屋・仕立て屋（2026-10-29 新しい部屋）は民家と同じ
   florist: 'house',
   'house-b': 'house',
