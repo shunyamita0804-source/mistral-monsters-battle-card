@@ -148,6 +148,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // （最初の手持ち3箱 × 1000回で決め、200回でも確かめた。npm run playtest:bosses・docs/deck-gacha-boss-v-20261030.md）。
   // イヴァン・バルカは、ライフを上げても勝つ割合がそれ以上下がらない（ボスの山札切れで負ける）ため ±3 に入らず、いちばん近い値にした
   // 2026-10-30 指示書 Z：CPU の腕前。ダンジョンのボス（守り手）はそのダンジョンのバトラーの1つ上：セラ・ルシア・ゼフィラ＝B、グラント・イヴァン・バルカ・テオ・アウレリオ＝A
+  // 同じ指示書で、新しい腕前（プレイヤー側は腕前 B）で lifeScale を V の目標 ±3 に合わせ直した（3箱 × 1000回。docs/cpu-skill-z-20261030.md）。
+  // テオだけは、ラズックとガウルのライフの段差が同じ所（1.0833）で、1.07＝31.0％・1.09＝17.3％ と飛ぶので ±3 に入らず、いちばん近い 1.07 にした
   // 2026-10-30 指示書 Y：サポートカードを入れ替え、最初の箱が変わったので、8人とも V の「直す前の勝つ割合」±3 に合わせ直した（3箱 × 1000回。docs/support-y-20261030.md）。
   // ゼフィラだけは、ライフの段差（1.21＝30.1％・1.22＝25.4％・1.25＝14.6％）で ±3 に入らず、いちばん近い 1.22 にした
   'enc-b1-a': { id: 'enc-b1-a', name: '野生モンスターの群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
@@ -158,22 +160,22 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
-  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], ace: GEOL_MONSTER_ID, lifeScale: 1.05, skill: 'A' },
+  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], ace: GEOL_MONSTER_ID, lifeScale: 1.06, skill: 'A' },
   // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終）。2026-10-29 夜 ユーザー指示：プカリム・フルーネ・ミュロル（案2）。
   // lifeScale は試遊（最初の手持ち3箱 × 200回）で勝つ割合が 45％ にいちばん近い 0.75（0.85＝35.0％・0.75＝43.2％・0.7＝55.2％。docs/flune-final-20261029.md 6章）。2026-10-30 指示書 V で 0.7 に
-  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], ace: FLUNE_MONSTER_ID, lifeScale: 0.75, skill: 'B' },
+  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], ace: FLUNE_MONSTER_ID, lifeScale: 0.93, skill: 'B' },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
   // 2026-10-30 指示書 V：どのボスも切り札（ace）＝祭壇でもらえるモンスター（真ん中）。デッキに切り札の技14種を2枚ずつ（deck.ts の buildAceDeck）。
   // 後ろの4人（イヴァン・バルカ・テオ・アウレリオ）の切り札は仮（あとで新しいモンスターに替える）
   // 水の神殿のボス：セレフィーンを真ん中に（2026-10-29 セレフィーンの最終。ソラモを外した〔ユーザー決定〕。lifeScale は今の 1.2 のまま。指示書 V のあとも 1.2）
-  'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, SEREPHINE_MONSTER_ID, MYU], ace: SEREPHINE_MONSTER_ID, lifeScale: 1.22, skill: 'B' },
+  'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, SEREPHINE_MONSTER_ID, MYU], ace: SEREPHINE_MONSTER_ID, lifeScale: 1.25, skill: 'B' },
   // 氷の洞窟のボス（2026-10-30 指示書 W）：切り札をカルシェルからヒョウズクに（真ん中）。ノビトンは外した（まきつく＋凍らせるで同じモンスターを止め続ける組み合わせになるため）。
   // lifeScale は V で直す前の勝つ割合 21.2％ から ±3 を目ざしたが、1.1 より上はライフを上げても 33〜36％ から下がらない（プレイヤーはほぼボスの山札切れでしか勝たない）。
   // 測った中でいちばん近い 1.3（1000回で 32.7％）にした。±3 には入っていない（docs/hyouzuku-w-20261030.md・npm run playtest:bosses）。指示書 Y で 1.2（20.1％）に
-  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.2, skill: 'A' },
-  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], ace: GAU, lifeScale: 1.45, skill: 'A' },
-  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.25, skill: 'A' },
-  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.22, skill: 'A' },
+  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.05, skill: 'A' },
+  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], ace: GAU, lifeScale: 1.09, skill: 'A' },
+  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
+  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
   'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, TSUMUJI_MONSTER_ID, GAU], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22, skill: 'B' },

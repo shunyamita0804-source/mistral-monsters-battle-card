@@ -57,13 +57,13 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
     // lifeScale の大きさの順は強さの順ではなくなった。強さは勝つ割合で比べる：tests/bossPlaytest.test.ts・docs/deck-gacha-boss-v-20261030.md）
     expect(Object.fromEntries(['dungeon-01', ...ids].map((id) => [id, runBossOpponent(id).lifeScale]))).toEqual({
       // 2026-10-30 指示書 Y：サポートの入れ替えで合わせ直した
-      'dungeon-01': 1.05,
-      'dungeon-02': 0.75,
-      'dungeon-03': 1.22,
-      'dungeon-04': 1.2,
-      'dungeon-05': 1.45,
-      'dungeon-06': 1.25,
-      'dungeon-07': 1.22,
+      'dungeon-01': 1.06,
+      'dungeon-02': 0.93,
+      'dungeon-03': 1.25,
+      'dungeon-04': 1.05,
+      'dungeon-05': 1.09,
+      'dungeon-06': 1.07,
+      'dungeon-07': 1.08,
     });
   });
 
