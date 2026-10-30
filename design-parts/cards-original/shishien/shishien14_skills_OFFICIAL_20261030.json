@@ -1,0 +1,167 @@
+{
+  "monster": "シシエン",
+  "monster_id": "mon-shishien",
+  "life": 7,
+  "monster_rank": "B",
+  "frame_color_name": "炭色",
+  "frame_color_hex": "#3E3A3F",
+  "habitat": "炎の火山",
+  "status": "正式（2026-10-30）。G3 14技・LIFE 7（22:24）・名前（22:28）。絵はすべて正式（技14・モンスターカード・バトル用・パックの窓）。炎の火山のボス・バルカの切り札（ガウルから替える）",
+  "recoil_rule": "7・8・9 の捨て身：攻撃が当たった（ダメージ1以上）ときだけ、使ったシシエンのライフ−1。回避・防御で0なら反動なし。反動で倒れてよい（自滅あり）。相手の最後の1体を倒して勝負がついたときは反動の前に勝ち（今のエンジンの selfDamageOnHit と同じ）",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-shishien-01",
+      "name": "じゃれつく",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_01.png"
+    },
+    {
+      "no": 2,
+      "id": "skl-shishien-02",
+      "name": "がぶり",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_02.png"
+    },
+    {
+      "no": 3,
+      "id": "skl-shishien-03",
+      "name": "ひのこ",
+      "category": "かしこさ技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_03.png"
+    },
+    {
+      "no": 4,
+      "id": "skl-shishien-04",
+      "name": "ねっぷう",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_04.png"
+    },
+    {
+      "no": 5,
+      "id": "skl-shishien-05",
+      "name": "とっしん",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_05.png"
+    },
+    {
+      "no": 6,
+      "id": "skl-shishien-06",
+      "name": "たてがみのひばな",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_06.png"
+    },
+    {
+      "no": 7,
+      "id": "skl-shishien-07",
+      "name": "すてみタックル",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "5",
+      "effect": "当たったら自分のライフ−1（捨て身）",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_07.png"
+    },
+    {
+      "no": 8,
+      "id": "skl-shishien-08",
+      "name": "もえるたてがみ",
+      "category": "かしこさ技",
+      "mana": 4,
+      "damage": "6",
+      "effect": "当たったら自分のライフ−1（捨て身）",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_08.png"
+    },
+    {
+      "no": 9,
+      "id": "skl-shishien-09",
+      "name": "れんごくのとっしん",
+      "category": "ちから技",
+      "mana": 5,
+      "damage": "7",
+      "effect": "当たったら自分のライフ−1（捨て身）",
+      "gacha_slot": "レア",
+      "art": "shishien_sk_09.png"
+    },
+    {
+      "no": 10,
+      "id": "skl-shishien-10",
+      "name": "ほのおのほうこう",
+      "category": "かしこさ技",
+      "mana": 6,
+      "damage": "6",
+      "effect": "なし",
+      "gacha_slot": "レア",
+      "art": "shishien_sk_10.png"
+    },
+    {
+      "no": 11,
+      "id": "skl-shishien-11",
+      "name": "たてがみでうける",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_11.png"
+    },
+    {
+      "no": 12,
+      "id": "skl-shishien-12",
+      "name": "ねつのとばり",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技のダメージを2軽減",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_12.png"
+    },
+    {
+      "no": 13,
+      "id": "skl-shishien-13",
+      "name": "とびのく",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技を回避",
+      "gacha_slot": "ノーマル",
+      "art": "shishien_sk_13.png"
+    },
+    {
+      "no": 14,
+      "id": "skl-shishien-14",
+      "name": "かげろう",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技を、消費マナに関係なく回避",
+      "gacha_slot": "レア",
+      "art": "shishien_sk_14.png"
+    }
+  ]
+}

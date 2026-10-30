@@ -11,6 +11,7 @@ import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
+import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
@@ -73,6 +74,10 @@ export const ZEPHYRA_BEATEN_FLAG = 'zephyra-beaten';
 export const IVAN_BEATEN_FLAG = 'ivan-beaten';
 /** 氷の洞窟の祭壇のヒョウズクをまだ受け取っていない（前に氷の洞窟をクリアしていたセーブ。LUCIA_ALTAR_OWED_FLAG と同じ形） */
 export const IVAN_ALTAR_OWED_FLAG = 'ivan-altar-owed';
+/** 炎の火山のバルカに初めて勝った（2026-10-31 指示書 AB：シシエンのガチャのシリーズが並ぶ。IVAN_BEATEN_FLAG と同じ形） */
+export const BARCA_BEATEN_FLAG = 'barca-beaten';
+/** 炎の火山の祭壇のシシエンをまだ受け取っていない（前に炎の火山をクリアしていたセーブ。IVAN_ALTAR_OWED_FLAG と同じ形） */
+export const BARCA_ALTAR_OWED_FLAG = 'barca-altar-owed';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -134,7 +139,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     altarOwedFlag: IVAN_ALTAR_OWED_FLAG,
     isPlaceholder: true,
   },
-  { id: 'dungeon-05', name: '炎の火山', description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(GAU), isPlaceholder: true },
+  {
+    id: 'dungeon-05',
+    name: '炎の火山',
+    description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    // 2026-10-31 指示書 AB：初回クリアは最奥の祭壇でシシエンのモンスターカード1枚（前はガウルと技3枚）。2回目からはシシエンの技カード1枚・宝箱もシシエンの技（氷の洞窟と同じ形）
+    firstClearCards: [{ cardId: SHISHIEN_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: BARCA_BEATEN_FLAG,
+    altarOwedFlag: BARCA_ALTAR_OWED_FLAG,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
   { id: 'dungeon-07', name: '天の聖域', description: '強い番人が守る最後の試練。2回負けると戻される。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(SORAMO_MONSTER_ID), isPlaceholder: true },
 ];
@@ -173,7 +189,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale は V で直す前の勝つ割合 21.2％ から ±3 を目ざしたが、1.1 より上はライフを上げても 33〜36％ から下がらない（プレイヤーはほぼボスの山札切れでしか勝たない）。
   // 測った中でいちばん近い 1.3（1000回で 32.7％）にした。±3 には入っていない（docs/hyouzuku-w-20261030.md・npm run playtest:bosses）。指示書 Y で 1.2（20.1％）に
   'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.05, skill: 'A' },
-  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], ace: GAU, lifeScale: 1.09, skill: 'A' },
+  // 炎の火山のボス（2026-10-31 指示書 AB）：切り札をガウルからシシエンに（真ん中）。ノビトンは外した。lifeScale は V の目標（18.1％ ±3）を目ざしたが、3体ともライフ7なので
+  // 1.0（29.1％）と 1.08 より上（11.0％）の2段にしか変わらず ±3 に入らない。いちばん近い今の 1.09 のまま（docs/shishien-ab-20261031.md・npm run playtest:barca）
+  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.09, skill: 'A' },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。

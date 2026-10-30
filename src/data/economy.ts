@@ -130,7 +130,7 @@ export interface GachaSeries {
   readonly rareSkillNames: readonly string[];
   /**
    * 2026-10-29 までの並ぶ条件（この記録があるときだけ並んだ）。プカリム＝ピートに勝ったあと（PETE_BEATEN_FLAG）、ジオル＝グラント（GRANT_BEATEN_FLAG）、
-   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）、ツムジ＝風の渓谷のゼフィラ（ZEPHYRA_BEATEN_FLAG）、ヒョウズク＝氷の洞窟のイヴァン（IVAN_BEATEN_FLAG）。
+   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）、ツムジ＝風の渓谷のゼフィラ（ZEPHYRA_BEATEN_FLAG）、ヒョウズク＝氷の洞窟のイヴァン（IVAN_BEATEN_FLAG）、シシエン＝炎の火山のバルカ（BARCA_BEATEN_FLAG）。
    * 2026-10-30（指示書 K）から並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor（モンスターカードを初めて手に入れたら開く）。
    * ここは前のセーブの変換（src/game/save/saveData.ts の v26→v27・v27→v28）でだけ使う
    */
@@ -161,6 +161,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['かまいたち', 'ストームブレイド', 'かぜよみ'], unlockFlag: 'zephyra-beaten' },
   // ヒョウズク（2026-10-30 指示書 W）：氷の洞窟のイヴァンに初めて勝ったあと（祭壇でカードを受け取ると）並ぶ。JSON の gacha_slot も同じ（hyouzuku14_skills_OFFICIAL_20261030.json）
   { id: 'hyouzuku', monsterId: 'mon-hyouzuku', rareSkillNames: ['ふぶき', 'ひょうが', 'おとなきはばたき'], unlockFlag: 'ivan-beaten' },
+  // シシエン（2026-10-31 指示書 AB）：炎の火山のバルカに初めて勝ったあと（祭壇でカードを受け取ると）並ぶ。JSON の gacha_slot も同じ（shishien14_skills_OFFICIAL_20261030.json）
+  { id: 'shishien', monsterId: 'mon-shishien', rareSkillNames: ['れんごくのとっしん', 'ほのおのほうこう', 'かげろう'], unlockFlag: 'barca-beaten' },
   // 道具のパック（仮。2026-10-30 指示書 Y）：サポート11種類。レアの枠は思い出の箱・熱気。最初から並ぶ。値段・確率・枚数はほかと同じ。
   // パックの絵（pack_tools.webp）・販売機の窓（panel_tools.webp）は 2026-10-30 指示書 Z で入れた（袋の色は銀 #B8BCC4。それまでは封をしたパック・店の中のパネル）
   { id: 'tools', monsterId: '', cardIds: [7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map(supportId), rareSkillNames: ['思い出の箱', '熱気'] },

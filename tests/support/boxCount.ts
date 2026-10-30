@@ -24,9 +24,13 @@ export interface MatchCount {
   misguard: number;
   /** フルーネのつたはたき（マナ0の攻撃技）を使った回数（むだに使いすぎないかを見る。2026-10-30 指示書 Z） */
   tsuta: number;
+  /** 捨て身の反動（2026-10-31 指示書 AB。シシエン）：反動の回数・反動で倒れた回数・反動で倒れて負けた対戦の数（両方の側の合計） */
+  recoil: number;
+  recoilKo: number;
+  recoilLoss: number;
 }
 
-export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0 });
+export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0, recoil: 0, recoilKo: 0, recoilLoss: 0 });
 
 /** a（player）と b（opponent）の1対戦を最後まで進めて数える */
 /** skill：両方の腕前（b の構え・腕前を opponent で別にできる。大会の常連など） */
@@ -52,7 +56,9 @@ export function playCounted(a: Deck, b: Deck, seed: number, first: Side, c: Matc
       if (used.includes('evade')) c.evaded++;
       else if (used.includes('defense')) c.defended++;
     }
+    const before = state;
     state = applyAction(state, action);
+    countRecoil(before, state, c);
   }
   c.games++;
   c.turns += state.turn;
@@ -63,8 +69,20 @@ export function playCounted(a: Deck, b: Deck, seed: number, first: Side, c: Matc
   } else c.draws++;
 }
 
+/** 1手のあいだに起きた反動を数える（新しい recoil の演出。その側のモンスターがその手で倒れたら反動で倒れた。それで負けたら自滅の負け） */
+function countRecoil(before: BattleState, after: BattleState, c: MatchCount): void {
+  const sides = after.fx.filter((f) => f.seq > (before.fxSeq ?? 0) && f.kind === 'recoil').map((f) => f.side);
+  for (const side of sides) {
+    c.recoil++;
+    const fell = after.sides[side].monsters.some((m) => m.life === 0 && (before.sides[side].monsters.find((x) => x.uid === m.uid)?.life ?? 0) > 0);
+    if (!fell) continue;
+    c.recoilKo++;
+    if (after.phase === 'ended' && after.winner !== side) c.recoilLoss++;
+  }
+}
+
 export function addCount(to: MatchCount, c: MatchCount): void {
-  for (const k of ['winsA', 'games', 'ko', 'deckOut', 'draws', 'turns', 'attacks', 'evaded', 'defended', 'hesitate', 'misguard', 'tsuta'] as const) to[k] += c[k];
+  for (const k of ['winsA', 'games', 'ko', 'deckOut', 'draws', 'turns', 'attacks', 'evaded', 'defended', 'hesitate', 'misguard', 'tsuta', 'recoil', 'recoilKo', 'recoilLoss'] as const) to[k] += c[k];
   for (const [k, v] of Object.entries(c.supports)) to.supports[k] = (to.supports[k] ?? 0) + v;
 }
 
@@ -84,6 +102,9 @@ export function summarize(c: MatchCount): Record<string, unknown> {
     hesitatePerGame: Math.round((c.hesitate / Math.max(1, c.games)) * 100) / 100,
     misguardPerGame: Math.round((c.misguard / Math.max(1, c.games)) * 100) / 100,
     tsutaPerGame: Math.round((c.tsuta / Math.max(1, c.games)) * 100) / 100,
+    recoilPerGame: Math.round((c.recoil / Math.max(1, c.games)) * 100) / 100,
+    recoilKoPerGame: Math.round((c.recoilKo / Math.max(1, c.games)) * 100) / 100,
+    recoilLossGames: pct(c.recoilLoss, c.games),
     supportsPerGame: Object.fromEntries(Object.entries(c.supports).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
   };
 }

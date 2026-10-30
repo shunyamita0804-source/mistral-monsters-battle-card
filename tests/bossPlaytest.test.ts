@@ -5,7 +5,7 @@ import { getPlayCard } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { RUN_DUNGEONS } from '../src/data/dungeonRun.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
-import type { OpponentDefinition } from '../src/data/tournaments.ts';
+import type { CpuSkill, OpponentDefinition } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { actingSide, applyAction, createBattle, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { buildOpponentDeck, type Deck } from '../src/game/deck/deck.ts';
@@ -19,7 +19,7 @@ import { boosterDeck } from '../src/game/story/introV2.ts';
  * PLAYTEST_NO_ACE=1 を付けると、切り札（ace）を使わない前のデッキの作り方で測る（直す前の勝つ割合）
  * ツムジ（ゼフィラ）の Wひっかきを2回続けて使った回数・かぜのりの回数も数える
  * 2026-10-30 指示書 W：決着の理由（倒して／山札切れ）・相手の行動不可（まきつく・こおりのいき・ふぶき）でプレイヤーのモンスターが動けなかった手番も数える。
- * PLAYTEST_BOSSES="enc-ice-boss" で測るボスをしぼれる
+ * PLAYTEST_BOSSES="enc-ice-boss" で測るボスをしぼれる。PLAYTEST_BOSS_SKILL="B" でボスの腕前を変えて測れる（2026-10-31）
  */
 const GAMES = Number(process.env.PLAYTEST ?? 2);
 const KEYS = BOOSTERS.map((b) => b.key);
@@ -52,11 +52,15 @@ interface Tally {
   streakMax: number;
   /** 2手番以上続けて動けなかった回の数 */
   streak2: number;
+  /** ボスの捨て身の反動（2026-10-31 指示書 AB。シシエン）：反動の回数・反動で倒れた回数・反動で倒れてボスが負けた対戦の数 */
+  recoil: number;
+  recoilKo: number;
+  recoilLoss: number;
 }
 
 const emptyTally = (): Tally => ({
   wins: 0, losses: 0, draws: 0, koWins: 0, deckOutWins: 0, koLosses: 0, deckOutLosses: 0, turns: 0,
-  doubleScratch: 0, windRide: 0, stunCasts: 0, playerTurns: 0, stunnedTurns: 0, monsterTurns: 0, stunnedMonsterTurns: 0, streakSum: 0, streakCount: 0, streakMax: 0, streak2: 0,
+  doubleScratch: 0, windRide: 0, stunCasts: 0, playerTurns: 0, stunnedTurns: 0, monsterTurns: 0, stunnedMonsterTurns: 0, streakSum: 0, streakCount: 0, streakMax: 0, streak2: 0, recoil: 0, recoilKo: 0, recoilLoss: 0,
 });
 
 const MAX_STEPS = 6000;
@@ -108,7 +112,16 @@ function play(a: Deck, b: Deck, lifeScale: number, seed: number, first: Side, t:
       if (card?.kind === 'skill' && card.effect.type === 'windRide') t.windRide++;
       if (card?.kind === 'skill' && card.effect.type === 'attack' && card.effect.stunTarget) t.stunCasts++;
     }
+    const before = state;
     state = applyAction(state, action);
+    for (const f of state.fx) {
+      if (f.seq <= before.fxSeq || f.kind !== 'recoil' || f.side !== 'opponent') continue;
+      t.recoil++;
+      if (state.sides.opponent.monsters.some((m) => m.life === 0 && (before.sides.opponent.monsters.find((x) => x.uid === m.uid)?.life ?? 0) > 0)) {
+        t.recoilKo++;
+        if (state.winner === 'player') t.recoilLoss++;
+      }
+    }
   }
   for (const uid of [...streak.keys()]) closeStreak(uid);
   t.turns += state.turn;
@@ -167,6 +180,9 @@ function summary(r: Record<string, Tally>): Record<string, number> {
     streakAvg: t.streakCount === 0 ? 0 : Math.round((t.streakSum / t.streakCount) * 100) / 100,
     streakCount: t.streakCount,
     streak2plus: t.streak2,
+    recoilPerGame: Math.round((t.recoil / Math.max(1, games)) * 100) / 100,
+    recoilKoPerGame: Math.round((t.recoilKo / Math.max(1, games)) * 100) / 100,
+    recoilLossGames: pct(t.recoilLoss, games),
   };
 }
 
@@ -179,7 +195,9 @@ describe('ボス8人の試遊（自動の対戦）', () => {
       if (only && !only.includes(id)) return;
       const def = ENCOUNTERS[id] as OpponentDefinition;
       const { ace: _ace, ...noAce } = def;
-      const boss: OpponentDefinition = process.env.PLAYTEST_NO_ACE ? noAce : def;
+      const boss0: OpponentDefinition = process.env.PLAYTEST_NO_ACE ? noAce : def;
+      // PLAYTEST_BOSS_SKILL="B" でボスの腕前を変えて測る（2026-10-31 指示書 AB：バルカの合わせ込みのくらべ。ゲームの値は変えない）
+      const boss: OpponentDefinition = process.env.PLAYTEST_BOSS_SKILL ? { ...boss0, skill: process.env.PLAYTEST_BOSS_SKILL as CpuSkill } : boss0;
       const seedBase = 30000 + b * 1000;
       const current = series(boss, boss.lifeScale, GAMES, seedBase);
       const row: Record<string, unknown> = {

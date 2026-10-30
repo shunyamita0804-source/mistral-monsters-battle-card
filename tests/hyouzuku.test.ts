@@ -131,7 +131,7 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
   it('パックの色（pack_tint.py）・パックの絵・販売機の窓・ショップの棚・枠の色の表にヒョウズクがある', () => {
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
     expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji', 'hyouzuku'(, '[a-z]+')*\]/);
-    expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji', 'hyouzuku'\]/);
+    expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji', 'hyouzuku'.*\]/);
     expect(readFileSync('tools/design/gacha_panel_build.py', 'utf8')).toContain("'hyouzuku': (");
     for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
   });
@@ -321,8 +321,8 @@ describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
     };
     const s = normalizeSave(JSON.parse(JSON.stringify(old)));
     if (!s) throw new Error('load');
-    expect(SAVE_VERSION).toBe(30);
-    expect(s.version).toBe(30);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(30); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に
+    expect(s.version).toBe(SAVE_VERSION);
     expect(s.storyFlags).toEqual(expect.arrayContaining([IVAN_BEATEN_FLAG, IVAN_ALTAR_OWED_FLAG]));
     // まだヒョウズクを持っていないので、シリーズは並ばない
     expect(availableGachaSeriesFor(s).map((x) => x.id)).not.toContain('hyouzuku');

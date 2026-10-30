@@ -7,8 +7,9 @@ import { CURRENCY, GACHA_SERIES, gachaSeenFlag, legacyAvailableGachaSeries, PACK
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
-import { DUNGEONS, IVAN_ALTAR_OWED_FLAG, LUCIA_ALTAR_OWED_FLAG } from '../../data/dungeons.ts';
+import { BARCA_ALTAR_OWED_FLAG, DUNGEONS, IVAN_ALTAR_OWED_FLAG, LUCIA_ALTAR_OWED_FLAG } from '../../data/dungeons.ts';
 import { HYOUZUKU_MONSTER_ID } from '../../data/hyouzuku.ts';
+import { SHISHIEN_MONSTER_ID } from '../../data/shishien.ts';
 import { SHOP_ROOMS_ART } from '../../data/shopRoomsArt.generated.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from '../progress/tournamentDraw.ts';
 import {
@@ -43,7 +44,7 @@ import { START_DATE } from '../../data/calendar.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 30;
+export const SAVE_VERSION = 31;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -727,6 +728,25 @@ function migrateHyouzukuAltarV30(raw: RawObject): RawObject {
   return { ...raw, storyFlags: owe ? [...flags, IVAN_ALTAR_OWED_FLAG] : flags };
 }
 
+/**
+ * v30 → v31（2026-10-31 指示書 AB）：炎の火山の祭壇の切り札をガウルからシシエンに替えた（v30 のヒョウズクと同じ形）。
+ * もう炎の火山をクリアしていて、シシエンのモンスターカードを持っていないセーブには「祭壇でまだ受け取っていない」記録（BARCA_ALTAR_OWED_FLAG）を付ける。
+ * 次にバルカに勝ったとき祭壇でシシエンを受け取る（受け取ったガウルはそのまま）。バルカに勝った記録（barca-beaten）は withBossFlags で付く。
+ * また、シシエンのシリーズを開いた記録（gacha-seen-shishien）は v30 までのセーブにはありえないので外す
+ * （v26 より前のセーブは v27 の変換で、炎の火山のクリアから付いてしまう。シリーズはシシエンを受け取ってから開く）
+ */
+function migrateShishienAltarV31(raw: RawObject): RawObject {
+  const dungeons = isObject(raw.dungeons) ? raw.dungeons : {};
+  const fire = dungeons['dungeon-05'];
+  const cleared = isObject(fire) && fire.bossDefeated === true;
+  const collection = isObject(raw.collection) ? (raw.collection as Record<string, unknown>) : {};
+  const owned = typeof collection[SHISHIEN_MONSTER_ID] === 'number' && (collection[SHISHIEN_MONSTER_ID] as number) > 0;
+  const seen = gachaSeenFlag('shishien');
+  const flags = (Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]) : []).filter((f) => f !== seen);
+  const owe = cleared && !owned && !flags.includes(BARCA_ALTAR_OWED_FLAG);
+  return { ...raw, storyFlags: owe ? [...flags, BARCA_ALTAR_OWED_FLAG] : flags };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -760,6 +780,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   // 2026-10-30 指示書 R2：年と月。前のセーブは「1年目 4月」として読む
   28: (raw) => ({ ...raw, calendar: START_DATE }),
   29: migrateHyouzukuAltarV30,
+  30: migrateShishienAltarV31,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

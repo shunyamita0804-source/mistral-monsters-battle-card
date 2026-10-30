@@ -12,8 +12,12 @@ COLORS = {
     'flune': '#9CBF5A', 'serephine': '#8FA6E8',
     'tsumuji': '#8FA3B8',  # 2026-10-30 ツムジ（くすんだ青みの灰）
     'hyouzuku': '#C8CCD4',  # 2026-10-30 ヒョウズク（銀に近い白。指示書 W）
+    'shishien': '#3E3A3F',  # 2026-10-31 シシエン（炭色。指示書 AB）
     'tools': '#B8BCC4',  # 2026-10-30 道具のパック（仮）（銀。指示書 Z）
 }
+
+# この明るさより暗い色は、縁の明るさもその色に寄せる（ほかの色は前と同じ）
+DARK = 0.35
 
 def smooth(x, a, b):
     t = np.clip((x - a) / (b - a), 0, 1)
@@ -37,11 +41,15 @@ def tint_template(tpl: np.ndarray, hexcol: str) -> np.ndarray:
     # クリーム色＝明るく彩度が低い所だけ（金・紺は変えない）
     w = smooth(mx, 0.62, 0.80) * (1 - smooth(sat, 0.22, 0.38))
     col = np.array([int(hexcol[i:i + 2], 16) for i in (1, 3, 5)]) / 255.0
-    h, _, sc = colorsys.rgb_to_hls(*col)
+    h, lc, sc = colorsys.rgb_to_hls(*col)
     l_orig = (mx + mn) / 2
     l_new = 0.5 + (l_orig - 0.5) * 0.72  # 明るさの濃淡は残し、少しだけ下げて色を見せる
+    if lc < DARK:
+        # 暗い色（シシエンの炭色）：色味が少ないので、明るさもその色に寄せないと銀の縁（ヒョウズク）と見分けられない（2026-10-31 指示書 AB）
+        l_new = lc + (l_orig - 0.5) * 0.35
     tinted = hls_to_rgb(h, l_new, min(sc, 0.8))
-    mixed = 0.35 * rgb + 0.65 * tinted
+    keep = 0.15 if lc < DARK else 0.35  # 元の明るさを混ぜる割合（暗い色は少なく）
+    mixed = keep * rgb + (1 - keep) * tinted
     out = rgb * (1 - w[..., None]) + mixed * w[..., None]
     res = tpl.copy().astype(float)
     res[..., :3] = out * 255
