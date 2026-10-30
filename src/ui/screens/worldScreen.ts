@@ -302,11 +302,11 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
-/** 場所の名前の札に入りきらない長さか（全角は1、半角は0.55 と数えて 8.5 より長い） */
+/** 場所の名前の札に入りきらない長さか（全角は1、半角は0.55 と数えて 7.5 より長い。2026-10-30：英語の Tournament Hall も切れていた） */
 function placeNameIsLong(name: string): boolean {
   let n = 0;
   for (const ch of name) n += ch.charCodeAt(0) < 0x2000 ? 0.55 : 1;
-  return n > 8.5;
+  return n > 7.5;
 }
 
 const ROOM_BGM: Readonly<Record<string, BgmId>> = {
@@ -2075,7 +2075,11 @@ export class WorldView {
       case 'worldBriefing':
         if (mapId === 'bureau' && v.state === 'packClaimed') return () => this.#walkOut('bureau-exit');
         if (inTown) {
-          this.#follower = this.#makeFollower(this.#sideTile(FOLLOW_LEAD), 'left');
+          // 2026-10-30 指示書 O3：管理局の扉の前では、ミレイユの立つ所が主人公のすぐとなりしかなく、主人公を隠していた。
+          // 主人公を扉の前から道へ少し下ろし（下へ3マス。通れなければ2マス）、ミレイユは4マス横に（重ならない近さ）
+          const down = this.#freeLine(DIR_DELTA.down, 3) ?? this.#freeLine(DIR_DELTA.down, 2);
+          if (down) this.#placeAt(down, 'down');
+          this.#follower = this.#makeFollower(this.#sideTile(FOLLOW_LEAD + 1), 'left');
           this.#faceFollower();
           return () =>
             this.#playScene('v2Briefing', () => {

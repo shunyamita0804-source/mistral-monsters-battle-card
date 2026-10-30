@@ -521,8 +521,10 @@ class DungeonRunView {
       const el = this.#entityEls.get(e.id);
       if (!el) continue;
       const seen = run.explored[e.y * f.width + e.x] === '1';
-      el.hidden = !seen || !active.has(e.id);
-      el.classList.toggle('is-lit', Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r);
+      // ボスは2マス以内なら見えて明るい（2026-10-30 指示書 O3：ボスには1マス手前から話しかけるので、見える範囲が1マスのダンジョンでも見えるように）
+      const nearBoss = e.kind === 'boss' && Math.max(Math.abs(e.x - run.x), Math.abs(e.y - run.y)) <= 2;
+      el.hidden = !(seen || nearBoss) || !active.has(e.id);
+      el.classList.toggle('is-lit', nearBoss || (Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r));
       el.classList.toggle('is-open', (e.kind === 'chest' && run.opened.includes(e.id)) || (e.kind === 'switch' && doorsOpen(run)));
     }
     // 扉：スイッチを押した階では開いている
