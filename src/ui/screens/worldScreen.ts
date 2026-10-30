@@ -10,6 +10,7 @@ import pointerFingerArt from '@assets/images/ui/booster/pointer_finger.webp';
 import guideTalkSmile from '@assets/images/characters/neighbor_guide_talk_smile.webp';
 import { cardCatalog, getMonster } from '../../data/cards.ts';
 import { createCardView } from '../components/cardView.ts';
+import { openCardDetail } from '../components/cardDetail.ts';
 import { talkFaceVisual } from '../components/dungeonPeopleArt.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import {
@@ -308,6 +309,9 @@ function placeNameIsLong(name: string): boolean {
   for (const ch of name) n += ch.charCodeAt(0) < 0x2000 ? 0.55 : 1;
   return n > 7.5;
 }
+
+/** 確認用の祭壇の場面（?qa=1&altar=N）を一度出したか */
+let qaAltarShown = false;
 
 const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   shop: 'shop',
@@ -751,6 +755,16 @@ export class WorldView {
     this.#last = performance.now();
     this.#raf = requestAnimationFrame((t) => this.#frame(t));
     // 確認画面では会話・お知らせを出さない（歩きだけを見る）
+    // 確認用（?qa=1&altar=N のときだけ・1回）：祭壇の場面を、ソラモのモンスターカードと技カード N 枚で出す（2026-10-30 指示書 Q の写真）
+    if (!dev && this.#store.qa && !qaAltarShown && typeof location !== 'undefined') {
+      const n = Number(new URLSearchParams(location.search).get('altar'));
+      if (n > 0) {
+        qaAltarShown = true;
+        const skills = Array.from({ length: Math.min(n, 14) }, (_, i) => `skl-soramo14-${String(i + 1).padStart(2, '0')}`);
+        this.#store.flashClear = { cards: ['mon-soramo', ...skills], firstClear: true };
+        this.#store.flashMessage = t('world.dungeonClearedFirst', { coins: t('common.coins', { n: 600 }) });
+      }
+    }
     const flash = dev ? null : this.#store.flashMessage;
     // 導入イベントV2の最中は、その続き（前の導入の場面は出さない）
     const v2Run = dev ? null : this.#introV2OnLoad();
@@ -2764,28 +2778,66 @@ export class WorldView {
    * クリアの報酬を受け取る場面（2026-10-27 デザイン33点の 12・13）：遺跡の最奥の祭壇の絵を画面いっぱいに出し、祭壇の上にカードを立てる
    * （2枚なら左右、1枚なら真ん中）。初めてのクリアは、ボスのカードに「初回クリア」の封蝋を付ける。お知らせを閉じると消す
    */
-  #clearScene(clear: { readonly cards: readonly string[]; readonly firstClear: boolean }): HTMLElement {
-    // 3枚より多いとき（景品の技カードもあるとき）は、小さくして1列に全部並べる（2026-10-30 指示書 O3）
-    const size = clear.cards.length > 3 ? 64 : clear.cards.length > 2 ? 88 : 104;
-    const cards = clear.cards.map((id, i) => {
-      const def = cardCatalog.get(id);
-      return def
-        ? h(
-            'div',
-            { class: 'world__clear-card' },
-            createCardView(def, size, false),
-            clear.firstClear && i === 0 && clear.cards.length > 1 ? h('img', { class: 'world__clear-seal', attrs: { src: firstClearSealArt, alt: '', draggable: 'false' } }) : null,
-          )
-        : null;
-    });
+  /**
+   * 祭壇でカードを受け取る場面（2026-10-30 指示書 Q）：いちばんのごほうびのモンスターカードを上の真ん中に大きく（技カードの約1.4倍）、
+   * 初回クリアの封の印はその右下の角に小さく。技カード（景品・勝って手に入れたもの）はその下に並べる（5枚以上は2段）。
+   * カードを押すと大きく見られる（カードの所はお知らせの窓より手前に出す。大きく見ている間は窓の後ろへ）
+   */
+  #clearScene(clear: { readonly cards: readonly string[]; readonly firstClear: boolean }): { remove(): void } {
+    const defs = clear.cards.map((id) => cardCatalog.get(id)).filter((d): d is NonNullable<typeof d> => !!d);
+    const monster = defs.find((d) => d.kind === 'monster') ?? null;
+    const skills = defs.filter((d) => d !== monster);
+    // 技カードの大きさ：4枚までは1段（少し大きく）、5枚から2段
+    const skillSize = skills.length <= 3 ? 80 : skills.length <= 4 ? 72 : 64;
+    const perRow = skills.length <= 4 ? Math.max(1, skills.length) : Math.ceil(skills.length / 2);
+    const monsterSize = Math.round((skills.length > 0 ? skillSize : 80) * 1.4);
+    const altar = h('div', { class: 'world__clear-altar' });
+    let detailOpen = false;
+    const cardButton = (def: NonNullable<(typeof defs)[number]>, size: number, seal: boolean): HTMLElement =>
+      h(
+        'button',
+        {
+          class: 'world__clear-card',
+          attrs: { type: 'button', 'aria-label': cardName(def) },
+          on: {
+            click: (e: Event) => {
+              e.stopPropagation();
+              if (detailOpen) return;
+              detailOpen = true;
+              // 大きく見ている間は、カードの所を窓の後ろへ（閉じたら手前へ戻す）
+              altar.classList.add('is-behind');
+              const handle = openCardDetail(this.#root, def);
+              const watch = new MutationObserver(() => {
+                if (handle.element.isConnected) return;
+                watch.disconnect();
+                detailOpen = false;
+                altar.classList.remove('is-behind');
+              });
+              watch.observe(this.#root, { childList: true });
+            },
+          },
+        },
+        createCardView(def, size, false),
+        seal ? h('img', { class: 'world__clear-seal', attrs: { src: firstClearSealArt, alt: '', draggable: 'false' } }) : null,
+      );
+    if (monster) altar.append(h('div', { class: 'world__clear-monster' }, cardButton(monster, monsterSize, clear.firstClear)));
+    if (skills.length > 0) {
+      const row = h('div', { class: 'world__clear-skills' }, ...skills.map((d) => cardButton(d, skillSize, false)));
+      row.style.maxWidth = `${perRow * skillSize + (perRow - 1) * 8}px`;
+      altar.append(row);
+    }
     const el = h(
       'div',
       { class: 'world__clear-scene', attrs: { 'aria-hidden': 'true' } },
       h('img', { class: 'world__clear-bg', attrs: { src: clearSceneArt, alt: '', draggable: 'false' } }),
-      h('div', { class: 'world__clear-altar' }, ...cards),
     );
-    this.#root.append(el);
-    return el;
+    this.#root.append(el, altar);
+    return {
+      remove: () => {
+        el.remove();
+        altar.remove();
+      },
+    };
   }
 
   #message(text: string, onClose?: () => void, visual?: HTMLElement): void {
