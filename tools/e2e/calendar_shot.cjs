@@ -1,6 +1,6 @@
 // カレンダー（2026-10-30 指示書 R2）の写真：街の左上の日付・ベッドの「寝る」の流れ（季節の挿絵あり・なし）・大会の受付で断られる・掲示板・ダンジョンから戻ったとき。
 // 使い方: node tools/e2e/calendar_shot.cjs URL 出力フォルダ セーブ.json [before]
-//   W・H で画面の大きさ（既定 390×844）、LANG=en で英語、ONLY=名前,名前 で一部だけ。before を付けると前の版で撮れるものだけ撮る
+//   W・H で画面の大きさ（既定 390×844）、LANG=en で英語、ONLY=名前,名前 で一部だけ、WAIT=ミリ秒 で読みこみを待つ時間。before を付けると前の版で撮れるものだけ撮る
 // セーブ.json は Vitest で createNewSave して書き出したもの（docs/handoff.md「画面写真の撮り方」）。calendar・dungeonRun は撮る場面ごとに足す
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -34,7 +34,8 @@ async function open(browser, patch) {
   await page.waitForTimeout(800);
   const cont = page.locator(LANG === 'en' ? 'text=Continue' : 'text=続きから').first();
   if (await cont.count()) await cont.click();
-  await page.waitForTimeout(2500);
+  // 公開ページは読みこみが遅いことがある（WAIT=8000 など）
+  await page.waitForTimeout(+(process.env.WAIT || 2500));
   return { ctx, page };
 }
 
