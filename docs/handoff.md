@@ -4,7 +4,13 @@
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-30 朝 O のあと）
+### まず読む：いまの状態（2026-10-30 Q のあと）
+
+- **公開中：`main`（Q まで）**。セーブ version 28。テスト 878件。O は合格。Q（祭壇の並べ方）は報告ずみ・返事待ち
+- **P（カルシェルの正式なモンスターカード）は未完了**：届いた ZIP に絵（kalshell_official_monstercard_LIFE8.png）が入っていなかった。届いたら `kalshell_official.webp`（幅 508）・`src/data/kalshell.ts` の art（layout: 'full'）
+- 記録 `docs/night-20261030.md` の「Q」「P」
+
+### その前（2026-10-30 朝 O のあと）
 
 - **公開中：`main`（O まで）**。セーブ version 28。テスト 878件。**O の作業報告書の ZIP で報告ずみ・返事待ち**
 - H〜N は進行の検品で合格。O（検品の直し）は `docs/night-20261030.md` の「O」。作業ブランチ `claude/inspection-o-20261030` は main に取り込み済み
