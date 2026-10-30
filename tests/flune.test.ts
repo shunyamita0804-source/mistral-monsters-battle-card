@@ -8,7 +8,7 @@ import { GACHA_SERIES } from '../src/data/economy.ts';
 import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
 import { FLUNE_COLOR, FLUNE_GACHA_RARE, FLUNE_MONSTER, FLUNE_MONSTER_ID, FLUNE_SKILLS, fluneSkillId } from '../src/data/flune.ts';
 import { geolSkillId } from '../src/data/geol.ts';
-import fluneJson from '../src/data/official/flune14_skills_OFFICIAL_20261029.json';
+import fluneJson from '../src/data/official/flune14_skills_OFFICIAL_20261030_z.json';
 import { pukarimSkillId } from '../src/data/pukarim.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
@@ -44,7 +44,8 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
 
   it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 特殊技: 'special', 防御技: 'defense', 回避技: 'evade' } as const;
-    const rows = csvRows('src/data/official/flune14_skills_OFFICIAL_20261029.csv');
+    // 2026-10-30 指示書 Z：技1〜4の数字を変えた新しい版（JSON・CSV）で照らし合わせる
+    const rows = csvRows('src/data/official/flune14_skills_OFFICIAL_20261030_z.csv');
     expect(rows).toHaveLength(14);
     rows.forEach((row, i) => {
       const skill = FLUNE_SKILLS[i];

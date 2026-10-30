@@ -42,7 +42,11 @@ FACE = {
     'soramo': (0.55, 0.30), 'gauul': (0.62, 0.26), 'kalshell': (0.55, 0.36), 'lazuck': (0.60, 0.30),
     'nobiton': (0.62, 0.30), 'myurol': (0.55, 0.30), 'flune': (0.50, 0.26), 'geol': (0.62, 0.34),
     'pukarim': (0.55, 0.32), 'serephine': (0.55, 0.24), 'tsumuji': (0.48, 0.56), 'hyouzuku': (0.66, 0.38),
+    # 道具のパック（仮）：顔は無いので、絵の真ん中（手帳と薬草のあたり。2026-10-30 指示書 Z）
+    'tools': (0.50, 0.52),
 }
+# パックの窓の絵がほかの所にあるもの（道具のパックの原本は design-parts/support-art-z-20261030/）
+PACK_ART_PATH = {'tools': os.path.join(ROOT, 'design-parts/support-art-z-20261030/pack_art_tools.png')}
 # 窓の四すみの星（machine_front の px。左・上・右・下）
 STAR_BOXES = [(192, 252, 280, 345), (620, 252, 708, 345), (188, 677, 280, 756), (620, 677, 712, 756)]
 
@@ -80,7 +84,7 @@ def panel(names: list[list[str]]) -> Image.Image:
             d.rectangle([x1 - 1, y1 - 1, x2, y2], fill=GOLD_DARK)
             d.rectangle([x1, y1, x2 - 1, y2 - 1], fill=NAVY)
             bw, bh = x2 - x1 - 2 * INSET, y2 - y1 - 2 * INSET
-            art = Image.open(os.path.join(PACK_ART, f'pack_art_{name}.png')).convert('RGB')
+            art = Image.open(PACK_ART_PATH.get(name, os.path.join(PACK_ART, f'pack_art_{name}.png'))).convert('RGB')
             pic = crop_face(art, FACE[name], bw / bh, 0.85 if rows * cols > 1 else 1.0).resize((bw, bh), Image.LANCZOS)
             im.paste(pic, (x1 + INSET, y1 + INSET))
             # 絵のまわりの細い金の線

@@ -430,15 +430,18 @@ const HALL_ART = ROOMS4_ART.arena;
 /**
  * 大会会場の壁の板（総当たりの表を小さく描く所。部屋の単位・skewY の傾き）。
  * 2026-10-30 指示書 X：正面向きの新しい絵には左の壁の紺の板が無いので null（表は描かない。表は受付で見られる）。
- * 板のある絵が届いたら、ここに位置を書き、HALL の「対戦表」（leagueBoard）を戻す
+ * 指示書 Z で対戦表の板の家具（勝ち抜きの線が描いてある）が届いたので、HALL の「対戦表」（leagueBoard）は戻した。板の絵に表が描いてあるので、
+ * 板の上に小さな表を重ねるのはやめたまま（null）
  */
 export const HALL_BOARD: { readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly skewDeg: number } | null = null;
 /**
- * 大会会場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。奥に観客席、真ん中の丸い舞台に対戦台、左に長いす2台、右に受付。
+ * 大会会場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。奥に観客席、真ん中の丸い舞台に対戦台、左に対戦表の板と長いす2台、右に受付。
  * 受付のセリアはカウンターの奥（話しかけるのはカウンターの前から）
  */
 export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HALL_ART, [
   interactAt('hall-desk', itemOf(HALL_ART, 'RECEPTION'), '受付カウンター', 'tournamentDesk'),
+  // 対戦表の板（2026-10-30 指示書 Z。左の観客席と長いすのあいだ。板の前〔長いすとのあいだの1列〕から調べる）
+  interactAt('hall-board', itemOf(HALL_ART, 'BOARD'), '対戦表', 'leagueBoard'),
   interactAt('hall-table', itemOf(HALL_ART, 'TABLE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
   interactAt('hall-seats-l', itemOf(HALL_ART, 'SEATS_L'), '客席', 'message', '観客席。'),
   interactAt('hall-seats-r', itemOf(HALL_ART, 'SEATS_R'), '客席', 'message', '観客席。'),

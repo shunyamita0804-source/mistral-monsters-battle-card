@@ -4,29 +4,30 @@ import rooms4Img0 from '@assets/images/maps/rooms/room4_arena_shell.webp';
 import rooms4Img1 from '@assets/images/maps/rooms/room4_arena_bench_back.webp';
 import rooms4Img2 from '@assets/images/maps/rooms/room4_arena_bench_front.webp';
 import rooms4Img3 from '@assets/images/maps/rooms/room4_arena_reception.webp';
-import rooms4Img4 from '@assets/images/maps/rooms/room4_arena_battle_table.webp';
-import rooms4Img5 from '@assets/images/maps/rooms/room4_arena_front.webp';
-import rooms4Img6 from '@assets/images/maps/rooms/room4_bureau_shell.webp';
-import rooms4Img7 from '@assets/images/maps/rooms/room4_bureau_counter.webp';
-import rooms4Img8 from '@assets/images/maps/rooms/room4_bureau_rank_board.webp';
-import rooms4Img9 from '@assets/images/maps/rooms/room4_bureau_notice_board.webp';
-import rooms4Img10 from '@assets/images/maps/rooms/room4_bureau_medal_case.webp';
-import rooms4Img11 from '@assets/images/maps/rooms/room4_bureau_benches.webp';
-import rooms4Img12 from '@assets/images/maps/rooms/room4_bureau_front.webp';
-import rooms4Img13 from '@assets/images/maps/rooms/room4_practice_shell.webp';
-import rooms4Img14 from '@assets/images/maps/rooms/room4_practice_shelf_1.webp';
-import rooms4Img15 from '@assets/images/maps/rooms/room4_practice_shelf_2.webp';
-import rooms4Img16 from '@assets/images/maps/rooms/room4_practice_shelf_3.webp';
-import rooms4Img17 from '@assets/images/maps/rooms/room4_practice_table_center.webp';
-import rooms4Img18 from '@assets/images/maps/rooms/room4_practice_table_right_back.webp';
-import rooms4Img19 from '@assets/images/maps/rooms/room4_practice_table_right_front.webp';
-import rooms4Img20 from '@assets/images/maps/rooms/room4_practice_front.webp';
-import rooms4Img21 from '@assets/images/maps/rooms/room4_lab_shell.webp';
-import rooms4Img22 from '@assets/images/maps/rooms/room4_lab_glass_cabinet.webp';
-import rooms4Img23 from '@assets/images/maps/rooms/room4_lab_desk.webp';
-import rooms4Img24 from '@assets/images/maps/rooms/room4_lab_machine.webp';
-import rooms4Img25 from '@assets/images/maps/rooms/room4_lab_lab_counter.webp';
-import rooms4Img26 from '@assets/images/maps/rooms/room4_lab_front.webp';
+import rooms4Img4 from '@assets/images/maps/rooms/room4_arena_board.webp';
+import rooms4Img5 from '@assets/images/maps/rooms/room4_arena_battle_table.webp';
+import rooms4Img6 from '@assets/images/maps/rooms/room4_arena_front.webp';
+import rooms4Img7 from '@assets/images/maps/rooms/room4_bureau_shell.webp';
+import rooms4Img8 from '@assets/images/maps/rooms/room4_bureau_counter.webp';
+import rooms4Img9 from '@assets/images/maps/rooms/room4_bureau_rank_board.webp';
+import rooms4Img10 from '@assets/images/maps/rooms/room4_bureau_notice_board.webp';
+import rooms4Img11 from '@assets/images/maps/rooms/room4_bureau_medal_case.webp';
+import rooms4Img12 from '@assets/images/maps/rooms/room4_bureau_benches.webp';
+import rooms4Img13 from '@assets/images/maps/rooms/room4_bureau_front.webp';
+import rooms4Img14 from '@assets/images/maps/rooms/room4_practice_shell.webp';
+import rooms4Img15 from '@assets/images/maps/rooms/room4_practice_shelf_1.webp';
+import rooms4Img16 from '@assets/images/maps/rooms/room4_practice_shelf_2.webp';
+import rooms4Img17 from '@assets/images/maps/rooms/room4_practice_shelf_3.webp';
+import rooms4Img18 from '@assets/images/maps/rooms/room4_practice_table_center.webp';
+import rooms4Img19 from '@assets/images/maps/rooms/room4_practice_table_right_back.webp';
+import rooms4Img20 from '@assets/images/maps/rooms/room4_practice_table_right_front.webp';
+import rooms4Img21 from '@assets/images/maps/rooms/room4_practice_front.webp';
+import rooms4Img22 from '@assets/images/maps/rooms/room4_lab_shell.webp';
+import rooms4Img23 from '@assets/images/maps/rooms/room4_lab_glass_cabinet.webp';
+import rooms4Img24 from '@assets/images/maps/rooms/room4_lab_desk.webp';
+import rooms4Img25 from '@assets/images/maps/rooms/room4_lab_machine.webp';
+import rooms4Img26 from '@assets/images/maps/rooms/room4_lab_lab_counter.webp';
+import rooms4Img27 from '@assets/images/maps/rooms/room4_lab_front.webp';
 import type { ArtMap } from './worldArt.generated.ts';
 
 /** 部屋4つの絵・歩ける所・調べる物・人の立つ所（キー：arena・bureau・practice・lab） */
@@ -50,12 +51,12 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
    "############################################################",
    "############################################################",
    "############################################################",
-   "#########.................########.................#########",
-   "####.................##################.................####",
-   "#.................########################.................#",
-   "#................##########################................#",
-   "#..............##############################..............#",
-   "#..............##############################..............#",
+   "##################################.................#########",
+   "#######################################.................####",
+   "#...######################################.................#",
+   "#...#######################################................#",
+   "#...#########################################..............#",
+   "#...#########################################..............#",
    "#.............################################.............#",
    "#...##########################################.............#",
    "#...#########################################..............#",
@@ -117,6 +118,14 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
    },
    {
     "file": rooms4Img4,
+    "x": 140,
+    "y": 329,
+    "w": 352,
+    "h": 208,
+    "z": 536
+   },
+   {
+    "file": rooms4Img5,
     "x": 674,
     "y": 351,
     "w": 571,
@@ -124,7 +133,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 364
    },
    {
-    "file": rooms4Img5,
+    "file": rooms4Img6,
     "x": 0,
     "y": 928,
     "w": 1920,
@@ -139,6 +148,12 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "w": 4,
     "h": 5
    },
+   "BOARD": {
+    "x": 4,
+    "y": 10,
+    "w": 12,
+    "h": 7
+   },
    "TABLE": {
     "x": 21,
     "y": 11,
@@ -146,10 +161,10 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "h": 13
    },
    "SEATS_L": {
-    "x": 9,
+    "x": 1,
     "y": 4,
-    "w": 12,
-    "h": 7
+    "w": 20,
+    "h": 8
    },
    "SEATS_R": {
     "x": 39,
@@ -233,7 +248,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "tiles": [
    {
-    "file": rooms4Img6,
+    "file": rooms4Img7,
     "x": 0,
     "y": 0,
     "w": 1920,
@@ -242,7 +257,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "sprites": [
    {
-    "file": rooms4Img7,
+    "file": rooms4Img8,
     "x": 560,
     "y": 274,
     "w": 829,
@@ -250,7 +265,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 565
    },
    {
-    "file": rooms4Img8,
+    "file": rooms4Img9,
     "x": 109,
     "y": 25,
     "w": 355,
@@ -258,7 +273,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 506
    },
    {
-    "file": rooms4Img9,
+    "file": rooms4Img10,
     "x": 131,
     "y": 530,
     "w": 385,
@@ -266,7 +281,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 722
    },
    {
-    "file": rooms4Img10,
+    "file": rooms4Img11,
     "x": 1438,
     "y": 69,
     "w": 309,
@@ -274,7 +289,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 510
    },
    {
-    "file": rooms4Img11,
+    "file": rooms4Img12,
     "x": 118,
     "y": 730,
     "w": 1684,
@@ -282,7 +297,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 940
    },
    {
-    "file": rooms4Img12,
+    "file": rooms4Img13,
     "x": 0,
     "y": 978,
     "w": 1920,
@@ -391,7 +406,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "tiles": [
    {
-    "file": rooms4Img13,
+    "file": rooms4Img14,
     "x": 0,
     "y": 0,
     "w": 1920,
@@ -400,7 +415,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "sprites": [
    {
-    "file": rooms4Img14,
+    "file": rooms4Img15,
     "x": 95,
     "y": 265,
     "w": 341,
@@ -408,7 +423,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 500
    },
    {
-    "file": rooms4Img15,
+    "file": rooms4Img16,
     "x": 95,
     "y": 505,
     "w": 339,
@@ -416,7 +431,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 742
    },
    {
-    "file": rooms4Img16,
+    "file": rooms4Img17,
     "x": 95,
     "y": 746,
     "w": 341,
@@ -424,7 +439,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 985
    },
    {
-    "file": rooms4Img17,
+    "file": rooms4Img18,
     "x": 765,
     "y": 458,
     "w": 376,
@@ -432,7 +447,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 771
    },
    {
-    "file": rooms4Img18,
+    "file": rooms4Img19,
     "x": 1359,
     "y": 256,
     "w": 384,
@@ -440,7 +455,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 581
    },
    {
-    "file": rooms4Img19,
+    "file": rooms4Img20,
     "x": 1361,
     "y": 658,
     "w": 381,
@@ -448,7 +463,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 965
    },
    {
-    "file": rooms4Img20,
+    "file": rooms4Img21,
     "x": 0,
     "y": 820,
     "w": 1920,
@@ -557,7 +572,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "tiles": [
    {
-    "file": rooms4Img21,
+    "file": rooms4Img22,
     "x": 0,
     "y": 0,
     "w": 1920,
@@ -566,7 +581,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
   ],
   "sprites": [
    {
-    "file": rooms4Img22,
+    "file": rooms4Img23,
     "x": 86,
     "y": 166,
     "w": 290,
@@ -574,7 +589,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 525
    },
    {
-    "file": rooms4Img23,
+    "file": rooms4Img24,
     "x": 620,
     "y": 415,
     "w": 456,
@@ -582,7 +597,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 725
    },
    {
-    "file": rooms4Img24,
+    "file": rooms4Img25,
     "x": 1286,
     "y": 115,
     "w": 376,
@@ -590,7 +605,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 506
    },
    {
-    "file": rooms4Img25,
+    "file": rooms4Img26,
     "x": 1421,
     "y": 536,
     "w": 499,
@@ -598,7 +613,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "z": 625
    },
    {
-    "file": rooms4Img26,
+    "file": rooms4Img27,
     "x": 0,
     "y": 841,
     "w": 1920,

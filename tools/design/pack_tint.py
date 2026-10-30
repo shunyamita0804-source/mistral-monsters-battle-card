@@ -1,5 +1,6 @@
 """ガチャのパック：型（pack_template_symmetric.png）の縁のクリーム色をモンスターの色にして、届いた絵の上に重ねる。
 使い方: python3 -I pack_tint.py 型.png 入力フォルダ 出力フォルダ
+（入力フォルダに pack_{名前}.png が無く pack_art_{名前}.png〔窓の絵〕だけあるときは、型の大きさに合わせてから重ねる）
 """
 import sys, colorsys
 import numpy as np
@@ -11,6 +12,7 @@ COLORS = {
     'flune': '#9CBF5A', 'serephine': '#8FA6E8',
     'tsumuji': '#8FA3B8',  # 2026-10-30 ツムジ（くすんだ青みの灰）
     'hyouzuku': '#C8CCD4',  # 2026-10-30 ヒョウズク（銀に近い白。指示書 W）
+    'tools': '#B8BCC4',  # 2026-10-30 道具のパック（仮）（銀。指示書 Z）
 }
 
 def smooth(x, a, b):
@@ -45,13 +47,25 @@ def tint_template(tpl: np.ndarray, hexcol: str) -> np.ndarray:
     res[..., :3] = out * 255
     return res.clip(0, 255).astype(np.uint8)
 
+def cover(art, size):
+    """窓の絵（pack_art_*.png。1042×1824 など）だけが届いたとき：型の高さに合わせて縮め、横は真ん中で切る
+    （届いた完成のパックと窓の絵を比べると、この合わせ方で一致した〔ヒョウズク：1683/1824 倍・横の真ん中〕。2026-10-30 指示書 Z）"""
+    w, h = size
+    k = h / art.height
+    a = art.resize((round(art.width * k), h), Image.LANCZOS)
+    x = (a.width - w) // 2
+    return a.crop((x, 0, x + w, h))
+
 def main(tpl_path, src, dst):
     tpl = np.array(Image.open(tpl_path).convert('RGBA'))
     for name, hexcol in COLORS.items():
         try:
             art = Image.open(f'{src}/pack_{name}.png').convert('RGBA')
         except FileNotFoundError:
-            continue
+            try:
+                art = cover(Image.open(f'{src}/pack_art_{name}.png').convert('RGBA'), (tpl.shape[1], tpl.shape[0]))
+            except FileNotFoundError:
+                continue
         assert art.size == (tpl.shape[1], tpl.shape[0]), name
         frame = Image.fromarray(tint_template(tpl, hexcol), 'RGBA')
         out = art.copy()

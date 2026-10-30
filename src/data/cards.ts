@@ -197,6 +197,9 @@ const BREEDER = { duration: 'instant', limitGroup: 'breeder', limitPerTurn: 1 } 
 /** 名前が決まっているサポート（ほかは仮の名前） */
 const FIXED_SUPPORT_NAMES: readonly string[] = ['投石', '薬草', '思い出の箱'];
 
+/** 絵のファイルの名前（sup_art_NN_〇〇.webp の〇〇。並びは SUPPORTS と同じ） */
+const SUPPORT_ART_NAMES: readonly string[] = ['toseki', 'techou', 'yakusou', 'omoide', 'kazemakase', 'kirinoka', 'seien', 'omoikuuki', 'yuragukiri', 'nekki', 'mamorinojin'];
+
 /** 並び＝表示の番号の順（S01〜S07・F01〜F04） */
 export const SUPPORTS: readonly SupportCard[] = [
   { no: 7, code: 'S01', name: '投石', nameEn: 'Stone Throw', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'stone', value: 1 }, text: '相手1体に1ダメージ', textEn: '1 dmg to 1 enemy' },
@@ -210,13 +213,16 @@ export const SUPPORTS: readonly SupportCard[] = [
   { no: 5, code: 'F02', name: 'ゆらぐ霧', nameEn: 'Wavering Mist', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'field', stat: 'wisdom', modifier: -1 }, text: 'かしこさ技のダメージ−1', textEn: 'INT skill damage -1' },
   { no: 6, code: 'F03', name: '熱気', nameEn: 'Heat Wave', cost: 3, rarity: 'R', duration: 'field', effect: { type: 'field', stat: 'all', modifier: 1 }, text: 'すべての攻撃のダメージ＋1', textEn: 'All attack damage +1' },
   { no: 11, code: 'F04', name: '守りの陣', nameEn: 'Guard Formation', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'guardDiscount', value: 1 }, text: '防御・回避のカードの消費マナ−1', textEn: 'Guard/dodge cards cost -1 mana' },
-].map(({ no, ...rest }) => ({
+].map(({ no, ...rest }, i) => ({
   ...rest,
   kind: 'support',
   id: supportId(no),
   isPlaceholder: false,
-  // 絵はまだ無い（文字だけのカード）。名前は投石・薬草・思い出の箱のほかは仮（ユーザー決定 2026-10-30）
-  pendingSpec: FIXED_SUPPORT_NAMES.includes(rest.name) ? ['art'] : ['art', 'name'],
+  // 絵（2026-10-30 指示書 Z。原本は design-parts/support-art-z-20261030/ に無改変）：sup_art_01〜11 は表示の番号の順（S01〜F04）。
+  // tools/art/card_art_webp.py で幅 827 の WebP に。sup_art_01_toseki（投石）は描き直し中の仮（届いたら同じ名前で差し替える）
+  art: { category: 'skillCards', file: `sup_art_${String(i + 1).padStart(2, '0')}_${SUPPORT_ART_NAMES[i]}.webp`, layout: 'frame' },
+  // 名前は投石・薬草・思い出の箱のほかは仮（ユーザー決定 2026-10-30）
+  ...(FIXED_SUPPORT_NAMES.includes(rest.name) ? {} : { pendingSpec: ['name'] }),
 }) as SupportCard);
 
 /** 前の仮サポート6種の ID（sup-1〜6。古いセーブの変換・前からある仮のデッキの組み方で使う。中身は 2026-10-30 から新しいカード） */
