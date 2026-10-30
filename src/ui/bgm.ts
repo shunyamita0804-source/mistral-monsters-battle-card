@@ -20,6 +20,7 @@ import houseMp3 from '@assets/audio/bgm/bgm_house.mp3';
 import neighborMp3 from '@assets/audio/bgm/bgm_neighbor.mp3';
 import bureauMp3 from '@assets/audio/bgm/bgm_bureau.mp3';
 import prologueMp3 from '@assets/audio/bgm/bgm_prologue.mp3';
+import departureMp3 from '@assets/audio/bgm/bgm_departure.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -54,6 +55,7 @@ export type BgmId =
   | 'neighbor'
   | 'bureau'
   | 'prologue'
+  | 'departure'
   | 'battle'
   | 'bossBattle';
 
@@ -67,7 +69,7 @@ interface BgmEntry {
 
 export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   // タイトル：異世界へようこそ / 蒲鉾さちこ（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供）。
-  // 前のタイトル曲（Bon Voyage! / HarumachiMusic・gain 0.68）は bgm_departure.mp3 に残した（主人公を選ぶ場面の候補。まだ鳴らさない）
+  // 前のタイトル曲（Bon Voyage! / HarumachiMusic）は bgm_departure.mp3（下の departure。主人公の選択・名前の画面）
   title: { src: titleMp3, gain: 1.2 },
   // 街・部屋：放浪者の街 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   town: { src: townMp3, gain: 0.39 },
@@ -110,6 +112,8 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   bureau: { src: bureauMp3, gain: 0.51 },
   // プロローグ（1回だけ。約12秒）：Shy Love / チョコミント（OpenTracks〔旧 DOVA-SYNDROME〕。2026-10-30 ユーザー提供・指示書 M）
   prologue: { src: prologueMp3, gain: 0.77, loop: false },
+  // 主人公の選択・名前（プロローグのあと）：Bon Voyage! / HarumachiMusic（Pixabay。前のタイトル曲。2026-10-30 指示書 O2 ユーザー決定）
+  departure: { src: departureMp3, gain: 0.68 },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）

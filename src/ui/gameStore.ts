@@ -29,6 +29,11 @@ export interface BattleRequest {
   readonly backgroundVivid?: boolean;
   /** 対戦後に1回だけ呼ばれる（summary：残ったモンスター・与えたダメージ。対戦が始まる前に終わったときは無い） */
   readonly onFinish: (winner: BattleWinner, summary?: BattleSummary) => void;
+  /**
+   * 勝ち負けが決まって結果の窓が出たときに1回だけ呼ばれる（「続ける」を押す前。2026-10-30 指示書 O3：
+   * 試験の合格は、結果の窓が出た時点で記録する。アプリを閉じても試験をやり直さない）
+   */
+  readonly onDecided?: (winner: BattleWinner) => void;
   /** 借りるデッキ（試験で先生が貸すデッキ。無ければ自分のデッキ。所持カードには入れない） */
   readonly playerDeck?: Deck;
   /** 相手のデッキ（無ければ opponent のモンスターから組む。確認用の画面：プカリムの試遊で、元の箱のデッキと戦うとき） */

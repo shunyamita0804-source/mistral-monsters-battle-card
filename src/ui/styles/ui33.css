@@ -332,7 +332,13 @@
   top: 33%;
   display: flex;
   justify-content: center;
+  align-items: flex-end;
   gap: 22px;
+}
+
+/* 4枚以上（景品の技カードもあるとき）：すき間を詰めて1列に（2026-10-30 指示書 O3） */
+.world__clear-altar:has(> :nth-child(4)) {
+  gap: 8px;
 }
 
 .world__clear-card {

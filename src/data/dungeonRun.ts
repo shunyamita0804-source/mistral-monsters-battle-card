@@ -162,12 +162,15 @@ const LOCAL_BATTLERS: Readonly<Record<string, { readonly face: string; readonly 
 
 /**
  * バトラーの顔のキー（地図の上の姿と対戦の顔をそろえる。src/ui/components/opponentFace.ts）。
- * 新しいダンジョンは、階の中の番号（1〜3）が奇数ならそのダンジョンの人、偶数なら今の3人のうちの1人
+ * 新しいダンジョンは、階の中の番号 1 がそのダンジョンの人、2 が今の3人のうちの1人（guest）、3 は今の3人のうちの別の1人。
+ * 2026-10-30 指示書 O3：前は 1 と 3 が同じ人（同じひと言）で、1つの階に同じ名前のバトラーが2人いた。1つの階では同じ人を出さない
  */
 export function runBattlerFace(index: number, dungeonId?: string): string {
   const local = LOCAL_BATTLERS[dungeonId ?? ''];
   if (!local) return `battler-${runBattlerLook(index)}`;
-  return index % 2 === 1 ? local.face : `battler-${local.guest}`;
+  if (index === 1) return local.face;
+  // 2 → guest、3 → guest のつぎの人、4 → そのつぎ …（1〜3 をくり返す）
+  return `battler-${((((local.guest - 1 + (index - 2)) % 3) + 3) % 3) + 1}`;
 }
 
 /** 【仮】通常のバトラー（話しかけると対戦）。編成はダンジョンごとの仮の編成。顔ぶれは runBattlerFace */

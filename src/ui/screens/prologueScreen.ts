@@ -14,6 +14,7 @@ import morningArt from '@assets/images/backgrounds/prologue_02_morning.webp';
  * - 文字は絵の上の約3分の1（空の所）に白い字＋やわらかい影。2つのかたまりを少し間をあけてフェードで出す
  * - 1枚あたり約6秒で次へ。タップで次へ（文字が出きっていないときは先に文字を全部出す）。右上に「スキップ」
  * - 曲は bgm_prologue（Shy Love。約12秒・ループしない）を1枚目と同時に1回だけ。早く進めた・スキップしたときは短く消して次へ
+ *   （主人公の選択・名前の画面は Bon Voyage!〔departure〕。2026-10-30 指示書 O2）
  */
 const SLIDES: readonly { readonly art: string; readonly lines: readonly [MessageKey, MessageKey] }[] = [
   { art: plazaArt, lines: ['prologue.1a', 'prologue.1b'] },
@@ -51,13 +52,10 @@ export const prologueScreen: ScreenDefinition = {
     const finish = once((): void => {
       leaving = true;
       clearTimers();
-      // 曲は短く消して、主人公を選ぶ画面へ（その画面の曲はプロローグの前と同じタイトルの曲。まだ決まっていない）
+      // 曲は短く消して、主人公を選ぶ画面へ（その画面で Bon Voyage! が始まる。2026-10-30 指示書 O2。newGameScreen.ts）
       bgm.play(null);
       element.classList.add('is-leaving');
-      later(() => {
-        bgm.play('title');
-        ctx.reset('newGame');
-      }, LEAVE_MS);
+      later(() => ctx.reset('newGame'), LEAVE_MS);
     });
 
     const lineEls = (i: number): HTMLElement[] => [...(slides[i]?.querySelectorAll<HTMLElement>('.prologue__line') ?? [])];

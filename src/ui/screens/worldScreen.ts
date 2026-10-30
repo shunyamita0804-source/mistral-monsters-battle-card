@@ -302,11 +302,11 @@ const DUNGEON_BATTLE_BG: Readonly<Record<string, string>> = {
 /** ダンジョンごとの BGM（2026-10-26 ユーザー提供）。無いダンジョンは 'dungeon' */
 const DUNGEON_BGM: Readonly<Record<string, BgmId>> = { 'dungeon-01': 'dungeonRuins', 'dungeon-02': 'dungeonForest' };
 /** 建物の中の BGM（2026-10-26 ユーザー提供）。無い部屋は街と同じ */
-/** 場所の名前の札に入りきらない長さか（全角は1、半角は0.55 と数えて 8.5 より長い） */
+/** 場所の名前の札に入りきらない長さか（全角は1、半角は0.55 と数えて 7.5 より長い。2026-10-30：英語の Tournament Hall も切れていた） */
 function placeNameIsLong(name: string): boolean {
   let n = 0;
   for (const ch of name) n += ch.charCodeAt(0) < 0x2000 ? 0.55 : 1;
-  return n > 8.5;
+  return n > 7.5;
 }
 
 const ROOM_BGM: Readonly<Record<string, BgmId>> = {
@@ -317,6 +317,8 @@ const ROOM_BGM: Readonly<Record<string, BgmId>> = {
   neighbor: 'neighbor',
   // カードバトラー管理局（2026-10-30。前は街の曲）
   bureau: 'bureau',
+  // 大会会場の中（2026-10-30 指示書 O3。前は街の曲）：受付の画面と同じ「スタンバイフェイズ」。街の曲は会場の外だけ
+  hall: 'tournament',
   // 花屋・仕立て屋（2026-10-29 新しい部屋）は民家と同じ
   florist: 'house',
   'house-b': 'house',
@@ -906,7 +908,17 @@ export class WorldView {
   };
 
   #blocked = (x: number, y: number): boolean =>
-    isBlocked(this.#map, x, y, this.#isVisible) || (this.#map.art !== undefined && isNearNpc(this.#map, x, y, this.#isVisible, NPC_SPACE));
+    isBlocked(this.#map, x, y, this.#isVisible) || (this.#map.art !== undefined && isNearNpc(this.#map, x, y, this.#isVisible, NPC_SPACE)) || this.#behindTeacher(x, y);
+
+  /**
+   * 練習場の先生のすぐうしろ（上）のマス（2026-10-30 指示書 O3：練習テーブルの左はしで、先生の体が主人公の足に重なっていた）。
+   * 先生の体に隠れる所なので入れない（よこ2マス・上4マス）
+   */
+  #behindTeacher(x: number, y: number): boolean {
+    if (this.#map.id !== 'practice') return false;
+    const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
+    return !!teacher && Math.abs(x - teacher.x) <= 2 && y < teacher.y && y >= teacher.y - 4;
+  }
 
   /** 話せる範囲にいる人（正式な絵の街・部屋。いちばん近い人・同じ近さなら向いている方） */
   #nearNpc(from: Point = this.#tile): NpcObject | null {
@@ -2063,7 +2075,11 @@ export class WorldView {
       case 'worldBriefing':
         if (mapId === 'bureau' && v.state === 'packClaimed') return () => this.#walkOut('bureau-exit');
         if (inTown) {
-          this.#follower = this.#makeFollower(this.#sideTile(FOLLOW_LEAD), 'left');
+          // 2026-10-30 指示書 O3：管理局の扉の前では、ミレイユの立つ所が主人公のすぐとなりしかなく、主人公を隠していた。
+          // 主人公を扉の前から道へ少し下ろし（下へ3マス。通れなければ2マス）、ミレイユは4マス横に（重ならない近さ）
+          const down = this.#freeLine(DIR_DELTA.down, 3) ?? this.#freeLine(DIR_DELTA.down, 2);
+          if (down) this.#placeAt(down, 'down');
+          this.#follower = this.#makeFollower(this.#sideTile(FOLLOW_LEAD + 1), 'left');
           this.#faceFollower();
           return () =>
             this.#playScene('v2Briefing', () => {
@@ -2177,12 +2193,21 @@ export class WorldView {
     this.#escortTo(warpId, false);
   }
 
-  /** 教習所の先生の前のマス（話せる近さで、入口からいちばん近い所）まで */
+  /**
+   * 教習所の先生の前のマス（話せる近さで、入口からいちばん近い所）まで。
+   * 2026-10-30 指示書 O3：先生の真下（2マス手前）に立つと主人公の体が先生に重なっていたので、先生の左ななめ前（よこ3マス）を先に探す
+   * （右どなりにはミレイユが立つ）
+   */
   #teacherFrontPath(): Point[] | null {
     const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
     if (!teacher) return null;
+    const side = (x: number, y: number): boolean => x === teacher.x - NPC_TALK_RANGE.x && y > teacher.y - 1 && inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE);
     const near = (x: number, y: number): boolean => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE) && x === teacher.x;
-    return findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ?? findPathWhere(this.#map, this.#tile, (x, y) => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE), this.#blocked, 40000, STEPS_4);
+    return (
+      findPathWhere(this.#map, this.#tile, side, this.#blocked, 40000, STEPS_4) ??
+      findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ??
+      findPathWhere(this.#map, this.#tile, (x, y) => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE), this.#blocked, 40000, STEPS_4)
+    );
   }
 
   #walkToTeacher(done: () => void): void {
@@ -2239,11 +2264,15 @@ export class WorldView {
 
   /** 主人公の横 n マスの歩けるマス（幼馴染を立たせる。無ければもっと近く） */
   #sideTile(n: number): Point {
-    for (let k = n; k >= 1; k -= 1) {
-      for (const d of [DIR_DELTA.right, DIR_DELTA.left, DIR_DELTA.down, DIR_DELTA.up]) {
-        const p = this.#freeLine(d, k);
-        if (p) return p;
-      }
+    // 2026-10-30 指示書 O3：幼馴染が主人公の前（下）に立つと主人公を隠していた（管理局のあとの「ひと区切り」）。
+    // よこ（2マス以上離れた所）を先に探し、たてなら主人公のうしろ（上）を前（下）より先に。1マスとなりは最後
+    const order: [Point, number][] = [];
+    for (let k = n; k >= 2; k -= 1) order.push([DIR_DELTA.right, k], [DIR_DELTA.left, k]);
+    for (let k = n; k >= 2; k -= 1) order.push([DIR_DELTA.up, k], [DIR_DELTA.down, k]);
+    order.push([DIR_DELTA.right, 1], [DIR_DELTA.left, 1], [DIR_DELTA.up, 1], [DIR_DELTA.down, 1]);
+    for (const [d, k] of order) {
+      const p = this.#freeLine(d, k);
+      if (p) return p;
     }
     return { ...this.#tile };
   }
@@ -2267,6 +2296,10 @@ export class WorldView {
       eventBattleId: 'introV2-exam',
       // 2026-10-28：先生が貸すデッキ（「旅立ちのきらめき」と同じ中身）。試験のあいだだけ使い、所持カードには入れない
       playerDeck: examLoanDeck(),
+      // 勝ったら、結果の窓が出た時点で合格を記録する（「続ける」の前にアプリを閉じても、次は試験のあとから。2026-10-30 指示書 O3）
+      onDecided: (winner) => {
+        if (winner === 'player') store.update((s) => finishExam(s, true));
+      },
       onFinish: (winner) => {
         store.update((s) => finishExam(s, winner === 'player'));
         store.introV2Result = winner === 'player' ? 'won' : 'lost';
@@ -2732,13 +2765,15 @@ export class WorldView {
    * （2枚なら左右、1枚なら真ん中）。初めてのクリアは、ボスのカードに「初回クリア」の封蝋を付ける。お知らせを閉じると消す
    */
   #clearScene(clear: { readonly cards: readonly string[]; readonly firstClear: boolean }): HTMLElement {
+    // 3枚より多いとき（景品の技カードもあるとき）は、小さくして1列に全部並べる（2026-10-30 指示書 O3）
+    const size = clear.cards.length > 3 ? 64 : clear.cards.length > 2 ? 88 : 104;
     const cards = clear.cards.map((id, i) => {
       const def = cardCatalog.get(id);
       return def
         ? h(
             'div',
             { class: 'world__clear-card' },
-            createCardView(def, 104, false),
+            createCardView(def, size, false),
             clear.firstClear && i === 0 && clear.cards.length > 1 ? h('img', { class: 'world__clear-seal', attrs: { src: firstClearSealArt, alt: '', draggable: 'false' } }) : null,
           )
         : null;

@@ -28,6 +28,9 @@ export function mountStage(root: HTMLElement, options: { readonly qa?: boolean }
     stage.style.width = `${layout.width}px`;
     stage.style.height = `${layout.height}px`;
     stage.style.transform = `translate(${layout.offsetX}px, ${layout.offsetY}px) scale(${layout.scale})`;
+    // 画面が縮んでいる（375×667 など）ときの、押す所の大きさの割り増し（実際の大きさで 44px 以上にする。tapSize.css。2026-10-30 指示書 O3）
+    stage.style.setProperty('--tap-inv', String(Math.max(1, 1 / layout.scale)));
+    stage.toggleAttribute('data-small', layout.scale < 0.98);
     if (diag) {
       const app = root.getBoundingClientRect();
       const vv = window.visualViewport;

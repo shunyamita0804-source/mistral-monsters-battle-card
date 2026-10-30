@@ -6,7 +6,7 @@ import { ITEM_RULES, type ItemId } from '../../data/items.ts';
 import { addItem, canAddItem, consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
-import { generateFloor, isWalkableTile, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
+import { generateFloor, isWalkableTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 
 /**
  * ランダム生成のダンジョンの挑戦（2026-10-26 試作。GB 版のダンジョンを参考に）。DOM に依存しない純粋関数。
@@ -124,6 +124,43 @@ export function facingPoint(run: DungeonRun): Point {
   return { x: run.x + d.x, y: run.y + d.y };
 }
 
+/**
+ * ボスのすぐ前（上下左右のとなり）のマスか（2026-10-30 指示書 O3：ボスの印〔森の木・門など〕は大きく、すぐ前に立つと主人公に重なる。
+ * ボスのとなりのマスには入れず、1マス手前から話しかける）
+ */
+function nextToBoss(run: DungeonRun, f: DungeonFloor, x: number, y: number): boolean {
+  return activeEntities(run, f).some((e) => e.kind === 'boss' && Math.abs(e.x - x) + Math.abs(e.y - y) === 1 && bossFromAfar(f, e));
+}
+
+const bossFromAfarCache = new WeakMap<DungeonFloor, boolean>();
+
+/**
+ * その階で、ボスに1マス手前（まっすぐ2マス先）から話しかけられるか：ボスのとなりのマスに入らずに、まっすぐ2マス先のマスまで行けて、
+ * あいだのマスが壁でない。行けない形の階（曲がり角のすぐ先にボスがいる など）では、今までどおりボスのとなりから話しかける（進めなくならないように）
+ */
+function bossFromAfar(f: DungeonFloor, boss: FloorEntity): boolean {
+  const hit = bossFromAfarCache.get(f);
+  if (hit !== undefined) return hit;
+  const others = f.entities.filter((e) => e.kind !== 'guardian' && e.kind !== 'boss');
+  const blocked = (x: number, y: number): boolean =>
+    others.some((e) => e.x === x && e.y === y) || (x === boss.x && y === boss.y) || Math.abs(boss.x - x) + Math.abs(boss.y - y) === 1;
+  const seen = reachable(f.tiles, f.start, blocked);
+  const ok = Object.values(STEP).some((d) => isWalkableTile(f.tiles[boss.y + d.y]?.[boss.x + d.x]) && seen.has(`${boss.x + 2 * d.x},${boss.y + 2 * d.y}`));
+  bossFromAfarCache.set(f, ok);
+  return ok;
+}
+
+/** 調べる相手：向いている先のもの。何もなく、その先（2マス先）がボスなら、ボス（ボスの1マス手前から話しかける） */
+export function talkTarget(run: DungeonRun): FloorEntity | undefined {
+  const f = runFloor(run);
+  const p = facingPoint(run);
+  const here = entityAt(run, f, p.x, p.y);
+  if (here) return here;
+  const d = STEP[run.dir];
+  const far = entityAt(run, f, p.x + d.x, p.y + d.y);
+  return far?.kind === 'boss' && isWalkableTile(f.tiles[p.y]?.[p.x]) && bossFromAfar(f, far) ? far : undefined;
+}
+
 export interface MoveResult {
   readonly run: DungeonRun;
   /** 通ったマス（すべる床では2マス以上。進めなかったときは空） */
@@ -156,7 +193,7 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   const f = runFloor(run);
   const turned: DungeonRun = { ...run, dir };
   const d = STEP[dir];
-  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y), doorsOpen(run));
+  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y) || nextToBoss(run, f, x, y), doorsOpen(run));
   const end = path?.[path.length - 1];
   if (!path || !end) return { run: turned, path: [], moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
   let explored = run.explored;

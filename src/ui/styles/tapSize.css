@@ -45,3 +45,30 @@
   position: absolute;
   inset: -8px -4px;
 }
+
+/*
+ * 2026-10-30 指示書 O3：375×667 など小さい画面では、画面全体が約 0.8 倍に縮むので 44px のボタンが約 35px になっていた。
+ * 縮んでいるときだけ（stage.ts が .stage に data-small を付ける）、縮む分だけ高さを割り増して、実際の大きさで 44px 以上にする。
+ * 390×844 以上では何も変わらない。大きいボタン（btn--large）は、もとから 44px より大きいので変えない
+ */
+.stage[data-small] .btn:not(.btn--large),
+.stage[data-small] .card-grid__tab,
+.stage[data-small] .deck__tab,
+.stage[data-small] .gacha-select__rates,
+.stage[data-small] .world__hud-btn,
+.stage[data-small] .battle__top-btn,
+.stage[data-small] .screen-header__back,
+.stage[data-small] .deck__item-name,
+.stage[data-small] .deck__status,
+.stage[data-small] input[type='range'] {
+  min-height: calc(44px * var(--tap-inv, 1));
+}
+
+.stage[data-small] .deck__step {
+  min-width: calc(44px * var(--tap-inv, 1));
+  min-height: calc(44px * var(--tap-inv, 1));
+}
+
+.stage[data-small] .world__hud .world__hud-btn {
+  height: calc(44px * var(--tap-inv, 1));
+}

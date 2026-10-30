@@ -22,8 +22,8 @@ import {
   maxLossesOf,
   pressSwitch,
   escapeGuardian,
-  entityAt,
   facingPoint,
+  talkTarget,
   isLastFloor,
   loseRunBattle,
   move,
@@ -521,8 +521,10 @@ class DungeonRunView {
       const el = this.#entityEls.get(e.id);
       if (!el) continue;
       const seen = run.explored[e.y * f.width + e.x] === '1';
-      el.hidden = !seen || !active.has(e.id);
-      el.classList.toggle('is-lit', Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r);
+      // ボスは2マス以内なら見えて明るい（2026-10-30 指示書 O3：ボスには1マス手前から話しかけるので、見える範囲が1マスのダンジョンでも見えるように）
+      const nearBoss = e.kind === 'boss' && Math.max(Math.abs(e.x - run.x), Math.abs(e.y - run.y)) <= 2;
+      el.hidden = !(seen || nearBoss) || !active.has(e.id);
+      el.classList.toggle('is-lit', nearBoss || (Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r));
       el.classList.toggle('is-open', (e.kind === 'chest' && run.opened.includes(e.id)) || (e.kind === 'switch' && doorsOpen(run)));
     }
     // 扉：スイッチを押した階では開いている
@@ -559,8 +561,7 @@ class DungeonRunView {
     this.#refreshEffects(run);
     this.#drawMinimap();
     // 向いている先にバトラー・ボス・宝箱がある、または階段の上：「調べる」が金色に光る（街と同じ）
-    const p = facingPoint(run);
-    const ahead = entityAt(run, f, p.x, p.y);
+    const ahead = talkTarget(run);
     const onStairs = !!f.stairs && f.stairs.x === run.x && f.stairs.y === run.y && !isLastFloor(run);
     this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian' && !(ahead.kind === 'switch' && doorsOpen(run))) || onStairs);
   }
@@ -712,8 +713,8 @@ class DungeonRunView {
     if (this.#busy || !this.#store.save.dungeonRun) return;
     const run = this.#run;
     const f = runFloor(run);
-    const p = facingPoint(run);
-    const target = entityAt(run, f, p.x, p.y);
+    // 向いている先のもの（ボスは1マス手前からも。run.ts の talkTarget）
+    const target = talkTarget(run);
     if (target?.kind === 'chest') return this.#openChest(target);
     if (target?.kind === 'switch') return this.#pressSwitch();
     if (target?.kind === 'npc' || target?.kind === 'boss') return this.#talk(target);
@@ -1045,7 +1046,8 @@ class DungeonRunView {
     sound.play('reward');
     if (r.returned) {
       // 帰還の羽根：挑戦を終えて街の入り口へ
-      this.#store.flashMessage = t('dungeonRun.featherDone', { n: gained });
+      // 0枚のときは「0枚を持ち帰った」の行を出さない（2026-10-30 指示書 O3）
+      this.#store.flashMessage = t('dungeonRun.featherDone') + (gained > 0 ? `\n${t('dungeonRun.featherKept', { n: gained })}` : '');
       this.#ctx.reset('world');
       return;
     }
@@ -1262,9 +1264,11 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
     store.flashRun = { ...(card ? { card } : {}), ...(kind === 'npc' ? { leave: id } : {}) };
     return;
   }
-  // クリアの報酬の場面（デザイン33点の 12・13。worldScreen.ts）：祭壇にボスのモンスターカード（初めてのクリアの景品にあれば）と、勝って手に入れた技カード
+  // クリアの報酬の場面（デザイン33点の 12・13。worldScreen.ts）：祭壇にボスのモンスターカード（初めてのクリアの景品にあれば）と、
+  // 景品の技カード、勝って手に入れた技カード。2026-10-30 指示書 O3：前はモンスターと勝って手に入れた1枚の2枚だけで、景品の技カードが出ていなかった
   const boss = r.clearCards.find((c) => cardCatalog.get(c.cardId)?.kind === 'monster')?.cardId;
-  store.flashClear = { cards: [boss, card].filter((c): c is string => !!c), firstClear: r.firstClear };
+  const prizeSkills = r.clearCards.filter((c) => c.cardId !== boss).map((c) => c.cardId);
+  store.flashClear = { cards: [boss, ...prizeSkills, card].filter((c): c is string => !!c), firstClear: r.firstClear };
   // 守り手のひと言（顔の絵と）：「最奥の祭壇へ」。お知らせの前に出す（worldScreen.ts）
   const after = personOfOpponent(opponent)?.lines?.after;
   if (kind === 'boss' && after) store.flashKeeper = { face: faceKeyOf(opponent), text: t('dungeonRun.keeperAfter', { name: opponentName(opponent), line: localText(after) }) };
@@ -1272,7 +1276,8 @@ function onRunWin(store: GameStore, kind: BattleTargetKind, id: string, opponent
   store.flashBanner = 'clear';
   store.flashMessage = `${got}\n${t(r.firstClear ? 'world.dungeonClearedFirst' : 'world.dungeonCleared', { coins })}`;
   if (r.clearCards.length > 0) {
-    const names = r.clearCards.map((c) => t('tournament.prizeCard', { name: cardName(c.cardId), n: c.count })).join(t('common.listSeparator'));
+    // 「シェルタックル／×1」のように名前と枚数のあいだで折れないよう、× の前に改行しない印（U+2060）を入れる
+    const names = r.clearCards.map((c) => t('tournament.prizeCard', { name: cardName(c.cardId), n: c.count }).replace('×', '\u2060×')).join(t('common.listSeparator'));
     store.flashMessage += `\n${t('world.bossCards', { cards: names })}`;
   }
 }
@@ -1285,7 +1290,7 @@ function onRunLoss(store: GameStore, kind: BattleTargetKind, id: string): void {
   store.flashMessage = r.charmSaved
     ? t('dungeonRun.charmSaved')
     : r.expelled
-      ? t('dungeonRun.expelled', { n: r.lostCards.length }) + (r.keptCard ? `\n${t('dungeonRun.expelledKept', { card: cardName(r.keptCard) })}` : '')
+      ? t('dungeonRun.expelled') + (r.lostCards.length > 0 ? `\n${t('dungeonRun.expelledLost', { n: r.lostCards.length })}` : '') + (r.keptCard ? `\n${t('dungeonRun.expelledKept', { card: cardName(r.keptCard) })}` : '')
       : t('dungeonRun.lose', { n: r.lossesLeft });
   // 3回負けて入り口へ戻されたときの帯（2026-10-27 デザイン第13弾）
   if (r.expelled) store.flashBanner = 'retreat';

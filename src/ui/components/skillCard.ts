@@ -291,7 +291,8 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
   const showName = size === 'normal' && options.width >= 70;
   const showText = options.showText ?? (size === 'normal' && options.width >= 120);
   const frame = frameUrl(size, f.monsterId);
-  const name = showName && l.name ? fitText(place(h('div', { class: 'skill-card__title', text: f.name }), l, l.name), f.name, 7.6, 9, 4) : null;
+  // 2026-10-30 指示書 O3：9文字の技の名前（フェイントステップ など）が約2px 切れていたので、8.4文字ぶんより長い名前から字を小さくする（前は 9）
+  const name = showName && l.name ? fitText(place(h('div', { class: 'skill-card__title', text: f.name }), l, l.name), f.name, 7.6, 8.4, 4) : null;
   const band =
     showText && l.band && f.text !== ''
       ? place(h('div', { class: 'skill-card__band' }, fitBandText(l, l.band, f.text)), l, l.band)

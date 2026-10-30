@@ -183,6 +183,17 @@ STONE_MID = 515                # 絵の北の塔の足元（約 392）と南の�
 STONE_FOOT_N = 392             # 絵の北の塔の足元（px）
 # 4本の塔（街灯も。絵の px。左・上・右・下。下＝塔の足元）
 STONE_TOWERS = {'nw': (180, 0, 380, 392), 'ne': (636, 0, 836, 392), 'sw': (180, 630, 380, 1046), 'se': (636, 630, 836, 1046)}
+# 2026-10-30（指示書 O1。ユーザー決定）：大通りの石畳の上に柱と欄干が立っているだけで橋に見えなかったので、小川をまたぐ所（北の塔の足元〜南の塔の上）に
+#  - 床を少し明るく（STONE_DECK_LIGHT）し、両はしに継ぎ目の線
+#  - 欄干の内側に沿って、細い明るい石の縁の帯（縁石 edges_curb の石の所だけ。幅 STONE_EDGE）
+#  - 床の真ん中に、前の石の橋の絵（bridges.png）の床のひし形の紋（STONE_EMBLEM。主人公より小さく、少し透かして石畳になじませる）
+#  - 欄干の外の水の上に、橋の影（暗い帯。STONE_WATER_SHADOW）
+STONE_SOUTH_TOP = 640          # 絵の南の塔の上（px）
+STONE_DECK_LIGHT = 1.07
+STONE_EDGE = 30                # 縁の帯の幅（単位）
+STONE_EMBLEM = dict(quad=[(1080.7, 338.3), (1151.7, 383.3), (1080.7, 440.0), (1009.3, 383.3)], width=110, alpha=0.82)
+STONE_RAIL_OUT = (321, 693)    # 絵の欄干の外のはし（px）。影はこの外の水の上
+STONE_WATER_SHADOW = dict(width=100, alpha=0.78)
 # 木の橋（24）：2026-10-28 点検（ユーザー「斜めだから歩くと違和感」）。部品は上ほど右へずれた斜めの絵なので、
 # 下の端はそのままに上を左へずらしてまっすぐにする（WOOD_DESKEW＝高さ1あたりのずれ。シートの橋板の真ん中は上下で約155px ずれていた）。
 # 渡った先は主人公の家ととなりの家のあいだ。そこから南の道まで小道（STREETS の最後）でつなぐ（前は草地で行き止まりだった）
@@ -460,6 +471,67 @@ def _stone_span(im: Image.Image, axis: int) -> tuple[int, int]:
     stone = (a[..., 3] > 128) & ~(a[..., 1] > a[..., 0] + 15)
     idx = np.where(stone.mean(axis=axis) > 0.5)[0]
     return int(idx[0]), int(idx[-1]) + 1
+
+
+def stone_deck(base: Image.Image, water: Image.Image, y0: float) -> None:
+    """石の橋の、小川をまたぐ所（北の塔の足元〜南の塔の上）を橋に見せる（指示書 O1。上の STONE_* の説明）。欄干・塔はこのあとで上に描く"""
+    sb = BRIDGE_STONE['s']
+    cx = BRIDGE_STONE['cx']
+    x1, x2 = cx - 256, cx + 256
+    t1, t2 = y0 + STONE_FOOT_N * sb, y0 + STONE_SOUTH_TOP * sb
+    # 水の上の橋の影：欄干の外のはしから外へ、だんだんうすく（水の所だけ）
+    wm = np.array(water).astype(np.float32) / 255
+    a = np.array(base).astype(np.float32)
+    rows = slice(P(t1 - 30), P(t2 + 30))
+    sw = STONE_WATER_SHADOW['width']
+    for edge, sign in ((cx - 256 - (STONE_DECK_X[0] - STONE_RAIL_OUT[0]) * sb, -1), (cx + 256 + (STONE_RAIL_OUT[1] - STONE_DECK_X[1]) * sb, 1)):
+        for px in range(P(sw)):
+            x = P(edge) + sign * px
+            k = STONE_WATER_SHADOW['alpha'] * (1 - px / P(sw)) ** 1.5
+            m = (k * wm[rows, x])[:, None]
+            a[rows, x, :3] = a[rows, x, :3] * (1 - m) + np.array([4, 14, 28], np.float32) * m
+    # 床を少し明るく（橋の上だけ）
+    ry, rx = slice(P(t1), P(t2)), slice(P(x1), P(x2))
+    a[ry, rx, :3] = np.clip(a[ry, rx, :3] * STONE_DECK_LIGHT, 0, 255)
+    out = Image.fromarray(a.astype(np.uint8))
+    d = ImageDraw.Draw(out, 'RGBA')
+    # 両はしの継ぎ目の線（暗い線＋すぐ下に明るい線）
+    for y in (t1, t2):
+        d.rectangle([P(x1), P(y) - 2, P(x2), P(y) - 1], fill=(70, 52, 34, 150))
+        d.rectangle([P(x1), P(y), P(x2), P(y)], fill=(255, 244, 220, 120))
+    base.paste(out)
+    # 欄干の内側に沿った、細い明るい石の縁の帯（縁石の石の所だけを縦に並べる）
+    vsrc = cut('edges_curb', (40, 270, 200, 950))
+    v0, v1 = _stone_span(vsrc, 0)
+    band = vsrc.crop((v0, 0, v1, vsrc.height))
+    band = resize(band, STONE_EDGE * K / band.width)
+    # 縁石の絵の草の色が少し残るので、明るさはそのままに石の色（あたたかい白）へ寄せる
+    ba = np.array(band).astype(np.float32)
+    lum = ba[..., :3].mean(-1, keepdims=True)
+    ba[..., :3] = np.clip(lum * np.array([1.16, 1.1, 1.0]), 0, 255)
+    band = Image.fromarray(ba.astype(np.uint8))
+    # 帯の内がわ（床の側）に細い影の線をつけて、床と分ける
+    bd = ImageDraw.Draw(band, 'RGBA')
+    bd.rectangle([band.width - 2, 0, band.width - 1, band.height], fill=(80, 60, 40, 130))
+    for bx in (x1, x2 - STONE_EDGE):
+        piece = band if bx == x1 else band.transpose(Image.FLIP_LEFT_RIGHT)
+        y = P(t1)
+        while y < P(t2):
+            base.alpha_composite(piece.crop((0, 0, piece.width, min(piece.height, P(t2) - y))), (P(bx), y))
+            y += piece.height - P(2)
+    # 床の真ん中のひし形の紋（前の石の橋の絵の床から切り出す。描き直さない）
+    sheet_im = sheet('bridges')
+    quad = STONE_EMBLEM['quad']
+    bx1, by1 = int(min(p[0] for p in quad)), int(min(p[1] for p in quad))
+    bx2, by2 = int(max(p[0] for p in quad)) + 1, int(max(p[1] for p in quad)) + 1
+    m = Image.new('L', sheet_im.size, 0)
+    ImageDraw.Draw(m).polygon(quad, fill=round(255 * STONE_EMBLEM['alpha']))
+    em = sheet_im.copy()
+    em.putalpha(Image.fromarray(np.minimum(np.array(m), np.array(sheet_im.getchannel('A')))))
+    em = em.crop((bx1, by1, bx2, by2))
+    em = resize(em, STONE_EMBLEM['width'] * K / em.width)
+    my = (t1 + t2) / 2
+    base.alpha_composite(em, (P(cx) - em.width // 2, P(my) - em.height // 2))
 
 
 def draw_curbs(base: Image.Image, rects, extra_paved) -> None:
@@ -801,6 +873,7 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     t.block |= sblock
     # 石の橋の下の道（小川の上に塗る。左右は橋の柱で隠れる）
     base.paste(st_img, (0, 0), gap_mask)
+    stone_deck(base, sm, stone_y0)
 
     # ── 石の橋（19）・木の橋（24） ──
     # 石の橋：左右の半分を、床（道）の左右のはしに欄干の内側の線が来るように置く。床は上で道として塗ってある

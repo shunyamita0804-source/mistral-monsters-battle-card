@@ -39,9 +39,14 @@ export const DUNGEON_RUN_MESSAGES = {
     ja: '負けてしまった…\nあと{n}回負けると、街の入り口へ戻されます。',
     en: 'You lost...\n{n} more losses and you will be sent back to town.',
   },
+  // 2026-10-30 指示書 O3：0枚のときは「技カード0枚を失った」の行を出さない（行を分けた。dungeonRunScreen.ts）
   'dungeonRun.expelled': {
-    ja: '負けてしまった…\n力尽きて、街の入り口へ戻された。\nこの挑戦で手に入れた技カード{n}枚を失った。',
-    en: 'You lost...\nExhausted, you were sent back to the town entrance.\nYou lost the {n} skill cards you got on this run.',
+    ja: '負けてしまった…\n力尽きて、街の入り口へ戻された。',
+    en: 'You lost...\nExhausted, you were sent back to the town entrance.',
+  },
+  'dungeonRun.expelledLost': {
+    ja: 'この挑戦で手に入れた技カード{n}枚を失った。',
+    en: 'You lost the {n} skill cards you got on this run.',
   },
   'dungeonRun.menuTitle': { ja: 'メニュー（仮）', en: 'Menu (Temp)' },
   'dungeonRun.menuLosses': { ja: '負けた回数：{n}／{max}（{max}回負けると街へ戻されます）', en: 'Losses: {n}/{max} (at {max} you go back to town)' },
@@ -70,7 +75,8 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.sealTitle': { ja: '小箱で守るカード', en: 'Card to Keep' },
   'dungeonRun.sealChoose': { ja: '守る技カードを1枚選んでください。', en: 'Choose one skill card to keep.' },
   'dungeonRun.featherBody': { ja: 'この挑戦はここで終わります。\n手に入れた技カードはすべて持ち帰れます。', en: 'This run ends here.\nYou keep all the skill cards you got.' },
-  'dungeonRun.featherDone': { ja: '帰還の羽根で、街の入り口へ帰ってきた。\n手に入れた技カード{n}枚を持ち帰った。', en: 'The feather took you back to town.\nYou brought back {n} skill cards.' },
+  'dungeonRun.featherDone': { ja: '帰還の羽根で、街の入り口へ帰ってきた。', en: 'The feather took you back to town.' },
+  'dungeonRun.featherKept': { ja: '手に入れた技カード{n}枚を持ち帰った。', en: 'You brought back {n} skill cards.' },
   'dungeonRun.guardianFight': { ja: '戦う', en: 'Fight' },
   'dungeonRun.guardianSmoke': { ja: '煙玉を使う（残り{n}個）', en: 'Smoke Ball ({n} left)' },
   'dungeonRun.smokeEscaped': { ja: '煙玉を投げて、うまく逃げた！', en: 'You threw a smoke ball and got away!' },
