@@ -6,10 +6,11 @@ import { FLUNE_SKILLS, fluneSkillId } from '../src/data/flune.ts';
 import { EXAM_OPPONENT } from '../src/data/introV2.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { TOURNAMENTS } from '../src/data/tournaments.ts';
+import { CPU_LINES, CPU_LINES_BY_OPPONENT, cpuLineChoices, pickCpuLine } from '../src/data/cpuLines.ts';
 import { chooseAction, CPU_SKILL, cpuRoll } from '../src/game/battle/ai.ts';
 import { applyAction, cardUsability, createBattle, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { skillValue } from '../src/game/cards/cardTypes.ts';
-import { setLanguage } from '../src/i18n/i18n.ts';
+import { setLanguage, t } from '../src/i18n/i18n.ts';
 
 /**
  * CPU の腕前（C 下手・B ふつう・A 上手。2026-10-30 指示書 Z）・フルーネの新しい数字・旅の手帳の CPU の使い方
@@ -91,7 +92,7 @@ describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
     expect([...targets].sort()).toEqual(['o-m1', 'o-m2', 'o-m3']);
   });
 
-  it('C：攻撃できる手番の約15%で攻撃を見送り、記録に「〇〇は迷っている…」。B・A は見送らない', () => {
+  it('C：攻撃できる手番の約15%で攻撃を見送る（2026-10-31 指示書 AB から記録には書かない。セリフは画面のふきだし）。B・A は見送らない', () => {
     setLanguage('ja');
     let hesitate = 0;
     let text = '';
@@ -102,17 +103,18 @@ describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
       if (a?.type === 'endAttack') {
         expect(a.note).toBe('hesitate');
         hesitate++;
-        text = applyAction(s, a).log.at(-2)?.text ?? '';
+        text = applyAction(s, a).log.map((l) => l.text).join('\n');
       }
       expect(chooseAction(s, 'player', 'normal', 'B')?.type).toBe('useCard');
       expect(chooseAction(s, 'player', 'normal', 'A')?.type).toBe('useCard');
     }
     expect(hesitate / n).toBeGreaterThan(0.08);
     expect(hesitate / n).toBeLessThan(0.22);
-    expect(text).toBe('Pは迷っている…');
+    expect(text).not.toContain('迷っている');
+    expect(text).toContain('マナ化');
   });
 
-  it('C：守れるのに約4割で守らず、記録に「〇〇は守りそこねた！」。B・A は守る', () => {
+  it('C：守れるのに約4割で守らない（記録はふつうの「守らなかった」。セリフは画面のふきだし）。B・A は守る', () => {
     setLanguage('ja');
     let missed = 0;
     let text = '';
@@ -127,12 +129,13 @@ describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
       if (c?.type === 'defend' && c.cardUid === null) {
         expect(c.note).toBe('misguard');
         missed++;
-        text = applyAction(s, c).log.find((l) => l.text.includes('守りそこねた'))?.text ?? '';
+        text = applyAction(s, c).log.map((l) => l.text).join('\n');
       }
     }
     expect(missed / n).toBeGreaterThan(0.3);
     expect(missed / n).toBeLessThan(0.5);
-    expect(text).toBe('Oは守りそこねた！');
+    expect(text).not.toContain('守りそこね');
+    expect(text).toContain(t('battle.log.noDefense', { side: '相手' }));
   });
 
   it('構えは腕前より優先：aggressive は A でも倒されそうなときしか守らない・守りを残さない', () => {
@@ -224,5 +227,43 @@ describe('腕前の割り当て（2026-10-30 指示書 Z・ユーザー OK の�
     const boss = (id: string): string | undefined => runBossOpponent(id).skill;
     expect(['dungeon-02', 'dungeon-03', 'dungeon-08'].map(boss)).toEqual(['B', 'B', 'B']);
     expect(['dungeon-01', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'].map(boss)).toEqual(['A', 'A', 'A', 'A', 'A']);
+  });
+});
+
+describe('CPU のセリフ（2026-10-31 指示書 AB【2】。src/data/cpuLines.ts）', () => {
+  it('構え6つすべてに、迷う・守りそこねるのセリフ（日本語・英語）がある。表の文は指示書のとおり', () => {
+    const styles = ['normal', 'aggressive', 'guard', 'flashy', 'hunter', 'disrupt'] as const;
+    for (const style of styles) {
+      for (const kind of ['hesitate', 'misguard'] as const) {
+        const lines = CPU_LINES[style][kind];
+        expect(lines.length, `${style} ${kind}`).toBeGreaterThan(0);
+        for (const l of lines) {
+          expect(l.ja.length).toBeGreaterThan(0);
+          expect(l.en.length).toBeGreaterThan(0);
+        }
+      }
+    }
+    expect(CPU_LINES.normal.hesitate.map((l) => l.ja)).toEqual(['うーん、これかなぁ……いや、やめとこ', 'どれを出せばいいんだろう……']);
+    expect(CPU_LINES.normal.misguard.map((l) => l.ja)).toEqual(['あっ、しまった！', 'わわっ、間に合わなかった……']);
+    expect(CPU_LINES.aggressive.hesitate.map((l) => l.ja)).toEqual(['チッ、いい手がねえ！', '……次でまとめてぶっとばす！']);
+    expect(CPU_LINES.aggressive.misguard.map((l) => l.ja)).toEqual(['守りなんて性に合わねえんだよ！']);
+    expect(CPU_LINES.guard.hesitate[0]?.ja).toBe('まだ動くときではありませんね');
+    expect(CPU_LINES.guard.misguard[0]?.ja).toBe('くっ……読み違えました');
+    expect(CPU_LINES.flashy.hesitate[0]?.ja).toBe('もっと派手な一撃のために、今は我慢！');
+    expect(CPU_LINES.flashy.misguard[0]?.ja).toBe('きゃっ、よそ見してたわ！');
+    expect(CPU_LINES.hunter.hesitate[0]?.ja).toBe('……狙いが定まらない');
+    expect(CPU_LINES.hunter.misguard[0]?.ja).toBe('……油断した');
+    expect(CPU_LINES.disrupt.hesitate[0]?.ja).toBe('ふふ、今は待つのが正解さ');
+    expect(CPU_LINES.disrupt.misguard[0]?.ja).toBe('おっと、計算外だね');
+  });
+
+  it('2つあるものは roll でどちらか。構えの無い相手は normal。人物ごとの上書きがあればそちら', () => {
+    const opp = { id: 'x' };
+    expect(pickCpuLine(opp, 'hesitate', 0).ja).toBe('うーん、これかなぁ……いや、やめとこ');
+    expect(pickCpuLine(opp, 'hesitate', 0.99).ja).toBe('どれを出せばいいんだろう……');
+    expect(pickCpuLine({ id: 'x', ai: 'hunter' }, 'misguard', 0.7).ja).toBe('……油断した');
+    expect(cpuLineChoices({ id: 'x', ai: 'guard' }, 'hesitate')).toBe(CPU_LINES.guard.hesitate);
+    // いまは人物ごとの上書きは無い（常連・ボスも構えのセリフ）
+    expect(Object.keys(CPU_LINES_BY_OPPONENT)).toEqual([]);
   });
 });

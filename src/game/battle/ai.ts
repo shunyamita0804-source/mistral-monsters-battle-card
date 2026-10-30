@@ -46,9 +46,9 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  * 腕前 skill（2026-10-30 指示書 Z。C 下手・B ふつう・A 上手。構えとは別。数字は CPU_SKILL にまとめた仮の値）：
  * - 倒せる相手がいるとき：C は 50%・B は 20% で見のがす。A は必ず倒し、倒せる技のうち倒しすぎない（ダメージがむだにならない）技を選ぶ
  * - 倒せないときの狙い：C・B はばらばら（対戦の seed から決まる）。A はいちばん危ない相手（技の最大ダメージ ÷ 残りライフ が大きい相手）
- * - 攻撃するか：C は攻撃できる手番の 15% で攻撃を見送る（記録に「〇〇は迷っている…」）
+ * - 攻撃するか：C は攻撃できる手番の 15% で攻撃を見送る（2026-10-31 指示書 AB から、相手の構えのセリフをふきだしで。src/data/cpuLines.ts）
  * - 技の選び方：C は 30% で強くない技（使える技からばらばら）。A は倒せないとき、次の手番に大技を払えるようマナを残すことがある
- * - 守るか：C は守れるのに 40% で守らない（記録に「〇〇は守りそこねた！」）。B・A は 3ダメージ以上か倒されそうなとき回避（1〜2 には回避を使わない）・防御
+ * - 守るか：C は守れるのに 40% で守らない（セリフをふきだしで）。B・A は 3ダメージ以上か倒されそうなとき回避（1〜2 には回避を使わない）・防御
  * - マナ化で残す守りのカード：C 0枚（さらに 30% の手番で、残したい攻撃より先に守りをマナにする）・B 1枚・A 2枚
  *   （A は相手の場のモンスターの技の種類に合う守りを優先し、守りの分のマナも残す）
  * - 「ライフの少ない相手から狙う」はやめた（ユーザー指示 2026-10-30 23:11）
@@ -182,7 +182,7 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
-  // 腕前 C：攻撃できる手番の一部で、攻撃を見送る（その手番の最初の1手のときだけ決める。記録に「〇〇は迷っている…」）
+  // 腕前 C：攻撃できる手番の一部で、攻撃を見送る（その手番の最初の1手のときだけ決める。画面が相手のセリフをふきだしで出す）
   const firstMove = aliveMonsters(mine).every((m) => !m.acted) && Object.keys(mine.turnUsage).length === 0;
   const canAttack = options.some((o) => o.def.effect.type === 'attack') && enemies.length > 0;
   if (firstMove && canAttack && cpuRoll(state, side, 'hesitate', false) < CPU_SKILL[skill].hesitate) return { type: 'endAttack', side, note: 'hesitate' };
@@ -730,7 +730,7 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
  */
 function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction | null {
   const guard = chooseGuard(state, side, style);
-  // 腕前 C：守れるのに一部で守らない（その攻撃の最初の守りのときだけ決める。記録に「〇〇は守りそこねた！」）
+  // 腕前 C：守れるのに一部で守らない（その攻撃の最初の守りのときだけ決める。画面が相手のセリフをふきだしで出す）
   if (guard?.type === 'defend' && guard.cardUid !== null && state.pending?.responses.length === 0 && cpuRoll(state, side, 'misguard') < CPU_SKILL[skill].misguard) {
     return { type: 'defend', side, cardUid: null, note: 'misguard' };
   }

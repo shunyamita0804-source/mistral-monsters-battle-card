@@ -113,3 +113,9 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 
 - 祭壇（初回・前のセーブ）は `dungeon_people_shot.cjs URL フォルダ 出力 win`（フォルダに `boss_dungeon-05.json`。前のセーブは version 30・炎の火山クリア済み）
 - ガチャは `gacha_shot.cjs URL セーブ 出力 390 844 名前 shishien`（パックの番号の代わりにシリーズの ID）
+
+## 2026-10-31 CPU のセリフ（指示書 AB【2】）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `cpu_lines_ab_shot.cjs` | 腕前 C の CPU が迷う・守りそこねるときのセリフ（顔とふきだし）と、そのあとの記録（説明文が出ない）。構えを書きかえて6つ撮る。開発用サーバー。LANG・STYLES・KINDS |

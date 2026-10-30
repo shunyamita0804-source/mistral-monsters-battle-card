@@ -1,6 +1,7 @@
 import { getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
 import { provisionalRuleNotes } from '../../data/rules.ts';
-import { chooseAction } from '../../game/battle/ai.ts';
+import { chooseAction, cpuRoll } from '../../game/battle/ai.ts';
+import { pickCpuLine } from '../../data/cpuLines.ts';
 import {
   actingSide,
   applyAction,
@@ -367,7 +368,11 @@ export const battleScreen: ScreenDefinition = {
       : {};
     const say = (key: Parameters<typeof t>[0]): void => {
       const own = ownLine[key];
-      oppLine = own ? localText(own) : t(key);
+      sayText(own ? localText(own) : t(key));
+    };
+    /** 相手のセリフ（文そのもの）をふきだしで出す。対戦の進み（手番・操作）は止めない */
+    const sayText = (text: string): void => {
+      oppLine = text;
       talkStart = Date.now();
       // 1文字ずつ出し終わってから TALK_MS 読めるように
       talkUntil = talkStart + [...oppLine].length * TALK_CHAR_MS + TALK_MS;
@@ -869,6 +874,9 @@ export const battleScreen: ScreenDefinition = {
         const s = actingSide(state);
         if (!s || (s === 'player' && !auto)) return;
         const action = chooseAction(state, s, s === 'opponent' ? req.opponent.ai : undefined, s === 'opponent' ? req.opponent.skill : undefined);
+        // 腕前 C の CPU が攻撃を見送った・守りそこねた：記録の文ではなく、相手のセリフをふきだしで（2026-10-31 指示書 AB【2】。src/data/cpuLines.ts）
+        const note = s === 'opponent' && action && 'note' in action ? action.note : undefined;
+        if (note) sayText(localText(pickCpuLine(req.opponent, note, cpuRoll(state, s, `line:${note}`))));
         if (action) dispatch(action);
       }, AI_STEP_MS + wait);
     };
