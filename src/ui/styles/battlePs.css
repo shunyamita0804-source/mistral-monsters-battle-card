@@ -1362,3 +1362,168 @@
   position: relative;
   z-index: 2;
 }
+
+/* ===== 2026-10-31 指示書 AB【3】：PS版のようにカメラが寄る画面（battleScreen.ts の layoutCamera） =====
+ * 上の帯と操作のボタンのあいだを1本の帯（.battle-board）にして、カメラ（.battle-camera）の中でずらす。
+ * 帯：相手の大きなカードの欄（.battle-opp-detail）→ 相手の手札（裏・自分と同じ大きさ）→ 相手3体 → 自分3体 → 説明の欄（左に小さな説明の箱・右に大きなカード）→ 自分の手札。
+ * 相手の番は上（相手の大きなカードと手札）、自分の番・守りの選択は下（説明の欄と手札。相手の手札は少しだけ）。0.3 秒でなめらかに。
+ * 欄の高さ（--opp-detail-h・--detail-h）とずらす量（--cam-shift）は画面の高さから JS が決める */
+.battle-camera {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.battle-camera__lens {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.battle-camera[data-focus='bottom'] .battle-camera__lens,
+.battle-camera[data-focus='none'] .battle-camera__lens {
+  transform: translateY(calc(var(--cam-shift, 0px) * -1));
+}
+
+.battle-camera .battle-board {
+  gap: 4px;
+  padding: 0 10px;
+}
+
+/* 相手の手札：前の「半分だけ上へ隠す」はやめて、カメラで寄せる */
+.battle-camera .battle-hand--opponent,
+.battle-camera[data-focus='bottom'] .battle-hand--opponent {
+  margin-top: 0;
+  transition: none;
+}
+
+/* 裏向きのカードも自分の手札と同じ幅・高さ（裏面の絵は上下を少し縮めて合わせる） */
+.battle-camera .battle-hand__back {
+  --opp-card-w: var(--hand-card-w);
+}
+
+/* 相手3体と自分3体のあいだ（説明の欄が DETAIL_MAX_H より大きくなる分をここに回す） */
+.battle-camera .battle-row--player {
+  margin-top: var(--field-gap, 4px);
+}
+
+/* 相手の大きなカードの欄（カメラが上に寄ったときに見える） */
+.battle-opp-detail {
+  flex: none;
+  display: flex;
+  height: var(--opp-detail-h, 220px);
+  margin: 0 -10px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, rgb(30 12 14 / 0.9), rgb(12 10 18 / 0.75));
+  border-bottom: 1px solid rgb(168 102 74 / 0.45);
+}
+
+.battle-opp-detail .battle-opp-spot {
+  position: static;
+  inset: auto;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.battle-opp-detail .battle-spot__card {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 見せていないとき：「相手の番」だけ小さく・カードは薄く */
+.battle-spot__info.is-idle {
+  flex: 0 1 auto;
+  align-self: center;
+  min-width: 120px;
+  border-color: rgb(184 120 72 / 0.35);
+  background: rgb(9 11 16 / 0.45);
+}
+
+.battle-spot__info.is-idle:has(.battle-spot__name:empty) {
+  visibility: hidden;
+}
+
+.battle-opp-spot.is-idle {
+  cursor: default;
+  animation: none;
+}
+
+/* 説明の欄：左に小さな説明の箱・右に大きなカード（PS版） */
+.battle-camera .battle-detail {
+  flex: none;
+  height: var(--detail-h, 220px);
+  min-height: 0;
+  margin: 0;
+  padding: 4px 0;
+  gap: 8px;
+}
+
+.battle-camera .battle-detail__card {
+  flex: none;
+  width: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 何も選んでいないとき：説明の箱は小さく（案内は1〜2行）、右に直前に使われたカードを薄く */
+.battle-camera .battle-detail.is-guide .battle-detail__left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.battle-camera .battle-detail.is-guide .battle-text {
+  flex: 1;
+  height: auto;
+  padding: 10px 12px;
+}
+
+.battle-camera .battle-detail.is-guide .battle-text__hint {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.battle-last-card {
+  opacity: 0.32;
+  filter: grayscale(0.35);
+  pointer-events: none;
+}
+
+/* 使われたカードがまだ無いときの、空の枠 */
+.battle-card-slot {
+  height: calc(100% - 8px);
+  aspect-ratio: 253 / 382;
+  border: 1px dashed rgb(255 255 255 / 0.14);
+  border-radius: 8px;
+}
+
+/* 守りの選択：手札は場所だけ残して見せず（帯の高さを変えない）、守りの選択の欄が説明の欄と手札の場所をまとめて使う */
+.battle.is-defending .battle-camera .battle__hand {
+  display: flex;
+  visibility: hidden;
+}
+
+.battle-camera .battle-detail.battle__defense {
+  height: calc(var(--detail-h, 220px) + var(--hand-h, 147px));
+  margin-bottom: calc(var(--hand-h, 147px) * -1);
+  position: relative;
+  z-index: 2;
+}
+
+/* 自分の手札：帯の中で画面の幅いっぱい */
+.battle-camera .battle__hand {
+  flex: none;
+  margin: 0 -10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-camera__lens {
+    transition: none;
+  }
+}

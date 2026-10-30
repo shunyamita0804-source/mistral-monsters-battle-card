@@ -165,7 +165,7 @@ const SPOT_FIT_STEPS = ['is-fit-1', 'is-fit-2', 'is-fit-3'] as const;
  * 場のモンスターの幅（論理px。指示書の目安 72〜80）。2026-10-25 ユーザー指示「ずっと出ているカードが新しいデザインの方」：
  * バトル用カード（800×920）のあるモンスターはそのカードで、まだ無いモンスターは同じ縦横比に切り抜いたアイコンで出す
  */
-const MONSTER_ICON = 76;
+const MONSTER_ICON = 88; // 2026-10-31 指示書 AB【3】：76 → 88（約1.16倍。もっとモンスターが戦っている感じに）
 const MONSTER_ICON_H = Math.round(MONSTER_ICON * BATTLE_CARD_RATIO);
 /** 場のモンスターをタップしたときに見せる正式カードの絵の幅（論理px） */
 const OFFICIAL_CARD_DETAIL_W = 250;
@@ -175,14 +175,12 @@ const OFFICIAL_CARD_DETAIL_W = 250;
  * 2026-10-28 手札の大きさの指示書（design-parts/handsize-20261028/）で 90。枚数が多くてもカードは小さくせず、重ねる量を増やして1列に入れる。
  * 高さは技の絵の縦横比から battleCardHeight() で出す
  */
-const HAND_CARD_W = 90;
+const HAND_CARD_W = 98; // 2026-10-31 指示書 AB【3】：90 → 98（少し大きく）
 /**
  * 重ねても残す、1枚ずつの見える幅（論理px）。目安はカードの左はし（マナの玉と数値の欄）が見える幅＝カードの幅の 35%。
  * 枚数がさらに多いときはそれより重ねてよいが、指で1枚ずつ選べる HAND_MIN_STEP は残す
  */
 const HAND_MIN_STEP = 28;
-/** 相手の手札（裏向き）の高さを決める幅（2026-10-26 自分の手札を縦長にしたが、相手の裏向きの列は高さを増やさないよう前の大きさのまま） */
-const OPP_HAND_BASE_W = 82;
 /** 手札の列の左右の余白とカードの間（論理px。battlePs.css の .battle__hand と同じ値） */
 const HAND_ROW_PAD = 6;
 const HAND_GAP = 3;
@@ -197,7 +195,7 @@ const DETAIL_CARD_W = 176;
 const SPOT_CARD_W = 176;
 /** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
 const DEFENSE_ATTACK_W = 112;
-const DEFENSE_CARD_W = 60;
+const DEFENSE_CARD_W = 76; // 2026-10-31 指示書 AB【3】：守りの選択の欄が手札の場所も使うので 60 → 76
 /**
  * 相手の手札の裏向きのカードが、フォーカスエリアのカードの場所へ大きくなりながら動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる）。
  * 2026-10-26 ユーザー指示「大きく見せて裏返しから表向きに。モンスターファームバトルカードをもっと参考に」：着いたら裏から表へ返す（OPP_CARD_FLIP_MS）
@@ -339,7 +337,8 @@ export const battleScreen: ScreenDefinition = {
     // 手札のカードの大きさ（自分の手札＝表・相手の手札＝裏で同じ値。CSS の --hand-card-w / --hand-card-h）
     element.style.setProperty('--hand-card-w', `${HAND_CARD_W}px`);
     element.style.setProperty('--hand-card-h', `${battleCardHeight(HAND_CARD_W, 'tall').toFixed(2)}px`);
-    element.style.setProperty('--opp-card-h', `${battleCardHeight(OPP_HAND_BASE_W, 'hand').toFixed(2)}px`);
+    // 相手の手札（裏向き）も自分の手札と同じ大きさ（2026-10-31 指示書 AB【3】。10/24 の改訂R2 の考え方に戻した）
+    element.style.setProperty('--opp-card-h', `${battleCardHeight(HAND_CARD_W, 'tall').toFixed(2)}px`);
     const save = ctx.store.save;
     const seed = randomSeed();
 
@@ -410,6 +409,8 @@ export const battleScreen: ScreenDefinition = {
     /** 使ったカードを大きく見せ終わる時刻（それまで指のマークを出さない） */
     let showcaseUntil = 0;
     /** いま大きく見せている技（パートC）。user＝使ったモンスター（守備は守ったモンスター）、target＝対象 */
+    /** それぞれの側が最後に大きく見せたカード（何も選んでいないとき、説明の欄の右に薄く出す。2026-10-31 指示書 AB【3】） */
+    const lastShown: Record<Side, string | null> = { player: null, opponent: null };
     let spotlight: {
       cardId: string;
       side: Side;
@@ -432,19 +433,66 @@ export const battleScreen: ScreenDefinition = {
     /** 描き直しても外さない演出の層（飛んでいくカード。外すとアニメーションが最初からになる） */
     const fxLayer = h('div', { class: 'battle__fx-layer', attrs: { 'aria-hidden': 'true' } });
     /**
-     * カメラ（2026-10-24 ユーザー指示、2026-10-25 リデザイン後に戻した）：相手が動く・守るときは上（相手の手札）へ、
-     * 自分が動く・守るときは下へ寄せる（相手の手札が半分ほど画面の上へ出る）。
-     * 動きをなめらかにするため、カメラの枠（camera）とレンズ（lens）は描き直しても作り直さない（中の盤面だけ入れ替える）
+     * カメラ（2026-10-24 ユーザー指示、2026-10-25 リデザイン後に戻した。2026-10-31 指示書 AB【3】で PS版のように画面全体が寄る形に）：
+     * 上の帯と操作のボタンのあいだを1本の帯にして（上から 相手の大きなカードの欄・相手の手札・相手3体・自分3体・説明の欄・自分の手札）、
+     * 相手が動く・守るときは上（相手の大きなカードと手札）、自分が動く・守るときは下（説明の欄と手札。相手の手札は少しだけ見える）へ、0.3 秒でずらす。
+     * 動きをなめらかにするため、カメラの枠（camera）とレンズ（lens）は描き直しても作り直さない（中の帯だけ入れ替える）
      */
     const lens = h('div', { class: 'battle-camera__lens' });
     const camera = h('div', { class: 'battle-camera', dataset: { focus: 'none' } }, lens);
-    /** カメラを寄せる側：相手が動く・守る＝上、自分が動く・守る＝下、終わったら寄せない */
+    /**
+     * カメラを寄せる側（2026-10-31 指示書 AB【3】）：使ったカードを見せている間はその側（相手のカード＝上・自分のカード＝下）。
+     * 守りの場面は下（自分が守る＝守りに使えるカードを見せる。自分の攻撃を相手が守る間も自分の側のまま）。ほかは手番の側。終わったら下
+     */
     const cameraFocus = (s: BattleState): 'top' | 'bottom' | 'none' => {
       if (s.phase === 'ended') return 'none';
-      // 相手の使ったカードを相手の場所で見せている間は上のまま（守備の場面になっても、見せ終わってから下へ）
-      if (spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until) return 'top';
-      const side = s.phase === 'defense' && s.pending ? otherSide(s.pending.attacker) : s.active;
-      return side === 'opponent' ? 'top' : 'bottom';
+      if (spotlight && Date.now() < spotlight.until) return spotlight.side === 'opponent' ? 'top' : 'bottom';
+      if (s.phase === 'defense') return 'bottom';
+      return s.active === 'opponent' ? 'top' : 'bottom';
+    };
+    /** 自分の側を見せるとき、相手の手札を見せておく高さ（相手の手札の高さに対する割合） */
+    const OPP_HAND_PEEK = 0.42;
+    /** 説明の欄・相手の大きなカードの欄の、いちばん小さい高さ（小さい画面でも、これより小さくしない） */
+    const DETAIL_MIN_H = 108;
+    /** 説明の欄のいちばん大きい高さ（2026-10-31 指示書 AB【3】「欄の高さは今より小さく」。それより余る分は相手3体と自分3体のあいだを空ける） */
+    const DETAIL_MAX_H = 200;
+    /** 相手3体と自分3体のあいだ（いちばん小さい値。論理px） */
+    const FIELD_GAP_MIN = 4;
+    /**
+     * カメラの帯の高さとずらす量を、いまの画面の高さから決める（2026-10-31 指示書 AB【3】）。
+     * 上（相手の側）：相手の大きなカードの欄〜自分3体がカメラにちょうど入る。下（自分の側）：相手の手札の下のはし〜自分の手札がちょうど入る。
+     * 説明の欄は DETAIL_MAX_H まで。余る分は相手3体と自分3体のあいだに回す（モンスターが向かい合って戦っている感じに）。
+     * 値はレンズの変数（--opp-detail-h・--detail-h・--field-gap・--cam-shift）にして、描き直しても変わらないようにする
+     */
+    const layoutCamera = (): void => {
+      const board = lens.querySelector<HTMLElement>('.battle-board');
+      const oppHand = board?.querySelector<HTMLElement>('.battle-hand--opponent');
+      const oppRow = board?.querySelector<HTMLElement>('.battle-row--opponent');
+      const playerRow = board?.querySelector<HTMLElement>('.battle-row--player');
+      const handEl = board?.querySelector<HTMLElement>('.battle__hand');
+      const view = camera.clientHeight;
+      if (!board || !oppHand || !oppRow || !playerRow || !handEl || view <= 0) return;
+      const g = parseFloat(getComputedStyle(board).rowGap) || 0;
+      const rows = oppRow.offsetHeight + playerRow.offsetHeight;
+      let peek = Math.round(oppHand.offsetHeight * OPP_HAND_PEEK);
+      // 下（自分の側）：相手の手札の見える分＋2列＋説明の欄＋手札（すき間は5つ）
+      const room = view - (peek + rows + handEl.offsetHeight + 4 * g + FIELD_GAP_MIN);
+      let detailH = Math.min(DETAIL_MAX_H, room);
+      if (detailH < DETAIL_MIN_H) {
+        // 小さい画面：相手の手札を見せる分を減らして、説明の欄を残す
+        peek = Math.max(0, peek - (DETAIL_MIN_H - detailH));
+        detailH = Math.max(DETAIL_MIN_H, view - (peek + rows + handEl.offsetHeight + 4 * g + FIELD_GAP_MIN));
+      }
+      const fieldGap = FIELD_GAP_MIN + Math.max(0, room - detailH);
+      // 上（相手の側）：相手の大きなカードの欄＋相手の手札＋2列（すき間は3つ）
+      const oppDetailH = Math.max(DETAIL_MIN_H, view - (oppHand.offsetHeight + rows + 2 * g + fieldGap));
+      const shift = oppDetailH + g + oppHand.offsetHeight - peek;
+      lens.style.setProperty('--opp-detail-h', `${oppDetailH}px`);
+      lens.style.setProperty('--detail-h', `${detailH}px`);
+      lens.style.setProperty('--field-gap', `${fieldGap}px`);
+      lens.style.setProperty('--cam-shift', `${Math.max(0, shift)}px`);
+      // 守りの選択の欄は、説明の欄と手札の場所をまとめて使う（手札は場所だけ残して見せない）
+      lens.style.setProperty('--hand-h', `${handEl.offsetHeight + g}px`);
     };
     /** 画面を描き直す（演出の層・カメラ・開いている窓は外さずに残す。外すとアニメーションが最初からになる／窓がすぐ閉じてしまう） */
     const replaceView = (...nodes: (Node | string)[]): void => {
@@ -710,6 +758,7 @@ export const battleScreen: ScreenDefinition = {
       const reveal = flyMs > 0 ? flyMs + OPP_CARD_FLIP_MS : 0;
       const until = now + reveal + (side === 'opponent' ? OPP_SHOWCASE_MS : SHOWCASE_MS);
       spotlight = { cardId, side, userUid, targetUid, until, arriveAt: flyMs > 0 ? now + flyMs : null };
+      lastShown[side] = cardId;
       showcaseUntil = until;
       setTimeout(() => {
         // 見せ終わったら、技の対象に指のマークを出す・守備の選択を出すために描き直す
@@ -1569,6 +1618,30 @@ export const battleScreen: ScreenDefinition = {
       return el;
     };
 
+    /**
+     * 相手の大きなカードの欄（2026-10-31 指示書 AB【3】。カメラが相手の側へ寄ったときに見える）：相手が使ったカードを大きく（カードを左・説明を右。PS版の 2P 側）。
+     * 見せていないときは、相手が最後に使ったカードを薄く・「相手の番」とだけ（目立たせない）
+     */
+    const oppDetailPanel = (s: BattleState): HTMLElement => {
+      if (spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until) return h('div', { class: 'battle-opp-detail' }, spotlightPanel(s, spotlight));
+      const last = lastShown.opponent;
+      return h(
+        'div',
+        { class: 'battle-opp-detail is-idle' },
+        h('div', { class: 'battle-opp-spot battle-spot battle-spot--opponent is-idle' },
+          h(
+            'div',
+            { class: 'battle-spot__body' },
+            h('div', { class: 'battle-spot__info is-idle' }, h('p', { class: 'battle-spot__name', text: s.active === 'opponent' ? t('battle.prompt.oppTurn') : '' })),
+            h('div', { class: 'battle-spot__card' }, last ? lastCardView(last) : h('div', { class: 'battle-card-slot' })),
+          ),
+        ),
+      );
+    };
+
+    /** 直前に使われたカードを薄く（説明の欄の右・相手の大きなカードの欄の左。何も選んでいないとき） */
+    const lastCardView = (cardId: string): HTMLElement => h('div', { class: 'battle-last-card' }, createBattleCard(getPlayCard(cardId), { width: SPOT_CARD_W, size: 'focus' }));
+
     const detailPanel = (s: BattleState): HTMLElement => {
       // 技を使った演出の間は、そのカードを大きく（パートC）。相手の攻撃に守れるときは、攻撃のカードの下に守備の選択
       // 自分の使ったカードだけここで大きく見せる（相手のカードは相手の場所＝上で見せる：opponentSpot）
@@ -1640,6 +1713,8 @@ export const battleScreen: ScreenDefinition = {
         ];
       }
       // フォーカスエリア（2026-10-25 リデザイン：画面の約1/3）。左＝説明の箱、右＝選んだカードを大きく。何も選んでいないときは説明（操作のガイド）だけ
+      // 2026-10-31 指示書 AB【3】：左に小さな説明の箱・右に大きなカード（PS版）。何も選んでいないときは、右に直前に使われたカードを薄く（無ければ空の枠）
+      const last = lastShown.player ?? lastShown.opponent;
       return h(
         'div',
         { class: `battle-detail${card ? '' : ' is-guide'}` },
@@ -1648,7 +1723,11 @@ export const battleScreen: ScreenDefinition = {
           { class: 'battle-detail__left' },
           h('div', { class: 'battle-text' }, h('div', { class: 'battle-text__body' }, ...body)),
         ),
-        card ? h('div', { class: 'battle-detail__card' }, createBattleCard(card, { width: detailW, size: 'focus' })) : null,
+        h(
+          'div',
+          { class: 'battle-detail__card' },
+          card ? createBattleCard(card, { width: detailW, size: 'focus' }) : last ? lastCardView(last) : h('div', { class: 'battle-card-slot' }),
+        ),
       );
     };
 
@@ -2240,17 +2319,22 @@ export const battleScreen: ScreenDefinition = {
       // 2026-10-25 リデザイン（PS版にならう）：上から 手番の帯 → 相手の情報1行 → 相手3体 → 経過1行 → 自分3体 → 自分の情報1行
       // → フォーカスエリア（説明と大きなカード。残りの高さに広がる）→ 手札 → 操作のボタン（横一列）
       camera.dataset.focus = cameraFocus(s);
-      // 相手の手札と列をひとまとめにして、相手が使ったカードはその上に大きく見せる（2026-10-26 ユーザー指示「相手は相手の場所で大きく見せる」）
-      const oppSpot = spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until ? spotlightPanel(s, spotlight) : null;
+      // 2026-10-31 指示書 AB【3】：カメラの帯（上から 相手の大きなカードの欄・相手の手札・相手3体・自分3体・説明の欄・自分の手札）。
+      // 相手が使ったカードは相手の大きなカードの欄に（2026-10-26 ユーザー指示「相手は相手の場所で大きく見せる」）
       lens.replaceChildren(
         h(
           'div',
           { class: 'battle-board' },
-          h('div', { class: 'battle-opp-zone' }, opponentHand(s), monsterRow(s, 'opponent'), oppSpot),
+          oppDetailPanel(s),
+          opponentHand(s),
+          monsterRow(s, 'opponent'),
           monsterRow(s, 'player'),
+          detailPanel(s),
+          hand,
         ),
       );
-      replaceView(header(s), qaBar() ?? '', camera, detailPanel(s), hand, commandPanel(s, blocked));
+      replaceView(header(s), qaBar() ?? '', camera, commandPanel(s, blocked));
+      layoutCamera();
       fitFocusCards();
       fitSpotTexts();
       // 文字の形（フォント）やカードの大きさが描いたあとで決まることがあるので、少しあとにもう一度測る
