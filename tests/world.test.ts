@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { FRAGMENTS } from '../src/data/fragments.ts';
 import { DUNGEON_B1, getMap, HOME, MAPS, TOWN, townDoorFront, type MapDefinition, type MapObject } from '../src/data/maps.ts';
 import { DEFAULT_LOCATION, NEW_GAME_LOCATION } from '../src/game/save/saveData.ts';
-import { adjacentCellOf, canStep, findPath, findPathCentered, findPathToObject, findPathWhere, isBlocked, objectsAt, STEPS_4, type Point } from '../src/game/world/world.ts';
+import { adjacentCellOf, canStep, findPath, findPathCentered, findPathToObject, findPathWhere, isBlocked, labelCenterAwayFromPeople, objectsAt, STEPS_4, type Point } from '../src/game/world/world.ts';
 
 const blockedIn = (map: MapDefinition) => (x: number, y: number) => isBlocked(map, x, y, () => true);
 const warps = (map: MapDefinition) => map.objects.filter((o): o is Extract<MapObject, { type: 'warp' }> => o.type === 'warp');
@@ -163,5 +163,27 @@ describe('案内で連れて歩く道（2026-10-28 点検）', () => {
     expect(grass).toBeLessThanOrEqual(2);
     // 遠回りしすぎない
     expect(centered.length).toBeLessThan(shortest.length * 2);
+  });
+});
+
+describe('家具の名札と人（2026-10-30 指示書 S1）', () => {
+  it('カードショップの「カウンター」の名札は、店員の顔・体にかからない所（店員のとなり）へ', () => {
+    const shop = getMap('shop');
+    if (!shop) throw new Error('shop');
+    const counter = shop.objects.find((o) => o.id === 'shop-counter');
+    const clerk = shop.objects.find((o) => o.type === 'npc' && o.npcId === 'clerk');
+    if (!counter || counter.type !== 'interact' || !clerk || clerk.type !== 'npc') throw new Error('counter');
+    const center = labelCenterAwayFromPeople(counter, shop.objects);
+    expect(center).not.toBeNull();
+    // 名札の幅は6マス・人の絵は足元の中心から左右に約2.5マス：重ならない
+    const clerkX = clerk.x + (clerk.drawDx ?? 0) + 0.5;
+    expect(Math.abs((center ?? 0) - clerkX)).toBeGreaterThanOrEqual(3 + 2.5);
+    // 名札はカウンターの範囲の中
+    expect(center).toBeGreaterThan(counter.x);
+    expect(center).toBeLessThan(counter.x + counter.w);
+  });
+
+  it('人のいない家具の名札は動かさない', () => {
+    for (const o of HOME.objects) if (o.type === 'interact') expect(labelCenterAwayFromPeople(o, HOME.objects)).toBeNull();
   });
 });

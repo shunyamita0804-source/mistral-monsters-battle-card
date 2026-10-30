@@ -105,8 +105,10 @@ def resize(im: Image.Image, s: float) -> Image.Image:
 BUILDINGS = [
     # 番号  ID              部品                      扉 cx, 上, 下     扉の高さ  街の扉 x, 敷居 y
     dict(no=1, id='ARENA', file='building_arena', door=(762, 735, 945), door_h=290, at=(3200, 1330), door_w=236),
-    dict(no=2, id='BUREAU', file='building_bureau', door=(511, 669, 874), door_h=240, at=(5420, 1830), door_w=150),
-    dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1520), door_w=150),
+    # 2026-10-30 iPhone の試遊（指示書 S4）「管理局の土台が前の石畳にかぶる」：建物の土台の下のふちで石畳が始まるよう、管理局を 75・研究所を 30 上へ
+    # （土台の下のふちは敷居より 管理局 約84・研究所 約67 下。前の道の上のふちは 1840・1560。入口の段だけは道につながる）
+    dict(no=2, id='BUREAU', file='building_bureau', door=(511, 669, 874), door_h=240, at=(5420, 1755), door_w=150),
+    dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1490), door_w=150),
     dict(no=4, id='TRAINING', file='building_practice', door=(768, 585, 824), door_h=240, at=(1100, 2960), door_w=170),
     dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=200),
     dict(no=6, id='HOUSE_A', file='building_florist', door=(516, 575, 828), door_h=215, at=(5800, 2890), door_w=100),
@@ -149,7 +151,9 @@ STREETS = [
     (2944, 5640, 3456, 6180),     # 南の大通り（石の橋 → 南の門）
     (3080, 6180, 3320, 6300),     # 南の門の前
     (900, 5930, 2944, 6170),      # 主人公の家・となりの家の前（主人公の家の扉の前で終わる）
-    (2420, 1330, 3980, 1560),     # 大会会場の前（高台の上。建物の幅だけ）
+    # 大会会場の前（高台の上。建物の幅だけ）。2026-10-30（指示書 S4）：上のふちを大会会場の土台の下のふち（敷居より約76 下）へ。
+    # 大会会場は北の塀のすぐ下まであるので、建物は動かさずに道を下げた（入口の段の所は扉の前の小道でつながる）
+    (2420, 1410, 3980, 1560),
     (1050, 1560, 2060, 1830),     # 研究所の扉の前 → 西の高台の階段（高台の上。2026-10-29：階段の幅いっぱい・階段の上の端まで）
     # 木の橋 → 主人公の家・となりの家の前の道（2026-10-28 点検。橋の先の行き止まりをなくす）。
     # 2026-10-29 夜：縁石（幅 30）の外のふちを橋の板のはし（x 1527〜1703）にそろえた。上のはしは橋の板の下に入れる（すき間なし）
@@ -217,14 +221,26 @@ WOOD_POSTS = {'post_nw': (143, 90, 300, 345), 'post_ne': (620, 90, 776, 345), 'p
 FOUNTAIN_WATER = (328, 682)
 FOUNTAIN_PILLAR = [(230, 200), (432, 200), (432, 515), (393, 515), (393, 600), (397, 600), (397, 642),
                    (260, 642), (260, 600), (242, 600), (242, 515), (230, 515)]
-# しぶき：2026-10-29 iPhone の試遊「取って貼り付けた感じ」：小さくして（1.2→0.9）、下の端を水盤の水の中（柱の前の水面）へ下げ、
+# しぶき：2026-10-29 iPhone の試遊「取って貼り付けた感じ」：小さくして（1.2→0.9）、
 # 水盤の水の色に寄せて少し透かす（FOUNTAIN_SPRAY_TINT・FOUNTAIN_SPRAY_ALPHA）。動きは少しゆっくり（コマ 140→220ms）。
-# しぶきは噴水の台の後ろに重ねる（柱の前のしぶきの根元と、水盤に落ちた先は台と水に隠れ、柱から出て水盤へ落ちて見える）
-FOUNTAIN_SPRAY_FOOT = (326, 655)
-FOUNTAIN_SPRAY_SCALE = 0.9
+# 2026-10-30 iPhone の試遊（指示書 S2）「水が噴水のてっぺんから出ていない（柱の途中に重なる）」：
+#  - しぶきの真ん中の水柱の根元を、いちばん上の受け皿の真ん中（金のとがった飾りの足元。シートの FOUNTAIN_SPRAY_FOOT）に合わせ、
+#    左右の筋の先が受け皿のふちに落ちる大きさに（FOUNTAIN_SPRAY_SCALE。前は下の池の水から出て柱の途中に重なっていた）
+#  - しぶきは噴水の手前に重ね、受け皿の水の面と手前のふち・とがった飾り・下の池の手前のふちの所だけ消す
+#    （水は飾りの先から上に出て、受け皿のふちの奥に落ちる）
+#  - 受け皿から下の池へ落ちる水は、今の絵（左右に弧を描くしぶき）では作れなかった（のばす・くり返すと雨のすじや段に見える）。
+#    あふれて落ちる水の絵を依頼した（docs/design-requests-20261030/fountain_overflow.md）
+FOUNTAIN_SPRAY_FOOT = (331, 335)
+FOUNTAIN_SPRAY_SCALE = 0.62
 FOUNTAIN_SPRAY_TINT = 0.35
 FOUNTAIN_SPRAY_ALPHA = 0.85
 FOUNTAIN_SPRAY_MS = 220
+FOUNTAIN_SPRAY_H = 311            # しぶきの絵（3コマの大きい方）の高さ：水柱の根元はこの行
+# 噴水の手前の物（シートの px）：とがった飾り・受け皿（ふちの線 y 322 より下）・下の池の手前のふち（水の輪の外で輪の中心より下）
+FOUNTAIN_SPIKE = [(331, 212), (346, 262), (362, 268), (362, 330), (368, 346), (294, 346), (300, 330), (300, 268), (316, 262)]
+FOUNTAIN_BOWL_INNER = ((330, 328), (73, 22))   # 受け皿の水の面（内側のふちの楕円：中心・横と縦の半径）
+FOUNTAIN_BOWL_FRONT = (226, 333, 436, 440)    # 受け皿の手前のふちから下（ふちの楕円の中心の線 y 333 より下の、台の絵の所）
+FOUNTAIN_POND = (238, 142)        # 下の池の水の輪の外の半径（横・縦。中心は FOUNTAIN_WATER）
 # 街のまわりの塀・南の門（14）。東西のはしは塀をやめて林のへり（2026-10-28 ユーザー）
 WALL_N_BASE = 300
 WALL_SIDE = 140
@@ -434,6 +450,90 @@ def level_bank() -> Image.Image:
     pad = int(BANK_SLOPE * w) + 2
     out = im.transform((w, h + pad), Image.AFFINE, (1, 0, 0, BANK_SLOPE, 1, 0), resample=Image.BICUBIC)
     return out.crop((0, BANK_TOP, w, BANK_BOTTOM))
+
+
+# 高台の石垣（terrace_parts の左上の塀）と街の塀（wall_gate の左の塀）：どちらも少しななめから見た絵で、上のふち・下のふちが右下がり
+# （右の柱ほど手前で大きい）。そのまま横に並べると、継ぎ目ごとに段がついて「のこぎりの歯」に見えた（2026-10-30 iPhone の試遊・指示書 S3・S5）。
+# 列ごとに上下にのばし縮めして、上のふち・下のふちの線を水平にそろえる（描き直しはしない）。線は切り出した絵の px（傾き, x=0 の y）
+TERRACE_TOP = (0.0747, 48.3)      # 石垣の上の石の上のふち（柱の飾りを除く）
+TERRACE_BOTTOM = (0.0977, 249.7)  # 石垣の下のふち（地面との境）
+WALL_TOP = (0.21, 65.0)           # 街の塀の凸凹の上のはし
+WALL_BOTTOM = (0.297, 235.4)      # 街の塀の下のふち
+
+
+def shift_line(line: tuple[float, float], dx: float, dy: float) -> tuple[float, float]:
+    """線（傾き, x=0 の y）を、絵の左上を (dx, dy) だけずらした絵の px に直す"""
+    return line[0], line[1] + line[0] * dx - dy
+
+
+def level_strip(im: Image.Image, top: tuple[float, float], bottom: tuple[float, float]) -> Image.Image:
+    """ななめから見た塀の絵を、上のふち（top）と下のふち（bottom）が水平になるよう列ごとにのばし縮めする。
+    そろえる高さは絵の真ん中の列の高さ（柱の飾りなど線より上の所も、同じ割合で動く）"""
+    a = np.array(im.convert('RGBA')).astype(np.float32)
+    h, w = a.shape[:2]
+    mid = w / 2
+    t_mid, b_mid = top[0] * mid + top[1], bottom[0] * mid + bottom[1]
+    pad = int(max(abs(top[0]), abs(bottom[0])) * w) + 4
+    out_h = h + pad
+    yy, xx = np.mgrid[0:out_h, 0:w].astype(np.float32)
+    tc = top[0] * xx + top[1]
+    bc = bottom[0] * xx + bottom[1]
+    # 出す行 y（水平の線：上 t_mid＋pad/2・下 b_mid＋pad/2）→ もとの絵の行
+    src = tc + (yy - (t_mid + pad / 2)) * (bc - tc) / (b_mid - t_mid)
+    pre = a.copy()
+    pre[..., :3] *= pre[..., 3:4] / 255
+    st = np.stack([ndimage.map_coordinates(pre[..., ch], [src, xx], order=1, mode='constant', cval=0.0) for ch in range(4)], axis=-1)
+    al = np.maximum(st[..., 3:4], 1e-3)
+    st[..., :3] = np.where(st[..., 3:4] > 0.5, st[..., :3] * 255 / al, 0)
+    out = Image.fromarray(np.clip(st, 0, 255).astype(np.uint8))
+    return out.crop(out.getchannel('A').getbbox())
+
+
+def pillar_spans(im: Image.Image, margin: int = 6) -> list[tuple[int, int]]:
+    """塀の絵の柱（上のふちより高く飛び出した列のかたまり）の左右（px）"""
+    a = np.array(im)[..., 3] > 128
+    tops = np.array([np.argmax(a[:, x]) if a[:, x].any() else a.shape[0] for x in range(a.shape[1])])
+    high = tops < np.median(tops) - margin
+    spans, start = [], None
+    for x, v in enumerate(list(high) + [False]):
+        if v and start is None:
+            start = x
+        elif not v and start is not None:
+            if x - start >= 6:
+                spans.append((start, x))
+            start = None
+    return spans
+
+
+def wall_run(base: Image.Image, im: Image.Image, x1: float, x2: float, bottom_px: int, lead: bool, close: bool) -> None:
+    """塀を x1〜x2（単位）に、柱の間かくをそろえて並べる（2026-10-30 指示書 S3・S5）。
+    1枚＝左の柱から右の柱の手前まで（右の柱は次の1枚の左の柱）。枚数は長さに合う数にして、1枚の幅を少しだけのばし縮めしてぴったり入れる。
+    lead：はじめの1枚の左の柱を出す（階段・門の下から始まるときは出さない）。close：右のはしに柱を1本足す。bottom_px：塀の絵の下のはしの y（px）"""
+    spans = pillar_spans(im)
+    l1, l2 = spans[0]
+    r1 = spans[-1][0]
+    piece = im.crop((0, 0, r1, im.height))
+    stride = r1 - l1
+    a, b = P(x1), P(x2)
+    start = a - l1 if lead else a - l2
+    # close：最後の柱の右のふちが x2 にくるよう、並べる区間を柱1本ぶん手前で終える
+    end = b - (l2 - l1) if close else b
+    n = max(1, round((end - start) / stride))
+    k = (end - start) / (n * stride)
+    # 短い区間（階段と高台のはしのあいだなど）では1枚を縮めすぎない：縮めずに置いて、はみ出しは切る
+    if k < 0.75:
+        k = 1.0
+    pk = piece.resize((max(1, round(piece.width * k)), piece.height), Image.LANCZOS)
+    y = bottom_px - im.height
+    for i in range(n):
+        x = start + round(i * stride * k)
+        lc = max(0, a - x)
+        rc = min(pk.width, end + (l2 - l1) // 2 - x) if close else min(pk.width, b - x)
+        if rc > lc:
+            base.alpha_composite(pk.crop((lc, 0, rc, pk.height)), (x + lc, y))
+    if close:
+        post = im.crop((0, 0, l2 + 2, im.height))
+        base.alpha_composite(post, (end - l1, y))
 
 
 def deskew(im: Image.Image, k: float) -> Image.Image:
@@ -728,6 +828,52 @@ class Town:
         return s
 
 
+def fountain_spray(fbase: Image.Image, fpos: tuple[int, int], fwater: Image.Image, sprays: list[Image.Image]) -> tuple[list[Image.Image], tuple[int, int]]:
+    """噴水のしぶき3コマ（しぶきの絵の px のまま）。真ん中の水柱の根元（絵の下のはし）を FOUNTAIN_SPRAY_FOOT に合わせたとき、
+    噴水の手前の物（飾り・受け皿・池の手前のふち）に隠れる所を消してある。返り値：コマ・（幅, 高さ）"""
+    fbx, fby = fpos
+    wcx, wcy = FOUNTAIN_WATER
+    sw_ = max(p.width for p in sprays)
+    sh_ = max(p.height for p in sprays)
+    ss = FOUNTAIN_SPRAY_SCALE
+    # 手前の物（シートの px）：とがった飾り・受け皿の水の面（内側の楕円）・受け皿のふちから下・下の池の手前のふち
+    front = Image.new('L', fbase.size, 0)
+    fd = ImageDraw.Draw(front)
+    fd.polygon([(x - fbx, y - fby) for x, y in FOUNTAIN_SPIKE], fill=255)
+    (icx, icy), (irx, iry) = FOUNTAIN_BOWL_INNER
+    fd.ellipse([icx - irx - fbx, icy - iry - fby, icx + irx - fbx, icy + iry - fby], fill=255)
+    fa = np.array(fbase.getchannel('A')).astype(np.float32) / 255
+    rows = np.arange(fbase.height)[:, None] + fby
+    cols = np.arange(fbase.width)[None, :] + fbx
+    bowl = (rows > FOUNTAIN_BOWL_FRONT[1]) & (rows < FOUNTAIN_BOWL_FRONT[3]) & (cols > FOUNTAIN_BOWL_FRONT[0]) & (cols < FOUNTAIN_BOWL_FRONT[2])
+    prx, pry = FOUNTAIN_POND
+    outside_pond = ((cols - wcx) / prx) ** 2 + ((rows - wcy) / pry) ** 2 > 1
+    occ = np.maximum(np.array(front).astype(np.float32) / 255, fa * (bowl | ((rows > wcy) & outside_pond)))
+    occ = ndimage.gaussian_filter(np.clip(occ, 0, 1), 1.5)
+    out_h = sh_
+    yy, xx = np.mgrid[0:out_h, 0:sw_].astype(np.float32)
+    # しぶきの絵の px → シートの px（手前の物で消す所）
+    sheet_x = FOUNTAIN_SPRAY_FOOT[0] + (xx - sw_ / 2) * ss - fbx
+    sheet_y = FOUNTAIN_SPRAY_FOOT[1] + (yy - sh_) * ss - fby
+    hide = np.clip(ndimage.map_coordinates(occ, [sheet_y, sheet_x], order=1, mode='constant', cval=0.0), 0, 1)
+    # 水盤の水の色（輪の絵の見えている所の平均）
+    wa = np.array(fwater).astype(np.float32)
+    water_col = wa[..., :3][wa[..., 3] > 200].mean(axis=0)
+    frames = []
+    for p in sprays:
+        c = Image.new('RGBA', (sw_, sh_))
+        c.alpha_composite(p, ((sw_ - p.width) // 2, sh_ - p.height))
+        a = np.array(c).astype(np.float32)
+        # 明るさは残して、色だけ水盤の水へ寄せる。全体を少し透かす
+        lum = a[..., :3].mean(-1, keepdims=True) / 255
+        target = np.clip(water_col * (0.55 + 0.9 * lum), 0, 255)
+        a[..., :3] = a[..., :3] * (1 - FOUNTAIN_SPRAY_TINT) + target * FOUNTAIN_SPRAY_TINT
+        a[..., 3] *= FOUNTAIN_SPRAY_ALPHA
+        a[..., 3] *= 1 - hide
+        frames.append(Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)))
+    return frames, (sw_, out_h)
+
+
 def build_town(shade_building, check_dir: str | None = None) -> dict:
     rng = random.Random(20261028)
     t = Town(shade_building)
@@ -924,7 +1070,9 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         t.add_sprite(resize(piece, s * K), f'wood_bridge_{name}', wx + px1 * s, wy + py1 * s, wy + py2 * s)
 
     # ── 高台（1・3 の段）：石の壁（terrace_parts）と階段 ──
-    wall = cut('terrace_parts', (40, 39, 630, 353))
+    wall, (wox, woy) = cut_at('terrace_parts', (40, 39, 630, 353))
+    # 上のふち・下のふちを水平に（線は切り出す箱 (40, 39) からの px で測った）
+    wall = level_strip(wall, shift_line(TERRACE_TOP, wox - 40, woy - 39), shift_line(TERRACE_BOTTOM, wox - 40, woy - 39))
     ws = TERRACE_FACE / (wall.height * 0.86)
     wall = resize(wall, ws * K)
     big_stairs, (bsx, _) = cut_at(STAIRS_N['file'])
@@ -935,21 +1083,17 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     sw_x = STAIRS_W['cx'] - small_stairs.width * STAIRS_W['s'] / 2
 
     def face(x1: float, x2: float, top: float, gaps: list[tuple[float, float]]) -> None:
-        stepw = wall.width - P(30)
-        x = P(x1) - P(20)
-        # 2026-10-29：右のはしは x2 で切る（前は最後の石が高台の外まではみ出し、その前に立つ木の幹が石垣の手前に見えた）
-        right = P(x2) + P(20)
-        while x < P(x2) - P(10):
-            ux1, ux2 = x / K, (x + wall.width) / K
-            if not any(ux2 > g1 + 30 and ux1 < g2 - 30 for g1, g2 in gaps):
-                base.alpha_composite(wall.crop((0, 0, min(wall.width, right - x), wall.height)), (x, P(top) - round(wall.height * 0.14)))
-            x += stepw
-        # 壁のすき間（階段のわき）は壁を詰めて置く。2026-10-29 iPhone の試遊「石垣が角ですき間（草が見える）」：
-        # 石垣を階段の外のふちから内へ STAIR_TUCK だけ差しこむ（はみ出しは階段の柱の絵で隠れる）
-        for g1, g2 in gaps:
-            for gx in (g1 - wall.width / K + STAIR_TUCK, g2 - STAIR_TUCK):
-                if x1 - 20 <= gx and P(gx) < right:
-                    base.alpha_composite(wall.crop((0, 0, min(wall.width, right - P(gx)), wall.height)), (P(gx), P(top) - round(wall.height * 0.14)))
+        # 2026-10-30 iPhone の試遊（指示書 S3）「階段の左右で石垣の高さがずれる・石垣と階段の柱のあいだに草が見える・柱の間かくがばらばら」：
+        # 上のふちを水平にした石垣（level_strip）を、階段で区切った区間ごとに柱の間かくをそろえて並べる（wall_run）。
+        # 階段のわきは、石垣を階段の外のふちから内へ STAIR_TUCK だけ差しこみ、柱は階段の柱にまかせる（2本並ばない）。
+        # 右のはし（x2）で止めて柱を1本足す（2026-10-29：はみ出した石の前に木の幹が見えないよう、x2 より外へは出さない）
+        bottom = P(top) - round(wall.height * 0.14) + wall.height
+        a = x1
+        lead = True
+        for g1, g2 in sorted(gaps):
+            wall_run(base, wall, a, g1 + STAIR_TUCK, bottom, lead, False)
+            a, lead = g2 - STAIR_TUCK, False
+        wall_run(base, wall, a, x2, bottom, lead, True)
 
     # 縦の辺（東向き・西向きの壁）：壁の上の石（rail）を縦にして細い帯に
     rail = cut('terrace_parts', (55, 408, 762, 556))
@@ -987,14 +1131,15 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
 
     # ── 街のまわりの塀（wall_gate）・南の門（14） ──
     gate_full = sheet('wall_gate')
-    seg = _trim(gate_full.crop((11, 560, 408, 931)))
+    seg, (sox, soy) = _trim_at(gate_full.crop((11, 560, 408, 931)), (11, 560))
+    # 上のふち（凸凹の上）・下のふちを水平に（線は切り出す箱 (11, 560) からの px で測った）
+    seg = level_strip(seg, shift_line(WALL_TOP, sox - 11, soy - 560), shift_line(WALL_BOTTOM, sox - 11, soy - 560))
     tower = cut('wall_gate', (1146, 436, 1529, 947))
     gate, (gox, goy) = _trim_at(gate_full.crop((408, 98, 1134, 931)), (408, 98))
     seg_s = 300 / seg.height
     seg_k = resize(seg, seg_s * K)
-    stepw = seg_k.width - P(36)
-    for x in range(-P(30), size[0], stepw):
-        base.alpha_composite(seg_k, (x, P(WALL_N_BASE) - seg_k.height))
+    # 2026-10-30 iPhone の試遊（指示書 S5）：北と南の塀は、上のふちを水平にした絵（level_strip）を、柱の間かくをそろえて1列に（wall_run）
+    wall_run(base, seg_k, -30, W + 30, P(WALL_N_BASE), True, False)
     # 東西のはしは塀をやめて林のへり（下の「林のへり」。2026-10-28 ユーザー）。北と南の塀の両はしに塔
     tower_k = resize(tower, 0.62 * K)
     for tx, ty in [(WALL_SIDE / 2, WALL_N_BASE + 40), (W - WALL_SIDE / 2, WALL_N_BASE + 40)]:
@@ -1004,14 +1149,11 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     gate_y = H - 10 - (850 - goy) * gs         # 扉の下の端を街の下の端に（門の前の段は街の外）
     gate_k = resize(gate, gs * K)
     gate_k = gate_k.crop((0, 0, gate_k.width, min(gate_k.height, P(H - gate_y))))
-    for x in range(-P(30), size[0], stepw):
-        ux1 = x / K
-        if ux1 + seg_k.width / K < gate_x + 80 or ux1 > gate_x + gate.width * gs - 80:
-            base.alpha_composite(seg_k, (x, size[1] - seg_k.height))
-    # 2026-10-29 iPhone の試遊「南の門の横にすき間があり、草の上を通れる」：門の両わきの塔まで塀をのばす（はしは門の絵の下に隠れる）
+    # 2026-10-29 iPhone の試遊「南の門の横にすき間があり、草の上を通れる」：門の両わきの塔まで塀をのばす（はしは門の絵の下に隠れる）。
+    # 2026-10-30（指示書 S5）：門の左右で同じ高さ・同じ柱の間かくに（左は門の下で止め、右は門の下から始める）
     gl, gr = gate_x + GATE_TUCK, gate_x + gate.width * gs - GATE_TUCK
-    base.alpha_composite(seg_k, (P(gl) - seg_k.width, size[1] - seg_k.height))
-    base.alpha_composite(seg_k, (P(gr), size[1] - seg_k.height))
+    wall_run(base, seg_k, -30, gl, size[1], True, False)
+    wall_run(base, seg_k, gr, W + 30, size[1], False, False)
     for tx in (WALL_SIDE / 2, W - WALL_SIDE / 2):
         base.alpha_composite(tower_k, (P(tx) - tower_k.width // 2, size[1] - tower_k.height))
     soft_shadow(base, gate_k, (P(gate_x), P(gate_y)), 16, 6, 8, 50)
@@ -1102,28 +1244,14 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     fz = fy + (wcy - fby) * fs
     t.add_sprite(fpart, 'fountain', fx, fy, fz)
     t.block_alpha(fpart, fx, fy, 1 / K, fy + (wcy - 150 - fby) * fs, fy + fpart.height / K)
-    # しぶき：柱のてっぺんの皿（シートの FOUNTAIN_SPRAY_FOOT）に、しぶきの下の端を合わせる
-    frames = []
-    sw_ = max(p.width for p in sprays)
-    sh_ = max(p.height for p in sprays)
-    # 水盤の水の色（輪の絵の見えている所の平均）
-    wa = np.array(fwater).astype(np.float32)
-    wcol = wa[..., :3][wa[..., 3] > 200].mean(axis=0)
-    for i, p in enumerate(sprays):
-        c = Image.new('RGBA', (sw_, sh_))
-        c.alpha_composite(p, ((sw_ - p.width) // 2, sh_ - p.height))
-        a = np.array(c).astype(np.float32)
-        # 明るさは残して、色だけ水盤の水へ寄せる。全体を少し透かす
-        lum = a[..., :3].mean(-1, keepdims=True) / 255
-        target = np.clip(wcol * (0.55 + 0.9 * lum), 0, 255)
-        a[..., :3] = a[..., :3] * (1 - FOUNTAIN_SPRAY_TINT) + target * FOUNTAIN_SPRAY_TINT
-        a[..., 3] *= FOUNTAIN_SPRAY_ALPHA
-        c = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
-        frames.append(t.save_sprite(resize(c, fs * FOUNTAIN_SPRAY_SCALE * K), f'fountain_spray{i + 1}'))
-    ss = fs * FOUNTAIN_SPRAY_SCALE
-    spx = fx + (FOUNTAIN_SPRAY_FOOT[0] - fbx) * fs - sw_ * ss / 2
-    spy = fy + (FOUNTAIN_SPRAY_FOOT[1] - fby) * fs - sh_ * ss
-    loops = [dict(frames=frames, x=round(spx), y=round(spy), w=round(sw_ * ss), h=round(sh_ * ss), z=round(fz - 1), ms=FOUNTAIN_SPRAY_MS)]
+    # しぶき：いちばん上の受け皿の真ん中（シートの FOUNTAIN_SPRAY_FOOT）から出て、受け皿と下の池に落ちる（fountain_spray）
+    spray_frames, (sw_, out_h) = fountain_spray(fbase, (fbx, fby), fwater, sprays)
+    ss = FOUNTAIN_SPRAY_SCALE
+    frames = [t.save_sprite(resize(c, fs * ss * K), f'fountain_spray{i + 1}') for i, c in enumerate(spray_frames)]
+    spx = fx + (FOUNTAIN_SPRAY_FOOT[0] - fbx) * fs - sw_ * fs * ss / 2
+    spy = fy + (FOUNTAIN_SPRAY_FOOT[1] - fby) * fs - FOUNTAIN_SPRAY_H * fs * ss
+    # 噴水の手前に重ねる（受け皿・飾り・池の手前のふちの所は fountain_spray で消してある）
+    loops = [dict(frames=frames, x=round(spx), y=round(spy), w=round(sw_ * fs * ss), h=round(out_h * fs * ss), z=round(fz + 1), ms=FOUNTAIN_SPRAY_MS)]
     fountain_cells = dict(x=int(fx // CELL), y=int((fy + (wcy - 150 - fby) * fs) // CELL),
                           w=int(fpart.width / K // CELL) + 1, h=int((fpart.height / K - (wcy - 150 - fby) * fs) // CELL) + 1)
 
