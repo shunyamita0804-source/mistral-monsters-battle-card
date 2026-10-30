@@ -61,16 +61,17 @@ const CATEGORY: Readonly<Record<string, string>> = { ちから技: 'force', か�
 /**
  * 効果の文のある技の、ゲームでの動き（効果の文は書き換えず、動きだけをここで表す。キーは JSON の no）。どれも今の決まりのまま：
  * - 05 こおりのいき・09 ふぶき「相手は次のターン行動不可」：ノビトンのまきつくと同じ（stunTarget。回避されたらかからない・防御で0ダメージでもかかる・
- *   守りのカードは使える・もう一度かけたら期限だけ新しく。凍らせ続けを止める決まりは入れない〔ユーザー決定〕）
+ *   守りのカードは使える・もう一度かけたら期限だけ新しく。凍らせ続けを止める決まりは入れない〔ユーザー決定〕）。
+ *   対戦の画面の印だけ「凍った」の絵にする（stunMark。2026-10-30 指示書 X）
  * - 06 こおりわり「防御されない」：ジオルのいわくだきと同じ（unblockable。回避はできる）
  * - 11 はねでつつむ：ちから技・かしこさ技−2。12 つばさのたて：ちから技−3（今の防御）
  * - 13 まいあがる：かしこさ技を回避。14 おとなきはばたき：消費マナに関係なく両方を回避（ツムジのかぜよみと同じ）
  * 細かい裁定は docs/battle-rules.md「ヒョウズクの効果の扱い」
  */
 const SPECIAL_EFFECTS: Readonly<Record<number, SkillEffect>> = {
-  5: { type: 'attack', stunTarget: true },
+  5: { type: 'attack', stunTarget: true, stunMark: 'frozen' },
   6: { type: 'attack', unblockable: true },
-  9: { type: 'attack', stunTarget: true },
+  9: { type: 'attack', stunTarget: true, stunMark: 'frozen' },
   11: { type: 'defense', reduce: 2, against: 'all' },
   12: { type: 'defense', reduce: 3, against: 'force' },
   13: { type: 'evade', against: 'wisdom' },

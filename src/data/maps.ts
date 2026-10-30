@@ -426,19 +426,18 @@ export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior'
 
 const HALL_ART = ROOMS4_ART.arena;
 /**
- * 大会会場の左の壁の紺の板（部屋の絵の中で斜めに見える平行四辺形）。部屋の単位（絵の px × 1.25）。
- * 左の辺 x 75・上 220〜下 440、右の辺 x 243 は 110 上がる（絵 arena_shell.png で測った）。skewY で板の傾きに合わせて表を描く
+ * 大会会場の壁の板（総当たりの表を小さく描く所。部屋の単位・skewY の傾き）。
+ * 2026-10-30 指示書 X：正面向きの新しい絵には左の壁の紺の板が無いので null（表は描かない。表は受付で見られる）。
+ * 板のある絵が届いたら、ここに位置を書き、HALL の「対戦表」（leagueBoard）を戻す
  */
-export const HALL_BOARD = { x: 94, y: 275, w: 210, h: 275, skewDeg: -33.2 } as const;
+export const HALL_BOARD: { readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly skewDeg: number } | null = null;
 /**
- * 大会会場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥に観客席、中央の円形の段に対戦台、右手前に受付。
- * 受付のセリアはカウンターの奥（話しかけるのはカウンターの左から）。左の壁の大きな紺の板は空（大会の総当たり表を描く予定。位置は HALL_ART.items.BOARD）
+ * 大会会場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。奥に観客席、真ん中の丸い舞台に対戦台、左に長いす2台、右に受付。
+ * 受付のセリアはカウンターの奥（話しかけるのはカウンターの前から）
  */
 export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HALL_ART, [
   interactAt('hall-desk', itemOf(HALL_ART, 'RECEPTION'), '受付カウンター', 'tournamentDesk'),
   interactAt('hall-table', itemOf(HALL_ART, 'TABLE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
-  // 左の壁の紺の板：いま出ている（または最後に出た）総当たりの大会の表を小さく描き（worldScreen.ts）、調べると対戦表の画面
-  interactAt('hall-board', itemOf(HALL_ART, 'BOARD_TOUCH'), '対戦表', 'leagueBoard'),
   interactAt('hall-seats-l', itemOf(HALL_ART, 'SEATS_L'), '客席', 'message', '観客席。'),
   interactAt('hall-seats-r', itemOf(HALL_ART, 'SEATS_R'), '客席', 'message', '観客席。'),
   spotNpc('hall-receptionist', HALL_ART, 'RECEPTIONIST_SPOT', ROOMS4_DRAW_OFFSET.arena.RECEPTIONIST_SPOT, 'receptionist', 'tournamentDesk'),
@@ -456,8 +455,8 @@ export const CAMERA_LEANS: readonly { readonly mapId: string; readonly npcId: st
 
 const PRACTICE_ART = ROOMS4_ART.practice;
 /**
- * カード練習場（2026-10-28 新しい絵。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
- * 奥の黒板・左の壁ぞいの教材の棚。ベンチは無くなった
+ * カード練習場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
+ * 奥の黒板・左の壁ぞいのカードの棚3台
  */
 export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 'interior', PRACTICE_ART, [
   interactAt('practice-shelf', itemOf(PRACTICE_ART, 'SHELF'), '教材の棚', 'message', '練習用のカードがきちんと並んでいる。'),
@@ -475,8 +474,8 @@ const BUREAU_ART = ROOMS4_ART.bureau;
 /** 管理局の受付の前（主人公が受付と話すために止まる所。tools/design/rooms4_build.py の PLAYER_SPOT） */
 export const BUREAU_DESK_FRONT: { readonly x: number; readonly y: number } = spotOf(BUREAU_ART, 'PLAYER_SPOT');
 /**
- * カードバトラー管理局の中（2026-10-28 新しい絵。tools/design/rooms4_build.py）。中央に受付のカウンター（エレノアはその奥）、
- * 左奥にランクの板、右奥にメダルの棚、左右に長いす、左手前に掲示板。入口は扉のない開いた通り道。
+ * カードバトラー管理局の中（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。奥に受付のカウンター（エレノアはその奥）、
+ * 左奥にランクの板、左の真ん中に掲示板（右どなりから調べる）、右奥にメダルの棚、左右に長いす。入口は扉のない開いた通り道。
  * 街では北東の、もとの住宅C の所（2026-10-27 ユーザー指示）
  */
 export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラー管理局', 'interior', BUREAU_ART, [

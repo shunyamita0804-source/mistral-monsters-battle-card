@@ -93,3 +93,12 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 
 - 祭壇（初回・前のセーブ）は `dungeon_people_shot.cjs URL フォルダ 出力 win`（フォルダに `boss_dungeon-04.json`。前のセーブは version 29・氷の洞窟クリア済み）
 - 撮影用のセーブで導入を終わらせるには `story.introV2` の `state: 'completed'` に加えて `examPassed`・`selectedBoosterKey`・`boosterClaimed`・`boosterGranted`・`tutorialCompleted` も入れる（入れないと練習場の試験に戻る）
+
+## 2026-10-30 部屋3つ・状態の印・噴水（指示書 X。`docs/rooms-status-fountain-x-20261030.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `status_marks_shot.cjs` | 対戦の画面に状態の印4つ（凍った・まきつく・エネルギー・回避できない）を付けて撮る。開発用サーバー。W・H・LANG |
+
+- 部屋の写真は `town_shot.cjs`（場所は `{bureau,30,30,up}`・受付の前 `{bureau,30,19,up}`・掲示板の右 `{bureau,16,19,left}`・大会会場の受付の前 `{hall,49,29,up}`）。
+  調べた所は `save_shot.cjs セーブ 出力 click:.world__action`（部屋でも z キーは効かない）

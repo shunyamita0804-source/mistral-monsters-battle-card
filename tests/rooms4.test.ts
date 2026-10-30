@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BUREAU, BUREAU_DESK_FRONT, HALL, LAB, PRACTICE, SHOP, type MapDefinition, type NpcObject } from '../src/data/maps.ts';
+import { BUREAU, BUREAU_DESK_FRONT, HALL, HALL_BOARD, LAB, PRACTICE, SHOP, type MapDefinition, type NpcObject } from '../src/data/maps.ts';
 import { isBlocked, reachable } from '../src/game/world/world.ts';
 
-/** 部屋4つの新しい絵（2026-10-28。tools/design/rooms4_build.py） */
+/** 部屋4つの新しい絵（2026-10-28。tools/design/rooms4_build.py）。2026-10-30 指示書 X で大会会場・管理局・練習場は正面向きの絵に */
 const ROOMS: readonly MapDefinition[] = [HALL, BUREAU, PRACTICE, LAB];
 const all = (): boolean => true;
 const area = (map: MapDefinition): Set<string> => reachable(map, map.spawn, (x, y) => isBlocked(map, x, y, all));
@@ -44,21 +44,22 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
     }
   });
 
-  it('家具の後ろに回り込める（大会会場の段の横・練習場の右奥の机の奥・研究所の机の奥・管理局のメダルの棚の前）', () => {
-    expect(area(HALL).has(cellOf(380, 320))).toBe(true);
-    expect(area(PRACTICE).has(cellOf(1200, 300))).toBe(true);
+  it('家具の後ろに回り込める（大会会場の舞台の横・練習場の真ん中の机の奥・研究所の机の奥・管理局のメダルの棚の前）', () => {
+    expect(area(HALL).has(cellOf(300, 330))).toBe(true);
+    expect(area(PRACTICE).has(cellOf(760, 330))).toBe(true);
     expect(area(LAB).has(cellOf(560, 400))).toBe(true);
     expect(area(BUREAU).has(cellOf(1200, 500))).toBe(true);
     // 家具の足もとは通れない
     expect(area(HALL).has(cellOf(768, 430))).toBe(false);
     expect(area(PRACTICE).has(cellOf(870, 480))).toBe(false);
     expect(area(LAB).has(cellOf(680, 520))).toBe(false);
-    expect(area(BUREAU).has(cellOf(768, 480))).toBe(false);
+    expect(area(BUREAU).has(cellOf(768, 420))).toBe(false);
   });
 
-  it('受付・研究員はカウンター・机の奥に見える（見た目だけ奥へずらす）。大会会場の受付は左から話しかける', () => {
+  it('受付・研究員はカウンター・机の奥に見える（見た目だけ奥へずらす）。大会会場の受付は前から話しかける（2026-10-30 指示書 X）', () => {
     const celia = npcOf(HALL, 'hall-receptionist');
-    expect(celia.drawDx ?? 0).toBeGreaterThan(2);
+    expect(celia.drawDy ?? 0).toBeLessThan(0);
+    expect(area(HALL).has(`${celia.x},${celia.y + 1}`)).toBe(true);
     const eleanor = npcOf(BUREAU, 'bureau-clerk');
     expect(eleanor.drawDy ?? 0).toBeLessThan(0);
     const lucas = npcOf(LAB, 'lab-researcher');
@@ -95,9 +96,10 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
     for (const id of ['lab-shelf', 'lab-cabinet', 'lab-projector', 'lab-analysis', 'lab-blackboard']) expect(ids).toContain(id);
   });
 
-  it('大会会場の左の壁の大きな板（総当たり表を描く予定）の位置を記録してある', () => {
-    const board = HALL.art?.items?.BOARD;
-    expect(board).toBeDefined();
-    expect((board?.h ?? 0) > (board?.w ?? 0)).toBe(true);
+  it('大会会場：正面向きの新しい絵には左の壁の板が無いので、壁に表は描かず「対戦表」を調べる所も無い（表は受付で見られる。2026-10-30 指示書 X）', () => {
+    expect(HALL_BOARD).toBeNull();
+    expect(HALL.art?.items?.BOARD).toBeUndefined();
+    expect(HALL.objects.some((o) => o.id === 'hall-board')).toBe(false);
+    expect(HALL.objects.some((o) => o.id === 'hall-desk')).toBe(true);
   });
 });
