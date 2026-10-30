@@ -1,14 +1,41 @@
-# 引き継ぎメモ（2026-10-30 朝：O のあと・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-30：H〜Q がすべて合格・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-30 P・Q のあと）
+### まず読む：いまの状態（2026-10-30 H〜Q のセッション終わり）
 
-- **公開中：`main`（P まで）**。セーブ version 28。テスト 878件。O は合格。Q（祭壇の並べ方）・P（カルシェルの正式なモンスターカード）は報告ずみ・返事待ち
-- ミュロルの正式なモンスターカードは、デザイン担当に依頼中（届いたらカルシェルと同じ手順：幅 508 の myurol_official.webp・`src/data/myurol.ts` の art・テスト）
-- 記録 `docs/night-20261030.md` の「Q」「P」
+- **公開中：`main`（P まで。H〜Q はすべてユーザー合格）**。**セーブ version 28**（K で 27→28）。テスト 878件。**次の指示を待っている**
+- 作業ブランチはどれも main に取り込み済み。新しい作業は新しいブランチで（`git fetch origin main && git checkout -B 新しいブランチ origin/main`）
+- このセッションでしたこと（記録：H〜J は `docs/parts-bgm-panel-20261030.md`、K〜Q は `docs/night-20261030.md`）
+  | # | 内容 |
+  | --- | --- |
+  | H | 正面向きの街の部品14枚（石の橋・ベンチ・排水溝・木箱・花壇・立て札・屋台・大工の小屋・階段）。原本 `design-parts/town-20261028/front-facing-20261030/` |
+  | I | BGM：タイトル「異世界へようこそ」・管理局「白銀の城」・プロローグ「Shy Love」。`docs/audio-credits.md` |
+  | J | 販売機の窓を絵のパネルに（`tools/design/gacha_panel_build.py`） |
+  | K | ガチャのシリーズの開く条件（箱の3体＋モンスターカードを手に入れたら開く・NEW。セーブ v28） |
+  | L | 通しで遊んで点検。見た目・押しにくさ14件を直した |
+  | M | プロローグ（「最初から」→ 挿絵2枚 → 主人公の選択）。`src/ui/screens/prologueScreen.ts` |
+  | N | カードショップの店の中を正面向きの絵に（`tools/design/cardshop_v2.py`・`shop_goods_20261030.py`） |
+  | O | 検品の直し：石の橋を橋に見せる（`town2026_build.py` の `stone_deck`）・主人公の選択と名前は Bon Voyage!・大会会場の曲・試験の記録・立ち位置・ダンジョン（ボスは1マス手前から・同じバトラーを出さない・0枚の行・祭壇）・小さい画面の押す所・図鑑の名前・英語 |
+  | Q | 祭壇の並べ方（モンスターを上の真ん中に大きく・技カードはその下。押すと大きく見られる）。確認用 `?qa=1&altar=N` |
+  | P | カルシェルの正式なモンスターカード（`kalshell_official.webp`・`src/data/kalshell.ts` の art） |
+- **待っているもの**
+  - ミュロルの正式なモンスターカード（デザイン担当に依頼中）。届いたらカルシェルと同じ手順：原本を `design-parts/cards-original/` に無改変 → 幅 508 の `myurol_official.webp` → `src/data/myurol.ts` に `art: { category: 'monsterCards', file: 'myurol_official.webp', layout: 'full' }` → `tests/myurol.test.ts`（今は art が無いことを確かめている）と `tests/dataIntegrity.test.ts` の一覧を直す
+  - 部屋の家具の描き直し（カードショップは N で済み。ほかの部屋の絵を待つ）
+- **未完了**：iPhone 実機での確認（H〜Q）。絵の中の日本語の字（英語表示のとき。あとで）
+- 公開のしかた：`gh` は使えない。`git fetch origin main && git checkout -B deploy-main origin/main && git merge --no-ff 作業ブランチ` →
+  **`npm run check` を通してから** `git push origin deploy-main:main` → GitHub の道具（MCP）の `actions_run_trigger` で `deploy-pages.yml` を main で動かす →
+  公開ページの `static/index-*.js` に変更が入ったかを curl で確かめる
+- 作業のこつ（このセッションで分かったこと）
+  - **コミットする前に `git status` で、ほかの作業のファイル（`git rm`・`git mv` したもの）が混ざっていないか見る**（M の公開で、N で消した絵の削除が混ざって組み立てに失敗した）
+  - 街の作り直し（`python3 -I tools/design/seimon_world_build.py design-parts/seimon-world`）は約5分。街だけの確認は `build_town(shade, 確認のフォルダ)` を呼ぶ小さなスクリプトで約3分
+  - 公開ページの前の版の写真は読みこみが遅い：`town_shot.cjs` の撮る場所に `"wait":8000`
+  - 前の版の写真を撮るときは `git worktree add 一時フォルダ origin/main` → `node_modules` をリンク → `npx vite build --outDir 別のフォルダ` → `npx vite preview --outDir 別のフォルダ --port 4177`
+  - 写真の確認で同じファイル名を作り直すと、前の絵が見えることがある（名前を変えて見る）
+  - 手伝いの係（サブエージェント）で通しの点検をするときは、`npm run check`（dist を作り直す）を係が終わるまで動かさない
+  - 撮影用のセーブは `tests/zz-*.test.ts` で作ったら必ず消す（型チェックに引っかかる）
 
 ### その前（2026-10-30 朝 O のあと）
 
