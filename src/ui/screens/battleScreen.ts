@@ -358,6 +358,8 @@ export const battleScreen: ScreenDefinition = {
     let talkStart = 0;
     let talkSeq = 0;
     let talkShownSeq = -1;
+    /** CPU のセリフ（迷う・守りそこねる）を出し終える時刻（それまでほかのひと言で上書きしない） */
+    let cpuLineUntil = 0;
     const detailW = DETAIL_CARD_W;
     /** 相手のひと言（【仮】台詞）を、顔の絵と一緒に大きく出す（カードの上に重ねる） */
     // ダンジョンの人（守り手・バトラー。2026-10-28）は、対戦の始め・勝ち・負けにその人のせりふ（src/data/people.ts の lines）
@@ -925,7 +927,10 @@ export const battleScreen: ScreenDefinition = {
         const action = chooseAction(state, s, s === 'opponent' ? req.opponent.ai : undefined, s === 'opponent' ? req.opponent.skill : undefined);
         // 腕前 C の CPU が攻撃を見送った・守りそこねた：記録の文ではなく、相手のセリフをふきだしで（2026-10-31 指示書 AB【2】。src/data/cpuLines.ts）
         const note = s === 'opponent' && action && 'note' in action ? action.note : undefined;
-        if (note) sayText(localText(pickCpuLine(req.opponent, note, cpuRoll(state, s, `line:${note}`))));
+        if (note) {
+          sayText(localText(pickCpuLine(req.opponent, note, cpuRoll(state, s, `line:${note}`))));
+          cpuLineUntil = talkUntil;
+        }
         if (action) dispatch(action);
       }, AI_STEP_MS + wait);
     };
@@ -2355,7 +2360,10 @@ export const battleScreen: ScreenDefinition = {
             // 相手のひと言（【仮】台詞）：自分のモンスターが倒れた／こちらのモンスターを倒した。
             // 何体目かで言葉を変える（2026-10-28：2体目・3体目でも「まず1体」と言っていた）。最後の1体のときは何も言わない（勝ち・負けのひと言が出る）
             const line = knockTalk(side, s.sides[side].monsters);
-            if (line) say(`battle.talk.${line}`);
+            // CPU のセリフ（守りそこねる など）を出している間は、言い終わってから（すぐ上書きしない。2026-10-31 指示書 AB【2】）
+            const wait = cpuLineUntil - Date.now();
+            if (line && wait > 0) setTimeout(() => !destroyed && say(`battle.talk.${line}`), wait);
+            else if (line) say(`battle.talk.${line}`);
           }
           else if (before !== undefined && m.life > before) sound.play('heal');
           if (!holding || before === undefined) prevLife.set(m.uid, m.life);

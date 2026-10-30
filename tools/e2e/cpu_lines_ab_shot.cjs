@@ -104,9 +104,10 @@ const want = (k) => !process.env.ONLY || process.env.ONLY.split(',').includes(k)
   for (const style of STYLES) {
     if (KINDS.includes('misguard')) {
       // 守りそこねる：こちらがヒョウズクのかぎづめ（ちから・2）でノエルのソラモ（真ん中）を攻撃。ノエルの手札にまるまる（ちから技の防御）
-      await start({ noel: true, style, mana: 5, hand: [hy(2), hy(1)], oppMana: 3, oppHand: ['skl-soramo14-11'] });
+      // 攻め（aggressive）は倒されそうなときしか守らないので、ソラモのライフを 2 にして倒される攻撃にする
+      await start({ noel: true, style, mana: 5, hand: [hy(2), hy(1)], oppMana: 3, oppHand: ['skl-soramo14-11'], oppLife: style === 'aggressive' ? { 'o-m2': 2 } : undefined });
       await use(hy4name(), 'o-m2');
-      for (const [i, ms] of [1200, 1200].entries()) { await page.waitForTimeout(ms); await shot(`misguard_${style}_${i}`); }
+      for (const [i, ms] of [1200, 1800, 1500].entries()) { await page.waitForTimeout(ms); await shot(`misguard_${style}_${i}`); }
       await page.waitForTimeout(2500);
       await page.locator('.battle__ticker-hit').first().click().catch(() => {});
       await page.waitForTimeout(900);
