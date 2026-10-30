@@ -24,11 +24,12 @@ import {
   withdraw,
 } from '../src/game/progress/tournament.ts';
 import { createNewSave, type SaveData } from '../src/game/save/saveData.ts';
+import { cupReady } from './support/cupReady.ts';
 
 const T_E = getTournament('tournament-e');
 
 function winTournament(save: SaveData, entryId: string): SaveData {
-  let s = enterTournament(save, 'tournament-e', entryId);
+  let s = enterTournament(cupReady(save), 'tournament-e', entryId);
   for (let round = 0; round < (T_E?.rounds.length ?? 0); round++) s = recordMatch(s, round, true);
   return s;
 }
@@ -71,7 +72,7 @@ describe('大会', () => {
   });
 
   it('1位になれなければ参加報酬だけ。同じ回戦の結果は二重に記録されない', () => {
-    let s = enterTournament(createNewSave(), 'tournament-e', 'entry-x');
+    let s = enterTournament(cupReady(createNewSave()), 'tournament-e', 'entry-x');
     s = recordMatch(s, 0, true);
     s = recordMatch(s, 0, true); // 二重記録は無視
     expect(s.activeTournament?.round).toBe(1);
@@ -87,7 +88,7 @@ describe('大会', () => {
   });
 
   it('途中の状態は保存され、再開できる。棄権もできる', () => {
-    let s = enterTournament(createNewSave(), 'tournament-e', 'entry-y');
+    let s = enterTournament(cupReady(createNewSave()), 'tournament-e', 'entry-y');
     s = recordMatch(s, 0, true);
     // 中断中に新しく参加しようとしても状態は変わらない
     expect(enterTournament(s, 'tournament-e', 'entry-z')).toBe(s);

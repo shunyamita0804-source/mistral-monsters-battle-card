@@ -16,6 +16,7 @@ import {
 } from '../src/game/progress/tournament.ts';
 import { drawEntrants, PLAYER_ENTRANT } from '../src/game/progress/tournamentDraw.ts';
 import { createNewSave, FLAG_SIENNA_LEFT, normalizeSave, SAVE_VERSION, type SaveData, type TournamentMatch } from '../src/game/save/saveData.ts';
+import { cupReady } from './support/cupReady.ts';
 
 const tour = (id: string): TournamentDefinition => {
   const t = getTournament(id);
@@ -28,7 +29,7 @@ const A = tour('tournament-a');
 const S = tour('tournament-s');
 const E = tour('tournament-e');
 
-const withRank = (rank: SaveData['rank']): SaveData => ({ ...createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance'), rank });
+const withRank = (rank: SaveData['rank']): SaveData => cupReady({ ...createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance'), rank });
 const match = (a: string, b: string, winner: string, aLeft: number, bLeft: number, aDamage: number, bDamage: number): TournamentMatch => ({ round: 0, a, b, winner, aLeft, bLeft, aDamage, bDamage });
 
 describe('大会のデータ（仮）', () => {
@@ -275,7 +276,7 @@ describe('シエナがいなくなったあいだ（2026-10-27 ユーザー指�
 
 describe('報酬・記録・セーブ', () => {
   const winC = (save: SaveData, entryId: string): SaveData => {
-    let s = enterTournament(save, 'tournament-c', entryId, 1);
+    let s = enterTournament(cupReady(save), 'tournament-c', entryId, 1);
     for (let r = 0; r < 3; r++) s = recordMatch(s, r, true);
     return s;
   };
@@ -319,7 +320,8 @@ describe('報酬・記録・セーブ', () => {
   });
 
   it('前の形式（version 17）の途中の大会は、その大会の1試合目からやり直し（参加の回数はそのまま）', () => {
-    const { storyFlags: _f, ...rest } = withRank('D');
+    // ボスを倒した記録のない前のセーブ（cupReady を通さない）
+    const { storyFlags: _f, ...rest } = { ...createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance'), rank: 'D' as const };
     const old = {
       ...rest,
       version: 17,

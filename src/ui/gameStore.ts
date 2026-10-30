@@ -4,7 +4,7 @@ import type { BattleWinner } from '../game/battle/engine.ts';
 import { sanitizeLocation } from '../game/progress/dungeon.ts';
 import type { PracticeResult } from '../game/story/intro.ts';
 import type { Deck } from '../game/deck/deck.ts';
-import { createNewGameSave, type SaveData } from '../game/save/saveData.ts';
+import { createNewGameSave, type GameDate, type SaveData } from '../game/save/saveData.ts';
 import { MemoryStorage, SaveRepository, type KeyValueStorage, type LoadResult } from '../game/save/saveRepository.ts';
 import type { BgmId } from './bgm.ts';
 import { SettingsStore } from './settingsStore.ts';
@@ -79,6 +79,11 @@ export class GameStore {
   lastSaveOk = true;
   /** 設定（言語・音量）。セーブとは別に保存する */
   readonly settings: SettingsStore;
+  /**
+   * 月が変わる演出を出し終えた年と月（2026-10-30 指示書 R2）。セーブの年と月と違えば、街・部屋に戻ったときなどに演出を出す。
+   * セーブを読んだとき・最初から始めたとき・バックアップから戻したときは、そのセーブの年と月（演出は出さない）
+   */
+  #shownCalendar: GameDate | null = null;
 
   constructor(storage: KeyValueStorage, qa = false) {
     // 言語を先に決める（読み込みのお知らせなどをその言語で出すため）
@@ -87,6 +92,7 @@ export class GameStore {
     this.qa = qa;
     this.loadResult = this.#repo.load();
     if (this.loadResult.status === 'loaded') this.#save = sanitizeLocation(this.loadResult.save);
+    this.#shownCalendar = this.#save?.calendar ?? null;
   }
 
   static fromBrowser(): GameStore {
@@ -113,7 +119,30 @@ export class GameStore {
   /** 最初から（2026-10-28：カードを持たずに始める。初期デッキ3択はなくした。名前は主人公を選んだすぐあとに決めたもの） */
   newGame(gender: 'male' | 'female', name: string): void {
     this.#save = { ...createNewGameSave(new Date()), player: { gender, name } };
+    this.#shownCalendar = this.#save.calendar;
     this.persist();
+  }
+
+  /** まだ演出を出していない月の変わり目（出したことのある年と月 → いまの年と月）。なければ null */
+  pendingMonthChange(): { readonly from: GameDate; readonly to: GameDate } | null {
+    const to = this.#save?.calendar;
+    if (!to) return null;
+    const from = this.#shownCalendar;
+    if (!from) {
+      this.#shownCalendar = to;
+      return null;
+    }
+    return from.year === to.year && from.month === to.month ? null : { from, to };
+  }
+
+  /** 日付の札に出す年と月（月が変わる演出を出すまでは、前の年と月のまま） */
+  get displayCalendar(): GameDate {
+    return this.#shownCalendar ?? this.save.calendar;
+  }
+
+  /** 月が変わる演出を出し終えた（いまの年と月まで） */
+  markMonthShown(): void {
+    this.#shownCalendar = this.#save?.calendar ?? null;
   }
 
   update(fn: (save: SaveData) => SaveData): SaveData {
@@ -138,6 +167,7 @@ export class GameStore {
     const next = sanitizeLocation(save);
     if (!this.#repo.save(next)) return false;
     this.#save = next;
+    this.#shownCalendar = next.calendar;
     this.pendingBattle = null;
     this.flashMessage = null;
     this.flashBanner = null;

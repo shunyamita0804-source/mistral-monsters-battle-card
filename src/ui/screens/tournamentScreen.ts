@@ -29,6 +29,9 @@ import { rewardGlow } from '../components/rewardGlow.ts';
 import { celebrationBanner, dungeonFoundBanner } from '../components/celebrationBanner.ts';
 import type { RankId } from '../../data/economy.ts';
 import { sound } from '../sound.ts';
+import { isOfficialMonth, isTeamMonth, nextOfficialMonth } from '../../game/calendar/calendar.ts';
+import { monthName } from '../../i18n/calendarText.ts';
+import { playMonthChange } from '../components/calendarArt.ts';
 import faceReceptionist from '@assets/images/characters/face_receptionist.webp';
 import arenaBg from '@assets/images/backgrounds/battle_arena.webp';
 import arenaDBg from '@assets/images/backgrounds/battle_arena_d.webp';
@@ -155,7 +158,16 @@ export const tournamentScreen: ScreenDefinition = {
           ...lines.map((t) => h('p', { class: 'modal__text', text: t })),
         ],
         actions: [{ label: tr('common.ok'), primary: true, onTap: () => handle.close() }],
-        onClose: render,
+        onClose: () => {
+          render();
+          // 大会が終わったので月が進んだ（2026-10-30 指示書 R2）：景品のお知らせのあとに月が変わる演出
+          const change = store.pendingMonthChange();
+          if (change) {
+            // 先に「出した」にしておく（演出の途中で会場に戻っても、もう一度は出さない）
+            store.markMonthShown();
+            playMonthChange(element, change.to, () => {}, { yearChanged: change.from.year !== change.to.year });
+          }
+        },
       });
     });
 
@@ -216,8 +228,12 @@ export const tournamentScreen: ScreenDefinition = {
       const t = active ? getTournament(active.tournamentId) : undefined;
       const body: (HTMLElement | null)[] = [];
       if (!active || !t) {
+        const welcome = save.player.name ? tr('tournament.welcomeName', { name: save.player.name, rank: save.rank }) : tr('tournament.welcome', { rank: save.rank });
+        // 公式戦は 3・6・9月だけ（2026-10-30 指示書 R2）：ほかの月は「次の公式戦は ○月です」、12月は「チーム戦の月です」と言って受け付けない
+        const month = save.calendar.month;
+        const monthNote = isOfficialMonth(month) ? null : isTeamMonth(month) ? tr('tournament.welcomeTeam') : tr('tournament.welcomeMonth', { month: monthName(nextOfficialMonth(month)) });
         body.push(
-          h('div', { class: 'tournament__desk' }, h('img', { class: 'tournament__clerk shop-menu__face', attrs: { src: faceReceptionist, alt: tr('tournament.clerk'), draggable: 'false' } }), h('p', { class: 'shop-menu__bubble', text: save.player.name ? tr('tournament.welcomeName', { name: save.player.name, rank: save.rank }) : tr('tournament.welcome', { rank: save.rank }) })),
+          h('div', { class: 'tournament__desk' }, h('img', { class: 'tournament__clerk shop-menu__face', attrs: { src: faceReceptionist, alt: tr('tournament.clerk'), draggable: 'false' } }), h('p', { class: 'shop-menu__bubble', text: monthNote ? `${welcome}\n${monthNote}` : welcome })),
           ...TOURNAMENTS.map(tournamentCard),
         );
       } else if (active.status === 'inProgress') {

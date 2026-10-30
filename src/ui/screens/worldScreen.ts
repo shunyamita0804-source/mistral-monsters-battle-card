@@ -99,6 +99,10 @@ import { newId } from '../gameStore.ts';
 import { playScene } from '../components/dialogue.ts';
 import { showDungeonIntro } from '../components/dungeonIntro.ts';
 import { showOpeningIntro } from '../components/openingIntro.ts';
+import { datePlate, playMonthChange, playSleep } from '../components/calendarArt.ts';
+import { openNoticeBoard } from '../components/noticeBoard.ts';
+import { advanceMonth } from '../../game/calendar/calendar.ts';
+import { dateLabel } from '../../i18n/calendarText.ts';
 import { confirmModal, messageModal, openModal } from '../components/modal.ts';
 import { openCardList } from '../components/cardListView.ts';
 import { canChallengePete, hasBeatenPete, PETE_OPPONENT, winPete } from '../../game/story/pete.ts';
@@ -796,7 +800,9 @@ export class WorldView {
     const afterOpening = (): void => {
       const afterScene = this.#afterLoadScene ?? undefined;
       this.#afterLoadScene = null;
-      const next = v2Run ?? (scene ? () => this.#playScene(scene, afterScene) : undefined);
+      const sceneNext = v2Run ?? (scene ? () => this.#playScene(scene, afterScene) : undefined);
+      // ダンジョンから戻った・大会が終わったあとに月が変わっていたら、お知らせのあとに月が変わる演出（2026-10-30 指示書 R2）
+      const next = dev ? sceneNext : () => this.#monthChange(() => sceneNext?.());
       if (flash) {
         this.#store.flashMessage = null;
         const stage = clear ? this.#clearScene(clear) : null;
@@ -1081,7 +1087,9 @@ export class WorldView {
     this.#fade = h('div', { class: `world__fade${fade || keepClosed ? ' is-on' : ''}`, attrs: { 'aria-hidden': 'true' } });
     this.#nearKey = '';
     this.#leanTo = null;
-    this.#root.replaceChildren(this.#viewport, hud, examine, hint ?? '', goal ?? '', this.#fade);
+    // 年と月の札（2026-10-30 指示書 R2）：街と部屋の左上、場所の名前の札の下（ダンジョン・確認画面では出さない）
+    const date = !this.#dev && map.area !== 'dungeon' ? datePlate(this.#store.displayCalendar) : null;
+    this.#root.replaceChildren(this.#viewport, hud, date ?? '', examine, hint ?? '', goal ?? '', this.#fade);
     this.#root.dataset.map = map.id;
     this.#root.dataset.intro = save.story.intro;
     this.#root.dataset.introV2 = save.story.introV2.state;
@@ -2598,6 +2606,82 @@ export class WorldView {
     });
   }
 
+  /** まだ出していない月の変わり目があれば、月が変わる演出（そのあいだは歩けない）。終わったら日付の札を描き直して done */
+  #monthChange(done: () => void): void {
+    const change = this.#store.pendingMonthChange();
+    if (!change) {
+      done();
+      return;
+    }
+    this.#busy = true;
+    this.#held = null;
+    this.#path = [];
+    playMonthChange(this.#root, change.to, () => {
+      this.#store.markMonthShown();
+      this.#busy = false;
+      this.#refreshDatePlate();
+      done();
+    }, { yearChanged: change.from.year !== change.to.year });
+  }
+
+  /** 左上の日付の札を、いまの年と月で描き直す */
+  #refreshDatePlate(): void {
+    const old = this.#root.querySelector('.date-plate');
+    if (old) old.replaceWith(datePlate(this.#store.displayCalendar));
+  }
+
+  /** 家のベッド（2026-10-30 指示書 R2）：寝る（1か月進む）・セーブ（これまでのベッドの画面）・ロード（バックアップから復元のある設定の画面） */
+  #bedMenu(): void {
+    this.#busy = true;
+    this.#held = null;
+    let next: (() => void) | null = null;
+    const handle = openModal(this.#root, {
+      title: t('calendar.bed.title'),
+      className: 'bed-menu',
+      body: [h('p', { class: 'modal__text', text: dateLabel(this.#store.save.calendar) })],
+      actions: [
+        { label: t('calendar.bed.sleep'), primary: true, onTap: () => ((next = () => this.#confirmSleep()), handle.close()) },
+        { label: t('calendar.bed.save'), onTap: () => ((next = () => this.#ctx.navigate('settings')), handle.close()) },
+        { label: t('calendar.bed.load'), onTap: () => ((next = () => this.#ctx.navigate('options')), handle.close()) },
+        { label: t('common.cancel'), onTap: () => handle.close() },
+      ],
+      onClose: () => {
+        this.#busy = false;
+        next?.();
+      },
+    });
+  }
+
+  /** 「1か月休みますか？」→ はい：夜の挿絵 → 暗転 → 月が変わる演出 → 家の中（ベッドの前）で朝。体力などは変わらない（時間を進めるだけ） */
+  #confirmSleep(): void {
+    this.#busy = true;
+    confirmModal(this.#root, t('calendar.bed.sleepConfirm'), [], () => this.#sleep(), () => (this.#busy = false));
+  }
+
+  #sleep(): void {
+    this.#busy = true;
+    this.#held = null;
+    this.#path = [];
+    const before = this.#store.save.calendar;
+    // 先に月の変わり目をすませておく（寝る前にまだ出していない変わり目があっても、ここでまとめて出す）
+    this.#store.update(advanceMonth);
+    const to = this.#store.save.calendar;
+    playSleep(this.#root, to, before.year !== to.year, () => {
+      this.#store.markMonthShown();
+      this.#refreshDatePlate();
+      this.#message(t('calendar.bed.morning', { date: dateLabel(to) }));
+    });
+  }
+
+  /** 管理局の掲示板：大会のお知らせ（公式戦・チーム戦の月と出場の条件） */
+  #openNoticeBoard(): void {
+    this.#busy = true;
+    this.#held = null;
+    openNoticeBoard(this.#root, this.#store.save, () => {
+      this.#busy = false;
+    });
+  }
+
   /** 総当たりの大会の表（出ている大会、なければ最後に出た E・D の大会） */
   #leagueNow(): { tour: TournamentDefinition; active: ActiveTournament } | null {
     const save = this.#store.save;
@@ -2660,6 +2744,8 @@ export class WorldView {
       case 'restore': return this.#openRestore();
       case 'researcher': return this.#researcherMenu();
       case 'leagueBoard': return this.#openLeagueBoard();
+      case 'bed': return this.#bedMenu();
+      case 'noticeBoard': return this.#openNoticeBoard();
       default: this.#message(message ?? '');
     }
   }

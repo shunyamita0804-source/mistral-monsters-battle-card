@@ -43,6 +43,7 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | `images/characters/neighbor_guide_talk_{normal,smile,explain,surprised,worried,happy}.webp` | 案内役の会話の絵（胸から上・表情6種。困り顔 troubled は worried） | ユーザー提供・**正式**。原本 1122×1402 PNG を半分（561×701）に縮小して WebP にしただけ（描き換えなし） |
 | `images/maps/town/town2_r{0-3}c{0-3}.webp`・`images/maps/town/t2_*.webp` | 街（2026-10-28 作り直し）：地面と人がいつも手前に立つ物（4×4 に分割）と、建物・木・小物・噴水・門など人と前後を比べる絵 | 2026-10-28 に届いた部品（原本 `design-parts/town-20261028/`）に、ユーザー承認の色の処理（`tools/design/town_tone_20261028.py`）をかけ、`tools/design/town2026_build.py` が配置図どおりに並べたもの。描き換えなし（切り出し・縮小・影） |
 | `images/maps/rooms/*.webp` | 7種類の部屋の箱と家具（1つずつ切り出し） | 同上（部屋の箱7・家具7） |
+| `images/ui/calendar/*.webp` | カレンダーの絵16枚（日付の札・季節の紋・月の帯・季節の街の挿絵・夜の挿絵・掲示板の背景と紙・行事の紋） | 2026-10-30 に届いた絵（原本 `design-parts/ui-calendar-20261030/`）を WebP にしただけ（掲示板の背景だけ 780×1688 に縮小）。描き換えなし |
 | `images/ui/talk/dialogue_window_blank.png`・`name_label_blank.png`・`button_blank.png` | 会話のセリフ枠・名前の札・選択肢のボタン（無地。文字はゲーム側で重ねる） | ミストラルモンスターズの会話 UI を許可により利用（ユーザー指示 2026-10-22。`docs/audio-credits.md`）。加工なし |
 
 | `audio/se/card_draw.*`・`turn_order_select.*`・`mana_gain.*` | 効果音（カードを引く・先攻後攻を選ぶ・マナが増える）。OGG と M4A | ミストラルモンスターズの素材を許可により利用（`docs/audio-credits.md`） |

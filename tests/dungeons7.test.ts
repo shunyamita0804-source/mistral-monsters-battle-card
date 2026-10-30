@@ -17,6 +17,7 @@ import {
 } from '../src/game/dungeon/run.ts';
 import { claimTournamentRewards, enterTournament, recordMatch } from '../src/game/progress/tournament.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, unlockedDungeonsFor, type Direction, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
+import { cupReady } from './support/cupReady.ts';
 
 const fresh = (): SaveData => createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance');
 const runOf = (s: SaveData): DungeonRun => {
@@ -99,7 +100,7 @@ describe('開放', () => {
     const d = getTournament('tournament-d');
     if (!d) throw new Error('d');
     let s: SaveData = { ...fresh(), rank: 'D', unlockedDungeons: ['dungeon-01', 'dungeon-02', 'dungeon-03'] };
-    s = enterTournament(s, 'tournament-d', 'd-1', 1);
+    s = enterTournament(cupReady(s), 'tournament-d', 'd-1', 1);
     for (let r = 0; r < 3; r++) s = recordMatch(s, r, true);
     const claim = claimTournamentRewards(s);
     if (claim.status !== 'ok') throw new Error('claim');

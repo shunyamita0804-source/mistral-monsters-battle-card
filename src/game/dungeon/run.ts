@@ -7,6 +7,7 @@ import { addItem, canAddItem, consumeItem, itemCount, useItem, type UseItemResul
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
 import { generateFloor, isWalkableTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
+import { advanceMonth } from '../calendar/calendar.ts';
 
 /**
  * ランダム生成のダンジョンの挑戦（2026-10-26 試作。GB 版のダンジョンを参考に）。DOM に依存しない純粋関数。
@@ -361,12 +362,13 @@ export function winRunBattle(save: SaveData, target: { kind: BattleTargetKind; i
   next = addCards(addCoins(next, coins), clearCards);
   const flag = dungeon?.bossFlag;
   const flags = [...next.storyFlags, ...(flag && !next.storyFlags.includes(flag) ? [flag] : [])].filter((f) => !(owed && f === dungeon?.altarOwedFlag));
-  next = {
+  // 挑戦を終えて街に戻るので、1か月進む（2026-10-30 指示書 R2）
+  next = advanceMonth({
     ...next,
     dungeonRun: null,
     dungeons: { ...next.dungeons, [run.dungeonId]: { ...record, bossDefeated: true, clears: record.clears + 1 } },
     storyFlags: flags,
-  };
+  });
   return { save: next, cleared: true, firstClear, coins, clearCards };
 }
 
@@ -459,7 +461,8 @@ export function loseRunBattle(save: SaveData, target: { kind: BattleTargetKind; 
     if (n > 0) collection[id] = n;
     else delete collection[id];
   }
-  return { save: { ...save, collection, dungeonRun: null }, expelled: true, lostCards: lost, lossesLeft: 0, charmSaved: false, keptCard };
+  // 街に戻されるので、1か月進む（2026-10-30 指示書 R2）
+  return { save: advanceMonth({ ...save, collection, dungeonRun: null }), expelled: true, lostCards: lost, lossesLeft: 0, charmSaved: false, keptCard };
 }
 
 /**

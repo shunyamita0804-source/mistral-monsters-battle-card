@@ -24,6 +24,7 @@ import './ui/styles/gacha.css';
 import './ui/styles/items.css';
 import './ui/styles/ui33.css';
 import './ui/styles/nameCardList.css';
+import './ui/styles/calendar.css';
 import './ui/styles/tapSize.css';
 import { startApp } from './ui/app.ts';
 

@@ -163,7 +163,6 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:bureau-medal-case:label': 'Medal Case',
   'object:bureau-medal-case:message': 'Medals of past champions shine behind the glass.',
   'object:bureau-notice-board:label': 'Notice Board',
-  'object:bureau-notice-board:message': 'Cup announcements are posted. "Raise your rank and take on the next cup!"',
   'object:bureau-exit:label': 'Exit',
   'object:door-hall:label': 'Tournament Hall',
   'object:door-dungeon:label': 'Dungeon Entrance',

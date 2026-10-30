@@ -1,6 +1,9 @@
 import { rankAtLeast } from '../../data/economy.ts';
 import { getTournament, tournamentOpponents, type CardReward, type OpponentDefinition, type TournamentDefinition } from '../../data/tournaments.ts';
 import { t } from '../../i18n/i18n.ts';
+import { monthName } from '../../i18n/calendarText.ts';
+import { dungeonName } from '../../i18n/content.ts';
+import { getDungeon } from '../../data/dungeons.ts';
 import { simulateBattle } from '../battle/simulate.ts';
 import { isDeckValid } from '../deck/deck.ts';
 import { shuffle } from '../rng.ts';
@@ -16,6 +19,7 @@ import {
   type TournamentRecord,
 } from '../save/saveData.ts';
 import { drawEntrants, PLAYER_ENTRANT, seedFromId, TOURNAMENT_ROUNDS } from './tournamentDraw.ts';
+import { advanceMonth, isOfficialMonth, isTeamMonth, missingBosses, nextOfficialMonth } from '../calendar/calendar.ts';
 
 /**
  * 大会の進行：受付 → 対戦（回戦ごと） → 結果 → 優勝/敗退 → 景品受け取り。
@@ -38,6 +42,20 @@ export function entryCheck(save: SaveData, tournament: TournamentDefinition): { 
   const reasons: string[] = [];
   if (!rankAtLeast(save.rank, tournament.requiredRank)) {
     reasons.push(t('tournament.issue.rank', { required: tournament.requiredRank, rank: save.rank }));
+  }
+  // 公式戦は 3・6・9月だけ。12月はチーム戦の月（2026-10-30 指示書 R2）
+  const month = save.calendar.month;
+  if (!isOfficialMonth(month)) {
+    reasons.push(isTeamMonth(month) ? t('tournament.issue.team') : t('tournament.issue.month', { month: monthName(nextOfficialMonth(month)) }));
+  }
+  // そのランクで開いているダンジョンのボスを、すべて倒していること（src/data/calendar.ts の RANK_BOSS_DUNGEONS）
+  const missing = missingBosses(save, tournament.requiredRank);
+  if (missing.length > 0) {
+    const names = missing.map((id) => {
+      const d = getDungeon(id);
+      return d ? dungeonName(d) : id;
+    });
+    reasons.push(t('tournament.issue.boss', { names: names.join(t('common.listSeparator')) }));
   }
   if (!isDeckValid(save.deck, save.collection)) reasons.push(t('tournament.issue.deck'));
   if (save.activeTournament && save.activeTournament.tournamentId !== tournament.id) {
@@ -270,7 +288,8 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
   if (newDungeons.length > 0) next = { ...next, unlockedDungeons: dungeons };
   // C ランク大会を終えたら（優勝しても負けても）「シエナがいなくなった」の記録（記録だけ。イベントダンジョンは別の指示書）
   if (tournament.id === 'tournament-c' && !next.storyFlags.includes(FLAG_SIENNA_LEFT)) next = { ...next, storyFlags: [...next.storyFlags, FLAG_SIENNA_LEFT] };
-  next = {
+  // 大会が終わったので、1か月進む（優勝でも負けでも。2026-10-30 指示書 R2）
+  next = advanceMonth({
     ...next,
     activeTournament: null,
     // 総当たりの大会は、終わった表を残す（大会会場の壁の板に描く）
@@ -284,7 +303,7 @@ export function claimTournamentRewards(save: SaveData): ClaimResult {
         firstWinClaimed: record.firstWinClaimed || firstWin,
       },
     },
-  };
+  });
   return {
     status: 'ok',
     save: next,

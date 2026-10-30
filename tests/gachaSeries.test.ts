@@ -235,7 +235,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
     const s = normalizeSave(JSON.parse(JSON.stringify(old)));
     if (!s) throw new Error('load');
     expect(s.version).toBe(SAVE_VERSION);
-    expect(SAVE_VERSION).toBe(28);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(28);
     expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']);
     for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
   });

@@ -1,5 +1,6 @@
 import { getItem, ITEM_RULES, type ItemId } from '../../data/items.ts';
 import { hasProcessed, markProcessed, type DungeonRun, type SaveData } from '../save/saveData.ts';
+import { advanceMonth } from '../calendar/calendar.ts';
 
 /**
  * ダンジョンの道具（2026-10-27 ユーザー指示書「ダンジョンの道具とショップの『道具を買う』」）。DOM に依存しない純粋関数。
@@ -136,7 +137,8 @@ export function useItem(save: SaveData, id: ItemId, sealCard?: string): UseItemR
       return withRun({ sealBoxUsed: true, sealedCard: sealCard });
     case 'returnFeather':
       // 挑戦を終えて街の入り口へ（位置は入る前の街の入り口のまま）。手に入れた技カードは勝ったときに所持へ入っているので、そのまま持ち帰る。クリアの報酬はない
-      return { status: 'ok', save: { ...spent, dungeonRun: null }, returned: true };
+      // 街に戻るので、1か月進む（2026-10-30 指示書 R2）
+      return { status: 'ok', save: advanceMonth({ ...spent, dungeonRun: null }), returned: true };
     case 'smokeBall':
       return { status: 'blocked', reason: 'guardianOnly', save };
   }
