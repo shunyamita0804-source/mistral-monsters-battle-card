@@ -1,0 +1,167 @@
+{
+  "monster": "ヒョウズク",
+  "monster_id": "mon-hyouzuku",
+  "life": 7,
+  "monster_rank": "B",
+  "frame_color_name": "銀に近い白",
+  "frame_color_hex": "#C8CCD4",
+  "habitat": "氷の洞窟",
+  "status": "正式（2026-10-30）。G3 決定 17:31・LIFE 7（17:42）・こおりわりは「防御されない」（17:47）。試遊は W で行う。絵はすべて正式（技14・モンスターカード・バトル用・パック）。氷の洞窟のボス・イヴァンの切り札（カルシェルから替える）",
+  "skills": [
+    {
+      "no": 1,
+      "id": "skl-hyouzuku-01",
+      "name": "ついばむ",
+      "category": "ちから技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_01.png"
+    },
+    {
+      "no": 2,
+      "id": "skl-hyouzuku-02",
+      "name": "かぎづめ",
+      "category": "ちから技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_02.png"
+    },
+    {
+      "no": 3,
+      "id": "skl-hyouzuku-03",
+      "name": "こなゆき",
+      "category": "かしこさ技",
+      "mana": 1,
+      "damage": "1",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_03.png"
+    },
+    {
+      "no": 4,
+      "id": "skl-hyouzuku-04",
+      "name": "つららおとし",
+      "category": "かしこさ技",
+      "mana": 2,
+      "damage": "2",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_04.png"
+    },
+    {
+      "no": 5,
+      "id": "skl-hyouzuku-05",
+      "name": "こおりのいき",
+      "category": "かしこさ技",
+      "mana": 3,
+      "damage": "1",
+      "effect": "相手は次のターン行動不可",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_05.png"
+    },
+    {
+      "no": 6,
+      "id": "skl-hyouzuku-06",
+      "name": "こおりわり",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "2",
+      "effect": "防御されない",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_06.png"
+    },
+    {
+      "no": 7,
+      "id": "skl-hyouzuku-07",
+      "name": "きゅうこうか",
+      "category": "ちから技",
+      "mana": 3,
+      "damage": "3",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_07.png"
+    },
+    {
+      "no": 8,
+      "id": "skl-hyouzuku-08",
+      "name": "つららのあめ",
+      "category": "かしこさ技",
+      "mana": 4,
+      "damage": "4",
+      "effect": "なし",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_08.png"
+    },
+    {
+      "no": 9,
+      "id": "skl-hyouzuku-09",
+      "name": "ふぶき",
+      "category": "かしこさ技",
+      "mana": 5,
+      "damage": "3",
+      "effect": "相手は次のターン行動不可",
+      "gacha_slot": "レア",
+      "art": "hyouzuku_sk_09.png"
+    },
+    {
+      "no": 10,
+      "id": "skl-hyouzuku-10",
+      "name": "ひょうが",
+      "category": "かしこさ技",
+      "mana": 5,
+      "damage": "5",
+      "effect": "なし",
+      "gacha_slot": "レア",
+      "art": "hyouzuku_sk_10.png"
+    },
+    {
+      "no": 11,
+      "id": "skl-hyouzuku-11",
+      "name": "はねでつつむ",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技のダメージを2軽減",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_11.png"
+    },
+    {
+      "no": 12,
+      "id": "skl-hyouzuku-12",
+      "name": "つばさのたて",
+      "category": "防御技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技のダメージを3軽減",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_12.png"
+    },
+    {
+      "no": 13,
+      "id": "skl-hyouzuku-13",
+      "name": "まいあがる",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "かしこさ技を回避",
+      "gacha_slot": "ノーマル",
+      "art": "hyouzuku_sk_13.png"
+    },
+    {
+      "no": 14,
+      "id": "skl-hyouzuku-14",
+      "name": "おとなきはばたき",
+      "category": "回避技",
+      "mana": 2,
+      "damage": "―",
+      "effect": "ちから技・かしこさ技を、消費マナに関係なく回避",
+      "gacha_slot": "レア",
+      "art": "hyouzuku_sk_14.png"
+    }
+  ],
+  "freeze_rule": "5 こおりのいき・9 ふぶき の「相手は次のターン行動不可」は、ノビトンのまきつくとまったく同じ決まり（回避されたらかからない・防御で0ダメージでもかかる・守りのカードは使える・もう一度かけたら期限だけ新しく）。6 こおりわり の「防御されない」はジオルのいわくだきと同じ決まり"
+}

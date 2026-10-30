@@ -45,6 +45,7 @@ MONSTER_COLORS = {
     'flune': '#9CBF5A',  # 2026-10-29 フルーネ（若葉色）
     'serephine': '#8FA6E8',  # 2026-10-29 セレフィーン（月の青紫）
     'tsumuji': '#8FA3B8',  # 2026-10-30 ツムジ（くすんだ青みの灰）
+    'hyouzuku': '#C8CCD4',  # 2026-10-30 ヒョウズク（銀に近い白。指示書 W）
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

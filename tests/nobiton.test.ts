@@ -214,7 +214,7 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
       ...s,
       sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [nob(1), nob(8), nob(9), sor(1)].map((cardId, i) => ({ uid: `o${i}`, cardId })) } },
     };
-    expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'このターンは行動できません（まきつく）' });
+    expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'このターンは行動できません（行動不可）' });
     expect(cardUsability(s, 'opponent', 'o1').usable).toBe(false);
     expect(cardUsability(s, 'opponent', 'o2').usable).toBe(false);
     expect(cardUsability(s, 'opponent', 'o3').usable).toBe(true);

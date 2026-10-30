@@ -356,7 +356,7 @@ describe('ツムジのガチャのシリーズ', () => {
 
   it('パックの色（pack_tint.py）・パックの絵（gacha_series_build.py）・ショップの棚（shop_goods_20261030.py）にツムジがある', () => {
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'tsumuji': '#8FA3B8'");
-    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji'\]/);
-    expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji'\]/);
+    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji'.*\]/);
+    expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji'.*\]/);
   });
 });

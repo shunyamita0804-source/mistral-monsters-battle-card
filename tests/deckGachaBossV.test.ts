@@ -118,8 +118,8 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
     }
   });
 
-  it('セーブの version は上げていない（デッキ・カードは書きかえないので）', () => {
-    expect(SAVE_VERSION).toBe(29);
+  it('セーブの version は上げていない（デッキ・カードは書きかえないので。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
+    expect(SAVE_VERSION).toBe(30);
   });
 });
 
@@ -189,7 +189,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     'enc-forest-boss': 'mon-flune',
     'enc-water-boss': 'mon-serephine',
     'enc-wind-boss': 'mon-tsumuji',
-    'enc-ice-boss': 'mon-kalshell',
+    'enc-ice-boss': 'mon-hyouzuku', // 2026-10-30 指示書 W：カルシェルからヒョウズクに
     'enc-fire-boss': 'mon-gauul',
     'enc-machine-boss': 'mon-lazuck',
     'enc-holy-boss': 'mon-soramo',
@@ -212,7 +212,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       'enc-forest-boss': 0.7,
       'enc-water-boss': 1.2,
       'enc-wind-boss': 1.1,
-      'enc-ice-boss': 1.6,
+      'enc-ice-boss': 1.3, // 2026-10-30 指示書 W：ヒョウズクに替えて合わせ直した（±3 には入らない）
       'enc-fire-boss': 1.75,
       'enc-machine-boss': 1.2,
       'enc-holy-boss': 1.75,

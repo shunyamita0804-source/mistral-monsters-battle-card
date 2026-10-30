@@ -84,3 +84,12 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 | `gacha_owned_shot.cjs` | 販売機の前でパックを選ぶ所・提供割合・シリーズを買ったときの中身の15枠（持っているモンスターは絵、持っていないものは ?）。W・H・LANG |
 
 - 見る前（直す前）の版は、`git worktree add` で前の main を作り、`vite build --outDir` して別のポート（例 4177）で `vite preview --outDir` する
+
+## 2026-10-30 ヒョウズク（指示書 W。`docs/hyouzuku-w-20261030.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `hyouzuku_battle_shot.cjs` | ふぶきが当たって相手が行動不可・こちらのヒョウズクが凍らされた手番（押すと理由）・こおりわり。開発用サーバー。W・H・LANG |
+
+- 祭壇（初回・前のセーブ）は `dungeon_people_shot.cjs URL フォルダ 出力 win`（フォルダに `boss_dungeon-04.json`。前のセーブは version 29・氷の洞窟クリア済み）
+- 撮影用のセーブで導入を終わらせるには `story.introV2` の `state: 'completed'` に加えて `examPassed`・`selectedBoosterKey`・`boosterClaimed`・`boosterGranted`・`tutorialCompleted` も入れる（入れないと練習場の試験に戻る）

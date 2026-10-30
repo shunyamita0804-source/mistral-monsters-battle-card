@@ -1,0 +1,238 @@
+{
+ "games": 200,
+ "baseAverage": 50.333333333333336,
+ "base": {
+  "booster-1": {
+   "booster-1": 48,
+   "booster-2": 46,
+   "booster-3": 55.00000000000001
+  },
+  "booster-2": {
+   "booster-1": 55.00000000000001,
+   "booster-2": 47.5,
+   "booster-3": 50
+  },
+  "booster-3": {
+   "booster-1": 51,
+   "booster-2": 47,
+   "booster-3": 53.5
+  }
+ },
+ "swapped": {
+  "booster-1#0": "ソラモ",
+  "booster-1#1": "ガウル",
+  "booster-1#2": "ミュロル",
+  "booster-2#0": "ガウル",
+  "booster-2#1": "ラズック",
+  "booster-2#2": "ノビトン",
+  "booster-3#0": "カルシェル",
+  "booster-3#1": "ミュロル",
+  "booster-3#2": "ノビトン"
+ },
+ "subjects": {
+  "mon-hyouzuku": {
+   "name": "ヒョウズク",
+   "average": 49.7962962962963,
+   "rows": {
+    "booster-1#0": {
+     "booster-1": 50.5,
+     "booster-2": 48,
+     "booster-3": 39.5
+    },
+    "booster-1#1": {
+     "booster-1": 46,
+     "booster-2": 57.49999999999999,
+     "booster-3": 46
+    },
+    "booster-1#2": {
+     "booster-1": 50.5,
+     "booster-2": 52.5,
+     "booster-3": 41.5
+    },
+    "booster-2#0": {
+     "booster-1": 48,
+     "booster-2": 49.5,
+     "booster-3": 54
+    },
+    "booster-2#1": {
+     "booster-1": 42,
+     "booster-2": 40.5,
+     "booster-3": 41.5
+    },
+    "booster-2#2": {
+     "booster-1": 67,
+     "booster-2": 68,
+     "booster-3": 53
+    },
+    "booster-3#0": {
+     "booster-1": 43,
+     "booster-2": 45,
+     "booster-3": 46
+    },
+    "booster-3#1": {
+     "booster-1": 53,
+     "booster-2": 49.5,
+     "booster-3": 43.5
+    },
+    "booster-3#2": {
+     "booster-1": 61.5,
+     "booster-2": 57.99999999999999,
+     "booster-3": 49.5
+    }
+   }
+  },
+  "mon-geol": {
+   "name": "ジオル",
+   "average": 76.33333333333333,
+   "rows": {
+    "booster-1#0": {
+     "booster-1": 77,
+     "booster-2": 83,
+     "booster-3": 76.5
+    },
+    "booster-1#1": {
+     "booster-1": 79,
+     "booster-2": 82.5,
+     "booster-3": 78.5
+    },
+    "booster-1#2": {
+     "booster-1": 69.5,
+     "booster-2": 77.5,
+     "booster-3": 72.5
+    },
+    "booster-2#0": {
+     "booster-1": 80.5,
+     "booster-2": 77.5,
+     "booster-3": 68
+    },
+    "booster-2#1": {
+     "booster-1": 76,
+     "booster-2": 76.5,
+     "booster-3": 66.5
+    },
+    "booster-2#2": {
+     "booster-1": 87,
+     "booster-2": 87,
+     "booster-3": 80.5
+    },
+    "booster-3#0": {
+     "booster-1": 75,
+     "booster-2": 75,
+     "booster-3": 69
+    },
+    "booster-3#1": {
+     "booster-1": 70,
+     "booster-2": 78,
+     "booster-3": 64.5
+    },
+    "booster-3#2": {
+     "booster-1": 83.5,
+     "booster-2": 80,
+     "booster-3": 70.5
+    }
+   }
+  },
+  "mon-flune": {
+   "name": "フルーネ",
+   "average": 53.611111111111114,
+   "rows": {
+    "booster-1#0": {
+     "booster-1": 54,
+     "booster-2": 64.5,
+     "booster-3": 46
+    },
+    "booster-1#1": {
+     "booster-1": 61,
+     "booster-2": 64,
+     "booster-3": 44.5
+    },
+    "booster-1#2": {
+     "booster-1": 56.00000000000001,
+     "booster-2": 65,
+     "booster-3": 52.5
+    },
+    "booster-2#0": {
+     "booster-1": 53,
+     "booster-2": 60,
+     "booster-3": 47
+    },
+    "booster-2#1": {
+     "booster-1": 45,
+     "booster-2": 57.99999999999999,
+     "booster-3": 49
+    },
+    "booster-2#2": {
+     "booster-1": 68,
+     "booster-2": 67,
+     "booster-3": 52
+    },
+    "booster-3#0": {
+     "booster-1": 48,
+     "booster-2": 53,
+     "booster-3": 44.5
+    },
+    "booster-3#1": {
+     "booster-1": 42,
+     "booster-2": 57.49999999999999,
+     "booster-3": 47
+    },
+    "booster-3#2": {
+     "booster-1": 48.5,
+     "booster-2": 56.49999999999999,
+     "booster-3": 44
+    }
+   }
+  },
+  "mon-pukarim": {
+   "name": "プカリム",
+   "average": 48.2037037037037,
+   "rows": {
+    "booster-1#0": {
+     "booster-1": 42.5,
+     "booster-2": 41.5,
+     "booster-3": 43.5
+    },
+    "booster-1#1": {
+     "booster-1": 52.5,
+     "booster-2": 53.5,
+     "booster-3": 50
+    },
+    "booster-1#2": {
+     "booster-1": 49.5,
+     "booster-2": 41.5,
+     "booster-3": 45
+    },
+    "booster-2#0": {
+     "booster-1": 48,
+     "booster-2": 47.5,
+     "booster-3": 55.50000000000001
+    },
+    "booster-2#1": {
+     "booster-1": 44.5,
+     "booster-2": 30.5,
+     "booster-3": 43.5
+    },
+    "booster-2#2": {
+     "booster-1": 58.5,
+     "booster-2": 73.5,
+     "booster-3": 65.5
+    },
+    "booster-3#0": {
+     "booster-1": 42,
+     "booster-2": 38.5,
+     "booster-3": 46.5
+    },
+    "booster-3#1": {
+     "booster-1": 46.5,
+     "booster-2": 46.5,
+     "booster-3": 45
+    },
+    "booster-3#2": {
+     "booster-1": 54,
+     "booster-2": 50,
+     "booster-3": 46
+    }
+   }
+  }
+ }
+}

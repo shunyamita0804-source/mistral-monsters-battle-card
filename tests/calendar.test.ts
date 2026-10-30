@@ -43,8 +43,8 @@ describe('年と月', () => {
   it('前のセーブ（version 28）は「1年目 4月」として読む・壊れた値も「1年目 4月」', () => {
     const { calendar: _c, ...rest } = base();
     const old = normalizeSave({ ...rest, version: 28 });
-    expect(SAVE_VERSION).toBe(29);
-    expect(old?.version).toBe(29);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(29);
+    expect(old?.version).toBe(SAVE_VERSION);
     expect(old?.calendar).toEqual({ year: 1, month: 4 });
     // ほかの中身はそのまま
     expect(old?.collection).toEqual(base().collection);

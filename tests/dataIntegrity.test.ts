@@ -38,6 +38,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-flune',
       'mon-serephine',
       'mon-tsumuji',
+      'mon-hyouzuku',
       ...skillIds('soramo14', all.slice(0, 14)),
       ...lazuck,
       ...skillIds('gauul14', all.slice(0, 14)),
@@ -57,6 +58,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...skillIds('serephine', all.slice(0, 14)),
       // ツムジ（2026-10-30 指示書 U）：01〜14
       ...skillIds('tsumuji', all.slice(0, 14)),
+      // ヒョウズク（2026-10-30 指示書 W）：01〜14
+      ...skillIds('hyouzuku', all.slice(0, 14)),
     ]);
   });
 
@@ -97,6 +100,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-flune',
       'mon-serephine',
       'mon-tsumuji',
+      'mon-hyouzuku',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);

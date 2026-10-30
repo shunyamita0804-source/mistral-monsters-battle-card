@@ -320,7 +320,7 @@ describe('D の大会の出場条件・セーブ', () => {
     expect(entryCheck(old, c).reasons.some((r) => r.includes('風の渓谷'))).toBe(false);
   });
 
-  it('セーブの version は上げていない（ダンジョン・人・モンスターを足しただけ）', () => {
-    expect(SAVE_VERSION).toBe(29);
+  it('セーブの version は上げていない（ダンジョン・人・モンスターを足しただけ。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
+    expect(SAVE_VERSION).toBe(30);
   });
 });

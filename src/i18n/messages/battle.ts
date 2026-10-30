@@ -106,7 +106,7 @@ export const BATTLE = {
   'battle.ng.noOpponentHand': { ja: '相手は手札がありません', en: 'The opponent has no cards in hand' },
   'battle.ng.noHandToReturn': { ja: '戻す手札がありません', en: 'No other cards in hand to return' },
   'battle.ng.noDeck': { ja: '山札がありません', en: 'Your deck is empty' },
-  'battle.ng.stunned': { ja: 'このターンは行動できません（まきつく）', en: "Can't act this turn (Coil)" },
+  'battle.ng.stunned': { ja: 'このターンは行動できません（行動不可）', en: "Can't act this turn (stunned)" }, // 2026-10-30 指示書 W：ヒョウズクのこおりのいき・ふぶきでも出るので「まきつく」を外した
   'battle.ng.evadeMinCost': { ja: '必要マナ{n}以上の攻撃にしか使えません', en: 'Only works against attacks costing {n}+ mana' },
   'battle.ng.maxCost': { ja: '必要マナ{n}以下の攻撃にしか使えません', en: 'Only works against attacks costing {n} mana or less' },
   'battle.ng.defenseOnAttack': {

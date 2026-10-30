@@ -261,10 +261,11 @@ describe('ダンジョンの挑戦', () => {
     expect(again.clearCards).toEqual([]);
     expect(again.save.collection['skl-geol-03']).toBe((w.save.collection['skl-geol-03'] ?? 0) + 1);
     expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 600, bossRepeat: 180 });
-    // 精霊の森・水の神殿も切り札の報酬（2026-10-29 フルーネ・セレフィーンの最終）：初めてのクリアの前は技カードなし。ほかのダンジョンはいままでどおり（相手の3体の技から）
+    // 精霊の森・水の神殿・氷の洞窟（2026-10-30 指示書 W）も切り札の報酬（2026-10-29 フルーネ・セレフィーンの最終）：初めてのクリアの前は技カードなし。ほかのダンジョンはいままでどおり（相手の3体の技から）
     expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-soramo'])).toEqual([]);
     expect(bossRewardCandidates(w.save, 'dungeon-03', ['mon-soramo'])).toEqual([]);
-    expect(bossRewardCandidates(w.save, 'dungeon-04', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
+    expect(bossRewardCandidates(w.save, 'dungeon-04', ['mon-soramo'])).toEqual([]);
+    expect(bossRewardCandidates(w.save, 'dungeon-05', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
   });
 });
 
