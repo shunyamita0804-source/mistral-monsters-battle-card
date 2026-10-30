@@ -22,10 +22,10 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 
 const fresh = (): SaveData => createNewSave(new Date('2026-10-27T00:00:00Z'), 'balance');
 
-describe('人物40人', () => {
-  it('No.01〜40 が1人ずつ（29〜40 は 2026-10-28 のダンジョンの12人）。名前・肩書き・ひとことは日本語と英語の両方がある', () => {
-    expect(PEOPLE.map((p) => p.no)).toEqual(Array.from({ length: 40 }, (_, i) => i + 1));
-    expect(new Set(PEOPLE.map((p) => p.id)).size).toBe(40);
+describe('人物42人', () => {
+  it('No.01〜42 が1人ずつ（29〜40 は 2026-10-28 のダンジョンの12人、41・42 は 2026-10-30 の風の渓谷のゼフィラ・ニコ）。名前・肩書き・ひとことは日本語と英語の両方がある', () => {
+    expect(PEOPLE.map((p) => p.no)).toEqual(Array.from({ length: 42 }, (_, i) => i + 1));
+    expect(new Set(PEOPLE.map((p) => p.id)).size).toBe(42);
     for (const p of PEOPLE) {
       for (const text of [p.name, p.title, p.line, ...(p.epithet ? [p.epithet] : [])]) {
         expect(text.ja, p.id).not.toBe('');

@@ -60,8 +60,9 @@ export const DUNGEON_RUN = {
  * - lava：溶岩の明かりで見える範囲が広いが、見えない番人が出やすい
  * - switch：階段（最後の階はボスの間）の手前に閉じた扉。同じ階のスイッチを調べると開く
  * - holy：見えない番人が強く、負けられる回数が少ない
+ * - wind（2026-10-30 指示書 U・風の渓谷。ユーザー決定）：強い風のマス。乗ると風の向きに2マス押し流される（src/game/dungeon/generate.ts の windPush）
  */
-export type DungeonGimmick = 'none' | 'water' | 'ice' | 'lava' | 'switch' | 'holy';
+export type DungeonGimmick = 'none' | 'water' | 'ice' | 'lava' | 'switch' | 'holy' | 'wind';
 
 /** 【仮】ダンジョンごとの値（階・開放・強さ・相手）。名前・説明は src/data/dungeons.ts */
 export interface RunDungeonConfig {
@@ -103,6 +104,12 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   'dungeon-03': {
     floors: 4, gimmick: 'water', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, KAL], bossId: 'enc-water-boss',
+  },
+  // 風の渓谷（D ランク・2026-10-30 指示書 U。水の神殿の次に並べる）：強い風のマス。強さは水の神殿と同じ段（地下4階・floorLife 0.8〜1.1・見える範囲 1・負けられる回数 3）。
+  // バトラー・見えない番人の編成は Claude の仮（空を飛ぶ・身軽なモンスター：ソラモ・ガウル・プカリム。ツムジは使わない〔ボスの切り札〕）
+  'dungeon-08': {
+    floors: 4, gimmick: 'wind', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[SOR, PUK, GAU], [GAU, SOR, MYU]], guardianTeam: [GAU, SOR, PUK], bossId: 'enc-wind-boss',
   },
   // 氷の洞窟（C ランク）：すべる床
   'dungeon-04': {
@@ -158,6 +165,8 @@ const LOCAL_BATTLERS: Readonly<Record<string, { readonly face: string; readonly 
   'dungeon-05': { face: 'battler-zack', guest: 3 },
   'dungeon-06': { face: 'battler-otto', guest: 2 },
   'dungeon-07': { face: 'battler-mina', guest: 2 },
+  // 2026-10-30 指示書 U：風の渓谷のニコ＋フローラ（水の神殿と同じ割り振り）
+  'dungeon-08': { face: 'battler-niko', guest: 1 },
 };
 
 /**

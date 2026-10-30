@@ -149,6 +149,18 @@ gain は約 -18.5 LUFS にそろえるための値（入れるときにそのま
 - 前のタイトル曲（Bon Voyage! / HarumachiMusic）は `bgm_departure.mp3` に名前を変えて残した（主人公を選ぶ場面で使う候補。まだ鳴らさない。gain は前と同じ 0.68 で約 -18.5 LUFS）
 - 英語の曲名・作曲者名はローマ字の仮表記（Hakugin no Shiro / Maniira・Isekai e Youkoso / Kamaboko Sachiko）
 
+### 2026-10-30 風の渓谷の曲（指示書 U）
+
+ユーザー提供の MP3 1つ（ZIP「Mistral_CC_U_Part1_WindValley_20261030」の bgm_dungeon_wind.mp3）。**OpenTracks（旧 DOVA-SYNDROME）のフリー素材**で、ゲームで使えることはユーザーが確認済み。
+クレジット（指示書のとおり）：「風のダンジョン」作曲：ハヤシユウ／音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/bgm/detail/4614
+ゲームのクレジット（設定 → 素材のクレジット）にも足した。届いた曲は 1分00秒・ループ対応なので、切らずにそのまま置いた（320kbps）。
+
+| 場面（BGM_REGISTRY） | ファイル | 曲名 / 作曲 | 鳴らす所 | 測った音量 → gain |
+| --- | --- | --- | --- | --- |
+| `dungeonWind`：風の渓谷 | bgm_dungeon_wind.mp3 | 風のダンジョン / ハヤシユウ | ダンジョンの中（ボス戦はほかのダンジョンと同じボスの曲） | -9.4 LUFS（水の神殿の曲 -9.3 LUFS と同じくらい）→ 0.35（水の神殿と同じ。約 -18.5 LUFS） |
+
+- 押し流されたときの音：風の音の素材は無いので、今の効果音のうち回避の音（`evade`・evade_success.mp3）を鳴らす
+
 ## ミスモンの画像（2026-10-22 追加）
 
 ユーザー指示「ダンジョンと景品のアイコン、ボタン、金貨を使って。残りは使わない」（2026-10-22）。本編の正式素材をそのまま（大きさの縮小だけ）。

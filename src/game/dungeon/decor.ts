@@ -11,6 +11,12 @@ export type FloorDecorKind =
   | 'feather'
   | 'candle'
   | 'light'
+  // 風の渓谷（2026-10-30 指示書 U）：つり橋の切れはし・風見の石の柱・小さな風車・木の葉の吹きだまり・ロープの杭
+  | 'bridge'
+  | 'vane'
+  | 'mill'
+  | 'leaves'
+  | 'stake'
   // 2026-10-29 イベントのダンジョン3つ（まだダンジョンとしては足していない。src/ui/components/eventDungeonArt.ts）
   | 'rail'
   | 'ore'
@@ -49,6 +55,17 @@ const DECOR_RULES: Readonly<Record<string, DecorRule>> = {
       { kind: 'feather', variants: 3, weight: 2 },
       { kind: 'candle', variants: 2, weight: 1 },
       { kind: 'light', variants: 2, weight: 1 },
+    ],
+  },
+  // 風の渓谷（2026-10-30 指示書 U）：木の葉の吹きだまりを多めに、柱・風車・杭・つり橋の切れはしを少し
+  'dungeon-08': {
+    rate: 0.06,
+    kinds: [
+      { kind: 'leaves', variants: 1, weight: 3 },
+      { kind: 'vane', variants: 1, weight: 1 },
+      { kind: 'mill', variants: 1, weight: 1 },
+      { kind: 'stake', variants: 1, weight: 1 },
+      { kind: 'bridge', variants: 1, weight: 1 },
     ],
   },
   // イベントのダンジョン3つ（2026-10-29。ID は仮で、まだどの階にも出ない。src/ui/components/eventDungeonArt.ts）

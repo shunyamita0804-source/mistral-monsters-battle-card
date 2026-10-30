@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """新しいダンジョン5つ（水の神殿・氷の洞窟・炎の火山・機械の塔・天の聖域）の正式な絵を、ゲーム用に切り出す（2026-10-28 届いた30枚）
 
-使い方: python3 -I tools/design/dungeons5_build.py design-parts/dungeons5-20261028 assets/images
+使い方: python3 -I tools/design/dungeons5_build.py design-parts/dungeons5-20261028 assets/images [wind …（作るダンジョンだけ。省くと全部）]
 
 原本（無改変）: design-parts/dungeons5-20261028/{water,ice,fire,machine,holy}/{d}_{tiles,parts,battle_bg,boss_mark,art,overlay}.png
 作るもの（{d} はフォルダ名）:
@@ -12,6 +12,7 @@
   maps/dungeon/fire_crack_{1..4}.webp                                  溶岩のひび割れ（大きい順）
   maps/dungeon/machine_door_{closed,open}.webp・machine_switch_{off,on}.webp
   maps/dungeon/holy_feather_{1..3}.webp・holy_candle_{1,2}.webp・holy_light_{1,2}.webp
+  maps/dungeon/wind_{bridge,vane,mill,leaves,stake}.webp                風の渓谷の飾り（2026-10-30 指示書 U。つり橋の切れはし・風見の石の柱・小さな風車・木の葉の吹きだまり・ロープの杭）
   maps/dungeon/boss_mark_{d}.webp                                      ボスの間のしるし（いまの boss_mark_ruins と同じ高さ 320）
   backgrounds/battle_{d}.webp                                          対戦の背景（1024×1536 のまま）
   ui/dungeon_intro/{d}_art.webp・{d}_overlay.webp                      入ったときの挿絵（縦長のまま）と重ねる輪
@@ -27,7 +28,9 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
-DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy')
+DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy', 'wind')
+# 原本のファイル名の頭（風の渓谷だけ wind_valley_*.png。2026-10-30 指示書 U。原本の名前は変えない）
+PREFIX = {'wind': 'wind_valley'}
 # 見えるとみなす透明度（これより薄い所は部品の外）
 ALPHA_SOLID = 16
 # 部品を1つにまとめるときに、どれだけ離れたかけらまで同じ部品とみなすか（px）
@@ -140,7 +143,7 @@ class Saver:
 
 
 def build_tiles(src: str, d: str, save: Saver) -> None:
-    sheet = Image.open(os.path.join(src, d, f'{d}_tiles.png')).convert('RGBA')
+    sheet = Image.open(os.path.join(src, d, f'{PREFIX.get(d, d)}_tiles.png')).convert('RGBA')
     # タイルどうしは近いので、かけらをまとめない
     comps = components(sheet, gap=0)
     assert len(comps) == 3, (d, 'tiles', len(comps))
@@ -152,8 +155,12 @@ def build_tiles(src: str, d: str, save: Saver) -> None:
 
 
 def build_parts(src: str, d: str, save: Saver) -> None:
-    sheet = Image.open(os.path.join(src, d, f'{d}_parts.png')).convert('RGBA')
+    sheet = Image.open(os.path.join(src, d, f'{PREFIX.get(d, d)}_parts.png')).convert('RGBA')
     a = np.array(sheet)[:, :, 3]
+    if d == 'wind':
+        # 下り階段と上り階段の間が狭いので、かけらをまとめる幅を小さく
+        build_wind_parts(sheet, components(sheet, gap=4), save)
+        return
     comps = components(sheet)
     if d == 'machine' and len(comps) == 5:
         # 上り階段と閉じた扉がくっついている
@@ -193,17 +200,36 @@ def build_parts(src: str, d: str, save: Saver) -> None:
             save(fit(im, height=288), f'maps/dungeon/holy_light_{i}.webp')
 
 
+def build_wind_parts(sheet: Image.Image, comps: list, save: Saver) -> None:
+    """風の渓谷：左から下り階段・上り階段、右に2列の飾り5つ（左の列：つり橋の切れはし・小さな風車、右の列：風見の石の柱・木の葉の吹きだまり・ロープの杭）。
+    座標では切らず、透明でない部分ごとに切り出し、列（横の真ん中）と上からの順で名前を決める"""
+    assert len(comps) == 7, ('wind', len(comps))
+    comps = sorted(comps, key=lambda c: (c[0] + c[2]) / 2)
+    save(fit(trim(cut(sheet, comps[0])), height=256), 'maps/dungeon/wind_stairs_down.webp')
+    deco = comps[2:]
+    mid = sum((c[0] + c[2]) / 2 for c in deco) / len(deco)
+    left = sorted([c for c in deco if (c[0] + c[2]) / 2 < mid], key=lambda c: c[1])
+    right = sorted([c for c in deco if (c[0] + c[2]) / 2 >= mid], key=lambda c: c[1])
+    assert (len(left), len(right)) == (2, 3), ('wind', len(left), len(right))
+    # 5つの大きさの比を変えないよう、どれも同じ割合で縮める（いちばん高いもの〔風見の石の柱〕が高さ 240）
+    ims = [trim(cut(sheet, c)) for c in [*left, *right]]
+    k = 240 / max(im.height for im in ims)
+    for im, name in zip(ims, ('bridge', 'mill', 'vane', 'leaves', 'stake')):
+        save(im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS), f'maps/dungeon/wind_{name}.webp')
+
+
 def main() -> None:
     src, out = sys.argv[1], sys.argv[2]
     save = Saver(out)
-    for d in DUNGEONS:
+    for d in sys.argv[3:] or DUNGEONS:
         build_tiles(src, d, save)
         build_parts(src, d, save)
-        boss = trim(Image.open(os.path.join(src, d, f'{d}_boss_mark.png')).convert('RGBA'))
+        f = PREFIX.get(d, d)
+        boss = trim(Image.open(os.path.join(src, d, f'{f}_boss_mark.png')).convert('RGBA'))
         save(fit(boss, height=320), f'maps/dungeon/boss_mark_{d}.webp')
-        save(Image.open(os.path.join(src, d, f'{d}_battle_bg.png')).convert('RGB'), f'backgrounds/battle_{d}.webp', quality=84)
-        save(Image.open(os.path.join(src, d, f'{d}_art.png')).convert('RGB'), f'ui/dungeon_intro/{d}_art.webp', quality=84)
-        overlay = trim(Image.open(os.path.join(src, d, f'{d}_overlay.png')).convert('RGBA'))
+        save(Image.open(os.path.join(src, d, f'{f}_battle_bg.png')).convert('RGB'), f'backgrounds/battle_{d}.webp', quality=84)
+        save(Image.open(os.path.join(src, d, f'{f}_art.png')).convert('RGB'), f'ui/dungeon_intro/{d}_art.webp', quality=84)
+        overlay = trim(Image.open(os.path.join(src, d, f'{f}_overlay.png')).convert('RGBA'))
         save(fit(overlay, width=1200), f'ui/dungeon_intro/{d}_overlay.webp', quality=88)
 
 

@@ -36,6 +36,8 @@ import faceHans from '@assets/images/characters/face_battler_ice_hans.webp';
 import faceZack from '@assets/images/characters/face_battler_fire_zack.webp';
 import faceOtto from '@assets/images/characters/face_battler_machine_otto.webp';
 import faceMina from '@assets/images/characters/face_battler_holy_mina.webp';
+import faceZephyra from '@assets/images/characters/face_guardian_wind_zephyra.webp';
+import faceNiko from '@assets/images/characters/face_battler_wind.webp';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { h } from '../dom.ts';
 
@@ -84,11 +86,13 @@ const OPPONENT_FACES: Readonly<Record<string, string>> = {
   'enc-fire-boss': faceBalka,
   'enc-machine-boss': faceTeo,
   'enc-holy-boss': faceAurelio,
+  'enc-wind-boss': faceZephyra,
   'battler-pia': facePia,
   'battler-hans': faceHans,
   'battler-zack': faceZack,
   'battler-otto': faceOtto,
   'battler-mina': faceMina,
+  'battler-niko': faceNiko,
   // 導入イベントV2の試験の相手（練習場の先生。2026-10-23 に届いた先生の顔の絵）
   teacher: faceTeacher,
   // 街のピート（2026-10-29 プカリムの最終：カードショップの前で勝負できる）。名刺図鑑と同じ顔

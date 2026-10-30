@@ -5,6 +5,7 @@ import { PUKARIM_MONSTER_ID } from './pukarim.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
 import { FLUNE_MONSTER_ID } from './flune.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
+import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -55,6 +56,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [FLUNE_MONSTER_ID]: { art: 'flune_battlecard.png', frame: 'flune', scale: 0.8, offsetY: -0.02 },
   // セレフィーン（2026-10-29）：枠は月の青紫（#8FA6E8）。絵は届いた serephine_battleart.png（1169×1345。フルーネと同じ大きさ・縦横比）を無改変
   [SEREPHINE_MONSTER_ID]: { art: 'serephine_battlecard.png', frame: 'serephine', scale: 0.8, offsetY: -0.02 },
+  // ツムジ（2026-10-30 指示書 U）：枠はくすんだ青みの灰（#8FA3B8）。絵は届いた tsumuji_battleart.png（1169×1346。セレフィーンと同じ大きさ・縦横比）を無改変
+  [TSUMUJI_MONSTER_ID]: { art: 'tsumuji_battlecard.png', frame: 'tsumuji', scale: 0.8, offsetY: -0.02 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

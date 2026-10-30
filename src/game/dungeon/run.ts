@@ -6,7 +6,7 @@ import { ITEM_RULES, type ItemId } from '../../data/items.ts';
 import { addItem, canAddItem, consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
-import { generateFloor, isWalkableTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
+import { generateFloor, isWalkableTile, isWindTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 import { advanceMonth } from '../calendar/calendar.ts';
 
 /**
@@ -119,6 +119,9 @@ export function entityAt(run: DungeonRun, f: DungeonFloor, x: number, y: number)
 
 const STEP: Readonly<Record<Direction, Point>> = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
 
+/** 風のマスの文字 → 向き（generate.ts の WIND_DIRS と同じ並び） */
+const WIND_DIRECTION: Readonly<Record<string, Direction>> = { '>': 'right', '<': 'left', '^': 'up', v: 'down' };
+
 /** 向いている先のマス */
 export function facingPoint(run: DungeonRun): Point {
   const d = STEP[run.dir];
@@ -145,7 +148,7 @@ function bossFromAfar(f: DungeonFloor, boss: FloorEntity): boolean {
   const others = f.entities.filter((e) => e.kind !== 'guardian' && e.kind !== 'boss');
   const blocked = (x: number, y: number): boolean =>
     others.some((e) => e.x === x && e.y === y) || (x === boss.x && y === boss.y) || Math.abs(boss.x - x) + Math.abs(boss.y - y) === 1;
-  const seen = reachable(f.tiles, f.start, blocked);
+  const seen = reachable(f.tiles, f.start, blocked, true, f.stairs);
   const ok = Object.values(STEP).some((d) => isWalkableTile(f.tiles[boss.y + d.y]?.[boss.x + d.x]) && seen.has(`${boss.x + 2 * d.x},${boss.y + 2 * d.y}`));
   bossFromAfarCache.set(f, ok);
   return ok;
@@ -170,6 +173,8 @@ export interface MoveResult {
   readonly moved: boolean;
   /** 下り階段の上に来た */
   readonly onStairs: boolean;
+  /** 強い風のマスで押し流された（風の渓谷）。押し流された向き（最後の風のマスの向き） */
+  readonly gust?: Direction | null;
   /** 見えない番人の気配（近い） */
   readonly omen: boolean;
   /** 見えない番人が対戦を挑んできた */
@@ -194,7 +199,8 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   const f = runFloor(run);
   const turned: DungeonRun = { ...run, dir };
   const d = STEP[dir];
-  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y) || nextToBoss(run, f, x, y), doorsOpen(run));
+  // 風の渓谷：風のマスに乗ったら押し流される（階段・人や物の手前で止まる）
+  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y) || nextToBoss(run, f, x, y), doorsOpen(run), f.stairs);
   const end = path?.[path.length - 1];
   if (!path || !end) return { run: turned, path: [], moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
   let explored = run.explored;
@@ -216,7 +222,10 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
     }
   }
   const onStairs = !!f.stairs && f.stairs.x === end.x && f.stairs.y === end.y;
-  return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian };
+  // 風のマスで押し流された：通ったマス（最後のマスを除く）に風のマスがある
+  const gustAt = [...path.slice(0, -1)].reverse().find((p) => isWindTile(f.tiles[p.y]?.[p.x]));
+  const gust = gustAt ? WIND_DIRECTION[f.tiles[gustAt.y]?.[gustAt.x] ?? ''] ?? null : null;
+  return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian, gust };
 }
 
 /** スイッチを調べた（機械の塔）：その階の扉が開く。もう開いていれば何もしない（opened: false） */

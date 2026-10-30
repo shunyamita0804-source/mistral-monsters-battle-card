@@ -76,6 +76,16 @@ export interface BattleMonster {
    * かしこさ技を使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える。ちから技では消えない
    */
   readonly energy?: { readonly turn: number } | null;
+  /**
+   * 効く手番（turn。かけた側の次の自分の手番）の間、このモンスターの攻撃技の消費マナ−discount（正式：ツムジのかぜのり 2026-10-30）。
+   * 0より下にはならない。重ねない。その手番が終わったら効かない。倒れたら消える
+   */
+  readonly windRide?: { readonly discount: number; readonly turn: number } | null;
+  /**
+   * この手番（turn）に、続けて使える技（cardId）をもう1回使える（正式：ツムジの Wひっかき 2026-10-30）。
+   * 「1体1ターン1回」のただ1つの例外：その手番の最初の技が続けて使える技のときに付き、2回目を使ったら消える（1ターンに最大2回）
+   */
+  readonly chain?: { readonly turn: number; readonly cardId: string } | null;
 }
 
 export interface HandCard {
@@ -300,12 +310,42 @@ export function findHandCard(state: BattleState, side: Side, cardUid: string): H
   return state.sides[side].hand.find((c) => c.uid === cardUid);
 }
 
-/** その技を使えるモンスター（適合・生存・未行動・まきつくで止められていない。攻撃の技は、すなかけで封じられていないこと） */
+/**
+ * その技を使えるモンスター（適合・生存・未行動・まきつくで止められていない。攻撃の技は、すなかけで封じられていないこと）。
+ * 続けて使える技（ツムジの Wひっかき）は、この手番にその技を1回だけ使ったモンスターも使える（chainReady）
+ */
 export function availableUsers(state: BattleState, side: Side, skill: SkillCard): BattleMonster[] {
   const attack = skill.effect.type === 'attack';
   return state.sides[side].monsters.filter(
-    (m) => m.cardId === skill.monsterId && m.life > 0 && !m.acted && m.stunnedTurn !== state.turn && !(attack && m.sealedTurn === state.turn),
+    (m) =>
+      m.cardId === skill.monsterId &&
+      m.life > 0 &&
+      (!m.acted || chainReady(state, m, skill)) &&
+      m.stunnedTurn !== state.turn &&
+      !(attack && m.sealedTurn === state.turn),
   );
+}
+
+/** このモンスターが、この手番に続けてもう1回 skill を使えるか（Wひっかき → Wひっかき。1ターンに最大2回） */
+export function chainReady(state: BattleState, m: BattleMonster, skill: SkillCard): boolean {
+  return skill.effect.type === 'attack' && !!skill.effect.chain && m.chain?.turn === state.turn && m.chain.cardId === skill.id;
+}
+
+/** 使うモンスターにかかっている「この手番の攻撃技の消費マナ−」（かぜのり。効く手番のときだけ。かけた同じ手番には効かない） */
+export function windRideOf(state: BattleState, user: BattleMonster | undefined): number {
+  const w = user?.windRide;
+  return w && user.life > 0 && state.turn === w.turn ? w.discount : 0;
+}
+
+/** その技を user が使うときの消費マナ（かぜのりで攻撃技は−1。0より下にはならない） */
+export function skillCost(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
+  return skill.effect.type === 'attack' ? Math.max(0, skill.cost - windRideOf(state, user)) : skill.cost;
+}
+
+/** 手札のその技を、いま使えるモンスターのだれかが使うときのいちばん少ない消費マナ（使えるモンスターがいなければカードのマナ） */
+export function handSkillCost(state: BattleState, side: Side, skill: SkillCard): number {
+  const users = availableUsers(state, side, skill);
+  return users.length === 0 ? skill.cost : Math.min(...users.map((u) => skillCost(state, skill, u)));
 }
 
 export interface Usability {
@@ -389,7 +429,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
-  if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
+  // かぜのり（ツムジ）が効いていれば、攻撃技の消費マナ−1
+  if (manaOf(state.sides[side]) < handSkillCost(state, side, skill)) return NO(t('battle.ng.noMana'));
   if (availableUsers(state, side, skill).length === 0) {
     // まきつくで止められている・すなかけで攻撃を封じられているだけのとき
     const stunned = owner.some((m) => m.life > 0 && !m.acted && m.stunnedTurn === state.turn);
@@ -612,8 +653,8 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   const found = findMonster(state, targetUid);
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
-  // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためるは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null } : { life });
+  // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -801,10 +842,14 @@ function useCard(
   // 使うモンスターの指定がなければ、選んだ相手に攻撃できるモンスター（ちょうはつで限られていないもの）を選ぶ
   // みずあび（自分を回復）は、指定がなければライフの一番減っているモンスターが使う（同じモンスターが2体以上いるとき）
   const selfHealer = skill.effect.type === 'healSelf' ? [...users].sort((a, b) => a.life - a.maxLife - (b.life - b.maxLife))[0] : undefined;
+  // かぜのり（消費マナ−1）が効いているモンスターを先に
+  const byCost = [...users].sort((a, b) => skillCost(state, skill, a) - skillCost(state, skill, b));
   const user = userUid
     ? users.find((m) => m.uid === userUid)
-    : (selfHealer ?? (targetUid ? users.find((u) => targetsFor(state, side, skill, u).some((m) => m.uid === targetUid)) : undefined) ?? users[0]);
+    : (selfHealer ?? (targetUid ? byCost.find((u) => targetsFor(state, side, skill, u).some((m) => m.uid === targetUid)) : undefined) ?? byCost[0]);
   if (!user) return state;
+  const cost = skillCost(state, skill, user);
+  if (manaOf(state.sides[side]) < cost) return state;
 
   const targets = targetsFor(state, side, skill, user);
   let target: BattleMonster | undefined;
@@ -819,9 +864,14 @@ function useCard(
   }
 
   let next = removeFromHand(state, side, cardUid);
-  next = payMana(next, side, skill.cost);
-  next = updateMonster(next, user.uid, { acted: true });
+  next = payMana(next, side, cost);
+  // Wひっかき：その手番の最初の技なら、もう1回続けて使える印を付ける。2回目を使ったら印を消す（3回目は使えない）
+  const chained = user.acted;
+  const chain = !chained && skill.effect.type === 'attack' && skill.effect.chain ? { turn: state.turn, cardId: skill.id } : null;
+  next = updateMonster(next, user.uid, { acted: true, chain });
   next = addLog(next, t('battle.log.skill', { name: nameOf(user.cardId), skill: cardName(skill) }));
+  if (chained) next = addLog(next, t('battle.log.chain', { name: nameOf(user.cardId), skill: cardName(skill) }));
+  if (cost < skill.cost) next = addLog(next, t('battle.log.windRideCost', { name: nameOf(user.cardId), n: cost }));
 
   switch (skill.effect.type) {
     case 'attack': {
@@ -946,6 +996,11 @@ function useCard(
       // エネルギーをためる：次の自分の手番（turn + 2）に最初に使うかしこさ技1回だけ2倍。重ねない（もう一度使ったら効く手番だけ新しく）
       next = updateMonster(next, user.uid, { energy: { turn: state.turn + 2 } });
       return addLog(next, t('battle.log.energy', { name: nameOf(user.cardId) }));
+    }
+    case 'windRide': {
+      // かぜのり：次の自分の手番（turn + 2）の間、使ったモンスターの攻撃技の消費マナ−discount。重ねない（もう一度使ったら効く手番だけ新しく）
+      next = updateMonster(next, user.uid, { windRide: { discount: skill.effect.discount, turn: state.turn + 2 } });
+      return addLog(next, t('battle.log.windRide', { name: nameOf(user.cardId), n: skill.effect.discount }));
     }
     case 'handToDeck':
       return handToDeck(next, otherSide(side));

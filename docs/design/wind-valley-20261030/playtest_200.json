@@ -1,0 +1,208 @@
+{
+ "games": 200,
+ "rows": {
+  "lucia_1.2": {
+   "lifeScale": 1.2,
+   "byBox": {
+    "booster-1": {
+     "wins": 48,
+     "losses": 152,
+     "draws": 0,
+     "turns": 6025,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 22,
+     "losses": 178,
+     "draws": 0,
+     "turns": 5891,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 52,
+     "losses": 148,
+     "draws": 0,
+     "turns": 6401,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "zephyra_1.2": {
+   "lifeScale": 1.2,
+   "byBox": {
+    "booster-1": {
+     "wins": 23,
+     "losses": 177,
+     "draws": 0,
+     "turns": 5654,
+     "doubleScratch": 0,
+     "windRide": 31
+    },
+    "booster-2": {
+     "wins": 21,
+     "losses": 179,
+     "draws": 0,
+     "turns": 5497,
+     "doubleScratch": 0,
+     "windRide": 18
+    },
+    "booster-3": {
+     "wins": 25,
+     "losses": 175,
+     "draws": 0,
+     "turns": 5916,
+     "doubleScratch": 0,
+     "windRide": 33
+    }
+   }
+  },
+  "zephyra_1.1": {
+   "lifeScale": 1.1,
+   "byBox": {
+    "booster-1": {
+     "wins": 23,
+     "losses": 177,
+     "draws": 0,
+     "turns": 5667,
+     "doubleScratch": 0,
+     "windRide": 25
+    },
+    "booster-2": {
+     "wins": 20,
+     "losses": 180,
+     "draws": 0,
+     "turns": 5367,
+     "doubleScratch": 0,
+     "windRide": 26
+    },
+    "booster-3": {
+     "wins": 33,
+     "losses": 167,
+     "draws": 0,
+     "turns": 5971,
+     "doubleScratch": 0,
+     "windRide": 35
+    }
+   }
+  },
+  "zephyra_1.3": {
+   "lifeScale": 1.3,
+   "byBox": {
+    "booster-1": {
+     "wins": 24,
+     "losses": 176,
+     "draws": 0,
+     "turns": 5664,
+     "doubleScratch": 0,
+     "windRide": 31
+    },
+    "booster-2": {
+     "wins": 12,
+     "losses": 188,
+     "draws": 0,
+     "turns": 5418,
+     "doubleScratch": 0,
+     "windRide": 29
+    },
+    "booster-3": {
+     "wins": 23,
+     "losses": 177,
+     "draws": 0,
+     "turns": 5902,
+     "doubleScratch": 0,
+     "windRide": 37
+    }
+   }
+  },
+  "zephyra_1.0": {
+   "lifeScale": 1,
+   "byBox": {
+    "booster-1": {
+     "wins": 45,
+     "losses": 155,
+     "draws": 0,
+     "turns": 5716,
+     "doubleScratch": 0,
+     "windRide": 28
+    },
+    "booster-2": {
+     "wins": 28,
+     "losses": 172,
+     "draws": 0,
+     "turns": 5375,
+     "doubleScratch": 0,
+     "windRide": 31
+    },
+    "booster-3": {
+     "wins": 53,
+     "losses": 147,
+     "draws": 0,
+     "turns": 6062,
+     "doubleScratch": 0,
+     "windRide": 24
+    }
+   }
+  },
+  "zephyra_0.9": {
+   "lifeScale": 0.9,
+   "byBox": {
+    "booster-1": {
+     "wins": 86,
+     "losses": 114,
+     "draws": 0,
+     "turns": 5253,
+     "doubleScratch": 0,
+     "windRide": 20
+    },
+    "booster-2": {
+     "wins": 91,
+     "losses": 109,
+     "draws": 0,
+     "turns": 5052,
+     "doubleScratch": 0,
+     "windRide": 18
+    },
+    "booster-3": {
+     "wins": 78,
+     "losses": 122,
+     "draws": 0,
+     "turns": 5745,
+     "doubleScratch": 0,
+     "windRide": 25
+    }
+   }
+  },
+  "zephyra_0.8": {
+   "lifeScale": 0.8,
+   "byBox": {
+    "booster-1": {
+     "wins": 87,
+     "losses": 113,
+     "draws": 0,
+     "turns": 5540,
+     "doubleScratch": 0,
+     "windRide": 19
+    },
+    "booster-2": {
+     "wins": 78,
+     "losses": 122,
+     "draws": 0,
+     "turns": 5172,
+     "doubleScratch": 0,
+     "windRide": 15
+    },
+    "booster-3": {
+     "wins": 83,
+     "losses": 117,
+     "draws": 0,
+     "turns": 5723,
+     "doubleScratch": 0,
+     "windRide": 21
+    }
+   }
+  }
+ }
+}

@@ -64,3 +64,13 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 - `geol_shot.cjs URL セーブ.json 出力`：`?qa=1&lab=geol` の確認用の画面（カード15枚）と、効果を確かめる用どうしの QA:オート の対戦（地ひびきが出た所）
 - `geol_effects_shot.cjs URL セーブ.json 出力`：自分で エネルギーをためる（場の「ためている」の印）・地ひびき・相手の攻撃を かばう を使って撮る（`DEBUG=1` で使う前後の写真も）
 - 技カードの大きな絵：`card_gallery_shot.cjs`（開発用サーバー）に `skl-geol-01`〜`14`
+
+## 2026-10-30 風の渓谷とツムジ（指示書 U。`docs/wind-valley-u-20261030.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `wind_valley_shot.cjs` | ダンジョンを選ぶ所（街の南の出口から）・入るときの絵と題字・風のマス（押し流される前・途中・あと）・ニコ・ゼフィラ（話しかける・対戦・QA 即勝利・勝ったあとのひと言・祭壇）。W・H・LANG・ONLY |
+| `tsumuji_battle_shot.cjs` | Wひっかきを2回続けて・かぜのりを使う・かぜのりが効いている手番（手札のマナ −1 が緑）。開発用サーバー |
+
+- セーブは Vitest の一時テストで作る（`base.json`：D ランク・物語の導入は終わり〔`story.introV2.state` を 'completed`〕・名前入り）。終わったら一時テストは消す
+- `card_detail_shot.cjs`・`people_book_shot.cjs` は W・H・LANG=en に対応した。`gacha_shot.cjs` はパックの番号に `last`（最後に並んだシリーズ）

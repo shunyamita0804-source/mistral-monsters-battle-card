@@ -369,6 +369,17 @@
   --d5-face-size: 101px 48px;
 }
 
+/* 風の渓谷（2026-10-30 指示書 U）：大きさは氷の洞窟と同じ割合（絵の px × 0.263） */
+.drun--dungeon-08 {
+  --d5-floor: url('@assets/images/maps/dungeon/wind_floor.webp');
+  --d5-top: url('@assets/images/maps/dungeon/wind_wall_top.webp');
+  --d5-face: url('@assets/images/maps/dungeon/wind_wall_face.webp');
+  --d5-stairs: url('@assets/images/maps/dungeon/wind_stairs_down.webp');
+  --d5-floor-size: 108px 112px;
+  --d5-top-size: 113px 112px;
+  --d5-face-size: 105px 48px;
+}
+
 /* 天の聖域：壁の上面は雲（壁の外側が雲の海）、壁の正面は手すり */
 .drun--dungeon-07 {
   --d5-floor: url('@assets/images/maps/dungeon/holy_floor.webp');
@@ -380,42 +391,42 @@
   --d5-face-size: 104px 48px;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-seen {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--floor.is-seen {
   background:
     linear-gradient(rgb(0 0 0 / 0.62), rgb(0 0 0 / 0.62)),
     var(--d5-floor) var(--ax, 0) var(--ay, 0) / var(--d5-floor-size) repeat;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--floor.is-lit {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--floor.is-lit {
   background:
     linear-gradient(rgb(255 236 200 / 0.08), rgb(255 236 200 / 0.08)),
     var(--d5-floor) var(--ax, 0) var(--ay, 0) / var(--d5-floor-size) repeat;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-seen {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--wall.is-seen {
   background:
     linear-gradient(rgb(4 5 8 / 0.82), rgb(4 5 8 / 0.82)),
     var(--d5-top) var(--ax, 0) var(--ay, 0) / var(--d5-top-size) repeat;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--wall.is-lit {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--wall.is-lit {
   background:
     linear-gradient(rgb(6 7 10 / 0.5), rgb(6 7 10 / 0.5)),
     var(--d5-top) var(--ax, 0) var(--ay, 0) / var(--d5-top-size) repeat;
 }
 
 /* 下が床の壁：壁の正面の絵をマスの高さいっぱいに横に並べる */
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--face.is-seen {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--face.is-seen {
   background:
     linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)),
     var(--d5-face) var(--ax, 0) 100% / var(--d5-face-size) repeat-x;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--face.is-lit {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--face.is-lit {
   background: var(--d5-face) var(--ax, 0) 100% / var(--d5-face-size) repeat-x;
 }
 
-:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07) .drun__tile--stairs.is-seen::after {
+:is(.drun--dungeon-03, .drun--dungeon-04, .drun--dungeon-05, .drun--dungeon-06, .drun--dungeon-07, .drun--dungeon-08) .drun__tile--stairs.is-seen::after {
   background-image: var(--d5-stairs);
 }
 
@@ -425,6 +436,7 @@
 .drun--dungeon-05 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_fire.webp'); scale: 1.9; }
 .drun--dungeon-06 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_machine.webp'); scale: 1.9; }
 .drun--dungeon-07 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_holy.webp'); scale: 1.9; }
+.drun--dungeon-08 .drun__entity--boss { background-image: url('@assets/images/maps/dungeon/boss_mark_wind.webp'); scale: 1.9; }
 
 /* 炎の火山：溶岩の明かりで、まわりの暗さを少し弱く */
 .drun--dungeon-05 .drun__light {
@@ -466,6 +478,81 @@
 
 .drun__tile--ice.is-seen:not(.is-lit) {
   filter: brightness(0.45);
+}
+
+/*
+ * 強い風のマス（風の渓谷 2026-10-30 指示書 U）：床の上に、風の向きへ流れる白い線と矢じり（新しい絵は使わずコードで描く）。
+ * 右向きの形で描き、左・上・下はまわして使う（drun__tile--wind-l/u/d）。乗る前から（見たマスなら）見える
+ */
+.drun__tile--wind.is-seen::before,
+.drun__tile--wind.is-lit::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background:
+    linear-gradient(90deg, transparent 0 6%, rgb(240 250 255 / 0.95) 6% 44%, transparent 44% 56%, rgb(240 250 255 / 0.95) 56% 78%, transparent 78%) 0 20% / 100% 4px no-repeat,
+    linear-gradient(90deg, transparent 0 2%, rgb(240 250 255) 2% 30%, transparent 30% 40%, rgb(240 250 255) 40% 70%, transparent 70%) 0 50% / 100% 4px no-repeat,
+    linear-gradient(90deg, transparent 0 14%, rgb(240 250 255 / 0.95) 14% 50%, transparent 50% 62%, rgb(240 250 255 / 0.95) 62% 82%, transparent 82%) 0 80% / 100% 4px no-repeat,
+    linear-gradient(90deg, rgb(120 190 255 / 0.12), rgb(150 215 255 / 0.4));
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 2px rgb(170 225 255 / 0.55);
+  filter: drop-shadow(0 0 3px rgb(120 200 255 / 0.95));
+  animation: drun-wind-flow 0.9s linear infinite;
+  pointer-events: none;
+}
+
+/* 矢じり（向きがひと目で分かるように） */
+.drun__tile--wind.is-seen::after,
+.drun__tile--wind.is-lit::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 15px;
+  height: 15px;
+  border-top: 5px solid rgb(245 252 255);
+  border-right: 5px solid rgb(245 252 255);
+  translate: 0 -50%;
+  rotate: 45deg;
+  filter: drop-shadow(0 0 3px rgb(80 170 255));
+  pointer-events: none;
+}
+
+.drun__tile--wind-l { rotate: 180deg; }
+.drun__tile--wind-u { rotate: -90deg; }
+.drun__tile--wind-d { rotate: 90deg; }
+
+.drun__tile--wind.is-seen:not(.is-lit)::before,
+.drun__tile--wind.is-seen:not(.is-lit)::after {
+  opacity: 0.7;
+}
+
+@keyframes drun-wind-flow {
+  from { background-position-x: -24px, -24px, -24px, 0; }
+  to { background-position-x: 24px, 24px, 24px, 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun__tile--wind.is-seen::before,
+  .drun__tile--wind.is-lit::before {
+    animation: none;
+  }
+}
+
+/* 押し流されたとき：画面の端に風の線が一瞬走る */
+.drun.is-gust .drun__view::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: repeating-linear-gradient(var(--gust-angle, 90deg), transparent 0 22px, rgb(230 245 255 / 0.22) 22px 26px, transparent 26px 48px);
+  animation: drun-gust 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes drun-gust {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 /* 扉（スイッチで開く）：閉じた扉 → スイッチを入れた階では開いた扉。上のマスに少しはみ出して立てる */
@@ -565,3 +652,19 @@
 
 .drun__decor--light-1::after { background-image: url('@assets/images/maps/dungeon/holy_light_1.webp'); }
 .drun__decor--light-2::after { background-image: url('@assets/images/maps/dungeon/holy_light_2.webp'); }
+
+/* 風の渓谷（2026-10-30 指示書 U）：木の葉の吹きだまりは床に置く。柱・風車・杭は床に立てる（上のマスに少しはみ出す）。つり橋の切れはしは床に置く */
+.drun__decor--leaves-1::after { inset: 10px 4px; background-image: url('@assets/images/maps/dungeon/wind_leaves.webp'); }
+.drun__decor--bridge-1::after { inset: 4px 2px; background-image: url('@assets/images/maps/dungeon/wind_bridge.webp'); }
+
+.drun__decor--vane-1::after,
+.drun__decor--mill-1::after,
+.drun__decor--stake-1::after {
+  inset: auto auto 4px 50%;
+  translate: -50% 0;
+  background-position: center bottom;
+}
+
+.drun__decor--vane-1::after { width: 34px; height: 58px; background-image: url('@assets/images/maps/dungeon/wind_vane.webp'); }
+.drun__decor--mill-1::after { width: 32px; height: 56px; background-image: url('@assets/images/maps/dungeon/wind_mill.webp'); }
+.drun__decor--stake-1::after { width: 30px; height: 32px; background-image: url('@assets/images/maps/dungeon/wind_stake.webp'); }

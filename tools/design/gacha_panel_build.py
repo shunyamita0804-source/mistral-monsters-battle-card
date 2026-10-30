@@ -41,7 +41,7 @@ SHOP_GRID = [['soramo', 'gauul', 'kalshell'], ['lazuck', 'nobiton', 'myurol']]
 FACE = {
     'soramo': (0.55, 0.30), 'gauul': (0.62, 0.26), 'kalshell': (0.55, 0.36), 'lazuck': (0.60, 0.30),
     'nobiton': (0.62, 0.30), 'myurol': (0.55, 0.30), 'flune': (0.50, 0.26), 'geol': (0.62, 0.34),
-    'pukarim': (0.55, 0.32), 'serephine': (0.55, 0.24),
+    'pukarim': (0.55, 0.32), 'serephine': (0.55, 0.24), 'tsumuji': (0.48, 0.56),
 }
 # 窓の四すみの星（machine_front の px。左・上・右・下）
 STAR_BOXES = [(192, 252, 280, 345), (620, 252, 708, 345), (188, 677, 280, 756), (620, 677, 712, 756)]

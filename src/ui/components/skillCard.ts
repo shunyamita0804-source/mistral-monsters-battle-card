@@ -32,6 +32,8 @@ export interface SkillCardOptions {
   readonly showText?: boolean;
   /** 枠の形（なければ 'normal'） */
   readonly size?: SkillCardSize;
+  /** マナの数字をカードの値の代わりに出す（対戦の手札：ツムジのかぜのりで攻撃技のマナ−1 のとき。2026-10-30 指示書 U） */
+  readonly mana?: number;
 }
 
 type Rect = readonly [number, number, number, number];
@@ -90,8 +92,12 @@ function fitText(el: HTMLElement, text: string, base: number, fit: number, min: 
   return el;
 }
 
-/** 字の幅の目安（全角1・半角0.55。字の大きさを1としたとき） */
-const roughEm = (text: string): number => [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : 0.55), 0);
+/**
+ * 字の幅の目安（全角1・半角0.55。字の大きさを1としたとき）。
+ * 日本語の文の中の英字の大文字（ツムジの「Wひっかき」の W。2026-10-30）は日本語の字の形で幅が広いので 0.8（英語の文は今までどおり 0.55）
+ */
+const roughEm = (text: string, ja = false): number =>
+  [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : ja && /[A-Z]/.test(ch) ? 0.8 : 0.55), 0);
 
 /**
  * 効果の帯の文字：2行に収まる大きさ（上限 4.6cqw・下限 2.2cqw）。帯の中の幅（cqw）に、文節（phraseText と同じ区切り）を
@@ -101,9 +107,10 @@ function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
   const el = phraseText(text, 'skill-card__band-text');
   const inner = ((band[2] - band[0]) / l.w) * 100 - 5;
   // 英語は単語（と後ろの空白）ごと
+  const ja = /[぀-ヿ㐀-鿿]/.test(text);
   const parts = phrases(text)
     .flatMap((p) => (p === '\n' ? [] : /\s/.test(p) ? p.split(/(?<=\s)/) : [p]))
-    .map(roughEm);
+    .map((p) => roughEm(p, ja));
   const lines = (size: number): number => {
     const cap = (inner * 0.96) / size;
     let n = 1;
@@ -131,9 +138,9 @@ function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
  * マナの球（2026-10-29 ユーザー「マナとダメージのとこは前のUI使ってね」：前の版〔3cf9050〕の枠のつやのある青い球を切り出した mana_ball.webp に、
  * 白い太い数字をゲームが重ねる。真ん中・大きさは LAYOUT の mana）
  */
-function manaOrb(l: FrameLayout, cost: number): HTMLElement {
+function manaOrb(l: FrameLayout, cost: number, lowered = false): HTMLElement {
   const [cx, cy, r] = l.mana;
-  const el = place(h('span', { class: 'skill-card__mana' }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r, cy - r, cx + r, cy + r]);
+  const el = place(h('span', { class: `skill-card__mana${lowered ? ' skill-card__mana--lowered' : ''}` }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r, cy - r, cx + r, cy + r]);
   // 数字の大きさ：球の直径の約6割（2桁は少し小さく）
   el.style.fontSize = cqw(((r * 2) / l.w) * 100 * (String(cost).length > 1 ? 0.48 : 0.6));
   return el;
@@ -305,7 +312,7 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
     valueBox(l, size, f.skill, f.supportLabel),
     band,
     name,
-    manaOrb(l, f.mana),
+    manaOrb(l, options.mana ?? f.mana, options.mana !== undefined && options.mana < f.mana),
     categoryIcon(l, f.category),
   );
   card.style.width = `${options.width}px`;

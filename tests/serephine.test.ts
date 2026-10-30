@@ -372,6 +372,6 @@ describe('セレフィーンのガチャのシリーズとショップ', () => {
   it('パックの絵の色（pack_tint.py）・ショップの棚（shop_goods_20261029.py）にセレフィーンがある', () => {
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'serephine': '#8FA6E8'");
     expect(readFileSync('tools/design/shop_goods_20261029.py', 'utf8')).toMatch(/MONSTERS = \[.*'serephine'\]/);
-    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'serephine'\]/);
+    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'serephine'(, '[a-z]+')*\]/);
   });
 });

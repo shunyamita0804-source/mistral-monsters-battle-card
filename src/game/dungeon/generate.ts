@@ -15,6 +15,8 @@ import { nextInt, nextRandom } from '../rng.ts';
  * - water：部屋を横切る水路（'w'。通れない）。水路のせいで行けない床ができるなら、その水路は作らない
  * - ice：部屋の床を氷（'i'）に。氷は乗るとすべる（run.ts の slide）。すべって止まる所だけを「行ける所」として確かめる
  * - switch：階段（最後の階はボス）の部屋の入口をすべて閉じた扉（'D'）にし、扉の手前から行ける所にスイッチを置く
+ * - wind（2026-10-30 指示書 U・風の渓谷）：決まった向きの強い風のマス（'>' '<' '^' 'v'）を1階に4〜8か所。乗ると風の向きに2マス押し流される（slide）。
+ *   押し流された先がまた風のマスなら、もう一度流される。輪にならない置き方・押し流されても階段とボスへ必ず行ける置き方だけを残す
  */
 export type FloorEntityKind = 'npc' | 'chest' | 'guardian' | 'boss' | 'switch';
 
@@ -35,7 +37,7 @@ export interface DungeonFloor {
   readonly index: number;
   readonly width: number;
   readonly height: number;
-  /** '#'＝壁、'.'＝床、'w'＝水路（通れない）、'i'＝氷（すべる）、'D'＝扉（スイッチで開く） */
+  /** '#'＝壁、'.'＝床、'w'＝水路（通れない）、'i'＝氷（すべる）、'D'＝扉（スイッチで開く）、'>' '<' '^' 'v'＝強い風のマス（その向きに押し流す） */
   readonly tiles: readonly string[];
   readonly start: Point;
   /** 下り階段（最後の階は null。代わりにボス） */
@@ -58,10 +60,21 @@ export interface GenerateParams {
 /** 【仮】仕掛けの量（部屋に水路・氷を作る割合） */
 const WATER_ROOM_RATE = 0.7;
 const ICE_ROOM_RATE = 0.6;
+/** 【仮】風のマスの数（1階に min〜max か所）・押し流すマスの数（2026-10-30 指示書 U） */
+export const WIND_TILES = { min: 4, max: 8 } as const;
+export const WIND_PUSH = 2;
+
+/** 風のマスの向き（文字 → 1マスの動き） */
+export const WIND_DIRS: Readonly<Record<string, Point>> = { '>': { x: 1, y: 0 }, '<': { x: -1, y: 0 }, '^': { x: 0, y: -1 }, v: { x: 0, y: 1 } };
+
+/** 強い風のマスか（風の渓谷） */
+export function isWindTile(ch: string | undefined): boolean {
+  return ch !== undefined && ch in WIND_DIRS;
+}
 
 /** 歩けるマスか（扉は開いているときだけ） */
 export function isWalkableTile(ch: string | undefined, doorsOpen = true): boolean {
-  return ch === '.' || ch === 'i' || (ch === 'D' && doorsOpen);
+  return ch === '.' || ch === 'i' || (ch === 'D' && doorsOpen) || isWindTile(ch);
 }
 
 const DIRS = [
@@ -73,9 +86,18 @@ const DIRS = [
 
 /**
  * 1歩：dir の向きに進む。氷の上では、壁・通れないもの・氷でないマスにぶつかるまで進み続ける（氷でないマスに乗ったらそこで止まる）。
- * 進めなければ null。blocked は人や物（バトラー・宝箱・スイッチ・ボス）のマス
+ * 進めなければ null。blocked は人や物（バトラー・宝箱・スイッチ・ボス）のマス。
+ * 風のマス（風の渓谷）に乗ったら、風の向きに WIND_PUSH マス押し流す（windPush。stairs＝階段のマスの手前でも止まる）
  */
-export function slide(tiles: readonly string[], from: Point, dx: number, dy: number, blocked: (x: number, y: number) => boolean, doorsOpen = true): Point[] | null {
+export function slide(
+  tiles: readonly string[],
+  from: Point,
+  dx: number,
+  dy: number,
+  blocked: (x: number, y: number) => boolean,
+  doorsOpen = true,
+  stairs: Point | null = null,
+): Point[] | null {
   let x = from.x + dx;
   let y = from.y + dy;
   if (!isWalkableTile(tiles[y]?.[x], doorsOpen) || blocked(x, y)) return null;
@@ -88,18 +110,85 @@ export function slide(tiles: readonly string[], from: Point, dx: number, dy: num
     y = ny;
     path.push({ x, y });
   }
-  return path;
+  return windPush(tiles, path, blocked, doorsOpen, stairs);
 }
 
-/** すべる床も考えて、止まれるマスまでの歩数（氷のない階ではふつうの歩数と同じ） */
-export function reachable(tiles: readonly string[], from: Point, blocked: (x: number, y: number) => boolean, doorsOpen = true): Map<string, number> {
+/**
+ * 風のマス at から1回押し流された道（at は入れない）。風の向きに WIND_PUSH マスまで。
+ * 途中に壁・通れないもの・人や物（blocked）・階段（stairs）があれば、その手前で止まる（1マスも動けなければ空）
+ */
+function windStep(tiles: readonly string[], at: Point, blocked: (x: number, y: number) => boolean, doorsOpen: boolean, stairs: Point | null): Point[] {
+  const wind = WIND_DIRS[tiles[at.y]?.[at.x] ?? ''];
+  if (!wind) return [];
+  const out: Point[] = [];
+  let { x, y } = at;
+  for (let i = 0; i < WIND_PUSH; i++) {
+    const nx = x + wind.x;
+    const ny = y + wind.y;
+    if (!isWalkableTile(tiles[ny]?.[nx], doorsOpen) || blocked(nx, ny) || (stairs !== null && stairs.x === nx && stairs.y === ny)) break;
+    x = nx;
+    y = ny;
+    out.push({ x, y });
+  }
+  return out;
+}
+
+/**
+ * 強い風のマス（2026-10-30 指示書 U）：path の最後が風のマスなら、風の向きに押し流す（windStep）。押し流された先がまた風のマスなら、そのマスの風でもう一度。
+ * 同じ風のマスに2度来たら（輪。作るときに輪にならない置き方にしているので、ふつうは起きない）そこで止まる
+ */
+export function windPush(
+  tiles: readonly string[],
+  path: Point[],
+  blocked: (x: number, y: number) => boolean,
+  doorsOpen = true,
+  stairs: Point | null = null,
+): Point[] {
+  const seen = new Set<string>();
+  for (;;) {
+    const at = path[path.length - 1] as Point;
+    if (!isWindTile(tiles[at.y]?.[at.x]) || seen.has(`${at.x},${at.y}`)) return path;
+    seen.add(`${at.x},${at.y}`);
+    const step = windStep(tiles, at, blocked, doorsOpen, stairs);
+    if (step.length === 0) return path;
+    path.push(...step);
+  }
+}
+
+/** どこかの風のマスから押し流される先をたどると、同じ風のマスに戻ってくる（輪になる）か */
+export function windLoops(tiles: readonly string[], blocked: (x: number, y: number) => boolean, stairs: Point | null = null): boolean {
+  for (let y = 0; y < tiles.length; y++) {
+    for (let x = 0; x < (tiles[y]?.length ?? 0); x++) {
+      const seen = new Set<string>();
+      let at: Point = { x, y };
+      while (isWindTile(tiles[at.y]?.[at.x])) {
+        const k = `${at.x},${at.y}`;
+        if (seen.has(k)) return true;
+        seen.add(k);
+        const step = windStep(tiles, at, blocked, true, stairs);
+        if (step.length === 0) break;
+        at = step[step.length - 1] as Point;
+      }
+    }
+  }
+  return false;
+}
+
+/** すべる床・風のマスも考えて、止まれるマスまでの歩数（氷・風のない階ではふつうの歩数と同じ） */
+export function reachable(
+  tiles: readonly string[],
+  from: Point,
+  blocked: (x: number, y: number) => boolean,
+  doorsOpen = true,
+  stairs: Point | null = null,
+): Map<string, number> {
   const dist = new Map<string, number>([[`${from.x},${from.y}`, 0]]);
   const queue: Point[] = [from];
   for (let i = 0; i < queue.length; i++) {
     const p = queue[i] as Point;
     const d = dist.get(`${p.x},${p.y}`) as number;
     for (const [dx, dy] of DIRS) {
-      const path = slide(tiles, p, dx, dy, blocked, doorsOpen);
+      const path = slide(tiles, p, dx, dy, blocked, doorsOpen, stairs);
       const end = path?.[path.length - 1];
       if (!end || dist.has(`${end.x},${end.y}`)) continue;
       dist.set(`${end.x},${end.y}`, d + 1);
@@ -250,8 +339,10 @@ export function generateFloor(runSeed: number, floor: number, isLast: boolean, p
   const set = (grid2: string[][], x: number, y: number, ch: string): void => {
     (grid2[y] as string[])[x] = ch;
   };
+  // 風に押し流されても階段の上には止まらない（階段の手前で止まる）。最後の階は階段がない
+  const stairsAt = isLast ? null : goal;
   const allFloorReachable = (t: readonly string[]): boolean => {
-    const dist = reachable(t, start, () => false);
+    const dist = reachable(t, start, () => false, true, stairsAt);
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (t[y]?.[x] === '.' && !dist.has(`${x},${y}`)) return false;
     return true;
   };
@@ -274,6 +365,32 @@ export function generateFloor(runSeed: number, floor: number, isLast: boolean, p
       }
       const next = trial.map((row) => row.join(''));
       if (allFloorReachable(next)) tiles = next;
+    }
+  }
+  // 強い風のマス（風の渓谷）：床のマス（スタート・階段〔ボス〕のマスは除く）に、決まった向きの風を置く。
+  // 押し流す先が1マス以上あり、置いたあとも全部の床へ行けて（押し流されても止まれる所として）、輪にならないものだけ残す
+  if (gimmick === 'wind') {
+    const want = rng.range(WIND_TILES.min, WIND_TILES.max);
+    const kinds = Object.keys(WIND_DIRS);
+    const candidates: Point[] = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (tiles[y]?.[x] !== '.' || (x === start.x && y === start.y) || (x === goal.x && y === goal.y)) continue;
+        candidates.push({ x, y });
+      }
+    }
+    let placed = 0;
+    for (let tries = 0; placed < want && tries < 200 && candidates.length > 0; tries++) {
+      const p = candidates.splice(rng.int(candidates.length), 1)[0] as Point;
+      const ch = kinds[rng.int(kinds.length)] as string;
+      const d = WIND_DIRS[ch] as Point;
+      if (tiles[p.y + d.y]?.[p.x + d.x] !== '.' || (stairsAt && stairsAt.x === p.x + d.x && stairsAt.y === p.y + d.y)) continue;
+      const trial = tiles.map((row) => row.split(''));
+      set(trial, p.x, p.y, ch);
+      const next = trial.map((row) => row.join(''));
+      if (!allFloorReachable(next) || windLoops(next, () => false, stairsAt)) continue;
+      tiles = next;
+      placed++;
     }
   }
   // 扉：階段・ボスの部屋の入口（部屋のすぐ外の床）をすべて扉にする
@@ -334,7 +451,7 @@ export function generateFloor(runSeed: number, floor: number, isLast: boolean, p
     place('guardian', params.guardiansPerFloor);
     if (isLast) entities.push({ id: `${prefix}-boss`, kind: 'boss', x: goal.x, y: goal.y });
     const result: DungeonFloor = { index: floor, width, height, tiles, start, stairs: isLast ? null : goal, entities };
-    if (isFloorReachable(result) && (gimmick !== 'switch' || isSwitchReachable(result))) return result;
+    if (isFloorReachable(result) && (gimmick !== 'switch' || isSwitchReachable(result)) && (gimmick !== 'wind' || !hasWindLoop(result))) return result;
   }
   // 置けなかったとき（ほぼ起きない）：バトラー・宝箱を置かない。扉もやめる（スイッチが無いと開けられないため）
   const fallback: FloorEntity[] = isLast ? [{ id: `${prefix}-boss`, kind: 'boss', x: goal.x, y: goal.y }] : [];
@@ -377,7 +494,7 @@ export function bfs(tiles: readonly string[], from: Point, blocked: (x: number, 
  */
 export function isFloorReachable(f: DungeonFloor): boolean {
   const blockers = new Set(f.entities.filter(blocksWay).map((e) => `${e.x},${e.y}`));
-  const dist = reachable(f.tiles, f.start, (x, y) => blockers.has(`${x},${y}`));
+  const dist = reachable(f.tiles, f.start, (x, y) => blockers.has(`${x},${y}`), true, f.stairs);
   const nextTo = (p: Point): boolean =>
     [
       [1, 0],
@@ -387,6 +504,12 @@ export function isFloorReachable(f: DungeonFloor): boolean {
     ].some(([dx, dy]) => dist.has(`${p.x + (dx as number)},${p.y + (dy as number)}`));
   if (f.stairs && !dist.has(`${f.stairs.x},${f.stairs.y}`)) return false;
   return f.entities.filter(blocksWay).every(nextTo);
+}
+
+/** 人や物を置いたあとの階で、風のマスが輪になっていないか（風の渓谷。人や物の手前で止まると行き先が変わるので、置いたあとにも確かめる） */
+export function hasWindLoop(f: DungeonFloor): boolean {
+  const blockers = new Set(f.entities.filter(blocksWay).map((e) => `${e.x},${e.y}`));
+  return windLoops(f.tiles, (x, y) => blockers.has(`${x},${y}`), f.stairs);
 }
 
 /** 扉を閉じたままで、スイッチの隣まで行けるか（機械の塔。必ず解ける） */
