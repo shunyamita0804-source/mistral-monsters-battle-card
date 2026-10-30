@@ -267,14 +267,16 @@ export const BATTLE = {
   'battle.prompt.supportLeft': { ja: 'サポート（このターンあと{n}回）', en: 'Support ({n} left this turn)' },
   'battle.prompt.usable': { ja: '使えます', en: 'Usable' },
   'battle.prompt.unusable': { ja: '使えません', en: 'Cannot use' },
+  // 2026-10-31 指示書 AB【3】：説明の箱を小さくしたので、案内は1〜2行に短く
   'battle.prompt.hintMain': {
-    ja: '手札をタップ（指でなぞると見比べられます）すると、説明と「使う」が出ます。上へはじくとすぐ使えます。攻撃を終えるときは、下の「攻撃終了」',
-    en: 'Tap a card (swipe to compare) to see it and "Use". Flick a card up to use it right away. To end your attack, tap "End Attack" at the bottom',
+    ja: '手札をタップで説明。上へはじくとすぐ使えます',
+    en: 'Tap a card for details. Flick it up to use it',
   },
   'battle.prompt.hint': {
-    ja: '手札のカードをタップするか指でなぞると、ここに説明と拡大したカードが出ます。',
-    en: 'Tap or swipe across your hand to see card details and a larger view here.',
+    ja: '手札をタップすると説明が出ます',
+    en: 'Tap a card in your hand for details',
   },
+  'battle.prompt.oppTurn': { ja: '相手の番', en: "Opponent's turn" },
 
   // 手札
   'battle.hand.aria': { ja: '手札', en: 'Hand' },
