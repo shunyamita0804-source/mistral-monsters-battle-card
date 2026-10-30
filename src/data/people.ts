@@ -247,7 +247,7 @@ export const PEOPLE: readonly Person[] = [
   }),
   // ---------- 風の渓谷（2026-10-30 指示書 U）。ゼフィラは守り手＝ボス、ニコはバトラー（守り手の一族ではない） ----------
   // ゼフィラ：身軽でおしゃべり、明るい若い女性。勝ったあとの祭壇へのせりふ（after）にだけ、ほかの聖地にも守り手の一族がいると分かる口をすべらせる一言（物語の伏線）
-  p(41, 'zephyra', 'dungeon', ['ゼフィラ', 'Zephyra'], ['渓谷の守り手・一族でいちばん若い', 'Keeper of the Valley, youngest of the clan'], ['つり橋はね、走って渡るのがいちばん気持ちいいの！', 'Rope bridges feel best when you run across them!'], {
+  p(41, 'zephyra', 'dungeon', ['ゼフィラ', 'Zephyra'], ['渓谷の守り手・一族でいちばん若い', "Valley Keeper, clan's youngest"], ['つり橋はね、走って渡るのがいちばん気持ちいいの！', 'Rope bridges feel best when you run across them!'], {
     opponentIds: ['enc-wind-boss'],
     lines: lines(
       ['わっ、お客さん！ 風に飛ばされずにここまで来られたんだ、すごいすごい！ じゃあ次は、わたしと勝負ね！', "Whoa, a visitor! You made it here without getting blown away? Amazing! Okay, now let's battle!"],

@@ -92,8 +92,12 @@ function fitText(el: HTMLElement, text: string, base: number, fit: number, min: 
   return el;
 }
 
-/** 字の幅の目安（全角1・半角0.55。字の大きさを1としたとき） */
-const roughEm = (text: string): number => [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : 0.55), 0);
+/**
+ * 字の幅の目安（全角1・半角0.55。字の大きさを1としたとき）。
+ * 日本語の文の中の英字の大文字（ツムジの「Wひっかき」の W。2026-10-30）は日本語の字の形で幅が広いので 0.8（英語の文は今までどおり 0.55）
+ */
+const roughEm = (text: string, ja = false): number =>
+  [...text].reduce((n, ch) => n + (ch.charCodeAt(0) > 0xff ? 1 : ja && /[A-Z]/.test(ch) ? 0.8 : 0.55), 0);
 
 /**
  * 効果の帯の文字：2行に収まる大きさ（上限 4.6cqw・下限 2.2cqw）。帯の中の幅（cqw）に、文節（phraseText と同じ区切り）を
@@ -103,9 +107,10 @@ function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
   const el = phraseText(text, 'skill-card__band-text');
   const inner = ((band[2] - band[0]) / l.w) * 100 - 5;
   // 英語は単語（と後ろの空白）ごと
+  const ja = /[぀-ヿ㐀-鿿]/.test(text);
   const parts = phrases(text)
     .flatMap((p) => (p === '\n' ? [] : /\s/.test(p) ? p.split(/(?<=\s)/) : [p]))
-    .map(roughEm);
+    .map((p) => roughEm(p, ja));
   const lines = (size: number): number => {
     const cap = (inner * 0.96) / size;
     let n = 1;

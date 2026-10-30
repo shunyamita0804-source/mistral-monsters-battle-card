@@ -52,6 +52,6 @@ export const DUNGEON_SPOTS: Readonly<Record<string, WorldMapSpot>> = {
   'dungeon-05': { x: 0.5, y: 0.5, region: 'ortiga' },
   'dungeon-06': { x: 0.8, y: 0.3, region: 'asteria' },
   'dungeon-07': { x: 0.89, y: 0.64, region: 'nebrasia' },
-  // 2026-10-30 指示書 U：風の渓谷。Claude が仮に置いた（オルティガ地方の西の山あい。水の神殿・炎の火山の印と重ならない所）
-  'dungeon-08': { x: 0.36, y: 0.56, region: 'ortiga' },
+  // 2026-10-30 指示書 U：風の渓谷。Claude が仮に置いた（オルティガ地方の南の岩山。街・水の神殿・炎の火山の印と名前の札が重ならない所）
+  'dungeon-08': { x: 0.47, y: 0.76, region: 'ortiga' },
 };

@@ -1,4 +1,4 @@
-// 使い方: node tools/e2e/gacha_shot.cjs URL セーブ.json 出力 幅 高さ 名前 [パックの番号=0]
+// 使い方: node tools/e2e/gacha_shot.cjs URL セーブ.json 出力 幅 高さ 名前 [パックの番号=0・last で最後]
 // ガチャ（販売機の前 {shop,45,20,up} のセーブ）でパックを選ぶ → 自動でまわす → 破る → 1枚ずつめくる → 結果の一覧（2026-10-29）
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -22,7 +22,9 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
   await page.keyboard.press('Enter');
   await page.waitForTimeout(1500);
   await shot('select');
-  const tile = page.locator('.gacha-select__tile').nth(+nth);
+  const tiles = page.locator('.gacha-select__tile');
+  // last＝いちばん最後に並んだシリーズ（2026-10-30 ツムジ）
+  const tile = nth === 'last' ? tiles.last() : tiles.nth(+nth);
   await tile.click(); await page.waitForTimeout(600); await tile.click(); await page.waitForTimeout(1200);
   await page.locator('.modal button:has-text("はい")').first().click();
   await page.waitForTimeout(2500);

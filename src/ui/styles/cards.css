@@ -83,7 +83,7 @@ img.skill-card__art {
 
 /* かぜのり（ツムジ 2026-10-30）でマナが下がった手札：数字を明るい緑に */
 .skill-card__mana--lowered {
-  color: #b8ffb0;
+  color: #52f06a;
 }
 
 /* 分類の札（前の版の八角形の札。tile_{分類}.webp） */

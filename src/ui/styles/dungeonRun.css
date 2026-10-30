@@ -488,13 +488,15 @@
 .drun__tile--wind.is-lit::before {
   content: '';
   position: absolute;
-  inset: 8px 4px;
+  inset: 2px;
   background:
-    linear-gradient(90deg, transparent 0 10%, rgb(236 248 255 / 0.9) 10% 46%, transparent 46% 58%, rgb(236 248 255 / 0.9) 58% 82%, transparent 82%) 0 22% / 100% 3px no-repeat,
-    linear-gradient(90deg, transparent 0 4%, rgb(236 248 255 / 0.95) 4% 30%, transparent 30% 40%, rgb(236 248 255 / 0.95) 40% 74%, transparent 74%) 0 50% / 100% 3px no-repeat,
-    linear-gradient(90deg, transparent 0 18%, rgb(236 248 255 / 0.9) 18% 52%, transparent 52% 64%, rgb(236 248 255 / 0.9) 64% 86%, transparent 86%) 0 78% / 100% 3px no-repeat;
-  border-radius: 2px;
-  filter: drop-shadow(0 0 2px rgb(140 200 255 / 0.9));
+    linear-gradient(90deg, transparent 0 6%, rgb(240 250 255 / 0.95) 6% 44%, transparent 44% 56%, rgb(240 250 255 / 0.95) 56% 78%, transparent 78%) 0 20% / 100% 4px no-repeat,
+    linear-gradient(90deg, transparent 0 2%, rgb(240 250 255) 2% 30%, transparent 30% 40%, rgb(240 250 255) 40% 70%, transparent 70%) 0 50% / 100% 4px no-repeat,
+    linear-gradient(90deg, transparent 0 14%, rgb(240 250 255 / 0.95) 14% 50%, transparent 50% 62%, rgb(240 250 255 / 0.95) 62% 82%, transparent 82%) 0 80% / 100% 4px no-repeat,
+    linear-gradient(90deg, rgb(120 190 255 / 0.12), rgb(150 215 255 / 0.4));
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 2px rgb(170 225 255 / 0.55);
+  filter: drop-shadow(0 0 3px rgb(120 200 255 / 0.95));
   animation: drun-wind-flow 0.9s linear infinite;
   pointer-events: none;
 }
@@ -505,14 +507,14 @@
   content: '';
   position: absolute;
   top: 50%;
-  right: 7px;
-  width: 11px;
-  height: 11px;
-  border-top: 3px solid rgb(240 250 255 / 0.95);
-  border-right: 3px solid rgb(240 250 255 / 0.95);
+  right: 6px;
+  width: 15px;
+  height: 15px;
+  border-top: 5px solid rgb(245 252 255);
+  border-right: 5px solid rgb(245 252 255);
   translate: 0 -50%;
   rotate: 45deg;
-  filter: drop-shadow(0 0 2px rgb(140 200 255 / 0.9));
+  filter: drop-shadow(0 0 3px rgb(80 170 255));
   pointer-events: none;
 }
 
@@ -522,12 +524,12 @@
 
 .drun__tile--wind.is-seen:not(.is-lit)::before,
 .drun__tile--wind.is-seen:not(.is-lit)::after {
-  opacity: 0.45;
+  opacity: 0.7;
 }
 
 @keyframes drun-wind-flow {
-  from { background-position-x: -24px, -24px, -24px; }
-  to { background-position-x: 24px, 24px, 24px; }
+  from { background-position-x: -24px, -24px, -24px, 0; }
+  to { background-position-x: 24px, 24px, 24px, 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
