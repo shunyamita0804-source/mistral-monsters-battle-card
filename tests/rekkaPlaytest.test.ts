@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { cardCatalog, skillsOf } from '../src/data/cards.ts';
+import { cardCatalog, LEGACY_SUPPORT_IDS, skillsOf } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import now from '../src/data/official/booster_contents_20261028.json';
@@ -26,7 +26,7 @@ interface Row {
 
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
-/** 資料の行（モンスター名・技名・枚数）から箱のデッキを作る。仮サポート12枚は今の箱のまま */
+/** 資料の行（モンスター名・技名・枚数）から箱のデッキを作る。サポートは 2026-10-29 の箱と同じ12枚（sup-1〜6 を2枚ずつ。中身は 2026-10-30 指示書 Y から新しいカード） */
 function deckFromRows(key: BoosterKey, rows: readonly Row[]): Deck {
   const base = boosterDeck(key);
   const skills: string[] = [];
@@ -36,7 +36,7 @@ function deckFromRows(key: BoosterKey, rows: readonly Row[]): Deck {
     if (hit.length !== 1 || !hit[0]) throw new Error(`${row.monster} ${row.skill_name}`);
     for (let i = 0; i < row.copies; i++) skills.push(hit[0].id);
   }
-  const supports = base.skills.filter((id) => cardCatalog.get(id)?.kind === 'support');
+  const supports = LEGACY_SUPPORT_IDS.flatMap((id) => [id, id]);
   return { monsters: [...base.monsters], skills: [...skills, ...supports] };
 }
 
@@ -73,8 +73,11 @@ function series(a: Deck, b: Deck, games: number, seedBase: number, options: Flun
 }
 
 describe('烈火の猛攻の試遊（自動の対戦）', () => {
-  it('案3 はゲームの今の箱と同じ（前の資料は record として残す）。どれも技48枚・同じカード3枚まで・ルールに合う。ほかの箱の行は変えない', () => {
-    expect(countCards(REKKA.plan3?.skills ?? [])).toEqual(countCards(boosterDeck('booster-2').skills));
+  it('案3 は 2026-10-29 の箱と同じ（2026-10-30 指示書 Y で今の箱は技を8枚足した）。どれも技48枚・同じカード3枚まで・ルールに合う。ほかの箱の行は変えない', () => {
+    const plan3 = countCards((REKKA.plan3?.skills ?? []).filter((c) => cardCatalog.get(c)?.kind === 'skill'));
+    const now3 = countCards(boosterDeck('booster-2').skills.filter((c) => cardCatalog.get(c)?.kind === 'skill'));
+    const added = Object.entries(now3).filter(([id, n]) => n !== (plan3[id] ?? 0)).map(([id, n]) => n - (plan3[id] ?? 0));
+    expect(added).toEqual(Array(8).fill(1));
     for (const [id, deck] of Object.entries(REKKA)) {
       const skills = deck.skills.filter((c) => cardCatalog.get(c)?.kind === 'skill');
       expect(skills, id).toHaveLength(48);

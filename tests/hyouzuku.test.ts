@@ -270,8 +270,8 @@ function beatIvan(save: SaveData, seed: number): ReturnType<typeof winRunBattle>
 }
 
 describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
-  it('イヴァンの編成：ミュロル・ヒョウズク（真ん中・切り札）・カルシェル。ノビトンは外した。lifeScale 1.3', () => {
-    expect(ENCOUNTERS['enc-ice-boss']).toMatchObject({ name: 'イヴァン', monsters: IVAN_TEAM, ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.3 });
+  it('イヴァンの編成：ミュロル・ヒョウズク（真ん中・切り札）・カルシェル。ノビトンは外した。lifeScale 1.3 → 指示書 Y で 1.2', () => {
+    expect(ENCOUNTERS['enc-ice-boss']).toMatchObject({ name: 'イヴァン', monsters: IVAN_TEAM, ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.2 });
     expect(ENCOUNTERS['enc-ice-boss']?.monsters).not.toContain('mon-nobiton');
     expect(DUNGEONS.find((d) => d.id === ICE)).toMatchObject({
       trumpReward: true,

@@ -7,13 +7,18 @@ import {
   canConvertToMana,
   chainReady,
   cardUsability,
+  cheerTargets,
   coverUser,
+  fieldModifier,
+  guardCost,
   isPinned,
+  recallChoices,
   manaOf,
   otherSide,
   incomingDamage,
   shieldOf,
   skillCost,
+  attackableMonsters,
   tailwindTargets,
   targetsFor,
   undodgeableNow,
@@ -65,6 +70,8 @@ function attackersWith(state: BattleState, side: Side, stat: StatType | 'all'): 
 /** 全体カードが自分にとってどれだけ得か（自分の攻撃が強くなる・相手の攻撃が弱くなるほど大きい） */
 function fieldScore(state: BattleState, side: Side, card: SupportCard): number {
   const e = card.effect;
+  // 守りの陣（2026-10-30 指示書 Y）：自分の手札に守りのカードが2枚以上あるとき
+  if (e.type === 'guardDiscount') return state.sides[side].hand.filter(isGuard).length >= 2 ? 1 : 0;
   if (e.type !== 'field') return 0;
   return e.modifier * (attackersWith(state, side, e.stat) - attackersWith(state, otherSide(side), e.stat));
 }
@@ -125,6 +132,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
     if (ally) return { type: 'useCard', side, cardUid: nectar.card.uid, targetUid: ally.uid };
   }
 
+  // 1.5 サポートカード（2026-10-30 指示書 Y の仮の思考）：投石で倒す・声援で倒す・霧の香・思い出の箱・風まかせ
+  const supportPlay = chooseSupportPlay(state, side, options, style);
+  if (supportPlay) return supportPlay;
+
   // 2. 全体カード：いまの場より自分に得になるときだけ出す（入れ替え合いでマナを無駄にしない）
   const current = state.field ? fieldScore(state, side, getSupport(state.field.cardId)) : 0;
   const field = options
@@ -177,6 +188,13 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const sniff = options.filter(isSkillOption).find((o) => o.def.effect.type === 'revealHand');
   if (sniff && state.sides[otherSide(side)].hand.length >= 3 && manaOf(mine) >= sniff.def.cost + 3) return { type: 'useCard', side, cardUid: sniff.card.uid };
 
+  // 4.5 投石（攻撃のあと）：マナが投石の分＋2以上残っていれば、いちばんライフの少ない相手に
+  const stone = supportOf(options, 'stone');
+  if (stone && manaOf(mine) >= stone.def.cost + 2) {
+    const weakest = [...attackableMonsters(state, otherSide(side))].sort((a, b) => a.life - b.life)[0];
+    if (weakest) return { type: 'useCard', side, cardUid: stone.card.uid, targetUid: weakest.uid };
+  }
+
   // 5. マナ・ドロー
   // 山札が足りないと負けになるので、山札を動かす効果は山札に余裕があるときだけ。
   // ドローは手札が少ないとき、山札からマナはマナが少ないときだけ使う
@@ -191,6 +209,71 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
 
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
+}
+
+/** 手札の中の、その種類のサポート（使えるもの） */
+function supportOf(options: Option[], type: SupportCard['effect']['type']): (Option & { def: SupportCard }) | undefined {
+  return options.find((o): o is Option & { def: SupportCard } => o.def.kind === 'support' && o.def.effect.type === type);
+}
+
+/**
+ * サポートカード（2026-10-30 指示書 Y。仮の思考）。すぐ効くカードは全部まとめて1ターン1回なので、上から順に1つだけ：
+ * - 投石：ライフ1の相手（投石で倒せる相手）がいれば、その相手に先に使う
+ * - 声援：その攻撃に＋1すれば相手を倒せるとき（＋1なしでは倒せないとき）、その攻撃をするモンスターに
+ * - 霧の香：これから攻撃する手番に、相手のマナが1〜2（守りを払えそうな数）のとき、攻撃の前に
+ * - 思い出の箱：マナが（3＋戻す技のマナ）以上あり、捨て札にダメージ3以上の攻撃技（使えるモンスターが生きている）があるとき、いちばんダメージの大きい技を
+ * - 風まかせ：手札に倒れたモンスターの技があるか、今のマナ＋ほかの手札をみなマナにしても払えない重い技があるとき、その1枚を戻す
+ */
+function chooseSupportPlay(state: BattleState, side: Side, options: Option[], style: AiStyle): BattleAction | null {
+  const mine = state.sides[side];
+  const mana = manaOf(mine);
+  const stone = supportOf(options, 'stone');
+  if (stone && stone.def.effect.type === 'stone') {
+    const power = Math.max(0, stone.def.effect.value + fieldModifier(state, 'force'));
+    const kill = attackableMonsters(state, otherSide(side)).filter((e) => e.life <= power && power > 0)[0];
+    if (kill) return { type: 'useCard', side, cardUid: stone.card.uid, targetUid: kill.uid };
+  }
+  const attacks = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack');
+  const cheer = supportOf(options, 'cheer');
+  if (cheer && cheer.def.effect.type === 'cheer' && !canKillThisTurn(state, side, options)) {
+    const plus = cheer.def.effect.value;
+    const cheerable = new Set(cheerTargets(state, side).map((m) => m.uid));
+    for (const o of attacks) {
+      for (const u of availableUsers(state, side, o.def)) {
+        if (!cheerable.has(u.uid) || mana - cheer.def.cost < skillCost(state, o.def, u)) continue;
+        const power = attackPower(state, o.def, u);
+        if (targetsFor(state, side, o.def, u).some((e) => e.life > power && e.life <= power + plus)) return { type: 'useCard', side, cardUid: cheer.card.uid, targetUid: u.uid };
+      }
+    }
+  }
+  const mist = supportOf(options, 'manaDrain');
+  if (mist && style !== 'guard') {
+    const theirs = manaOf(state.sides[otherSide(side)]);
+    const canStillAttack = attacks.some((o) => availableUsers(state, side, o.def).some((u) => skillCost(state, o.def, u) <= mana - mist.def.cost));
+    if (theirs >= 1 && theirs <= 2 && canStillAttack) return { type: 'useCard', side, cardUid: mist.card.uid };
+  }
+  const recall = supportOf(options, 'recall');
+  if (recall) {
+    const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+    const best = recallChoices(state, side)
+      .map((id) => getPlayCard(id))
+      .filter((k): k is SkillCard => k.kind === 'skill' && k.effect.type === 'attack' && skillValue(k) >= 3 && alive.has(k.monsterId) && mana >= recall.def.cost + k.cost)
+      .sort((a, b) => skillValue(b) - skillValue(a))[0];
+    if (best) return { type: 'useCard', side, cardUid: recall.card.uid, choice: best.id };
+  }
+  const swap = supportOf(options, 'swap');
+  if (swap) {
+    const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+    const others = mine.hand.filter((c) => c.uid !== swap.card.uid);
+    const dead = others.find((c) => {
+      const k = getPlayCard(c.cardId);
+      return k.kind === 'skill' && !alive.has(k.monsterId);
+    });
+    const heavy = others.find((c) => getPlayCard(c.cardId).cost > mana + others.length - 1);
+    const back = dead ?? heavy;
+    if (back) return { type: 'useCard', side, cardUid: swap.card.uid, choice: back.uid };
+  }
+  return null;
 }
 
 /** みちしおを使うのに要る山札の枚数（これより少なければ山札が残り少ないので使わない） */
@@ -443,16 +526,19 @@ const guardValue = (c: HandCard): number => {
 
 /**
  * マナ化（仮の思考）：残す手札を最大2枚に絞り、残りをすべてマナにする。
- * - 防御・回避カード1枚：いまのマナで払える中で一番強いもの（相手の攻撃に備える）
+ * - 防御・回避カード2枚（2026-10-30 指示書 Y で1枚から2枚に。aggressive は0枚）：いまのマナで払える中で強いもの（相手の攻撃に備える）
  * - 技・サポート1枚：マナ化し終えたあとのマナで払える中で一番重いもの（次のターンに使う）
  * マナ化するたびにマナ+1・手札-1 なので「マナ化し終えたあとのマナ」は途中で変わらず、残す札が安定する。
  */
 function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'normal'): BattleAction {
   const mine = state.sides[side];
   const mana = manaOf(mine);
-  const cost = (c: HandCard): number => getPlayCard(c.cardId).cost;
-  // 守りのカードを残す枚数（aggressive は残さない・guard は2枚）
-  const guardKeep = style === 'aggressive' ? 0 : style === 'guard' ? 2 : 1;
+  const cost = (c: HandCard): number => {
+    const card = getPlayCard(c.cardId);
+    return card.kind === 'skill' ? guardCost(state, card) : card.cost;
+  };
+  // 守りのカードを残す枚数（aggressive は残さない・guard は2枚。ふつうは 2026-10-30 指示書 Y で 1 → 2）
+  const guardKeep = style === 'aggressive' ? 0 : 2;
   const keepGuards = mine.hand.filter((c) => isGuard(c) && cost(c) <= mana).sort((a, b) => guardValue(b) - guardValue(a)).slice(0, guardKeep);
   const others = mine.hand.filter((c) => !keepGuards.includes(c) && (!isGuard(c) || style === 'aggressive'));
   const manaAfter = mana + mine.hand.length - keepGuards.length - 1;

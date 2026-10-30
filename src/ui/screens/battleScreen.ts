@@ -8,7 +8,9 @@ import {
   cardUsability,
   createBattle,
   findMonster,
+  guardCost,
   handSkillCost,
+  recallChoices,
   manaOf,
   otherSide,
   incomingDamage,
@@ -667,9 +669,15 @@ export const battleScreen: ScreenDefinition = {
       return (now.find((m, i) => m.acted && !was[i]?.acted) ?? now.find((m, i) => !!was[i]?.chain && !m.chain && m.acted))?.uid ?? null;
     };
 
-    /** 手札のマナの数字（かぜのりで攻撃技のマナが下がっていれば、その数。下がっていなければ何も渡さない） */
+    /** 手札のマナの数字（かぜのりで攻撃技のマナが、守りの陣で防御・回避のマナが下がっていれば、その数。下がっていなければ何も渡さない） */
     const handMana = (s: BattleState, card: PlayCard): { mana?: number } => {
-      if (card.kind !== 'skill' || card.effect.type !== 'attack' || s.active !== 'player') return {};
+      if (card.kind !== 'skill') return {};
+      // 守りの陣（2026-10-30 指示書 Y）：場にある間、防御・回避のカードはいつでも下げて見せる（守りは相手の手番に使う）
+      if (card.effect.type === 'defense' || card.effect.type === 'evade' || card.effect.type === 'cover') {
+        const cost = guardCost(s, card);
+        return cost < card.cost ? { mana: cost } : {};
+      }
+      if (card.effect.type !== 'attack' || s.active !== 'player') return {};
       const cost = handSkillCost(s, 'player', card);
       return cost < card.cost ? { mana: cost } : {};
     };
@@ -935,10 +943,17 @@ export const battleScreen: ScreenDefinition = {
       if (!hand || !cardUsability(state, 'player', cardUid).usable) return;
       const card = getPlayCard(hand.cardId);
       const targets = targetsFor(state, 'player', card);
+      // 思い出の箱・風まかせ（2026-10-30 指示書 Y）：選ぶ画面
+      if (card.kind === 'support' && (card.effect.type === 'recall' || card.effect.type === 'swap')) {
+        pickSupportCard(cardUid, card.effect.type);
+        return;
+      }
       // 相手全体への攻撃（試遊中：ジオルの地ひびき）は相手を選ばない
       const allTargets = card.kind === 'skill' && card.effect.type === 'attack' && !!card.effect.allTargets;
-      const enemyTarget = card.kind === 'skill' && targetsEnemy(card) && !allTargets;
-      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind') {
+      // 投石（サポート）も相手1体を選ぶ
+      const stone = card.kind === 'support' && card.effect.type === 'stone';
+      const enemyTarget = (card.kind === 'skill' && targetsEnemy(card) && !allTargets) || stone;
+      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind' || card.effect.type === 'cheer') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
           return;
@@ -947,19 +962,61 @@ export const battleScreen: ScreenDefinition = {
           cardUid,
           targets: targets.map((t) => t.uid),
           prompt: t(
-            card.effect.type === 'attack'
+            card.effect.type === 'attack' || stone
               ? 'battle.prompt.attackTarget'
               : enemyTarget
                 ? 'battle.prompt.specialTarget'
                 : card.effect.type === 'tailwind'
                   ? 'battle.prompt.tailwindTarget'
-                  : 'battle.prompt.healTarget',
+                  : card.effect.type === 'cheer'
+                    ? 'battle.prompt.cheerTarget'
+                    : 'battle.prompt.healTarget',
           ),
         };
         render();
         return;
       }
       dispatch({ type: 'useCard', side: 'player', cardUid });
+    };
+
+    /**
+     * 思い出の箱（捨て札の技カードから）・風まかせ（このカードのほかの手札から）で1枚を選ぶ窓（2026-10-30 指示書 Y）。
+     * 押したカードを選んで使う。「やめる」で使わずに閉じる
+     */
+    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap'): void => {
+      if (!state) return;
+      const choices: { readonly choice: string; readonly cardId: string }[] =
+        kind === 'recall'
+          ? recallChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
+          : state.sides.player.hand.filter((c) => c.uid !== cardUid).map((c) => ({ choice: c.uid, cardId: c.cardId }));
+      const handle = openModal(element, {
+        title: t(kind === 'recall' ? 'battle.pick.recall' : 'battle.pick.swap'),
+        className: 'battle-pick',
+        body: [
+          h(
+            'div',
+            { class: 'battle-pick__grid' },
+            ...choices.map((c) =>
+              h(
+                'button',
+                {
+                  class: 'battle-pick__item',
+                  attrs: { type: 'button', 'aria-label': cardName(c.cardId) },
+                  on: {
+                    click: () => {
+                      handle.close();
+                      dispatch({ type: 'useCard', side: 'player', cardUid, choice: c.choice });
+                    },
+                  },
+                },
+                createBattleCard(getPlayCard(c.cardId), { width: 74, size: 'hand' }),
+                h('span', { class: 'battle-pick__name', text: cardName(c.cardId) }),
+              ),
+            ),
+          ),
+        ],
+        actions: [{ label: t('battle.pick.cancel'), onTap: () => handle.close() }],
+      });
     };
 
     /* ---------- 手札を指でなぞる ---------- */
@@ -1413,6 +1470,8 @@ export const battleScreen: ScreenDefinition = {
       if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
       // かぜのり（ツムジ 2026-10-30）：おいかぜと同じ風の印。かけてから、マナ−1 が効く次の自分のターンまで出す（相手からも見える）
       if (m.windRide && m.life > 0 && m.windRide.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.windRide', { n: m.windRide.discount }), 'tailwind'));
+      // 声援（2026-10-30 指示書 Y）：おいかぜと同じ形の印。このターンの次の攻撃まで（相手からも見える）
+      if (m.cheer && m.life > 0 && m.cheer.turn === s.turn) marks.push(mark(statusTailwindArt, t('battle.status.cheer', { n: m.cheer.amount }), 'tailwind'));
       return marks.length ? h('span', { class: 'battle__corner-marks' }, ...marks) : null;
     };
 

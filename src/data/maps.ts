@@ -389,6 +389,8 @@ const SHOP_ART = artOf('shop');
 const SHOP_CLERK_DRAW_DY = -1;
 /** 販売機の名札：調べる範囲の上のはし（絵の y 420＝16 マス目）から、機械の屋根の下（7 マス目＝絵の y 約 180）へ */
 const SHOP_GACHA_LABEL_DY = -9;
+/** 管理局の掲示板の名札：ランクの板と掲示板のあいだに浮いて分かりにくかったので、掲示板の上のふちに重ねる（2026-10-30 指示書 Y-F2） */
+const BUREAU_NOTICE_LABEL_DY = 1.75;
 /** カードショップ。主役はカードの購入（店員のカウンター）とカードパックの販売機（いまのガチャ。カプセルではない） */
 export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'interior', SHOP_ART, [
   interactAt('shop-counter', itemOf(SHOP_ART, 'COUNTER'), 'カウンター', 'shopClerk'),
@@ -482,7 +484,7 @@ export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラ�
   interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
   interactAt('bureau-rank-board', itemOf(BUREAU_ART, 'RANK_BOARD'), 'ランクの板', 'message', 'カードバトラーのランクの一覧。E から S まで、6つの段がある。'),
   interactAt('bureau-medal-case', itemOf(BUREAU_ART, 'MEDAL_CASE'), 'メダルの棚', 'message', '歴代の優勝者のメダルが、ガラスの中で光っている。'),
-  interactAt('bureau-notice-board', itemOf(BUREAU_ART, 'NOTICE_BOARD'), '掲示板', 'noticeBoard'),
+  { ...interactAt('bureau-notice-board', itemOf(BUREAU_ART, 'NOTICE_BOARD'), '掲示板', 'noticeBoard'), labelDy: BUREAU_NOTICE_LABEL_DY },
   spotNpc('bureau-clerk', BUREAU_ART, 'CLERK_SPOT', ROOMS4_DRAW_OFFSET.bureau.CLERK_SPOT, 'bureau_clerk', 'bureauDesk'),
   // 幼馴染（ミレイユ）：導入イベントでパックを選ぶ間だけ、受付の前の主人公の右に立つ（2026-10-27 パック選びで幼馴染が説明する）
   npc('guide-bureau', BUREAU_DESK_FRONT.x + 4, BUREAU_DESK_FRONT.y, 'neighbor_guide'),

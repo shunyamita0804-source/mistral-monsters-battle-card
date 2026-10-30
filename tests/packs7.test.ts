@@ -10,8 +10,8 @@ function webpSize(path: string): { width: number; height: number } {
 }
 
 describe('ガチャのパック7つ（2026-10-29 新しい型）', () => {
-  it('どのシリーズにもパックの絵がある（無地の pack_sealed で出るシリーズが無い）。大きさは 600×1080', () => {
-    for (const s of GACHA_SERIES) {
+  it('どのシリーズにもパックの絵がある（無地の pack_sealed で出るシリーズが無い。道具のパック〔2026-10-30 指示書 Y〕は絵がまだ無いので封をしたパックで出す）。大きさは 600×1080', () => {
+    for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) {
       const file = `assets/images/ui/gacha/pack_${s.id}.webp`;
       expect(existsSync(file), file).toBe(true);
       expect(webpSize(file), file).toEqual({ width: 600, height: 1080 });

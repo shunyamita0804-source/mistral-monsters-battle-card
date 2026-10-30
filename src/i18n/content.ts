@@ -1,6 +1,6 @@
 import { cardCatalog } from '../data/cards.ts';
 import type { DungeonDefinition } from '../data/dungeons.ts';
-import type { PackDefinition } from '../data/economy.ts';
+import type { GachaSeries, PackDefinition } from '../data/economy.ts';
 import type { ItemDefinition } from '../data/items.ts';
 import type { MapDefinition, MapObject } from '../data/maps.ts';
 import { personOfOpponent, type LocalText, type Person } from '../data/people.ts';
@@ -33,6 +33,11 @@ export function cardName(card: CardDefinition | string): string {
   const c = typeof card === 'string' ? cardCatalog.get(card) : card;
   if (!c) return typeof card === 'string' ? card : '';
   return contentText('card', c.id, 'name', c.name);
+}
+
+/** ガチャのシリーズの名前（「ソラモのパック」。道具のパック〔2026-10-30 指示書 Y〕はモンスターが無いので決まった名前） */
+export function gachaSeriesName(series: GachaSeries): string {
+  return series.cardIds ? t('gacha.series.tools') : t('gacha.series.name', { monster: cardName(series.monsterId) });
 }
 
 /** モンスターの説明（仮モンスターは共通の説明） */

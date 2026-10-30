@@ -1,4 +1,4 @@
-import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
+import { cardCatalog, LEGACY_SUPPORT_IDS, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
 import { GAUUL_STARTER } from '../../data/gauul.ts';
 import { getStarterDeck, STARTER_TEMP_SUPPORTS, type StarterDeckKey } from '../../data/introV2.ts';
 import { LAZUCK_MONSTER_ID, LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
@@ -178,8 +178,8 @@ export function createSoramoTestDeck(): Deck {
   for (const id of SORAMO_OLD_SKILL_IDS) {
     for (let i = 0; i < DECK_RULES.maxCopies; i++) skills.push(id);
   }
-  for (const card of SUPPORTS) {
-    for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(card.id);
+  for (const id of LEGACY_SUPPORT_IDS) {
+    for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(id);
   }
   return { monsters: [...SORAMO_TEAM], skills };
 }
@@ -200,8 +200,8 @@ export function createMixedTestDeck(): Deck {
   // もう1枚ずつ入れるのは、元の番号 01〜08 の技（2026-10-24 にラズックの表示の順が変わっても、ID で同じカードを選ぶ）
   const extra = new Set(Array.from({ length: TEST_EXTRA_COPY_UPTO }, (_, i) => [SORAMO_OLD_SKILL_IDS[i] as string, lazuckSkillId(i + 1)]).flat());
   for (const list of both) skills.push(...list.filter((id) => extra.has(id)));
-  for (const card of SUPPORTS) {
-    for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(card.id);
+  for (const id of LEGACY_SUPPORT_IDS) {
+    for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(id);
   }
   return { monsters: [...LEGACY_TEST_TEAM], skills };
 }
@@ -234,7 +234,7 @@ export function createStarterDeck(): Deck {
   }
   const supports: string[] = [];
   for (let round = 0; round < DECK_RULES.maxCopies && supports.length < STARTER_SUPPORT_COUNT; round++) {
-    for (const card of SUPPORTS) if (supports.length < STARTER_SUPPORT_COUNT) supports.push(card.id);
+    for (const id of LEGACY_SUPPORT_IDS) if (supports.length < STARTER_SUPPORT_COUNT) supports.push(id);
   }
   return { monsters: [...TEST_TEAM], skills: [...soramo, ...lazuck, ...extra, ...supports] };
 }
@@ -270,7 +270,7 @@ export function createStarterDeckFor(key: StarterDeckKey): Deck {
   const skills = def.monsters.flatMap((m) => (INITIAL_DISTRIBUTION.find((d) => d.monsterId === m)?.cards ?? []).flatMap((c) => Array<string>(c.copies).fill(c.id)));
   const supports: string[] = [];
   for (let round = 0; supports.length < STARTER_TEMP_SUPPORTS && round < DECK_RULES.maxCopies; round++) {
-    for (const card of SUPPORTS) if (supports.length < STARTER_TEMP_SUPPORTS) supports.push(card.id);
+    for (const id of LEGACY_SUPPORT_IDS) if (supports.length < STARTER_TEMP_SUPPORTS) supports.push(id);
   }
   return { monsters: [...def.monsters], skills: [...skills, ...supports] };
 }
@@ -287,13 +287,18 @@ export function createStarterCollection(deck: Deck = createStarterDeck()): Recor
   return owned;
 }
 
-/** NPC のデッキに入れる仮サポート（各2枚） */
-const NPC_SUPPORTS = [1, 2, 4, 5].map(supportId);
+/**
+ * CPU（大会の相手・ボス・番人など）のデッキに入れるサポート（各2枚）：旅の手帳・投石（2026-10-30 指示書 Y。前は仮サポート4種×2）。
+ * 回復・場のカードは CPU のデッキに入れない（対戦が長くなるため）
+ */
+const NPC_SUPPORTS = [2, 7].map(supportId);
 const NPC_SUPPORT_COPIES = 2;
+/** 技だけで60枚に届かないときに埋めるサポート（すぐ効くカードのうち回復を除く。旅の手帳・投石から） */
+const NPC_FILL_SUPPORTS = [2, 7, 3, 9, 10, 8].map(supportId);
 
 /**
  * NPC（ダンジョンの敵・大会の相手）用のデッキを自動で組む。
- * 仮サポートを少し入れ、残りはモンスターの適合技を順番に、上限枚数を超えないように入れて60枚にする。
+ * サポート（旅の手帳・投石を2枚ずつ）を入れ、残りはモンスターの適合技を順番に、上限枚数を超えないように入れて60枚にする。
  */
 export function buildAutoDeck(monsters: readonly string[]): Deck {
   const pool = monsters.flatMap((m) => skillsOf(m).map((s) => s.id));
@@ -310,10 +315,10 @@ export function buildAutoDeck(monsters: readonly string[]): Deck {
     i++;
   }
   // 適合技だけで60枚に届かないとき（技の少ないモンスターなど）は、サポートを上限まで足して埋める
-  for (const card of SUPPORTS) {
-    while (skills.length < DECK_RULES.skillCount && (counts[card.id] ?? 0) < DECK_RULES.maxCopies) {
-      counts[card.id] = (counts[card.id] ?? 0) + 1;
-      skills.push(card.id);
+  for (const id of NPC_FILL_SUPPORTS) {
+    while (skills.length < DECK_RULES.skillCount && (counts[id] ?? 0) < DECK_RULES.maxCopies) {
+      counts[id] = (counts[id] ?? 0) + 1;
+      skills.push(id);
     }
   }
   return { monsters, skills };
@@ -354,7 +359,7 @@ function styleScore(style: Exclude<DeckStyle, 'balanced'>, skill: SkillCard): nu
 export const ACE_SKILL_COPIES = 2;
 
 /**
- * ボスのデッキ（2026-10-30 指示書 V「切り札の技を2枚ずつ」）：仮サポート（buildAutoDeck と同じ）＋切り札の技14種を2枚ずつ。
+ * ボスのデッキ（2026-10-30 指示書 V「切り札の技を2枚ずつ」）：サポート（buildAutoDeck と同じ）＋切り札の技14種を2枚ずつ。
  * 残りは今の作り方（buildAutoDeck）と同じく、ほかのモンスターの技を並びの順に1枚ずつ入れていく（切り札の技は2枚のまま）
  */
 export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
@@ -370,10 +375,10 @@ export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
       skills.push(id);
     }
   }
-  for (const card of SUPPORTS) {
-    while (skills.length < DECK_RULES.skillCount && (counts[card.id] ?? 0) < DECK_RULES.maxCopies) {
-      counts[card.id] = (counts[card.id] ?? 0) + 1;
-      skills.push(card.id);
+  for (const id of NPC_FILL_SUPPORTS) {
+    while (skills.length < DECK_RULES.skillCount && (counts[id] ?? 0) < DECK_RULES.maxCopies) {
+      counts[id] = (counts[id] ?? 0) + 1;
+      skills.push(id);
     }
   }
   return { monsters, skills };
@@ -381,7 +386,7 @@ export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
 
 /**
  * 大会の相手のデッキ（組み方 deckStyle が無い・balanced なら今までの buildAutoDeck。切り札 ace のあるボスは buildAceDeck）。
- * 組み方があれば、仮サポートを少し入れ、適合技を点数の高い順に上限枚数まで入れて60枚にする。足りなければ点数の低い技・サポートで埋める
+ * 組み方があれば、サポート（旅の手帳・投石を2枚ずつ）を入れ、適合技を点数の高い順に上限枚数まで入れて60枚にする。足りなければ点数の低い技・サポートで埋める
  */
 export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle' | 'ace'>): Deck {
   if (opponent.ace) return buildAceDeck(opponent.monsters, opponent.ace);
@@ -406,16 +411,42 @@ export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' 
   fill(ranked.filter((r) => r.score > 0).map((r) => r.id));
   fill(ranked.filter((r) => r.score <= 0).map((r) => r.id));
   fill(ranked.map((r) => r.id), true);
-  fill(SUPPORTS.map((c) => c.id), true);
+  fill(NPC_FILL_SUPPORTS, true);
   return { monsters: opponent.monsters, skills };
 }
 
+/** おまかせで入れるサポート（持っていれば2枚ずつまで。2026-10-30 指示書 Y：旅の手帳・投石） */
+const AUTO_SUPPORTS = [2, 7].map(supportId);
+const AUTO_SUPPORT_COPIES = 2;
+
+/** おまかせで技を入れる順の点数（強い攻撃〔ダメージの大きい順〕と守り〔防御・回避〕を先に。ほかの技はそのあと） */
+function autoScore(skill: SkillCard): number {
+  const type = skill.effect.type;
+  if (type === 'attack') return 100 + skillValue(skill) * 10 - skill.cost;
+  if (type === 'defense' || type === 'evade') return 125;
+  return 0;
+}
+
 /**
- * 所持カードから、指定モンスター3体で組める一番近いデッキを自動で作る（デッキ編集の「おまかせ」）。
- * 適合技を先に入れ、足りない分を持っているサポートで埋める。それでも足りなければ60枚に満たないデッキを返す（画面側で不足を表示）。
+ * 所持カードから、指定モンスター3体で組める一番近いデッキを自動で作る（デッキ編集の「おまかせ」。2026-10-30 指示書 Y）。
+ * サポートは持っていれば旅の手帳・投石を2枚ずつまで。適合技は強い攻撃（ダメージの大きい順）と守りを先に、3枚ずつ（持っている枚数まで）。
+ * 技が足りないときだけ、ほかの持っているサポートで埋める。それでも足りなければ60枚に満たないデッキを返す（画面側で不足を表示）
  */
 export function buildDeckFromCollection(monsters: readonly string[], collection: CardCounts): Deck {
-  return topUpDeck({ monsters, skills: [] }, collection);
+  const skills: string[] = [];
+  const used: Record<string, number> = {};
+  const put = (id: string, max: number): void => {
+    while (skills.length < DECK_RULES.skillCount && (used[id] ?? 0) < Math.min(max, collection[id] ?? 0)) {
+      used[id] = (used[id] ?? 0) + 1;
+      skills.push(id);
+    }
+  };
+  for (const id of AUTO_SUPPORTS) put(id, AUTO_SUPPORT_COPIES);
+  const pool = [...new Map([...new Set(monsters)].flatMap((m) => skillsOf(m)).map((k) => [k.id, k])).values()];
+  const ranked = pool.map((k, i) => ({ k, i })).sort((a, b) => autoScore(b.k) - autoScore(a.k) || a.i - b.i);
+  for (const { k } of ranked) put(k.id, DECK_RULES.maxCopies);
+  for (const card of SUPPORTS) put(card.id, DECK_RULES.maxCopies);
+  return { monsters, skills };
 }
 
 /**

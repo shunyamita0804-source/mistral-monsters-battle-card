@@ -27,21 +27,25 @@ describe('カードデータ（仮）', () => {
     for (const c of [...MONSTERS, ...SKILLS, ...SUPPORTS]) {
       const official =
         ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku'].includes(c.id) ||
-        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-'].some((p) => c.id.startsWith(p));
+        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-'].some((p) => c.id.startsWith(p)) ||
+        // サポート11種類（2026-10-30 指示書 Y）
+        c.kind === 'support';
       expect(c.isPlaceholder).toBe(!official);
     }
   });
 
-  it('サポートカードは名前が「仮」で始まり、パックで手に入る', () => {
-    expect(SUPPORTS.length).toBeGreaterThan(0);
+  it('サポートカードは正式の11種類（2026-10-30 指示書 Y）。すぐ効くカードは全部まとめて1ターン1回、場に残るカードは回数制限なし', () => {
+    expect(SUPPORTS).toHaveLength(11);
+    expect(SUPPORTS.map((c) => c.code)).toEqual(['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'F01', 'F02', 'F03', 'F04']);
     for (const c of SUPPORTS) {
       expect(c.kind).toBe('support');
-      expect(c.name.startsWith('仮')).toBe(true);
-      expect(PACKS.some((p) => p.cardIds.includes(c.id))).toBe(true);
+      expect(c.isPlaceholder).toBe(false);
+      expect(c.name.startsWith('仮')).toBe(false);
     }
-    // 旧ブリーダーにあたるもの（すぐ効果）は1ターン1回、旧全体カードにあたるもの（場に残る）は回数制限なし
-    for (const c of SUPPORTS.filter((x) => x.duration === 'instant')) expect(c.limitPerTurn).toBe(1);
-    for (const c of SUPPORTS.filter((x) => x.duration === 'field')) expect(c.effect.type).toBe('field');
+    for (const c of SUPPORTS.filter((x) => x.duration === 'instant')) expect(c).toMatchObject({ limitGroup: 'breeder', limitPerTurn: 1 });
+    for (const c of SUPPORTS.filter((x) => x.duration === 'field')) expect(['field', 'guardDiscount']).toContain(c.effect.type);
+    // 古いパック（第1〜2弾・仮）は同じ ID のまま新しい中身で出る
+    expect(PACKS.some((p) => p.cardIds.includes('sup-1'))).toBe(true);
   });
 
   it('各モンスターに守備（ちから・かしこさの防御か回避）を含む適合技がある', () => {

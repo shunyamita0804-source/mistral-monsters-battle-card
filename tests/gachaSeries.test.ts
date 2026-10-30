@@ -31,14 +31,14 @@ const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
-  it('12シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku']);
+  it('13シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック）。どれも 150G・5枚', () => {
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'tools']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
 
   it('中身はそのモンスターの技14種＋モンスターカード＝15枠。レア枠の名前はすべて今のデータにある', () => {
-    for (const series of GACHA_SERIES) {
+    for (const series of GACHA_SERIES.filter((s) => !s.cardIds)) {
       const lineup = seriesLineup(series);
       expect(lineup.errors).toEqual([]);
       expect(lineup.skillIds).toHaveLength(14);
@@ -70,7 +70,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       tsumuji: ['かまいたち', 'ストームブレイド', 'かぜよみ'],
       hyouzuku: ['ふぶき', 'ひょうが', 'おとなきはばたき'],
     };
-    for (const s of GACHA_SERIES) expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
+    for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
   });
 
   it('1パック5枚。シリーズのカードだけが出て、開ける順はノーマル → レア → モンスター', () => {
@@ -196,9 +196,9 @@ const series = (id: string) => {
 
 describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決定）', () => {
   it('最初から並ぶのは、管理局で選んだ箱の3体のシリーズだけ', () => {
-    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'gauul', 'myurol']);
-    expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton']);
-    expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell']);
+    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'gauul', 'myurol', 'tools']);
+    expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton', 'tools']);
+    expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
     // 箱の3体には NEW を出さない
     const s = boxSave('booster-1');
     for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
@@ -211,7 +211,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
 
   it('そのモンスターのモンスターカードを初めて手に入れたら開き、NEW が出る（ショップで箱を買った・ボスから受け取った など）', () => {
     const s = addCards(boxSave('booster-1'), [{ cardId: 'mon-kalshell', count: 1 }, { cardId: 'mon-geol', count: 1 }]);
-    expect(ids(s)).toEqual(['soramo', 'gauul', 'myurol', 'kalshell', 'geol']);
+    expect(ids(s)).toEqual(['soramo', 'gauul', 'myurol', 'kalshell', 'geol', 'tools']);
     expect(isNewGachaSeries(s, series('kalshell'))).toBe(true);
     expect(isNewGachaSeries(s, series('geol'))).toBe(true);
     // 技カードだけでは開かない
@@ -237,7 +237,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
   it('チュートリアルをスキップした（箱を選んでいない）セーブは、今のまま6つ並ぶ', () => {
     const skipped = { ...createNewGameSave(), story: { ...createNewGameSave().story, introV2: { ...createNewGameSave().story.introV2, state: 'skipped' as const } } };
     expect(startingGachaMonsters(skipped)).toHaveLength(6);
-    expect(ids(skipped)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell']);
+    expect(ids(skipped)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'tools']);
     for (const g of availableGachaSeriesFor(skipped)) expect(isNewGachaSeries(skipped, g)).toBe(false);
   });
 
@@ -248,7 +248,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
     if (!s) throw new Error('load');
     expect(s.version).toBe(SAVE_VERSION);
     expect(SAVE_VERSION).toBeGreaterThanOrEqual(28);
-    expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim']);
+    expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'tools']);
     for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
   });
 });

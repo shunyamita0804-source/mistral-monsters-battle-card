@@ -1,6 +1,6 @@
 import { cardCatalog, skillsOf } from '../../data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, isBoosterKey, isStarterDeckKey, type BoosterKey, type StarterDeckKey } from '../../data/introV2.ts';
-import boosterContents from '../../data/official/booster_contents_20261029.json';
+import boosterContents from '../../data/official/booster_contents_20261030.json';
 import { t } from '../../i18n/i18n.ts';
 import { countCards, createStarterDeckFor, isDeckValid, type Deck } from '../deck/deck.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
@@ -131,10 +131,10 @@ export function finishExam(save: SaveData, won: boolean): SaveData {
 /* ---------- ブースターの箱（2026-10-28 ユーザー決定：箱＝初期配布。モンスター3＋山札60＝そのまま1つのデッキ） ---------- */
 
 /**
- * 箱の中身のデッキ（モンスター3体＋技48枚＋仮サポート12枚）。
- * 技は資料 src/data/official/booster_contents_20261029.json の行（モンスター名・技名・枚数。ID は今のデータから名前で引く）。
- * 2026-10-29 夜（ユーザー決定）：烈火の猛攻だけ技を入れかえた（案3。docs/rekka-playtest-20261029.md）。ほかの2箱は前と同じ中身。
- * 同じモンスターでも箱によって技がちがうので、モンスターごとの初期配布（createStarterDeckFor）ではなく箱の資料から作る。仮サポート12枚は今までどおり
+ * 箱の中身のデッキ（モンスター3体＋技56枚＋サポート4枚＝60枚。2026-10-30 指示書 Y・ユーザー決定）。
+ * 技とサポートは資料 src/data/official/booster_contents_20261030.json の行（モンスター名・技名・枚数。ID は今のデータから名前で引く）。
+ * 前の版（技48枚＋仮サポート12枚）は booster_contents_20261029.json（2026-10-29 夜に烈火の猛攻だけ案3に入れかえた版）。
+ * 同じモンスターでも箱によって技がちがうので、モンスターごとの初期配布（createStarterDeckFor）ではなく箱の資料から作る
  */
 export function boosterDeck(key: BoosterKey): Deck {
   const def = BOOSTERS.find((b) => b.key === key) ?? (BOOSTERS[0] as (typeof BOOSTERS)[number]);
@@ -147,7 +147,11 @@ export function boosterDeck(key: BoosterKey): Deck {
     if (hit.length !== 1 || !hit[0]) throw new Error(`箱の技が見つかりません: ${def.key} ${row.monster} ${row.skill_name}`);
     return Array<string>(row.copies).fill(hit[0].id);
   });
-  const supports = base.skills.filter((id) => cardCatalog.get(id)?.kind === 'support');
+  const supports = group.support_cards.flatMap((row) => {
+    const card = cardCatalog.get(row.support_id);
+    if (card?.kind !== 'support' || card.name !== row.name) throw new Error(`箱のサポートが見つかりません: ${def.key} ${row.name}`);
+    return Array<string>(row.copies).fill(card.id);
+  });
   return { monsters: [...def.monsters], skills: [...skills, ...supports] };
 }
 
