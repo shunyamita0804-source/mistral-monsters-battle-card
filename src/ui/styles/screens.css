@@ -984,8 +984,25 @@ span.deck__item-name {
 }
 
 .tournament__ng {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   font-size: 12px;
   color: #ff8a9a;
+}
+
+/* 1行に1つ。頭に「・」。折り返すときは2行目を字の頭にそろえ、1文字だけ次の行に落ちないように（2026-10-30 指示書 T2） */
+.tournament__ng li {
+  position: relative;
+  padding-left: 1em;
+  line-break: strict;
+  text-wrap: pretty;
+}
+
+.tournament__ng li::before {
+  content: '・';
+  position: absolute;
+  left: 0;
 }
 
 .tournament__bracket {

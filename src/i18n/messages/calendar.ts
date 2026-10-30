@@ -27,7 +27,6 @@ export const CALENDAR = {
   'calendar.bed.title': { ja: 'ベッド', en: 'Bed' },
   'calendar.bed.sleep': { ja: '寝る', en: 'Sleep' },
   'calendar.bed.save': { ja: 'セーブ', en: 'Save' },
-  'calendar.bed.load': { ja: 'ロード', en: 'Load' },
   'calendar.bed.sleepConfirm': { ja: '1か月休みますか？', en: 'Rest for a month?' },
   'calendar.bed.morning': { ja: 'よく眠った。\n{date}の朝だ。', en: 'You slept well.\nIt is morning, {date}.' },
 
