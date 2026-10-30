@@ -32,6 +32,7 @@
     街は `tools/e2e/town_shot.cjs`（写真の上の操作説明を消したいときは `.world__hint` を隠す写しを一時的に作る）。撮影用のセーブは `tests/zz-*.test.ts` で作ったら必ず消す
   - 前の版の写真：`git worktree add 一時フォルダ 前のコミット` → `node_modules` をリンク → その中の `./node_modules/.bin/vite build --outDir 別のフォルダ` → `vite preview --outDir … --port 4177`
   - 年と月の欄を入れた撮影用セーブは version 29 にする（28 のままだと読み込みで「1年目 4月」に戻る）
+  - `npm run check` で `kalshell.test.ts`・`lazuck.test.ts`（絵の原本を1バイトずつ比べるテスト）が1回だけ落ちたことがある（2026-10-30。重い作業と同時のとき）。もう一度動かすと通った。続けて落ちるときは本当に絵が変わっていないか見る
 
 ### その前（2026-10-30 S のあと）
 
