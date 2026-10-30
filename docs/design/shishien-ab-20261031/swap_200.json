@@ -1,0 +1,297 @@
+{
+ "games": 200,
+ "skill": "A",
+ "base": {
+  "games": 1800,
+  "winA": 48.9,
+  "ko": 50.4,
+  "deckOut": 49.6,
+  "draws": 0,
+  "avgTurns": 35.6,
+  "attacksPerGame": 20.9,
+  "evaded": 3.8,
+  "defended": 15.1,
+  "hesitatePerGame": 0,
+  "misguardPerGame": 0,
+  "tsutaPerGame": 0,
+  "recoilPerGame": 0,
+  "recoilKoPerGame": 0,
+  "recoilLossGames": 0,
+  "supportsPerGame": {
+   "S01": 1.12,
+   "S02": 1.29
+  }
+ },
+ "subjects": {
+  "mon-shishien": {
+   "name": "シシエン",
+   "cards": [
+    {
+     "id": "skl-shishien-01",
+     "copies": 2
+    },
+    {
+     "id": "skl-shishien-02",
+     "copies": 2
+    },
+    {
+     "id": "skl-shishien-03",
+     "copies": 2
+    },
+    {
+     "id": "skl-shishien-04",
+     "copies": 2
+    },
+    {
+     "id": "skl-shishien-05",
+     "copies": 2
+    },
+    {
+     "id": "skl-shishien-06",
+     "copies": 1
+    },
+    {
+     "id": "skl-shishien-07",
+     "copies": 1
+    },
+    {
+     "id": "skl-shishien-08",
+     "copies": 1
+    },
+    {
+     "id": "skl-shishien-11",
+     "copies": 1
+    },
+    {
+     "id": "skl-shishien-12",
+     "copies": 1
+    },
+    {
+     "id": "skl-shishien-13",
+     "copies": 1
+    }
+   ],
+   "all": {
+    "games": 5400,
+    "winA": 59.1,
+    "ko": 56.1,
+    "deckOut": 43.9,
+    "draws": 0,
+    "avgTurns": 34.4,
+    "attacksPerGame": 20.4,
+    "evaded": 3.6,
+    "defended": 15.6,
+    "hesitatePerGame": 0,
+    "misguardPerGame": 0,
+    "tsutaPerGame": 0,
+    "recoilPerGame": 0.23,
+    "recoilKoPerGame": 0,
+    "recoilLossGames": 0,
+    "supportsPerGame": {
+     "S01": 1.07,
+     "S02": 1.28
+    }
+   },
+   "rows": {
+    "booster-1#0": {
+     "out": "ソラモ",
+     "games": 600,
+     "winA": 51.3,
+     "ko": 58.2,
+     "deckOut": 41.8,
+     "draws": 0,
+     "avgTurns": 34.5,
+     "attacksPerGame": 20.7,
+     "evaded": 3.4,
+     "defended": 15.4,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.23,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.1,
+      "S02": 1.23
+     }
+    },
+    "booster-1#1": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 55.3,
+     "ko": 45.2,
+     "deckOut": 54.8,
+     "draws": 0,
+     "avgTurns": 35.8,
+     "attacksPerGame": 20.6,
+     "evaded": 4.9,
+     "defended": 15.3,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.21,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.09,
+      "S02": 1.31
+     }
+    },
+    "booster-1#2": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 56.5,
+     "ko": 50.8,
+     "deckOut": 49.2,
+     "draws": 0,
+     "avgTurns": 35.6,
+     "attacksPerGame": 19.7,
+     "evaded": 4.5,
+     "defended": 15.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.21,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.11,
+      "S02": 1.35
+     }
+    },
+    "booster-2#0": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 65.8,
+     "ko": 69,
+     "deckOut": 31,
+     "draws": 0,
+     "avgTurns": 32.3,
+     "attacksPerGame": 19.5,
+     "evaded": 3.7,
+     "defended": 14.3,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.25,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.11,
+      "S02": 1.23
+     }
+    },
+    "booster-2#1": {
+     "out": "ラズック",
+     "games": 600,
+     "winA": 45.2,
+     "ko": 49.3,
+     "deckOut": 50.7,
+     "draws": 0,
+     "avgTurns": 35.1,
+     "attacksPerGame": 20.8,
+     "evaded": 3.5,
+     "defended": 16,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.22,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.08,
+      "S02": 1.25
+     }
+    },
+    "booster-2#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 87.3,
+     "ko": 90.3,
+     "deckOut": 9.7,
+     "draws": 0,
+     "avgTurns": 29.1,
+     "attacksPerGame": 18.5,
+     "evaded": 4.4,
+     "defended": 15.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.21,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 0.87,
+      "S02": 1.2
+     }
+    },
+    "booster-3#0": {
+     "out": "カルシェル",
+     "games": 600,
+     "winA": 50.3,
+     "ko": 46,
+     "deckOut": 54,
+     "draws": 0,
+     "avgTurns": 36.1,
+     "attacksPerGame": 21.8,
+     "evaded": 2.9,
+     "defended": 12.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.24,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.17,
+      "S02": 1.33
+     }
+    },
+    "booster-3#1": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 54,
+     "ko": 42.8,
+     "deckOut": 57.2,
+     "draws": 0,
+     "avgTurns": 36.3,
+     "attacksPerGame": 21.3,
+     "evaded": 2.3,
+     "defended": 18,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.23,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.04,
+      "S02": 1.33
+     }
+    },
+    "booster-3#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 65.7,
+     "ko": 53.3,
+     "deckOut": 46.7,
+     "draws": 0,
+     "avgTurns": 35.4,
+     "attacksPerGame": 20.9,
+     "evaded": 2.8,
+     "defended": 17.2,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0.23,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "supportsPerGame": {
+      "S01": 1.06,
+      "S02": 1.31
+     }
+    }
+   }
+  }
+ }
+}

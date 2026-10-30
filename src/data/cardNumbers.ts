@@ -5,6 +5,7 @@ import { FLUNE_MONSTER_ID } from './flune.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
+import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -37,6 +38,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   TSUMUJI_MONSTER_ID,
   // 2026-10-30 指示書 W：ツムジのあと（No.166〜180）
   HYOUZUKU_MONSTER_ID,
+  // 2026-10-31 指示書 AB：ヒョウズクのあと（No.181〜195）
+  SHISHIEN_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */

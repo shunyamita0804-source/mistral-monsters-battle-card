@@ -6,6 +6,7 @@ import { GACHA_SERIES } from '../src/data/economy.ts';
 import { FLUNE_MONSTER_ID } from '../src/data/flune.ts';
 import { GEOL_MONSTER_ID } from '../src/data/geol.ts';
 import { HYOUZUKU_MONSTER_ID } from '../src/data/hyouzuku.ts';
+import { SHISHIEN_MONSTER_ID } from '../src/data/shishien.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
 import { PUKARIM_MONSTER_ID } from '../src/data/pukarim.ts';
 import { SEREPHINE_MONSTER_ID } from '../src/data/serephine.ts';
@@ -41,7 +42,9 @@ export function playtest16(monsterId: string): Pick {
   return normal.map((k) => ({ id: k.id, copies: second.includes(k.id) ? 2 : 1 }));
 }
 
-const SUBJECTS: readonly string[] = [GEOL_MONSTER_ID, FLUNE_MONSTER_ID, HYOUZUKU_MONSTER_ID, TSUMUJI_MONSTER_ID, PUKARIM_MONSTER_ID, SEREPHINE_MONSTER_ID];
+// 2026-10-31 指示書 AB：シシエンを足した（PLAYTEST_SUBJECTS=mon-shishien でしぼれる）
+const ALL_SUBJECTS: readonly string[] = [GEOL_MONSTER_ID, FLUNE_MONSTER_ID, HYOUZUKU_MONSTER_ID, TSUMUJI_MONSTER_ID, PUKARIM_MONSTER_ID, SEREPHINE_MONSTER_ID, SHISHIEN_MONSTER_ID];
+const SUBJECTS: readonly string[] = process.env.PLAYTEST_SUBJECTS ? ALL_SUBJECTS.filter((id) => process.env.PLAYTEST_SUBJECTS?.split(',').includes(id)) : ALL_SUBJECTS;
 
 describe('入れ替えの試遊（腕前 A どうし・レア抜きの16枚）', () => {
   it('16枚ずつ・レアは入らない', () => {

@@ -37,9 +37,9 @@ const setLife = (s: BattleState, side: Side, lives: number[]): BattleState => ({
 
 describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
   it('腕前ごとの数字（仮）は1か所にまとまっている', () => {
-    expect(CPU_SKILL.C).toEqual({ missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3 });
-    expect(CPU_SKILL.B).toEqual({ missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0 });
-    expect(CPU_SKILL.A).toEqual({ missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0 });
+    expect(CPU_SKILL.C).toEqual({ missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3, forgetRecoil: 0.3 });
+    expect(CPU_SKILL.B).toEqual({ missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0, forgetRecoil: 0 });
+    expect(CPU_SKILL.A).toEqual({ missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0, forgetRecoil: 0 });
   });
 
   it('ばらばらは対戦の seed から決まる（同じ場面では同じ値・0 以上 1 未満）', () => {

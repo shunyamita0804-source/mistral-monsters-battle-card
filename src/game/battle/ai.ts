@@ -52,6 +52,7 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  * - マナ化で残す守りのカード：C 0枚（さらに 30% の手番で、残したい攻撃より先に守りをマナにする）・B 1枚・A 2枚
  *   （A は相手の場のモンスターの技の種類に合う守りを優先し、守りの分のマナも残す）
  * - 「ライフの少ない相手から狙う」はやめた（ユーザー指示 2026-10-30 23:11）
+ * - 捨て身の技（シシエン。2026-10-31 指示書 AB）：使うモンスターのライフが反動で倒れるほど少ないときは、相手の最後の1体を倒せるときだけ使う。C は 30% でこの気づかいを忘れる
  * - 構えは腕前より優先（aggressive は A でも守らない・守りを残さない。guard は守りを2枚残す）
  */
 
@@ -72,12 +73,14 @@ export const CPU_SKILL: Readonly<
       readonly guardKeep: number;
       /** マナ化で、残したい攻撃より先に守りをマナにする手番の割合 */
       readonly guardFirst: number;
+      /** 反動で倒れるのに捨て身の技を使ってしまう割合（2026-10-31 指示書 AB） */
+      readonly forgetRecoil: number;
     }
   >
 > = {
-  C: { missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3 },
-  B: { missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0 },
-  A: { missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0 },
+  C: { missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3, forgetRecoil: 0.3 },
+  B: { missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0, forgetRecoil: 0 },
+  A: { missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0, forgetRecoil: 0 },
 };
 
 /**
@@ -484,7 +487,12 @@ function chooseDrain(state: BattleState, side: Side, attacks: SkillOption[], sty
 
 /** 攻撃（倒せる相手がいれば倒す。構えで技の順・狙う相手が、腕前で見のがし・技の選び方・狙いが変わる）。攻撃できなければ null */
 function chooseAttack(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle, skill: CpuSkill = 'B'): BattleAction | null {
-  const attacks = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack');
+  // 捨て身の技（シシエン）：反動で倒れるなら、相手の最後の1体を倒せるときだけ（腕前 C は一部の手番で忘れる）
+  const forgetRecoil = cpuRoll(state, side, 'recoil') < CPU_SKILL[skill].forgetRecoil;
+  const attacks = options
+    .filter(isSkillOption)
+    .filter((o) => o.def.effect.type === 'attack')
+    .filter((o) => forgetRecoil || recoilSafe(state, side, o, enemies));
   if (attacks.length === 0 || enemies.length === 0) return null;
   const drained = chooseDrain(state, side, attacks, style, skill);
   if (drained) return drained;
@@ -533,6 +541,19 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   if (skill === 'A' && style !== 'aggressive' && saveManaForBig(state, side, strongest, power(strongest))) return null;
   const target = pickTarget(state, side, reachable(strongest), style, skill, 'attack');
   return target ? attackAction(state, side, strongest, target.uid) : null;
+}
+
+/**
+ * 捨て身の技（selfDamageOnHit。シシエン 2026-10-31 指示書 AB）を使ってよいか：反動で使ったモンスターが倒れないか、
+ * 倒れても相手の最後の1体を倒せる（勝負がつくので反動は無い）とき。捨て身でない技はいつもよい
+ */
+function recoilSafe(state: BattleState, side: Side, o: SkillOption, enemies: readonly BattleMonster[]): boolean {
+  const e = o.def.effect;
+  if (e.type !== 'attack' || !e.selfDamageOnHit) return true;
+  const user = availableUsers(state, side, o.def)[0];
+  if (!user || user.life > e.selfDamageOnHit) return true;
+  const last = enemies.length === 1 ? enemies[0] : undefined;
+  return !!last && targetsFor(state, side, o.def, user).some((m) => m.uid === last.uid) && last.life <= attackPower(state, o.def, user);
 }
 
 /** 大技とみなすダメージ（腕前 A のマナを残す考え方） */

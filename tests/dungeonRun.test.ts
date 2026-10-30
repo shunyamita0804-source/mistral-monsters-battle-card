@@ -265,7 +265,8 @@ describe('ダンジョンの挑戦', () => {
     expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-soramo'])).toEqual([]);
     expect(bossRewardCandidates(w.save, 'dungeon-03', ['mon-soramo'])).toEqual([]);
     expect(bossRewardCandidates(w.save, 'dungeon-04', ['mon-soramo'])).toEqual([]);
-    expect(bossRewardCandidates(w.save, 'dungeon-05', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
+    expect(bossRewardCandidates(w.save, 'dungeon-05', ['mon-soramo'])).toEqual([]); // 2026-10-31 指示書 AB：炎の火山も切り札の報酬
+    expect(bossRewardCandidates(w.save, 'dungeon-06', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
   });
 });
 

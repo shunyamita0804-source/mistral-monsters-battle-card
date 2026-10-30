@@ -8,6 +8,7 @@ import { FLUNE_MONSTER, FLUNE_SKILLS } from './flune.ts';
 import { SEREPHINE_MONSTER, SEREPHINE_SKILLS } from './serephine.ts';
 import { TSUMUJI_MONSTER, TSUMUJI_SKILLS } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER, HYOUZUKU_SKILLS } from './hyouzuku.ts';
+import { SHISHIEN_MONSTER, SHISHIEN_SKILLS } from './shishien.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -31,6 +32,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-29：セレフィーンと技14種を足した（src/data/serephine.ts。セレフィーンの最終）
  * 2026-10-30：ツムジと技14種を足した（src/data/tsumuji.ts。指示書 U）
  * 2026-10-30：ヒョウズクと技14種を足した（src/data/hyouzuku.ts。指示書 W）
+ * 2026-10-31：シシエンと技14種を足した（src/data/shishien.ts。指示書 AB）
  */
 
 interface MonsterSeed {
@@ -165,6 +167,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   SEREPHINE_MONSTER,
   TSUMUJI_MONSTER,
   HYOUZUKU_MONSTER,
+  SHISHIEN_MONSTER,
 ];
 
 export const SKILLS: readonly SkillCard[] = [
@@ -182,6 +185,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...SEREPHINE_SKILLS,
   ...TSUMUJI_SKILLS,
   ...HYOUZUKU_SKILLS,
+  ...SHISHIEN_SKILLS,
 ];
 
 /**
@@ -219,7 +223,7 @@ export const SUPPORTS: readonly SupportCard[] = [
   id: supportId(no),
   isPlaceholder: false,
   // 絵（2026-10-30 指示書 Z。原本は design-parts/support-art-z-20261030/ に無改変）：sup_art_01〜11 は表示の番号の順（S01〜F04）。
-  // tools/art/card_art_webp.py で幅 827 の WebP に。sup_art_01_toseki（投石）は描き直し中の仮（届いたら同じ名前で差し替える）
+  // tools/art/card_art_webp.py で幅 827 の WebP に。sup_art_01_toseki（投石）は 2026-10-31 指示書 AB で描き直しに差し替えた（原本 design-parts/support-art-ab-20261031/）
   art: { category: 'skillCards', file: `sup_art_${String(i + 1).padStart(2, '0')}_${SUPPORT_ART_NAMES[i]}.webp`, layout: 'frame' },
   // 名前は投石・薬草・思い出の箱のほかは仮（ユーザー決定 2026-10-30）
   ...(FIXED_SUPPORT_NAMES.includes(rest.name) ? {} : { pendingSpec: ['name'] }),

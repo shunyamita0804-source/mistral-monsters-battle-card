@@ -1,4 +1,4 @@
-// 使い方: node tools/e2e/gacha_shot.cjs URL セーブ.json 出力 幅 高さ 名前 [パックの番号=0・last で最後]
+// 使い方: node tools/e2e/gacha_shot.cjs URL セーブ.json 出力 幅 高さ 名前 [パックの番号=0・last で最後・シリーズの ID（shishien など）]
 // ガチャ（販売機の前 {shop,45,20,up} のセーブ）でパックを選ぶ → 自動でまわす → 破る → 1枚ずつめくる → 結果の一覧（2026-10-29）
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -24,7 +24,8 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
   await shot('select');
   const tiles = page.locator('.gacha-select__tile');
   // last＝いちばん最後に並んだシリーズ（2026-10-30 ツムジ）
-  const tile = nth === 'last' ? tiles.last() : tiles.nth(+nth);
+  // last＝いちばん最後に並んだシリーズ（2026-10-30 ツムジ）・数字でないもの＝シリーズの ID（2026-10-31 シシエン）
+  const tile = nth === 'last' ? tiles.last() : /^\d+$/.test(nth) ? tiles.nth(+nth) : page.locator(`.gacha-select__tile[data-series="${nth}"]`);
   await tile.click(); await page.waitForTimeout(600); await tile.click(); await page.waitForTimeout(1200);
   await page.locator('.modal button:has-text("はい")').first().click();
   await page.waitForTimeout(2500);

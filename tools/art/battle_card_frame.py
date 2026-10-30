@@ -22,6 +22,8 @@ from scipy import ndimage
 BR, SAT, RAD, EDGE = 212, 34, 3, 52
 SPECK_MAX, SPECK_SAT, SPECK_BR = 90, 70, 170
 TINT_STRENGTH = 0.95
+# この明るさ（0〜255）より暗い色は、枠の明るさもその色に寄せる（ほかの色は前と同じ）
+DARK = 90
 
 
 def clean_checker(im: np.ndarray) -> np.ndarray:
@@ -82,6 +84,10 @@ def tint(im: np.ndarray, mask: np.ndarray, color: tuple[int, int, int]) -> np.nd
     lum = (rgb @ weights)[..., None]
     target = np.array(color, float)
     col = np.clip(target + (lum - target @ weights), 0, 255)
+    if target @ weights < DARK:
+        # 暗い色（シシエンの炭色）：明るさを残すと銀の枠（ヒョウズク）と見分けられないので、明るさもその色に寄せる。濃淡（金の明暗・輪郭）は少し残す（2026-10-31 指示書 AB）
+        ref = float(np.median(lum[mask > 0.5]))
+        col = np.clip(target + (lum - ref) * 0.6, 0, 255)
     w = (mask * TINT_STRENGTH)[..., None]
     out = im.copy()
     out[..., :3] = np.clip(rgb * (1 - w) + col * w, 0, 255).astype(np.uint8)

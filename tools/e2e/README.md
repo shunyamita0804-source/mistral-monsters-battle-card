@@ -104,3 +104,12 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 
 - 部屋の写真は `town_shot.cjs`（場所は `{bureau,30,30,up}`・受付の前 `{bureau,30,19,up}`・掲示板の右 `{bureau,16,19,left}`・大会会場の受付の前 `{hall,49,29,up}`）。
   調べた所は `save_shot.cjs セーブ 出力 click:.world__action`（部屋でも z キーは効かない）
+
+## 2026-10-31 シシエン（指示書 AB【1】。`docs/shishien-ab-20261031.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `shishien_battle_shot.cjs` | 捨て身が当たって自分のライフが減った所・反動で倒れた所・相手の最後の1体を倒して勝った所（反動なし）・手札（炭色の枠）・れんごくのとっしんと投石の大きなカード。開発用サーバー。W・H・LANG |
+
+- 祭壇（初回・前のセーブ）は `dungeon_people_shot.cjs URL フォルダ 出力 win`（フォルダに `boss_dungeon-05.json`。前のセーブは version 30・炎の火山クリア済み）
+- ガチャは `gacha_shot.cjs URL セーブ 出力 390 844 名前 shishien`（パックの番号の代わりにシリーズの ID）

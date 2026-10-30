@@ -6,7 +6,7 @@ tools/design/cardshop_v2.py が家具の絵を書き出す前に dress() を呼�
 
 デザインの決まり：棚の商品は無地の紺のカード・パックで描いてもらった。その紺の所（青みのある所。金のふち・棚板は手前のまま）の中だけに本物の絵を重ねる。
 - 立てたパック（左右の壁ぞいの棚・奥左の段の棚・販売機の左の小さな展示台）：パック専用の絵（design-parts/gacha-20261029/shop/shop_pack_*.png）を、
-  紺のパックの前の面の形に合わせて縮める。同じ絵が隣どうしで続かないよう、12種類を順に使う（2026-10-30 指示書 U でツムジ、指示書 W でヒョウズクを足した）
+  紺のパックの前の面の形に合わせて縮める。同じ絵が隣どうしで続かないよう、13種類を順に使う（2026-10-30 指示書 U でツムジ、指示書 W でヒョウズク、2026-10-31 指示書 AB でシシエンを足した）
 - ガラスの台の中のカード（中央の2つ・奥左の小さな台）：技カードの絵（assets/images/cards/skills/）。ガラスの映りこみは元の絵からもう一度上に重ねる
 - 額の台の額4つ：中の紺の窓に、初期のモンスターのモンスターカードの絵（assets/images/cards/monsters/*_official.webp）を1枚ずつ
 - 紺の窓の形は、青みのある所をつないだかたまりで探す（小さな上ぶた・細い影・棚の前の板〔横長〕は、大きさと形で外す）
@@ -23,7 +23,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 PACKS = os.path.join(ROOT, 'design-parts/gacha-20261029/shop')
 SKILLS = os.path.join(ROOT, 'assets/images/cards/skills')
 MONSTER_CARDS = os.path.join(ROOT, 'assets/images/cards/monsters')
-MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku']
+MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien']
 # 額の台の額4つ（左から）：初期のモンスターのモンスターカード
 FRAME_MONSTERS = ['soramo', 'gauul', 'nobiton', 'lazuck']
 

@@ -119,7 +119,7 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
   });
 
   it('セーブの version は上げていない（デッキ・カードは書きかえないので。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(30);
+    expect(SAVE_VERSION).toBe(31); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に
   });
 });
 
@@ -190,7 +190,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     'enc-water-boss': 'mon-serephine',
     'enc-wind-boss': 'mon-tsumuji',
     'enc-ice-boss': 'mon-hyouzuku', // 2026-10-30 指示書 W：カルシェルからヒョウズクに
-    'enc-fire-boss': 'mon-gauul',
+    'enc-fire-boss': 'mon-shishien', // 2026-10-31 指示書 AB：ガウルからシシエンに
     'enc-machine-boss': 'mon-lazuck',
     'enc-holy-boss': 'mon-soramo',
   };
