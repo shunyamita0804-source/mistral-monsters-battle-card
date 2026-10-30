@@ -1,0 +1,398 @@
+{
+ "games": 200,
+ "playerSkill": "B",
+ "rows": {
+  "tournament-c:シエナ": {
+   "tournament": "Cランク大会",
+   "name": "シエナ",
+   "ai": "normal",
+   "skill": "B",
+   "lifeScale": 1.15,
+   "games": 600,
+   "winA": 28.3,
+   "ko": 75.8,
+   "deckOut": 24.2,
+   "draws": 0,
+   "avgTurns": 28,
+   "attacksPerGame": 20.8,
+   "evaded": 1.7,
+   "defended": 12.6,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.95,
+    "S02": 1.29
+   },
+   "byBox": {
+    "booster-1": 22,
+    "booster-2": 31,
+    "booster-3": 32
+   }
+  },
+  "tournament-c:ドルフ": {
+   "tournament": "Cランク大会",
+   "name": "ドルフ",
+   "ai": "aggressive",
+   "skill": "C",
+   "lifeScale": 1.15,
+   "games": 600,
+   "winA": 14.7,
+   "ko": 93.2,
+   "deckOut": 6.8,
+   "draws": 0,
+   "avgTurns": 22.2,
+   "attacksPerGame": 17,
+   "evaded": 1.2,
+   "defended": 6.7,
+   "hesitatePerGame": 1.49,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.51,
+    "S02": 0.85
+   },
+   "byBox": {
+    "booster-1": 9,
+    "booster-2": 14.5,
+    "booster-3": 20.5
+   }
+  },
+  "tournament-c:レナード": {
+   "tournament": "Cランク大会",
+   "name": "レナード",
+   "ai": "disrupt",
+   "skill": "B",
+   "lifeScale": 1.32,
+   "games": 600,
+   "winA": 7.8,
+   "ko": 93.7,
+   "deckOut": 6.3,
+   "draws": 0,
+   "avgTurns": 22.3,
+   "attacksPerGame": 16.1,
+   "evaded": 1.7,
+   "defended": 7.1,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.54,
+    "S02": 0.98
+   },
+   "byBox": {
+    "booster-1": 5.5,
+    "booster-2": 5.5,
+    "booster-3": 12.5
+   }
+  },
+  "tournament-b:ドルフ": {
+   "tournament": "Bランク大会",
+   "name": "ドルフ",
+   "ai": "aggressive",
+   "skill": "C",
+   "lifeScale": 1.25,
+   "games": 600,
+   "winA": 8.2,
+   "ko": 93.3,
+   "deckOut": 6.7,
+   "draws": 0,
+   "avgTurns": 21.7,
+   "attacksPerGame": 16.8,
+   "evaded": 1.2,
+   "defended": 7.7,
+   "hesitatePerGame": 1.44,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.46,
+    "S02": 0.85
+   },
+   "byBox": {
+    "booster-1": 5,
+    "booster-2": 5.5,
+    "booster-3": 14
+   }
+  },
+  "tournament-b:レナード": {
+   "tournament": "Bランク大会",
+   "name": "レナード",
+   "ai": "disrupt",
+   "skill": "B",
+   "lifeScale": 1.44,
+   "games": 600,
+   "winA": 7.7,
+   "ko": 92.3,
+   "deckOut": 7.7,
+   "draws": 0,
+   "avgTurns": 22.1,
+   "attacksPerGame": 16,
+   "evaded": 1.5,
+   "defended": 7,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.53,
+    "S02": 0.87
+   },
+   "byBox": {
+    "booster-1": 5,
+    "booster-2": 3.5,
+    "booster-3": 14.5
+   }
+  },
+  "tournament-b:グレタ": {
+   "tournament": "Bランク大会",
+   "name": "グレタ",
+   "ai": "guard",
+   "skill": "B",
+   "lifeScale": 1.06,
+   "games": 600,
+   "winA": 29.8,
+   "ko": 29.8,
+   "deckOut": 70.2,
+   "draws": 0,
+   "avgTurns": 33.3,
+   "attacksPerGame": 19.1,
+   "evaded": 0.8,
+   "defended": 28.6,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 1.22,
+    "S02": 0.43
+   },
+   "byBox": {
+    "booster-1": 26.5,
+    "booster-2": 45,
+    "booster-3": 18
+   }
+  },
+  "tournament-b:ユリウス": {
+   "tournament": "Bランク大会",
+   "name": "ユリウス",
+   "ai": "flashy",
+   "skill": "A",
+   "lifeScale": 1.31,
+   "games": 600,
+   "winA": 1.2,
+   "ko": 98.8,
+   "deckOut": 1.2,
+   "draws": 0,
+   "avgTurns": 20.7,
+   "attacksPerGame": 15.5,
+   "evaded": 1.6,
+   "defended": 7.6,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.51,
+    "S02": 1.05
+   },
+   "byBox": {
+    "booster-1": 2,
+    "booster-2": 0.5,
+    "booster-3": 1
+   }
+  },
+  "tournament-a:レナード": {
+   "tournament": "Aランク大会",
+   "name": "レナード",
+   "ai": "disrupt",
+   "skill": "B",
+   "lifeScale": 1.55,
+   "games": 600,
+   "winA": 6.2,
+   "ko": 94.2,
+   "deckOut": 5.8,
+   "draws": 0,
+   "avgTurns": 22.2,
+   "attacksPerGame": 16.1,
+   "evaded": 1.6,
+   "defended": 7.4,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.56,
+    "S02": 0.93
+   },
+   "byBox": {
+    "booster-1": 4,
+    "booster-2": 4,
+    "booster-3": 10.5
+   }
+  },
+  "tournament-a:グレタ": {
+   "tournament": "Aランク大会",
+   "name": "グレタ",
+   "ai": "guard",
+   "skill": "B",
+   "lifeScale": 1.15,
+   "games": 600,
+   "winA": 12.7,
+   "ko": 12.7,
+   "deckOut": 87.3,
+   "draws": 0,
+   "avgTurns": 34.3,
+   "attacksPerGame": 19.6,
+   "evaded": 1.1,
+   "defended": 27.6,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 1.32,
+    "S02": 0.41
+   },
+   "byBox": {
+    "booster-1": 7.5,
+    "booster-2": 25.5,
+    "booster-3": 5
+   }
+  },
+  "tournament-a:ユリウス": {
+   "tournament": "Aランク大会",
+   "name": "ユリウス",
+   "ai": "flashy",
+   "skill": "A",
+   "lifeScale": 1.42,
+   "games": 600,
+   "winA": 1.3,
+   "ko": 98.7,
+   "deckOut": 1.3,
+   "draws": 0,
+   "avgTurns": 20.5,
+   "attacksPerGame": 15.3,
+   "evaded": 1.6,
+   "defended": 7.3,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.48,
+    "S02": 1.03
+   },
+   "byBox": {
+    "booster-1": 2.5,
+    "booster-2": 0,
+    "booster-3": 1.5
+   }
+  },
+  "tournament-a:カミラ": {
+   "tournament": "Aランク大会",
+   "name": "カミラ",
+   "ai": "hunter",
+   "skill": "A",
+   "lifeScale": 1.49,
+   "games": 600,
+   "winA": 0.3,
+   "ko": 99.7,
+   "deckOut": 0.3,
+   "draws": 0,
+   "avgTurns": 19.4,
+   "attacksPerGame": 14.5,
+   "evaded": 1.6,
+   "defended": 7.2,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.46,
+    "S02": 1.05
+   },
+   "byBox": {
+    "booster-1": 0,
+    "booster-2": 0,
+    "booster-3": 1
+   }
+  },
+  "tournament-s:ユリウス": {
+   "tournament": "Sランク大会",
+   "name": "ユリウス",
+   "ai": "flashy",
+   "skill": "A",
+   "lifeScale": 1.58,
+   "games": 600,
+   "winA": 1.2,
+   "ko": 98.8,
+   "deckOut": 1.2,
+   "draws": 0,
+   "avgTurns": 20.6,
+   "attacksPerGame": 15.4,
+   "evaded": 1.6,
+   "defended": 7.3,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.5,
+    "S02": 1
+   },
+   "byBox": {
+    "booster-1": 0.5,
+    "booster-2": 0.5,
+    "booster-3": 2.5
+   }
+  },
+  "tournament-s:カミラ": {
+   "tournament": "Sランク大会",
+   "name": "カミラ",
+   "ai": "hunter",
+   "skill": "A",
+   "lifeScale": 1.65,
+   "games": 600,
+   "winA": 0.3,
+   "ko": 99.7,
+   "deckOut": 0.3,
+   "draws": 0,
+   "avgTurns": 19.5,
+   "attacksPerGame": 14.4,
+   "evaded": 1.8,
+   "defended": 7.1,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.43,
+    "S02": 1.11
+   },
+   "byBox": {
+    "booster-1": 0.5,
+    "booster-2": 0,
+    "booster-3": 0.5
+   }
+  },
+  "tournament-s:アルヴィン": {
+   "tournament": "Sランク大会",
+   "name": "アルヴィン",
+   "ai": "hunter",
+   "skill": "A",
+   "lifeScale": 1.8,
+   "games": 600,
+   "winA": 0.3,
+   "ko": 99.7,
+   "deckOut": 0.3,
+   "draws": 0,
+   "avgTurns": 19.1,
+   "attacksPerGame": 14.4,
+   "evaded": 1.6,
+   "defended": 7.5,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "tsutaPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.41,
+    "S02": 1.03
+   },
+   "byBox": {
+    "booster-1": 0.5,
+    "booster-2": 0,
+    "booster-3": 0.5
+   }
+  }
+ }
+}
