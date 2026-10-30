@@ -1,0 +1,558 @@
+{
+ "games": 200,
+ "A": {
+  "all": {
+   "games": 1800,
+   "winA": 48.9,
+   "ko": 50.4,
+   "deckOut": 49.6,
+   "draws": 0,
+   "avgTurns": 35.6,
+   "attacksPerGame": 20.9,
+   "evaded": 3.8,
+   "defended": 15.1,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "supportsPerGame": {
+    "S01": 1.12,
+    "S02": 1.29
+   }
+  },
+  "rowAverage": {
+   "booster-1": 45.8,
+   "booster-2": 49.2,
+   "booster-3": 51.8
+  },
+  "table": {
+   "booster-1": {
+    "booster-1": {
+     "games": 200,
+     "winA": 52,
+     "ko": 41,
+     "deckOut": 59,
+     "draws": 0,
+     "avgTurns": 36.6,
+     "attacksPerGame": 20.4,
+     "evaded": 5.7,
+     "defended": 16.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.16,
+      "S02": 1.32
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 46,
+     "ko": 59,
+     "deckOut": 41,
+     "draws": 0,
+     "avgTurns": 33.9,
+     "attacksPerGame": 19.8,
+     "evaded": 5.7,
+     "defended": 16,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.19,
+      "S02": 1.34
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 39.5,
+     "ko": 44,
+     "deckOut": 56,
+     "draws": 0,
+     "avgTurns": 36.5,
+     "attacksPerGame": 21.5,
+     "evaded": 3.1,
+     "defended": 15.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.02,
+      "S02": 1.17
+     }
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "games": 200,
+     "winA": 55,
+     "ko": 54.5,
+     "deckOut": 45.5,
+     "draws": 0,
+     "avgTurns": 34.5,
+     "attacksPerGame": 19.9,
+     "evaded": 6.3,
+     "defended": 15.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.09,
+      "S02": 1.34
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 47.5,
+     "ko": 74.5,
+     "deckOut": 25.5,
+     "draws": 0,
+     "avgTurns": 32,
+     "attacksPerGame": 19.1,
+     "evaded": 4.7,
+     "defended": 14.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.24,
+      "S02": 1.34
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 45,
+     "ko": 57,
+     "deckOut": 43,
+     "draws": 0,
+     "avgTurns": 35.4,
+     "attacksPerGame": 21.2,
+     "evaded": 3.2,
+     "defended": 14.1,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.11,
+      "S02": 1.21
+     }
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "games": 200,
+     "winA": 62,
+     "ko": 41,
+     "deckOut": 59,
+     "draws": 0,
+     "avgTurns": 37.2,
+     "attacksPerGame": 21.8,
+     "evaded": 3,
+     "defended": 16.7,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.1,
+      "S02": 1.28
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 47.5,
+     "ko": 50.5,
+     "deckOut": 49.5,
+     "draws": 0,
+     "avgTurns": 35.5,
+     "attacksPerGame": 21.1,
+     "evaded": 2.2,
+     "defended": 13.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.12,
+      "S02": 1.27
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 46,
+     "ko": 32.5,
+     "deckOut": 67.5,
+     "draws": 0,
+     "avgTurns": 38.9,
+     "attacksPerGame": 23.5,
+     "evaded": 1,
+     "defended": 12.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 1.05,
+      "S02": 1.33
+     }
+    }
+   }
+  }
+ },
+ "B": {
+  "all": {
+   "games": 1800,
+   "winA": 49.4,
+   "ko": 83.4,
+   "deckOut": 16.6,
+   "draws": 0,
+   "avgTurns": 27.6,
+   "attacksPerGame": 21.3,
+   "evaded": 1.5,
+   "defended": 12.5,
+   "hesitatePerGame": 0,
+   "misguardPerGame": 0,
+   "supportsPerGame": {
+    "S01": 0.84,
+    "S02": 1.05
+   }
+  },
+  "rowAverage": {
+   "booster-1": 40.5,
+   "booster-2": 50.2,
+   "booster-3": 57.5
+  },
+  "table": {
+   "booster-1": {
+    "booster-1": {
+     "games": 200,
+     "winA": 51.5,
+     "ko": 81.5,
+     "deckOut": 18.5,
+     "draws": 0,
+     "avgTurns": 27.8,
+     "attacksPerGame": 20.6,
+     "evaded": 2.2,
+     "defended": 14.1,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.85,
+      "S02": 1.1
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 41,
+     "ko": 92.5,
+     "deckOut": 7.5,
+     "draws": 0,
+     "avgTurns": 25.7,
+     "attacksPerGame": 19.5,
+     "evaded": 1.4,
+     "defended": 12.4,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.79,
+      "S02": 1.13
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 29,
+     "ko": 78.5,
+     "deckOut": 21.5,
+     "draws": 0,
+     "avgTurns": 29,
+     "attacksPerGame": 22.3,
+     "evaded": 1.5,
+     "defended": 11.7,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.84,
+      "S02": 1.01
+     }
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "games": 200,
+     "winA": 56,
+     "ko": 90.5,
+     "deckOut": 9.5,
+     "draws": 0,
+     "avgTurns": 25.9,
+     "attacksPerGame": 19.8,
+     "evaded": 2.3,
+     "defended": 12.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.85,
+      "S02": 1.11
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 51,
+     "ko": 94.5,
+     "deckOut": 5.5,
+     "draws": 0,
+     "avgTurns": 24.7,
+     "attacksPerGame": 19.5,
+     "evaded": 1.4,
+     "defended": 13.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.85,
+      "S02": 1.05
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 43.5,
+     "ko": 87.5,
+     "deckOut": 12.5,
+     "draws": 0,
+     "avgTurns": 27.6,
+     "attacksPerGame": 21.7,
+     "evaded": 1,
+     "defended": 12.2,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.87,
+      "S02": 1.12
+     }
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "games": 200,
+     "winA": 66.5,
+     "ko": 79.5,
+     "deckOut": 20.5,
+     "draws": 0,
+     "avgTurns": 28.9,
+     "attacksPerGame": 22,
+     "evaded": 1.3,
+     "defended": 11.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.81,
+      "S02": 1.06
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 54.5,
+     "ko": 83,
+     "deckOut": 17,
+     "draws": 0,
+     "avgTurns": 28.3,
+     "attacksPerGame": 22.2,
+     "evaded": 1.3,
+     "defended": 12.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.94,
+      "S02": 0.97
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 51.5,
+     "ko": 63,
+     "deckOut": 37,
+     "draws": 0,
+     "avgTurns": 30.9,
+     "attacksPerGame": 24.1,
+     "evaded": 1,
+     "defended": 10.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "supportsPerGame": {
+      "S01": 0.83,
+      "S02": 0.93
+     }
+    }
+   }
+  }
+ },
+ "C": {
+  "all": {
+   "games": 1800,
+   "winA": 50.7,
+   "ko": 95.4,
+   "deckOut": 4.6,
+   "draws": 0,
+   "avgTurns": 21.4,
+   "attacksPerGame": 17.7,
+   "evaded": 0.4,
+   "defended": 0.8,
+   "hesitatePerGame": 2.39,
+   "misguardPerGame": 0.16,
+   "supportsPerGame": {
+    "S01": 0.97,
+    "S02": 1.03
+   }
+  },
+  "rowAverage": {
+   "booster-1": 48.3,
+   "booster-2": 49.3,
+   "booster-3": 54.3
+  },
+  "table": {
+   "booster-1": {
+    "booster-1": {
+     "games": 200,
+     "winA": 52.5,
+     "ko": 99.5,
+     "deckOut": 0.5,
+     "draws": 0,
+     "avgTurns": 20.4,
+     "attacksPerGame": 16.3,
+     "evaded": 0.7,
+     "defended": 1,
+     "hesitatePerGame": 2.03,
+     "misguardPerGame": 0.21,
+     "supportsPerGame": {
+      "S01": 0.93,
+      "S02": 1.24
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 48.5,
+     "ko": 98,
+     "deckOut": 2,
+     "draws": 0,
+     "avgTurns": 19.9,
+     "attacksPerGame": 16.2,
+     "evaded": 0.6,
+     "defended": 1.1,
+     "hesitatePerGame": 2.27,
+     "misguardPerGame": 0.15,
+     "supportsPerGame": {
+      "S01": 0.98,
+      "S02": 0.98
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 44,
+     "ko": 94.5,
+     "deckOut": 5.5,
+     "draws": 0,
+     "avgTurns": 22.2,
+     "attacksPerGame": 18.7,
+     "evaded": 0.5,
+     "defended": 0.7,
+     "hesitatePerGame": 2.64,
+     "misguardPerGame": 0.19,
+     "supportsPerGame": {
+      "S01": 1.09,
+      "S02": 0.94
+     }
+    }
+   },
+   "booster-2": {
+    "booster-1": {
+     "games": 200,
+     "winA": 50.5,
+     "ko": 98.5,
+     "deckOut": 1.5,
+     "draws": 0,
+     "avgTurns": 19.9,
+     "attacksPerGame": 16.2,
+     "evaded": 0.3,
+     "defended": 0.9,
+     "hesitatePerGame": 2.31,
+     "misguardPerGame": 0.19,
+     "supportsPerGame": {
+      "S01": 0.98,
+      "S02": 1.12
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 51,
+     "ko": 99.5,
+     "deckOut": 0.5,
+     "draws": 0,
+     "avgTurns": 18.7,
+     "attacksPerGame": 15.8,
+     "evaded": 0.4,
+     "defended": 0.9,
+     "hesitatePerGame": 2.09,
+     "misguardPerGame": 0.14,
+     "supportsPerGame": {
+      "S01": 0.81,
+      "S02": 0.94
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 46.5,
+     "ko": 93,
+     "deckOut": 7,
+     "draws": 0,
+     "avgTurns": 22.3,
+     "attacksPerGame": 18.5,
+     "evaded": 0.4,
+     "defended": 0.6,
+     "hesitatePerGame": 2.49,
+     "misguardPerGame": 0.13,
+     "supportsPerGame": {
+      "S01": 1.02,
+      "S02": 0.99
+     }
+    }
+   },
+   "booster-3": {
+    "booster-1": {
+     "games": 200,
+     "winA": 58,
+     "ko": 94,
+     "deckOut": 6,
+     "draws": 0,
+     "avgTurns": 22.4,
+     "attacksPerGame": 18.5,
+     "evaded": 0.3,
+     "defended": 0.7,
+     "hesitatePerGame": 2.34,
+     "misguardPerGame": 0.17,
+     "supportsPerGame": {
+      "S01": 1.08,
+      "S02": 1.06
+     }
+    },
+    "booster-2": {
+     "games": 200,
+     "winA": 53.5,
+     "ko": 96,
+     "deckOut": 4,
+     "draws": 0,
+     "avgTurns": 21.7,
+     "attacksPerGame": 18.2,
+     "evaded": 0.2,
+     "defended": 0.6,
+     "hesitatePerGame": 2.53,
+     "misguardPerGame": 0.12,
+     "supportsPerGame": {
+      "S01": 0.83,
+      "S02": 1.02
+     }
+    },
+    "booster-3": {
+     "games": 200,
+     "winA": 51.5,
+     "ko": 85.5,
+     "deckOut": 14.5,
+     "draws": 0,
+     "avgTurns": 24.8,
+     "attacksPerGame": 21,
+     "evaded": 0.3,
+     "defended": 0.6,
+     "hesitatePerGame": 2.8,
+     "misguardPerGame": 0.14,
+     "supportsPerGame": {
+      "S01": 1.05,
+      "S02": 0.95
+     }
+    }
+   }
+  }
+ }
+}

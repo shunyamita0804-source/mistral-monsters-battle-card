@@ -868,7 +868,7 @@ export const battleScreen: ScreenDefinition = {
         if (destroyed || !state) return;
         const s = actingSide(state);
         if (!s || (s === 'player' && !auto)) return;
-        const action = chooseAction(state, s, s === 'opponent' ? req.opponent.ai : undefined);
+        const action = chooseAction(state, s, s === 'opponent' ? req.opponent.ai : undefined, s === 'opponent' ? req.opponent.skill : undefined);
         if (action) dispatch(action);
       }, AI_STEP_MS + wait);
     };

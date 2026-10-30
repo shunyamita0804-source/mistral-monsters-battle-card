@@ -130,7 +130,7 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
 
   it('パックの色（pack_tint.py）・パックの絵・販売機の窓・ショップの棚・枠の色の表にヒョウズクがある', () => {
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
-    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji', 'hyouzuku'\]/);
+    expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji', 'hyouzuku'(, '[a-z]+')*\]/);
     expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji', 'hyouzuku'\]/);
     expect(readFileSync('tools/design/gacha_panel_build.py', 'utf8')).toContain("'hyouzuku': (");
     for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
@@ -271,7 +271,7 @@ function beatIvan(save: SaveData, seed: number): ReturnType<typeof winRunBattle>
 
 describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
   it('イヴァンの編成：ミュロル・ヒョウズク（真ん中・切り札）・カルシェル。ノビトンは外した。lifeScale 1.3 → 指示書 Y で 1.2', () => {
-    expect(ENCOUNTERS['enc-ice-boss']).toMatchObject({ name: 'イヴァン', monsters: IVAN_TEAM, ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.2 });
+    expect(ENCOUNTERS['enc-ice-boss']).toMatchObject({ name: 'イヴァン', monsters: IVAN_TEAM, ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.05, skill: 'A' });
     expect(ENCOUNTERS['enc-ice-boss']?.monsters).not.toContain('mon-nobiton');
     expect(DUNGEONS.find((d) => d.id === ICE)).toMatchObject({
       trumpReward: true,

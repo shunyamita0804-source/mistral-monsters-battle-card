@@ -104,6 +104,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-tsumuji',
       'mon-hyouzuku',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
+      // サポート11種類（2026-10-30 指示書 Z で絵が入った）
+      ...SUPPORTS.map((s) => s.id),
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);
   });

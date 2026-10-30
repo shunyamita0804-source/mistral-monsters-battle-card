@@ -24,7 +24,9 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / 'assets' / 'images' / 'ui' / 'gacha'
-PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku']
+PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'tools']
+# パックの絵がほかの所にあるもの：道具のパック（仮）は届いた窓の絵 pack_art_tools.png から pack_tint.py で作った袋（2026-10-30 指示書 Z）
+PACK_PATH = {'tools': Path(__file__).resolve().parents[2] / 'design-parts' / 'support-art-z-20261030' / 'build' / 'pack_tools.png'}
 PACK_SIZE = (600, 1080)
 PARTS = ['knob_base', 'knob_dial', 'outlet_zoom_back', 'outlet_zoom_front', 'open_burst']
 
@@ -32,7 +34,7 @@ PARTS = ['knob_base', 'knob_dial', 'outlet_zoom_back', 'outlet_zoom_front', 'ope
 def main(src: Path, pack_src: Path) -> None:
     ROOT.mkdir(parents=True, exist_ok=True)
     for name in [f'pack_{k}' for k in PACKS]:
-        im = Image.open(pack_src / f'{name}.png').convert('RGBA').resize(PACK_SIZE, Image.LANCZOS)
+        im = Image.open(PACK_PATH.get(name.removeprefix('pack_'), pack_src / f'{name}.png')).convert('RGBA').resize(PACK_SIZE, Image.LANCZOS)
         im.save(ROOT / f'{name}.webp', quality=90, method=6)
         print(name, im.size)
     for name in PARTS:

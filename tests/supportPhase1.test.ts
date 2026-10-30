@@ -288,18 +288,19 @@ describe('CPU の思考（2026-10-30 指示書 Y の仮の思考）', () => {
     expect(chooseAction(s, 'player')).toMatchObject({ type: 'useCard', cardUid: 'p0', targetUid: 'o-m3' });
   });
 
-  it('守りのカードを残す枚数：ふつうの CPU は2枚', async () => {
+  it('守りのカードを残す枚数（指示書 Y でふつう 1→2、指示書 Z で腕前ごとに C 0・B 1・A 2）', async () => {
     const { chooseAction } = await import('../src/game/battle/ai.ts');
     let s = scene({ player: [sor(11), sor(14), sor(13), sor(4)] }, { player: 3 });
     s = { ...s, phase: 'mana' };
-    const kept = new Set<string>();
-    let x = s;
-    for (let i = 0; i < 6; i++) {
-      const a = chooseAction(x, 'player');
-      if (!a || a.type !== 'convertToMana') break;
-      x = applyAction(x, a);
-    }
-    for (const c of x.sides.player.hand) kept.add(c.cardId);
-    expect([...kept].filter((id) => [sor(11), sor(14), sor(13)].includes(id))).toHaveLength(2);
+    const keptGuards = (skill: 'C' | 'B' | 'A'): number => {
+      let x = s;
+      for (let i = 0; i < 6; i++) {
+        const a = chooseAction(x, 'player', 'normal', skill);
+        if (!a || a.type !== 'convertToMana') break;
+        x = applyAction(x, a);
+      }
+      return x.sides.player.hand.filter((c) => [sor(11), sor(14), sor(13)].includes(c.cardId)).length;
+    };
+    expect([keptGuards('C'), keptGuards('B'), keptGuards('A')]).toEqual([0, 1, 2]);
   });
 });

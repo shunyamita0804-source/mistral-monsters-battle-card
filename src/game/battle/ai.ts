@@ -29,7 +29,7 @@ import {
   type HandCard,
   type Side,
 } from './engine.ts';
-import type { AiStyle } from '../../data/tournaments.ts';
+import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
 
 /**
  * 対戦相手（およびQA用のオート操作）の思考。
@@ -41,8 +41,93 @@ import type { AiStyle } from '../../data/tournaments.ts';
  * - disrupt（レナード）：手番の最初に妨害（ちょうはつ・すなかけ など）を攻撃より先に使う
  * - guard（グレタ）：ダメージを受けるときはいつも守る。守りのカードを2枚まで残す。ドローで自分の山札を減らさない（相手の山札切れを待つ）
  * - flashy（ユリウス）：必要マナのいちばん多い攻撃（大技）を先に使う
- * - hunter（カミラ・アルヴィン）：相手のいちばん弱いモンスター（最大ライフ・残りライフの少ない順）を先に狙う
+ * - hunter（カミラ・アルヴィン）：相手のいちばん弱いモンスター（最大ライフの少ないモンスター）を先に狙う
+ *
+ * 腕前 skill（2026-10-30 指示書 Z。C 下手・B ふつう・A 上手。構えとは別。数字は CPU_SKILL にまとめた仮の値）：
+ * - 倒せる相手がいるとき：C は 50%・B は 20% で見のがす。A は必ず倒し、倒せる技のうち倒しすぎない（ダメージがむだにならない）技を選ぶ
+ * - 倒せないときの狙い：C・B はばらばら（対戦の seed から決まる）。A はいちばん危ない相手（技の最大ダメージ ÷ 残りライフ が大きい相手）
+ * - 攻撃するか：C は攻撃できる手番の 15% で攻撃を見送る（記録に「〇〇は迷っている…」）
+ * - 技の選び方：C は 30% で強くない技（使える技からばらばら）。A は倒せないとき、次の手番に大技を払えるようマナを残すことがある
+ * - 守るか：C は守れるのに 40% で守らない（記録に「〇〇は守りそこねた！」）。B・A は 3ダメージ以上か倒されそうなとき回避（1〜2 には回避を使わない）・防御
+ * - マナ化で残す守りのカード：C 0枚（さらに 30% の手番で、残したい攻撃より先に守りをマナにする）・B 1枚・A 2枚
+ *   （A は相手の場のモンスターの技の種類に合う守りを優先し、守りの分のマナも残す）
+ * - 「ライフの少ない相手から狙う」はやめた（ユーザー指示 2026-10-30 23:11）
+ * - 構えは腕前より優先（aggressive は A でも守らない・守りを残さない。guard は守りを2枚残す）
  */
+
+/** 腕前ごとのふるまい（2026-10-30 指示書 Z。数字は仮。ここでまとめて合わせる） */
+export const CPU_SKILL: Readonly<
+  Record<
+    CpuSkill,
+    {
+      /** 倒せる相手を見のがす割合 */
+      readonly missKill: number;
+      /** 攻撃できる手番に攻撃を見送る割合 */
+      readonly hesitate: number;
+      /** 強くない技（使える技からばらばら）を選ぶ割合 */
+      readonly weakSkill: number;
+      /** 守れるのに守らない割合 */
+      readonly misguard: number;
+      /** マナ化で残す守りのカードの枚数 */
+      readonly guardKeep: number;
+      /** マナ化で、残したい攻撃より先に守りをマナにする手番の割合 */
+      readonly guardFirst: number;
+    }
+  >
+> = {
+  C: { missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3 },
+  B: { missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0 },
+  A: { missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0 },
+};
+
+/**
+ * CPU のばらばら（決まった seed から）：対戦の seed・手番・側・用途（と、perAction なら記録の行数）から 0 以上 1 未満の数を作る。
+ * 同じ場面では同じ値になる（対戦をやり直しても同じ）。perAction が false なら、その手番の中では同じ値
+ */
+export function cpuRoll(state: BattleState, side: Side, key: string, perAction = true): number {
+  let h = (2166136261 ^ (state.seed >>> 0)) >>> 0;
+  const text = `${state.turn}|${side}|${key}|${perAction ? state.log.length : ''}`;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  h ^= h >>> 15;
+  h = Math.imul(h, 2246822507);
+  h ^= h >>> 13;
+  h = Math.imul(h, 3266489909);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+
+/** そのモンスターの攻撃の強さ（攻撃技の最大ダメージ。場の増減も入れる。腕前 A の「いちばん危ない相手」に使う） */
+function threatOf(state: BattleState, m: BattleMonster): number {
+  return Math.max(
+    0,
+    ...skillsOf(m.cardId)
+      .filter((k) => k.effect.type === 'attack' && k.stat !== null)
+      .map((k) => skillValue(k) + (k.stat ? fieldModifier(state, k.stat.type) : 0)),
+  );
+}
+
+/** いちばん危ない相手から（攻撃の強さ ÷ 残りライフ が大きい順） */
+const dangerOf = (state: BattleState, m: BattleMonster): number => threatOf(state, m) / Math.max(1, m.life);
+
+/**
+ * 倒せないときの狙い（2026-10-30 指示書 Z）：じならしをかけた相手（この手番に回避できない）を先に。hunter の構えは最大ライフの少ないモンスターから。
+ * そのうえで、腕前 A はいちばん危ない相手、C・B はばらばら（key ごとの cpuRoll）
+ */
+function pickTarget(state: BattleState, side: Side, reach: readonly BattleMonster[], style: AiStyle, skill: CpuSkill, key: string): BattleMonster | undefined {
+  let pool = [...reach];
+  if (pool.length === 0) return undefined;
+  const pinned = pool.filter((m) => isPinned(state, m));
+  if (pinned.length > 0) pool = pinned;
+  if (style === 'hunter') {
+    const min = Math.min(...pool.map((m) => m.maxLife));
+    pool = pool.filter((m) => m.maxLife === min);
+  }
+  if (skill === 'A') return pool.sort((a, b) => dangerOf(state, b) - dangerOf(state, a))[0];
+  return pool[Math.min(pool.length - 1, Math.floor(cpuRoll(state, side, `target:${key}`) * pool.length))];
+}
 interface Option {
   readonly card: HandCard;
   readonly def: PlayCard;
@@ -83,24 +168,29 @@ function deckAmount(card: PlayCard): number {
   return e.type === 'draw' || e.type === 'mana' ? e.value : 0;
 }
 
-export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'normal'): BattleAction | null {
+export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction | null {
   if (state.phase === 'ended') return null;
 
-  if (state.phase === 'defense') return chooseDefense(state, side, style);
+  if (state.phase === 'defense') return chooseDefense(state, side, style, skill);
 
   if (state.active !== side) return null;
-  if (state.phase === 'mana') return chooseManaAction(state, side, style);
+  if (state.phase === 'mana') return chooseManaAction(state, side, style, skill);
   const options = usableOptions(state, side);
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
+  // 腕前 C：攻撃できる手番の一部で、攻撃を見送る（その手番の最初の1手のときだけ決める。記録に「〇〇は迷っている…」）
+  const firstMove = aliveMonsters(mine).every((m) => !m.acted) && Object.keys(mine.turnUsage).length === 0;
+  const canAttack = options.some((o) => o.def.effect.type === 'attack') && enemies.length > 0;
+  if (firstMove && canAttack && cpuRoll(state, side, 'hesitate', false) < CPU_SKILL[skill].hesitate) return { type: 'endAttack', side, note: 'hesitate' };
+
   // ツムジ（2026-10-30 指示書 U）：Wひっかきを2回続けて使う（2回目が使えるなら必ず続ける）
-  const scratch = chooseDoubleScratch(state, side, options, enemies, style);
+  const scratch = chooseDoubleScratch(state, side, options, enemies, style, skill);
   if (scratch) return scratch;
 
   // 癖：攻撃・妨害を先に使う人
   if (style === 'aggressive' || style === 'flashy' || style === 'hunter') {
-    const attack = chooseAttack(state, side, options, enemies, style);
+    const attack = chooseAttack(state, side, options, enemies, style, skill);
     if (attack) return attack;
   }
   // 妨害を先に：その手番の最初の1手（妨害のあとにほかのモンスターで攻撃できるよう、生きているモンスターが2体以上のとき）
@@ -148,7 +238,7 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const puff = chooseChargeOrTailwind(state, side, options, enemies);
   if (puff) return puff;
   // 2.6 試遊中：ジオル（2026-10-29）。エネルギーをためる・じならし
-  const geol = chooseEnergyOrPin(state, side, options, enemies);
+  const geol = chooseEnergyOrPin(state, side, options, enemies, style, skill);
   if (geol) return geol;
 
   // 2.7 セレフィーン（2026-10-29）。みちしお
@@ -159,8 +249,8 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const windRide = chooseWindRide(state, side, options);
   if (windRide) return windRide;
 
-  // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃をライフの少ない相手へ
-  const attack = chooseAttack(state, side, options, enemies, style);
+  // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
+  const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
 
   // 4. 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）
@@ -188,17 +278,27 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const sniff = options.filter(isSkillOption).find((o) => o.def.effect.type === 'revealHand');
   if (sniff && state.sides[otherSide(side)].hand.length >= 3 && manaOf(mine) >= sniff.def.cost + 3) return { type: 'useCard', side, cardUid: sniff.card.uid };
 
-  // 4.5 投石（攻撃のあと）：マナが投石の分＋2以上残っていれば、いちばんライフの少ない相手に
+  // 4.5 投石（攻撃のあと）：マナが投石の分＋2以上残っていれば。狙いは攻撃と同じ（2026-10-30 指示書 Z で「いちばんライフの少ない相手」をやめた）
   const stone = supportOf(options, 'stone');
   if (stone && manaOf(mine) >= stone.def.cost + 2) {
-    const weakest = [...attackableMonsters(state, otherSide(side))].sort((a, b) => a.life - b.life)[0];
-    if (weakest) return { type: 'useCard', side, cardUid: stone.card.uid, targetUid: weakest.uid };
+    const target = pickTarget(state, side, attackableMonsters(state, otherSide(side)), style, skill, 'stone');
+    if (target) return { type: 'useCard', side, cardUid: stone.card.uid, targetUid: target.uid };
+  }
+
+  // 4.8 旅の手帳（2026-10-30 指示書 Z）：山札が20枚以上あり、攻撃のあとにマナが残っていて（払える）、手札に今のマナで使える攻撃技が無いとき。
+  // 腕前 A は、手札に守りのカードが無いときも使う
+  const journal = options.find((o): o is Option & { def: SupportCard } => o.def.kind === 'support' && o.def.effect.type === 'draw');
+  if (journal && style !== 'guard' && mine.deck.length >= JOURNAL_MIN_DECK && manaOf(mine) >= journal.def.cost) {
+    const noAttack = !options.some((o) => o.def.effect.type === 'attack');
+    const noGuard = !mine.hand.some(isGuard);
+    if (noAttack || (skill === 'A' && noGuard)) return { type: 'useCard', side, cardUid: journal.card.uid };
   }
 
   // 5. マナ・ドロー
   // 山札が足りないと負けになるので、山札を動かす効果は山札に余裕があるときだけ。
-  // ドローは手札が少ないとき、山札からマナはマナが少ないときだけ使う
+  // ドローは手札が少ないとき、山札からマナはマナが少ないときだけ使う（旅の手帳は 4.8 だけで考える）
   const support = options.find((o) => {
+    if (o.def.kind === 'support' && o.def.effect.type === 'draw') return false;
     if (mine.deck.length <= deckAmount(o.def) + 15) return false;
     if (o.def.effect.type === 'draw') return style !== 'guard' && mine.hand.length <= 3;
     // みちしお（amount のある技）は chooseTide だけで考える
@@ -210,6 +310,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
 }
+
+/** 旅の手帳を使う山札の枚数の下限（2026-10-30 指示書 Z） */
+const JOURNAL_MIN_DECK = 20;
 
 /** 手札の中の、その種類のサポート（使えるもの） */
 function supportOf(options: Option[], type: SupportCard['effect']['type']): (Option & { def: SupportCard }) | undefined {
@@ -308,14 +411,15 @@ function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAc
  * Wひっかき（ツムジ。2026-10-30 指示書 U）：続けて使える2回目があれば必ず使う（1回目のあと）。
  * 1回目は、手札に2枚あり、2枚ぶんのマナ（かぜのりが効いていればそのぶん少なく）があるときに使う。1枚だけのときは、ふつうの攻撃と同じ考え方（chooseAttack）
  */
-function chooseDoubleScratch(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle): BattleAction | null {
+function chooseDoubleScratch(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle, skill: CpuSkill): BattleAction | null {
   const scratches = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack' && o.def.effect.chain);
   if (scratches.length === 0 || enemies.length === 0) return null;
   const pick = (o: SkillOption, user: BattleMonster): BattleAction | null => {
     const reach = targetsFor(state, side, o.def, user);
     const power = attackPower(state, o.def, user);
-    const weakFirst = (a: BattleMonster, b: BattleMonster): number => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || a.life - b.life;
-    const target = reach.filter((e) => e.life <= power).sort((a, b) => b.life - a.life)[0] ?? [...reach].sort(weakFirst)[0];
+    const missKill = cpuRoll(state, side, 'kill') < CPU_SKILL[skill].missKill;
+    const kill = missKill ? undefined : reach.filter((e) => e.life <= power).sort((a, b) => b.life - a.life)[0];
+    const target = kill ?? pickTarget(state, side, reach, style, skill, 'scratch');
     return target ? { type: 'useCard', side, cardUid: o.card.uid, userUid: user.uid, targetUid: target.uid } : null;
   };
   // 2回目：1回目を使ったツムジが、続けてもう1回
@@ -362,7 +466,7 @@ function canKillThisTurn(state: BattleState, side: Side, options: Option[]): boo
  * フラワードレイン（フルーネ。2026-10-29 指示書）：マナが足りる（6以上）とき、相手を倒せるならその相手（ライフの多い順）へ、
  * 倒せなくてもフルーネのライフが最大から2以上減っていれば、ふつうの攻撃と同じ選び方の相手へ、ほかの攻撃より先に使う
  */
-function chooseDrain(state: BattleState, side: Side, attacks: SkillOption[], style: AiStyle): BattleAction | null {
+function chooseDrain(state: BattleState, side: Side, attacks: SkillOption[], style: AiStyle, skill: CpuSkill): BattleAction | null {
   const drain = attacks.find((o) => o.def.effect.type === 'attack' && o.def.effect.drain);
   if (!drain) return null;
   for (const user of availableUsers(state, side, drain.def)) {
@@ -371,20 +475,18 @@ function chooseDrain(state: BattleState, side: Side, attacks: SkillOption[], sty
     const kill = reach.filter((e) => e.life <= power).sort((a, b) => b.life - a.life)[0];
     if (kill) return { type: 'useCard', side, cardUid: drain.card.uid, userUid: user.uid, targetUid: kill.uid };
     if (user.maxLife - user.life >= 2) {
-      const weakFirst = (a: BattleMonster, b: BattleMonster): number => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || a.life - b.life;
-      const pinnedFirst = (a: BattleMonster, b: BattleMonster): number => Number(isPinned(state, b)) - Number(isPinned(state, a));
-      const target = [...reach].sort((a, b) => pinnedFirst(a, b) || weakFirst(a, b))[0];
+      const target = pickTarget(state, side, reach, style, skill, 'drain');
       if (target) return { type: 'useCard', side, cardUid: drain.card.uid, userUid: user.uid, targetUid: target.uid };
     }
   }
   return null;
 }
 
-/** 攻撃（倒せる相手がいれば倒す。癖で技の順・狙う相手が変わる）。攻撃できなければ null */
-function chooseAttack(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle): BattleAction | null {
+/** 攻撃（倒せる相手がいれば倒す。構えで技の順・狙う相手が、腕前で見のがし・技の選び方・狙いが変わる）。攻撃できなければ null */
+function chooseAttack(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle, skill: CpuSkill = 'B'): BattleAction | null {
   const attacks = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack');
   if (attacks.length === 0 || enemies.length === 0) return null;
-  const drained = chooseDrain(state, side, attacks, style);
+  const drained = chooseDrain(state, side, attacks, style, skill);
   if (drained) return drained;
   const power = (o: SkillOption): number => attackPower(state, o.def, availableUsers(state, side, o.def)[0]);
   // ためているときのぷはーっ（回避されない）は、少し強いものとして先に考える（試遊中：プカリム）
@@ -393,31 +495,65 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   const byPower = [...attacks].sort((a, b) => (style === 'flashy' ? b.def.cost - a.def.cost : 0) || rank(b) - rank(a));
   // 攻撃できる相手（ちょうはつで限られていればそれだけ）
   const reachable = (o: SkillOption): BattleMonster[] => targetsFor(state, side, o.def);
-  // 弱いモンスターを先に狙う（hunter）：最大ライフの少ない順・残りライフの少ない順
-  const weakFirst = (a: BattleMonster, b: BattleMonster): number => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || a.life - b.life;
-  if (style !== 'flashy') {
-    for (const option of byPower) {
-      const killable = reachable(option).filter((e) => e.life <= power(option));
-      const kill = style === 'hunter' ? killable.sort(weakFirst)[0] : killable.sort((a, b) => b.life - a.life)[0];
-      if (kill) return attackAction(state, side, option, kill.uid);
+  // 倒せる相手：腕前 C・B は一部を見のがす。A は倒せる組み合わせのうち、倒しすぎない（威力−残りライフが小さい）・安い・危ない相手の順
+  const missKill = cpuRoll(state, side, 'kill') < CPU_SKILL[skill].missKill;
+  if (style !== 'flashy' && !missKill) {
+    if (skill === 'A') {
+      const kills = byPower
+        .flatMap((o) => reachable(o).filter((e) => e.life <= power(o)).map((e) => ({ o, e, over: power(o) - e.life })))
+        .sort((a, b) => a.over - b.over || a.o.def.cost - b.o.def.cost || dangerOf(state, b.e) - dangerOf(state, a.e));
+      const best = kills[0];
+      if (best) return attackAction(state, side, best.o, best.e.uid);
+    } else {
+      for (const option of byPower) {
+        const killable = reachable(option).filter((e) => e.life <= power(option));
+        // hunter は最大ライフの少ないモンスターから。ほかはライフの多い相手（倒せるうちの大物）から
+        const kill = killable.sort((a, b) => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || b.life - a.life)[0];
+        if (kill) return attackAction(state, side, option, kill.uid);
+      }
     }
   }
   // かぜのり（ツムジ）が効いている間は、マナが減った分で使える大きい攻撃を先に（2026-10-30 指示書 U）
   const ridden = byPower.find((o) => availableUsers(state, side, o.def).some((u) => windRideOf(state, u) > 0));
   if (ridden) {
     const rider = availableUsers(state, side, ridden.def).find((u) => windRideOf(state, u) > 0);
-    const target = rider ? [...targetsFor(state, side, ridden.def, rider)].sort(weakFirst)[0] : undefined;
+    const target = rider ? pickTarget(state, side, targetsFor(state, side, ridden.def, rider), style, skill, 'ride') : undefined;
     if (rider && target) return { type: 'useCard', side, cardUid: ridden.card.uid, userUid: rider.uid, targetUid: target.uid };
   }
   // 試遊中：ジオルの地ひびき（相手全体）。倒せる相手がいなければ、相手が2体以上生きているときに使う（2026-10-29 指示書）
   const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets);
   if (quake && reachable(quake).length >= 2) return attackAction(state, side, quake, reachable(quake)[0]?.uid ?? '');
   // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える
-  const strongest = byPower.find((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && reachable(o).length >= 2));
-  // じならしをかけた相手（この手番に回避できない）がいれば、そこを狙う
-  const pinnedFirst = (a: BattleMonster, b: BattleMonster): number => Number(isPinned(state, b)) - Number(isPinned(state, a));
-  const target = strongest ? [...reachable(strongest)].sort((a, b) => pinnedFirst(a, b) || weakFirst(a, b))[0] : undefined;
-  return target && strongest ? attackAction(state, side, strongest, target.uid) : null;
+  const candidates = byPower.filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && reachable(o).length >= 2));
+  // 腕前 C：一部の手番で、強くない技（使える技からばらばら）を選ぶ
+  const weak = cpuRoll(state, side, 'weak') < CPU_SKILL[skill].weakSkill;
+  const strongest = weak ? candidates[Math.min(candidates.length - 1, Math.floor(cpuRoll(state, side, 'weakPick') * candidates.length))] : candidates[0];
+  if (!strongest) return null;
+  // 腕前 A：倒せないときは、次の手番に大技を払えるようマナを残すことがある
+  if (skill === 'A' && style !== 'aggressive' && saveManaForBig(state, side, strongest, power(strongest))) return null;
+  const target = pickTarget(state, side, reachable(strongest), style, skill, 'attack');
+  return target ? attackAction(state, side, strongest, target.uid) : null;
+}
+
+/** 大技とみなすダメージ（腕前 A のマナを残す考え方） */
+const BIG_POWER = 3;
+
+/**
+ * 腕前 A（2026-10-30 指示書 Z）：倒せない手番に、弱い攻撃（ダメージ2以下）を使うと次の手番に手札の大技（ダメージ3以上・今のマナでは足りない）が
+ * 払えなくなり、使わなければ払えるとき、その攻撃をやめる（無理をしない程度）。次の手番のマナ＝今のマナ＋この手番の終わりにマナにできる手札（2枚は残す）
+ */
+function saveManaForBig(state: BattleState, side: Side, chosen: SkillOption, chosenPower: number): boolean {
+  if (chosenPower > 2) return false;
+  const mine = state.sides[side];
+  const mana = manaOf(mine);
+  const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+  const holdNext = mana + Math.max(0, mine.hand.length - 2);
+  const useNext = mana - chosen.def.cost + Math.max(0, mine.hand.length - 1 - 2);
+  return mine.hand.some((c) => {
+    if (c.uid === chosen.card.uid) return false;
+    const k = getPlayCard(c.cardId);
+    return k.kind === 'skill' && k.effect.type === 'attack' && alive.has(k.monsterId) && skillValue(k) >= BIG_POWER && k.cost > mana && k.cost > useNext && k.cost <= holdNext;
+  });
 }
 
 /**
@@ -425,7 +561,7 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
  * - エネルギーをためる：ジオルがその手番に相手を倒せず、次の手番にクリスタルショット・クリスタルレイ（ジオルのかしこさ技）を使えそうなとき
  * - じならし：同じ手番に、まだ動いていない味方が攻撃技（ダメージ3以上）を使えそうなとき。狙うのはその味方が攻撃する相手
  */
-function chooseEnergyOrPin(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[]): BattleAction | null {
+function chooseEnergyOrPin(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle, skill: CpuSkill): BattleAction | null {
   const skills = options.filter(isSkillOption);
   const special = skills.filter((o) => o.def.effect.type === 'energy' || o.def.effect.type === 'pin');
   if (special.length === 0 || enemies.length === 0) return null;
@@ -460,9 +596,9 @@ function chooseEnergyOrPin(state: BattleState, side: Side, options: Option[], en
     .sort((a, b) => b.power - a.power);
   const follow = followUps[0];
   if (!follow) return null;
-  // その味方が攻撃する相手：倒せる相手がいればそれ（ライフの多い順）、いなければライフの少ない相手（chooseAttack と同じ選び方）
+  // その味方が攻撃する相手：倒せる相手がいればそれ（ライフの多い順）、いなければ腕前ごとの狙い（chooseAttack と同じ選び方）
   const reach = targetsFor(state, side, follow.o.def, follow.ally);
-  const victim = reach.filter((e) => e.life <= follow.power).sort((a, b) => b.life - a.life)[0] ?? [...reach].sort((a, b) => a.life - b.life)[0];
+  const victim = reach.filter((e) => e.life <= follow.power).sort((a, b) => b.life - a.life)[0] ?? pickTarget(state, side, reach, style, skill, 'pin');
   if (!victim || isPinned(state, victim)) return null;
   return { type: 'useCard', side, cardUid: pin.card.uid, userUid: user.uid, targetUid: victim.uid };
 }
@@ -525,25 +661,44 @@ const guardValue = (c: HandCard): number => {
 };
 
 /**
- * マナ化（仮の思考）：残す手札を最大2枚に絞り、残りをすべてマナにする。
- * - 防御・回避カード2枚（2026-10-30 指示書 Y で1枚から2枚に。aggressive は0枚）：いまのマナで払える中で強いもの（相手の攻撃に備える）
- * - 技・サポート1枚：マナ化し終えたあとのマナで払える中で一番重いもの（次のターンに使う）
+ * マナ化（仮の思考）：残す手札を絞り、残りをすべてマナにする。
+ * - 防御・回避カード（2026-10-30 指示書 Z：腕前 C 0枚・B 1枚・A 2枚。構えの aggressive は0枚・guard は2枚）：いまのマナで払える中で強いもの（相手の攻撃に備える）。
+ *   腕前 A は、相手の場のモンスターの攻撃技の種類に合う守りを先に
+ * - 技・サポート1枚：マナ化し終えたあとのマナで払える中で一番重いもの（次のターンに使う）。腕前 A は、それを残すと守りの分のマナが足りなくなるなら残さない
+ * - 腕前 C は一部の手番で、残したい攻撃より先に守りをマナにする（マナにできる枚数に上限がある手番〔先攻の1手番目〕で差が出る）
  * マナ化するたびにマナ+1・手札-1 なので「マナ化し終えたあとのマナ」は途中で変わらず、残す札が安定する。
  */
-function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'normal'): BattleAction {
+function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction {
   const mine = state.sides[side];
   const mana = manaOf(mine);
   const cost = (c: HandCard): number => {
     const card = getPlayCard(c.cardId);
     return card.kind === 'skill' ? guardCost(state, card) : card.cost;
   };
-  // 守りのカードを残す枚数（aggressive は残さない・guard は2枚。ふつうは 2026-10-30 指示書 Y で 1 → 2）
-  const guardKeep = style === 'aggressive' ? 0 : 2;
-  const keepGuards = mine.hand.filter((c) => isGuard(c) && cost(c) <= mana).sort((a, b) => guardValue(b) - guardValue(a)).slice(0, guardKeep);
-  const others = mine.hand.filter((c) => !keepGuards.includes(c) && (!isGuard(c) || style === 'aggressive'));
+  const guardKeep = style === 'aggressive' ? 0 : style === 'guard' ? 2 : CPU_SKILL[skill].guardKeep;
+  // 腕前 A：相手の生きているモンスターの攻撃技の種類（ちから・かしこさの多い方）に効く守りを先に
+  const theirs = otherSide(side);
+  const force = attackersWith(state, theirs, 'force');
+  const wisdom = attackersWith(state, theirs, 'wisdom');
+  const fits = (c: HandCard): number => {
+    if (skill !== 'A') return 0;
+    const card = getPlayCard(c.cardId);
+    if (card.kind !== 'skill') return 0;
+    const against = guardAgainst(card);
+    return against === 'all' ? 2 : (against === 'force' && force >= wisdom) || (against === 'wisdom' && wisdom >= force) ? 1 : 0;
+  };
+  const keepGuards = mine.hand
+    .filter((c) => isGuard(c) && cost(c) <= mana)
+    .sort((a, b) => fits(b) - fits(a) || guardValue(b) - guardValue(a))
+    .slice(0, guardKeep);
+  const others = mine.hand.filter((c) => !keepGuards.includes(c) && (!isGuard(c) || guardKeep === 0));
   const manaAfter = mana + mine.hand.length - keepGuards.length - 1;
-  const keepSkill = [...others].sort((a, b) => cost(b) - cost(a)).find((c) => cost(c) <= manaAfter);
-  const convert = mine.hand.find((c) => !keepGuards.includes(c) && c !== keepSkill);
+  let keepSkill = [...others].sort((a, b) => cost(b) - cost(a)).find((c) => cost(c) <= manaAfter);
+  // 腕前 A：守りの分のマナも残す（残した守りのカードの必要マナに足りないなら、その技もマナにする）
+  if (skill === 'A' && keepSkill && keepGuards.length > 0 && manaAfter < Math.max(...keepGuards.map(cost))) keepSkill = undefined;
+  const rest = mine.hand.filter((c) => !keepGuards.includes(c) && c !== keepSkill);
+  const guardFirst = cpuRoll(state, side, 'guardFirst', false) < CPU_SKILL[skill].guardFirst;
+  const convert = guardFirst ? (rest.find(isGuard) ?? rest[0]) : (rest.find((c) => !isGuard(c)) ?? rest[0]);
   if (convert && canConvertToMana(state, side)) return { type: 'convertToMana', side, cardUid: convert.uid };
   return { type: 'endTurn', side };
 }
@@ -552,7 +707,17 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
  * 守備（仮の思考）：1枚ずつ選び、ダメージが0になるか使えるカードがなくなったら守備を終える。
  * 回避は倒されそうなときか大きなダメージのときに使い、そうでなければ防御で減らす。
  */
-function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal'): BattleAction | null {
+function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction | null {
+  const guard = chooseGuard(state, side, style);
+  // 腕前 C：守れるのに一部で守らない（その攻撃の最初の守りのときだけ決める。記録に「〇〇は守りそこねた！」）
+  if (guard?.type === 'defend' && guard.cardUid !== null && state.pending?.responses.length === 0 && cpuRoll(state, side, 'misguard') < CPU_SKILL[skill].misguard) {
+    return { type: 'defend', side, cardUid: null, note: 'misguard' };
+  }
+  return guard;
+}
+
+/** 守るカード（腕前で変わる前の考え方。B・A はこのまま） */
+function chooseGuard(state: BattleState, side: Side, style: AiStyle): BattleAction | null {
   const pending = state.pending;
   if (!pending || pending.attacker === side) return null;
   const end: BattleAction = { type: 'defend', side, cardUid: null };

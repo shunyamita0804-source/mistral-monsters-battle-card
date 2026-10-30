@@ -45,7 +45,9 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
   });
 
   it('家具の後ろに回り込める（大会会場の舞台の横・練習場の真ん中の机の奥・研究所の机の奥・管理局のメダルの棚の前）', () => {
-    expect(area(HALL).has(cellOf(300, 330))).toBe(true);
+    // 大会会場の舞台の左奥は、指示書 Z の対戦表の板でふさがった。板の前（長いすとのあいだ）へは左の通路から回り込める
+    expect(area(HALL).has(cellOf(300, 330))).toBe(false);
+    expect(area(HALL).has(cellOf(300, 422))).toBe(true);
     expect(area(PRACTICE).has(cellOf(760, 330))).toBe(true);
     expect(area(LAB).has(cellOf(560, 400))).toBe(true);
     expect(area(BUREAU).has(cellOf(1200, 500))).toBe(true);
@@ -96,10 +98,20 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
     for (const id of ['lab-shelf', 'lab-cabinet', 'lab-projector', 'lab-analysis', 'lab-blackboard']) expect(ids).toContain(id);
   });
 
-  it('大会会場：正面向きの新しい絵には左の壁の板が無いので、壁に表は描かず「対戦表」を調べる所も無い（表は受付で見られる。2026-10-30 指示書 X）', () => {
+  it('大会会場：対戦表の板（2026-10-30 指示書 Z）。板の前（長いすとのあいだの1列）から「対戦表」を調べる。板の裏はふさぐ。板の上に小さな表は重ねない', () => {
     expect(HALL_BOARD).toBeNull();
-    expect(HALL.art?.items?.BOARD).toBeUndefined();
-    expect(HALL.objects.some((o) => o.id === 'hall-board')).toBe(false);
+    const board = HALL.art?.items?.BOARD;
+    expect(board).toEqual({ x: 4, y: 10, w: 12, h: 7 });
+    const obj = HALL.objects.find((o) => o.id === 'hall-board');
+    expect(obj).toMatchObject({ type: 'interact', action: 'leagueBoard', label: '対戦表' });
+    // 板の裏・脚のあいだ（10〜15行）は歩けない。すぐ下の16行（長いすとのあいだ）は歩ける。17行からは長いす
+    for (let x = 4; x <= 13; x++) {
+      for (let y = 10; y <= 15; y++) expect(isBlocked(HALL, x, y, () => true), `${x},${y}`).toBe(true);
+      expect(isBlocked(HALL, x, 16, () => true), `${x},16`).toBe(false);
+      expect(isBlocked(HALL, x, 17, () => true), `${x},17`).toBe(true);
+    }
+    // 板の絵（家具）は足もと y 429 で人と前後を比べる
+    expect(HALL.art?.sprites.some((s) => s.file.endsWith('arena_board.webp'))).toBe(true);
     expect(HALL.objects.some((o) => o.id === 'hall-desk')).toBe(true);
   });
 });

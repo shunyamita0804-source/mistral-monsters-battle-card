@@ -1,5 +1,5 @@
 import type { MonsterCard, SkillCard, SkillEffect } from '../game/cards/cardTypes.ts';
-import fluneData from './official/flune14_skills_OFFICIAL_20261029_rare3.json';
+import fluneData from './official/flune14_skills_OFFICIAL_20261030_z.json';
 import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.ts';
 
 /**
@@ -20,7 +20,9 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - バトル用 flune_battlecard.png（届いた flune_battleart.png を無改変。1169×1346）
  * 色：若葉色 #9CBF5A（モンスターカード枠・技カード枠とも）
  * ガチャのレアの枠（JSON の gacha_slot）：08 はなびらストーム・09 フラワードレイン・10 いやしのみつ（FLUNE_GACHA_RARE）。
- * 2026-10-29 夜（ユーザー決定）にレアを3つにそろえた新しい版 flune14_skills_OFFICIAL_20261029_rare3.json を読む（gacha_slot だけ違う。元の版は残す）
+ * 2026-10-29 夜（ユーザー決定）にレアを3つにそろえた新しい版 flune14_skills_OFFICIAL_20261029_rare3.json を読む（gacha_slot だけ違う。元の版は残す）。
+ * 2026-10-30 指示書 Z（ユーザー決定）：技1〜4のマナ・ダメージを変えた新しい版 flune14_skills_OFFICIAL_20261030_z.json（同じ内容の CSV も）を読む
+ * （つたはたき 0・1／ねっこづき 2・1／ねっこムチ 3・2／ねっこラッシュ 4・3。前の版は残す）。つたはたきは初めての「マナ0の攻撃技」
  */
 export const FLUNE_MONSTER_ID = 'mon-flune';
 export const fluneSkillId = (no: number): string => `skl-flune-${twoDigits(no)}`;

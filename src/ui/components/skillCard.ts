@@ -146,9 +146,12 @@ function manaOrb(l: FrameLayout, cost: number, lowered = false): HTMLElement {
   return el;
 }
 
-/** 分類の札（前の版の枠の八角形の札〔赤い拳・緑の本・青い盾・橙の羽・紫の星〕を切り出した tile_{分類}.webp）。サポートは札なし */
-function categoryIcon(l: FrameLayout, category: SkillCategory | 'support'): HTMLElement | null {
-  const url = category === 'support' ? undefined : TILE_URLS[`/assets/images/ui/skillcard_simple/tile_${category}.webp`];
+/**
+ * 分類の札（前の版の枠の八角形の札〔赤い拳・緑の本・青い盾・橙の羽・紫の星〕を切り出した tile_{分類}.webp）。
+ * サポートは tile_support（すぐ効く）・tile_field（場）。2026-10-30 指示書 Z（届いた 504×544 を tile_force と同じ 126×136 に縮めた）
+ */
+function categoryIcon(l: FrameLayout, tile: string): HTMLElement | null {
+  const url = TILE_URLS[`/assets/images/ui/skillcard_simple/tile_${tile}.webp`];
   if (!url) return null;
   const [cx, cy, side] = l.icon;
   const hh = (side * TILE_RATIO) / 2;
@@ -253,6 +256,10 @@ interface Face {
   readonly supportLabel: string;
   readonly monsterId?: string;
   readonly placeholder: boolean;
+  /** 絵の横の位置を引くキー（技・サポートの ID。skillArtPosition.ts） */
+  readonly artKey: string;
+  /** 分類の印（tile_{…}.webp の {…}）。サポートは tile_support・場のカードは tile_field（2026-10-30 指示書 Z） */
+  readonly tile: string;
 }
 
 function skillFace(skill: SkillCard): Face {
@@ -272,6 +279,8 @@ function skillFace(skill: SkillCard): Face {
     supportLabel: '',
     monsterId: getMonster(skill.monsterId).id,
     placeholder: skill.isPlaceholder,
+    artKey: skill.id,
+    tile: skillCategory(skill),
   };
 }
 
@@ -287,6 +296,8 @@ function supportFace(card: SupportCard): Face {
     skill: null,
     supportLabel: t(card.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support'),
     placeholder: card.isPlaceholder,
+    artKey: card.id,
+    tile: card.duration === 'field' ? 'field' : 'support',
   };
 }
 
@@ -307,13 +318,13 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
   const card = h(
     'div',
     { class: `skill-card skill-card--${size}${f.skill ? '' : ' skill-card--support'}`, dataset: { category: f.category }, attrs: { role: 'img', 'aria-label': f.aria } },
-    artLayer(l, f.art, f.mark, !f.skill, f.skill?.id ?? null),
+    artLayer(l, f.art, f.mark, !f.skill, f.artKey),
     frame ? h('img', { class: 'skill-card__frame', attrs: { src: frame, alt: '', draggable: 'false' } }) : null,
     valueBox(l, size, f.skill, f.supportLabel),
     band,
     name,
     manaOrb(l, options.mana ?? f.mana, options.mana !== undefined && options.mana < f.mana),
-    categoryIcon(l, f.category),
+    categoryIcon(l, f.tile),
   );
   card.style.width = `${options.width}px`;
   card.style.height = `${((options.width * l.h) / l.w).toFixed(1)}px`;
@@ -324,7 +335,7 @@ export function createSkillCard(skill: SkillCard, options: SkillCardOptions): HT
   return render(skillFace(skill), options);
 }
 
-/** サポートカード（銀の枠・分類の印なし。ダメージの四角には区分〔サポート／全体〕） */
+/** サポートカード（銀の枠・分類の印〔すぐ効く／場〕。ダメージの四角には区分〔サポート／全体〕） */
 export function createSupportCard(card: SupportCard, options: SkillCardOptions): HTMLElement {
   return render(supportFace(card), options);
 }

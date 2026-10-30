@@ -69,7 +69,7 @@ describe('フルーネの試遊（自動の対戦）', () => {
       }
     }
     // lifeScale は 0.75 から、2026-10-30 指示書 V（切り札の技を2枚ずつ）で 0.7 に、指示書 Y で 0.75 に（tests/bossPlaytest.test.ts）
-    expect(SERA).toMatchObject({ monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], lifeScale: 0.75 });
+    expect(SERA).toMatchObject({ monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], lifeScale: 0.93 });
   });
 
   it(`各組み合わせ ${GAMES} 回ずつ：勝率の表`, () => {

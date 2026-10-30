@@ -9,7 +9,8 @@ describe('技の絵の横の位置', () => {
     expect(skillArtX('skl-kalshell-02')).toBe(75);
     expect(skillArtX('skl-kalshell-13')).toBe(40);
     expect(skillArtX('skl-soramo14-01')).toBe(50);
-    expect(Object.keys(SKILL_ART_X)).toHaveLength(15);
+    // 技15枚＋サポート4枚（2026-10-30 指示書 Z）
+    expect(Object.keys(SKILL_ART_X)).toHaveLength(19);
   });
 
   it('点検の一覧の12枚（2026-10-29 夜。案の値のまま）', () => {
@@ -21,9 +22,14 @@ describe('技の絵の横の位置', () => {
     expect(['06', '09'].map((n) => skillArtX(`skl-geol-${n}`))).toEqual([65, 100]);
   });
 
-  it('決めた技はどれも実在する技で、0〜100 の間', () => {
+  it('サポートの絵（2026-10-30 指示書 Z）：風まかせ 55・霧の香 100・声援 30・守りの陣 65。ほかは真ん中', () => {
+    expect(['sup-3', 'sup-9', 'sup-10', 'sup-11'].map(skillArtX)).toEqual([55, 100, 30, 65]);
+    expect(skillArtX('sup-7')).toBe(50);
+  });
+
+  it('決めた技・サポートはどれも実在するカードで、0〜100 の間', () => {
     for (const [id, x] of Object.entries(SKILL_ART_X)) {
-      expect(cardCatalog.get(id)?.kind, id).toBe('skill');
+      expect(['skill', 'support'], id).toContain(cardCatalog.get(id)?.kind);
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(100);
     }

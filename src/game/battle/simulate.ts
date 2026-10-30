@@ -49,7 +49,7 @@ export function simulateBattle(a: OpponentDefinition, b: OpponentDefinition, see
   for (let i = 0; i < MAX_STEPS && state.phase !== 'ended'; i++) {
     const side = actingSide(state);
     if (!side) break;
-    const action = chooseAction(state, side, side === 'player' ? a.ai : b.ai);
+    const action = chooseAction(state, side, side === 'player' ? a.ai : b.ai, side === 'player' ? a.skill : b.skill);
     if (!action) break;
     state = applyAction(state, action);
   }

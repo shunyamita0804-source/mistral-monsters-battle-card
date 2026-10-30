@@ -22,8 +22,10 @@ import type { ItemId } from './items.ts';
 
 /** デッキの組み方（src/game/deck/deck.ts の buildOpponentDeck） */
 export type DeckStyle = 'balanced' | 'power' | 'disrupt' | 'guard' | 'flashy' | 'strong';
-/** 相手の考え方の癖（src/game/battle/ai.ts の chooseAction） */
+/** 相手の考え方の癖＝構え（キャラクターの性格。src/game/battle/ai.ts の chooseAction） */
 export type AiStyle = 'normal' | 'aggressive' | 'disrupt' | 'guard' | 'flashy' | 'hunter';
+/** CPU の腕前（2026-10-30 指示書 Z。C 下手・B ふつう・A 上手。構えとは別。ふるまいの数字は src/game/battle/ai.ts の CPU_SKILL） */
+export type CpuSkill = 'C' | 'B' | 'A';
 
 export interface OpponentDefinition {
   readonly id: string;
@@ -35,8 +37,10 @@ export interface OpponentDefinition {
   readonly face?: string;
   /** デッキの組み方（無ければ balanced：適合技を順番に） */
   readonly deckStyle?: DeckStyle;
-  /** 考え方の癖（無ければ normal） */
+  /** 考え方の癖＝構え（無ければ normal） */
   readonly ai?: AiStyle;
+  /** 腕前（無ければ B。2026-10-30 指示書 Z） */
+  readonly skill?: CpuSkill;
   /**
    * 切り札のモンスター（ダンジョンのボス。2026-10-30 指示書 V：祭壇でもらえるモンスターと同じで、並びの真ん中）。
    * デッキに切り札の技14種を2枚ずつ必ず入れる（src/game/deck/deck.ts の buildOpponentDeck）
@@ -115,21 +119,22 @@ const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 1.15, B: 1.25, A:
  * 常連（人物は src/data/people.ts。相手の ID は reg-〈人物の ID〉）。
  * モンスター・デッキ・考え方は性格に合わせた仮の構成。強さ（scale）はランクの倍率に掛ける。勝率は仮の固定値
  */
-const REGULARS: Readonly<Record<RegularId, { name: string; monsters: readonly string[]; deckStyle: DeckStyle; ai: AiStyle; scale: number; winRate: number }>> = {
+// 腕前（2026-10-30 指示書 Z。1人ずつ。構えは今のまま）：シエナ B・ドルフ C・レナード B・グレタ B・ユリウス A・カミラ A・アルヴィン A
+const REGULARS: Readonly<Record<RegularId, { name: string; monsters: readonly string[]; deckStyle: DeckStyle; ai: AiStyle; skill: CpuSkill; scale: number; winRate: number }>> = {
   // 偏りのない、まっすぐな構成・ふつう
-  sienna: { name: 'シエナ', monsters: [SOR, MYU, GAU], deckStyle: 'balanced', ai: 'normal', scale: 1, winRate: 64 },
+  sienna: { name: 'シエナ', monsters: [SOR, MYU, GAU], deckStyle: 'balanced', ai: 'normal', skill: 'B', scale: 1, winRate: 64 },
   // 必要マナの多い強い攻撃ばかり・守りはほぼ入れない・いつも攻撃
-  dolf: { name: 'ドルフ', monsters: [GAU, LAZ, NOB], deckStyle: 'power', ai: 'aggressive', scale: 1, winRate: 58 },
+  dolf: { name: 'ドルフ', monsters: [GAU, LAZ, NOB], deckStyle: 'power', ai: 'aggressive', skill: 'C', scale: 1, winRate: 58 },
   // ちょうはつ・すなかけなど妨害が中心・妨害を先に
-  leonard: { name: 'レナード', monsters: [LAZ, SOR, GAU], deckStyle: 'disrupt', ai: 'disrupt', scale: 1.15, winRate: 66 },
+  leonard: { name: 'レナード', monsters: [LAZ, SOR, GAU], deckStyle: 'disrupt', ai: 'disrupt', skill: 'B', scale: 1.15, winRate: 66 },
   // 防御・回避が多い・守りを優先して相手の山札切れを待つ
-  greta: { name: 'グレタ', monsters: [KAL, MYU, NOB], deckStyle: 'guard', ai: 'guard', scale: 0.85, winRate: 72 },
+  greta: { name: 'グレタ', monsters: [KAL, MYU, NOB], deckStyle: 'guard', ai: 'guard', skill: 'B', scale: 0.85, winRate: 72 },
   // 華やかな大技・大技を優先
-  julius: { name: 'ユリウス', monsters: [GAU, SOR, KAL], deckStyle: 'flashy', ai: 'flashy', scale: 1.05, winRate: 80 },
+  julius: { name: 'ユリウス', monsters: [GAU, SOR, KAL], deckStyle: 'flashy', ai: 'flashy', skill: 'A', scale: 1.05, winRate: 80 },
   // 強くてバランスのよい構成・相手の弱いモンスターを先に狙う
-  camilla: { name: 'カミラ', monsters: [KAL, GAU, MYU], deckStyle: 'strong', ai: 'hunter', scale: 1.1, winRate: 91 },
+  camilla: { name: 'カミラ', monsters: [KAL, GAU, MYU], deckStyle: 'strong', ai: 'hunter', skill: 'A', scale: 1.1, winRate: 91 },
   // いちばん強い構成・カミラと同じ考え方で強さはいちばん上
-  alvin: { name: 'アルヴィン', monsters: [SOR, GAU, KAL], deckStyle: 'strong', ai: 'hunter', scale: 1.2, winRate: 100 },
+  alvin: { name: 'アルヴィン', monsters: [SOR, GAU, KAL], deckStyle: 'strong', ai: 'hunter', skill: 'A', scale: 1.2, winRate: 100 },
 };
 
 /** 一般の出場者（名刺図鑑には載せない。名前と顔だけ。顔は src/ui/components/opponentFace.ts の gen-〈名前〉） */
@@ -174,14 +179,15 @@ function bracketTournament(
     bracket: {
       regulars: regulars.map((id) => {
         const r = REGULARS[id];
-        return { id: `reg-${id}`, name: r.name, monsters: r.monsters, lifeScale: round2(scale * r.scale), deckStyle: r.deckStyle, ai: r.ai, winRate: r.winRate };
+        return { id: `reg-${id}`, name: r.name, monsters: r.monsters, lifeScale: round2(scale * r.scale), deckStyle: r.deckStyle, ai: r.ai, skill: r.skill, winRate: r.winRate };
       }),
-      pool: GENERAL[group].map((g) => ({ ...g, lifeScale: round2(scale * GENERAL_SCALE) })),
+      // 一般の出場者の腕前（2026-10-30 指示書 Z）：C・B ランクの大会は B、A・S は A
+      pool: GENERAL[group].map((g) => ({ ...g, lifeScale: round2(scale * GENERAL_SCALE), skill: group === 'cb' ? 'B' : 'A' })),
       generalCount,
       finalist: finalist ? `reg-${finalist}` : null,
     },
     // C でシエナがいないあいだは、D ランクの相手のゴードン（かつての大会の常連）が C の一般の出場者の強さで出る（2026-10-27 ユーザー指示）
-    ...(rank === 'C' ? { siennaLeft: { replace: 'reg-sienna', with: { id: 'c-gordon', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: round2(scale * GENERAL_SCALE) } } } : {}),
+    ...(rank === 'C' ? { siennaLeft: { replace: 'reg-sienna', with: { id: 'c-gordon', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: round2(scale * GENERAL_SCALE), skill: 'B' } } } : {}),
     rewards: {
       participationCoins: participation,
       // パックの解放・カードの景品は C 以上では付けない（決まっていないため）
@@ -202,13 +208,14 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     description: 'はじめての公式大会（内容は仮）。4人の総当たりで1位なら優勝。',
     participants: 4,
     // 相手の名前は人物（src/data/people.ts。2026-10-27 決定）。編成・強さは仮のまま
+    // 腕前（2026-10-30 指示書 Z）：E の大会の相手は C
     rounds: [
-      { id: 'e-1', name: 'ノエル', monsters: [PUK, SOR, MYU], lifeScale: 0.6 },
-      { id: 'e-2', name: 'ヴィクトル', monsters: [GAU, LAZ, PUK], lifeScale: 0.65 },
-      { id: 'e-3', name: 'シエナ', monsters: [SOR, MYU, PUK], lifeScale: 0.7 },
+      { id: 'e-1', name: 'ノエル', monsters: [PUK, SOR, MYU], lifeScale: 0.6, skill: 'C' },
+      { id: 'e-2', name: 'ヴィクトル', monsters: [GAU, LAZ, PUK], lifeScale: 0.65, skill: 'C' },
+      { id: 'e-3', name: 'シエナ', monsters: [SOR, MYU, PUK], lifeScale: 0.7, skill: 'C' },
     ],
     // シエナがいないあいだは、一般の出場者のマリーが E の強さで出る
-    siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: 0.7, face: 'gen-marie' } },
+    siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: 0.7, face: 'gen-marie', skill: 'C' } },
     rewards: {
       participationCoins: 20,
       firstWin: {
@@ -230,10 +237,11 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     requiredRank: 'D',
     description: 'Eランク優勝者向けの大会（内容は仮）。4人の総当たりで1位なら優勝。',
     participants: 4,
+    // 腕前（2026-10-30 指示書 Z）：D の大会の相手は C〜B（はじめの2人 C・ゴードン B）
     rounds: [
-      { id: 'd-1', name: 'ダリオ', monsters: [MYU, KAL, PUK], lifeScale: 1 },
-      { id: 'd-2', name: 'イザベラ', monsters: [SOR, MYU, NOB], lifeScale: 1.05 },
-      { id: 'd-3', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: 1.1 },
+      { id: 'd-1', name: 'ダリオ', monsters: [MYU, KAL, PUK], lifeScale: 1, skill: 'C' },
+      { id: 'd-2', name: 'イザベラ', monsters: [SOR, MYU, NOB], lifeScale: 1.05, skill: 'C' },
+      { id: 'd-3', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: 1.1, skill: 'B' },
     ],
     rewards: {
       participationCoins: 30,
