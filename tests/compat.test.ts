@@ -60,8 +60,9 @@ describe('改名前のセーブを新しい名前のアプリで読む', () => {
     // ソラモ14技の初期配布のデッキに替わる（旧ソラモの技は削除）
     expect(s.collection).toMatchObject(OLD_SAVE.collection);
     expect(s.collection['skl-soramo-01']).toBeUndefined();
-    // 初期デッキ（2026-10-26 改訂）の枚数：ソラモの 02 は初期配布2枚＋3体目の【仮】1枚、ラズックのひっかきは正式の初期配布で3枚
-    expect(s.collection['skl-soramo14-02']).toBe(3);
+    // 初期デッキ（2026-10-26 改訂）の枚数：ソラモの 02 は初期配布2枚（2026-10-30 指示書 V から3体目はプカリムなので、ソラモの【仮】の1枚は無い）、
+    // ラズックのひっかきは正式の初期配布で3枚
+    expect(s.collection['skl-soramo14-02']).toBe(2);
     expect(s.collection['skl-lazuck-01']).toBe(3);
     expect(s.deck).toEqual(createStarterDeck());
     expect(s.tournaments).toEqual(OLD_SAVE.tournaments);

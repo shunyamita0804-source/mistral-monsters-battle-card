@@ -16,10 +16,10 @@ export const DECK_RULES = {
   /** 同じカードの上限枚数（PS版：3枚。docs/battle-rules.md） */
   maxCopies: 3,
   /**
-   * 同じモンスターを2体以上入れられるか（仮）。
-   * 2026-10-23 ユーザー指示「技の発動を見るため、仮のカードはすべてソラモに」で、ソラモ3体のデッキを組めるよう「可」にした（正式な決まりは未定）
+   * 同じモンスターを2体以上入れられるか。
+   * 2026-10-23 は仮で「可」（ソラモ3体のデッキを組めるよう）。2026-10-30 指示書 V（ユーザー決定・正式）：同じモンスターは1つのデッキに1体まで
    */
-  allowDuplicateMonsters: true,
+  allowDuplicateMonsters: false,
 } as const;
 
 export const BATTLE_RULES = {

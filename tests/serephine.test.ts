@@ -285,7 +285,8 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
         ['mon-myurol', 'mon-kalshell', 'mon-soramo'],
         ['mon-kalshell', 'mon-myurol', 'mon-nobiton'],
       ],
-      guardianTeam: ['mon-kalshell', 'mon-myurol', 'mon-kalshell'],
+      // 2026-10-30 指示書 V（同じモンスターは1体まで）：2体目のカルシェルをノビトンに
+      guardianTeam: ['mon-kalshell', 'mon-myurol', 'mon-nobiton'],
     });
   });
 

@@ -1,17 +1,18 @@
 import { cardCatalog, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
 import { GAUUL_STARTER } from '../../data/gauul.ts';
 import { getStarterDeck, STARTER_TEMP_SUPPORTS, type StarterDeckKey } from '../../data/introV2.ts';
-import { LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
+import { LAZUCK_MONSTER_ID, LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
 import { KALSHELL_STARTER } from '../../data/kalshell.ts';
 import { MYUROL_STARTER } from '../../data/myurol.ts';
 import { NOBITON_STARTER } from '../../data/nobiton.ts';
-import { SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
+import { SORAMO_MONSTER_ID, SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
 import { skillCategory, skillValue, type SkillCard } from '../cards/cardTypes.ts';
 import type { DeckStyle, OpponentDefinition } from '../../data/tournaments.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
+import type { MessageKey } from '../../i18n/messages/index.ts';
 
 export interface Deck {
   readonly monsters: readonly string[];
@@ -132,6 +133,19 @@ export function isDeckValid(deck: Deck, collection?: CardCounts): boolean {
 }
 
 /**
+ * 同じモンスターが2体以上入っているデッキか（2026-10-30 指示書 V：同じモンスターは1つのデッキに1体まで）。
+ * 前のセーブのデッキはそのまま読み込み、対戦・ダンジョン・大会の前に、デッキを組み直すよう案内する（deckInvalidText）
+ */
+export function hasDuplicateMonsters(deck: Deck): boolean {
+  return !DECK_RULES.allowDuplicateMonsters && new Set(deck.monsters).size !== deck.monsters.length;
+}
+
+/** デッキが使えないときの案内（同じモンスターが2体以上なら「1体までになりました」、ほかは key の文） */
+export function deckInvalidText(deck: Deck, key: MessageKey): string {
+  return hasDuplicateMonsters(deck) ? t('deck.duplicateGuide') : t(key);
+}
+
+/**
  * 新しく始めたときのデッキ（仮）：仮モンスターA〜C と、それぞれの技1〜6 を3枚ずつ（54枚）＋仮サポート6枚＝60枚。
  * 同じカードは3枚までなので、技だけでは60枚に届かない分をサポートで埋める。
  */
@@ -178,6 +192,8 @@ export function createSoramoTestDeck(): Deck {
  * 正式なスターターデッキの内訳は未承認（これは技を試すための仮の組み合わせ）
  */
 const TEST_EXTRA_COPY_UPTO = 8;
+/** 前の仮の編成（ソラモ・ラズック・ソラモ。2026-10-30 指示書 V で TEST_TEAM を組みかえた）。前のセーブのデッキを見分けるためだけに使う */
+const LEGACY_TEST_TEAM: readonly string[] = [SORAMO_MONSTER_ID, LAZUCK_MONSTER_ID, SORAMO_MONSTER_ID];
 export function createMixedTestDeck(): Deck {
   const both = [SORAMO_OLD_SKILL_IDS, LAZUCK_OLD16_IDS];
   const skills: string[] = both.flat();
@@ -187,7 +203,7 @@ export function createMixedTestDeck(): Deck {
   for (const card of SUPPORTS) {
     for (let i = 0; i < TEST_SORAMO_SUPPORT_COPIES && skills.length < DECK_RULES.skillCount; i++) skills.push(card.id);
   }
-  return { monsters: [...TEST_TEAM], skills };
+  return { monsters: [...LEGACY_TEST_TEAM], skills };
 }
 
 /** 初期デッキの3体目の技の枚数・サポートの枚数（2026-10-25 ユーザー指示：3体分の技45枚＋サポート15枚＝60枚。ソラモ16枚・ラズック16枚） */
@@ -200,6 +216,7 @@ export const STARTER_SUPPORT_COUNT = 15;
  * - ラズック16枚：正式（2026-10-26。src/data/lazuck.ts の LAZUCK_STARTER）
  * - 3体目の技13枚・サポート15枚：**未確定**。3体目は決まっていないので、それまでの仮の編成（ソラモ・ラズック・ソラモ）の3体目（ソラモ）の技を【仮】で入れる：
  *   初期配布に入っていないソラモの技を1枚ずつ → 足りない分は初期配布の技をもう1枚ずつ（同じカード3枚まで）。サポートは仮サポート1〜6を順に3枚まで（15枚）
+ * - 2026-10-30 指示書 V（同じモンスターは1体まで）：仮の編成の3体目をプカリムにしたので、3体目の技13枚はプカリムの技（TEST_TEAM[2]）
  */
 export function createStarterDeck(): Deck {
   const soramo = SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
@@ -333,11 +350,41 @@ function styleScore(style: Exclude<DeckStyle, 'balanced'>, skill: SkillCard): nu
   }
 }
 
+/** ボスのデッキで、切り札の技を入れる枚数（2026-10-30 指示書 V） */
+export const ACE_SKILL_COPIES = 2;
+
 /**
- * 大会の相手のデッキ（組み方 deckStyle が無い・balanced なら今までの buildAutoDeck）。
+ * ボスのデッキ（2026-10-30 指示書 V「切り札の技を2枚ずつ」）：仮サポート（buildAutoDeck と同じ）＋切り札の技14種を2枚ずつ。
+ * 残りは今の作り方（buildAutoDeck）と同じく、ほかのモンスターの技を並びの順に1枚ずつ入れていく（切り札の技は2枚のまま）
+ */
+export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
+  const aceSkills = skillsOf(ace).map((s) => s.id);
+  const skills: string[] = NPC_SUPPORTS.flatMap((id) => Array<string>(NPC_SUPPORT_COPIES).fill(id));
+  for (const id of aceSkills) for (let n = 0; n < ACE_SKILL_COPIES && skills.length < DECK_RULES.skillCount; n++) skills.push(id);
+  const counts: Record<string, number> = countCards(skills);
+  const pool = monsters.filter((m) => m !== ace).flatMap((m) => skillsOf(m).map((s) => s.id));
+  for (let i = 0; skills.length < DECK_RULES.skillCount && i < pool.length * DECK_RULES.maxCopies; i++) {
+    const id = pool[i % pool.length] as string;
+    if ((counts[id] ?? 0) < DECK_RULES.maxCopies) {
+      counts[id] = (counts[id] ?? 0) + 1;
+      skills.push(id);
+    }
+  }
+  for (const card of SUPPORTS) {
+    while (skills.length < DECK_RULES.skillCount && (counts[card.id] ?? 0) < DECK_RULES.maxCopies) {
+      counts[card.id] = (counts[card.id] ?? 0) + 1;
+      skills.push(card.id);
+    }
+  }
+  return { monsters, skills };
+}
+
+/**
+ * 大会の相手のデッキ（組み方 deckStyle が無い・balanced なら今までの buildAutoDeck。切り札 ace のあるボスは buildAceDeck）。
  * 組み方があれば、仮サポートを少し入れ、適合技を点数の高い順に上限枚数まで入れて60枚にする。足りなければ点数の低い技・サポートで埋める
  */
-export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle'>): Deck {
+export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle' | 'ace'>): Deck {
+  if (opponent.ace) return buildAceDeck(opponent.monsters, opponent.ace);
   const style = opponent.deckStyle;
   if (!style || style === 'balanced') return buildAutoDeck(opponent.monsters);
   const pool = [...new Map(opponent.monsters.flatMap((m) => skillsOf(m)).map((k) => [k.id, k])).values()];

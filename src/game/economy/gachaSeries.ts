@@ -80,9 +80,11 @@ export function skillWeights(lineup: SeriesLineup): { readonly cardId: string; r
 
 /**
  * パック1つを開けた中身（開ける順に並べる）。
- * 5枚それぞれ技を重みで選び、1パックに monsterRate の確率で5枚のうち1枚をモンスターカードに替える
+ * 5枚それぞれ技を重みで選び、1パックに monsterRate の確率で5枚のうち1枚をモンスターカードに替える。
+ * 2026-10-30 指示書 V（ユーザー決定）：モンスターカードは「まだ持っていないとき」だけ（ownsMonster が true なら、モンスターの当たりの抽選をしない。
+ * 技14種だけ）。天井なし。この先の「大会の優勝で開き、ガチャで当てるしかないモンスター」も同じ決まりで動く
  */
-export function drawSeriesPack(series: GachaSeries, seed: number): { cards: string[]; seed: number } {
+export function drawSeriesPack(series: GachaSeries, seed: number, ownsMonster = false): { cards: string[]; seed: number } {
   const lineup = seriesLineup(series);
   const weights = skillWeights(lineup);
   const total = weights.reduce((s, w) => s + w.weight, 0);
@@ -105,7 +107,7 @@ export function drawSeriesPack(series: GachaSeries, seed: number): { cards: stri
     }
     if (picked) cards.push(picked);
   }
-  if (roll() < GACHA.monsterRate) {
+  if (!ownsMonster && roll() < GACHA.monsterRate) {
     const slot = Math.min(cards.length - 1, Math.floor(roll() * cards.length));
     cards[slot] = lineup.monsterId;
   }
@@ -135,7 +137,8 @@ export function purchaseSeriesPack(save: SaveData, seriesId: string, transaction
   // まだ並んでいないシリーズ（そのモンスターのカードをまだ持っていない）は買えない
   if (!series || !availableGachaSeriesFor(save).includes(series)) return { status: 'error', save, message: t('gacha.error.noPack') };
   if (save.coins < GACHA.price) return { status: 'error', save, message: t('gacha.error.coins') };
-  const { cards } = drawSeriesPack(series, seed);
+  // モンスターカードは、そのモンスターのカードを1枚も持っていないときだけ出る（2026-10-30 指示書 V）
+  const { cards } = drawSeriesPack(series, seed, (save.collection[series.monsterId] ?? 0) > 0);
   let next = addCards(
     { ...save, coins: save.coins - GACHA.price },
     cards.map((cardId) => ({ cardId, count: 1 })),

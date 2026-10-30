@@ -53,7 +53,8 @@ describe('セーブデータ', () => {
     const save = normalizeSave(raw);
     if (!save) throw new Error('save');
     // version 2 で仮モンスターのデッキに直り、version 6（2026-10-23）でテスト用のソラモのデッキ、version 7 でソラモとラズックのデッキに替わる
-    expect(save.deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-soramo']);
+    // version 8（2026-10-26）でそのデッキは初期デッキ（createStarterDeck）に替わる。2026-10-30 指示書 V から初期デッキの3体目はプカリム
+    expect(save.deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-pukarim']);
     expect(validateDeck(save.deck, save.collection)).toEqual([]);
     expect(save.collection['mon-a']).toBe(1);
     // 持っていた枚数は減らさない

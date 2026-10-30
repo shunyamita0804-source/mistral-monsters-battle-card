@@ -12,7 +12,7 @@ import { cardCatalog, getMonster } from '../../data/cards.ts';
 import { createCardView } from '../components/cardView.ts';
 import { openCardDetail } from '../components/cardDetail.ts';
 import { talkFaceVisual } from '../components/dungeonPeopleArt.ts';
-import { isDeckValid } from '../../game/deck/deck.ts';
+import { deckInvalidText, isDeckValid } from '../../game/deck/deck.ts';
 import {
   changeFloor,
   defeatEnemy,
@@ -2523,7 +2523,7 @@ export class WorldView {
     const opponent = ENCOUNTERS['enc-practice'];
     if (!opponent) return;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
-      this.#message(t('world.deckInvalidBattle'));
+      this.#message(deckInvalidText(store.save.deck, 'world.deckInvalidBattle'));
       return;
     }
     this.#busy = true;
@@ -2551,7 +2551,7 @@ export class WorldView {
   #startPete(): void {
     const store = this.#store;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
-      this.#message(t('world.deckInvalidBattle'));
+      this.#message(deckInvalidText(store.save.deck, 'world.deckInvalidBattle'));
       return;
     }
     this.#busy = true;
@@ -2790,7 +2790,7 @@ export class WorldView {
     if (!opponent) return;
     const store = this.#store;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
-      this.#message(t('world.deckInvalidBattle'));
+      this.#message(deckInvalidText(store.save.deck, 'world.deckInvalidBattle'));
       return;
     }
     this.#busy = true;
@@ -2956,7 +2956,7 @@ export class WorldView {
       title: t('world.menu'),
       body: [
         h('p', { class: 'modal__text', text: t('world.menuStatus', { rank: save.rank, coins: coins(save.coins) }) }),
-        h('p', { class: 'modal__text', text: t(deckOk ? 'world.menuDeckOk' : 'world.menuDeckNg') }),
+        h('p', { class: 'modal__text', text: deckOk ? t('world.menuDeckOk') : deckInvalidText(save.deck, 'world.menuDeckNg') }),
         fragments > 0 ? h('p', { class: 'modal__text', text: t('world.menuFragments', { n: fragments, total: FRAGMENT_TOTAL }) }) : null,
         h('p', { class: 'modal__text modal__text--sub', text: t(this.#store.lastSaveOk ? 'world.autoSave' : 'world.autoSaveFailed') }),
       ],

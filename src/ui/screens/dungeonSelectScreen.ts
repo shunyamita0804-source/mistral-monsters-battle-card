@@ -4,7 +4,7 @@ import firstClearSealArt from '@assets/images/ui/reward/first_clear_seal.webp';
 import { DUNGEONS } from '../../data/dungeons.ts';
 import { isRunDungeon } from '../../data/dungeonRun.ts';
 import { DUNGEON_SPOTS, TOWN_SPOT, type WorldMapSpot } from '../../data/worldMap.ts';
-import { isDeckValid } from '../../game/deck/deck.ts';
+import { deckInvalidText, isDeckValid } from '../../game/deck/deck.ts';
 import { startRun } from '../../game/dungeon/run.ts';
 import { dungeonRecord, startDungeon } from '../../game/progress/dungeon.ts';
 import { randomSeed } from '../../game/rng.ts';
@@ -70,7 +70,7 @@ export const dungeonSelectScreen: ScreenDefinition = {
         return;
       }
       if (!isDeckValid(store.save.deck, store.save.collection)) {
-        messageModal(element, t('world.dungeonSelect.deckInvalid'));
+        messageModal(element, deckInvalidText(store.save.deck, 'world.dungeonSelect.deckInvalid'));
         return;
       }
       depart(dungeonId);

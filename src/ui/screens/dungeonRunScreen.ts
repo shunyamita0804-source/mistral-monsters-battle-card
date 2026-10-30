@@ -9,7 +9,7 @@ import { dungeonMoney } from '../../data/economy.ts';
 import { getItem, ITEM_RULES, ITEMS, type ItemDefinition, type ItemId } from '../../data/items.ts';
 import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts';
 import type { OpponentDefinition } from '../../data/tournaments.ts';
-import { isDeckValid } from '../../game/deck/deck.ts';
+import { deckInvalidText, isDeckValid } from '../../game/deck/deck.ts';
 import { floorDecorations } from '../../game/dungeon/decor.ts';
 import { isWalkableTile, isWindTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
@@ -197,6 +197,14 @@ const WIND_CLASS: Readonly<Record<string, string>> = { '>': 'r', '<': 'l', '^': 
 const WATER_EDGES = [['n', 0, -1], ['s', 0, 1], ['w', -1, 0], ['e', 1, 0]] as const;
 /** 水路のとなりが床（水路でも壁でもない）か */
 const isShore = (ch: string | undefined): boolean => ch !== undefined && ch !== '#' && ch !== 'w';
+
+/**
+ * 地図の上に立つもの（人・宝箱・スイッチ・ボスのしるし・立てる飾り・扉）の重なりの順（2026-10-30 指示書 V）：画面の上の行から下の行の順。
+ * 前は置いた順だったので、人のすぐ上のマスの宝箱が人の頭に重なっていた。同じ行では飾りより人や物を手前に
+ */
+const rowZ = (y: number, front: boolean): string => String(100 + y * 2 + (front ? 1 : 0));
+/** 床に置く平らな飾り（行の順にせず、いつも人や物より奥） */
+const FLAT_DECOR: readonly string[] = ['crack', 'feather', 'rug', 'emblem', 'fog', 'leaves', 'bridge', 'rail', 'slab'];
 
 const KEY_DIR: Readonly<Record<string, Direction>> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
 
@@ -467,6 +475,8 @@ class DungeonRunView {
         // 4マスで割り切れない大きさの絵（新しい5つのダンジョン）用：マスの位置そのまま
         el.style.setProperty('--ax', `${-x * TILE}px`);
         el.style.setProperty('--ay', `${-y * TILE}px`);
+        // 扉は上のマスにはみ出して立てるので、人や物と同じく行の順に重ねる
+        if (ch === 'D') el.style.zIndex = rowZ(y, false);
         this.#tiles.push(el);
         frag.append(el);
       }
@@ -476,6 +486,7 @@ class DungeonRunView {
       const el = h('div', { class: `drun__decor drun__decor--${d.kind}-${d.variant + 1}`, attrs: { 'aria-hidden': 'true' } });
       el.style.left = `${d.x * TILE}px`;
       el.style.top = `${d.y * TILE}px`;
+      if (!FLAT_DECOR.includes(d.kind)) el.style.zIndex = rowZ(d.y, false);
       frag.append(el);
       return { i: d.y * f.width + d.x, el };
     });
@@ -486,6 +497,7 @@ class DungeonRunView {
       if (e.kind === 'npc') this.#battlerLook(el, e.id);
       el.style.left = `${e.x * TILE}px`;
       el.style.top = `${e.y * TILE}px`;
+      el.style.zIndex = rowZ(e.y, true);
       this.#entityEls.set(e.id, el);
       frag.append(el);
     }
@@ -819,13 +831,15 @@ class DungeonRunView {
     el.style.height = `${GUARDIAN_H}px`;
     el.style.left = `${Math.round((spot.x + 0.5) * TILE - w / 2)}px`;
     el.style.top = `${Math.round(spot.y * TILE + TILE * 0.82 - GUARDIAN_H)}px`;
+    // 現れた番人は、行の順に重ねた人や物（rowZ）より手前に
+    el.style.zIndex = '1000';
     this.#world.append(el);
   }
 
   #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear'): void {
     const store = this.#store;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
-      this.#message(t('world.deckInvalidBattle'));
+      this.#message(deckInvalidText(store.save.deck, 'world.deckInvalidBattle'));
       return;
     }
     this.#busy = true;
@@ -1155,6 +1169,7 @@ class DungeonRunView {
     for (const el of [ghost, fx]) {
       el.style.left = `${e.x * TILE}px`;
       el.style.top = `${e.y * TILE}px`;
+      el.style.zIndex = rowZ(e.y, true);
     }
     this.#world.append(ghost, fx);
     [fxLeave2, fxLeave3].forEach((src, i) => setTimeout(() => (fx.src = src), (i + 1) * LEAVE_FRAME_MS));

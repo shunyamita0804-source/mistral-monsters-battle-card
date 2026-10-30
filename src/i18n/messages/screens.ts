@@ -255,6 +255,13 @@ export const SCREENS = {
   // デッキの決まりの確認（src/game/deck/deck.ts）
   'deck.issue.monsterCount': { ja: 'モンスターは{n}体必要です（現在{current}体）', en: 'You need {n} monsters (now {current})' },
   'deck.issue.duplicateMonster': { ja: '同じモンスターは1体までです', en: 'Only 1 of each monster' },
+  // 2026-10-30 指示書 V：同じモンスターは1つのデッキに1体まで
+  'deck.duplicateMonster': { ja: '{name}はもうデッキにいます（同じモンスターは1体まで）', en: '{name} is already in the deck (1 of each monster)' },
+  'deck.inDeck': { ja: 'デッキにいる', en: 'In deck' },
+  'deck.duplicateGuide': {
+    ja: '同じモンスターは1つのデッキに1体までになりました。家の机でデッキを組み直してください。',
+    en: 'Each monster can now be in a deck only once. Please rebuild your deck at the desk at home.',
+  },
   'deck.issue.unknownCard': { ja: '存在しないカードです: {id}', en: 'Unknown card: {id}' },
   'deck.issue.notMonster': { ja: '{name} はモンスターではありません', en: '{name} is not a monster' },
   'deck.issue.deckCount': {
@@ -302,7 +309,10 @@ export const SCREENS = {
 
   // ガチャ
   'gacha.ratesTitle': { ja: '提供割合', en: 'Pull Rates' },
-  'gacha.ratesMonster': { ja: 'モンスターカード：1パックに{rate}％', en: 'Monster card: {rate}% per pack' },
+  'gacha.ratesMonster': {
+    ja: 'モンスターカード：まだ持っていないときだけ、1パックに{rate}％',
+    en: "Monster card: {rate}% per pack, only while you don't have it yet",
+  },
   'gacha.ratesSkills': { ja: '技カードは、技によって出やすさがちがいます', en: 'Some skill cards are easier to get than others' },
   'gacha.notEnough': {
     ja: '所持金が足りません（{price}G 必要）。\nダンジョンや大会で稼ぎましょう。',

@@ -17,6 +17,16 @@ import {
 import { addCards, createNewGameSave, createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
 import { PETE_BEATEN_FLAG, winPete } from '../src/game/story/pete.ts';
 
+/**
+ * プカリムのカードを持っていない createNewSave（2026-10-30 指示書 V で仮の編成 TEST_TEAM の3体目がプカリムになり、
+ * createNewSave の手持ちにプカリムが入るようになったため。「最初から」の本当のセーブ createNewGameSave はカードを持たない）
+ */
+const newSaveWithoutPukarim = (): SaveData => {
+  const s = createNewSave();
+  const { 'mon-pukarim': _p, ...collection } = s.collection;
+  return { ...s, collection };
+};
+
 const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
@@ -141,7 +151,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
   });
 
   it('プカリムはモンスターカード（ピートに勝つと受け取る）を手に入れたあとだけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
-    const before = { ...createNewSave(), coins: 150 };
+    const before = { ...newSaveWithoutPukarim(), coins: 150 };
     expect(availableGachaSeriesFor(before).map((s) => s.id)).not.toContain('pukarim');
     expect(purchaseSeriesPack(before, 'pukarim', 'tx-p', 3).status).toBe('error');
     // ピートに勝った記録だけ（カードなし）では並ばない（2026-10-30 指示書 K）
@@ -247,7 +257,7 @@ describe('新しく並んだシリーズの NEW の印（2026-10-29 夜）', () 
   if (!PUKARIM) throw new Error('pukarim');
 
   it('並んだばかりのシリーズだけ NEW。最初から並ぶシリーズ・まだ並ばないシリーズには出さない', () => {
-    const base = createNewSave();
+    const base = newSaveWithoutPukarim();
     expect(isNewGachaSeries(addCards(base, [{ cardId: 'mon-pukarim', count: 1 }]), PUKARIM)).toBe(true);
     expect(isNewGachaSeries(base, PUKARIM)).toBe(false);
     expect(isNewGachaSeries(addCards(base, [{ cardId: 'mon-pukarim', count: 1 }]), SORAMO)).toBe(false);

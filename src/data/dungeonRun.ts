@@ -78,7 +78,7 @@ export interface RunDungeonConfig {
   readonly guardianRate: number;
   /** 負けられる回数 */
   readonly maxLosses: number;
-  /** 見えない番人の強さ（階の強さに足す） */
+  /** 見えない番人の強さ（階の強さに足す。2026-10-30 指示書 V から、弱めるためのマイナスもある） */
   readonly guardianLifeBonus: number;
   /** バトラーの編成（バトラーの番号で順に使う） */
   readonly npcTeams: readonly (readonly string[])[];
@@ -87,13 +87,21 @@ export interface RunDungeonConfig {
   readonly bossId: string;
 }
 
+/**
+ * 2026-10-30 指示書 V（同じモンスターは1つのデッキに1体まで）：見えない番人の2体目の同じモンスターを入れかえた（そのダンジョンらしさを残す）。
+ * 遺跡・氷 カルシェル・ノビトン・カルシェル → カルシェル・ノビトン・ミュロル（遺跡は氷の洞窟と同じ編成のまま）、水 カルシェル・ミュロル・カルシェル → カルシェル・ミュロル・ノビトン、
+ * 火 ガウル・ガウル・ラズック → ガウル・ラズック・ノビトン、
+ * 機械 ラズック・ノビトン・ラズック → ラズック・ノビトン・ガウル（強さの比べは docs/deck-gacha-boss-v-20261030.md）。
+ * 3体ともちがうと番人が強くなったので（最後の階で、最初の手持ち3箱 × 200回）、番人のライフ（guardianLifeBonus）で前の勝つ割合に近づけた：
+ * 遺跡・氷 −0.2（36.8％ → 22.3％ → 31.8％。±3 に入る値はなく、いちばん近い値）、火 −0.2（24.7％ → 18.5％ → 26.0％）、機械 −0.3（22.8％ → 17.3％ → 23.2％）。水は 26.2％ → 24.2％ でそのまま
+ */
 /** 2026-10-27 指示書：ふつうのダンジョンは最大5階。強さは 森 ＜ 水 ＜ 氷・遺跡 ＜ 火 ＜ 機械 ＜ 聖域（すべて仮。遺跡は 2026-10-29 に氷の洞窟と同じ段へ） */
 export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   // 太古の遺跡（C ランク。2026-10-29 ジオルの最終で初期のダンジョンから外した）：地下4階・仕掛けなし。
   // 強さ・バトラーと見えない番人の編成は氷の洞窟と同じ段（プカリムを使うのは精霊の森のバトラーだけ）
   'dungeon-01': {
     floors: 4, gimmick: 'none', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, KAL], bossId: 'enc-b3-boss',
+    guardianLifeBonus: -0.2, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, MYU], bossId: 'enc-b3-boss',
   },
   // 精霊の森（最初から。2026-10-29 から初期のダンジョンはここだけ）：固定のマップをやめて、ランダム生成（2026-10-27）
   'dungeon-02': {
@@ -103,7 +111,7 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   // 水の神殿（D ランク）：水路
   'dungeon-03': {
     floors: 4, gimmick: 'water', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, KAL], bossId: 'enc-water-boss',
+    guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, NOB], bossId: 'enc-water-boss',
   },
   // 風の渓谷（D ランク・2026-10-30 指示書 U。水の神殿の次に並べる）：強い風のマス。強さは水の神殿と同じ段（地下4階・floorLife 0.8〜1.1・見える範囲 1・負けられる回数 3）。
   // バトラー・見えない番人の編成は Claude の仮（空を飛ぶ・身軽なモンスター：ソラモ・ガウル・プカリム。ツムジは使わない〔ボスの切り札〕）
@@ -114,17 +122,17 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
   // 氷の洞窟（C ランク）：すべる床
   'dungeon-04': {
     floors: 4, gimmick: 'ice', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, KAL], bossId: 'enc-ice-boss',
+    guardianLifeBonus: -0.2, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, MYU], bossId: 'enc-ice-boss',
   },
   // 炎の火山（B ランク）：見える範囲が1マス広い（2マス）・見えない番人が出やすい（1.5倍）
   'dungeon-05': {
     floors: 5, gimmick: 'lava', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 2, guardianRate: 0.45, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[GAU, LAZ, NOB], [LAZ, GAU, SOR]], guardianTeam: [GAU, GAU, LAZ], bossId: 'enc-fire-boss',
+    guardianLifeBonus: -0.2, npcTeams: [[GAU, LAZ, NOB], [LAZ, GAU, SOR]], guardianTeam: [GAU, LAZ, NOB], bossId: 'enc-fire-boss',
   },
   // 機械の塔（A ランク）：スイッチで開く扉
   'dungeon-06': {
     floors: 5, gimmick: 'switch', unlockRank: 'A', floorLife: [1.1, 1.2, 1.3, 1.4, 1.5], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[NOB, LAZ, KAL], [LAZ, NOB, GAU]], guardianTeam: [LAZ, NOB, LAZ], bossId: 'enc-machine-boss',
+    guardianLifeBonus: -0.3, npcTeams: [[NOB, LAZ, KAL], [LAZ, NOB, GAU]], guardianTeam: [LAZ, NOB, GAU], bossId: 'enc-machine-boss',
   },
   // 天の聖域（S ランク）：見えない番人が強く、2回負けると戻される
   'dungeon-07': {

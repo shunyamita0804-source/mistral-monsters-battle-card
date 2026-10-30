@@ -50,14 +50,20 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
   it('強さは 森 ＜ 水 ＜ 氷・遺跡 ＜ 火 ＜ 機械 ＜ 聖域（最後の階・ボス）', () => {
     // 太古の遺跡は 2026-10-29 から氷の洞窟と同じ段（階ごとの強さが同じ）
     expect(runConfig('dungeon-01').floorLife).toEqual(runConfig('dungeon-04').floorLife);
-    expect(runBossOpponent('dungeon-01').lifeScale).toBe(1.2);
     const ids = ['dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
     const last = ids.map((id) => runConfig(id).floorLife.at(-1) ?? 0);
-    const boss = ids.map((id) => runBossOpponent(id).lifeScale);
-    for (let i = 1; i < ids.length; i++) {
-      expect(last[i]).toBeGreaterThan(last[i - 1] as number);
-      expect(boss[i]).toBeGreaterThan(boss[i - 1] as number);
-    }
+    for (let i = 1; i < ids.length; i++) expect(last[i]).toBeGreaterThan(last[i - 1] as number);
+    // ボスの lifeScale：2026-10-30 指示書 V で切り札の技を2枚ずつにしたあと、直す前の勝つ割合に合わせ直した（切り札がボスごとにちがうので、
+    // lifeScale の大きさの順は強さの順ではなくなった。強さは勝つ割合で比べる：tests/bossPlaytest.test.ts・docs/deck-gacha-boss-v-20261030.md）
+    expect(Object.fromEntries(['dungeon-01', ...ids].map((id) => [id, runBossOpponent(id).lifeScale]))).toEqual({
+      'dungeon-01': 1.05,
+      'dungeon-02': 0.7,
+      'dungeon-03': 1.2,
+      'dungeon-04': 1.6,
+      'dungeon-05': 1.75,
+      'dungeon-06': 1.2,
+      'dungeon-07': 1.75,
+    });
   });
 
   it('ボス：初回クリアはボスのモンスターカード（真ん中のモンスター）＋そのモンスターの技カード', () => {

@@ -38,9 +38,9 @@ describe('デッキ構成チェック（仮ルール）', () => {
     const codes = (d: Parameters<typeof validateDeck>[0]) => validateDeck(d).map((i) => i.code);
     expect(codes({ ...deck, skills: deck.skills.slice(1) })).toContain('skillCount');
     expect(codes({ ...deck, monsters: deck.monsters.slice(1) })).toContain('monsterCount');
-    // 同じモンスターの重複は、2026-10-23 からテスト用に「可」（ソラモ3体のデッキのため。DECK_RULES.allowDuplicateMonsters）
-    expect(DECK_RULES.allowDuplicateMonsters).toBe(true);
-    expect(codes({ ...deck, monsters: [monsterId('a'), monsterId('a'), monsterId('b')] })).not.toContain('duplicateMonster');
+    // 同じモンスターの重複は、2026-10-23 からテスト用に「可」だった。2026-10-30 指示書 V（ユーザー決定・正式）で1つのデッキに1体まで
+    expect(DECK_RULES.allowDuplicateMonsters).toBe(false);
+    expect(codes({ ...deck, monsters: [monsterId('a'), monsterId('a'), monsterId('b')] })).toContain('duplicateMonster');
   });
 
   it('上限を超える同名カードと、適合しない技を検出する', () => {
