@@ -5,7 +5,7 @@ import { monthName } from '../../i18n/calendarText.ts';
 import { dungeonName } from '../../i18n/content.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { simulateBattle } from '../battle/simulate.ts';
-import { isDeckValid } from '../deck/deck.ts';
+import { deckInvalidText, isDeckValid } from '../deck/deck.ts';
 import { shuffle } from '../rng.ts';
 import {
   addCards,
@@ -57,7 +57,7 @@ export function entryCheck(save: SaveData, tournament: TournamentDefinition): { 
     });
     reasons.push(t('tournament.issue.boss', { names: names.join(t('common.listSeparator')) }));
   }
-  if (!isDeckValid(save.deck, save.collection)) reasons.push(t('tournament.issue.deck'));
+  if (!isDeckValid(save.deck, save.collection)) reasons.push(deckInvalidText(save.deck, 'tournament.issue.deck'));
   if (save.activeTournament && save.activeTournament.tournamentId !== tournament.id) {
     reasons.push(t('tournament.issue.other'));
   }

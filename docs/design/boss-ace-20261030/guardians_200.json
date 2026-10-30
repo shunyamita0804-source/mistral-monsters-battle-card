@@ -1,0 +1,106 @@
+[
+ {
+  "name": "太古の遺跡・氷の洞窟 番人（1.2）",
+  "before": [
+   "mon-kalshell",
+   "mon-nobiton",
+   "mon-kalshell"
+  ],
+  "after": [
+   "mon-kalshell",
+   "mon-nobiton",
+   "mon-myurol"
+  ],
+  "lifeScale": 1.2,
+  "beforeRate": 36.8,
+  "afterRate": 22.3,
+  "adjustedLifeScale": 1.0,
+  "adjustedRate": 31.8
+ },
+ {
+  "name": "水の神殿 番人（1.1）",
+  "before": [
+   "mon-kalshell",
+   "mon-myurol",
+   "mon-kalshell"
+  ],
+  "after": [
+   "mon-kalshell",
+   "mon-myurol",
+   "mon-nobiton"
+  ],
+  "lifeScale": 1.1,
+  "beforeRate": 26.2,
+  "afterRate": 24.2
+ },
+ {
+  "name": "火山 番人（1.4）",
+  "before": [
+   "mon-gauul",
+   "mon-gauul",
+   "mon-lazuck"
+  ],
+  "after": [
+   "mon-gauul",
+   "mon-lazuck",
+   "mon-nobiton"
+  ],
+  "lifeScale": 1.4,
+  "beforeRate": 24.7,
+  "afterRate": 18.5,
+  "adjustedLifeScale": 1.2,
+  "adjustedRate": 26.0
+ },
+ {
+  "name": "機械の塔 番人（1.5）",
+  "before": [
+   "mon-lazuck",
+   "mon-nobiton",
+   "mon-lazuck"
+  ],
+  "after": [
+   "mon-lazuck",
+   "mon-nobiton",
+   "mon-gauul"
+  ],
+  "lifeScale": 1.5,
+  "beforeRate": 22.8,
+  "afterRate": 17.3,
+  "adjustedLifeScale": 1.2,
+  "adjustedRate": 23.2
+ },
+ {
+  "name": "仮の編成 TEST_TEAM（練習 0.6）",
+  "before": [
+   "mon-soramo",
+   "mon-lazuck",
+   "mon-soramo"
+  ],
+  "after": [
+   "mon-soramo",
+   "mon-lazuck",
+   "mon-pukarim"
+  ],
+  "lifeScale": 0.6,
+  "beforeRate": 64,
+  "afterRate": 91.7,
+  "adjustedLifeScale": 0.65,
+  "adjustedRate": 71.3
+ },
+ {
+  "name": "仮の編成 TEST_TEAM_ALT（0.6）",
+  "before": [
+   "mon-lazuck",
+   "mon-soramo",
+   "mon-lazuck"
+  ],
+  "after": [
+   "mon-lazuck",
+   "mon-soramo",
+   "mon-pukarim"
+  ],
+  "lifeScale": 0.6,
+  "beforeRate": 70.5,
+  "afterRate": 89.8
+ }
+]

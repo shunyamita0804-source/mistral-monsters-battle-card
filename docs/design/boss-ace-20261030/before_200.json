@@ -1,0 +1,277 @@
+{
+ "games": 200,
+ "bosses": {
+  "enc-b3-boss": {
+   "name": "グラント",
+   "monsters": [
+    "mon-gauul",
+    "mon-geol",
+    "mon-lazuck"
+   ],
+   "ace": null,
+   "lifeScale": 1.2,
+   "rate": 15.833333333333332,
+   "byBox": {
+    "booster-1": {
+     "wins": 33,
+     "losses": 167,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 23,
+     "losses": 177,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 39,
+     "losses": 161,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-forest-boss": {
+   "name": "セラ",
+   "monsters": [
+    "mon-pukarim",
+    "mon-flune",
+    "mon-myurol"
+   ],
+   "ace": null,
+   "lifeScale": 0.75,
+   "rate": 54.333333333333336,
+   "byBox": {
+    "booster-1": {
+     "wins": 113,
+     "losses": 87,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 128,
+     "losses": 72,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 85,
+     "losses": 115,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-water-boss": {
+   "name": "ルシア",
+   "monsters": [
+    "mon-kalshell",
+    "mon-serephine",
+    "mon-myurol"
+   ],
+   "ace": null,
+   "lifeScale": 1.2,
+   "rate": 23.166666666666664,
+   "byBox": {
+    "booster-1": {
+     "wins": 54,
+     "losses": 146,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 40,
+     "losses": 160,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 45,
+     "losses": 155,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-wind-boss": {
+   "name": "ゼフィラ",
+   "monsters": [
+    "mon-soramo",
+    "mon-tsumuji",
+    "mon-gauul"
+   ],
+   "ace": null,
+   "lifeScale": 1,
+   "rate": 22,
+   "byBox": {
+    "booster-1": {
+     "wins": 33,
+     "losses": 167,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 23
+    },
+    "booster-2": {
+     "wins": 48,
+     "losses": 152,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 24
+    },
+    "booster-3": {
+     "wins": 51,
+     "losses": 149,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 18
+    }
+   }
+  },
+  "enc-ice-boss": {
+   "name": "イヴァン",
+   "monsters": [
+    "mon-myurol",
+    "mon-kalshell",
+    "mon-nobiton"
+   ],
+   "ace": null,
+   "lifeScale": 1.3,
+   "rate": 19.5,
+   "byBox": {
+    "booster-1": {
+     "wins": 51,
+     "losses": 149,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 26,
+     "losses": 174,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 40,
+     "losses": 160,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-fire-boss": {
+   "name": "バルカ",
+   "monsters": [
+    "mon-lazuck",
+    "mon-gauul",
+    "mon-nobiton"
+   ],
+   "ace": null,
+   "lifeScale": 1.5,
+   "rate": 19.666666666666664,
+   "byBox": {
+    "booster-1": {
+     "wins": 33,
+     "losses": 167,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 32,
+     "losses": 168,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 53,
+     "losses": 147,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-machine-boss": {
+   "name": "テオ",
+   "monsters": [
+    "mon-nobiton",
+    "mon-lazuck",
+    "mon-gauul"
+   ],
+   "ace": null,
+   "lifeScale": 1.6,
+   "rate": 24.166666666666668,
+   "byBox": {
+    "booster-1": {
+     "wins": 48,
+     "losses": 152,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 33,
+     "losses": 167,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 64,
+     "losses": 136,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  },
+  "enc-holy-boss": {
+   "name": "アウレリオ",
+   "monsters": [
+    "mon-gauul",
+    "mon-soramo",
+    "mon-kalshell"
+   ],
+   "ace": null,
+   "lifeScale": 1.75,
+   "rate": 12.833333333333332,
+   "byBox": {
+    "booster-1": {
+     "wins": 30,
+     "losses": 170,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-2": {
+     "wins": 8,
+     "losses": 192,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    },
+    "booster-3": {
+     "wins": 39,
+     "losses": 161,
+     "draws": 0,
+     "doubleScratch": 0,
+     "windRide": 0
+    }
+   }
+  }
+ }
+}

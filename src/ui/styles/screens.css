@@ -499,6 +499,30 @@ span.deck__item-name {
   align-items: center;
 }
 
+/* 同じモンスターは1体まで（2026-10-30 指示書 V）：ほかの枠に入っているモンスターは薄く・札を付ける */
+.deck__item.is-taken {
+  opacity: 0.55;
+}
+
+.deck__item-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.14);
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.deck__reason {
+  margin: 0;
+  color: #ffd27a;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .deck__item-num {
   font-size: 15px;
   font-weight: 800;

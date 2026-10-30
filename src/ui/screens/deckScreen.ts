@@ -75,7 +75,12 @@ export const deckScreen: ScreenDefinition = {
       if (slot < next.length) next[slot] = id;
       else next.push(id);
       const used = next.filter((m) => m === id).length;
-      if (used > (collection()[id] ?? 0) || (!DECK_RULES.allowDuplicateMonsters && used > 1)) {
+      // 同じモンスターは1つのデッキに1体まで（2026-10-30 指示書 V）
+      if (!DECK_RULES.allowDuplicateMonsters && used > 1) {
+        messageModal(element, t('deck.duplicateMonster', { name: cardName(getMonster(id)) }));
+        return;
+      }
+      if (used > (collection()[id] ?? 0)) {
         messageModal(element, t('deck.issue.notOwned', { name: cardName(getMonster(id)), owned: collection()[id] ?? 0, count: used }));
         return;
       }
@@ -265,8 +270,11 @@ export const deckScreen: ScreenDefinition = {
           h('p', { class: 'deck-preview__meta', text: t('deck.monsterInfo', { life: m.life, n: skillsOf(m.id).length, owned: coll[m.id] ?? 0 }) }),
           h('p', { class: 'deck-preview__text' }, phraseText(cardDescription(m))),
         );
+      // ほかの枠にもう入っているモンスター（同じモンスターは1体まで。2026-10-30 指示書 V）
+      const takenElsewhere = (id: string): boolean => !DECK_RULES.allowDuplicateMonsters && draft.monsters.some((m, i) => m === id && i !== slot);
       const put = button(t('deck.put'), () => monster && putMonster(monster.id), 'btn btn--primary btn--small');
-      put.disabled = !monster || draft.monsters[slot] === monster.id;
+      put.disabled = !monster || draft.monsters[slot] === monster.id || takenElsewhere(monster.id);
+      const reason = monster && takenElsewhere(monster.id) ? h('p', { class: 'deck__reason', text: t('deck.duplicateMonster', { name: cardName(monster) }) }) : null;
       const remove = button(t('deck.removeSlot'), removeMonster, 'btn btn--small');
       remove.disabled = slot >= draft.monsters.length;
       const preview = h(
@@ -309,10 +317,11 @@ export const deckScreen: ScreenDefinition = {
         h('div', { class: 'deck__list-head' }, h('span', { text: t('deck.col.name') }), h('span', { text: t('deck.col.stock') })),
         ...owned.map((m) => {
           const left = (coll[m.id] ?? 0) - draft.monsters.filter((x) => x === m.id).length;
+          const taken = takenElsewhere(m.id);
           return h(
             'button',
             {
-              class: `deck__item${focus === m.id ? ' is-focused' : ''}`,
+              class: `deck__item${focus === m.id ? ' is-focused' : ''}${taken ? ' is-taken' : ''}`,
               attrs: { type: 'button' },
               dataset: { id: m.id },
               on: {
@@ -323,12 +332,12 @@ export const deckScreen: ScreenDefinition = {
               },
             },
             createMonsterPortrait(m, 32),
-            h('span', { class: 'deck__item-name', text: cardName(m) }),
+            h('span', { class: 'deck__item-name' }, h('span', { text: cardName(m) }), taken ? h('span', { class: 'deck__item-tag', text: t('deck.inDeck') }) : null),
             h('span', { class: 'deck__item-num', text: String(left) }),
           );
         }),
       );
-      return [preview, h('div', { class: 'deck__actions' }, put, remove), slots, list, hint(t('deck.hint.monsters'))];
+      return [preview, h('div', { class: 'deck__actions' }, put, remove), ...(reason ? [reason] : []), slots, list, hint(t('deck.hint.monsters'))];
     };
 
     // ===== 技カードを選ぶ =====

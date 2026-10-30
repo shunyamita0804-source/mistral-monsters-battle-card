@@ -74,3 +74,13 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 
 - セーブは Vitest の一時テストで作る（`base.json`：D ランク・物語の導入は終わり〔`story.introV2.state` を 'completed`〕・名前入り）。終わったら一時テストは消す
 - `card_detail_shot.cjs`・`people_book_shot.cjs` は W・H・LANG=en に対応した。`gacha_shot.cjs` はパックの番号に `last`（最後に並んだシリーズ）
+
+## 2026-10-30 デッキ・ガチャ・ボス・重なり（指示書 V。`docs/deck-gacha-boss-v-20261030.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `save_shot.cjs` | セーブを入れて「続きから」→ キーを押して撮る（ダンジョンの宝箱と人の重なりの前後・メニューの案内・大会受付など）。キーは `z`・`Enter`・`wait:ミリ秒`・`click:セレクタ`（街では `click:.world__action`）。W・H・LANG・WAIT・CROP |
+| `deck_dup_shot.cjs` | 家の机（`{home,8,17,left}`）→ デッキ編集 → モンスターを選ぶ → もうデッキにいるモンスターを押す（入れられない理由）。MENU=1 で最初のメニュー、ISSUES=1 で問題の一覧。W・H・LANG |
+| `gacha_owned_shot.cjs` | 販売機の前でパックを選ぶ所・提供割合・シリーズを買ったときの中身の15枠（持っているモンスターは絵、持っていないものは ?）。W・H・LANG |
+
+- 見る前（直す前）の版は、`git worktree add` で前の main を作り、`vite build --outDir` して別のポート（例 4177）で `vite preview --outDir` する

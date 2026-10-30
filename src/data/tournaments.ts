@@ -37,6 +37,11 @@ export interface OpponentDefinition {
   readonly deckStyle?: DeckStyle;
   /** 考え方の癖（無ければ normal） */
   readonly ai?: AiStyle;
+  /**
+   * 切り札のモンスター（ダンジョンのボス。2026-10-30 指示書 V：祭壇でもらえるモンスターと同じで、並びの真ん中）。
+   * デッキに切り札の技14種を2枚ずつ必ず入れる（src/game/deck/deck.ts の buildOpponentDeck）
+   */
+  readonly ace?: string;
   /** 通算の勝率（%。札を押したときに出す。仮の固定値。常連だけ） */
   readonly winRate?: number;
 }

@@ -147,7 +147,8 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
 /* ---------- 技の効果（バトル） ---------- */
 
 // 両方とも ソラモ（m1）・ラズック（m2）・ソラモ（m3）。2026-10-25 からはソラモ14技の初期デッキ
-const mixedDeck = createStarterDeck();
+// 技の決まりを試す場面：ソラモ・ラズック・ソラモ（2026-10-30 指示書 V で初期デッキは3体ともちがうモンスターになったが、ここは対戦の決まりだけを見るので前の並びのまま）
+const mixedDeck = { ...createStarterDeck(), monsters: ['mon-soramo', 'mon-lazuck', 'mon-soramo'] };
 
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}): BattleState {
   const s = createBattle({ name: 'P', deck: mixedDeck }, { name: 'O', deck: mixedDeck }, 7, 'player');

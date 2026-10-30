@@ -129,13 +129,13 @@ describe('初期配布（2026-10-25 ユーザー確定）', () => {
     for (const n of [2, 3, 4, 7, 9, 10, 11, 13]) expect(counts[ids(n)]).toBe(2);
   });
 
-  it('初期デッキ60枚＝ソラモ16＋ラズック16（2026-10-26 正式）＋3体目13（未確定・仮。いまの3体目はソラモ）＋サポート15（未確定・仮）。そのまま使える', () => {
+  it('初期デッキ60枚＝ソラモ16＋ラズック16（2026-10-26 正式）＋3体目13（未確定・仮。2026-10-30 指示書 V から3体目はプカリム）＋サポート15（未確定・仮）。そのまま使える', () => {
     const deck = createStarterDeck();
-    expect(deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-soramo']);
+    expect(deck.monsters).toEqual(['mon-soramo', 'mon-lazuck', 'mon-pukarim']);
     expect(deck.skills).toHaveLength(60);
     expect(deck.skills.slice(0, 16)).toEqual(SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id)));
     expect(deck.skills.filter((id) => id.startsWith('skl-lazuck-'))).toHaveLength(16);
-    expect(deck.skills.slice(32, 32 + STARTER_THIRD_SKILLS).every((id) => id.startsWith('skl-soramo14-'))).toBe(true);
+    expect(deck.skills.slice(32, 32 + STARTER_THIRD_SKILLS).every((id) => id.startsWith('skl-pukarim-'))).toBe(true);
     expect(deck.skills.filter((id) => id.startsWith('sup-'))).toHaveLength(STARTER_SUPPORT_COUNT);
     expect(Math.max(...Object.values(countCards(deck.skills)))).toBeLessThanOrEqual(3);
     expect(validateDeck(deck, createNewSave().collection)).toEqual([]);
