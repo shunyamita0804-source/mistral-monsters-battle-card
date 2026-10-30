@@ -37,8 +37,8 @@ export const SCREENS = {
 
   // ベッド
   'bed.title': { ja: 'ベッド', en: 'Bed' },
-  'bed.rest': { ja: '休む（セーブする）', en: 'Rest (Save)' },
-  'bed.rested': { ja: 'ゆっくり休んだ。\nセーブしました。', en: 'You had a good rest.\nGame saved.' },
+  'bed.rest': { ja: 'セーブする', en: 'Save' },
+  'bed.rested': { ja: 'セーブしました。', en: 'Game saved.' },
   'bed.autoSaveNote': {
     ja: '進行状況はカードの入手・移動・対戦のたびに自動でも保存されます（この端末のブラウザ内）。',
     en: 'Progress is also saved automatically whenever you get cards, move or battle (in this device’s browser).',
@@ -418,4 +418,13 @@ export const SCREENS = {
   'tournament.issue.rank': { ja: '{required}ランク以上が必要です（現在{rank}ランク）', en: 'Rank {required} or higher needed (now Rank {rank})' },
   'tournament.issue.deck': { ja: 'デッキの構成が正しくありません（家の机で確認）', en: 'Your deck is not valid (check it at the desk at home)' },
   'tournament.issue.other': { ja: '別の大会に参加中です', en: 'You are already in another cup' },
+  // 2026-10-30 指示書 R2：公式戦は 3・6・9月だけ・12月はチーム戦の月・そのランクのダンジョンのボスを倒していること
+  'tournament.issue.month': { ja: '次の公式戦は {month}です', en: 'The next official cup is in {month}' },
+  'tournament.issue.team': { ja: '12月はチーム戦の月です', en: 'December is the month for team battles' },
+  'tournament.issue.boss': { ja: '{names}のボスをまだ倒していません', en: 'You have not beaten the boss of {names} yet' },
+  'tournament.welcomeMonth': { ja: '次の公式戦は {month}です。\nその月にまた来てくださいね。', en: 'The next official cup is in {month}.\nPlease come back then.' },
+  'tournament.welcomeTeam': {
+    ja: '12月はチーム戦の月です。\n公式戦はありません。チーム戦は、まだ受け付けていません。',
+    en: 'December is the month for team battles.\nThere is no official cup. Team battle entries are not open yet.',
+  },
 } as const satisfies Readonly<Record<string, MessageEntry>>;

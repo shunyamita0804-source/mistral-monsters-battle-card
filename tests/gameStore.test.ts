@@ -22,6 +22,19 @@ describe('GameStore（セーブの一元管理）', () => {
     expect(new GameStore(storage).save.coins).toBe(999);
   });
 
+  it('月が変わる演出：読み込んだとき・最初から始めたときは出さず、月が進んだら1回だけ出す（2026-10-30 指示書 R2）', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(SAVE_KEY, JSON.stringify({ ...createNewSave(), calendar: { year: 1, month: 8 } }));
+    const store = new GameStore(storage);
+    expect(store.pendingMonthChange()).toBeNull();
+    store.update((s) => ({ ...s, calendar: { year: 1, month: 9 } }));
+    expect(store.pendingMonthChange()).toEqual({ from: { year: 1, month: 8 }, to: { year: 1, month: 9 } });
+    store.markMonthShown();
+    expect(store.pendingMonthChange()).toBeNull();
+    store.newGame('male', 'テスト');
+    expect(store.pendingMonthChange()).toBeNull();
+  });
+
   it('矛盾した位置のセーブは読み込み時に家へ戻す', () => {
     const storage = new MemoryStorage();
     storage.setItem(SAVE_KEY, JSON.stringify({ ...createNewSave(), location: { mapId: 'dungeon-01-b3', x: 6, y: 14, dir: 'up' } }));

@@ -72,6 +72,10 @@ export type InteractAction =
   | 'researcher'
   /** 大会会場の左の壁の板：総当たりの対戦表を見る（受付と同じ表） */
   | 'leagueBoard'
+  /** 家のベッド：寝る（1か月進む）・セーブ・ロード（2026-10-30 指示書 R2） */
+  | 'bed'
+  /** 管理局の掲示板：大会のお知らせ（公式戦・チーム戦の月と出場の条件。2026-10-30 指示書 R2） */
+  | 'noticeBoard'
   | 'message';
 
 export type WarpTarget =
@@ -355,7 +359,7 @@ export const TOWN: MapDefinition = artMap(
 
 const HOME_ART = artOf('player');
 export const HOME: MapDefinition = artMap('home', '家', 'interior', HOME_ART, [
-  interactAt('home-bed', itemOf(HOME_ART, 'BED'), 'ベッド', 'settings'),
+  interactAt('home-bed', itemOf(HOME_ART, 'BED'), 'ベッド', 'bed'),
   interactAt('home-map', itemOf(HOME_ART, 'WALL_MAP'), '壁の地図', 'dungeonSelect'),
   // 本棚：名刺図鑑（2026-10-27 指示書。カード図鑑は研究所）
   interactAt('home-shelf', itemOf(HOME_ART, 'BOOKSHELF'), '本棚', 'peopleBook'),
@@ -479,7 +483,7 @@ export const BUREAU: MapDefinition = artMap(BUREAU_MAP_ID, 'カードバトラ�
   interactAt('bureau-desk', itemOf(BUREAU_ART, 'COUNTER'), '受付', 'bureauDesk'),
   interactAt('bureau-rank-board', itemOf(BUREAU_ART, 'RANK_BOARD'), 'ランクの板', 'message', 'カードバトラーのランクの一覧。E から S まで、6つの段がある。'),
   interactAt('bureau-medal-case', itemOf(BUREAU_ART, 'MEDAL_CASE'), 'メダルの棚', 'message', '歴代の優勝者のメダルが、ガラスの中で光っている。'),
-  interactAt('bureau-notice-board', itemOf(BUREAU_ART, 'NOTICE_BOARD'), '掲示板', 'message', '大会のお知らせが貼ってある。「ランクを上げて、次の大会に挑もう！」'),
+  interactAt('bureau-notice-board', itemOf(BUREAU_ART, 'NOTICE_BOARD'), '掲示板', 'noticeBoard'),
   spotNpc('bureau-clerk', BUREAU_ART, 'CLERK_SPOT', ROOMS4_DRAW_OFFSET.bureau.CLERK_SPOT, 'bureau_clerk', 'bureauDesk'),
   // 幼馴染（ミレイユ）：導入イベントでパックを選ぶ間だけ、受付の前の主人公の右に立つ（2026-10-27 パック選びで幼馴染が説明する）
   npc('guide-bureau', BUREAU_DESK_FRONT.x + 4, BUREAU_DESK_FRONT.y, 'neighbor_guide'),

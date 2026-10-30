@@ -24,6 +24,7 @@ import {
 import { isNewItem, itemBlock, itemCount, markItemsSeen, purchaseItem } from '../src/game/items/items.ts';
 import { claimTournamentRewards, enterTournament } from '../src/game/progress/tournament.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
+import { cupReady } from './support/cupReady.ts';
 
 const SKILL = skillsOf('mon-soramo')[0]?.id as string;
 const SKILL2 = skillsOf('mon-soramo')[1]?.id as string;
@@ -102,7 +103,7 @@ describe('ショップで買う', () => {
 
 describe('道具が並ぶ時期（大会の初優勝）', () => {
   const winTournament = (save: SaveData, id: string): SaveData => {
-    const entered = enterTournament(save, id, `entry-${id}`);
+    const entered = enterTournament(cupReady(save), id, `entry-${id}`);
     if (!entered.activeTournament) throw new Error('参加できない');
     const won = { ...entered, activeTournament: { ...entered.activeTournament, status: 'won' as const } };
     const r = claimTournamentRewards(won);
@@ -125,7 +126,7 @@ describe('道具が並ぶ時期（大会の初優勝）', () => {
   });
 
   it('報酬の画面に出す内容（summary）には道具を入れない', () => {
-    const entered = enterTournament(createNewSave(), 'tournament-e', 'entry-1');
+    const entered = enterTournament(cupReady(createNewSave()), 'tournament-e', 'entry-1');
     if (!entered.activeTournament) throw new Error('参加できない');
     const r = claimTournamentRewards({ ...entered, activeTournament: { ...entered.activeTournament, status: 'won' } });
     if (r.status !== 'ok') throw new Error('景品なし');

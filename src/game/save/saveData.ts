@@ -33,6 +33,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
 import { EMPTY_PEOPLE_BOOK, normalizePeopleBook, ownedCardIds, rescuePeopleBook, type PeopleBook } from '../people/peopleBook.ts';
 import { grantPendingBooster, LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
 import type { StarterDeckKey } from '../../data/introV2.ts';
+import { START_DATE } from '../../data/calendar.ts';
 
 /**
  * セーブデータ（カード所持・通貨・パック解放・欠片・大会実績・ダンジョン進捗・デッキを一元管理）。
@@ -41,7 +42,7 @@ import type { StarterDeckKey } from '../../data/introV2.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 28;
+export const SAVE_VERSION = 29;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -51,6 +52,12 @@ export interface Location {
   readonly x: number;
   readonly y: number;
   readonly dir: Direction;
+}
+
+/** ゲームの中の日付（2026-10-30 指示書 R2。month は 1〜12。年は 4月になるたびに進む。src/game/calendar/calendar.ts） */
+export interface GameDate {
+  readonly year: number;
+  readonly month: number;
 }
 
 export interface TournamentRecord {
@@ -214,6 +221,8 @@ export interface SaveData {
   /** ショップで「NEW」を見た道具（最初に見たときだけ NEW の印） */
   readonly seenItems: readonly ItemId[];
   readonly location: Location;
+  /** ゲームの中の年と月（2026-10-30 指示書 R2。version 29。1年目 4月から） */
+  readonly calendar: GameDate;
   /** 処理済みの購入・受け取りID（二重決済・二重タップ防止。新しい順に最大 TRANSACTION_LOG_SIZE 件） */
   readonly processedTransactions: readonly string[];
   readonly stats: {
@@ -274,6 +283,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     unlockedItems: ITEMS.filter((i) => i.unlockedFromStart).map((i) => i.id),
     seenItems: [],
     location: NEW_GAME_LOCATION,
+    calendar: START_DATE,
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
     peopleBook: EMPTY_PEOPLE_BOOK,
@@ -727,6 +737,8 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   25: migrateSerephineAltarV26,
   26: migrateGachaSeenV27,
   27: migrateGachaOpenV28,
+  // 2026-10-30 指示書 R2：年と月。前のセーブは「1年目 4月」として読む
+  28: (raw) => ({ ...raw, calendar: START_DATE }),
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -927,6 +939,14 @@ function withBossFlags(flags: string[], dungeons: Readonly<Record<string, Dungeo
   return more.length > 0 ? [...flags, ...more] : flags;
 }
 
+/** 年と月：読めない値は「1年目 4月」 */
+function normalizeCalendar(v: unknown): GameDate {
+  if (!isObject(v)) return START_DATE;
+  const { year, month } = v;
+  const ok = typeof year === 'number' && Number.isInteger(year) && year >= 1 && year <= 9999 && typeof month === 'number' && Number.isInteger(month) && month >= 1 && month <= 12;
+  return ok ? { year, month } : START_DATE;
+}
+
 /** 生データ（JSON.parse の結果）を検証してセーブデータにする。読めない場合は null */
 export function normalizeSave(raw: unknown): SaveData | null {
   if (!isObject(raw)) return null;
@@ -967,6 +987,7 @@ export function normalizeSave(raw: unknown): SaveData | null {
     unlockedItems: unlockedItemsFor({ rank, tournaments, unlockedItems: itemIds(migrated.unlockedItems) }),
     seenItems: itemIds(migrated.seenItems),
     location: normalizeLocation(migrated.location),
+    calendar: normalizeCalendar(migrated.calendar),
     processedTransactions: unique(asStringArray(migrated.processedTransactions)).slice(0, TRANSACTION_LOG_SIZE),
     stats: {
       battlesWon: asCount(stats.battlesWon),

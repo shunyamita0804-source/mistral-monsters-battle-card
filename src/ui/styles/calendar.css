@@ -1,0 +1,334 @@
+/* ===== カレンダー（2026-10-30 指示書 R2。絵は assets/images/ui/calendar/、原本 design-parts/ui-calendar-20261030/） ===== */
+
+/* 街と部屋の左上：場所の名前の札の下に日付の札（左の丸い台座に季節の紋、右に「1年目 4月」）。
+   絵 date_plate（480×100）：丸の中心は左から 14.6%、字の欄は左 24%〜右 8.5% */
+.date-plate {
+  position: absolute;
+  top: 47px;
+  left: 6px;
+  z-index: 21;
+  width: 186px;
+  height: 39px;
+  background: url('@assets/images/ui/calendar/date_plate.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.45));
+  pointer-events: none;
+}
+
+.date-plate__icon {
+  position: absolute;
+  left: 14.6%;
+  top: 50%;
+  width: 33px;
+  height: 33px;
+  transform: translate(-50%, -50%);
+}
+
+.date-plate__text {
+  position: absolute;
+  left: 24%;
+  right: 8.5%;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbf3da;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+}
+
+/* 英語の長い月（Year 1 · September など）は字を小さく */
+.date-plate__text.is-long {
+  font-size: 11.5px;
+  letter-spacing: 0;
+}
+
+/* 日付の札があるときは、目的地の札をその下へ（重ならないように） */
+.world:has(.date-plate) .world__goal {
+  top: 92px;
+}
+
+/* ===== 月が変わる演出：季節の挿絵（3・6・9・12月だけ）と月の帯 ===== */
+.month-change {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+.month-change.is-on {
+  opacity: 1;
+}
+
+.month-change.is-leaving {
+  opacity: 0;
+}
+
+/* 寝たあと（暗転の上）・季節の挿絵のとき：後ろを見せない */
+.month-change.is-dark,
+.month-change.has-season {
+  background: #000;
+}
+
+/* 季節の挿絵：画面いっぱい（はみ出す左右を切る）。ゆっくり少しだけ寄る */
+.month-change__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 3200ms linear;
+}
+
+.month-change.is-on .month-change__art {
+  transform: scale(1.04);
+}
+
+/* 月の帯（month_banner 900×300。紺の帯の中は上から 40%〜62%） */
+.month-change__banner {
+  position: relative;
+  width: 330px;
+  height: 110px;
+  background: url('@assets/images/ui/calendar/month_banner.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.55));
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.month-change.is-banner .month-change__banner {
+  opacity: 1;
+  transform: none;
+}
+
+.month-change__text {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 40%;
+  height: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbf3da;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.8), 0 0 10px rgb(216 184 106 / 0.35);
+  white-space: nowrap;
+}
+
+/* ===== ベッドで寝る：夜の挿絵 → 暗転 ===== */
+.sleep-night {
+  position: absolute;
+  inset: 0;
+  z-index: 69;
+  background: #000;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.sleep-night.is-on {
+  opacity: 1;
+}
+
+.sleep-night.is-leaving {
+  opacity: 0;
+}
+
+.sleep-night__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 700ms ease;
+}
+
+.sleep-night.is-dark .sleep-night__art {
+  opacity: 0;
+}
+
+/* ===== ベッドのコマンド（寝る・セーブ・ロード） ===== */
+.bed-menu .modal__actions {
+  flex-direction: column;
+}
+
+.bed-menu .modal__actions .btn {
+  width: 100%;
+}
+
+/* ===== 管理局の掲示板（notice_board_bg 1170×2532＝画面と同じ形。上の札は上から 62〜118px） ===== */
+.notice-board {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  background: #0d1a33 url('@assets/images/ui/calendar/notice_board_bg.webp') center top / 100% 100% no-repeat;
+  animation: fade-in 160ms ease-out;
+}
+
+.notice-board__title {
+  position: absolute;
+  top: 66px;
+  left: 64px;
+  right: 64px;
+  height: 48px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbf3da;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
+}
+
+.notice-board__list {
+  position: absolute;
+  top: 134px;
+  left: 0;
+  right: 0;
+  bottom: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow: hidden auto;
+  margin: 0;
+  padding: 4px 0 12px;
+  list-style: none;
+}
+
+/* 紙（notice_paper 900×220：見える紙は左 8%〜右 8%。左の丸は中心が左から 20.8%・直径は幅の 14.4%。錠前は右上）。
+   絵の左右の透明な所は枠の外にはみ出させて、見える紙を枠の内側いっぱいに */
+.notice-board__paper {
+  position: relative;
+  flex: none;
+  width: calc(100% + 14px);
+  margin-left: -7px;
+  aspect-ratio: 900 / 220;
+  background: url('@assets/images/ui/calendar/notice_paper.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.45));
+}
+
+.notice-board__paper.is-locked {
+  background-image: url('@assets/images/ui/calendar/notice_paper_locked.webp');
+}
+
+.notice-board__icon {
+  position: absolute;
+  left: 20.8%;
+  top: 50%;
+  width: 15.5%;
+  transform: translate(-50%, -50%);
+}
+
+.notice-board__paper.is-locked .notice-board__icon {
+  filter: grayscale(0.55) brightness(0.92);
+  opacity: 0.8;
+}
+
+.notice-board__text {
+  position: absolute;
+  left: 30%;
+  right: 12%;
+  top: 12%;
+  bottom: 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  color: #3b2a14;
+  line-height: 1.22;
+}
+
+/* 1行目：行事の名前。錠前の紙では錠前（右上）にかからないように */
+.notice-board__head {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.notice-board__paper.is-locked .notice-board__head {
+  margin-right: 17%;
+}
+
+.notice-board__name,
+.notice-board__cond {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.notice-board__cond {
+  color: #6a4a22;
+}
+
+.notice-board__paper.is-locked .notice-board__cond {
+  color: #8a2b1c;
+}
+
+/* 「今月」「次は ○月」の印（紙の下のふちに貼った札。字の行にはかからない） */
+.notice-board__tag {
+  position: absolute;
+  right: 12%;
+  bottom: -7px;
+  padding: 1px 9px;
+  border-radius: 9px;
+  font-family: var(--font-base);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.notice-board__tag.is-now {
+  background: #a3261b;
+  color: #fff6e0;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+.notice-board__tag.is-next {
+  background: rgb(29 45 82 / 0.9);
+  color: #f3dc8a;
+}
+
+.notice-board__back {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  min-width: 160px;
+  transform: translateX(-50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .month-change__art,
+  .month-change.is-on .month-change__art {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* 大会の受付のひと言：「次の公式戦は ○月です」などを改行して出す */
+.tournament__desk .shop-menu__bubble {
+  white-space: pre-line;
+}

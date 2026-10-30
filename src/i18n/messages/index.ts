@@ -13,6 +13,7 @@ import { GEOL_LAB } from './geolLab.ts';
 import { EVENT_LAB } from './eventLab.ts';
 import { WORLD } from './world.ts';
 import { NAME_MESSAGES } from './name.ts';
+import { CALENDAR } from './calendar.ts';
 
 /**
  * 画面の文字の辞書（固定キー → ja/en）。分野ごとのファイルに分け、ここでまとめる。
@@ -34,6 +35,7 @@ export const MESSAGE_GROUPS = {
   geolLab: GEOL_LAB,
   eventLab: EVENT_LAB,
   name: NAME_MESSAGES,
+  calendar: CALENDAR,
 } as const;
 
 export const MESSAGES = {
@@ -52,6 +54,7 @@ export const MESSAGES = {
   ...GEOL_LAB,
   ...EVENT_LAB,
   ...NAME_MESSAGES,
+  ...CALENDAR,
 };
 
 export type MessageKey = keyof typeof MESSAGES;
