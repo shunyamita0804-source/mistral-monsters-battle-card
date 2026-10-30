@@ -165,7 +165,7 @@
   opacity: 0;
 }
 
-/* ===== ベッドのコマンド（寝る・セーブ・ロード） ===== */
+/* ===== ベッドのコマンド（寝る・セーブ・やめる） ===== */
 .bed-menu .modal__actions {
   flex-direction: column;
 }

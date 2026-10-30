@@ -2634,7 +2634,10 @@ export class WorldView {
     if (old) old.replaceWith(datePlate(this.#store.displayCalendar));
   }
 
-  /** 家のベッド（2026-10-30 指示書 R2）：寝る（1か月進む）・セーブ（これまでのベッドの画面）・ロード（バックアップから復元のある設定の画面） */
+  /**
+   * 家のベッド（2026-10-30 指示書 R2・T3）：寝る（1か月進む）・セーブ（これまでのベッドの画面）・やめる。
+   * セーブはいつも自動なので、ベッドに読み込みは置かない（バックアップからの復元は設定の画面だけ。2026-10-30 ユーザー決定）
+   */
   #bedMenu(): void {
     this.#busy = true;
     this.#held = null;
@@ -2646,7 +2649,6 @@ export class WorldView {
       actions: [
         { label: t('calendar.bed.sleep'), primary: true, onTap: () => ((next = () => this.#confirmSleep()), handle.close()) },
         { label: t('calendar.bed.save'), onTap: () => ((next = () => this.#ctx.navigate('settings')), handle.close()) },
-        { label: t('calendar.bed.load'), onTap: () => ((next = () => this.#ctx.navigate('options')), handle.close()) },
         { label: t('common.cancel'), onTap: () => handle.close() },
       ],
       onClose: () => {

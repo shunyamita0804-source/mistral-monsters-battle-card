@@ -15,7 +15,8 @@ contact_sheet_old_02_06.jpg は前の ZIP の一覧（02・06 は前の版が写
 | story_06_rescue.png | 霧の廃坑でシエナを助ける（直した版） | シエナを助けたとき |
 | story_07_team_december.png | 12月のチーム戦（雪の会場） | 12月のチーム戦 |
 | story_08_archive.png | 忘れられた書庫の3人 | 忘れられた書庫 |
-| story_09_altar_seal.png | 祭壇の封印 | 封印の場面 |
+| story_09_altar_seal.png | 祭壇の封印。灯籠 11（左5・真ん中1・右5）。封印 11 に合わせた版（2026-10-30 指示書 T4 で差しかえ。届いたファイル名は story_09_altar_seal_v2.png） | 封印の場面 |
+| story_09_altar_seal_v1_7lights.png | 祭壇の封印の前の版（灯籠 7。封印が 7 だったころ）。使わない・残しておくだけ | 使わない |
 | story_10_epilogue.png | 机の上の石板（エピローグ） | 物語の終わり |
 
 ## 覚え書き（あとで使うとき）

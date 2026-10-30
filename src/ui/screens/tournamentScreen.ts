@@ -207,7 +207,8 @@ export const tournamentScreen: ScreenDefinition = {
           class: 'tournament__record',
           text: tr(record.firstWinClaimed ? 'tournament.recordClaimed' : 'tournament.record', { entries: record.entries, wins: record.wins }),
         }),
-        check.ok ? null : h('p', { class: 'tournament__ng', text: check.reasons.join(tr('tournament.issueSeparator')) }),
+        // 出られない理由は1行に1つ（2026-10-30 指示書 T2。前は「 / 」でつないでいて、最後の1文字だけ次の行に落ちることがあった）
+        check.ok ? null : h('ul', { class: 'tournament__ng' }, ...check.reasons.map((r) => h('li', { text: r }))),
         join,
       );
     };

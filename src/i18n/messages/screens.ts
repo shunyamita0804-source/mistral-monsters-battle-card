@@ -396,7 +396,6 @@ export const SCREENS = {
   },
   'tournament.record': { ja: '参加{entries}回・優勝{wins}回', en: 'Entered {entries} · Won {wins}' },
   'tournament.recordClaimed': { ja: '参加{entries}回・優勝{wins}回（初回景品受取済）', en: 'Entered {entries} · Won {wins} (first-win prizes received)' },
-  'tournament.issueSeparator': { ja: ' / ', en: ' / ' },
   'tournament.clerk': { ja: '受付', en: 'Desk' },
   'tournament.welcome': { ja: '大会会場へようこそ。あなたのランクは {rank} です。', en: 'Welcome to the hall! Your rank is {rank}.' },
   'tournament.welcomeName': { ja: '{name}さん、大会会場へようこそ。ランクは {rank} です。', en: 'Welcome to the hall, {name}! Your rank is {rank}.' },
