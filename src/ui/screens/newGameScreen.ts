@@ -3,6 +3,7 @@ import { t } from '../../i18n/i18n.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { button, h } from '../dom.ts';
 import { once } from '../gameStore.ts';
+import { bgm } from '../bgm.ts';
 import { heroArtUrl } from '../components/heroArt.ts';
 import { openNamePrompt } from '../components/namePrompt.ts';
 import type { ScreenDefinition } from './types.ts';
@@ -20,6 +21,8 @@ export const newGameScreen: ScreenDefinition = {
   titleKey: 'newGame.title',
   create(ctx) {
     const element = h('main', { class: 'screen new-game' });
+    // 主人公の選択・名前の曲（2026-10-30 指示書 O2 ユーザー決定）：Bon Voyage!。名前のあと家に入ると家の曲、「戻る」でタイトルに戻るとタイトルの曲
+    bgm.play('departure');
     const start = once((gender: Gender, name: string) => {
       ctx.store.newGame(gender, name);
       // 家の中の画面の上の物語の始まりの挿絵（2026-10-27。src/ui/components/openingIntro.ts）は、

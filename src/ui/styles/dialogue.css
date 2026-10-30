@@ -90,6 +90,9 @@
 .talk__choices:empty { display: none; }
 .talk.is-choice .talk__portrait { margin-bottom: -6px; }
 .talk.is-choice .talk__choices { position: absolute; left: 12px; bottom: calc(14px + 168px + 52px + env(safe-area-inset-bottom, 0px)); margin: 0; }
+/* 2026-10-30 指示書 O3：選ぶボタン（幅 236px）が右の話し手の顔の絵（幅 184px）にかかっていたので、顔の絵の左までの幅に */
+.talk.is-choice .talk__choices { width: 196px; }
+.talk.is-choice .talk__choice { font-size: 15px; letter-spacing: 0.04em; }
 
 .talk__choice {
   box-sizing: border-box;

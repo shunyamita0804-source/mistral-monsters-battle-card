@@ -1733,6 +1733,7 @@ export const battleScreen: ScreenDefinition = {
       const w = s.winner;
       if (!resultSounded) {
         resultSounded = true;
+        req.onDecided?.(w ?? 'draw');
         sound.play(w === 'player' ? 'battleWin' : 'battleLose', 500);
         say(w === 'player' ? 'battle.talk.lose' : 'battle.talk.win');
       }

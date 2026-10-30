@@ -37,14 +37,16 @@ describe('ダンジョンの人物12人（2026-10-28）', () => {
     expect(DUNGEONS).toHaveLength(7);
   });
 
-  it('新しい5つのバトラーは「そのダンジョンの人＋今の3人のうち1人」。遺跡・森は今の3人のまま', () => {
+  it('新しい5つのバトラーは「そのダンジョンの人＋今の3人のうち2人」（1つの階で同じ人は出ない）。遺跡・森は今の3人のまま', () => {
     ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'].forEach((id, i) => {
       // 階の中の番号は 1〜3（generate.ts の npc-1〜3）
       const faces = [1, 2, 3].map((n) => runBattlerFace(n, id));
       const people = faces.map((f) => personOfOpponent({ id: 'enc-run-npc', face: f })?.id);
       expect(people[0], id).toBe(BATTLERS[i]);
-      expect(people[2], id).toBe(BATTLERS[i]);
+      // 2026-10-30 指示書 O3：1つの階では同じ人を出さない（前は 1 と 3 が同じ人）。2・3 は今の3人のうちの別々の人
       expect(['flora', 'oscar', 'kyle']).toContain(people[1]);
+      expect(['flora', 'oscar', 'kyle']).toContain(people[2]);
+      expect(new Set(people).size, id).toBe(3);
       expect(personOfOpponent(runNpcOpponent(0, 1, id))?.id).toBe(BATTLERS[i]);
     });
     for (const id of ['dungeon-01', 'dungeon-02']) {

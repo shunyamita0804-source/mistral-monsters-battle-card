@@ -88,7 +88,7 @@ export const WORLD = {
   },
 
   // メニュー
-  'world.menuStatus': { ja: 'ランク：{rank}　所持金：{coins}', en: 'Rank: {rank}   Money: {coins}' },
+  'world.menuStatus': { ja: 'ランク：{rank}　所持金：{coins}', en: 'Rank: {rank} · Money: {coins}' },
   'world.menuDeckOk': { ja: 'デッキ：使用可能', en: 'Deck: Ready' },
   'world.menuDeckNg': { ja: 'デッキ：構成に問題あり（家の机で確認）', en: 'Deck: Has problems (check at the desk at home)' },
   'world.menuFragments': { ja: '不思議な欠片：{n}/{total}', en: 'Mysterious Shards: {n}/{total}' },
