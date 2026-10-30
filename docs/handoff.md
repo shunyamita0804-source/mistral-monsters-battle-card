@@ -1,15 +1,37 @@
-# 引き継ぎメモ（2026-10-30：T 小さな直しまで・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-30：R〜T のセッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-30 T のあと）
+### まず読む：いまの状態（2026-10-30 R〜T のセッション終わり）
 
-- **公開中：`main`（T まで）**。**セーブ version 29**。テスト 894件。**R は合格（T の検品）。S・T の報告の返事待ち**
-- T：受付の出られない理由は1行に1つ（`tournamentScreen.ts`・`.tournament__ng li`）・ベッドは「寝る」「セーブ」「やめる」（ロードはなくした。ユーザー決定）・
-  祭壇の挿絵を灯籠 11 の版に差しかえ（`design-parts/story-stills-20261030/story_09_altar_seal.png`。前の版は `_v1_7lights.png`。まだゲームには入れない）
-- 写真のこつ：公開ページ・街の写真は暗転の途中を撮らないよう `WAIT=8000`（`calendar_shot.cjs`）
+- **公開中：`main`（T まで）**。**セーブ version 29**（R で 28→29：年と月 `calendar`）。テスト 894件。**次の指示を待っている**
+- 作業ブランチはどれも main に取り込み済み。新しい作業は新しいブランチで（`git fetch origin main && git checkout -B 新しいブランチ origin/main`）
+- このセッションでしたこと
+  | # | 内容 | 合否 | 記録 |
+  | --- | --- | --- | --- |
+  | R1 | 新しい絵60枚の原本を保管（`design-parts/ui-calendar-20261030/`・`ui-ranking-tablet-20261030/`・`talk-portraits-20261030/`・`story-stills-20261030/`。各 README に何の絵か・いつ使うか・覚え書き） | 合格 | `docs/calendar-r-20261030.md` |
+  | R2 | 年と月（1年目 4月から・4月で年が進む）。ダンジョンから戻る・大会の景品を受け取る・ベッドで寝るで1か月。日付の札・月の帯・季節の挿絵・寝る流れ・公式戦は 3・6・9月だけ＋そのランクのボスを倒していること（`src/data/calendar.ts` の `RANK_BOSS_DUNGEONS`）・管理局の掲示板 | 合格 | 同上 |
+  | S | iPhone の試遊の直し：名札を人のとなりへ（`world.ts` の `labelCenterAwayFromPeople`）・噴水の水を上の受け皿から・高台の石垣と北と南の城壁（`level_strip`・`wall_run`）・管理局と研究所を少し上へ・大会会場の前の道を下へ | **返事待ち** | `docs/townfix-s-20261030.md` |
+  | T | R の検品の直し：受付の理由を1行に1つ・ベッドは「寝る」「セーブ」「やめる」（ロードはなくした。ユーザー決定）・祭壇の挿絵を灯籠 11 の版に差しかえ（前の版 `story_09_altar_seal_v1_7lights.png`。まだゲームに入れない） | **返事待ち** | このファイル |
+- 報告：R https://claude.ai/artifact/R2sUMVwrciFGut7JwmQ3m4 ・S https://claude.ai/artifact/74Dv7WwJZHamqXCu15626r ・T https://claude.ai/artifact/RsxceDvzLa8oLbD2yU5peV （ZIP も渡した。`downloads/` は git に入れない）
+- **待っているもの**
+  - 噴水の受け皿から下の池へ落ちる水の絵（依頼文 `docs/design-requests-20261030/10_fountain_overflow.md`。届いたら `town2026_build.py` の `fountain_spray` のとなりに重ねる）
+  - ミュロルの正式なモンスターカード・部屋の家具の描き直し（前のセッションから）
+- **次にくる予定**（R の指示書の「ほかの決まり」の順）：ランキング（管理局のランクの板・この12か月のポイントの合計）→ 12月のチーム戦（8チームのトーナメント。景品は「取得カード」の画面で見せる）→ クリア後のミレイユ戦（練習場）。
+  絵は `design-parts/ui-ranking-tablet-20261030/`（石板の図鑑は 4×5・くぼみのふちを背景の色に寄せる）。会話の立ち絵・物語の挿絵は物語を作るときに（オスカーの顔はバトラーの共用の絵から分ける・挿絵の字は上の3分の1）
+- **未完了**：iPhone 実機での確認（R〜T）。絵の中の日本語の字（英語表示のとき）
+- 公開のしかた：`gh` は使えない。`git fetch origin main && git checkout -B deploy-main origin/main && git merge --no-ff 作業ブランチ` →
+  **`npm run check` を通してから** `git push origin deploy-main:main` → GitHub の道具（MCP）の `actions_run_trigger`（`run_workflow`・`deploy-pages.yml`・ref `main`）→
+  公開ページの `static/index-*.js` の名前が変わるのを待つ（公開ページの名前は手元のビルドと同じにならない。中身は絵のファイル名のハッシュで確かめる）
+- 作業のこつ（このセッションで分かったこと）
+  - セッションの始めに `node_modules` が無いことがある → `npm install --no-audit --no-fund`（package-lock.json が書き換わったら `git checkout package-lock.json`）
+  - 街を作り直すには `pip install scipy matplotlib`。作り直す前に、変えないまま作り直して今の絵と同じになる（git の差分が出ない）ことを確かめると、前と後をきれいに比べられる
+  - 写真：`tools/e2e/calendar_shot.cjs`（カレンダーの場面。`WAIT=8000` で公開ページの暗転の途中を撮らない・`W=375 H=667`・`LANG=en`・`ONLY=`・`before`）、
+    街は `tools/e2e/town_shot.cjs`（写真の上の操作説明を消したいときは `.world__hint` を隠す写しを一時的に作る）。撮影用のセーブは `tests/zz-*.test.ts` で作ったら必ず消す
+  - 前の版の写真：`git worktree add 一時フォルダ 前のコミット` → `node_modules` をリンク → その中の `./node_modules/.bin/vite build --outDir 別のフォルダ` → `vite preview --outDir … --port 4177`
+  - 年と月の欄を入れた撮影用セーブは version 29 にする（28 のままだと読み込みで「1年目 4月」に戻る）
 
 ### その前（2026-10-30 S のあと）
 
