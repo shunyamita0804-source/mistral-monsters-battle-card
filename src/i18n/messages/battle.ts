@@ -42,6 +42,9 @@ export const BATTLE = {
   },
   'battle.log.support': { ja: '{side}はサポート「{card}」を使った！', en: '{side} used Support: {card}!' },
   // 2026-10-30 指示書 Y：サポートカード フェーズ1
+  // CPU の腕前 C（2026-10-30 指示書 Z）
+  'battle.log.hesitate': { ja: '{name}は迷っている…', en: '{name} is hesitating...' },
+  'battle.log.misguard': { ja: '{name}は守りそこねた！', en: '{name} failed to guard!' },
   'battle.log.recall': { ja: '{side}は捨て札の「{card}」を手札に戻した。', en: '{side} returned {card} from the discard pile to hand.' },
   'battle.log.swap': { ja: '{side}は手札1枚を山札に戻してシャッフルした。', en: '{side} shuffled 1 card from hand into the deck.' },
   'battle.log.cheer': { ja: '{name}に声援。このターン、次の攻撃のダメージ＋{n}。', en: "Cheering for {name}! Its next attack this turn deals +{n}." },

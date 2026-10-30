@@ -64,7 +64,8 @@ ROOMS: dict[str, dict] = {
             ('arena_furniture_benches', 'bench_back', 566, (96, 430, 396, 600)),
             ('arena_furniture_benches', 'bench_front', 762, (96, 600, 396, 775)),
             ('arena_furniture_reception', 'reception', 730, None),
-            ('support-art-z-20261030/arena_furniture_board', 'board', 429, None),
+            # 対戦表の板：脚の下は y 約429 だが、板のすぐ前（長いすとのあいだの1列。足もと y 約422）に立った人が板の後ろに隠れないよう、前後を比べる y は 410 にする
+            ('support-art-z-20261030/arena_furniture_board', 'board', 410, None),
         ],
         # 舞台の上の対戦台（前の絵。舞台の円の真ん中へ。前の舞台の円の真ん中との差だけずらす）。人は舞台に上がれないので、いつも人より奥
         extra=[('Mistral_Room_arena_parts/arena_02_battle_table', 'battle_table', 291, (0, 13))],

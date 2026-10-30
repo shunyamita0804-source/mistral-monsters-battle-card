@@ -9,7 +9,7 @@ import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TEST_TEAM } from './testTeams.ts';
-import type { OpponentDefinition } from './tournaments.ts';
+import type { CpuSkill, OpponentDefinition } from './tournaments.ts';
 
 const LAZ = LAZUCK_MONSTER_ID;
 const SOR = SORAMO_MONSTER_ID;
@@ -190,18 +190,40 @@ export function runBattlerFace(index: number, dungeonId?: string): string {
   return `battler-${((((local.guest - 1 + (index - 2)) % 3) + 3) % 3) + 1}`;
 }
 
+/**
+ * ダンジョンのバトラー・見えない番人の CPU の腕前（2026-10-30 指示書 Z。ユーザー OK の案）：
+ * 精霊の森（D）＝C・水の神殿と風の渓谷（D）＝C と B を半分ずつ（バトラーは階の中の番号、番人は階で交互）・
+ * 太古の遺跡・氷の洞窟・炎の火山（C・B）＝B・機械の塔・天の聖域（A・S）＝A。ボスは1つ上（src/data/dungeons.ts の ENCOUNTERS）
+ */
+const RUN_CPU_SKILL: Readonly<Record<string, CpuSkill | 'CB'>> = {
+  'dungeon-02': 'C',
+  'dungeon-03': 'CB',
+  'dungeon-08': 'CB',
+  'dungeon-01': 'B',
+  'dungeon-04': 'B',
+  'dungeon-05': 'B',
+  'dungeon-06': 'A',
+  'dungeon-07': 'A',
+};
+
+/** そのダンジョンの CPU の腕前。C と B を半分ずつのダンジョンは、n（バトラーは階の中の番号・番人は階）が奇数なら C、偶数なら B */
+export function runCpuSkill(dungeonId: string | undefined, n: number): CpuSkill {
+  const s = RUN_CPU_SKILL[dungeonId ?? ''] ?? 'B';
+  return s === 'CB' ? (n % 2 === 1 ? 'C' : 'B') : s;
+}
+
 /** 【仮】通常のバトラー（話しかけると対戦）。編成はダンジョンごとの仮の編成。顔ぶれは runBattlerFace */
 export function runNpcOpponent(floor: number, index: number, dungeonId?: string): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-npc'] as OpponentDefinition;
   const teams = runConfig(dungeonId).npcTeams;
-  return { ...base, monsters: teams[index % teams.length] ?? TEST_TEAM, lifeScale: floorLife(dungeonId, floor), face: runBattlerFace(index, dungeonId) };
+  return { ...base, monsters: teams[index % teams.length] ?? TEST_TEAM, lifeScale: floorLife(dungeonId, floor), face: runBattlerFace(index, dungeonId), skill: runCpuSkill(dungeonId, index) };
 }
 
 /** 【仮】見えない番人。編成はダンジョンごとの仮の編成（天の聖域は強い） */
 export function runGuardianOpponent(floor: number, dungeonId?: string): OpponentDefinition {
   const base = ENCOUNTERS['enc-run-guardian'] as OpponentDefinition;
   const c = runConfig(dungeonId);
-  return { ...base, monsters: c.guardianTeam, lifeScale: Math.round((floorLife(dungeonId, floor) + c.guardianLifeBonus) * 100) / 100, face: 'guardian' };
+  return { ...base, monsters: c.guardianTeam, lifeScale: Math.round((floorLife(dungeonId, floor) + c.guardianLifeBonus) * 100) / 100, face: 'guardian', skill: runCpuSkill(dungeonId, floor) };
 }
 
 /** ボス＝そのダンジョンの守り手（src/data/dungeons.ts の ENCOUNTERS・人物は src/data/people.ts。遺跡はジオル、森は仮のフルーネ、ほかは正式モンスターの仮の編成） */

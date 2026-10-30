@@ -61,7 +61,8 @@ const emptyTally = (): Tally => ({
 
 const MAX_STEPS = 6000;
 
-function play(a: Deck, b: Deck, lifeScale: number, seed: number, first: Side, t: Tally): void {
+/** 2026-10-30 指示書 Z：ボスは定義の構え（ai）と腕前（skill）で、プレイヤー側は腕前 B（構えはふつう） */
+function play(a: Deck, b: Deck, lifeScale: number, seed: number, first: Side, t: Tally, boss?: OpponentDefinition): void {
   let state: BattleState = createBattle({ name: 'A', deck: a }, { name: 'B', deck: b, lifeScale }, seed, first);
   let seenTurn = -1;
   // モンスターごとの、いま続いている「動けなかった手番」の長さ
@@ -97,7 +98,7 @@ function play(a: Deck, b: Deck, lifeScale: number, seed: number, first: Side, t:
     }
     const side = actingSide(state);
     if (!side) break;
-    const action = chooseAction(state, side);
+    const action = side === 'opponent' ? chooseAction(state, side, boss?.ai, boss?.skill ?? 'B') : chooseAction(state, side, 'normal', 'B');
     if (!action) break;
     if (side === 'opponent' && action.type === 'useCard' && state.phase === 'main') {
       const hand = state.sides.opponent.hand.find((c) => c.uid === action.cardUid);
@@ -128,7 +129,7 @@ function series(boss: OpponentDefinition, lifeScale: number, games: number, seed
   const out: Record<string, Tally> = {};
   KEYS.forEach((key, k) => {
     const t = emptyTally();
-    for (let i = 0; i < games; i++) play(boosterDeck(key), deck, lifeScale, seedBase + k * 100000 + i * 7919, i % 2 === 0 ? 'player' : 'opponent', t);
+    for (let i = 0; i < games; i++) play(boosterDeck(key), deck, lifeScale, seedBase + k * 100000 + i * 7919, i % 2 === 0 ? 'player' : 'opponent', t, boss);
     out[key] = t;
   });
   return out;

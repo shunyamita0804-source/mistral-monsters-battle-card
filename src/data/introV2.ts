@@ -82,7 +82,7 @@ export const isBoosterKey = (v: unknown): v is BoosterKey => BOOSTERS.some((b) =
  * 2026-10-28 ユーザー決定：編成は「ラズック・カルシェル・ノビトン」（前のソラモ・ラズック・ソラモは同じモンスターが2体いて不具合に見え、
  * 貸しデッキ〔旅立ちのきらめき〕のソラモとも重なるため）。ライフの割合（0.35 → 0.25 → 0.15）はそのまま
  */
-export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: 'ガレス', monsters: [LAZUCK_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID], lifeScale: 0.35, face: 'teacher' };
+export const EXAM_OPPONENT: OpponentDefinition = { id: 'exam-teacher', name: 'ガレス', monsters: [LAZUCK_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID], lifeScale: 0.35, face: 'teacher', skill: 'C' };
 
 /** 何回目の挑戦かで、先生のモンスターのライフの割合（1回目 0.35 → 2回目 0.25 → 3回目以降 0.15。最低でもライフ1） */
 export function examLifeScale(attempt: number): number {

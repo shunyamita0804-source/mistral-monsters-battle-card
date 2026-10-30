@@ -208,7 +208,7 @@ describe('風の渓谷の階（いくつもの階をつくって確かめる）'
 
 describe('人：守り手ゼフィラ・バトラーのニコ', () => {
   it('ゼフィラの編成：真ん中がツムジ、左右はソラモ・ガウル。lifeScale 1.0（1.2 から試遊して、勝つ割合がルシアと同じくらいになる値）→ 2026-10-30 指示書 V で切り札（ツムジ）の技を2枚ずつにして 1.1 → 指示書 Y で 1.22', () => {
-    expect(ENCOUNTERS['enc-wind-boss']).toEqual({ id: 'enc-wind-boss', name: 'ゼフィラ', monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22 });
+    expect(ENCOUNTERS['enc-wind-boss']).toEqual({ id: 'enc-wind-boss', name: 'ゼフィラ', monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22, skill: 'B' });
     expect(runBossOpponent(ID).monsters[1]).toBe(TSUMUJI_MONSTER_ID);
     expect(ENCOUNTERS['enc-water-boss']?.lifeScale).toBe(1.22);
   });

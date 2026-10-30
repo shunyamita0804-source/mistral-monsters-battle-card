@@ -122,7 +122,7 @@ export const ROOMS4_ART: Readonly<Record<'arena' | 'bureau' | 'practice' | 'lab'
     "y": 329,
     "w": 352,
     "h": 208,
-    "z": 536
+    "z": 512
    },
    {
     "file": rooms4Img5,
