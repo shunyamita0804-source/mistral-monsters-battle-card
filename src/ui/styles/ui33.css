@@ -325,30 +325,53 @@
   object-fit: cover;
 }
 
+/*
+ * 2026-10-30 指示書 Q：モンスターカードを上の真ん中に大きく（技カードの約1.4倍）、技カードはその下に並べる（5枚以上は2段）。
+ * カードの所は、お知らせの窓（.modal・z-index 50）より手前に出して押せるように。カードを大きく見ている間は窓の後ろへ（is-behind）
+ */
 .world__clear-altar {
   position: absolute;
   left: 0;
   right: 0;
-  top: 33%;
+  top: 11%;
+  z-index: 51;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 22px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  pointer-events: none;
 }
 
-/* 4枚以上（景品の技カードもあるとき）：すき間を詰めて1列に（2026-10-30 指示書 O3） */
-.world__clear-altar:has(> :nth-child(4)) {
+.world__clear-altar.is-behind {
+  z-index: 49;
+}
+
+.world__clear-monster {
+  display: flex;
+  justify-content: center;
+}
+
+.world__clear-skills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
 }
 
 .world__clear-card {
   position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
   filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.6)) drop-shadow(0 0 14px rgb(255 226 160 / 0.35));
   animation: clear-card-rise 700ms ease-out both;
 }
 
-.world__clear-card + .world__clear-card {
-  animation-delay: 150ms;
+.world__clear-skills .world__clear-card {
+  animation-delay: 200ms;
 }
 
 @keyframes clear-card-rise {
@@ -356,12 +379,14 @@
   100% { opacity: 1; transform: none; }
 }
 
+/* 初回クリアの封の印：モンスターカードの右下の角に小さく（絵を隠さない） */
 .world__clear-seal {
   position: absolute;
-  right: -22px;
-  bottom: -18px;
-  width: 64px;
+  right: -10px;
+  bottom: -10px;
+  width: 36px;
   height: auto;
+  pointer-events: none;
   filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.6));
 }
 
