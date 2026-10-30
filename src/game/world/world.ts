@@ -339,3 +339,25 @@ export function reachable(map: MapDefinition, start: Point, blocked: (x: number,
   }
   return seen;
 }
+
+/**
+ * 名札（家具の調べる範囲の上のはしの真ん中）が、その家具の奥・上に立つ人の絵にかかるときは、人のとなり（人から遠いほうの側）へずらす。
+ * 人の絵は足元のマス（npc.x・y と drawDx・drawDy）から上へ約5マス・左右に約2.5マス。返り値は名札の真ん中の x（マス）。かからなければ null（真ん中のまま）
+ */
+export function labelCenterAwayFromPeople(obj: { x: number; y: number; w: number; h: number }, objects: readonly MapObject[], labelDy = 0): number | null {
+  const top = obj.y + labelDy;
+  const mid = obj.x + obj.w / 2;
+  for (const o of objects) {
+    if (o.type !== 'npc') continue;
+    const cx = o.x + (o.drawDx ?? 0) + 0.5;
+    const foot = o.y + (o.drawDy ?? 0) + 1;
+    // 名札：上のはしの ±1 マス・真ん中から ±3 マス
+    const overlapX = Math.abs(cx - mid) < 3 + 2.5;
+    const overlapY = top + 1 > foot - 5 && top - 1 < foot;
+    if (!overlapX || !overlapY) continue;
+    // 人の絵のはし（±2.5）から名札の半分（3）だけ離した所。家具の範囲の中におさめる
+    const away = cx >= mid ? cx - 5.5 : cx + 5.5;
+    return Math.min(obj.x + obj.w - 1, Math.max(obj.x + 1, away));
+  }
+  return null;
+}

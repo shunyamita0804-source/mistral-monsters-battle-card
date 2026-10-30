@@ -35,6 +35,7 @@ import {
   inReach,
   isBlocked,
   isNearNpc,
+  labelCenterAwayFromPeople,
   mapSize,
   nearestNpc,
   objectsAt,
@@ -1214,6 +1215,9 @@ export class WorldView {
           : h('div', { class: `world__label world__label--${obj.type}`, text: objectLabel(obj) });
       const labelDy = obj.type === 'interact' ? (obj.labelDy ?? 0) : 0;
       Object.assign(el.style, { left: `${obj.x * cell}px`, top: `${(obj.y + labelDy) * cell}px`, width: `${obj.w * cell}px`, height: `${obj.h * cell}px` });
+      // 人が立つ家具（カウンターの奥の店員など）：名札は人の顔・体にかからない、人のとなりへ（人を優先して見せる。2026-10-30 指示書 S1）
+      const center = map.art && obj.type === 'interact' ? labelCenterAwayFromPeople(obj, map.objects, labelDy) : null;
+      if (center !== null) Object.assign(el.style, { left: `${(center - 3) * cell}px`, width: `${6 * cell}px` });
       this.#mapLayer.append(el);
     }
   }
