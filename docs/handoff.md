@@ -1,10 +1,25 @@
-# 引き継ぎメモ（2026-10-30：Z のセッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-31：AB のセッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-30 Z のセッション終わり）
+### まず読む：いまの状態（2026-10-31 AB のセッション終わり）
+
+- **main に AB【1】〜【3】を入れた（まだ公開していない。ユーザーの「公開して」待ち）**。**セーブ version 31**（AB で 30→31：前に炎の火山をクリアしたセーブに祭壇のシシエンの記録）。テスト 1051件。**AB の報告の返事待ち**
+- Z の質問への返事（2026-10-31）：腕前 C の守りを先にマナにする・D の大会の腕前・投石の狙いはどれも「このまま」
+- AB【1】（記録 `docs/shishien-ab-20261031.md`）：シシエン（mon-shishien・LIFE 7・炭色・図鑑 No.181〜195・捨て身＝selfDamageOnHit）。バルカ＝ガウル・シシエン・ラズック。祭壇・barca-beaten・barca-altar-owed・ガチャのシリーズ・ショップの棚。投石の絵を描き直しに差し替え（原本 `design-parts/support-art-ab-20261031/`）。
+  炭色は暗い色のときだけ明るさも寄せる（`battle_card_frame.py`・`pack_tint.py` の DARK）。CPU：ライフ1の捨て身は相手の最後の1体を倒せるときだけ（C は 30% で忘れる `forgetRecoil`）
+  - **未完了：バルカの lifeScale は ±3 に入らない**（3体ともライフ7で 29.1%／11.0% の2段。1.09 のまま。腕前 B なら 1.1＝22.9%）。入れ替え 59.1%・自滅の負け 0.07%
+- AB【2】：腕前 C の迷う・守りそこねるは記録に書かず、相手の顔とふきだしでセリフ（`src/data/cpuLines.ts`。構えごと・人物ごとの上書きは空）。セリフのあとの倒れたときのひと言は言い終わってから
+- AB【3】（記録 `docs/battle-layout-ab-20261031.md`）：カメラの帯（相手の大きなカードの欄・相手の手札・相手3体・自分3体・説明の欄・手札）を 0.3 秒でずらす（`layoutCamera`・`cameraFocus`）。説明の欄 264→200・モンスター 88・手札 98・相手の手札は同じ大きさ
+- 報告：AB https://claude.ai/artifact/6JnifhZsPCw3qygnKpDSxQ （同じ内容を ZIP「AB作業報告_20261031.zip」〔報告書・写真60枚・資料〕でもユーザーに渡した）。作業ブランチ `ab1-shishien`・`ab2-cpu-lines`・`ab2-cpu-lines-fix`・`ab3-battle-layout` は main に取り込み済み
+- 写真の道具：`shishien_battle_shot.cjs`・`cpu_lines_ab_shot.cjs`・`battle_layout_ab_shot.cjs`（前の版は git worktree で前の main を別のポートの開発用サーバーに）。試遊 `npm run playtest:shishien`・`playtest:barca`
+- 作業のこつ（AB で分かったこと）：セッション開始の自動準備（Node 24）が動かなかったときは nodejs.org から Node 24 を入れて `npm install`。`battle_card_frame.py` は scipy が要る（`pip install scipy`）
+- **待っているもの**：ミュロルの正式なモンスターカード（デザイン担当の返事待ち）・部屋の家具の描き直し（まだ依頼していない）
+- **未完了**：iPhone 実機での確認（R〜AB）・バルカの強さ
+
+### その前（2026-10-30 Z のセッション終わり）
 
 - **公開中：`main`（Z まで）**。**セーブ version 30**（Z では変えていない）。**Z の報告の返事待ち**
 - Z（記録 `docs/cpu-skill-z-20261030.md`。原本 `design-parts/support-art-z-20261030/`）
