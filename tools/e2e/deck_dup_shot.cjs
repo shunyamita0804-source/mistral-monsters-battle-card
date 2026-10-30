@@ -1,6 +1,6 @@
 // 同じモンスターは1デッキ1体まで（2026-10-30 指示書 V）の画面写真：家の机でデッキを組む → モンスターを選ぶ → もうデッキにいるモンスターを押す
 // 使い方: node tools/e2e/deck_dup_shot.cjs URL セーブ.json 出力.png [モンスターのID=mon-soramo]
-//   セーブは家の机の前 {home,1,7,up}。W・H で画面の大きさ、LANG=en で英語。MENU=1 なら最初のメニュー（デッキの状態）だけ撮る。ISSUES=1 なら状態を押して問題の一覧を出す
+//   セーブの場所は家の机の横 {home,8,17,left} にしておく。W・H で画面の大きさ、LANG=en で英語。MENU=1 なら最初のメニュー（デッキの状態）だけ撮る。ISSUES=1 なら状態を押して問題の一覧を出す
 const { chromium } = require('playwright');
 const fs = require('fs');
 const [base, saveFile, out, id = 'mon-soramo'] = process.argv.slice(2);
