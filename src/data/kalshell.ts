@@ -37,7 +37,10 @@ export const KALSHELL_MONSTER: MonsterCard = {
   themeColor: KALSHELL_COLOR,
   description: 'カルシェル（水系）。',
   isPlaceholder: false,
-  // 対戦画面のアイコンの切り抜きと、図鑑などのカードに使う絵：正式のバトル用の絵（src/data/battleCards.ts と同じファイル）
+  // 図鑑・箱を受け取る窓・取得カード・祭壇などのカード：名前と LIFE 入りの正式モンスターカード（2026-10-30 指示書 P。
+  // 届いた design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png を幅 508 に縮めただけ。ソラモ・プカリムと同じ使い方）
+  art: { category: 'monsterCards', file: 'kalshell_official.webp', layout: 'full' },
+  // 対戦画面のアイコンの切り抜き：正式のバトル用の絵（src/data/battleCards.ts と同じファイル）
   battleArt: { category: 'monsterCards', file: 'kalshell_battlecard.png', layout: 'full' },
   pendingSpec: ['rarity'],
 };

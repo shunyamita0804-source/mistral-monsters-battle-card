@@ -106,12 +106,14 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
 });
 
 describe('カルシェル：モンスター・初期配布16枚', () => {
-  it('モンスター：ライフ8・淡い氷色 #DFF2F6。名前・LIFE 入りの1枚絵は貼らない', () => {
+  it('モンスター：ライフ8・淡い氷色 #DFF2F6。名前・LIFE 入りの正式モンスターカード（2026-10-30 指示書 P）', () => {
     expect(KALSHELL_MONSTER.name).toBe('カルシェル');
     expect(KALSHELL_MONSTER.life).toBe(8);
     expect(KALSHELL_COLOR).toBe('#DFF2F6');
     expect(KALSHELL_MONSTER.themeColor).toBe('#DFF2F6');
-    expect(KALSHELL_MONSTER.art).toBeUndefined();
+    expect(KALSHELL_MONSTER.art).toEqual({ category: 'monsterCards', file: 'kalshell_official.webp', layout: 'full' });
+    expect(existsSync('assets/images/cards/monsters/kalshell_official.webp')).toBe(true);
+    expect(existsSync('design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png')).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-kalshell')).toHaveLength(1);
     expect(SKILLS.filter((s) => s.monsterId === 'mon-kalshell')).toHaveLength(14);
   });
