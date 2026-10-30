@@ -7,6 +7,7 @@ import { GEOL_MONSTER, GEOL_SKILLS } from './geol.ts';
 import { FLUNE_MONSTER, FLUNE_SKILLS } from './flune.ts';
 import { SEREPHINE_MONSTER, SEREPHINE_SKILLS } from './serephine.ts';
 import { TSUMUJI_MONSTER, TSUMUJI_SKILLS } from './tsumuji.ts';
+import { HYOUZUKU_MONSTER, HYOUZUKU_SKILLS } from './hyouzuku.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -29,6 +30,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-29：フルーネと技14種を足した（src/data/flune.ts。フルーネの最終）。仮フルーネ（tmp-flune）はゲームから外した
  * 2026-10-29：セレフィーンと技14種を足した（src/data/serephine.ts。セレフィーンの最終）
  * 2026-10-30：ツムジと技14種を足した（src/data/tsumuji.ts。指示書 U）
+ * 2026-10-30：ヒョウズクと技14種を足した（src/data/hyouzuku.ts。指示書 W）
  */
 
 interface MonsterSeed {
@@ -162,6 +164,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   FLUNE_MONSTER,
   SEREPHINE_MONSTER,
   TSUMUJI_MONSTER,
+  HYOUZUKU_MONSTER,
 ];
 
 export const SKILLS: readonly SkillCard[] = [
@@ -178,6 +181,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...FLUNE_SKILLS,
   ...SEREPHINE_SKILLS,
   ...TSUMUJI_SKILLS,
+  ...HYOUZUKU_SKILLS,
 ];
 
 /**

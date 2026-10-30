@@ -125,7 +125,7 @@ export interface GachaSeries {
   readonly rareSkillNames: readonly string[];
   /**
    * 2026-10-29 までの並ぶ条件（この記録があるときだけ並んだ）。プカリム＝ピートに勝ったあと（PETE_BEATEN_FLAG）、ジオル＝グラント（GRANT_BEATEN_FLAG）、
-   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）、ツムジ＝風の渓谷のゼフィラ（ZEPHYRA_BEATEN_FLAG）。
+   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）、ツムジ＝風の渓谷のゼフィラ（ZEPHYRA_BEATEN_FLAG）、ヒョウズク＝氷の洞窟のイヴァン（IVAN_BEATEN_FLAG）。
    * 2026-10-30（指示書 K）から並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor（モンスターカードを初めて手に入れたら開く）。
    * ここは前のセーブの変換（src/game/save/saveData.ts の v26→v27・v27→v28）でだけ使う
    */
@@ -154,6 +154,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' },
   // ツムジ（2026-10-30 指示書 U）：風の渓谷のゼフィラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（tsumuji14_skills_OFFICIAL_20261030.json）
   { id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['かまいたち', 'ストームブレイド', 'かぜよみ'], unlockFlag: 'zephyra-beaten' },
+  // ヒョウズク（2026-10-30 指示書 W）：氷の洞窟のイヴァンに初めて勝ったあと（祭壇でカードを受け取ると）並ぶ。JSON の gacha_slot も同じ（hyouzuku14_skills_OFFICIAL_20261030.json）
+  { id: 'hyouzuku', monsterId: 'mon-hyouzuku', rareSkillNames: ['ふぶき', 'ひょうが', 'おとなきはばたき'], unlockFlag: 'ivan-beaten' },
 ];
 
 /**

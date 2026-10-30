@@ -23,7 +23,8 @@
     "playtest:zephyra": "PLAYTEST=200 PLAYTEST_OUT=docs/design/wind-valley-20261030/playtest_200.json vitest run tests/zephyraPlaytest.test.ts",
     "playtest:lazuck": "PLAYTEST=200 PLAYTEST_OUT=docs/design/lazuck-20261029/playtest_200_after.json vitest run tests/lazuckPlaytest.test.ts",
     "playtest:rekka": "PLAYTEST=200 PLAYTEST_OUT=docs/design/rekka-20261029/playtest_200.json vitest run tests/rekkaPlaytest.test.ts",
-    "playtest:bosses": "PLAYTEST=200 PLAYTEST_OUT=docs/design/boss-ace-20261030/after_200.json vitest run tests/bossPlaytest.test.ts"
+    "playtest:hyouzuku": "PLAYTEST=200 PLAYTEST_OUT=docs/design/hyouzuku-w-20261030/hyouzuku_200.json vitest run tests/hyouzukuPlaytest.test.ts",
+    "playtest:bosses": "PLAYTEST=200 PLAYTEST_OUT=docs/design/hyouzuku-w-20261030/bosses_200.json vitest run tests/bossPlaytest.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

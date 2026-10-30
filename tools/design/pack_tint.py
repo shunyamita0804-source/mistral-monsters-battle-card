@@ -10,6 +10,7 @@ COLORS = {
     'myurol': '#84E5FA', 'kalshell': '#DFF2F6', 'pukarim': '#A8DCC4', 'geol': '#9A7B5C',
     'flune': '#9CBF5A', 'serephine': '#8FA6E8',
     'tsumuji': '#8FA3B8',  # 2026-10-30 ツムジ（くすんだ青みの灰）
+    'hyouzuku': '#C8CCD4',  # 2026-10-30 ヒョウズク（銀に近い白。指示書 W）
 }
 
 def smooth(x, a, b):

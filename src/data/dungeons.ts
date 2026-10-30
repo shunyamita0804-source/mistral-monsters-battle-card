@@ -10,6 +10,7 @@ import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
+import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
@@ -68,6 +69,10 @@ export const LUCIA_BEATEN_FLAG = 'lucia-beaten';
 export const LUCIA_ALTAR_OWED_FLAG = 'lucia-altar-owed';
 /** 風の渓谷のゼフィラに初めて勝った（2026-10-30 指示書 U：ツムジのガチャのシリーズが並ぶ。SERA_BEATEN_FLAG と同じ形） */
 export const ZEPHYRA_BEATEN_FLAG = 'zephyra-beaten';
+/** 氷の洞窟のイヴァンに初めて勝った（2026-10-30 指示書 W：ヒョウズクのガチャのシリーズが並ぶ。ZEPHYRA_BEATEN_FLAG と同じ形） */
+export const IVAN_BEATEN_FLAG = 'ivan-beaten';
+/** 氷の洞窟の祭壇のヒョウズクをまだ受け取っていない（前に氷の洞窟をクリアしていたセーブ。LUCIA_ALTAR_OWED_FLAG と同じ形） */
+export const IVAN_ALTAR_OWED_FLAG = 'ivan-altar-owed';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -117,7 +122,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     bossFlag: ZEPHYRA_BEATEN_FLAG,
     isPlaceholder: true,
   },
-  { id: 'dungeon-04', name: '氷の洞窟', description: '足元がすべる氷の洞窟。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(KAL), isPlaceholder: true },
+  {
+    id: 'dungeon-04',
+    name: '氷の洞窟',
+    description: '足元がすべる氷の洞窟。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    // 2026-10-30 指示書 W：初回クリアは最奥の祭壇でヒョウズクのモンスターカード1枚（前はカルシェルと技3枚）。2回目からはヒョウズクの技カード1枚・宝箱もヒョウズクの技（風の渓谷と同じ形）
+    firstClearCards: [{ cardId: HYOUZUKU_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: IVAN_BEATEN_FLAG,
+    altarOwedFlag: IVAN_ALTAR_OWED_FLAG,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-05', name: '炎の火山', description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(GAU), isPlaceholder: true },
   { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
   { id: 'dungeon-07', name: '天の聖域', description: '強い番人が守る最後の試練。2回負けると戻される。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(SORAMO_MONSTER_ID), isPlaceholder: true },
@@ -148,7 +164,10 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 後ろの4人（イヴァン・バルカ・テオ・アウレリオ）の切り札は仮（あとで新しいモンスターに替える）
   // 水の神殿のボス：セレフィーンを真ん中に（2026-10-29 セレフィーンの最終。ソラモを外した〔ユーザー決定〕。lifeScale は今の 1.2 のまま。指示書 V のあとも 1.2）
   'enc-water-boss': { id: 'enc-water-boss', name: 'ルシア', monsters: [KAL, SEREPHINE_MONSTER_ID, MYU], ace: SEREPHINE_MONSTER_ID, lifeScale: 1.2 },
-  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, KAL, NOB], ace: KAL, lifeScale: 1.6 },
+  // 氷の洞窟のボス（2026-10-30 指示書 W）：切り札をカルシェルからヒョウズクに（真ん中）。ノビトンは外した（まきつく＋凍らせるで同じモンスターを止め続ける組み合わせになるため）。
+  // lifeScale は V で直す前の勝つ割合 21.2％ から ±3 を目ざしたが、1.1 より上はライフを上げても 33〜36％ から下がらない（プレイヤーはほぼボスの山札切れでしか勝たない）。
+  // 測った中でいちばん近い 1.3（1000回で 32.7％）にした。±3 には入っていない（docs/hyouzuku-w-20261030.md・npm run playtest:bosses）
+  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.3 },
   'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], ace: GAU, lifeScale: 1.75 },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.2 },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.75 },
