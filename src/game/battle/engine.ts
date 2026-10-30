@@ -213,9 +213,9 @@ export type BattleAction =
       /** 選んだカード（2026-10-30 指示書 Y：思い出の箱＝捨て札の技カードの ID、風まかせ＝山札に戻す手札の uid） */
       readonly choice?: string;
     }
-  /** note（2026-10-30 指示書 Z）：腕前 C の CPU が守れるのに守らなかったとき 'misguard'（記録に「〇〇は守りそこねた！」） */
+  /** note（2026-10-30 指示書 Z）：腕前 C の CPU が守れるのに守らなかったとき 'misguard'（2026-10-31 指示書 AB から記録には書かず、画面が相手のセリフをふきだしで出す。src/data/cpuLines.ts） */
   | { readonly type: 'defend'; readonly side: Side; readonly cardUid: string | null; readonly note?: 'misguard' }
-  /** 攻撃を終えてマナ化へ進む。note：腕前 C の CPU が攻撃を見送ったとき 'hesitate'（記録に「〇〇は迷っている…」。2026-10-30 指示書 Z） */
+  /** 攻撃を終えてマナ化へ進む。note：腕前 C の CPU が攻撃を見送ったとき 'hesitate'（2026-10-30 指示書 Z。2026-10-31 指示書 AB から記録には書かず、画面が相手のセリフをふきだしで出す） */
   | { readonly type: 'endAttack'; readonly side: Side; readonly note?: 'hesitate' }
   /** マナ化：手札1枚をマナにする（マナ化の間は何回でも） */
   | { readonly type: 'convertToMana'; readonly side: Side; readonly cardUid: string }
@@ -872,11 +872,10 @@ export function applyAction(state: BattleState, action: BattleAction): BattleSta
     case 'useCard':
       return useCard(state, action.side, action.cardUid, action.userUid, action.targetUid, action.choice);
     case 'defend':
-      return defend(state, action.side, action.cardUid, action.note);
+      return defend(state, action.side, action.cardUid);
     case 'endAttack': {
       if (state.phase !== 'main' || state.active !== action.side) return state;
-      const hesitated = action.note === 'hesitate' ? addLog(state, t('battle.log.hesitate', { name: state.sides[action.side].name })) : state;
-      return addLog({ ...hesitated, phase: 'mana' }, t(`battle.log.manaPhase.${action.side}`));
+      return addLog({ ...state, phase: 'mana' }, t(`battle.log.manaPhase.${action.side}`));
     }
     case 'convertToMana': {
       if (!canConvertToMana(state, action.side)) return state;
@@ -1310,15 +1309,11 @@ function useSupport(state: BattleState, side: Side, cardUid: string, card: Suppo
  * 守備：防御・回避カードを1枚使う（条件を満たす限り1回の攻撃に何枚でも）。
  * cardUid が null なら守備を終えて、ダメージを計算する。
  */
-function defend(state: BattleState, side: Side, cardUid: string | null, note?: 'misguard'): BattleState {
+function defend(state: BattleState, side: Side, cardUid: string | null): BattleState {
   const pending = state.pending;
   if (state.phase !== 'defense' || !pending || pending.attacker === side) return state;
   if (cardUid === null) {
-    const text =
-      note === 'misguard'
-        ? t('battle.log.misguard', { name: state.sides[side].name })
-        : t(pending.responses.length === 0 ? 'battle.log.noDefense' : 'battle.log.defenseDone', { side: sideLabel(side) });
-    return resolvePending(addLog(state, text));
+    return resolvePending(addLog(state, t(pending.responses.length === 0 ? 'battle.log.noDefense' : 'battle.log.defenseDone', { side: sideLabel(side) })));
   }
   if (!cardUsability(state, side, cardUid).usable) return state;
   const hand = findHandCard(state, side, cardUid);
