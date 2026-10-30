@@ -14,6 +14,8 @@ export type BattleCardSize = 'hand' | 'tall' | 'focus';
 export interface BattleCardOptions {
   readonly width: number;
   readonly size: BattleCardSize;
+  /** マナの数字（かぜのりで下がったとき。skillCard.ts の SkillCardOptions.mana） */
+  readonly mana?: number;
 }
 
 export function battleCardHeight(width: number, size: BattleCardSize): number {
@@ -21,6 +23,7 @@ export function battleCardHeight(width: number, size: BattleCardSize): number {
 }
 
 export function createBattleCard(card: PlayCard, options: BattleCardOptions): HTMLElement {
-  if (options.size !== 'focus') return createPlayCard(card, { width: options.width, size: 'hand', showText: false });
-  return createPlayCard(card, { width: options.width, size: 'normal', showText: true });
+  const mana = options.mana !== undefined ? { mana: options.mana } : {};
+  if (options.size !== 'focus') return createPlayCard(card, { width: options.width, size: 'hand', showText: false, ...mana });
+  return createPlayCard(card, { width: options.width, size: 'normal', showText: true, ...mana });
 }

@@ -6,6 +6,7 @@ import { PUKARIM_MONSTER, PUKARIM_SKILLS } from './pukarim.ts';
 import { GEOL_MONSTER, GEOL_SKILLS } from './geol.ts';
 import { FLUNE_MONSTER, FLUNE_SKILLS } from './flune.ts';
 import { SEREPHINE_MONSTER, SEREPHINE_SKILLS } from './serephine.ts';
+import { TSUMUJI_MONSTER, TSUMUJI_SKILLS } from './tsumuji.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -27,6 +28,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-29：ジオルと技14種も確認用の一覧からふつうの一覧へ移した（src/data/geol.ts。ジオルの最終）。仮ジオル（tmp-geol）はゲームから外した
  * 2026-10-29：フルーネと技14種を足した（src/data/flune.ts。フルーネの最終）。仮フルーネ（tmp-flune）はゲームから外した
  * 2026-10-29：セレフィーンと技14種を足した（src/data/serephine.ts。セレフィーンの最終）
+ * 2026-10-30：ツムジと技14種を足した（src/data/tsumuji.ts。指示書 U）
  */
 
 interface MonsterSeed {
@@ -159,6 +161,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   GEOL_MONSTER,
   FLUNE_MONSTER,
   SEREPHINE_MONSTER,
+  TSUMUJI_MONSTER,
 ];
 
 export const SKILLS: readonly SkillCard[] = [
@@ -174,6 +177,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...GEOL_SKILLS,
   ...FLUNE_SKILLS,
   ...SEREPHINE_SKILLS,
+  ...TSUMUJI_SKILLS,
 ];
 
 /**

@@ -13,6 +13,7 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.buttonA': { ja: 'しらべる・話す', en: 'Check / Talk' },
   'dungeonRun.buttonB': { ja: 'メニュー', en: 'Menu' },
   'dungeonRun.omen': { ja: 'なにかの気配がする…', en: 'You sense something nearby...' },
+  'dungeonRun.gust': { ja: '強い風に押し流された！', en: 'A strong gust pushed you along!' },
   'dungeonRun.omenMark': { ja: '！', en: '!' },
   'dungeonRun.npcTalk': { ja: '{name}が勝負を挑んできた！\n（{monsters}）', en: '{name} challenges you!\n({monsters})' },
   'dungeonRun.guardianAppear': { ja: '{name}が姿を現した！\n（{monsters}）', en: '{name} reveals itself!\n({monsters})' },

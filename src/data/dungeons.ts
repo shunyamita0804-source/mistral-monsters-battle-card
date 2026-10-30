@@ -9,6 +9,7 @@ import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
+import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
@@ -65,6 +66,8 @@ export const SERA_BEATEN_FLAG = 'sera-beaten';
 export const LUCIA_BEATEN_FLAG = 'lucia-beaten';
 /** 水の神殿の祭壇のセレフィーンをまだ受け取っていない（前に水の神殿をクリアしていたセーブ。DungeonDefinition の altarOwedFlag） */
 export const LUCIA_ALTAR_OWED_FLAG = 'lucia-altar-owed';
+/** 風の渓谷のゼフィラに初めて勝った（2026-10-30 指示書 U：ツムジのガチャのシリーズが並ぶ。SERA_BEATEN_FLAG と同じ形） */
+export const ZEPHYRA_BEATEN_FLAG = 'zephyra-beaten';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -102,6 +105,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     altarOwedFlag: LUCIA_ALTAR_OWED_FLAG,
     isPlaceholder: true,
   },
+  // 2026-10-30 指示書 U：D ランクの2つ目のダンジョン（水の神殿と同じ段）。仕掛けは強い風のマス。ボスは守り手ゼフィラ・切り札はツムジ。ダンジョンを選ぶ所では水の神殿の次
+  {
+    id: 'dungeon-08',
+    name: '風の渓谷',
+    description: '崖とつり橋の渓谷。強い風が吹き、乗ると押し流される。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    // 初回クリアは最奥の祭壇でツムジのモンスターカード1枚。2回目からはツムジの技カード1枚（水の神殿のセレフィーンと同じ形）
+    firstClearCards: [{ cardId: TSUMUJI_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: ZEPHYRA_BEATEN_FLAG,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-04', name: '氷の洞窟', description: '足元がすべる氷の洞窟。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(KAL), isPlaceholder: true },
   { id: 'dungeon-05', name: '炎の火山', description: '溶岩の明かりで明るいが、見えない番人が多い火山。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(GAU), isPlaceholder: true },
   { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
@@ -132,6 +147,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [LAZUCK_MONSTER_ID, GAU, NOB], lifeScale: 1.5 },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], lifeScale: 1.6 },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], lifeScale: 1.75 },
+  // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
+  // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）
+  'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, TSUMUJI_MONSTER_ID, GAU], lifeScale: 1 },
   // 【仮】ランダム生成のダンジョン（2026-10-26 試作。src/data/dungeonRun.ts）：通常のバトラー・見えない番人。編成とライフは階ごとに src/data/dungeonRun.ts で決める
   'enc-run-npc': { id: 'enc-run-npc', name: 'ダンジョンのバトラー（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
   'enc-run-guardian': { id: 'enc-run-guardian', name: '見えない番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },

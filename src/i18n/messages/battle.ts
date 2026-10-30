@@ -61,6 +61,9 @@ export const BATTLE = {
   'battle.log.allTargets': { ja: '{name}の攻撃は相手全体へ！ 1体ずつ守りを選ぶ。', en: "{name}'s attack hits all enemies! Each one guards separately." },
   'battle.log.pin': { ja: '{name}はじならしで足もとを固められた。このターンに受ける次の攻撃は回避できない。', en: "{name}'s footing was leveled. It can't dodge the next attack it takes this turn." },
   'battle.log.energy': { ja: '{name}はエネルギーをためた。次のターンに最初に使うかしこさ技のダメージ2倍。', en: "{name} stored energy. Its first INT skill next turn deals double damage." },
+  'battle.log.windRide': { ja: '{name}は風に乗った。次のターン、{name}の攻撃技のマナ−{n}。', en: "{name} rides the wind. Next turn, {name}'s attacks cost {n} less mana." },
+  'battle.log.windRideCost': { ja: '（かぜのりでマナ{n}）', en: '(Wind Ride: {n} mana)' },
+  'battle.log.chain': { ja: '{name}は続けて{skill}を使った！', en: '{name} followed up with {skill}!' },
   'battle.log.energyDouble': { ja: '{name}はためたエネルギーを放った！ ダメージ2倍！', en: '{name} released its stored energy! Double damage!' },
   'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
   'battle.log.nullify': { ja: '{side}は「{skill}」でうけとめた（ダメージ0）！', en: '{side} caught it with {skill} (no damage)!' },
@@ -126,6 +129,7 @@ export const BATTLE = {
   'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
   'battle.status.charged': { ja: 'ためている', en: 'Charged' },
   'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },
+  'battle.status.windRide': { ja: 'かぜのり マナ−{n}', en: 'Wind Ride: mana −{n}' },
   'battle.oppHand.count': { ja: '相手の手札 {n}枚', en: "Opponent's hand: {n} {n|card|cards}" },
   'battle.cmd.menu': { ja: 'コマンド', en: 'Command' },
   // 対戦相手のひと言（【仮】台詞。正式な台詞・人物ごとの言い回しは未定）

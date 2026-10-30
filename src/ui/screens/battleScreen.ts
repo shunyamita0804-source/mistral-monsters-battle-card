@@ -8,6 +8,7 @@ import {
   cardUsability,
   createBattle,
   findMonster,
+  handSkillCost,
   manaOf,
   otherSide,
   incomingDamage,
@@ -650,12 +651,23 @@ export const battleScreen: ScreenDefinition = {
         });
     };
 
-    /** カードを使ったモンスター（技：行動済になったモンスター、守備：狙われたモンスター、サポート：なし） */
+    /**
+     * カードを使ったモンスター（技：行動済になったモンスター、守備：狙われたモンスター、サポート：なし）。
+     * Wひっかきの2回目（ツムジ。もう行動済）は、続けて使える印が消えたモンスター
+     */
     const playedBy = (before: BattleState, after: BattleState, action: BattleAction): string | null => {
       if (action.type === 'defend') return before.pending?.targetUid ?? null;
       if (action.type !== 'useCard') return null;
       const was = before.sides[action.side].monsters;
-      return after.sides[action.side].monsters.find((m, i) => m.acted && !was[i]?.acted)?.uid ?? null;
+      const now = after.sides[action.side].monsters;
+      return (now.find((m, i) => m.acted && !was[i]?.acted) ?? now.find((m, i) => !!was[i]?.chain && !m.chain && m.acted))?.uid ?? null;
+    };
+
+    /** 手札のマナの数字（かぜのりで攻撃技のマナが下がっていれば、その数。下がっていなければ何も渡さない） */
+    const handMana = (s: BattleState, card: PlayCard): { mana?: number } => {
+      if (card.kind !== 'skill' || card.effect.type !== 'attack' || s.active !== 'player') return {};
+      const cost = handSkillCost(s, 'player', card);
+      return cost < card.cost ? { mana: cost } : {};
     };
 
     /** 演出をタップで飛ばす：大きく見せるのをやめ、待たせていた操作・相手の行動をすぐ進める */
@@ -1275,6 +1287,9 @@ export const battleScreen: ScreenDefinition = {
           // 使ったカードを大きく見せている間は出さない（2026-10-24 ユーザー指示）。見せ終わってから
           const isPointed = m.life > 0 && Date.now() >= showcaseUntil && (isPendingTarget || (pointed?.uid === m.uid && Date.now() < pointed.until));
           const down = barLife <= 0;
+          // Wひっかき（ツムジ）の1回目のあと、手札にもう1枚あって続けて使えるうちは「行動済み」にしない
+          const chainOpen = m.chain?.turn === s.turn && s.sides[side].hand.some((c) => c.cardId === m.chain?.cardId);
+          const acted = m.acted && !chainOpen;
           // 技の演出の間：使った側と対象のアイコンを光らせる（つながりが分かるように）
           const spot = spotlight && Date.now() < spotlight.until ? spotlight : null;
           const spotClass = spot?.userUid === m.uid ? ' is-spot-user' : spot?.targetUid === m.uid ? ' is-spot-target' : '';
@@ -1286,7 +1301,7 @@ export const battleScreen: ScreenDefinition = {
             'button',
             {
               // 対象を選ぶ間は、選べないモンスターを暗くして候補と見分ける
-              class: `battle__monster battle__monster--${side}${isTarget ? ' is-target' : targeting ? ' is-not-target' : ''}${isPendingTarget ? ' is-attacked' : ''}${m.acted && !down ? ' is-acted' : ''}${down ? ' is-down' : ''}${diff < 0 ? ' is-hit' : ''}${spotClass}`,
+              class: `battle__monster battle__monster--${side}${isTarget ? ' is-target' : targeting ? ' is-not-target' : ''}${isPendingTarget ? ' is-attacked' : ''}${acted && !down ? ' is-acted' : ''}${down ? ' is-down' : ''}${diff < 0 ? ' is-hit' : ''}${spotClass}`,
               attrs: { type: 'button', 'aria-label': t('battle.monster.aria', { name: cardName(m.cardId), life: m.life }) },
               // 技の対象に選ぶとき（カードを使う操作）はボタンの音を付けない
               dataset: { uid: m.uid, ...(targeting ? { se: 'none' } : {}) },
@@ -1302,7 +1317,7 @@ export const battleScreen: ScreenDefinition = {
               down
                 ? h('span', { class: 'battle__monster-down' }, h('img', { class: 'battle__monster-down-mark', attrs: { src: knockoutArt, alt: '', draggable: 'false' } }), h('span', { class: 'battle__monster-down-text', text: t('card.down') }))
                 : null,
-              m.acted && !down ? h('span', { class: 'battle__acted' }, statusIcon(statusActedArt), h('span', { text: t('battle.monster.acted') })) : null,
+              acted && !down ? h('span', { class: 'battle__acted' }, statusIcon(statusActedArt), h('span', { text: t('battle.monster.acted') })) : null,
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印
               !down ? statusBadges(s, m) : null,
               !down ? cornerMarks(s, m) : null,
@@ -1387,6 +1402,8 @@ export const battleScreen: ScreenDefinition = {
       // 試遊中：ジオルのエネルギーをためる（同じ「ためている」の絵。かけた手番から、効く手番まで出す。相手からも見える）
       if (m.energy && m.life > 0 && s.turn <= m.energy.turn) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
       if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
+      // かぜのり（ツムジ 2026-10-30）：おいかぜと同じ風の印。かけてから、マナ−1 が効く次の自分のターンまで出す（相手からも見える）
+      if (m.windRide && m.life > 0 && m.windRide.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.windRide', { n: m.windRide.discount }), 'tailwind'));
       return marks.length ? h('span', { class: 'battle__corner-marks' }, ...marks) : null;
     };
 
@@ -1624,8 +1641,8 @@ export const battleScreen: ScreenDefinition = {
               },
             },
             isNew
-              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'tall' }), h('span', { class: 'battle__hand-cover' }))
-              : createBattleCard(card, { width: cardW, size: 'tall' }),
+              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card) }), h('span', { class: 'battle__hand-cover' }))
+              : createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card) }),
             picked ? h('span', { class: 'battle__hand-mana' }, h('span', { class: 'battle__hand-mana-text', text: t('card.detail.mana') })) : null,
           );
           if (deal && isNew) {

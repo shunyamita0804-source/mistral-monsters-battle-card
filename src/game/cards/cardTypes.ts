@@ -96,6 +96,11 @@ export type SkillEffect =
        * 最大ライフを超えない。回避されたら・防御で0なら回復しない
        */
       readonly drain?: boolean;
+      /**
+       * 同じターンに、手札のもう1枚の同じ技を続けて使える（正式：ツムジの Wひっかき 2026-10-30）。「モンスター1体は1ターンに技1回」のただ1つの例外。
+       * 続けて使えるのはこの技 → この技の1回だけ（1ターンに最大2回）。2枚目もマナを払う。この技のあとにほかの技は使えない
+       */
+      readonly chain?: boolean;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -176,6 +181,11 @@ export type SkillEffect =
    * 使わなかったらそのターンの終わりに消える。重ねない。ちから技を使っても消えない
    */
   | { readonly type: 'energy' }
+  /**
+   * 特殊（正式：ツムジのかぜのり 2026-10-30）：次の自分のターンの間、使ったモンスターの攻撃技（ちから技・かしこさ技）の消費マナを discount 減らす。
+   * 0より下にはならない。重ねない（もう一度使っても discount のまま、効くターンだけ新しく）。次の自分のターンが終わったら消える。倒れたら消える
+   */
+  | { readonly type: 'windRide'; readonly discount: number }
   /**
    * 守り（試遊中：ジオルのかばう 2026-10-29）：使ったモンスター以外の味方が攻撃で狙われたとき、使ったモンスターが代わりに受ける。
    * 「防御されない」攻撃・相手全体への攻撃には使えない
@@ -355,8 +365,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'cover';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'cover'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

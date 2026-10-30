@@ -27,13 +27,14 @@ const runOf = (s: SaveData): DungeonRun => {
 const DIRS: readonly Direction[] = ['up', 'down', 'left', 'right'];
 
 describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ」。値は仮）', () => {
-  it('7つ：階・仕掛け・開放のランク', () => {
-    expect(DUNGEONS.map((d) => d.id)).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07']);
+  it('7つ（2026-10-30 に風の渓谷を足して8つ。水の神殿の次）：階・仕掛け・開放のランク', () => {
+    expect(DUNGEONS.map((d) => d.id)).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07']);
     expect(DUNGEONS.map((d) => [d.name, runConfig(d.id).floors, runConfig(d.id).gimmick, runConfig(d.id).unlockRank])).toEqual([
       // 2026-10-29 ジオルの最終：遺跡は C ランクで開く地下4階（氷の洞窟と同じ段）
       ['太古の遺跡', 4, 'none', 'C'],
       ['精霊の森', 3, 'none', null],
       ['水の神殿', 4, 'water', 'D'],
+      ['風の渓谷', 4, 'wind', 'D'],
       ['氷の洞窟', 4, 'ice', 'C'],
       ['炎の火山', 5, 'lava', 'B'],
       ['機械の塔', 5, 'switch', 'A'],
@@ -75,8 +76,8 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
 describe('開放', () => {
   it('新しく始めたときは精霊の森だけ（2026-10-29 から。太古の遺跡は C ランクで氷の洞窟と同時に開く）', () => {
     expect(fresh().unlockedDungeons).toEqual(['dungeon-02']);
-    expect(unlockedDungeonsFor('D', [])).toEqual(['dungeon-02', 'dungeon-03']);
-    expect(unlockedDungeonsFor('C', [])).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-04']);
+    expect(unlockedDungeonsFor('D', [])).toEqual(['dungeon-02', 'dungeon-03', 'dungeon-08']);
+    expect(unlockedDungeonsFor('C', [])).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04']);
   });
 
   it('すでに遺跡が開いている・クリアしたセーブは、そのまま（閉じない）', () => {
@@ -91,7 +92,7 @@ describe('開放', () => {
     const old = { ...rest, version: 18, rank: 'A', activeDungeon: { dungeonId: 'dungeon-02', floor: 1, defeatedEnemies: [] }, location: { mapId: 'dungeon-02-b2', x: 5, y: 5, dir: 'up' } };
     const s = normalizeSave(old);
     expect(s?.version).toBe(SAVE_VERSION);
-    expect(s?.unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06']);
+    expect(s?.unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-06']);
     expect(s?.activeDungeon).toBeNull();
     expect(s?.location.mapId).toBe('home');
   });
@@ -99,7 +100,7 @@ describe('開放', () => {
   it('大会でランクが上がったときに開放し、報酬の画面で知らせる（D 優勝で C → 氷の洞窟）', () => {
     const d = getTournament('tournament-d');
     if (!d) throw new Error('d');
-    let s: SaveData = { ...fresh(), rank: 'D', unlockedDungeons: ['dungeon-01', 'dungeon-02', 'dungeon-03'] };
+    let s: SaveData = { ...fresh(), rank: 'D', unlockedDungeons: ['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08'] };
     s = enterTournament(cupReady(s), 'tournament-d', 'd-1', 1);
     for (let r = 0; r < 3; r++) s = recordMatch(s, r, true);
     const claim = claimTournamentRewards(s);

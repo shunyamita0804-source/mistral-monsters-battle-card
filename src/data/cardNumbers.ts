@@ -3,6 +3,7 @@ import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
 import { FLUNE_MONSTER_ID } from './flune.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
+import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -31,6 +32,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   FLUNE_MONSTER_ID,
   // 2026-10-29 セレフィーンの最終：フルーネのあと（No.136〜150）
   SEREPHINE_MONSTER_ID,
+  // 2026-10-30 指示書 U：セレフィーンのあと（No.151〜165）
+  TSUMUJI_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（いまは正式なサポートカードが無い。仮サポートは「仮」の区切りへ） */

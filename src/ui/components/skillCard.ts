@@ -32,6 +32,8 @@ export interface SkillCardOptions {
   readonly showText?: boolean;
   /** 枠の形（なければ 'normal'） */
   readonly size?: SkillCardSize;
+  /** マナの数字をカードの値の代わりに出す（対戦の手札：ツムジのかぜのりで攻撃技のマナ−1 のとき。2026-10-30 指示書 U） */
+  readonly mana?: number;
 }
 
 type Rect = readonly [number, number, number, number];
@@ -131,9 +133,9 @@ function fitBandText(l: FrameLayout, band: Rect, text: string): HTMLElement {
  * マナの球（2026-10-29 ユーザー「マナとダメージのとこは前のUI使ってね」：前の版〔3cf9050〕の枠のつやのある青い球を切り出した mana_ball.webp に、
  * 白い太い数字をゲームが重ねる。真ん中・大きさは LAYOUT の mana）
  */
-function manaOrb(l: FrameLayout, cost: number): HTMLElement {
+function manaOrb(l: FrameLayout, cost: number, lowered = false): HTMLElement {
   const [cx, cy, r] = l.mana;
-  const el = place(h('span', { class: 'skill-card__mana' }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r, cy - r, cx + r, cy + r]);
+  const el = place(h('span', { class: `skill-card__mana${lowered ? ' skill-card__mana--lowered' : ''}` }, h('span', { class: 'skill-card__mana-num', text: String(cost) })), l, [cx - r, cy - r, cx + r, cy + r]);
   // 数字の大きさ：球の直径の約6割（2桁は少し小さく）
   el.style.fontSize = cqw(((r * 2) / l.w) * 100 * (String(cost).length > 1 ? 0.48 : 0.6));
   return el;
@@ -305,7 +307,7 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
     valueBox(l, size, f.skill, f.supportLabel),
     band,
     name,
-    manaOrb(l, f.mana),
+    manaOrb(l, options.mana ?? f.mana, options.mana !== undefined && options.mana < f.mana),
     categoryIcon(l, f.category),
   );
   card.style.width = `${options.width}px`;

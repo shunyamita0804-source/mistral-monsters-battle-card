@@ -11,7 +11,7 @@ import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts'
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { isDeckValid } from '../../game/deck/deck.ts';
 import { floorDecorations } from '../../game/dungeon/decor.ts';
-import { isWalkableTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
+import { isWalkableTile, isWindTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
   bossRewardCandidates,
@@ -65,6 +65,7 @@ import iceBattleBg from '@assets/images/backgrounds/battle_ice.webp';
 import fireBattleBg from '@assets/images/backgrounds/battle_fire.webp';
 import machineBattleBg from '@assets/images/backgrounds/battle_machine.webp';
 import holyBattleBg from '@assets/images/backgrounds/battle_holy.webp';
+import windBattleBg from '@assets/images/backgrounds/battle_wind.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
@@ -166,6 +167,8 @@ const RUN_BGM: Readonly<Record<string, BgmId>> = {
   'dungeon-05': 'dungeonFire',
   'dungeon-06': 'dungeonMachine',
   'dungeon-07': 'dungeonHoly',
+  // 2026-10-30 指示書 U：風の渓谷
+  'dungeon-08': 'dungeonWind',
 };
 
 /**
@@ -181,10 +184,14 @@ const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-05': fireBattleBg,
   'dungeon-06': machineBattleBg,
   'dungeon-07': holyBattleBg,
+  'dungeon-08': windBattleBg,
 };
 
 /** ボス戦もそのダンジョンの対戦の背景にするダンジョン（2026-10-28 ユーザー：新しい5つ） */
-const BOSS_OWN_BG: readonly string[] = ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
+const BOSS_OWN_BG: readonly string[] = ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07', 'dungeon-08'];
+
+/** 風のマスの文字 → 絵の向きのクラス（右向きの形をまわす。dungeonRun.css の drun__tile--wind-*） */
+const WIND_CLASS: Readonly<Record<string, string>> = { '>': 'r', '<': 'l', '^': 'u', v: 'd' };
 
 /** 水路のふちの石を置く辺（上・下・左・右）と、そのとなりのマスの向き */
 const WATER_EDGES = [['n', 0, -1], ['s', 0, 1], ['w', -1, 0], ['e', 1, 0]] as const;
@@ -447,9 +454,9 @@ class DungeonRunView {
         const below = f.tiles[y + 1]?.[x];
         const face = wall && below !== undefined && below !== '#';
         const stairs = !!f.stairs && f.stairs.x === x && f.stairs.y === y;
-        // 水路・氷は床の代わり、扉は床の上に重ねる（dungeonRun.css）
+        // 水路・氷は床の代わり、扉は床の上に重ねる（dungeonRun.css）。強い風のマス（風の渓谷）は床の上に風の線を重ねる
         const kind = wall ? 'wall' : ch === 'w' ? 'water' : ch === 'i' ? 'ice' : 'floor';
-        const door = ch === 'D' ? ' drun__tile--door' : '';
+        const door = ch === 'D' ? ' drun__tile--door' : isWindTile(ch) ? ` drun__tile--wind drun__tile--wind-${WIND_CLASS[ch as string]}` : '';
         // 水路のふちの石：となりが水路でも壁でもない辺（水と床の境目）
         const edges = kind !== 'water' ? '' : WATER_EDGES.filter(([, dx, dy]) => isShore(f.tiles[y + dy]?.[x + dx])).map(([d]) => ` drun__tile--edge-${d}`).join('');
         const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}${edges}` });
@@ -679,6 +686,7 @@ class DungeonRunView {
       setTimeout(() => (this.#busy = false), STEP_MS * steps);
     }
     this.#refresh(r.moved, steps);
+    if (r.gust) this.#gust(r.gust);
     this.#setOmen(r.omen);
     if (r.guardian) {
       this.#release();
@@ -687,6 +695,17 @@ class DungeonRunView {
       this.#release();
       this.#askStairs();
     }
+  }
+
+  /** 強い風のマスで押し流された（風の渓谷）：風の線が一瞬走り、風を切る音（風の音の素材は無いので、今の効果音のうち回避の「ヒュッ」） */
+  #gust(dir: Direction): void {
+    this.#root.style.setProperty('--gust-angle', dir === 'up' || dir === 'down' ? '0deg' : '90deg');
+    this.#root.classList.remove('is-gust');
+    void this.#root.offsetWidth;
+    this.#root.classList.add('is-gust');
+    setTimeout(() => this.#root.classList.remove('is-gust'), 650);
+    sound.play('evade');
+    this.#live.textContent = t('dungeonRun.gust');
   }
 
   /** 見えない番人の気配：画面の端が揺れて、気配が出た瞬間に「！」 */

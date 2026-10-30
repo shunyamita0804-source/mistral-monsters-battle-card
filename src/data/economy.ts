@@ -121,7 +121,7 @@ export interface GachaSeries {
   readonly rareSkillNames: readonly string[];
   /**
    * 2026-10-29 までの並ぶ条件（この記録があるときだけ並んだ）。プカリム＝ピートに勝ったあと（PETE_BEATEN_FLAG）、ジオル＝グラント（GRANT_BEATEN_FLAG）、
-   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）。
+   * フルーネ＝セラ（SERA_BEATEN_FLAG）、セレフィーン＝ルシア（LUCIA_BEATEN_FLAG）、ツムジ＝風の渓谷のゼフィラ（ZEPHYRA_BEATEN_FLAG）。
    * 2026-10-30（指示書 K）から並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor（モンスターカードを初めて手に入れたら開く）。
    * ここは前のセーブの変換（src/game/save/saveData.ts の v26→v27・v27→v28）でだけ使う
    */
@@ -148,6 +148,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' },
   // セレフィーン（2026-10-29 セレフィーンの最終）：ルシアに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（serephine14_skills_OFFICIAL_20261029.json）
   { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' },
+  // ツムジ（2026-10-30 指示書 U）：風の渓谷のゼフィラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（tsumuji14_skills_OFFICIAL_20261030.json）
+  { id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['かまいたち', 'ストームブレイド', 'かぜよみ'], unlockFlag: 'zephyra-beaten' },
 ];
 
 /**
@@ -194,6 +196,8 @@ export const DUNGEON_MONEY: Readonly<Record<string, DungeonMoney>> = {
   'dungeon-05': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
   'dungeon-06': { win: 35, chest: [35, 70], bossFirst: 850, bossRepeat: 250 },
   'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
+  // 風の渓谷（2026-10-30 指示書 U）：水の神殿と同じ段
+  'dungeon-08': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
 };
 
 /** そのダンジョンのお金（表に無いダンジョンは太古の遺跡と同じ） */

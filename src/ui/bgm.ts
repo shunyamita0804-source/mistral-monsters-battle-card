@@ -12,6 +12,7 @@ import dungeonIceMp3 from '@assets/audio/bgm/bgm_dungeon_ice.mp3';
 import dungeonFireMp3 from '@assets/audio/bgm/bgm_dungeon_fire.mp3';
 import dungeonMachineMp3 from '@assets/audio/bgm/bgm_dungeon_machine.mp3';
 import dungeonHolyMp3 from '@assets/audio/bgm/bgm_dungeon_holy.mp3';
+import dungeonWindMp3 from '@assets/audio/bgm/bgm_dungeon_wind.mp3';
 import shopMp3 from '@assets/audio/bgm/bgm_shop.mp3';
 import practiceMp3 from '@assets/audio/bgm/bgm_practice.mp3';
 import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
@@ -47,6 +48,7 @@ export type BgmId =
   | 'dungeonFire'
   | 'dungeonMachine'
   | 'dungeonHoly'
+  | 'dungeonWind'
   | 'shop'
   | 'practice'
   | 'lab'
@@ -95,6 +97,9 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   dungeonMachine: { src: dungeonMachineMp3, gain: 0.35 },
   // 天の聖域：The Sacred Place
   dungeonHoly: { src: dungeonHolyMp3, gain: 0.46 },
+  // 風の渓谷（2026-10-30 指示書 U）：風のダンジョン / ハヤシユウ（OpenTracks〔旧 DOVA-SYNDROME〕。1分00秒・ループ対応のまま）。
+  // 測った音量 -9.4 LUFS（水の神殿の曲 -9.3 LUFS と同じくらい）→ 水の神殿と同じ gain で約 -18.5 LUFS
+  dungeonWind: { src: dungeonWindMp3, gain: 0.35 },
   // カードショップ（店の中とショップの画面）：セールストーク / BGMer
   shop: { src: shopMp3, gain: 0.48 },
   // カード練習場（ユーザーの言う「教習所」）：無心になれる作業 / BGMer

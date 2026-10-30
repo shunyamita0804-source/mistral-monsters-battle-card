@@ -13,8 +13,8 @@
   | --- | --- | --- | --- |
   | R1 | 新しい絵60枚の原本を保管（`design-parts/ui-calendar-20261030/`・`ui-ranking-tablet-20261030/`・`talk-portraits-20261030/`・`story-stills-20261030/`。各 README に何の絵か・いつ使うか・覚え書き） | 合格 | `docs/calendar-r-20261030.md` |
   | R2 | 年と月（1年目 4月から・4月で年が進む）。ダンジョンから戻る・大会の景品を受け取る・ベッドで寝るで1か月。日付の札・月の帯・季節の挿絵・寝る流れ・公式戦は 3・6・9月だけ＋そのランクのボスを倒していること（`src/data/calendar.ts` の `RANK_BOSS_DUNGEONS`）・管理局の掲示板 | 合格 | 同上 |
-  | S | iPhone の試遊の直し：名札を人のとなりへ（`world.ts` の `labelCenterAwayFromPeople`）・噴水の水を上の受け皿から・高台の石垣と北と南の城壁（`level_strip`・`wall_run`）・管理局と研究所を少し上へ・大会会場の前の道を下へ | **返事待ち** | `docs/townfix-s-20261030.md` |
-  | T | R の検品の直し：受付の理由を1行に1つ・ベッドは「寝る」「セーブ」「やめる」（ロードはなくした。ユーザー決定）・祭壇の挿絵を灯籠 11 の版に差しかえ（前の版 `story_09_altar_seal_v1_7lights.png`。まだゲームに入れない） | **返事待ち** | このファイル |
+  | S | iPhone の試遊の直し：名札を人のとなりへ（`world.ts` の `labelCenterAwayFromPeople`）・噴水の水を上の受け皿から・高台の石垣と北と南の城壁（`level_strip`・`wall_run`）・管理局と研究所を少し上へ・大会会場の前の道を下へ | 合格（2026-10-30 ユーザー検品） | `docs/townfix-s-20261030.md` |
+  | T | R の検品の直し：受付の理由を1行に1つ・ベッドは「寝る」「セーブ」「やめる」（ロードはなくした。ユーザー決定）・祭壇の挿絵を灯籠 11 の版に差しかえ（前の版 `story_09_altar_seal_v1_7lights.png`。まだゲームに入れない） | 合格（2026-10-30 ユーザー検品） | このファイル |
 - 報告：R https://claude.ai/artifact/R2sUMVwrciFGut7JwmQ3m4 ・S https://claude.ai/artifact/74Dv7WwJZHamqXCu15626r ・T https://claude.ai/artifact/RsxceDvzLa8oLbD2yU5peV （ZIP も渡した。`downloads/` は git に入れない）
 - **待っているもの**
   - 噴水の受け皿から下の池へ落ちる水の絵（依頼文 `docs/design-requests-20261030/10_fountain_overflow.md`。届いたら `town2026_build.py` の `fountain_spray` のとなりに重ねる）

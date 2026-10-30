@@ -70,4 +70,11 @@ export const SKILL_CARD_TEXT: Readonly<Record<string, string>> = {
   'skl-serephine-12': 'ちから技を回避', // すいっとよける
   'skl-serephine-13': 'かしこさ技を回避', // ゆらりとかわす
   'skl-serephine-14': 'マナに関係なく、ちから技・かしこさ技を回避', // ウェーブダンス
+  // ツムジ（2026-10-30 指示書 U の TSUMUJI_CARD_TEXT。フルーネと同じくここにまとめる。04「回避されない」は JSON の文のまま）
+  'skl-tsumuji-02': '同じターンに、もう1枚の「Wひっかき」を続けて使える', // Wひっかき
+  'skl-tsumuji-08': '次のターン、ツムジの攻撃技のマナ−1', // かぜのり
+  'skl-tsumuji-11': 'ちから技・かしこさ技に効く', // かぜのまく（今の言い方）
+  'skl-tsumuji-12': 'ちから技を回避', // ひらりとかわす（JSON と同じ文）
+  'skl-tsumuji-13': 'かしこさ技を回避', // すりぬける（JSON と同じ文）
+  'skl-tsumuji-14': 'ちから技・かしこさ技を、消費マナに関係なく回避', // かぜよみ（指示書の表の文）
 };

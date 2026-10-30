@@ -24,7 +24,7 @@ export const TEAM_REQUIREMENT = { rank: 'C' as RankId } as const;
  */
 export const RANK_BOSS_DUNGEONS: Readonly<Record<RankId, readonly string[]>> = {
   E: ['dungeon-02'], // 精霊の森
-  D: ['dungeon-03'], // 水の神殿
+  D: ['dungeon-03', 'dungeon-08'], // 水の神殿・風の渓谷（2026-10-30 指示書 U）
   C: ['dungeon-04', 'dungeon-01'], // 氷の洞窟・太古の遺跡
   B: ['dungeon-05'], // 炎の火山
   A: ['dungeon-06'], // 機械の塔

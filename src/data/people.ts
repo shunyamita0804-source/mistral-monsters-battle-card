@@ -2,7 +2,8 @@ import type { NpcId } from './maps.ts';
 import type { OpponentDefinition } from './tournaments.ts';
 
 /**
- * 登場人物40人（28人は 2026-10-27 ユーザー承認の指示書「人物の名前・名刺図鑑・カード図鑑」、29〜40 は 2026-10-28 指示書「ダンジョンの人物12人」）。
+ * 登場人物42人（28人は 2026-10-27 ユーザー承認の指示書「人物の名前・名刺図鑑・カード図鑑」、29〜40 は 2026-10-28 指示書「ダンジョンの人物12人」、
+ * 41・42 は 2026-10-30 指示書 U「風の渓谷とツムジ」の守り手ゼフィラ・バトラーのニコ。せりふは Claude の案）。
  * 名前・二つ名・肩書き・ひとことは指示書のとおり（言い回しを変えない）。英語は Claude の仮訳。
  * No. は名刺図鑑の番号。顔の絵は src/ui/components/personFace.ts（絵が無い人は人影）。
  *
@@ -242,6 +243,31 @@ export const PEOPLE: readonly Person[] = [
       ['よろしくお願いします。', 'Nice to meet you.'],
       ['ありがとうございました。あなたの旅に、光がありますように。', 'Thank you. May light be with you on your journey.'],
       ['負けてしまいました……。でも、いい勝負でした。', 'I lost... But it was a good match.'],
+    ),
+  }),
+  // ---------- 風の渓谷（2026-10-30 指示書 U）。ゼフィラは守り手＝ボス、ニコはバトラー（守り手の一族ではない） ----------
+  // ゼフィラ：身軽でおしゃべり、明るい若い女性。勝ったあとの祭壇へのせりふ（after）にだけ、ほかの聖地にも守り手の一族がいると分かる口をすべらせる一言（物語の伏線）
+  p(41, 'zephyra', 'dungeon', ['ゼフィラ', 'Zephyra'], ['渓谷の守り手・一族でいちばん若い', 'Keeper of the Valley, youngest of the clan'], ['つり橋はね、走って渡るのがいちばん気持ちいいの！', 'Rope bridges feel best when you run across them!'], {
+    opponentIds: ['enc-wind-boss'],
+    lines: lines(
+      ['わっ、お客さん！ 風に飛ばされずにここまで来られたんだ、すごいすごい！ じゃあ次は、わたしと勝負ね！', "Whoa, a visitor! You made it here without getting blown away? Amazing! Okay, now let's battle!"],
+      ['いっくよー！ 風みたいに速いんだから、ちゃんとついてきてね！', "Here I go! I'm fast as the wind, so try to keep up!"],
+      ['やったー！ でも惜しかったよ！ 風を読めば、次はきっといけるって！', "Yay! But that was close! Read the wind and you'll get me next time!"],
+      ['うそっ、負けちゃった！ すごいね、風よりも速かったかも！', 'No way, I lost! Wow, you might be faster than the wind!'],
+      [
+        '祭壇はこの先だよ！ ツムジもきっと喜ぶ！ ほかの聖地のみんなにも教えてあげなきゃ……あっ、今のなし！ 聞かなかったことにして！',
+        "The altar's just ahead! Tsumuji will be so happy! I've gotta tell everyone at the other sacred sites too... Oops, forget I said that!",
+      ],
+    ),
+  }),
+  // ニコ：人なつこく、面倒見のいい青年
+  p(42, 'niko', 'dungeon', ['ニコ', 'Niko'], ['つり橋の番', 'Bridge Keeper'], ['風の強い日は、つり橋の綱をしっかり持つんだよ。', 'On windy days, hold the bridge rope tight.'], {
+    opponentFaces: ['battler-niko'],
+    lines: lines(
+      ['やあ、風に気をつけて。強い風のところに乗ると、押し流されちゃうからね。……そうだ、ひと勝負していかない？', "Hey, watch out for the wind. Step on a strong gust and it'll push you right along. ...Say, how about a battle?"],
+      ['よし、いこうか。', "Alright, let's go."],
+      ['ぼくの勝ちだね。足もとの風に気をつけて進むんだよ。', 'I win this one. Mind the wind at your feet as you go.'],
+      ['まいったな、君は強いね。この先も、気をつけて。', "You got me. You're strong. Take care up ahead."],
     ),
   }),
 ];

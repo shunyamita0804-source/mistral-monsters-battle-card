@@ -44,6 +44,7 @@ export const CARDS = {
   'card.effect.tailwind': { ja: '特殊', en: 'Special' },
   'card.effect.pin': { ja: '特殊', en: 'Special' },
   'card.effect.energy': { ja: '特殊', en: 'Special' },
+  'card.effect.windRide': { ja: '特殊', en: 'Special' },
   'card.effect.cover': { ja: '防御', en: 'Guard' },
   'card.supportKind.field': { ja: '全体', en: 'Field' },
 

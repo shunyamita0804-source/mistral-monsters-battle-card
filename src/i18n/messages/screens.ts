@@ -167,8 +167,8 @@ export const SCREENS = {
   },
   'options.credits': { ja: '素材のクレジット', en: 'Credits' },
   'options.creditsText': {
-    ja: '効果音：OtoLogic（https://otologic.jp/）・効果音ラボ（https://soundeffect-lab.info/）\nBGM：「放浪者の街」「神獣の試練」「己と仲間を信じて」「Conflict」「月の廃墟」「古代エルフの聖域」「開かれし封印の扉」ユーフルカ（Wingless Seraph）・「セールストーク」「無心になれる作業」BGMer・「Battle - スタンバイフェイズ」lei（DOVA-SYNDROME）・「Bon Voyage!」HarumachiMusic（Pixabay）・「Spirits Forest」HydroGene\n「白銀の城」作曲：マニーラ\n「異世界へようこそ」作曲：蒲鉾さちこ\n「Shy Love」作曲：チョコミント\n音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/',
-    en: 'Sound effects: OtoLogic (https://otologic.jp/), Sound Effect Lab (https://soundeffect-lab.info/)\nMusic: "Hourousha no Machi", "Shinju no Shiren", "Onore to Nakama wo Shinjite", "Conflict", "Tsuki no Haikyo", "Kodai Elf no Seiiki", "Hirakareshi Fuuin no Tobira" by Yufuruka (Wingless Seraph), "Sales Talk", "Mushin ni Nareru Sagyou" by BGMer, "Battle - Standby Phase" by lei (DOVA-SYNDROME), "Bon Voyage!" by HarumachiMusic (Pixabay), "Spirits Forest" by HydroGene\n"Hakugin no Shiro" composed by Maniira\n"Isekai e Youkoso" composed by Kamaboko Sachiko\n"Shy Love" composed by Chocomint\nMusic provided by OpenTracks (formerly DOVA-SYNDROME) https://opentracks.com/',
+    ja: '効果音：OtoLogic（https://otologic.jp/）・効果音ラボ（https://soundeffect-lab.info/）\nBGM：「放浪者の街」「神獣の試練」「己と仲間を信じて」「Conflict」「月の廃墟」「古代エルフの聖域」「開かれし封印の扉」ユーフルカ（Wingless Seraph）・「セールストーク」「無心になれる作業」BGMer・「Battle - スタンバイフェイズ」lei（DOVA-SYNDROME）・「Bon Voyage!」HarumachiMusic（Pixabay）・「Spirits Forest」HydroGene\n「白銀の城」作曲：マニーラ\n「異世界へようこそ」作曲：蒲鉾さちこ\n「Shy Love」作曲：チョコミント\n「風のダンジョン」作曲：ハヤシユウ（https://opentracks.com/bgm/detail/4614）\n音楽素材提供：OpenTracks（旧DOVA-SYNDROME） https://opentracks.com/',
+    en: 'Sound effects: OtoLogic (https://otologic.jp/), Sound Effect Lab (https://soundeffect-lab.info/)\nMusic: "Hourousha no Machi", "Shinju no Shiren", "Onore to Nakama wo Shinjite", "Conflict", "Tsuki no Haikyo", "Kodai Elf no Seiiki", "Hirakareshi Fuuin no Tobira" by Yufuruka (Wingless Seraph), "Sales Talk", "Mushin ni Nareru Sagyou" by BGMer, "Battle - Standby Phase" by lei (DOVA-SYNDROME), "Bon Voyage!" by HarumachiMusic (Pixabay), "Spirits Forest" by HydroGene\n"Hakugin no Shiro" composed by Maniira\n"Isekai e Youkoso" composed by Kamaboko Sachiko\n"Shy Love" composed by Chocomint\n"Kaze no Dungeon" composed by Hayashi Yuu (https://opentracks.com/bgm/detail/4614)\nMusic provided by OpenTracks (formerly DOVA-SYNDROME) https://opentracks.com/',
   },
   'options.battleLocked': { ja: '対戦中は言語を変えられません。', en: 'You cannot change the language during a battle.' },
 
@@ -176,8 +176,8 @@ export const SCREENS = {
   'collection.title': { ja: '図鑑', en: 'Card Album' },
   'collection.progress': { ja: '集めた割合 {n}%', en: 'Collected {n}%' },
   'collection.count': {
-    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン。ほかは仮データ）',
-    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune and Serephine cards are official; others are temporary)',
+    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ。ほかは仮データ）',
+    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune, Serephine and Tsumuji cards are official; others are temporary)',
   },
   'cardList.title': { ja: 'カード一覧', en: 'Card List' },
   'cardList.heading': { ja: 'カードを見る', en: 'View Cards' },

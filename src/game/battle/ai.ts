@@ -5,6 +5,7 @@ import {
   attackPower,
   availableUsers,
   canConvertToMana,
+  chainReady,
   cardUsability,
   coverUser,
   isPinned,
@@ -12,9 +13,11 @@ import {
   otherSide,
   incomingDamage,
   shieldOf,
+  skillCost,
   tailwindTargets,
   targetsFor,
   undodgeableNow,
+  windRideOf,
   type BattleAction,
   type BattleMonster,
   type BattleState,
@@ -84,6 +87,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
+  // ツムジ（2026-10-30 指示書 U）：Wひっかきを2回続けて使う（2回目が使えるなら必ず続ける）
+  const scratch = chooseDoubleScratch(state, side, options, enemies, style);
+  if (scratch) return scratch;
+
   // 癖：攻撃・妨害を先に使う人
   if (style === 'aggressive' || style === 'flashy' || style === 'hunter') {
     const attack = chooseAttack(state, side, options, enemies, style);
@@ -136,6 +143,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.7 セレフィーン（2026-10-29）。みちしお
   const tide = chooseTide(state, side, options);
   if (tide) return tide;
+
+  // 2.8 ツムジ（2026-10-30 指示書 U）。かぜのり（Wひっかきの2回続けては、いちばん先に考える）
+  const windRide = chooseWindRide(state, side, options);
+  if (windRide) return windRide;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃をライフの少ない相手へ
   const attack = chooseAttack(state, side, options, enemies, style);
@@ -210,6 +221,52 @@ function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAc
   return { type: 'useCard', side, cardUid: tide.card.uid, userUid: user.uid };
 }
 
+/**
+ * Wひっかき（ツムジ。2026-10-30 指示書 U）：続けて使える2回目があれば必ず使う（1回目のあと）。
+ * 1回目は、手札に2枚あり、2枚ぶんのマナ（かぜのりが効いていればそのぶん少なく）があるときに使う。1枚だけのときは、ふつうの攻撃と同じ考え方（chooseAttack）
+ */
+function chooseDoubleScratch(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle): BattleAction | null {
+  const scratches = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'attack' && o.def.effect.chain);
+  if (scratches.length === 0 || enemies.length === 0) return null;
+  const pick = (o: SkillOption, user: BattleMonster): BattleAction | null => {
+    const reach = targetsFor(state, side, o.def, user);
+    const power = attackPower(state, o.def, user);
+    const weakFirst = (a: BattleMonster, b: BattleMonster): number => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || a.life - b.life;
+    const target = reach.filter((e) => e.life <= power).sort((a, b) => b.life - a.life)[0] ?? [...reach].sort(weakFirst)[0];
+    return target ? { type: 'useCard', side, cardUid: o.card.uid, userUid: user.uid, targetUid: target.uid } : null;
+  };
+  // 2回目：1回目を使ったツムジが、続けてもう1回
+  for (const o of scratches) {
+    const user = availableUsers(state, side, o.def).find((m) => chainReady(state, m, o.def));
+    if (user) return pick(o, user);
+  }
+  // 1回目：同じ技が手札に2枚あり、2回ぶん払えるとき
+  const mana = manaOf(state.sides[side]);
+  for (const o of scratches) {
+    if (scratches.filter((x) => x.def.id === o.def.id).length < 2) continue;
+    const user = availableUsers(state, side, o.def).find((m) => !m.acted && skillCost(state, o.def, m) * 2 <= mana);
+    if (user) return pick(o, user);
+  }
+  return null;
+}
+
+/**
+ * かぜのり（ツムジ。2026-10-30 指示書 U）：その手番に相手を倒せる攻撃が無く、手札にツムジの攻撃技（マナ1以上）があるとき。
+ * もう次の手番に効くようにかけてあれば使わない
+ */
+function chooseWindRide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
+  const ride = options.filter(isSkillOption).find((o) => o.def.effect.type === 'windRide');
+  if (!ride || canKillThisTurn(state, side, options)) return null;
+  const user = availableUsers(state, side, ride.def).find((m) => m.windRide?.turn !== state.turn + 2);
+  if (!user) return null;
+  const hasAttack = state.sides[side].hand.some((c) => {
+    if (c.uid === ride.card.uid) return false;
+    const card = getPlayCard(c.cardId);
+    return card.kind === 'skill' && card.effect.type === 'attack' && card.monsterId === ride.def.monsterId && card.cost >= 1;
+  });
+  return hasAttack ? { type: 'useCard', side, cardUid: ride.card.uid, userUid: user.uid } : null;
+}
+
 /** その手番に、手札の攻撃技で倒せる相手がいるか */
 function canKillThisTurn(state: BattleState, side: Side, options: Option[]): boolean {
   return options
@@ -261,6 +318,13 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
       const kill = style === 'hunter' ? killable.sort(weakFirst)[0] : killable.sort((a, b) => b.life - a.life)[0];
       if (kill) return attackAction(state, side, option, kill.uid);
     }
+  }
+  // かぜのり（ツムジ）が効いている間は、マナが減った分で使える大きい攻撃を先に（2026-10-30 指示書 U）
+  const ridden = byPower.find((o) => availableUsers(state, side, o.def).some((u) => windRideOf(state, u) > 0));
+  if (ridden) {
+    const rider = availableUsers(state, side, ridden.def).find((u) => windRideOf(state, u) > 0);
+    const target = rider ? [...targetsFor(state, side, ridden.def, rider)].sort(weakFirst)[0] : undefined;
+    if (rider && target) return { type: 'useCard', side, cardUid: ridden.card.uid, userUid: rider.uid, targetUid: target.uid };
   }
   // 試遊中：ジオルの地ひびき（相手全体）。倒せる相手がいなければ、相手が2体以上生きているときに使う（2026-10-29 指示書）
   const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets);
