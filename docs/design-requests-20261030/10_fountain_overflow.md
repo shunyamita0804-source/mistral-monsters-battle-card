@@ -27,3 +27,7 @@
 ## 届いたら
 
 - `design-parts/town-20261028/` に原本を置き、`tools/design/town2026_build.py` の噴水（`fountain_spray` のとなり）に、受け皿のふちの奥・池の手前のふちの奥に隠れる所を消して重ねる（しぶきと同じ `loops`）
+
+## 届いた（2026-10-30 指示書 X）
+
+- 原本は `design-parts/town-20261028/fountain-overflow-20261030/`。`town2026_build.py` の `fountain_overflow` で噴水に重ねた（記録 `docs/rooms-status-fountain-x-20261030.md` の C）

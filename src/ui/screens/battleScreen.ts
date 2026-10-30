@@ -79,6 +79,10 @@ import statusTauntArt from '@assets/images/ui/battle/status_taunt.webp';
 import statusShieldArt from '@assets/images/ui/battle/status_shield.webp';
 import statusActedArt from '@assets/images/ui/battle/status_acted.webp';
 import statusWeakenArt from '@assets/images/ui/battle/status_weaken.webp';
+// 2026-10-30 指示書 X：凍った（ヒョウズク）・エネルギーをためた・回避できない（原本 design-parts/battle-status-20261030/。256×256 を 64×64 に縮めただけ）
+import statusFrozenArt from '@assets/images/ui/battle/status_frozen.webp';
+import statusEnergyArt from '@assets/images/ui/battle/status_energy.webp';
+import statusNoEvadeArt from '@assets/images/ui/battle/status_no_evade.webp';
 import rulesArt1 from '@assets/images/ui/rules/rules_1.webp';
 import rulesArt2 from '@assets/images/ui/rules/rules_2.webp';
 import rulesArt3 from '@assets/images/ui/rules/rules_3.webp';
@@ -1376,8 +1380,14 @@ export const battleScreen: ScreenDefinition = {
       // 状態のアイコン（2026-10-26 デザイン第9弾。文字も残す）
       const textBadge = (art: string, text: string): HTMLElement => h('span', { class: 'battle__status-text' }, statusIcon(art), h('span', { text }));
       if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) items.push(textBadge(statusSealedArt, t('battle.status.sealed')));
-      // まきつく：次の手番は技を使えない（2026-10-26 から印を出す）
-      if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) items.push(textBadge(statusStunnedArt, t('battle.status.stunned')));
+      // まきつく：次の手番は技を使えない（2026-10-26 から印を出す）。ヒョウズクのこおりのいき・ふぶきで付いたときは「凍った」の印（2026-10-30 指示書 X）
+      if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) {
+        items.push(m.stunMark === 'frozen' ? textBadge(statusFrozenArt, t('battle.status.frozen')) : textBadge(statusStunnedArt, t('battle.status.stunned')));
+      }
+      // ジオルのじならし：この手番に受ける次の攻撃1回を回避できない（2026-10-30 指示書 X）
+      if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn && m.life > 0) items.push(textBadge(statusNoEvadeArt, t('battle.status.noEvade')));
+      // ジオルのエネルギーをためる：かけた手番から、効く手番まで（相手からも見える。2026-10-30 指示書 X。前は右上の角の「ためている」の印）
+      if (m.energy && m.life > 0 && s.turn <= m.energy.turn) items.push(textBadge(statusEnergyArt, t('battle.status.energy')));
       // すなをほる：攻撃の対象にならない（使った手番と相手の次の手番の間だけ出す。絵は守りの印を使う）
       if (m.hiddenTurn !== undefined && m.hiddenTurn !== null && m.hiddenTurn >= s.turn) items.push(textBadge(statusShieldArt, t('battle.status.hidden')));
       if (m.taunt && m.taunt.turn >= s.turn) items.push(textBadge(statusTauntArt, t('battle.status.taunted', { only: cardName(m.taunt.monsterId) })));
@@ -1399,8 +1409,7 @@ export const battleScreen: ScreenDefinition = {
       const mark = (src: string, label: string, kind: string): HTMLElement =>
         h('img', { class: `battle__corner-mark battle__corner-mark--${kind}`, attrs: { src, alt: label, title: label, draggable: 'false' } });
       if (m.charge && m.life > 0) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
-      // 試遊中：ジオルのエネルギーをためる（同じ「ためている」の絵。かけた手番から、効く手番まで出す。相手からも見える）
-      if (m.energy && m.life > 0 && s.turn <= m.energy.turn) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
+      // ジオルのエネルギーをためるは 2026-10-30（指示書 X）から状態の印（statusBadges の status_energy）
       if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
       // かぜのり（ツムジ 2026-10-30）：おいかぜと同じ風の印。かけてから、マナ−1 が効く次の自分のターンまで出す（相手からも見える）
       if (m.windRide && m.life > 0 && m.windRide.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.windRide', { n: m.windRide.discount }), 'tailwind'));

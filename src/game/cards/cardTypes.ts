@@ -87,6 +87,8 @@ export type SkillEffect =
       readonly manaDrain?: number;
       /** 回避されなかったとき、対象は次の手番に行動できない（正式：ノビトンのまきつく 2026-10-25） */
       readonly stunTarget?: boolean;
+      /** 行動不可の印の絵（'frozen'＝凍った。ヒョウズクのこおりのいき・ふぶき 2026-10-30 指示書 X。無ければまきつくのつる草）。決まりは同じ */
+      readonly stunMark?: 'frozen';
       /** 使ったモンスターが「ほっぺにためる」でためているときに使うと、回避されない（試遊中：プカリムのぷはーっ 2026-10-28） */
       readonly undodgeableWhenCharged?: boolean;
       /** 相手全体への攻撃（試遊中：ジオルの地ひびき 2026-10-29）。生きている相手全員に。守り（防御・回避）は1体ずつ順に */

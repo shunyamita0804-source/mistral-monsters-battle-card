@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """部屋4つ（大会会場・管理局・練習場・研究所）の新しい絵（2026-10-28 ZIP「Mistral_Rooms4_ClaudeCode_20261028」）。
+2026-10-30 指示書 X：大会会場・管理局・練習場は正面向きの新しい絵（design-parts/rooms-frontfacing-20261030/。部屋の設定の v2。下の _build_v2）。研究所は前のまま。
 
 使い方：python3 -I tools/design/rooms4_build.py [確認画像の出力先]
 原本：design-parts/rooms-20261028/（無改変）。絵は描き直さない（重ねる・切り抜く・形式を変えるだけ。色の処理もかけない）。
@@ -27,6 +28,8 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/rooms-20261028')
+# 2026-10-30 指示書 X：正面向きの新しい絵（大会会場・管理局・練習場）
+SRC_V2 = os.path.join(ROOT, 'design-parts/rooms-frontfacing-20261030')
 OUT_ROOMS = os.path.join(ROOT, 'assets/images/maps/rooms')
 OUT_TS = os.path.join(ROOT, 'src/data/rooms4Art.generated.ts')
 WEBP_Q = 88
@@ -46,101 +49,126 @@ def ellipse(cx: float, cy: float, rx: float, ry: float, n: int = 36) -> list[tup
 
 # ===== 部屋ごとの設定（座標は絵の px）=====
 ROOMS: dict[str, dict] = {
-    # 大会会場：奥に観客席、中央に円形の段と対戦台、右手前に受付。左の壁の大きな紺の板は空（総当たり表を描く予定。BOARD に位置だけ記録）
+    # ===== 2026-10-30 指示書 X：大会会場・管理局・練習場を正面向きの新しい絵に（カードショップ〔指示書 N〕と同じ作り）=====
+    # 原本 design-parts/rooms-frontfacing-20261030/{arena,bureau,practice}/（無改変）。床と壁（shell。不透明）＋家具（1536×1024 の透明な画像に置く位置で描いたもの）。
+    # 手前の低い壁・入口の柱・入口わきの植木は shell に描きこまれているので、shell からその所だけ切り抜いて「いつも人より手前」の層にする（front_cut。描き直さない）。
+    # 1つの絵に家具が2つ以上あるもの（長いす2台・棚3台・机3つ）は、split の範囲ごとに切り分けて、それぞれの足もとで人と前後を比べる
+    # 大会会場：奥に観客席（shell）、真ん中に丸い舞台（shell）、左に長いす2台、右に受付。舞台の上の対戦台は前の絵（arena_02_battle_table）を舞台の真ん中に重ねる。
+    # 前の絵の左の壁の紺の板（総当たりの表を描いていた）は新しい絵に無いので、板の表と「対戦表」を調べる所はなくした（表は受付でも見られる）
     'arena': dict(
-        dir='Mistral_Room_arena_parts', prefix='arena',
-        # 2026-10-29 iPhone の試遊「主人公が段の手すりにめりこむ」：段と対戦台は低い台で、人は段の上に乗れない（段のまわりにしか立てない）ので、
-        # 前後はいつも人より奥（z を段の上のふちの 290 に）。床の下のふちは手前の低い壁の上のふちまで（壁の上を歩けない）
-        furniture={'01_stage': 290, '02_battle_table': 291, '03_bench_left_back': 702, '04_bench_left_front': 750, '05_reception': 760},
-        floor=[(300, 330), (450, 298), (1090, 298), (1235, 335), (1360, 470), (1420, 520), (1530, 560), (1530, 758), (40, 735), (40, 620), (60, 600)],
-        passage=(610, 730, 925, 1024),
+        v2='arena',
+        furniture=[
+            # (ファイル名, 部屋の絵の中の名前, 足もとの y, 切り分ける範囲 or None)
+            ('arena_furniture_benches', 'bench_back', 566, (96, 430, 396, 600)),
+            ('arena_furniture_benches', 'bench_front', 762, (96, 600, 396, 775)),
+            ('arena_furniture_reception', 'reception', 730, None),
+        ],
+        # 舞台の上の対戦台（前の絵。舞台の円の真ん中へ。前の舞台の円の真ん中との差だけずらす）。人は舞台に上がれないので、いつも人より奥
+        extra=[('Mistral_Room_arena_parts/arena_02_battle_table', 'battle_table', 291, (0, 13))],
+        # 手前の低い壁（上のふち y 約795）・入口の柱（金の飾りの先 y 約745）。入口の通り道（x 618〜918）は切り抜かない
+        front_cut=[(0, 793, 494, 1024), (493, 742, 619, 1024), (917, 742, 1043, 1024), (1042, 793, 1536, 1024)],
+        floor=[(36, 312), (236, 266), (1300, 266), (1500, 312), (1500, 798), (36, 798)],
+        passage=(620, 780, 916, 1024),
         blocks=[
-            ellipse(768, 433, 370, 147),         # 円形の段（対戦台はこの上）
-            (78, 625, 232, 702),                 # 左の長いす（奥）
-            (242, 672, 407, 750),                # 左の長いす（手前）
-            (1180, 552, 1536, 780),              # 受付（カウンターの奥も）。2026-10-29 新しいカウンター（x 1203〜1496・y 609〜776）
-            (490, 740, 610, 1024),               # 入口の左の柱
-            (925, 740, 1045, 1024),              # 入口の右の柱
+            ellipse(768, 431, 400, 170),         # 丸い舞台（段も。対戦台はこの上）
+            (96, 430, 396, 572),                 # 左の長いす（奥）
+            (96, 624, 396, 768),                 # 左の長いす（手前）
+            (1100, 560, 1430, 730),              # 受付（カウンターの奥のセリアの所も）
+            (490, 740, 622, 1024),               # 入口の左の柱
+            (914, 740, 1046, 1024),              # 入口の右の柱
         ],
         items={
-            # 2026-10-29 新しいカウンター：名前の札（範囲の上の真ん中）がセリアの顔に重ならないよう、カウンターの左のはし（話しかける側）だけ
-            'RECEPTION': (1180, 600, 1270, 780),
-            'TABLE': (560, 300, 980, 560),
-            'SEATS_L': (300, 230, 450, 300),
-            'SEATS_R': (1090, 230, 1235, 300),
-            # 左の壁の紺の板（2026-10-28 夜：調べると総当たりの対戦表。板の下の床から調べる）
-            'BOARD_TOUCH': (55, 140, 250, 600),
+            # 受付：名前の札（範囲の上の真ん中）がセリアの顔に重ならないよう、カウンターの左のはし
+            'RECEPTION': (1108, 628, 1180, 728),
+            'TABLE': (560, 290, 980, 600),
+            'SEATS_L': (250, 110, 530, 262),
+            'SEATS_R': (1010, 110, 1290, 262),
         },
-        # 記録だけ（調べる物にはしない）：左の壁の大きな紺の板（大会の総当たり表を描く予定）
-        # 受付のカウンターの絵の範囲（2026-10-29：受付の前に立つと、画面の中心をここの真ん中へ寄せる。worldScreen の CAMERA_LEANS）
-        marks={'BOARD': (55, 140, 250, 590), 'COUNTER': (1203, 609, 1496, 776)},
-        # 受付のセリア：見た目はカウンターの奥（下半身がカウンターで隠れる）。話しかけるマスはカウンターの左はし（カウンターの左から話す）
-        # 2026-10-29 iPhone の試遊「職員はカウンターの内側に」：見た目をカウンターの前の板の奥（内側の床）へ。話しかけるマスは今のまま
-        # 2026-10-29 新しいカウンター（小さくなった）：話しかけるマスはカウンターの左の柱のすぐ左の列、見た目はコの字の内側（前の板のすぐ奥。足もとは天板の奥の線より約45px手前で、すねから下が前の板で隠れる）
-        spots={'RECEPTIONIST_SPOT': dict(logic=(1190, 653), look=(1330, 700))},
-        spawn=(768, 742), exit_bottom=1024,
+        # 受付のカウンターの絵の範囲（受付の前に立つと画面の中心をここへ寄せる。worldScreen の CAMERA_LEANS）
+        marks={'COUNTER': (1108, 628, 1422, 728)},
+        # 受付のセリア：見た目はカウンターの奥（足もとは天板の奥の線 y 約632 より約45px手前。すねから下がカウンターで隠れる）。
+        # 話しかけるマスはカウンターの真ん中の一番手前の行（主人公はカウンターの前から話す）
+        spots={'RECEPTIONIST_SPOT': dict(logic=(1265, 720), look=(1265, 677))},
+        spawn=(768, 770), exit_bottom=1024,
     ),
-    # 管理局：奥に書類棚、中央に受付のカウンター、左奥にランクの板、右奥にメダルの棚、左右に長いす、右の壁に掲示板（白い枠の額）
+    # 管理局：奥の壁の前に受付のカウンター（エレノアはその奥）、左奥にランクの板、その下（左の真ん中）に掲示板、右奥にメダルの棚、左右に長いす
     'bureau': dict(
-        dir='Mistral_Room_bureau_parts', prefix='bureau',
-        # 2026-10-29 ユーザー指示：置いて立てる掲示板の絵（05_notice_board）は使わない（左の長いすに重なり、動かしても床の真ん中に立って不自然）。
-        # 代わりに右の壁の白い枠の額（shell の絵）を掲示板として調べる（下の items の NOTICE_BOARD）
-        furniture={'01_counter': 555, '02_rank_board': 300, '03_medal_case': 430, '04_bench_left': 790, '06_bench_right': 790},
-        floor=[(205, 300), (1340, 300), (1370, 470), (1430, 600), (1445, 790), (90, 790), (95, 600), (120, 500), (205, 445)],
-        passage=(540, 780, 1000, 975),
+        v2='bureau',
+        furniture=[
+            ('bureau_furniture_counter', 'counter', 452, None),
+            ('bureau_furniture_rank_board', 'rank_board', 405, None),
+            ('bureau_furniture_notice_board', 'notice_board', 578, None),
+            ('bureau_furniture_medal_case', 'medal_case', 408, None),
+            ('bureau_furniture_benches', 'benches', 752, None),
+        ],
+        extra=[],
+        # 手前の低い壁（上のふち y 約812）・入口の柱（上のはし y 約785）。入口の通り道（x 546〜994）は切り抜かない
+        front_cut=[(0, 810, 432, 1024), (430, 782, 547, 1024), (993, 782, 1110, 1024), (1108, 810, 1536, 1024)],
+        floor=[(36, 198), (1500, 198), (1500, 812), (36, 812)],
+        passage=(548, 790, 992, 1024),
         blocks=[
-            (470, 420, 1068, 555),                                   # 受付のカウンター
-            (440, 300, 1100, 420),                                   # カウンターの奥（受付の人の所。入らない）
-            [(200, 295), (422, 295), (422, 392), (222, 455), (200, 455)],  # ランクの板
-            [(1108, 295), (1345, 295), (1345, 472), (1118, 432)],    # メダルの棚
-            (148, 440, 238, 505),                                    # 左の植木
-            (1302, 440, 1375, 505),                                  # 右の植木
-            (52, 628, 434, 790),                                     # 左の長いす
-            (1108, 628, 1486, 790),                                  # 右の長いす
-            (428, 740, 540, 990),                                    # 入口の左の柱
-            (1000, 740, 1108, 990),                                  # 入口の右の柱
+            (452, 190, 1083, 452),               # 受付のカウンターと、その奥（エレノアの所・奥の植木。入らない）
+            (36, 190, 380, 405),                 # ランクの板
+            # 掲示板とランクの板のあいだ（掲示板のうしろに回ると隠れるので入らない）。右のはしはマスの境（x 409.6）の少し右で止めて、
+            # 掲示板のすぐ右の列（x 409.6〜435.2）は歩ける（右から近づいて調べる）
+            (36, 405, 405, 580),
+            (1145, 190, 1500, 408),              # メダルの棚
+            # 左右の長いす。長いすと手前の壁のあいだ（2マス）は入口の柱でふさがれて行き止まりになるので、手前の壁までふさぐ
+            (36, 580, 432, 812),                 # 左の長いす
+            (1105, 580, 1500, 812),              # 右の長いす
+            (430, 780, 550, 1024),               # 入口の左の柱
+            (990, 780, 1110, 1024),              # 入口の右の柱
         ],
         items={
             # 名前の札（範囲の上の真ん中）が受付の人に重ならないよう、カウンターの前の板の所
-            'COUNTER': (470, 470, 1068, 555),
-            'RANK_BOARD': (205, 68, 420, 452),
-            'MEDAL_CASE': (1112, 100, 1340, 470),
-            # 掲示板＝右の壁の白い枠の額2つ（shell の絵。2026-10-29）：右の壁ぞいの床（右の植木と右の長いすの間）から調べる
-            'NOTICE_BOARD': (1385, 285, 1440, 545),
+            'COUNTER': (452, 345, 1083, 452),
+            'RANK_BOARD': (90, 24, 371, 403),
+            'MEDAL_CASE': (1152, 57, 1397, 406),
+            # 掲示板（左の真ん中。ランクの板と左の長いすの間）。下はすぐ長いすなので、右どなりの列から調べる
+            'NOTICE_BOARD': (105, 427, 405, 577),
         },
         marks={},
-        # エレノア：見た目はカウンターの奥。話しかけるマスはカウンターの一番手前の行。主人公はその2つ手前（導入イベントのブースター選びもここ）
-        spots={'CLERK_SPOT': dict(logic=(768, 550), look=(768, 472)), 'PLAYER_SPOT': dict(logic=(768, 601))},
-        spawn=(768, 880), exit_bottom=975,
+        # エレノア：見た目はカウンターの奥（足もとは天板の奥の線 y 約290 より約65px手前。腰から上が見える）。話しかけるマスはカウンターの一番手前の行。
+        # 主人公はその2つ手前（導入イベントのブースター選びもここ。ミレイユは主人公の右 4マス）
+        spots={'CLERK_SPOT': dict(logic=(768, 440), look=(768, 355)), 'PLAYER_SPOT': dict(logic=(768, 491))},
+        spawn=(768, 785), exit_bottom=1024,
     ),
-    # 練習場：奥に黒板と棚、左の壁ぞいにカウンター、対戦机3つ
+    # 練習場：奥の壁に黒板（shell）、左の壁ぞいにカードの棚3台、真ん中と右に対戦の机（いす付き）3組
     'practice': dict(
-        dir='Mistral_Room_practice_parts', prefix='practice',
-        furniture={'01_table_center': 528, '02_table_right_back': 420, '03_table_right_front': 658, '04_left_counter': 330, '05_stool': 499},
-        floor=[(90, 255), (1400, 255), (1430, 420), (1490, 700), (1500, 742), (90, 742)],  # 下のふち：手前の低い壁の上のふちまで（2026-10-29）
-        passage=(615, 755, 920, 1024),
+        v2='practice',
+        furniture=[
+            ('practice_furniture_card_shelf', 'shelf_1', 400, (70, 205, 352, 403)),
+            ('practice_furniture_card_shelf', 'shelf_2', 594, (70, 403, 352, 597)),
+            ('practice_furniture_card_shelf', 'shelf_3', 788, (70, 597, 352, 800)),
+            ('practice_furniture_tables', 'table_center', 617, (600, 360, 925, 630)),
+            ('practice_furniture_tables', 'table_right_back', 465, (1080, 205, 1400, 495)),
+            ('practice_furniture_tables', 'table_right_front', 772, (1080, 495, 1400, 785)),
+        ],
+        extra=[],
+        # 手前の低い壁（上のふち y 約795）・入口の柱（上の飾りの先 y 約660）・入口わきの植木（y 約675 から）。入口の通り道（x 592〜938）は切り抜かない
+        front_cut=[(0, 792, 410, 1024), (405, 672, 500, 1024), (486, 656, 593, 1024), (937, 656, 1042, 1024), (1028, 672, 1122, 1024), (1118, 792, 1536, 1024)],
+        floor=[(46, 212), (1490, 212), (1490, 798), (46, 798)],
+        passage=(594, 780, 936, 1024),
         blocks=[
-            [(0, 240), (352, 240), (352, 336), (246, 522), (184, 700), (0, 700)],  # 左のカウンターと左の壁の棚
-            (0, 690, 98, 775),                                       # 左手前の植木と小棚
-            (712, 440, 1040, 528),                                   # 真ん中の対戦机
-            (1046, 335, 1356, 420),                                  # 右奥の対戦机
-            (1072, 555, 1424, 656),                                  # 右手前の対戦机
-            (254, 462, 318, 500),                                    # 丸いす
-            (1335, 250, 1402, 282),                                  # 右奥の植木
-            (440, 640, 615, 1024),                                   # 入口の左の柱と植木
-            (920, 640, 1085, 1024),                                  # 入口の右の柱と植木
+            (46, 200, 352, 800),                 # 左の壁ぞいのカードの棚3台
+            (1388, 200, 1490, 222),              # 右奥の植木（shell）
+            (608, 365, 918, 620),                # 真ん中の対戦の机（いすも）
+            (1086, 212, 1398, 468),              # 右奥の対戦の机
+            (1086, 522, 1398, 775),              # 右手前の対戦の机
+            (400, 665, 596, 1024),               # 入口の左の柱と植木
+            (934, 665, 1126, 1024),              # 入口の右の柱と植木
         ],
         items={
-            'TABLE_1': (712, 440, 1040, 528),
-            'TABLE_2': (1046, 335, 1356, 420),
-            'TABLE_3': (1072, 555, 1424, 656),
-            'BOARD': (550, 40, 930, 255),
-            'SHELF': (88, 243, 352, 690),
+            'TABLE_1': (613, 376, 912, 616),
+            'TABLE_2': (1091, 221, 1393, 464),
+            'TABLE_3': (1091, 529, 1393, 771),
+            'BOARD': (520, 30, 1015, 205),
+            'SHELF': (78, 215, 344, 787),
         },
         marks={},
-        # ガレス先生：真ん中の机のすぐ手前の左寄り（机の名前の札に重ならない。右どなりにミレイユが立つ）
-        spots={'TEACHER_SPOT': dict(logic=(762, 550))},
-        spawn=(768, 742), exit_bottom=1024,
+        # ガレス先生：真ん中の机のすぐ手前の左寄り（右どなり 5マスにミレイユが立つ）
+        spots={'TEACHER_SPOT': dict(logic=(640, 652))},
+        spawn=(765, 770), exit_bottom=1024,
     ),
     # 研究所：奥に本棚（図鑑）、左奥にガラスの飾り棚、中央に机、右奥に機械と青い画面、右の壁ぞいに実験台と図形の板（黒板）
     # 2026-10-29 夜：白い研究施設の絵（v2。ZIP「Mistral_Room_lab_v2_parts」）に替えた。前の木の絵は design-parts/rooms-20261028/lab_v1_wood/。
@@ -213,6 +241,40 @@ def _draw_shape(d: ImageDraw.ImageDraw, shape, fill: int) -> None:
         d.rectangle(shape, fill=fill)
 
 
+def _v2_open(room: dict, name: str) -> Image.Image:
+    return Image.open(os.path.join(SRC_V2, room['v2'], f'{name}.png'))
+
+
+def _build_v2(room: dict, pre: str) -> tuple[list[dict], list[dict]]:
+    """正面向きの新しい絵（2026-10-30 指示書 X）：shell（不透明）・家具（切り分け）・前の絵の重ね物（extra）・shell から切り抜いた手前の層"""
+    u = ROOM_UNIT
+    shell = _v2_open(room, f"{room['v2']}_shell").convert('RGB')
+    shell.save(os.path.join(OUT_ROOMS, f'{pre}_shell.webp'), quality=WEBP_Q, method=6)
+    tiles = [dict(file=f'maps/rooms/{pre}_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
+    sprites = []
+    for file, name, foot, box in room['furniture']:
+        im = _v2_open(room, file).convert('RGBA')
+        if box:
+            part = Image.new('RGBA', im.size)
+            part.paste(im.crop(box), box[:2])
+            im = part
+        sprites.append({**_save(im, f'{pre}_{name}.webp'), 'z': round(foot * u)})
+    for path, name, foot, (dx, dy) in room['extra']:
+        src = Image.open(os.path.join(SRC, f'{path}.png')).convert('RGBA')
+        im = Image.new('RGBA', src.size)
+        im.alpha_composite(src, (dx, dy))
+        sprites.append({**_save(im, f'{pre}_{name}.webp'), 'z': round(foot * u)})
+    # 手前の低い壁・入口の柱（shell の絵をそのまま切り抜く）
+    mask = Image.new('L', shell.size, 0)
+    d = ImageDraw.Draw(mask)
+    for b in room['front_cut']:
+        _draw_shape(d, b, 255)
+    front = Image.new('RGBA', shell.size)
+    front.paste(shell.convert('RGBA'), (0, 0), mask)
+    sprites.append({**_save(front, f'{pre}_front.webp'), 'z': FRONT_Z})
+    return tiles, sprites
+
+
 def build_room(key: str, check: str | None, rooms: dict[str, dict] | None = None, pre: str | None = None) -> tuple[dict, dict]:
     """rooms・pre は別の道具（rooms_shop_build.py）から使うとき。部屋の設定に src（原本の置き場所）を書ける"""
     room = (rooms or ROOMS)[key]
@@ -238,15 +300,18 @@ def build_room(key: str, check: str | None, rooms: dict[str, dict] | None = None
 
     # 部屋の箱（透明な所は部屋の外の暗い色）
     pre = pre or f'room4_{key}'
-    shell = Image.new('RGBA', (1536, 1024), BG + (255,))
-    shell.alpha_composite(_load(room, 'shell'))
     os.makedirs(OUT_ROOMS, exist_ok=True)
-    shell.convert('RGB').save(os.path.join(OUT_ROOMS, f'{pre}_shell.webp'), quality=WEBP_Q, method=6)
-    tiles = [dict(file=f'maps/rooms/{pre}_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
-    sprites = []
-    for name, foot in room['furniture'].items():
-        sprites.append({**_save(_load(room, name), f'{pre}_{name[3:]}.webp'), 'z': round(foot * u)})
-    sprites.append({**_save(_load(room, 'front'), f'{pre}_front.webp'), 'z': FRONT_Z})
+    if room.get('v2'):
+        tiles, sprites = _build_v2(room, pre)
+    else:
+        shell = Image.new('RGBA', (1536, 1024), BG + (255,))
+        shell.alpha_composite(_load(room, 'shell'))
+        shell.convert('RGB').save(os.path.join(OUT_ROOMS, f'{pre}_shell.webp'), quality=WEBP_Q, method=6)
+        tiles = [dict(file=f'maps/rooms/{pre}_shell.webp', x=0, y=0, w=ROOM_W, h=ROOM_H)]
+        sprites = []
+        for name, foot in room['furniture'].items():
+            sprites.append({**_save(_load(room, name), f'{pre}_{name[3:]}.webp'), 'z': round(foot * u)})
+        sprites.append({**_save(_load(room, 'front'), f'{pre}_front.webp'), 'z': FRONT_Z})
 
     # 調べる物：となりに歩けるマスが無ければ、あるまで下へ広げる
     items: dict[str, dict] = {}
@@ -292,7 +357,10 @@ def build_room(key: str, check: str | None, rooms: dict[str, dict] | None = None
 
 def _check_image(key: str, room: dict, art: dict, offsets: dict, out: str) -> None:
     """確認画像：見本に、歩けるマス（緑）・調べる物（黄の枠）・人の所（話す＝赤、見た目＝水色）を重ねる"""
-    im = Image.open(os.path.join(room.get('src', SRC), room['dir'], f"{room['prefix']}_preview.png")).convert('RGBA')
+    if room.get('v2'):
+        im = Image.open(os.path.join(SRC_V2, room['v2'], f"review_{room['v2']}.jpg")).convert('RGBA')
+    else:
+        im = Image.open(os.path.join(room.get('src', SRC), room['dir'], f"{room['prefix']}_preview.png")).convert('RGBA')
     ov = Image.new('RGBA', im.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     for y, row in enumerate(art['grid']):

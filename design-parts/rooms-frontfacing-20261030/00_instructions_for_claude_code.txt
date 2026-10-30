@@ -1,0 +1,46 @@
+【指示書 X】部屋3つを正面向きに・バトルの状態の印3つ・噴水の水（2026-10-30）
+
+W（ヒョウズク）のあとに作業してください（W がまだなら W を先に）。新しいブランチで作業し、npm run check を通してから main に取り込んで公開してください。
+絵はすべて進行チャットとユーザーで合格済みです（描き直し・色の変更はしない）。
+
+■ ZIP の中身（Mistral_CC_X_Rooms_Status_Fountain_20261030.zip）
+A. 部屋（カードショップ〔指示書 N〕と同じ形：床と壁 1536×1024 不透明＋家具は 1536×1024 の透明な画像に置く位置で描いたもの）
+- 管理局：bureau_shell.png・bureau_furniture_counter.png・bureau_furniture_benches.png（左右2台）・bureau_furniture_medal_case.png・bureau_furniture_rank_board.png・bureau_furniture_notice_board.png・review_bureau.jpg（確認用）
+- 練習場：practice_shell.png・practice_furniture_card_shelf.png（左に3台）・practice_furniture_tables.png（机といす3組）・review_practice.jpg
+- 大会会場：arena_shell.png（観客席・丸い舞台は描きこみ）・arena_furniture_benches.png（左に2台）・arena_furniture_reception.png（右の受付）・review_arena.jpg
+B. バトルの状態の印（256×256 透明）：status_frozen.png（凍った）・status_energy.png（エネルギーをためた）・status_no_evade.png（回避できない）
+C. 噴水の水（600×750 透明・3コマ）：fountain_overflow_1.png〜_3.png
+
+■ 置き場所（原本は無改変）
+- 部屋：design-parts/rooms-frontfacing-20261030/（bureau・practice・arena）。印：design-parts/battle-status-20261030/。噴水：design-parts/town-20261028/fountain-overflow-20261030/
+
+■ A. 部屋を正面向きの絵に入れ替える（管理局・練習場・大会会場）
+- 今の部屋は tools/design/rooms4_build.py（ROOMS4_ART。左右の壁と家具がななめ）。カードショップを入れ替えたとき（tools/design/cardshop_v2.py）と同じ作りで、新しい絵に入れ替える：
+  床と壁＋家具の層（家具は人より手前・奥の重なり）・当たり（家具・壁）・歩ける所・入口（3つとも下の真ん中）・部屋に入ったときの立つ位置
+- 人の位置：管理局のエレノアは受付のカウンターの奥。練習場のガレス先生（試験）・大会会場の受付の人は、新しい家具に合わせて自然な所に（店番がカウンターの奥に立てるか）。導入イベントでミレイユが受付の前の主人公の右に立つ所も確かめる
+- 「調べる」所（maps.ts）を新しい家具の位置に合わせる：管理局＝受付・ランクの板（左奥）・メダルの棚（右奥）・**掲示板（左の真ん中。ランクの板と左のベンチの間）**。掲示板は大会のお知らせ（R2 の noticeBoard）。掲示板の下はすぐベンチなので、右から近づいて調べられるように（届かないなら報告）
+- 練習場：カードの棚（左）・対戦の机。大会会場：受付（右）・舞台の上の対戦の台は今の room4_arena_battle_table を舞台の真ん中に重ねる（舞台の円は幅約570px）
+- 主人公（背 145〜150px）を置いて、縮尺・通り道（入口から受付まで）・家具の重なりを写真で確かめる
+- 使わなくなった前の家具の絵は消してよい（作り直しでまたできるなら）
+
+■ B. バトルの状態の印
+- battleScreen.ts の状態の印に足す
+  - status_frozen：**ヒョウズクのこおりのいき・ふぶき**で付いた行動不可のとき。ノビトンのまきつくで付いたときは今のつる草（status_stunned）のまま → 行動不可を付けた技を覚えておき、印を分ける（ルールは同じ。セーブに入るなら version を上げる理由を報告）
+  - status_energy：ジオルのエネルギーをためる が効いている間
+  - status_no_evade：ジオルのじならし（回避できない）が効いている間
+- ほかの印と同じ大きさ・同じ並べ方。英語の印の名前も（仮訳）
+
+■ C. 噴水の水
+- docs/design-requests-20261030/10_fountain_overflow.md の「届いたら」のとおり：tools/design/town2026_build.py の噴水（fountain_spray のとなり）に、受け皿のふちの奥・池の手前のふちの奥に隠れる所を消して重ね、しぶきと同じ loops で3コマをくり返す
+- 1コマ目だけ少し薄い（不透明さの平均が 208、ほかは 236）。くり返したときにちらつくなら、1コマ目の濃さをほかにそろえてよい
+- 大きさ（倍率）は今の噴水の絵（fountain_layers.png の左の噴水）に合わせる。受け皿の大きさと水の輪がずれていれば、合わせて縮める
+
+■ やらないこと
+- 絵の描き直し・色の変更。ほかの部屋（家・花屋・仕立て屋・研究所・カードショップ）の変更
+
+■ 報告
+npm run check → main に取り込んで公開 → 作業報告書（V と同じ ZIP の形・写真入り）：
+- 3つの部屋の前と後（390×844）。主人公が入口・受付の前に立った所。管理局の掲示板・ランクの板・メダルの棚を調べた所
+- バトル：凍った（ヒョウズク）・まきつく（つる草のまま）・エネルギー・回避できない の印が出ている所
+- 街の噴水（水があふれ落ちる所・できれば短い動画か3枚）
+- 小さい画面（375×667）で部屋の入口・受付が隠れないか

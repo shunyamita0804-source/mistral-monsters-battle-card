@@ -230,6 +230,16 @@ FOUNTAIN_PILLAR = [(230, 200), (432, 200), (432, 515), (393, 515), (393, 600), (
 #    （水は飾りの先から上に出て、受け皿のふちの奥に落ちる）
 #  - 受け皿から下の池へ落ちる水は、今の絵（左右に弧を描くしぶき）では作れなかった（のばす・くり返すと雨のすじや段に見える）。
 #    あふれて落ちる水の絵を依頼した（docs/design-requests-20261030/fountain_overflow.md）
+# 2026-10-30 指示書 X：あふれて落ちる水の絵が届いた（design-parts/town-20261028/fountain-overflow-20261030/。600×750・3コマ。
+#  今の噴水の絵〔シートの左の噴水〕と同じ倍率）。水の輪（受け皿のふち）の真ん中 FOUNTAIN_OVERFLOW_RING（絵の px）を、受け皿のふちの真ん中
+#  （シートの FOUNTAIN_OVERFLOW_AT）に合わせて噴水の手前に重ね、受け皿の水の面・とがった飾り・下の池の手前のふちに隠れる所だけ消す（fountain_overflow）。
+#  水の輪の幅（約200px）は受け皿のふち（約210px）とそろっているので、倍率はそのまま（1倍）。しぶきと同じ loops・同じ速さでくり返す。
+#  1コマ目だけ少し薄い（見えている所の不透明さの平均 約206、ほかは 約236）ので、くり返したときにちらつかないよう、1コマ目の不透明さだけ
+#  ほかにそろえる（FOUNTAIN_OVERFLOW_ALPHA1。色は変えない）
+FOUNTAIN_OVERFLOW_DIR = os.path.join(ROOT, 'design-parts/town-20261028/fountain-overflow-20261030')
+FOUNTAIN_OVERFLOW_RING = (303, 125)
+FOUNTAIN_OVERFLOW_AT = (331, 333)
+FOUNTAIN_OVERFLOW_ALPHA1 = 236 / 206
 FOUNTAIN_SPRAY_FOOT = (331, 335)
 FOUNTAIN_SPRAY_SCALE = 0.62
 FOUNTAIN_SPRAY_TINT = 0.35
@@ -874,6 +884,44 @@ def fountain_spray(fbase: Image.Image, fpos: tuple[int, int], fwater: Image.Imag
     return frames, (sw_, out_h)
 
 
+def fountain_overflow(fbase: Image.Image, fpos: tuple[int, int], fwater: Image.Image) -> tuple[list[Image.Image], tuple[int, int]]:
+    """あふれて落ちる水の3コマ（シートの倍率のまま、3コマの透明でない所の外枠で切り抜いたもの）。
+    受け皿の水の面・とがった飾り・下の池の手前のふちに隠れる所を消してある。返り値：コマ・切り抜いた左上のシートの px"""
+    fbx, fby = fpos
+    wcx, wcy = FOUNTAIN_WATER
+    raw = [Image.open(os.path.join(FOUNTAIN_OVERFLOW_DIR, f'fountain_overflow_{i}.png')).convert('RGBA') for i in (1, 2, 3)]
+    box = raw[0].getbbox()
+    for im in raw[1:]:
+        b = im.getbbox()
+        box = (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+    ox = FOUNTAIN_OVERFLOW_AT[0] - FOUNTAIN_OVERFLOW_RING[0] + box[0]
+    oy = FOUNTAIN_OVERFLOW_AT[1] - FOUNTAIN_OVERFLOW_RING[1] + box[1]
+    # 手前の物（シートの px）：とがった飾り・受け皿の水の面・下の池の手前のふち（水の輪の外で輪の中心より下の、台の絵の所）
+    front = Image.new('L', fbase.size, 0)
+    fd = ImageDraw.Draw(front)
+    fd.polygon([(x - fbx, y - fby) for x, y in FOUNTAIN_SPIKE], fill=255)
+    (icx, icy), (irx, iry) = FOUNTAIN_BOWL_INNER
+    fd.ellipse([icx - irx - fbx, icy - iry - fby, icx + irx - fbx, icy + iry - fby], fill=255)
+    fa = np.array(fbase.getchannel('A')).astype(np.float32) / 255
+    rows = np.arange(fbase.height)[:, None] + fby
+    cols = np.arange(fbase.width)[None, :] + fbx
+    prx, pry = FOUNTAIN_POND
+    outside_pond = ((cols - wcx) / prx) ** 2 + ((rows - wcy) / pry) ** 2 > 1
+    occ = np.maximum(np.array(front).astype(np.float32) / 255, fa * ((rows > wcy) & outside_pond))
+    occ = ndimage.gaussian_filter(np.clip(occ, 0, 1), 1.5)
+    w, h = box[2] - box[0], box[3] - box[1]
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    hide = np.clip(ndimage.map_coordinates(occ, [yy + oy - fby, xx + ox - fbx], order=1, mode='constant', cval=0.0), 0, 1)
+    frames = []
+    for i, im in enumerate(raw):
+        a = np.array(im.crop(box)).astype(np.float32)
+        if i == 0:
+            a[..., 3] *= FOUNTAIN_OVERFLOW_ALPHA1
+        a[..., 3] *= 1 - hide
+        frames.append(Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)))
+    return frames, (ox, oy)
+
+
 def build_town(shade_building, check_dir: str | None = None) -> dict:
     rng = random.Random(20261028)
     t = Town(shade_building)
@@ -1252,6 +1300,11 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     spy = fy + (FOUNTAIN_SPRAY_FOOT[1] - fby) * fs - FOUNTAIN_SPRAY_H * fs * ss
     # 噴水の手前に重ねる（受け皿・飾り・池の手前のふちの所は fountain_spray で消してある）
     loops = [dict(frames=frames, x=round(spx), y=round(spy), w=round(sw_ * fs * ss), h=round(out_h * fs * ss), z=round(fz + 1), ms=FOUNTAIN_SPRAY_MS)]
+    # あふれて落ちる水（2026-10-30 指示書 X）：受け皿のふちから下の池へ。しぶきより手前・しぶきと同じ速さ
+    over_frames, (ovx, ovy) = fountain_overflow(fbase, (fbx, fby), fwater)
+    over_files = [t.save_sprite(resize(c, fs * K), f'fountain_overflow{i + 1}') for i, c in enumerate(over_frames)]
+    ow_, oh_ = over_frames[0].size
+    loops.append(dict(frames=over_files, x=round(fx + (ovx - fbx) * fs), y=round(fy + (ovy - fby) * fs), w=round(ow_ * fs), h=round(oh_ * fs), z=round(fz + 2), ms=FOUNTAIN_SPRAY_MS))
     fountain_cells = dict(x=int(fx // CELL), y=int((fy + (wcy - 150 - fby) * fs) // CELL),
                           w=int(fpart.width / K // CELL) + 1, h=int((fpart.height / K - (wcy - 150 - fby) * fs) // CELL) + 1)
 

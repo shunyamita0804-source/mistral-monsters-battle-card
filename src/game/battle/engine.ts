@@ -55,6 +55,8 @@ export interface BattleMonster {
   readonly taunt?: { readonly monsterId: string; readonly turn: number } | null;
   /** この手番（turn）の間は技を使えない（攻撃も特殊も。正式：ノビトンのまきつく「次ターン行動不可」2026-10-25。守備のカードは使える） */
   readonly stunnedTurn?: number | null;
+  /** 行動不可を付けた技の印（'frozen'＝ヒョウズクの技で凍った。null・無し＝まきつく。印の絵を分けるだけで、決まりは同じ。2026-10-30 指示書 X） */
+  readonly stunMark?: 'frozen' | null;
   /**
    * 受ける against の技のダメージを reduce 減らす。untilTurn の手番が終わるまで（正式：ミュロルのしめったはだ 2026-10-25。
    * 使った手番を含む2手番＝相手の次の手番まで）。重ねがけはしない
@@ -1062,7 +1064,7 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
   if (e.stunTarget) {
     const target = findMonster(next, targetUid);
     if (target && target.monster.life > 0) {
-      next = updateMonster(next, targetUid, { stunnedTurn: state.turn + 1 });
+      next = updateMonster(next, targetUid, { stunnedTurn: state.turn + 1, stunMark: e.stunMark ?? null });
       next = addLog(next, t('battle.log.stun', { name: nameOf(target.monster.cardId) }));
     }
   }

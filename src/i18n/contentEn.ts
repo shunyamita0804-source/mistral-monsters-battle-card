@@ -256,7 +256,6 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:shop-exit:label': 'Exit',
   // 大会会場
   'object:hall-desk:label': 'Reception',
-  'object:hall-board:label': 'Match Board',
   'object:hall-table:label': 'Battle table',
   'object:hall-table:message': 'The battle table in the middle of the indoor hall. Tournament matches are played here.',
   'object:hall-seats-l:label': 'Seats',

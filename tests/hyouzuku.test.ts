@@ -173,7 +173,7 @@ function attackWith(attack: string, guard: string | null, target = 'o-m1', start
 describe('05 こおりのいき・09 ふぶき：相手は次のターン行動不可（ノビトンのまきつくと同じ）', () => {
   it('当たると、相手は次の手番に技を使えない。ほかのモンスターは使える。その次の手番は使える', () => {
     for (const no of [5, 9]) {
-      expect(getSkill(hyo(no)).effect).toEqual({ type: 'attack', stunTarget: true });
+      expect(getSkill(hyo(no)).effect).toEqual({ type: 'attack', stunTarget: true, stunMark: 'frozen' });
       let s = attackWith(hyo(no), null).after;
       expect(monster(s, 'o-m1').stunnedTurn).toBe(s.turn + 1);
       expect(monster(s, 'o-m1').life).toBe(7 - (no === 5 ? 1 : 3));
@@ -183,6 +183,16 @@ describe('05 こおりのいき・09 ふぶき：相手は次のターン行動�
       expect(cardUsability(s, 'opponent', 'o1').usable).toBe(true);
       expect(cardUsability({ ...s, turn: s.turn + 2 }, 'opponent', 'o0').usable).toBe(true);
     }
+  });
+
+  it('対戦の画面の印：ヒョウズクの技で付いた行動不可は「凍った」（stunMark）、まきつくはつる草のまま（決まりは同じ。2026-10-30 指示書 X）', () => {
+    expect(monster(attackWith(hyo(5), null).after, 'o-m1').stunMark).toBe('frozen');
+    expect(monster(attackWith(hyo(9), null).after, 'o-m1').stunMark).toBe('frozen');
+    const coil = scene({ player: ['skl-nobiton-03'] });
+    const nobi = { ...coil, sides: { ...coil.sides, player: { ...coil.sides.player, monsters: coil.sides.player.monsters.map((m, i) => (i === 0 ? { ...m, cardId: 'mon-nobiton' } : m)) } } };
+    const after = attackWith('skl-nobiton-03', null, 'o-m1', nobi).after;
+    expect(monster(after, 'o-m1').stunnedTurn).toBe(after.turn + 1);
+    expect(monster(after, 'o-m1').stunMark ?? null).toBeNull();
   });
 
   it('回避されたらかからない（まいあがる・おとなきはばたき）', () => {

@@ -126,6 +126,10 @@ export const BATTLE = {
   'battle.status.weaken': { ja: '{stat}−{n}', en: '{stat} -{n}' },
   'battle.status.sealed': { ja: '攻撃不可', en: 'No attack' },
   'battle.status.stunned': { ja: '行動不可', en: "Can't act" },
+  // 2026-10-30 指示書 X：状態の印を3つ足した（英語は仮訳）
+  'battle.status.frozen': { ja: '凍って行動不可', en: 'Frozen' },
+  'battle.status.energy': { ja: 'エネルギー', en: 'Energy' },
+  'battle.status.noEvade': { ja: '回避できない', en: "Can't dodge" },
   'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
   'battle.status.charged': { ja: 'ためている', en: 'Charged' },
   'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },

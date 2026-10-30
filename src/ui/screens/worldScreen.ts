@@ -2719,8 +2719,8 @@ export class WorldView {
 
   /** 大会会場の左の壁の紺の板に、総当たりの表を小さく描く（板の位置は rooms4Art の BOARD） */
   #addLeagueBoard(): void {
-    if (this.#map.id !== 'hall') return;
     const board = HALL_BOARD;
+    if (this.#map.id !== 'hall' || !board) return;
     const k = this.#scale;
     const now = this.#leagueNow();
     const el = h(
