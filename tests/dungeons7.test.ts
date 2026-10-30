@@ -56,13 +56,14 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
     // ボスの lifeScale：2026-10-30 指示書 V で切り札の技を2枚ずつにしたあと、直す前の勝つ割合に合わせ直した（切り札がボスごとにちがうので、
     // lifeScale の大きさの順は強さの順ではなくなった。強さは勝つ割合で比べる：tests/bossPlaytest.test.ts・docs/deck-gacha-boss-v-20261030.md）
     expect(Object.fromEntries(['dungeon-01', ...ids].map((id) => [id, runBossOpponent(id).lifeScale]))).toEqual({
+      // 2026-10-30 指示書 Y：サポートの入れ替えで合わせ直した
       'dungeon-01': 1.05,
-      'dungeon-02': 0.7,
-      'dungeon-03': 1.2,
-      'dungeon-04': 1.3, // 2026-10-30 指示書 W：切り札をヒョウズクに替えて合わせ直した
-      'dungeon-05': 1.75,
-      'dungeon-06': 1.2,
-      'dungeon-07': 1.75,
+      'dungeon-02': 0.75,
+      'dungeon-03': 1.22,
+      'dungeon-04': 1.2,
+      'dungeon-05': 1.45,
+      'dungeon-06': 1.25,
+      'dungeon-07': 1.22,
     });
   });
 

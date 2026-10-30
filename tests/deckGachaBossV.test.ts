@@ -208,14 +208,15 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
 
   it('ボス8人の lifeScale（直す前の勝つ割合から ±3 ポイントに合わせ直した。イヴァン・バルカは入らず、いちばん近い値）', () => {
     expect(Object.fromEntries(Object.keys(ACES).map((id) => [id, ENCOUNTERS[id]?.lifeScale]))).toEqual({
+      // 2026-10-30 指示書 Y：サポートの入れ替えで最初の箱が変わったので、8人とも合わせ直した（ゼフィラは ±3 に入らない）
       'enc-b3-boss': 1.05,
-      'enc-forest-boss': 0.7,
-      'enc-water-boss': 1.2,
-      'enc-wind-boss': 1.1,
-      'enc-ice-boss': 1.3, // 2026-10-30 指示書 W：ヒョウズクに替えて合わせ直した（±3 には入らない）
-      'enc-fire-boss': 1.75,
-      'enc-machine-boss': 1.2,
-      'enc-holy-boss': 1.75,
+      'enc-forest-boss': 0.75,
+      'enc-water-boss': 1.22,
+      'enc-wind-boss': 1.22,
+      'enc-ice-boss': 1.2,
+      'enc-fire-boss': 1.45,
+      'enc-machine-boss': 1.25,
+      'enc-holy-boss': 1.22,
     });
   });
 

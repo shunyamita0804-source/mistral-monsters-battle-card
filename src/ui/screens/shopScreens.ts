@@ -9,7 +9,7 @@ import { isNewItem } from '../../game/items/items.ts';
 import { availableGachaSeriesFor, isNewGachaSeries, markGachaSeriesSeen, purchaseSeriesPack, seriesOwned } from '../../game/economy/gachaSeries.ts';
 
 import { randomSeed } from '../../game/rng.ts';
-import { cardName } from '../../i18n/content.ts';
+import { gachaSeriesName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { seriesPackUrl } from '../components/gachaArt.ts';
 import { showGachaMachine } from '../components/gachaMachine.ts';
@@ -24,7 +24,7 @@ import { sound } from '../sound.ts';
 import faceClerk from '@assets/images/characters/face_clerk.webp';
 
 /** シリーズの名前「○○のパック」 */
-const seriesName = (series: GachaSeries): string => t('gacha.series.name', { monster: cardName(series.monsterId) });
+const seriesName = (series: GachaSeries): string => gachaSeriesName(series);
 
 /**
  * ブースターの箱の棚（2026-10-28 ユーザー決定）：管理局で選ばなかった箱を 1箱 1,500G で買える（各箱1回まで。買ったら「購入済み」）。
@@ -186,6 +186,7 @@ export const gachaScreen: ScreenDefinition = {
         body: [
           h('p', { class: 'modal__text', text: t('gacha.ratesMonster', { rate: Math.round(GACHA.monsterRate * 1000) / 10 }) }),
           h('p', { class: 'modal__text', text: t('gacha.ratesSkills') }),
+          h('p', { class: 'modal__text', text: t('gacha.ratesTools') }),
         ],
         actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
       });

@@ -271,8 +271,8 @@ function beatLucia(save: SaveData, seed: number): ReturnType<typeof winRunBattle
 const LUCIA_TEAM = ['mon-kalshell', SEREPHINE_MONSTER_ID, 'mon-myurol'];
 
 describe('水の神殿のボス（ルシア）・入手の流れ', () => {
-  it('ルシアのデッキはカルシェル・セレフィーン・ミュロル（ソラモを外した）・lifeScale 1.2 のまま', () => {
-    expect(ENCOUNTERS['enc-water-boss']).toMatchObject({ name: 'ルシア', monsters: LUCIA_TEAM, lifeScale: 1.2 });
+  it('ルシアのデッキはカルシェル・セレフィーン・ミュロル（ソラモを外した）・lifeScale 1.2（指示書 Y で 1.22）', () => {
+    expect(ENCOUNTERS['enc-water-boss']).toMatchObject({ name: 'ルシア', monsters: LUCIA_TEAM, lifeScale: 1.22 });
     expect(DUNGEONS.find((d) => d.id === 'dungeon-03')).toMatchObject({
       trumpReward: true,
       bossFlag: LUCIA_BEATEN_FLAG,

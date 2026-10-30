@@ -314,6 +314,7 @@ export const SCREENS = {
     en: "Monster card: {rate}% per pack, only while you don't have it yet",
   },
   'gacha.ratesSkills': { ja: '技カードは、技によって出やすさがちがいます', en: 'Some skill cards are easier to get than others' },
+  'gacha.ratesTools': { ja: '道具のパック（仮）：モンスターカードは入りません。サポートカードは、カードによって出やすさがちがいます', en: 'Tool Pack (Temp): no monster cards. Some support cards are easier to get than others' },
   'gacha.notEnough': {
     ja: '所持金が足りません（{price}G 必要）。\nダンジョンや大会で稼ぎましょう。',
     en: 'Not enough money ({price}G needed).\nEarn some in the dungeon or at cups.',
@@ -327,6 +328,7 @@ export const SCREENS = {
   'gacha.select.title': { ja: 'どのパックをまわす？', en: 'Which pack will you turn?' },
   'gacha.select.lead': { ja: '1つ選んで、もう1回押すと決定（1回 {price}G）', en: 'Tap a pack, then tap it again to choose ({price}G each)' },
   'gacha.series.name': { ja: '{monster}のパック', en: '{monster} Pack' },
+  'gacha.series.tools': { ja: '道具のパック（仮）', en: 'Tool Pack (Temp)' },
   'gacha.series.owned': { ja: '{n} / {total} そろった', en: '{n} / {total} collected' },
   'gacha.reselect': { ja: 'パックを選び直す', en: 'Choose another pack' },
   'gacha.knob': { ja: 'つまみ', en: 'Knob' },

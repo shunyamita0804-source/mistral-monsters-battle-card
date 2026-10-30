@@ -1,4 +1,4 @@
-import { getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
+import { cardCatalog, getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
 import { BATTLE_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -78,6 +78,8 @@ export interface BattleMonster {
    * かしこさ技を使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える。ちから技では消えない
    */
   readonly energy?: { readonly turn: number } | null;
+  /** このターン（turn）に次に使う攻撃技のダメージ＋amount（2026-10-30 指示書 Y：声援）。攻撃を1回使うか、ターンが終わったら効かない。倒れたら消える */
+  readonly cheer?: { readonly amount: number; readonly turn: number } | null;
   /**
    * 効く手番（turn。かけた側の次の自分の手番）の間、このモンスターの攻撃技の消費マナ−discount（正式：ツムジのかぜのり 2026-10-30）。
    * 0より下にはならない。重ねない。その手番が終わったら効かない。倒れたら消える
@@ -208,6 +210,8 @@ export type BattleAction =
       readonly userUid?: string;
       /** 対象（攻撃：相手モンスター、回復：味方モンスター） */
       readonly targetUid?: string;
+      /** 選んだカード（2026-10-30 指示書 Y：思い出の箱＝捨て札の技カードの ID、風まかせ＝山札に戻す手札の uid） */
+      readonly choice?: string;
     }
   | { readonly type: 'defend'; readonly side: Side; readonly cardUid: string | null }
   /** 攻撃を終えてマナ化へ進む */
@@ -346,6 +350,7 @@ export function skillCost(state: BattleState, skill: SkillCard, user?: BattleMon
 
 /** 手札のその技を、いま使えるモンスターのだれかが使うときのいちばん少ない消費マナ（使えるモンスターがいなければカードのマナ） */
 export function handSkillCost(state: BattleState, side: Side, skill: SkillCard): number {
+  if (isGuardSkill(skill)) return guardCost(state, skill);
   const users = availableUsers(state, side, skill);
   return users.length === 0 ? skill.cost : Math.min(...users.map((u) => skillCost(state, skill, u)));
 }
@@ -372,7 +377,39 @@ function supportUsability(state: BattleState, side: Side, card: SupportCard): Us
   const left = supportUsesLeft(state, side, card);
   if (left !== null && left <= 0) return NO(t('battle.ng.usedThisTurn'));
   if (card.effect.type === 'heal' && aliveMonsters(state.sides[side]).length === 0) return NO(t('battle.ng.noHealTarget'));
+  // 2026-10-30 指示書 Y：サポートカード フェーズ1
+  const s = state.sides[side];
+  switch (card.effect.type) {
+    case 'stone':
+      if (attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.noAttackTarget'));
+      break;
+    case 'recall':
+      if (recallChoices(state, side).length === 0) return NO(t('battle.ng.noRecall'));
+      if (s.hand.length - 1 >= BATTLE_RULES.maxHand) return NO(t('battle.ng.handFull'));
+      break;
+    case 'swap':
+      if (s.hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
+      break;
+    case 'manaDrain':
+      if (manaOf(state.sides[otherSide(side)]) <= 0) return NO(t('battle.ng.noOpponentMana'));
+      break;
+    case 'cheer':
+      if (cheerTargets(state, side).length === 0) return NO(t('battle.ng.noCheerTarget'));
+      break;
+    default:
+      break;
+  }
   return YES;
+}
+
+/** 思い出の箱で選べるカード（自分の捨て札の技カード。同じカードは1つにまとめる。捨て札の順） */
+export function recallChoices(state: BattleState, side: Side): string[] {
+  return [...new Set(state.sides[side].discard.filter((id) => cardCatalog.get(id)?.kind === 'skill'))];
+}
+
+/** 声援をかけられる味方（生きていて、このターンまだ動いていない） */
+export function cheerTargets(state: BattleState, side: Side): BattleMonster[] {
+  return aliveMonsters(state.sides[side]).filter((m) => !m.acted);
 }
 
 /** 手札のカードを今使えるか（使用不可状態の表示に使う） */
@@ -399,7 +436,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (!target || target.cardId !== skill.monsterId) return NO(t('battle.ng.notTarget'));
     const against = guardAgainst(skill);
     if (against !== 'all' && against !== pending.stat) return NO(t('battle.ng.wrongStat', { stat: statLabel(pending.stat) }));
-    const attackCard = getSkill(pending.cardId);
+    const attackCard = attackCardOf(pending.cardId);
     const attack = attackCard.effect;
     if (attack.type === 'attack' && type === 'defense' && attack.unblockable) return NO(t('battle.ng.unblockable'));
     // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）
@@ -412,7 +449,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (minCost > 0 && attackCard.cost < minCost) return NO(t('battle.ng.evadeMinCost', { n: minCost }));
     const maxCost = guardMaxCost(skill);
     if (maxCost !== null && attackCard.cost > maxCost) return NO(t('battle.ng.maxCost', { n: maxCost }));
-    if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
+    if (manaOf(state.sides[side]) < guardCost(state, skill)) return NO(t('battle.ng.noMana'));
     return YES;
   }
 
@@ -462,7 +499,7 @@ export function coverUser(state: BattleState, side: Side, skill: SkillCard): Bat
  * 「防御されない」攻撃・相手全体への攻撃には使えない。1回の攻撃に1回だけで、狙われた味方がほかの守りを使う前（最初の守り）だけ【Claude の裁定】
  */
 function coverUsability(state: BattleState, side: Side, skill: SkillCard, pending: PendingAttack): Usability {
-  const attack = getSkill(pending.cardId).effect;
+  const attack = attackCardOf(pending.cardId).effect;
   if (attack.type === 'attack' && attack.unblockable) return NO(t('battle.ng.unblockable'));
   if (attack.type === 'attack' && attack.allTargets) return NO(t('battle.ng.coverAllTargets'));
   if (pending.coveredFrom) return NO(t('battle.ng.coverOnce'));
@@ -470,7 +507,7 @@ function coverUsability(state: BattleState, side: Side, skill: SkillCard, pendin
   const target = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
   if (!target || target.cardId === skill.monsterId) return NO(t('battle.ng.coverSelf'));
   if (!coverUser(state, side, skill)) return NO(t('battle.ng.ownerDown'));
-  if (manaOf(state.sides[side]) < skill.cost) return NO(t('battle.ng.noMana'));
+  if (manaOf(state.sides[side]) < guardCost(state, skill)) return NO(t('battle.ng.noMana'));
   return YES;
 }
 
@@ -509,8 +546,11 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
       }),
     );
   }
-  // 回復（仮サポート）・いやしのみつ（フルーネ。使ったモンスターも選べる）：生きている味方（倒れた味方は選べない）
+  // 回復（薬草）・いやしのみつ（フルーネ。使ったモンスターも選べる）：生きている味方（倒れた味方は選べない）
   if (card.effect.type === 'heal' || card.effect.type === 'healAlly') return aliveMonsters(state.sides[side]);
+  // 投石（2026-10-30 指示書 Y）：すなをほるで隠れていない相手（ちょうはつの制限は受けない）。声援：まだ動いていない味方
+  if (card.kind === 'support' && card.effect.type === 'stone') return attackableMonsters(state, otherSide(side));
+  if (card.kind === 'support' && card.effect.type === 'cheer') return cheerTargets(state, side);
   if (card.kind === 'skill' && card.effect.type === 'tailwind') return tailwindTargets(state, side, card);
   return [];
 }
@@ -518,6 +558,38 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
 /** おいかぜをかけられる味方（生きていて、使ったモンスターと同じ種類〔プカリム〕でない） */
 export function tailwindTargets(state: BattleState, side: Side, skill: SkillCard): BattleMonster[] {
   return aliveMonsters(state.sides[side]).filter((m) => m.cardId !== skill.monsterId);
+}
+
+/**
+ * 攻撃のカード（守りの判定・ダメージ・攻撃に付いた効果に使う）。投石（2026-10-30 指示書 Y）はサポートだが、
+ * ちから技（マナ＝カードのマナ・ダメージ value・効果なし）として扱う。使うモンスターはいない
+ */
+export function attackCardOf(cardId: string): SkillCard {
+  const card = getPlayCard(cardId);
+  if (card.kind === 'skill') return card;
+  const value = card.effect.type === 'stone' ? card.effect.value : 0;
+  return { kind: 'skill', id: card.id, name: card.name, rarity: card.rarity, isPlaceholder: false, monsterId: '', cost: card.cost, category: 'force', stat: { type: 'force', value }, effect: { type: 'attack' } } as SkillCard;
+}
+
+/** 声援（2026-10-30 指示書 Y）：このターンの、次の攻撃技のダメージ＋ */
+export function cheerOf(state: BattleState, user: BattleMonster | undefined): number {
+  const c = user?.cheer;
+  return c && user.life > 0 && c.turn === state.turn ? c.amount : 0;
+}
+
+/** 場のカード「守りの陣」（2026-10-30 指示書 Y）：防御・回避のカードの必要マナを減らす量（場に無ければ 0） */
+export function guardDiscountOf(state: BattleState): number {
+  if (!state.field) return 0;
+  const e = getSupport(state.field.cardId).effect;
+  return e.type === 'guardDiscount' ? e.value : 0;
+}
+
+/** 守りのカード（防御・回避・かばう）か */
+const isGuardSkill = (skill: SkillCard): boolean => skill.effect.type === 'defense' || skill.effect.type === 'evade' || skill.effect.type === 'cover';
+
+/** 守りのカードの必要マナ（守りの陣が場にあれば−。0より下にならない） */
+export function guardCost(state: BattleState, skill: SkillCard): number {
+  return isGuardSkill(skill) ? Math.max(0, skill.cost - guardDiscountOf(state)) : skill.cost;
 }
 
 /** 使うモンスターがためている「次の攻撃技のダメージ＋」（ほっぺにためる） */
@@ -570,7 +642,7 @@ export function weakenTurnOf(state: BattleState, user: BattleMonster | undefined
 export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
   if (!skill.stat) return 0;
   const base = skill.stat.value * (energyOf(state, user, skill) ? 2 : 1);
-  const boost = chargeOf(user) + tailwindOf(state, user);
+  const boost = chargeOf(user) + tailwindOf(state, user) + cheerOf(state, user);
   return Math.max(0, base + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
 }
 
@@ -656,7 +728,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -669,7 +741,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
 export function pendingDamage(pending: PendingAttack): number {
   const cards = pending.responses.map(getSkill);
   if (cards.some((c) => c.effect.type === 'evade')) {
-    const attack = getSkill(pending.cardId).effect;
+    const attack = attackCardOf(pending.cardId).effect;
     return attack.type === 'attack' && attack.halfOnEvade ? Math.floor(pending.power / 2) : 0;
   }
   const reduction = cards.filter((c) => c.effect.type === 'defense').reduce((sum, c) => sum + guardReduction(c), 0);
@@ -741,7 +813,7 @@ function nextAllTarget(state: BattleState, done: PendingAttack): BattleState {
  * 【要仕様確定】「当たった」はダメージが1以上のときとした（回避・防御で0のときは反動なし）。勝負がついたあとは何もしない
  */
 function selfDamageOnHit(state: BattleState, skillId: string, userUid: string): BattleState {
-  const e = getSkill(skillId).effect;
+  const e = attackCardOf(skillId).effect;
   if (e.type !== 'attack' || !e.selfDamageOnHit || state.phase === 'ended') return state;
   const user = findMonster(state, userUid);
   if (!user || user.monster.life <= 0) return state;
@@ -754,7 +826,7 @@ function selfDamageOnHit(state: BattleState, skillId: string, userUid: string): 
  * 最大ライフ（その対戦での最大。ボスの lifeScale がかかっていればその値）を超えない。0 なら何もしない。勝負がついたあと・使ったモンスターが倒れていれば何もしない
  */
 function drainHeal(state: BattleState, skillId: string, userUid: string, lost: number): BattleState {
-  const e = getSkill(skillId).effect;
+  const e = attackCardOf(skillId).effect;
   if (e.type !== 'attack' || !e.drain || lost <= 0 || state.phase === 'ended') return state;
   const user = findMonster(state, userUid)?.monster;
   if (!user || user.life <= 0 || user.life >= user.maxLife) return state;
@@ -763,7 +835,7 @@ function drainHeal(state: BattleState, skillId: string, userUid: string, lost: n
 
 /** 命中の音の種類（強攻撃は仮に必要マナ STRONG_ATTACK_COST 以上の技） */
 function hitKind(skillId: string): BattleFxKind {
-  return getSkill(skillId).cost >= STRONG_ATTACK_COST ? 'hitStrong' : 'hitNormal';
+  return attackCardOf(skillId).cost >= STRONG_ATTACK_COST ? 'hitStrong' : 'hitNormal';
 }
 
 /**
@@ -797,7 +869,7 @@ export function applyAction(state: BattleState, action: BattleAction): BattleSta
   if (state.phase === 'ended') return state;
   switch (action.type) {
     case 'useCard':
-      return useCard(state, action.side, action.cardUid, action.userUid, action.targetUid);
+      return useCard(state, action.side, action.cardUid, action.userUid, action.targetUid, action.choice);
     case 'defend':
       return defend(state, action.side, action.cardUid);
     case 'endAttack': {
@@ -832,13 +904,14 @@ function useCard(
   cardUid: string,
   userUid: string | undefined,
   targetUid: string | undefined,
+  choice?: string,
 ): BattleState {
   if (state.phase !== 'main') return state;
   if (!cardUsability(state, side, cardUid).usable) return state;
   const hand = findHandCard(state, side, cardUid);
   if (!hand) return state;
   const card = getPlayCard(hand.cardId);
-  if (card.kind === 'support') return useSupport(state, side, cardUid, card, targetUid);
+  if (card.kind === 'support') return useSupport(state, side, cardUid, card, targetUid, choice);
   const skill = card;
   const users = availableUsers(state, side, skill);
   // 使うモンスターの指定がなければ、選んだ相手に攻撃できるモンスター（ちょうはつで限られていないもの）を選ぶ
@@ -886,6 +959,8 @@ function useCard(
       // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）。おいかぜは効く手番に使ったときだけ消える
       if (user.charge) next = updateMonster(next, user.uid, { charge: null });
       if (tailwindOf(state, user) > 0) next = updateMonster(next, user.uid, { tailwind: null });
+      // 声援：攻撃技を1回使ったら消える
+      if (cheerOf(state, user) > 0) next = updateMonster(next, user.uid, { cheer: null });
       // エネルギーをためる：効く手番の最初のかしこさ技で消える（ちから技では消えない）
       if (energized) next = addLog(updateMonster(next, user.uid, { energy: null }), t('battle.log.energyDouble', { name: nameOf(user.cardId) }));
       if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
@@ -1057,7 +1132,7 @@ function drainMana(state: BattleState, side: Side, n: number): BattleState {
  * 【要仕様確定】回避されなければ発動する（防御でダメージが0になっても発動。回避されたら発動しない）。勝負がついたあとは何もしない
  */
 function attackRiders(state: BattleState, skillId: string, attacker: Side, targetUid: string): BattleState {
-  const e = getSkill(skillId).effect;
+  const e = attackCardOf(skillId).effect;
   if (e.type !== 'attack' || state.phase === 'ended') return state;
   let next = state;
   if (e.manaDrain) next = drainMana(next, attacker, e.manaDrain);
@@ -1142,12 +1217,16 @@ function drawByEffect(state: BattleState, side: Side, count: number): BattleStat
  * サポートを使う。モンスターの行動は使わない。回数制限のあるものは使用回数を数える。
  * 全体カードは場に残り、すでに場にあったカードは持ち主の捨て札へ。
  */
-function useSupport(state: BattleState, side: Side, cardUid: string, card: SupportCard, targetUid: string | undefined): BattleState {
+function useSupport(state: BattleState, side: Side, cardUid: string, card: SupportCard, targetUid: string | undefined, choice?: string): BattleState {
   let target: BattleMonster | undefined;
-  if (card.effect.type === 'heal') {
+  const type = card.effect.type;
+  if (type === 'heal' || type === 'stone' || type === 'cheer') {
     target = targetUid ? targetsFor(state, side, card).find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
+  // 思い出の箱：捨て札の技カード（choice＝カードの ID）。風まかせ：このカード以外の手札（choice＝uid）
+  if (type === 'recall' && (!choice || !recallChoices(state, side).includes(choice))) return state;
+  if (type === 'swap' && (!choice || choice === cardUid || !findHandCard(state, side, choice))) return state;
   const s = state.sides[side];
   let next: BattleState;
   if (card.duration === 'field') {
@@ -1170,6 +1249,49 @@ function useSupport(state: BattleState, side: Side, cardUid: string, card: Suppo
       return drawByEffect(next, side, e.value);
     case 'mana':
       return deckToMana(next, side, e.value);
+    case 'stone': {
+      // 投石：ちから技（マナ1・ダメージ1）として、相手の守り（防御・回避）を待つ。場の増減・しめったはだ・防御の軽減は今の決まりどおり
+      if (!target) return state;
+      const power = Math.max(0, e.value + fieldModifier(state, 'force'));
+      return {
+        ...next,
+        phase: 'defense',
+        pending: {
+          attacker: side,
+          userUid: '',
+          targetUid: target.uid,
+          cardId: card.id,
+          stat: 'force',
+          power,
+          responses: [],
+          ...(isPinned(state, target) ? { pinned: true } : {}),
+        },
+      };
+    }
+    case 'recall': {
+      const s2 = next.sides[side];
+      const at = s2.discard.lastIndexOf(choice as string);
+      if (at < 0) return state;
+      const discard = [...s2.discard.slice(0, at), ...s2.discard.slice(at + 1)];
+      next = updateSide({ ...next, nextUid: next.nextUid + 1 }, side, { discard, hand: [...s2.hand, { uid: `c${next.nextUid}`, cardId: choice as string }] });
+      return addLog(next, t('battle.log.recall', { side: sideLabel(side), card: nameOf(choice as string) }));
+    }
+    case 'swap': {
+      const s2 = next.sides[side];
+      const back = s2.hand.find((c) => c.uid === choice);
+      if (!back) return state;
+      const mixed = shuffle([...s2.deck, back.cardId], next.seed);
+      next = updateSide({ ...next, seed: mixed.seed }, side, { hand: s2.hand.filter((c) => c.uid !== back.uid), deck: mixed.items });
+      next = addLog(next, t('battle.log.swap', { side: sideLabel(side) }));
+      return drawByEffect(next, side, 1);
+    }
+    case 'manaDrain':
+      return drainMana(next, side, e.value);
+    case 'cheer':
+      if (!target) return state;
+      next = updateMonster(next, target.uid, { cheer: { amount: e.value, turn: state.turn } });
+      return addLog(next, t('battle.log.cheer', { name: nameOf(target.cardId), n: e.value }));
+    case 'guardDiscount':
     case 'field': {
       const old = next.field;
       if (old) {
@@ -1199,7 +1321,7 @@ function defend(state: BattleState, side: Side, cardUid: string | null): BattleS
   const skill = getSkill(hand.cardId);
   if (skill.effect.type === 'cover') return cover(state, side, cardUid, skill, pending);
   let next = removeFromHand(state, side, cardUid);
-  next = payMana(next, side, skill.cost);
+  next = payMana(next, side, guardCost(next, skill));
   next = { ...next, pending: { ...pending, responses: [...pending.responses, skill.id] } };
   const params = { side: sideLabel(side), skill: cardName(skill), v: guardReduction(skill) };
   const logKey = skill.effect.type === 'evade' ? 'battle.log.evade' : skill.effect.type === 'defense' && skill.effect.nullify ? 'battle.log.nullify' : 'battle.log.guard';
@@ -1215,7 +1337,7 @@ function cover(state: BattleState, side: Side, cardUid: string, skill: SkillCard
   const ally = findMonster(state, pending.targetUid)?.monster;
   if (!user || !ally) return state;
   let next = removeFromHand(state, side, cardUid);
-  next = payMana(next, side, skill.cost);
+  next = payMana(next, side, guardCost(next, skill));
   const { pinned: _p, ...base } = pending;
   next = { ...next, pending: { ...base, targetUid: user.uid, coveredFrom: ally.uid, responses: [], ...(isPinned(next, user) ? { pinned: true } : {}) } };
   return addLog(next, t('battle.log.cover', { name: nameOf(user.cardId), ally: nameOf(ally.cardId) }));

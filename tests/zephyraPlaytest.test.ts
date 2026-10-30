@@ -66,8 +66,8 @@ const LUCIA = ENCOUNTERS['enc-water-boss'];
 
 describe('ゼフィラの試遊（自動の対戦）', () => {
   it('ゼフィラ：ソラモ・ツムジ・ガウル。ルシアと同じ 1.2 から試遊し、勝つ割合がルシアといちばん近い 1.0 にした（2026-10-30 指示書 V で切り札の技を2枚ずつにして 1.1）', () => {
-    expect(ZEPHYRA).toMatchObject({ monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.1 });
-    expect(LUCIA?.lifeScale).toBe(1.2);
+    expect(ZEPHYRA).toMatchObject({ monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22 });
+    expect(LUCIA?.lifeScale).toBe(1.22);
   });
 
   it(`各組み合わせ ${GAMES} 回ずつ：最初の手持ちで勝つ割合`, () => {

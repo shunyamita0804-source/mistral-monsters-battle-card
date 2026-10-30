@@ -76,6 +76,22 @@ export const CARDS = {
   'card.support.heal': { ja: '味方モンスター1体のライフを{v}回復する。{limit}', en: 'Restore {v} life to 1 ally monster.{limit}' },
   'card.support.draw': { ja: '山札からカードを{v}枚引く。{limit}', en: 'Draw {v} {v|card|cards}.{limit}' },
   'card.support.mana': { ja: '山札の上から{v}枚をマナにする。{limit}', en: 'Turn the top {v} {v|card|cards} of your deck into mana.{limit}' },
+  // 2026-10-30 指示書 Y：サポートカード フェーズ1（英語は仮訳）
+  'card.support.stone': {
+    ja: '相手モンスター1体に、ちから{v}ダメージ（ちから技として扱う。相手は防御・回避を使える）。{limit}',
+    en: 'Deal {v} POW damage to 1 enemy monster (counts as a POW skill; it can be guarded or dodged).{limit}',
+  },
+  'card.support.recall': { ja: '自分の捨て札の技カード1枚を選んで、手札に戻す。{limit}', en: 'Choose 1 skill card in your discard pile and return it to your hand.{limit}' },
+  'card.support.swap': { ja: '手札のほかのカード1枚を山札に戻してシャッフルし、1枚引く。{limit}', en: 'Shuffle 1 other card from your hand into your deck, then draw 1.{limit}' },
+  'card.support.manaDrain': { ja: '相手のマナを{v}減らす。{limit}', en: "Reduce the opponent's mana by {v}.{limit}" },
+  'card.support.cheer': {
+    ja: 'このターン、味方1体が次に使う攻撃のダメージ＋{v}。{limit}',
+    en: "This turn, 1 ally's next attack deals +{v} damage.{limit}",
+  },
+  'card.support.guardDiscount': {
+    ja: '場に残る。防御・回避のカードの消費マナ−{v}（双方。0より下にならない）。場のカードは1枚だけで、新しく出すと入れ替わる。',
+    en: 'Stays on the field. Guard and dodge cards cost {v} less mana (both players, not below 0). Only 1 field card at a time; a new one replaces it.',
+  },
   'card.support.field': {
     ja: '場に残る。{stat}攻撃のダメージを{sign}する（双方）。場のカードは1枚だけで、新しく出すと入れ替わる。',
     en: 'Stays on the field. {stat}attack damage {sign} (both players). Only 1 field card at a time; a new one replaces it.',
@@ -90,6 +106,12 @@ export const CARDS = {
   'card.short.mana': { ja: '山札{v}枚をマナに', en: '{v} deck {v|card|cards} → mana' },
   'card.short.draw': { ja: 'カードを{v}枚引く', en: 'Draw {v}' },
   'card.short.field': { ja: '場：{stat}攻撃{sign}', en: 'Field: {stat}atk {sign}' },
+  // 2026-10-30 指示書 Y（ユーザー決定の効果の文。英語は仮訳）
+  'card.short.recall': { ja: '捨て札の技カード1枚を選んで手札に戻す', en: 'Return 1 skill from discard to hand' },
+  'card.short.swap': { ja: '手札1枚を山札に戻してシャッフルし、1枚引く', en: 'Shuffle 1 hand card into deck, draw 1' },
+  'card.short.manaDrain': { ja: '相手のマナを{v}減らす', en: 'Opponent mana -{v}' },
+  'card.short.cheer': { ja: 'このターン、味方1体が次に使う攻撃のダメージ＋{v}', en: "This turn: 1 ally's next attack +{v}" },
+  'card.short.guardDiscount': { ja: '防御・回避のカードの消費マナ−{v}', en: 'Guard/dodge cards cost -{v}' },
   'card.short.fieldPrefix': { ja: '場：', en: 'Field: ' },
 
   // カード面の絵の代わりの文字・読み上げ
@@ -134,6 +156,7 @@ export const CARDS = {
   'card.badge.guard': { ja: '軽減', en: 'Guard' },
   'card.badge.effect': { ja: '効果', en: 'Effect' },
   'card.pending.availability': { ja: '配布の区分（初期・収集）', en: 'distribution group' },
+  'card.pending.name': { ja: '名前', en: 'name' },
   'card.detail.supportKind': { ja: '区分', en: 'Category' },
   'card.detail.supportField': { ja: '全体（場に残る）', en: 'Field (stays in play)' },
   'card.detail.supportInstant': { ja: 'すぐ効果（1ターンに1回まで）', en: 'Instant (once per turn)' },

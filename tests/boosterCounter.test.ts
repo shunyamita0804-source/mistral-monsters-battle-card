@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
-import contents from '../src/data/official/booster_contents_20261029.json';
-import before from '../src/data/official/booster_contents_20261028.json';
+import contents from '../src/data/official/booster_contents_20261030.json';
+import before from '../src/data/official/booster_contents_20261029.json';
 import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
 import {
@@ -27,7 +27,7 @@ const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginE
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
 describe('ブースターの箱＝初期配布', () => {
-  it('箱の中身はモンスター3枚＋技48枚（3体の初期配布16枚ずつ）＋仮サポート12枚。技は資料（06）の技名・枚数どおり', () => {
+  it('箱の中身はモンスター3枚＋技56枚＋サポート4枚（旅の手帳×2・投石×2。2026-10-30 指示書 Y）。資料の技名・枚数どおり', () => {
     for (const group of contents.booster_groups) {
       const key = group.booster_key as BoosterKey;
       const deck = boosterDeck(key);
@@ -36,8 +36,9 @@ describe('ブースターの箱＝初期配布', () => {
       expect(deck.skills).toHaveLength(60);
       const skills = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'skill');
       const supports = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'support');
-      expect(skills).toHaveLength(48);
-      expect(supports).toHaveLength(12);
+      expect(skills).toHaveLength(56);
+      expect(countCards(supports)).toEqual({ 'sup-2': 2, 'sup-7': 2 });
+      expect(supports.map(name).sort()).toEqual(['投石', '投石', '旅の手帳', '旅の手帳'].sort());
       // 資料の行（モンスター名・技名・枚数）と、今のデータの技（名前で引く）が一致する
       const want: Record<string, number> = {};
       for (const row of group.card_rows) {
@@ -53,23 +54,29 @@ describe('ブースターの箱＝初期配布', () => {
   });
 });
 
-describe('烈火の猛攻の入れかえ（2026-10-29 夜 ユーザー決定：案3）', () => {
+describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとからある技を8枚足した）', () => {
   const ids = (key: BoosterKey): Record<string, number> => countCards(boosterDeck(key).skills);
-  it('旅立ちのきらめき・蒼海の守りは前と同じ（並びも）。資料の行も前の版と同じ', () => {
-    expect(boosterDeck('booster-1')).toEqual(createStarterDeckFor('balance'));
-    expect(boosterDeck('booster-3')).toEqual(createStarterDeckFor('defense'));
-    for (const key of ['booster-1', 'booster-3']) {
-      expect(contents.booster_groups.find((g) => g.booster_key === key)?.card_rows).toEqual(before.booster_groups.find((g) => g.booster_key === key)?.card_rows);
+  const ADDED: Record<string, readonly [string, string][]> = {
+    'booster-1': [['ソラモ', 'まるまる'], ['ソラモ', 'ひらりジャンプ'], ['ソラモ', 'スターダストレイ'], ['ソラモ', 'しっぽアタック'], ['ガウル', '翼の盾'], ['ガウル', '炎の壁'], ['ガウル', 'かぎ爪'], ['ガウル', 'ファイアボール']],
+    'booster-2': [['ガウル', '翼の盾'], ['ガウル', '炎の壁'], ['ガウル', '上に飛ぶ'], ['ガウル', 'かぎ爪'], ['ガウル', 'ファイアボール'], ['ラズック', 'しっぽいなし'], ['ラズック', 'シャドウバースト'], ['ラズック', 'とびかかり']],
+    'booster-3': [['カルシェル', 'からにこもる'], ['カルシェル', 'あわのまく'], ['カルシェル', 'クラッシュクロー'], ['カルシェル', 'アクアバースト'], ['ミュロル', 'スリップガード'], ['ミュロル', 'ひらりよける'], ['ミュロル', '連続ひっかき'], ['ミュロル', 'アクアボール']],
+  };
+  it('前の版（20261029）の行と比べて、決めた8つの技だけが1枚ずつ多い。同じカードは3枚まで', () => {
+    for (const g of contents.booster_groups) {
+      const old = before.booster_groups.find((b) => b.booster_key === g.booster_key);
+      const diff = g.card_rows
+        .map((r) => ({ r, was: old?.card_rows.find((o) => o.monster === r.monster && o.skill_name === r.skill_name)?.copies ?? 0 }))
+        .filter(({ r, was }) => r.copies !== was);
+      expect(diff.map(({ r, was }) => [r.monster, r.skill_name, r.copies - was])).toEqual((ADDED[g.booster_key] ?? []).map(([m, n]) => [m, n, 1]).sort((a, b) => g.card_rows.findIndex((r) => r.monster === a[0] && r.skill_name === a[1]) - g.card_rows.findIndex((r) => r.monster === b[0] && r.skill_name === b[1])));
+      for (const r of g.card_rows) expect(r.copies).toBeLessThanOrEqual(3);
     }
   });
 
-  it('烈火の猛攻：ラズック ひっかき1・かみつき2・とびかかり2・みだれづめ2・トリックショット1・シャドウバースト2（ちょうはつ・ダストキックなし）、ノビトン くしゃみ1・ミラージュノーズ2。ガウルは同じ', () => {
+  it('烈火の猛攻：ラズック ひっかき1・かみつき2・とびかかり3・みだれづめ2・トリックショット1・シャドウバースト3（案3に足した）、ノビトン くしゃみ1・ミラージュノーズ2', () => {
     const c = ids('booster-2');
     const laz = (n: string): number => c[n] ?? 0;
-    expect([1, 2, 3, 4, 9, 10, 7, 8].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([1, 2, 2, 2, 1, 2, 0, 0]);
+    expect([1, 2, 3, 4, 9, 10, 7, 8].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([1, 2, 3, 2, 1, 3, 0, 0]);
     expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([1, 2]);
-    const gauul = (d: Record<string, number>): [string, number][] => Object.entries(d).filter(([id]) => id.startsWith('skl-gauul')).sort();
-    expect(gauul(c)).toEqual(gauul(countCards(createStarterDeckFor('attack').skills)));
   });
 
   it('前の中身で箱を開けたセーブは、所持カード・デッキを変えない（読み込み直しても同じ）', () => {

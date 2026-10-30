@@ -1,7 +1,8 @@
 import { getPlayCard, skillsOf } from '../../data/cards.ts';
 import type { BoosterKey } from '../../data/introV2.ts';
 import { PUKARIM_MONSTER_ID, PUKARIM_PLAYTEST_16, pukarimSkillId } from '../../data/pukarim.ts';
-import type { Deck } from '../deck/deck.ts';
+import { DECK_RULES } from '../../data/rules.ts';
+import { countCards, type Deck } from '../deck/deck.ts';
 import { boosterDeck } from '../story/introV2.ts';
 import { chooseAction } from './ai.ts';
 import { actingSide, applyAction, createBattle, findMonster, type BattleState, type BattleWinner, type Side } from './engine.ts';
@@ -25,7 +26,9 @@ export function pukarimSwapDeck(key: BoosterKey, slot: number, pukarimCards: rea
 
 /**
  * ブースターの箱のデッキの slot 番目のモンスターを monsterId に入れ替える（2026-10-29 ジオルでも使うように分けた）。
- * そのモンスターの技を抜き、cards（入れるモンスターの16枚）を入れる（山札は60枚のまま）
+ * そのモンスターの技を抜き、cards（入れるモンスターの16枚）を入れる（山札は60枚のまま）。
+ * 2026-10-30 指示書 Y で箱の技が56枚（1体あたり16〜20枚）になったので、抜いた枚数が16より多いときは、cards の順にもう1枚ずつ
+ * （同じカード3枚まで）足して、抜いた枚数と同じにする
  */
 export function swapDeck(key: BoosterKey, slot: number, monsterId: string, cards: readonly { readonly id: string; readonly copies: number }[]): Deck {
   const base = boosterDeck(key);
@@ -34,6 +37,16 @@ export function swapDeck(key: BoosterKey, slot: number, monsterId: string, cards
   const removed = new Set(skillsOf(out).map((s) => s.id));
   const kept = base.skills.filter((id) => !removed.has(id));
   const added = cards.flatMap((c) => Array<string>(c.copies).fill(c.id));
+  const counts = countCards(added);
+  for (let round = 0; kept.length + added.length < base.skills.length && round < DECK_RULES.maxCopies; round++) {
+    for (const c of cards) {
+      if (kept.length + added.length >= base.skills.length) break;
+      if ((counts[c.id] ?? 0) < DECK_RULES.maxCopies) {
+        counts[c.id] = (counts[c.id] ?? 0) + 1;
+        added.push(c.id);
+      }
+    }
+  }
   return { monsters: base.monsters.map((m, i) => (i === slot ? monsterId : m)), skills: [...kept, ...added] };
 }
 

@@ -5,7 +5,7 @@ import { seriesLineup } from '../../game/economy/gachaSeries.ts';
 import { boosterCardCounts } from '../../game/story/introV2.ts';
 import type { MessageKey } from '../../i18n/messages/index.ts';
 import { categoryLabel, describeSkill, describeSupport, effectLabel, kindLabel, rarityLabel, skillCategory, type CardDefinition } from '../../game/cards/cardTypes.ts';
-import { cardDescription, cardName } from '../../i18n/content.ts';
+import { cardDescription, cardName, gachaSeriesName } from '../../i18n/content.ts';
 import { t, tKey } from '../../i18n/i18n.ts';
 import { h } from '../dom.ts';
 import { createCardView } from './cardView.ts';
@@ -42,13 +42,15 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
     rows.push([t('card.detail.life'), card.pendingSpec?.includes('life') ? t('card.provisionalValue', { n: card.life }) : String(card.life)]);
   }
   if (card.kind === 'skill' && card.displayNo !== undefined) rows.push([t('card.detail.number'), String(card.displayNo).padStart(2, '0')]);
+  // サポートの表示の番号（S01〜・F01〜。2026-10-30 指示書 Y）
+  if (card.kind === 'support' && card.code) rows.push([t('card.detail.number'), card.code]);
   if (card.designId) rows.push([t('card.detail.designId'), card.designId]);
   // レア度：印（決まっているときだけ）と名前
   const badge = rarityBadge(card.rarity, 18);
   rows.push([t('card.detail.rarity'), badge ? h('span', { class: 'card-detail__rarity' }, badge, rarityLabel(card.rarity)) : rarityLabel(card.rarity)]);
   // 入手方法：販売機のガチャのシリーズ・ブースターの箱（2026-10-28 夜。前は販売機から外した仮パックの名前を出していた）
   const packs = [
-    ...GACHA_SERIES.filter((s) => seriesLineup(s).all.includes(card.id)).map((s) => t('gacha.series.name', { monster: cardName(s.monsterId) })),
+    ...GACHA_SERIES.filter((s) => seriesLineup(s).all.includes(card.id)).map(gachaSeriesName),
     ...BOOSTERS.filter((b) => (boosterCardCounts(b.key)[card.id] ?? 0) > 0).map((b) => t(`introV2.pack.name.${b.key.slice(-1)}` as MessageKey)),
   ];
   rows.push([

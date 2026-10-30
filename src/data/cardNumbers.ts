@@ -39,8 +39,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   HYOUZUKU_MONSTER_ID,
 ];
 
-/** 番号を付けるサポートカード（いまは正式なサポートカードが無い。仮サポートは「仮」の区切りへ） */
-export const NUMBERED_SUPPORTS: readonly string[] = [];
+/** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */
+export const NUMBERED_SUPPORTS: readonly string[] = SUPPORTS.map((c) => c.id);
 
 /** 区切り：モンスターの ID・サポート・隠しモンスター・仮 */
 export type BookSection = { readonly kind: 'monster'; readonly monsterId: string } | { readonly kind: 'support' } | { readonly kind: 'hidden' } | { readonly kind: 'temp' };

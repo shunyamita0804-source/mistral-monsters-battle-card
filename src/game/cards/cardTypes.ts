@@ -279,14 +279,27 @@ export function targetsEnemy(skill: SkillCard): boolean {
 }
 
 /**
- * サポートの効果（仮カード用。正式カードが決まったら足す）。
+ * サポートの効果。
  * field は「場に残る」効果：その能力の攻撃のダメージを双方とも modifier だけ増減する（stat 'all' は全攻撃）。
+ * 2026-10-30 指示書 Y（サポートカード フェーズ1・ユーザー決定）で足したもの。細かい決まりは docs/battle-rules.md「サポートカード（フェーズ1）」
+ * - stone（投石）：相手1体に、ちから技（マナ＝カードのマナ・ダメージ value）として攻撃する。使うモンスターはいない
+ * - recall（思い出の箱）：自分の捨て札の技カード1枚を選んで手札に戻す
+ * - swap（風まかせ）：手札のほかの1枚を山札に戻してシャッフルし、1枚引く
+ * - manaDrain（霧の香）：相手のマナを value 減らす（ノビトンのくしゃみと同じ減らし方）
+ * - cheer（声援）：味方1体の、このターンの次の攻撃技のダメージ＋value
+ * - guardDiscount（守りの陣・場）：場にある間、双方の防御・回避のカードの必要マナ−value（0より下にならない）
  */
 export type SupportEffect =
   | { readonly type: 'heal'; readonly value: number }
   | { readonly type: 'draw'; readonly value: number }
   | { readonly type: 'mana'; readonly value: number }
-  | { readonly type: 'field'; readonly stat: StatType | 'all'; readonly modifier: number };
+  | { readonly type: 'field'; readonly stat: StatType | 'all'; readonly modifier: number }
+  | { readonly type: 'stone'; readonly value: number }
+  | { readonly type: 'recall' }
+  | { readonly type: 'swap' }
+  | { readonly type: 'manaDrain'; readonly value: number }
+  | { readonly type: 'cheer'; readonly value: number }
+  | { readonly type: 'guardDiscount'; readonly value: number };
 
 export interface SupportCard extends CardBase {
   readonly kind: 'support';
@@ -302,6 +315,13 @@ export interface SupportCard extends CardBase {
   readonly limitGroup?: string;
   readonly limitPerTurn?: number;
   readonly effect: SupportEffect;
+  /** 表示の番号（2026-10-30 指示書 Y：すぐ効くカード S01〜・場に残るカード F01〜） */
+  readonly code?: string;
+  /** 英語の名前（仮訳） */
+  readonly nameEn?: string;
+  /** カードに書く効果の文（ユーザー決定の文。2026-10-30 指示書 Y）と英語（仮訳）。あればカード面・場の表示はこの文 */
+  readonly text?: string;
+  readonly textEn?: string;
 }
 
 /** バトルで手札・山札に入るカード（技とサポート） */
@@ -332,20 +352,37 @@ export function describeSupport(card: SupportCard): string {
     case 'heal':
     case 'draw':
     case 'mana':
+    case 'stone':
+    case 'manaDrain':
+    case 'cheer':
       return t(`card.support.${e.type}`, { v: e.value, limit });
+    case 'recall':
+    case 'swap':
+      return t(`card.support.${e.type}`, { limit });
     case 'field':
       return t('card.support.field', { stat: statOrAll(e.stat), sign: signed(e.modifier) });
+    case 'guardDiscount':
+      return t('card.support.guardDiscount', { v: e.value });
   }
 }
 
 /** サポートカードの短い説明（カード面・場の表示） */
 export function supportShortText(card: SupportCard): string {
+  if (card.text) return getLanguage() === 'en' && card.textEn ? card.textEn : card.text;
   const e = card.effect;
   switch (e.type) {
     case 'heal':
     case 'draw':
     case 'mana':
+    case 'manaDrain':
+    case 'cheer':
+    case 'guardDiscount':
       return t(`card.short.${e.type}`, { v: e.value });
+    case 'stone':
+      return t('card.short.attack', { v: e.value });
+    case 'recall':
+    case 'swap':
+      return t(`card.short.${e.type}`);
     case 'field':
       return t('card.short.field', { stat: statOrAll(e.stat), sign: signed(e.modifier) });
   }

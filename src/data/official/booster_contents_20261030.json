@@ -1,0 +1,557 @@
+{
+  "revision": "2026-10-30 指示書 Y（ユーザー決定）：箱は 前の版の技48枚＋箱にもとからある技8枚（各1枚足す）＋サポート4枚（旅の手帳×2・投石×2）＝60枚。前の版 booster_contents_20261029.json は残す",
+  "game": "ミストラルモンスターズ バトルカード",
+  "reference_kind": "初期配布カード3体組み合わせ別資料",
+  "note": "特別ブースターの正式封入枚数ではない／先にユーザー意思を確認する",
+  "booster_groups": [
+    {
+      "booster_key": "booster-1",
+      "booster_name": "旅立ちのきらめき",
+      "type": "バランス",
+      "initial_deck_skill_distribution_reference": true,
+      "not_confirmed_as_booster_opening_payload": true,
+      "monsters": [
+        "ソラモ",
+        "ガウル",
+        "ミュロル"
+      ],
+      "skill_card_count": 56,
+      "support_cards": [
+        {
+          "name": "旅の手帳",
+          "support_id": "sup-2",
+          "copies": 2
+        },
+        {
+          "name": "投石",
+          "support_id": "sup-7",
+          "copies": 2
+        }
+      ],
+      "card_rows": [
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "02",
+          "skill_name": "連続ひっかき",
+          "copies": 2
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "03",
+          "skill_name": "たいあたり",
+          "copies": 2
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "04",
+          "skill_name": "しっぽアタック",
+          "copies": 3
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "07",
+          "skill_name": "スターダストレイ",
+          "copies": 3
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "09",
+          "skill_name": "すなかけ",
+          "copies": 2
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "10",
+          "skill_name": "吠える",
+          "copies": 2
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "11",
+          "skill_name": "まるまる",
+          "copies": 3
+        },
+        {
+          "monster": "ソラモ",
+          "official_skill_no": "13",
+          "skill_name": "ひらりジャンプ",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "01",
+          "skill_name": "つつく",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "02",
+          "skill_name": "連続つつき",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "03",
+          "skill_name": "かぎ爪",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "06",
+          "skill_name": "火の粉",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "07",
+          "skill_name": "ファイアボール",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "10",
+          "skill_name": "威嚇",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "11",
+          "skill_name": "翼の盾",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "12",
+          "skill_name": "炎の壁",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "13",
+          "skill_name": "上に飛ぶ",
+          "copies": 1
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "01",
+          "skill_name": "たいあたり",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "02",
+          "skill_name": "しっぽたたき",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "03",
+          "skill_name": "連続ひっかき",
+          "copies": 1
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "05",
+          "skill_name": "みずでっぽう",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "06",
+          "skill_name": "バブルショット",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "07",
+          "skill_name": "アクアボール",
+          "copies": 1
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "08",
+          "skill_name": "しめったはだ",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "12",
+          "skill_name": "スリップガード",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "13",
+          "skill_name": "ひらりよける",
+          "copies": 2
+        }
+      ]
+    },
+    {
+      "booster_key": "booster-2",
+      "booster_name": "烈火の猛攻",
+      "type": "攻撃",
+      "initial_deck_skill_distribution_reference": true,
+      "not_confirmed_as_booster_opening_payload": true,
+      "monsters": [
+        "ガウル",
+        "ラズック",
+        "ノビトン"
+      ],
+      "skill_card_count": 56,
+      "support_cards": [
+        {
+          "name": "旅の手帳",
+          "support_id": "sup-2",
+          "copies": 2
+        },
+        {
+          "name": "投石",
+          "support_id": "sup-7",
+          "copies": 2
+        }
+      ],
+      "card_rows": [
+        {
+          "monster": "ガウル",
+          "official_skill_no": "01",
+          "skill_name": "つつく",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "02",
+          "skill_name": "連続つつき",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "03",
+          "skill_name": "かぎ爪",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "06",
+          "skill_name": "火の粉",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "07",
+          "skill_name": "ファイアボール",
+          "copies": 3
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "10",
+          "skill_name": "威嚇",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "11",
+          "skill_name": "翼の盾",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "12",
+          "skill_name": "炎の壁",
+          "copies": 2
+        },
+        {
+          "monster": "ガウル",
+          "official_skill_no": "13",
+          "skill_name": "上に飛ぶ",
+          "copies": 2
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "01",
+          "skill_name": "ひっかき",
+          "copies": 1
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "02",
+          "skill_name": "かみつき",
+          "copies": 2
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "03",
+          "skill_name": "とびかかり",
+          "copies": 3
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "04",
+          "skill_name": "みだれづめ",
+          "copies": 2
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "05",
+          "skill_name": "しっぷうタックル",
+          "copies": 3
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "06",
+          "skill_name": "トリックショット",
+          "copies": 1
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "07",
+          "skill_name": "シャドウバースト",
+          "copies": 3
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "11",
+          "skill_name": "しっぽいなし",
+          "copies": 2
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "12",
+          "skill_name": "シャドウガード",
+          "copies": 1
+        },
+        {
+          "monster": "ラズック",
+          "official_skill_no": "13",
+          "skill_name": "シャドウスリップ",
+          "copies": 1
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "01",
+          "skill_name": "はなビンタ",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "02",
+          "skill_name": "ずつき",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "03",
+          "skill_name": "まきつく",
+          "copies": 1
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "05",
+          "skill_name": "くしゃみ",
+          "copies": 1
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "06",
+          "skill_name": "ミラージュノーズ",
+          "copies": 2
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "08",
+          "skill_name": "考える",
+          "copies": 2
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "10",
+          "skill_name": "鼻でまもる",
+          "copies": 2
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "13",
+          "skill_name": "横によける",
+          "copies": 2
+        }
+      ]
+    },
+    {
+      "booster_key": "booster-3",
+      "booster_name": "蒼海の守り",
+      "type": "防御",
+      "initial_deck_skill_distribution_reference": true,
+      "not_confirmed_as_booster_opening_payload": true,
+      "monsters": [
+        "カルシェル",
+        "ミュロル",
+        "ノビトン"
+      ],
+      "skill_card_count": 56,
+      "support_cards": [
+        {
+          "name": "旅の手帳",
+          "support_id": "sup-2",
+          "copies": 2
+        },
+        {
+          "name": "投石",
+          "support_id": "sup-7",
+          "copies": 2
+        }
+      ],
+      "card_rows": [
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "01",
+          "skill_name": "はさむ",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "02",
+          "skill_name": "シェルタックル",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "03",
+          "skill_name": "クラッシュクロー",
+          "copies": 3
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "06",
+          "skill_name": "あわだま",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "07",
+          "skill_name": "アクアバースト",
+          "copies": 3
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "09",
+          "skill_name": "いかくのハサミ",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "10",
+          "skill_name": "すなをほる",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "11",
+          "skill_name": "からにこもる",
+          "copies": 2
+        },
+        {
+          "monster": "カルシェル",
+          "official_skill_no": "12",
+          "skill_name": "あわのまく",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "01",
+          "skill_name": "たいあたり",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "02",
+          "skill_name": "しっぽたたき",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "03",
+          "skill_name": "連続ひっかき",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "05",
+          "skill_name": "みずでっぽう",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "06",
+          "skill_name": "バブルショット",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "07",
+          "skill_name": "アクアボール",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "08",
+          "skill_name": "しめったはだ",
+          "copies": 2
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "12",
+          "skill_name": "スリップガード",
+          "copies": 3
+        },
+        {
+          "monster": "ミュロル",
+          "official_skill_no": "13",
+          "skill_name": "ひらりよける",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "01",
+          "skill_name": "はなビンタ",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "02",
+          "skill_name": "ずつき",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "03",
+          "skill_name": "まきつく",
+          "copies": 1
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "05",
+          "skill_name": "くしゃみ",
+          "copies": 3
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "08",
+          "skill_name": "考える",
+          "copies": 2
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "10",
+          "skill_name": "鼻でまもる",
+          "copies": 2
+        },
+        {
+          "monster": "ノビトン",
+          "official_skill_no": "13",
+          "skill_name": "横によける",
+          "copies": 2
+        }
+      ]
+    }
+  ]
+}

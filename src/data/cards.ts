@@ -185,23 +185,42 @@ export const SKILLS: readonly SkillCard[] = [
 ];
 
 /**
- * 仮のサポートカード（ユーザー承認 2026-10-22：仮サポートの追加）。
- * - 仮サポート1〜3：旧ブリーダーカードにあたる。すぐ効果が出て、まとめて1ターンに1回まで
- * - 仮全体1〜3：旧全体カードにあたる。場に1枚だけ残り、双方に効果が続く
- * 効果・数値はすべて仮（原作のカードの写しではない）。
+ * サポートカード フェーズ1（2026-10-30 指示書 Y・ユーザー決定）。11種類。前の仮サポート6種（sup-1〜6）の ID の中身を置きかえ、新しい5つは sup-7〜11
+ * （前のセーブで持っている仮サポートは、変換なしでそのまま新しいカードになる）。名前は投石・薬草・思い出の箱のほかは仮。英語は仮訳。絵はまだ無い（文字だけのカード）。
+ * - すぐ効くカード（S01〜S07。旧ブリーダー）：使ったらすぐ効いて捨て札へ。全部まとめて1ターンに1回（limitGroup 'breeder'）。モンスターの行動は使わない
+ * - 場に残るカード（F01〜F04。旧全体カード）：場に1枚だけ・双方に効く・新しいのが出たら古いのは持ち主の捨て札へ
+ * 細かい決まりは docs/battle-rules.md「サポートカード（フェーズ1）」
  */
 export const supportId = (no: number): string => `sup-${no}`;
 
 const BREEDER = { duration: 'instant', limitGroup: 'breeder', limitPerTurn: 1 } as const;
+/** 名前が決まっているサポート（ほかは仮の名前） */
+const FIXED_SUPPORT_NAMES: readonly string[] = ['投石', '薬草', '思い出の箱'];
 
+/** 並び＝表示の番号の順（S01〜S07・F01〜F04） */
 export const SUPPORTS: readonly SupportCard[] = [
-  { no: 1, name: '仮サポート1', cost: 2, rarity: 'U', ...BREEDER, effect: { type: 'heal', value: 3 } },
-  { no: 2, name: '仮サポート2', cost: 1, rarity: 'U', ...BREEDER, effect: { type: 'draw', value: 2 } },
-  { no: 3, name: '仮サポート3', cost: 1, rarity: 'U', ...BREEDER, effect: { type: 'mana', value: 2 } },
-  { no: 4, name: '仮全体1', cost: 2, rarity: 'U', duration: 'field', effect: { type: 'field', stat: 'force', modifier: -1 } },
-  { no: 5, name: '仮全体2', cost: 2, rarity: 'U', duration: 'field', effect: { type: 'field', stat: 'wisdom', modifier: -1 } },
-  { no: 6, name: '仮全体3', cost: 3, rarity: 'R', duration: 'field', effect: { type: 'field', stat: 'all', modifier: 1 } },
-].map(({ no, ...rest }) => ({ ...rest, kind: 'support', id: supportId(no), isPlaceholder: true }) as SupportCard);
+  { no: 7, code: 'S01', name: '投石', nameEn: 'Stone Throw', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'stone', value: 1 }, text: '相手1体に1ダメージ', textEn: '1 dmg to 1 enemy' },
+  { no: 2, code: 'S02', name: '旅の手帳', nameEn: 'Travel Journal', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'draw', value: 2 }, text: 'カードを2枚引く', textEn: 'Draw 2 cards' },
+  { no: 1, code: 'S03', name: '薬草', nameEn: 'Herb', cost: 2, rarity: 'C', ...BREEDER, effect: { type: 'heal', value: 1 }, text: '味方1体のライフを1回復', textEn: 'Restore 1 life to 1 ally' },
+  { no: 8, code: 'S04', name: '思い出の箱', nameEn: 'Memory Box', cost: 3, rarity: 'R', ...BREEDER, effect: { type: 'recall' }, text: '捨て札の技カード1枚を選んで手札に戻す', textEn: 'Return 1 skill card from your discard to your hand' },
+  { no: 3, code: 'S05', name: '風まかせ', nameEn: 'Drift', cost: 0, rarity: 'C', ...BREEDER, effect: { type: 'swap' }, text: '手札1枚を山札に戻してシャッフルし、1枚引く', textEn: 'Shuffle 1 hand card into your deck, then draw 1' },
+  { no: 9, code: 'S06', name: '霧の香', nameEn: 'Mist Incense', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'manaDrain', value: 1 }, text: '相手のマナを1減らす', textEn: "Opponent's mana -1" },
+  { no: 10, code: 'S07', name: '声援', nameEn: 'Cheer', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'cheer', value: 1 }, text: 'このターン、味方1体が次に使う攻撃のダメージ＋1', textEn: "This turn, 1 ally's next attack +1 dmg" },
+  { no: 4, code: 'F01', name: '重い空気', nameEn: 'Heavy Air', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'field', stat: 'force', modifier: -1 }, text: 'ちから技のダメージ−1', textEn: 'POW skill damage -1' },
+  { no: 5, code: 'F02', name: 'ゆらぐ霧', nameEn: 'Wavering Mist', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'field', stat: 'wisdom', modifier: -1 }, text: 'かしこさ技のダメージ−1', textEn: 'INT skill damage -1' },
+  { no: 6, code: 'F03', name: '熱気', nameEn: 'Heat Wave', cost: 3, rarity: 'R', duration: 'field', effect: { type: 'field', stat: 'all', modifier: 1 }, text: 'すべての攻撃のダメージ＋1', textEn: 'All attack damage +1' },
+  { no: 11, code: 'F04', name: '守りの陣', nameEn: 'Guard Formation', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'guardDiscount', value: 1 }, text: '防御・回避のカードの消費マナ−1', textEn: 'Guard/dodge cards cost -1 mana' },
+].map(({ no, ...rest }) => ({
+  ...rest,
+  kind: 'support',
+  id: supportId(no),
+  isPlaceholder: false,
+  // 絵はまだ無い（文字だけのカード）。名前は投石・薬草・思い出の箱のほかは仮（ユーザー決定 2026-10-30）
+  pendingSpec: FIXED_SUPPORT_NAMES.includes(rest.name) ? ['art'] : ['art', 'name'],
+}) as SupportCard);
+
+/** 前の仮サポート6種の ID（sup-1〜6。古いセーブの変換・前からある仮のデッキの組み方で使う。中身は 2026-10-30 から新しいカード） */
+export const LEGACY_SUPPORT_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map(supportId);
 
 /**
  * 確認用（?qa=1）だけで使うカード。カードの一覧（MONSTERS・SKILLS）には入れないので、図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。

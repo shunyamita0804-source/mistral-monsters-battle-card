@@ -948,9 +948,35 @@ export class WorldView {
 
   /** 人の方を向いてから話しかける */
   #talkTo(npc: NpcObject): void {
+    // 2026-10-30 指示書 Y-F1：練習場の先生の真ん前（体が先生の顔に重なる所）から話しかけたら、先に先生の右どなり（なければ左どなり）へ歩く
+    if (npc.npcId === 'teacher' && this.#map.id === 'practice' && this.#coversTeacher(npc)) {
+      const path = this.#teacherSidePath(npc);
+      if (path) {
+        this.#autoWalk(path, () => {
+          this.#dir = this.#dirTo(npc);
+          this.#diag = null;
+          this.#talk(npc);
+        });
+        return;
+      }
+    }
     this.#dir = this.#dirTo(npc);
     this.#diag = null;
     this.#talk(npc);
+  }
+
+  /** 主人公の絵が先生の絵に重なる所（よこ2マス以内で、先生より手前）に立っているか */
+  #coversTeacher(teacher: Point): boolean {
+    return Math.abs(this.#tile.x - teacher.x) <= NPC_SPACE.x && this.#tile.y > teacher.y;
+  }
+
+  /** 先生のよこ（右どなりを先に、なければ左どなり。よこ3マス・同じ高さ）までの道 */
+  #teacherSidePath(teacher: Point): Point[] | null {
+    for (const dx of [NPC_TALK_RANGE.x, -NPC_TALK_RANGE.x]) {
+      const path = findPathWhere(this.#map, this.#tile, (x, y) => x === teacher.x + dx && y === teacher.y, this.#blocked, 4000, STEPS_4);
+      if (path) return path;
+    }
+    return null;
   }
 
   #build(fade = false): void {
@@ -2222,16 +2248,15 @@ export class WorldView {
   /**
    * 教習所の先生の前のマス（話せる近さで、入口からいちばん近い所）まで。
    * 2026-10-30 指示書 O3：先生の真下（2マス手前）に立つと主人公の体が先生に重なっていたので、先生の左ななめ前（よこ3マス）を先に探す
-   * （右どなりにはミレイユが立つ）
+   * （右どなりにはミレイユが立つ）。指示書 Y-F1 で、真下に立つ道はやめた（よこ3マスが無いときだけ、話せる近さのどこか）
    */
   #teacherFrontPath(): Point[] | null {
     const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
     if (!teacher) return null;
     const side = (x: number, y: number): boolean => x === teacher.x - NPC_TALK_RANGE.x && y > teacher.y - 1 && inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE);
-    const near = (x: number, y: number): boolean => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE) && x === teacher.x;
     return (
       findPathWhere(this.#map, this.#tile, side, this.#blocked, 40000, STEPS_4) ??
-      findPathWhere(this.#map, this.#tile, near, this.#blocked, 40000, STEPS_4) ??
+      this.#teacherSidePath(teacher) ??
       findPathWhere(this.#map, this.#tile, (x, y) => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE), this.#blocked, 40000, STEPS_4)
     );
   }

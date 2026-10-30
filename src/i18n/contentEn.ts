@@ -19,8 +19,9 @@ function placeholderCardNames(): Record<string, string> {
     if (!s.isPlaceholder) continue;
     names[`card:${s.id}:name`] = s.name.replace(/^仮技/, 'Temp Skill ').replace(/^隠し技（未確定）/, 'Hidden Skill (TBD) ');
   }
+  // サポート（2026-10-30 指示書 Y：正式の11種類。英語は仮訳）
   for (const s of SUPPORTS) {
-    names[`card:${s.id}:name`] = s.name.replace(/^仮サポート/, 'Temp Support ').replace(/^仮全体/, 'Temp Field ');
+    names[`card:${s.id}:name`] = s.nameEn ?? s.name;
   }
   return names;
 }

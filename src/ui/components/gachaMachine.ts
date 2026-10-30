@@ -2,7 +2,7 @@ import { cardCatalog } from '../../data/cards.ts';
 import type { GachaSeries } from '../../data/economy.ts';
 import { skillArtX } from '../../data/skillArtPosition.ts';
 import { canReselectSeries, seriesLineup } from '../../game/economy/gachaSeries.ts';
-import { cardName } from '../../i18n/content.ts';
+import { cardName, gachaSeriesName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { button, h } from '../dom.ts';
 import { once } from '../gameStore.ts';
@@ -81,7 +81,12 @@ function lineupView(series: GachaSeries, collection: Readonly<Record<string, num
     return h(
       'div',
       { class: `gacha-lineup__cell${has ? ' is-owned' : ''}${id === monsterId ? ' is-monster' : ''}`, attrs: { role: 'img', 'aria-label': has && card ? cardName(card) : '?' } },
-      url ? lineupArt(url, card?.kind === 'skill' ? skillArtX(id) : 50) : h('span', { class: 'gacha-lineup__q', text: '?' }),
+      url
+        ? lineupArt(url, card?.kind === 'skill' ? skillArtX(id) : 50)
+        : // 絵の無いサポート（2026-10-30 指示書 Y：文字だけのカード）は、持っていれば名前を出す
+          has && card
+          ? h('span', { class: 'gacha-lineup__name', text: cardName(card) })
+          : h('span', { class: 'gacha-lineup__q', text: '?' }),
     );
   });
   return h(
@@ -95,7 +100,7 @@ function lineupView(series: GachaSeries, collection: Readonly<Record<string, num
 export function showGachaMachine(root: HTMLElement, options: GachaMachineOptions): GachaMachineHandle {
   const { series } = options;
   const packUrl = seriesPackUrl(series);
-  const name = t('gacha.series.name', { monster: cardName(series.monsterId) });
+  const name = gachaSeriesName(series);
   let paid = options.paid;
   let turned = 0;
   let clicks = 0;

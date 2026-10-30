@@ -1034,3 +1034,40 @@
     animation: none;
   }
 }
+
+/* 思い出の箱・風まかせで1枚を選ぶ窓（2026-10-30 指示書 Y）。カードは手札と同じ形で小さく並べる。押せる所は高さ 40px 以上 */
+.battle-pick .modal__body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.battle-pick__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.battle-pick__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 4px 2px;
+  border: 1px solid rgba(255, 220, 140, 0.35);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  color: inherit;
+  cursor: pointer;
+}
+
+.battle-pick__item:focus-visible {
+  outline: 2px solid #ffd27a;
+}
+
+.battle-pick__name {
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-all;
+}

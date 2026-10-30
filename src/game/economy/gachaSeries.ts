@@ -1,4 +1,4 @@
-import { skillsOf } from '../../data/cards.ts';
+import { cardCatalog, skillsOf } from '../../data/cards.ts';
 import { GACHA, GACHA_SERIES, gachaSeenFlag, getGachaSeries, SKIP_GACHA_SERIES_IDS, type GachaSeries } from '../../data/economy.ts';
 import { BOOSTERS } from '../../data/introV2.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -27,7 +27,13 @@ export interface SeriesLineup {
 
 /** シリーズの中身。レア枠は技の名前から今のデータの ID を引く（見つからない名前は errors に入れる） */
 export function seriesLineup(series: GachaSeries): SeriesLineup & { readonly errors: readonly string[] } {
-  const skills = skillsOf(series.monsterId);
+  // 道具のパック（2026-10-30 指示書 Y）：決まったカードだけ（モンスターカードは入らない）
+  const skills = series.cardIds
+    ? series.cardIds.flatMap((id) => {
+        const card = cardCatalog.get(id);
+        return card ? [card] : [];
+      })
+    : skillsOf(series.monsterId);
   const errors: string[] = [];
   const rareIds = series.rareSkillNames.flatMap((name) => {
     const hit = skills.filter((s) => s.name === name);
@@ -35,7 +41,7 @@ export function seriesLineup(series: GachaSeries): SeriesLineup & { readonly err
     return hit.map((s) => s.id);
   });
   const skillIds = skills.map((s) => s.id);
-  return { monsterId: series.monsterId, skillIds, rareIds, all: [...skillIds, series.monsterId], errors };
+  return { monsterId: series.monsterId, skillIds, rareIds, all: series.cardIds ? skillIds : [...skillIds, series.monsterId], errors };
 }
 
 /**
@@ -57,19 +63,19 @@ export function startingGachaMonsters(save: SaveData): readonly string[] {
 export function availableGachaSeriesFor(save: SaveData): readonly GachaSeries[] {
   const start = startingGachaMonsters(save);
   return GACHA_SERIES.filter(
-    (s) => start.includes(s.monsterId) || (save.collection[s.monsterId] ?? 0) > 0 || save.storyFlags.includes(gachaSeenFlag(s.id)),
+    (s) => !!s.cardIds || start.includes(s.monsterId) || (save.collection[s.monsterId] ?? 0) > 0 || save.storyFlags.includes(gachaSeenFlag(s.id)),
   );
 }
 
 /** NEW の印を出すシリーズか（あとから開いて、まだ一度も選んでいない。最初から並ぶシリーズには出さない） */
 export function isNewGachaSeries(save: SaveData, series: GachaSeries): boolean {
-  if (startingGachaMonsters(save).includes(series.monsterId) || save.storyFlags.includes(gachaSeenFlag(series.id))) return false;
+  if (series.cardIds || startingGachaMonsters(save).includes(series.monsterId) || save.storyFlags.includes(gachaSeenFlag(series.id))) return false;
   return availableGachaSeriesFor(save).includes(series);
 }
 
 /** カードの枠 */
 export function tierOf(lineup: SeriesLineup, cardId: string): GachaTier {
-  if (cardId === lineup.monsterId) return 'monster';
+  if (lineup.monsterId !== '' && cardId === lineup.monsterId) return 'monster';
   return lineup.rareIds.includes(cardId) ? 'rare' : 'normal';
 }
 
@@ -107,7 +113,7 @@ export function drawSeriesPack(series: GachaSeries, seed: number, ownsMonster = 
     }
     if (picked) cards.push(picked);
   }
-  if (!ownsMonster && roll() < GACHA.monsterRate) {
+  if (!ownsMonster && !series.cardIds && roll() < GACHA.monsterRate) {
     const slot = Math.min(cards.length - 1, Math.floor(roll() * cards.length));
     cards[slot] = lineup.monsterId;
   }
@@ -138,7 +144,7 @@ export function purchaseSeriesPack(save: SaveData, seriesId: string, transaction
   if (!series || !availableGachaSeriesFor(save).includes(series)) return { status: 'error', save, message: t('gacha.error.noPack') };
   if (save.coins < GACHA.price) return { status: 'error', save, message: t('gacha.error.coins') };
   // モンスターカードは、そのモンスターのカードを1枚も持っていないときだけ出る（2026-10-30 指示書 V）
-  const { cards } = drawSeriesPack(series, seed, (save.collection[series.monsterId] ?? 0) > 0);
+  const { cards } = drawSeriesPack(series, seed, !!series.cardIds || (save.collection[series.monsterId] ?? 0) > 0);
   let next = addCards(
     { ...save, coins: save.coins - GACHA.price },
     cards.map((cardId) => ({ cardId, count: 1 })),
