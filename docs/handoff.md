@@ -16,6 +16,10 @@
 - 要確認（記録に書いた）：腕前 C の「残したい攻撃より先に守りをマナにする」の入れ方・D の大会の腕前（ダリオ C・イザベラ C・ゴードン B）・投石（攻撃のあと）の狙いを攻撃と同じにしたこと
 - 報告：Z https://claude.ai/artifact/EDKzSxFtxzz8xt6sPZwzXm （同じ内容を ZIP「Z作業報告_20261030.zip」〔報告書・写真30枚・資料〕でもユーザーに渡した）。公開ページは `static/index-BIHS1t-t.js`（Z の内容が入っていることを確認）。作業ブランチ `z-cpu-skill` は main に取り込み済み
 - 写真：`tools/e2e/cpu_skill_z_shot.cjs`（対戦）
+- **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は main から新しいブランチを切る（`z-cpu-skill` は取り込み済み・使い終わり）。公開は deploy-pages.yml を手動で動かす（main への push だけでは公開されない）
+- 作業のこつ（Z で分かったこと）
+  - 試遊：`npm run playtest:boxes`（腕前 A・B・C。`PLAYTEST_SKILLS="A"` でしぼれる）・`playtest:swap`（腕前 A・レア抜き16枚）・`playtest:bosses`（プレイヤー側 B）・`playtest:regulars`。ボスの合わせ込みは `PLAYTEST_BOSSES`・`PLAYTEST_SCALES="lo:hi:step"`。ライフは整数に丸めるので勝つ割合が段差で飛ぶ（0.01 刻みで確かめる）
+  - 対戦の写真で CPU の動きを必ず出したいときは、page.route で ai.ts の CPU_SKILL を書きかえる（cpu_skill_z_shot.cjs）。記録の帯はすぐ流れるので「これまでの経過」の窓で撮る
 - **待っているもの**：投石の絵の描き直し（届いたら同じ名前 `sup_art_01_toseki.png` で差し替えて `card_art_webp.py`）・ミュロルの正式なモンスターカード・部屋の家具の描き直し
 - **未完了**：iPhone 実機での確認（R〜Z）
 
