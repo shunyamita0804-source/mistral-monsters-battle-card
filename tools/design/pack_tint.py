@@ -1,6 +1,6 @@
 """ガチャのパック：型（pack_template_symmetric.png）の縁のクリーム色をモンスターの色にして、届いた絵の上に重ねる。
 使い方: python3 -I pack_tint.py 型.png 入力フォルダ 出力フォルダ
-（入力フォルダに pack_{名前}.png が無く pack_art_{名前}.png〔窓の絵〕だけあるときは、型の大きさに合わせてから重ねる）
+（入力フォルダに pack_{名前}.png が無く pack_art_{名前}.png〔窓の絵〕だけあるときは、型の大きさに合わせてから重ねる。WINDOW_FIT のものは窓に収める）
 """
 import sys, colorsys
 import numpy as np
@@ -18,6 +18,11 @@ COLORS = {
 
 # この明るさより暗い色は、縁の明るさもその色に寄せる（ほかの色は前と同じ）
 DARK = 0.35
+
+# 窓の絵を、型の窓（左・上・幅・高さ。型の px）にちょうど収めるもの（cover で型いっぱいに広げない）。
+# ミュロル：前の完成のパック（デザイン担当が型に入れた版。design-parts/gacha-20261029/art_v1/pack_myurol.png）は、窓の絵を 695×1218 に縮めて
+# 窓の (121, 232) に置いていた（前の窓の絵とくらべて測った）。描き直した窓の絵（2026-10-31 指示書 AC【3】）も同じ収め方にして、顔の位置を前と同じにする
+WINDOW_FIT = {'myurol': (121, 232, 695, 1218)}
 
 def smooth(x, a, b):
     t = np.clip((x - a) / (b - a), 0, 1)
@@ -71,9 +76,15 @@ def main(tpl_path, src, dst):
             art = Image.open(f'{src}/pack_{name}.png').convert('RGBA')
         except FileNotFoundError:
             try:
-                art = cover(Image.open(f'{src}/pack_art_{name}.png').convert('RGBA'), (tpl.shape[1], tpl.shape[0]))
+                window = Image.open(f'{src}/pack_art_{name}.png').convert('RGBA')
             except FileNotFoundError:
                 continue
+            if name in WINDOW_FIT:
+                x, y, w, h = WINDOW_FIT[name]
+                art = Image.new('RGBA', (tpl.shape[1], tpl.shape[0]), (0, 0, 0, 0))
+                art.alpha_composite(window.resize((w, h), Image.LANCZOS), (x, y))
+            else:
+                art = cover(window, (tpl.shape[1], tpl.shape[0]))
         assert art.size == (tpl.shape[1], tpl.shape[0]), name
         frame = Image.fromarray(tint_template(tpl, hexcol), 'RGBA')
         out = art.copy()

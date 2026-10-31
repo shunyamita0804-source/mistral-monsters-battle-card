@@ -29,8 +29,11 @@ export const MYUROL_MONSTER: MonsterCard = {
   themeColor: MYUROL_COLOR,
   description: 'ミュロル（水系）。',
   isPlaceholder: false,
-  // 対戦画面のアイコンの切り抜きに使う絵：正式のバトル用の絵（透明つき 800×920。src/data/battleCards.ts と同じファイル）。
-  // 名前・LIFE 入りの正式カードの1枚絵は無い（見本は確認用で貼らない）ので、図鑑などのカードはバトル用カードを重ねて描く（monsterCard.ts）
+  // 図鑑・大きなカード・祭壇・もらったカードの一覧などのカード：名前と LIFE 入りの正式モンスターカード（2026-10-31 指示書 AC【3】。カルシェルと同じ使い方）。
+  // 届いた design-parts/cards-original/myurol-official-20261031/myurol_official_monstercard_LIFE7.png（974×1615。ほかの正式カードの 970×1622 より少し横長）を、
+  // ゆがめずに幅 508 に縮め、上下に白い余白を 3・4 足してほかと同じ 508×849 にした（tools/art/official_card_webp.py）
+  art: { category: 'monsterCards', file: 'myurol_official.webp', layout: 'full' },
+  // 対戦画面のアイコンの切り抜きに使う絵：正式のバトル用の絵（透明つき 800×920。src/data/battleCards.ts と同じファイル。2026-10-31 指示書 AC【3】で足4本・えら片側3本の版に）
   battleArt: { category: 'monsterCards', file: 'myurol_battlecard.png', layout: 'full' },
   pendingSpec: ['rarity'],
 };

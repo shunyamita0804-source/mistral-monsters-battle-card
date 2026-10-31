@@ -121,3 +121,12 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | `images/effects/{drun_light,fx_leave}_N.webp`・`images/ui/dungeon/{omen_vignette,omen_fog,stairs_confirm,pouch_N,menu_*}.webp`・`images/maps/dungeon/ruins_b{2,3}_*.webp`・`images/ui/reward/{card_get_*,clear_scene,first_clear_seal*}.webp`・`images/ui/frame/{emblem_*,empty_*}.webp`・`images/ui/hud/btn_*.webp`・`images/backgrounds/deck_bg.webp`・`images/ui/settings/credits_*.webp` | デザイン33点のうち、いまある画面・演出に組み込んだもの（明かり・気配・地下2/3階・去る光・技カードを得た台・革袋・メニュー・クリア報酬・階段・紋章・右上のボタン・空のとき・デッキ編集の背景・クレジットの巻物） | 同じ原本・同じ道具。`omen_fog` だけは、乗算用の原本を「白を透明に・霧を 2.2 倍に明るく」した版（真っ黒な画面でも見えるように） |
 | `images/ui/later/*.webp` | デザイン33点のうち、まだ画面・機能がないもの（8 技カードを失う〔古い裏面の絵のため保留〕・11 全体地図・16 起動画面・17 読み込みの印・19 まだ行けない場所・21 売ったときのお金・22 短いお知らせ・25 初めての人への案内） | シートのまま 1/2 に縮小して置いただけ（ゲームでは使っていない）。使うときに切り分ける |
 | `store/*.png` | ストア用（28 スクリーンショットの台紙・29 Google Play の横長の絵・30 Android のアイコン〔前景・背景の分けた版も〕） | 原本の PNG をそのまま（ゲームでは使わない） |
+
+## 配置した素材（2026-10-31 指示書 AC【3】【4】）
+
+| パス | 内容 | 状態 |
+| --- | --- | --- |
+| `images/cards/monsters/myurol_official.webp` | ミュロルの正式モンスターカード（508×849） | 原本 `design-parts/cards-original/myurol-official-20261031/myurol_official_monstercard_LIFE7.png`（974×1615・無改変）を幅 508 に縮め、上下に白い余白 3・4 を足した（`tools/art/official_card_webp.py`） |
+| `images/cards/monsters/myurol_battlecard.png` | ミュロルのバトル用の絵（足4本・えら片側3本の描き直し。800×920） | 原本と同じバイト列（前の版の原本は `myurol14-20261027/MONSTER/` に残る） |
+| `images/ui/gacha/{pack,panel}_myurol.webp`・`panel_shop.webp`・`images/maps/rooms/cardshop_{left_wall,right_wall,back_left_shelf,gacha_machine}.webp` | ミュロルのパック・販売機の窓・ショップの棚 | 新しい窓の絵 `pack_art_myurol.png` から今と同じ道具で作り直した（前の窓の絵は `pack_art_myurol_v1.png`、前のパックは `art_v1/pack_myurol.png`） |
+| `images/cards/monsters/shishien_official.webp` | シシエンの正式モンスターカード（枠の金色をなくした版） | 原本 `design-parts/cards-original/shishien/shishien_official_monstercard_LIFE7_v2_20261031.png`（無改変。前の版も残す）を幅 508 に縮めた |

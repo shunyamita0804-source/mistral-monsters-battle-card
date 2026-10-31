@@ -92,13 +92,14 @@ describe('カードデータの点検（正式データを入れる前の土台�
     ]);
   });
 
-  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン・カルシェル〔2026-10-30〕・プカリム・ジオル・フルーネ・セレフィーン・ツムジ。ミュロルのモンスターはバトル用の絵を重ねて描く）だけ', () => {
+  it('仮カードは画像がなくても問題にしない（仮の絵で表示する）。画像があるのは正式カード（ソラモ・ラズック・ガウル・ノビトン・ミュロル〔2026-10-31 指示書 AC【3】〕・カルシェル〔2026-10-30〕・プカリム・ジオル・フルーネ・セレフィーン・ツムジ・ヒョウズク・シシエン）だけ', () => {
     expect(cardCatalog.all().filter((c) => c.art && c.isPlaceholder)).toEqual([]);
     expect(cardCatalog.all().filter((c) => c.art).map((c) => c.id)).toEqual([
       'mon-soramo',
       'mon-lazuck',
       'mon-gauul',
       'mon-nobiton',
+      'mon-myurol',
       'mon-kalshell',
       'mon-pukarim',
       'mon-geol',

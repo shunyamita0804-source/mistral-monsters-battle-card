@@ -104,7 +104,8 @@ describe('シシエン：データ（届いた JSON・CSV を無改変で置き�
     }
     expect(SHISHIEN_MONSTER.art?.file).toBe('shishien_official.webp');
     expect(existsSync('assets/images/cards/monsters/shishien_official.webp')).toBe(true);
-    for (const f of ['shishien_official_monstercard_LIFE7.png', 'shishien_original_approved.png', 'shishien_3view_approved.png', 'pack_art_shishien.png']) {
+    // 2026-10-31 指示書 AC【4】：枠の金色をなくした v2 を足した（前の版も残す）
+    for (const f of ['shishien_official_monstercard_LIFE7.png', 'shishien_official_monstercard_LIFE7_v2_20261031.png', 'shishien_original_approved.png', 'shishien_3view_approved.png', 'pack_art_shishien.png']) {
       expect(existsSync(`${ORIGINAL_DIR}/${f}`), f).toBe(true);
     }
     expect(readFileSync('design-parts/gacha-20261029/pack_art/pack_art_shishien.png').equals(readFileSync(`${ORIGINAL_DIR}/pack_art_shishien.png`))).toBe(true);

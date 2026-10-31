@@ -45,7 +45,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // ノビトン（2026-10-26）：枠は黄色（#FFD400。ユーザー指示「外枠は黄色」）。絵はチャットで届いた正式原画（1179×1334・透明つき）を無改変。
   // 0.8・少し上へ：鼻先・しっぽ・足先が枠の飾りと名前の札に隠れない大きさ
   [NOBITON_MONSTER_ID]: { art: 'nobiton_battlecard.png', frame: 'nobiton', scale: 0.8, offsetY: -0.025 },
-  // ミュロル（2026-10-27）：枠は水色（#84E5FA。ユーザー確定「水色」・src/data/myurol.ts の MYUROL_COLOR）。絵は届いた MONSTER/Myurol_Battle_800x920_RGBA.png を無改変
+  // ミュロル（2026-10-27）：枠は水色（#84E5FA。ユーザー確定「水色」・src/data/myurol.ts の MYUROL_COLOR）。絵は届いた MONSTER/Myurol_Battle_800x920_RGBA.png を無改変。
+  // 2026-10-31 指示書 AC【3】：足4本・えら片側3本の描き直し（design-parts/cards-original/myurol-official-20261031/myurol_battlecard.png。同じ 800×920・同じポーズ）に差し替え
   [MYUROL_MONSTER_ID]: { art: 'myurol_battlecard.png', frame: 'myurol', scale: 0.86, offsetY: 0.0 },
   // カルシェル（2026-10-27）：枠は淡い氷色（#DFF2F6。src/data/kalshell.ts の KALSHELL_COLOR）。絵は届いた BattleArt/Kalshell_BattleArt_Transparent_Approved.png（1169×1345）を無改変
   // 0.8・少し上へ：絵がキャンバスいっぱいに描かれている（ノビトンと同じくらい）ので、ハサミ・脚が枠の飾りと名前の札に隠れない大きさ
