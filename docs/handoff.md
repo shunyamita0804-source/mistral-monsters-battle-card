@@ -15,7 +15,9 @@
 - AB【3】（記録 `docs/battle-layout-ab-20261031.md`）：カメラの帯（相手の大きなカードの欄・相手の手札・相手3体・自分3体・説明の欄・手札）を 0.3 秒でずらす（`layoutCamera`・`cameraFocus`）。説明の欄 264→200・モンスター 88・手札 98・相手の手札は同じ大きさ
 - 報告：AB https://claude.ai/artifact/6JnifhZsPCw3qygnKpDSxQ （同じ内容を ZIP「AB作業報告_20261031.zip」〔報告書・写真60枚・資料〕でもユーザーに渡した）。作業ブランチ `ab1-shishien`・`ab2-cpu-lines`・`ab2-cpu-lines-fix`・`ab3-battle-layout` は main に取り込み済み
 - 写真の道具：`shishien_battle_shot.cjs`・`cpu_lines_ab_shot.cjs`・`battle_layout_ab_shot.cjs`（前の版は git worktree で前の main を別のポートの開発用サーバーに）。試遊 `npm run playtest:shishien`・`playtest:barca`
-- 作業のこつ（AB で分かったこと）：セッション開始の自動準備（Node 24）が動かなかったときは nodejs.org から Node 24 を入れて `npm install`。`battle_card_frame.py` は scipy が要る（`pip install scipy`）
+- **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は main から新しいブランチを切る（AB のブランチ4つは取り込み済み・使い終わり）。公開は deploy-pages.yml を手動で動かす（main への push だけでは公開されない）
+- **ユーザーの返事待ち**：バルカの強さ（今の 1.09＝11.0% のままか、腕前 B〔1.1＝22.9%〕などにするか）・AB の報告への感想（炭色の枠・説明の欄 200・薄く出す直前のカード）
+- 作業のこつ（AB で分かったこと）：始めたときローカルの main が古い別の履歴を指していたことがある → `git fetch origin main` して origin/main に合わせてから作業する。セッション開始の自動準備（Node 24）が動かなかったときは nodejs.org から Node 24 を入れて `npm install`。`battle_card_frame.py` は scipy が要る（`pip install scipy`）
 - **待っているもの**：ミュロルの正式なモンスターカード（デザイン担当の返事待ち）・部屋の家具の描き直し（まだ依頼していない）
 - **未完了**：iPhone 実機での確認（R〜AB）・バルカの強さ
 
