@@ -65,16 +65,21 @@ MONSTER_COLORS = {
 }
 
 
+# 明るい所（名前の帯など）を白へ寄せる割合（ふつうは 0.7）。暗い色で、帯がほかの色（シシエンの灰色）と見分けにくくなるものだけ少なくする
+# 2026-11-01 指示書 AG2：デスオルの帯が青みのある鋼色でシシエンに近かったので、紺（#1E2B58）にもっと寄せる
+LIGHT_MIX = {'desuoru': 0.22}
+
+
 def hex_rgb(s: str) -> np.ndarray:
     s = s.lstrip('#')
     return np.array([int(s[i : i + 2], 16) for i in (0, 2, 4)], float)
 
 
-def tint(src: np.ndarray, color: np.ndarray) -> np.ndarray:
+def tint(src: np.ndarray, color: np.ndarray, light_mix: float = 0.7) -> np.ndarray:
     rgb, al = src[..., :3], src[..., 3]
     gold = (rgb[..., 0] - rgb[..., 2]) > 40
     silver = (al > 0) & ~gold
-    dark, mid, light = color * 0.45, color, color + (255 - color) * 0.7
+    dark, mid, light = color * 0.45, color, color + (255 - color) * light_mix
     t = (rgb.mean(-1) / 255.0)[..., None]
     col = np.where(t < 0.6, dark + (mid - dark) * np.clip(t / 0.6, 0, 1), mid + (light - mid) * np.clip((t - 0.6) / 0.4, 0, 1))
     out = rgb.copy()
@@ -113,7 +118,7 @@ def main() -> None:
         size = (w * SCALE, h * SCALE)
         shrink(src, size).save(OUT / f'frame_{kind}_support.webp', quality=WEBP_QUALITY, method=6)
         for key, color in MONSTER_COLORS.items():
-            shrink(tint(src, hex_rgb(color)), size).save(OUT / f'frame_{kind}_{key}.webp', quality=WEBP_QUALITY, method=6)
+            shrink(tint(src, hex_rgb(color), LIGHT_MIX.get(key, 0.7)), size).save(OUT / f'frame_{kind}_{key}.webp', quality=WEBP_QUALITY, method=6)
     print('書き出し：', len(list(OUT.glob('frame_*.webp'))), '枚')
 
 

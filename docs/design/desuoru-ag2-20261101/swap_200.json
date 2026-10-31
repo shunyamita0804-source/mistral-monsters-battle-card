@@ -1,0 +1,465 @@
+{
+ "games": 200,
+ "skill": "A",
+ "base": {
+  "games": 1800,
+  "winA": 48.9,
+  "ko": 50.4,
+  "deckOut": 49.6,
+  "draws": 0,
+  "avgTurns": 35.6,
+  "attacksPerGame": 20.9,
+  "evaded": 3.8,
+  "defended": 15.1,
+  "hesitatePerGame": 0,
+  "misguardPerGame": 0,
+  "tsutaPerGame": 0,
+  "recoilPerGame": 0,
+  "recoilKoPerGame": 0,
+  "recoilLossGames": 0,
+  "winKo": 24,
+  "winDeckOut": 24.9,
+  "loseKo": 26.4,
+  "loseDeckOut": 24.6,
+  "undodgeablePerGame": 0.41,
+  "undodgeableBlockedPerGame": 0.03,
+  "undodgeableByMonsterPerGame": {
+   "mon-lazuck": 0.15,
+   "mon-nobiton": 0.26
+  },
+  "undodgeableBlockedByMonsterPerGame": {
+   "mon-lazuck": 0.01,
+   "mon-nobiton": 0.02
+  },
+  "crowEyePerGame": 0,
+  "crowEyeDiscards": {},
+  "supportsPerGame": {
+   "S01": 1.12,
+   "S02": 1.29
+  }
+ },
+ "subjects": {
+  "mon-desuoru": {
+   "name": "デスオル",
+   "cards": [
+    {
+     "id": "skl-desuoru-01",
+     "copies": 2
+    },
+    {
+     "id": "skl-desuoru-02",
+     "copies": 2
+    },
+    {
+     "id": "skl-desuoru-03",
+     "copies": 2
+    },
+    {
+     "id": "skl-desuoru-04",
+     "copies": 2
+    },
+    {
+     "id": "skl-desuoru-05",
+     "copies": 2
+    },
+    {
+     "id": "skl-desuoru-06",
+     "copies": 1
+    },
+    {
+     "id": "skl-desuoru-07",
+     "copies": 1
+    },
+    {
+     "id": "skl-desuoru-09",
+     "copies": 1
+    },
+    {
+     "id": "skl-desuoru-11",
+     "copies": 1
+    },
+    {
+     "id": "skl-desuoru-12",
+     "copies": 1
+    },
+    {
+     "id": "skl-desuoru-13",
+     "copies": 1
+    }
+   ],
+   "all": {
+    "games": 5400,
+    "winA": 72,
+    "ko": 68.7,
+    "deckOut": 31.3,
+    "draws": 0,
+    "avgTurns": 32.3,
+    "attacksPerGame": 19.7,
+    "evaded": 3.3,
+    "defended": 14.2,
+    "hesitatePerGame": 0,
+    "misguardPerGame": 0,
+    "tsutaPerGame": 0,
+    "recoilPerGame": 0,
+    "recoilKoPerGame": 0,
+    "recoilLossGames": 0,
+    "winKo": 57.2,
+    "winDeckOut": 14.9,
+    "loseKo": 11.5,
+    "loseDeckOut": 16.4,
+    "undodgeablePerGame": 0.38,
+    "undodgeableBlockedPerGame": 0.03,
+    "undodgeableByMonsterPerGame": {
+     "mon-desuoru": 0.11,
+     "mon-lazuck": 0.1,
+     "mon-nobiton": 0.17
+    },
+    "undodgeableBlockedByMonsterPerGame": {
+     "mon-desuoru": 0.01,
+     "mon-lazuck": 0.01,
+     "mon-nobiton": 0.01
+    },
+    "crowEyePerGame": 0,
+    "crowEyeDiscards": {},
+    "supportsPerGame": {
+     "S01": 1.04,
+     "S02": 1.3
+    }
+   },
+   "rows": {
+    "booster-1#0": {
+     "out": "ソラモ",
+     "games": 600,
+     "winA": 71.2,
+     "ko": 73.8,
+     "deckOut": 26.2,
+     "draws": 0,
+     "avgTurns": 31.4,
+     "attacksPerGame": 19.5,
+     "evaded": 3,
+     "defended": 13.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 60.3,
+     "winDeckOut": 10.8,
+     "loseKo": 13.5,
+     "loseDeckOut": 15.3,
+     "undodgeablePerGame": 0.13,
+     "undodgeableBlockedPerGame": 0.01,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.13
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.07,
+      "S02": 1.34
+     }
+    },
+    "booster-1#1": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 69,
+     "ko": 61.8,
+     "deckOut": 38.2,
+     "draws": 0,
+     "avgTurns": 33.5,
+     "attacksPerGame": 20,
+     "evaded": 4.1,
+     "defended": 14.3,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 47.5,
+     "winDeckOut": 21.5,
+     "loseKo": 14.3,
+     "loseDeckOut": 16.7,
+     "undodgeablePerGame": 0.12,
+     "undodgeableBlockedPerGame": 0.01,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.12
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.12,
+      "S02": 1.31
+     }
+    },
+    "booster-1#2": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 70.8,
+     "ko": 62.8,
+     "deckOut": 37.2,
+     "draws": 0,
+     "avgTurns": 34.2,
+     "attacksPerGame": 19.4,
+     "evaded": 4.2,
+     "defended": 14.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 47.2,
+     "winDeckOut": 23.7,
+     "loseKo": 15.7,
+     "loseDeckOut": 13.5,
+     "undodgeablePerGame": 0.09,
+     "undodgeableBlockedPerGame": 0.01,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.09
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.1,
+      "S02": 1.32
+     }
+    },
+    "booster-2#0": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 81.3,
+     "ko": 79.8,
+     "deckOut": 20.2,
+     "draws": 0,
+     "avgTurns": 28.9,
+     "attacksPerGame": 18.2,
+     "evaded": 3.3,
+     "defended": 13.2,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 71.5,
+     "winDeckOut": 9.8,
+     "loseKo": 8.3,
+     "loseDeckOut": 10.3,
+     "undodgeablePerGame": 1.11,
+     "undodgeableBlockedPerGame": 0.09,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.1,
+      "mon-lazuck": 0.38,
+      "mon-nobiton": 0.63
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01,
+      "mon-lazuck": 0.05,
+      "mon-nobiton": 0.03
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 0.91,
+      "S02": 1.22
+     }
+    },
+    "booster-2#1": {
+     "out": "ラズック",
+     "games": 600,
+     "winA": 61.8,
+     "ko": 64.2,
+     "deckOut": 35.8,
+     "draws": 0,
+     "avgTurns": 33.1,
+     "attacksPerGame": 20.2,
+     "evaded": 3.2,
+     "defended": 13.9,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 49.2,
+     "winDeckOut": 12.7,
+     "loseKo": 15,
+     "loseDeckOut": 23.2,
+     "undodgeablePerGame": 1.01,
+     "undodgeableBlockedPerGame": 0.06,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.15,
+      "mon-nobiton": 0.86
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01,
+      "mon-nobiton": 0.05
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.11,
+      "S02": 1.24
+     }
+    },
+    "booster-2#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 89.3,
+     "ko": 91.5,
+     "deckOut": 8.5,
+     "draws": 0,
+     "avgTurns": 27.6,
+     "attacksPerGame": 17.9,
+     "evaded": 4.3,
+     "defended": 14.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 86.3,
+     "winDeckOut": 3,
+     "loseKo": 5.2,
+     "loseDeckOut": 5.5,
+     "undodgeablePerGame": 0.6,
+     "undodgeableBlockedPerGame": 0.06,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.1,
+      "mon-lazuck": 0.49
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01,
+      "mon-lazuck": 0.06
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 0.81,
+      "S02": 1.2
+     }
+    },
+    "booster-3#0": {
+     "out": "カルシェル",
+     "games": 600,
+     "winA": 64.7,
+     "ko": 58.7,
+     "deckOut": 41.3,
+     "draws": 0,
+     "avgTurns": 33.7,
+     "attacksPerGame": 21,
+     "evaded": 3,
+     "defended": 11.5,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 45.7,
+     "winDeckOut": 19,
+     "loseKo": 13,
+     "loseDeckOut": 22.3,
+     "undodgeablePerGame": 0.11,
+     "undodgeableBlockedPerGame": 0.02,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.11
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.02
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.14,
+      "S02": 1.35
+     }
+    },
+    "booster-3#1": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 69.8,
+     "ko": 61.3,
+     "deckOut": 38.7,
+     "draws": 0,
+     "avgTurns": 34.4,
+     "attacksPerGame": 20.5,
+     "evaded": 2.3,
+     "defended": 16.3,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 51.3,
+     "winDeckOut": 18.5,
+     "loseKo": 10,
+     "loseDeckOut": 20.2,
+     "undodgeablePerGame": 0.12,
+     "undodgeableBlockedPerGame": 0.01,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.12
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.06,
+      "S02": 1.43
+     }
+    },
+    "booster-3#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 70.2,
+     "ko": 64.3,
+     "deckOut": 35.7,
+     "draws": 0,
+     "avgTurns": 34,
+     "attacksPerGame": 20.5,
+     "evaded": 2.5,
+     "defended": 15.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 55.5,
+     "winDeckOut": 14.7,
+     "loseKo": 8.8,
+     "loseDeckOut": 21,
+     "undodgeablePerGame": 0.11,
+     "undodgeableBlockedPerGame": 0.01,
+     "undodgeableByMonsterPerGame": {
+      "mon-desuoru": 0.11
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-desuoru": 0.01
+     },
+     "crowEyePerGame": 0,
+     "crowEyeDiscards": {},
+     "supportsPerGame": {
+      "S01": 1.05,
+      "S02": 1.33
+     }
+    }
+   }
+  }
+ }
+}

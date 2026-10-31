@@ -19,7 +19,9 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - 技 desuoru_sk_01〜14.webp（届いた desuoru_sk_NN.png を tools/art/card_art_webp.py で幅 827 の WebP に。番号＝技番号）
  * - 正式モンスターカード desuoru_official.webp（届いた desuoru_official_monstercard_LIFE7.png〔970×1622〕を tools/art/official_card_webp.py で 508×849 に）
  * - バトル用 desuoru_battlecard.png（届いた desuoru_battleart.png を無改変。1169×1346 透過）
- * 色：紺 #1E2B58（モンスターカード枠・技カード枠とも。暗い色なのでシシエンと同じ暗い色のしかた）
+ * 色：紺 #1E2B58（モンスターカード枠・技カード枠とも。暗い色なのでシシエンと同じ暗い色のしかた）。
+ *   2026-11-01 指示書 AG2：技カードの名前の帯が鋼色でシシエンの灰色に近かったので、紺に寄せた（tools/art/skillcard_simple_build.py の LIGHT_MIX）
+ * 2026-11-01 指示書 AG2（A の目安 70% 以上にするため）：4 しのささやき ダメージ 3→4・5 めいかいのかぜ ダメージ 4→5。JSON・CSV を直し、前の版は *_v1_20261031.* に残す
  * ガチャのレアの枠（JSON の gacha_slot）：08 ヘルのもん・10 カラスのめ・14 かげにとける（DESUORU_GACHA_RARE）
  */
 export const DESUORU_MONSTER_ID = 'mon-desuoru';
