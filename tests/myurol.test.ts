@@ -43,6 +43,8 @@ const m14 = (displayNo: number): string => {
   return s.id;
 };
 const ORIGINAL_DIR = 'design-parts/cards-original/myurol14-20261027';
+/** 2026-10-31 指示書 AC【3】：正式モンスターカード・バトル用の絵・パックの窓の絵（無改変） */
+const NEW_ORIGINAL_DIR = 'design-parts/cards-original/myurol-official-20261031';
 
 /** 届いた CSV の行（BOM 付き・カンマ区切り。効果の文にカンマは無い） */
 function csvRows(path: string): string[][] {
@@ -202,16 +204,20 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(deck.skills).toContain(myu(1));
   });
 
-  it('モンスター：ライフ7・水色。バトル用カードは届いた透過 PNG（無改変）と水色の枠。技カードの枠も水色', () => {
+  it('モンスター：ライフ7・水色。正式モンスターカード（2026-10-31 指示書 AC【3】）。バトル用カードは届いた透過 PNG（無改変）と水色の枠。技カードの枠も水色', () => {
     expect(MYUROL_MONSTER.life).toBe(7);
     expect(MYUROL_MONSTER.name).toBe('ミュロル');
     expect(MYUROL_MONSTER.themeColor).toBe(MYUROL_COLOR);
     expect(MYUROL_COLOR).toBe('#84E5FA');
-    expect(MYUROL_MONSTER.art).toBeUndefined();
+    expect(MYUROL_MONSTER.art).toEqual({ category: 'monsterCards', file: 'myurol_official.webp', layout: 'full' });
+    expect(existsSync('assets/images/cards/monsters/myurol_official.webp')).toBe(true);
+    expect(existsSync(`${NEW_ORIGINAL_DIR}/myurol_official_monstercard_LIFE7.png`)).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-myurol')).toHaveLength(1);
     expect(SKILLS.filter((s) => s.monsterId === 'mon-myurol')).toHaveLength(14);
     expect(BATTLE_CARDS['mon-myurol']).toMatchObject({ art: 'myurol_battlecard.png', frame: 'myurol' });
-    const original = readFileSync(`${ORIGINAL_DIR}/MONSTER/Myurol_Battle_800x920_RGBA.png`);
+    // 2026-10-31 指示書 AC【3】：足4本・えら片側3本の描き直し（前の版は ORIGINAL_DIR/MONSTER/Myurol_Battle_800x920_RGBA.png に残る）
+    expect(existsSync(`${ORIGINAL_DIR}/MONSTER/Myurol_Battle_800x920_RGBA.png`)).toBe(true);
+    const original = readFileSync(`${NEW_ORIGINAL_DIR}/myurol_battlecard.png`);
     expect(readFileSync('assets/images/cards/monsters/myurol_battlecard.png').equals(original)).toBe(true);
     expect([original.readUInt32BE(16), original.readUInt32BE(20)]).toEqual([800, 920]);
     expect(existsSync('assets/images/ui/battlecard/frame_myurol.png')).toBe(true);

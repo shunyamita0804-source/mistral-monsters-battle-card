@@ -16,7 +16,9 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * ゲーム内 ID：mon-shishien（ライフ7・内部ランク B。画面には出さない）、skl-shishien-01〜14（JSON の no）
  * 絵（原本は design-parts/cards-original/shishien/ に無改変）：
  * - 技 shishien_sk_01〜14.webp（届いた shishien_sk_NN.png を tools/art/card_art_webp.py で幅 827 の WebP に。番号＝技番号）
- * - 正式モンスターカード shishien_official.webp（届いた shishien_official_monstercard_LIFE7.png を幅 508 に縮めただけ。ヒョウズクと同じ）
+ * - 正式モンスターカード shishien_official.webp（届いた shishien_official_monstercard_LIFE7.png を幅 508 に縮めただけ。ヒョウズクと同じ）。
+ *   2026-10-31 指示書 AC【4】：枠の金色をなくした版 shishien_official_monstercard_LIFE7_v2_20261031.png（炭色〜銀の金属の枠・名前の下の飾りと文字のふちは白〜灰色）から
+ *   作り直した（tools/art/official_card_webp.py。絵は同じ。前の版の原本も消さずに残す）
  * - バトル用 shishien_battlecard.png（届いた shishien_battleart.png を無改変。1169×1346）
  * 色：炭色 #3E3A3F（モンスターカード枠・技カード枠とも）
  * ガチャのレアの枠（JSON の gacha_slot）：09 れんごくのとっしん・10 ほのおのほうこう・14 かげろう（SHISHIEN_GACHA_RARE）
