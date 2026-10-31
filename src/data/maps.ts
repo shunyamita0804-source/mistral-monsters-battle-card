@@ -411,7 +411,8 @@ const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: n
 };
 /**
  * カード研究所（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥の壁の本棚＝図鑑、左奥のガラスの飾り棚＝標本棚、中央の机（研究員ルーカスはその奥）、
- * 右奥の機械＝記録の投影機、右の実験台＝解析台、右の壁の図形の板（黒板）。2026-10-29 夜に白い研究施設の絵（v2）へ。前の絵にあった水晶の台・資料棚・閲覧テーブル・薬品の作業台・標本ケースは外した
+ * 右奥の機械＝記録の投影機、右の実験台＝解析台、右の壁の図形の板（黒板）。2026-10-29 夜に白い研究施設の絵（v2）へ。前の絵にあった水晶の台・資料棚・閲覧テーブル・薬品の作業台・標本ケースは外した。
+ * 2026-10-31 指示書 AD で正面向きの新しい絵に（左の壁ぞいにガラスの棚、図形の板は右の壁ぞいに立つ板、解析台は右の手前寄り）
  */
 export const LAB: MapDefinition = artMap('lab', 'カード研究所', 'interior', LAB_ART, [
   interactAt('lab-shelf', itemOf(LAB_ART, 'BIG_SHELF'), '図鑑の本棚', 'collection'),
@@ -511,7 +512,8 @@ export const HOUSES: readonly MapDefinition[] = (['b', 'e'] as const).map(house)
 const FLORIST_ART = SHOP_ROOMS_ART.florist;
 /**
  * 花屋の中（住宅A。2026-10-29 新しい絵。tools/design/rooms_shop_build.py）。奥の作りつけの棚（花・包み紙・リボン）、左右の花の段、
- * 左右の壁の吊り花かご、真ん中のカウンター（マルタはその奥。話しかけるのはカウンターの手前の床から）
+ * 左右の壁の吊り花かご、真ん中のカウンター（マルタはその奥。話しかけるのはカウンターの手前の床から）。
+ * 2026-10-31 指示書 AD で正面向きの新しい絵に（吊り花かごは奥の壁の左右のはし。手前に花台と鉢植え）
  */
 export const FLORIST: MapDefinition = artMap('florist', '花屋', 'interior', FLORIST_ART, [
   // 吊り花かごは花の段の上の壁にある（範囲が重なるので先に並べる）
@@ -527,7 +529,8 @@ export const FLORIST: MapDefinition = artMap('florist', '花屋', 'interior', FL
 const TAILOR_ART = SHOP_ROOMS_ART.tailor;
 /**
  * 仕立て屋の中（住宅D。2026-10-29 新しい絵。tools/design/rooms_shop_build.py）。奥の布の棚、右奥の試着の囲い、右の姿見、左右のトルソー、
- * 左の布の台、真ん中の作業カウンター（ロザリーはその奥。話しかけるのはカウンターの手前の床から）
+ * 左の布の台、真ん中の作業カウンター（ロザリーはその奥。話しかけるのはカウンターの手前の床から）。
+ * 2026-10-31 指示書 AD で正面向きの新しい絵に（布の台は左の手前の陳列台。左の壁ぞいに棚2つ）
  */
 export const TAILOR: MapDefinition = artMap('tailor', '仕立て屋', 'interior', TAILOR_ART, [
   interactAt('tailor-cloth-shelf', itemOf(TAILOR_ART, 'CLOTH_SHELF'), '布の棚', 'message', '巻いた布が色ごとに並んでいる。紺と赤が多い。'),
