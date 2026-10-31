@@ -522,6 +522,10 @@ export const FLORIST: MapDefinition = artMap('florist', '花屋', 'interior', FL
   interactAt('florist-steps-l', itemOf(FLORIST_ART, 'STEPS_L'), '花の段', 'message', '段の上に、色とりどりの花の鉢がずらりと並んでいる。'),
   interactAt('florist-steps-r', itemOf(FLORIST_ART, 'STEPS_R'), '花の段', 'message', '青い花が気持ちよさそうに咲いている。じょうろも置いてある。'),
   interactAt('florist-shelf', itemOf(FLORIST_ART, 'SHELF'), '奥の棚', 'message', '花束を包む紙とリボンが、色ごとに巻いてしまってある。'),
+  // 2026-10-31 指示書 AE：手前の鉢植え（左右）と花台
+  interactAt('florist-plant-l', itemOf(FLORIST_ART, 'PLANT_L'), '観葉植物', 'message', '大きな葉の観葉植物。葉が一枚ずつ、ていねいにふいてある。'),
+  interactAt('florist-plant-stand', itemOf(FLORIST_ART, 'PLANT_STAND'), '花台', 'message', '小さな台の上に、白い花の鉢がひとつ。今日いちばんのおすすめらしい。'),
+  interactAt('florist-plant-r', itemOf(FLORIST_ART, 'PLANT_R'), '観葉植物', 'message', '入口の横で、大きな鉢植えがお客さんを出むかえている。'),
   spotNpc('florist-keeper', FLORIST_ART, 'KEEPER_SPOT', SHOP_ROOMS_DRAW_OFFSET.florist.KEEPER_SPOT, 'resident_a'),
   roomExit('florist-exit', FLORIST_ART, 'HOUSE_A'),
 ], entryOf(FLORIST_ART));
@@ -539,6 +543,9 @@ export const TAILOR: MapDefinition = artMap('tailor', '仕立て屋', 'interior'
   interactAt('tailor-torso-l', itemOf(TAILOR_ART, 'TORSO_L'), 'トルソー', 'message', '紺と白の上着が着せてある。仕立てたばかりのようだ。'),
   interactAt('tailor-torso-r', itemOf(TAILOR_ART, 'TORSO_R'), 'トルソー', 'message', '緑のドレスが着せてある。すそのししゅうがきれいだ。'),
   interactAt('tailor-cloth-table', itemOf(TAILOR_ART, 'CLOTH_TABLE'), '布の台', 'message', 'たたんだ服と布が、きちんと積んである。'),
+  // 2026-10-31 指示書 AE：左の壁ぞいの棚2つ
+  interactAt('tailor-box-cabinet', itemOf(TAILOR_ART, 'BOX_CABINET'), '小物の棚', 'message', '青い小箱に、色とりどりのボタンがぎっしりつまっている。'),
+  interactAt('tailor-low-cabinet', itemOf(TAILOR_ART, 'LOW_CABINET'), '低い棚', 'message', '引き出しに、巻き尺や糸巻きがきちんとしまってある。'),
   spotNpc('tailor-keeper', TAILOR_ART, 'KEEPER_SPOT', SHOP_ROOMS_DRAW_OFFSET.tailor.KEEPER_SPOT, 'resident_d'),
   roomExit('tailor-exit', TAILOR_ART, 'HOUSE_D'),
 ], entryOf(TAILOR_ART));

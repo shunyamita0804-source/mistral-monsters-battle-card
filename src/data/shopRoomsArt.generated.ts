@@ -172,6 +172,24 @@ export const SHOP_ROOMS_ART: Readonly<Record<'florist' | 'tailor', ArtMap>> = {
     "w": 35,
     "h": 12
    },
+   "PLANT_L": {
+    "x": 3,
+    "y": 27,
+    "w": 5,
+    "h": 2
+   },
+   "PLANT_STAND": {
+    "x": 46,
+    "y": 27,
+    "w": 2,
+    "h": 2
+   },
+   "PLANT_R": {
+    "x": 52,
+    "y": 27,
+    "w": 6,
+    "h": 2
+   },
    "COUNTER": {
     "x": 20,
     "y": 15,
@@ -381,6 +399,18 @@ export const SHOP_ROOMS_ART: Readonly<Record<'florist' | 'tailor', ArtMap>> = {
     "y": 22,
     "w": 13,
     "h": 5
+   },
+   "BOX_CABINET": {
+    "x": 4,
+    "y": 11,
+    "w": 6,
+    "h": 5
+   },
+   "LOW_CABINET": {
+    "x": 2,
+    "y": 19,
+    "w": 8,
+    "h": 2
    },
    "COUNTER": {
     "x": 20,

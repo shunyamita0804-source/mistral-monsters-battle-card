@@ -117,8 +117,9 @@ describe('花屋・仕立て屋の新しい部屋', () => {
 
   it('調べる物：花屋＝花の段（左右）・奥の棚・吊り花かご、仕立て屋＝布の棚・試着の囲い・姿見・トルソー（左右）・布の台。どれも歩ける所のとなり', () => {
     const ids = (m: MapDefinition) => m.objects.filter((o) => o.type === 'interact').map((o) => o.id);
-    expect(ids(FLORIST)).toEqual(['florist-basket-l', 'florist-basket-r', 'florist-steps-l', 'florist-steps-r', 'florist-shelf']);
-    expect(ids(TAILOR)).toEqual(['tailor-cloth-shelf', 'tailor-fitting', 'tailor-mirror', 'tailor-torso-l', 'tailor-torso-r', 'tailor-cloth-table']);
+    // 2026-10-31 指示書 AE：花屋の手前の鉢植え（左右）・花台、仕立て屋の左の棚2つを足した（今ある物はそのまま・前に並べる）
+    expect(ids(FLORIST)).toEqual(['florist-basket-l', 'florist-basket-r', 'florist-steps-l', 'florist-steps-r', 'florist-shelf', 'florist-plant-l', 'florist-plant-stand', 'florist-plant-r']);
+    expect(ids(TAILOR)).toEqual(['tailor-cloth-shelf', 'tailor-fitting', 'tailor-mirror', 'tailor-torso-l', 'tailor-torso-r', 'tailor-cloth-table', 'tailor-box-cabinet', 'tailor-low-cabinet']);
     for (const m of ROOMS) {
       const a = area(m);
       for (const o of m.objects) {
@@ -133,6 +134,30 @@ describe('花屋・仕立て屋の新しい部屋', () => {
         }
         expect(near, o.id).toBe(true);
         expect(o.message, o.id).toBeTruthy();
+      }
+    }
+  });
+
+  it('指示書 AE の調べる所5か所：となりの歩ける床から調べられて、鉢の後ろへ回りこめるのも前のまま', () => {
+    const msg = (m: MapDefinition, id: string): string | undefined => {
+      const o = m.objects.find((x) => x.id === id);
+      return o?.type === 'interact' ? o.message : undefined;
+    };
+    expect(msg(FLORIST, 'florist-plant-l')).toBe('大きな葉の観葉植物。葉が一枚ずつ、ていねいにふいてある。');
+    expect(msg(FLORIST, 'florist-plant-stand')).toBe('小さな台の上に、白い花の鉢がひとつ。今日いちばんのおすすめらしい。');
+    expect(msg(FLORIST, 'florist-plant-r')).toBe('入口の横で、大きな鉢植えがお客さんを出むかえている。');
+    expect(msg(TAILOR, 'tailor-box-cabinet')).toBe('青い小箱に、色とりどりのボタンがぎっしりつまっている。');
+    expect(msg(TAILOR, 'tailor-low-cabinet')).toBe('引き出しに、巻き尺や糸巻きがきちんとしまってある。');
+    // 鉢の後ろ（すぐ上の行）は歩ける
+    expect(area(FLORIST).has(cellOf(140, 678))).toBe(true);
+    expect(area(FLORIST).has(cellOf(1400, 678))).toBe(true);
+    // 範囲は家具の当たりの所だけ（歩ける床にはかけない）
+    for (const [m, ids] of [[FLORIST, ['florist-plant-l', 'florist-plant-stand', 'florist-plant-r']], [TAILOR, ['tailor-box-cabinet', 'tailor-low-cabinet']]] as const) {
+      const a = area(m);
+      for (const id of ids) {
+        const o = m.objects.find((x) => x.id === id);
+        if (!o || o.type !== 'interact') throw new Error(id);
+        for (let x = o.x; x < o.x + o.w; x++) for (let y = o.y; y < o.y + o.h; y++) expect(a.has(`${x},${y}`), `${id} ${x},${y}`).toBe(false);
       }
     }
   });
