@@ -325,7 +325,7 @@ export function buildAutoDeck(monsters: readonly string[]): Deck {
 }
 
 /** 妨害の技（ちょうはつ・すなかけ・ダストキック・いたずら・吠える など） */
-const DISRUPT_EFFECTS = ['seal', 'weaken', 'taunt', 'handToDeck', 'discardRandom'];
+const DISRUPT_EFFECTS = ['seal', 'weaken', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice'];
 /** 守りの技（防御・回避・しめったはだ・すなをほる・みずあび） */
 const GUARD_EFFECTS = ['defense', 'evade', 'shield', 'hide', 'healSelf', 'healAlly', 'cover'];
 

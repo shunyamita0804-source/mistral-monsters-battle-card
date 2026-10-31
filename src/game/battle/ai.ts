@@ -9,6 +9,7 @@ import {
   cardUsability,
   cheerTargets,
   coverUser,
+  defaultDiscardChoice,
   fieldModifier,
   guardCost,
   isPinned,
@@ -53,6 +54,8 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  *   （A は相手の場のモンスターの技の種類に合う守りを優先し、守りの分のマナも残す）
  * - 「ライフの少ない相手から狙う」はやめた（ユーザー指示 2026-10-30 23:11）
  * - 捨て身の技（シシエン。2026-10-31 指示書 AB）：使うモンスターのライフが反動で倒れるほど少ないときは、相手の最後の1体を倒せるときだけ使う。C は 30% でこの気づかいを忘れる
+ * - カラスのめ（デスオル。2026-10-31 指示書 AG）：その手番に相手を倒せる攻撃が無く、相手の手札が3枚以上のときに使う。
+ *   捨てさせる1枚は A・B が engine.ts の defaultDiscardChoice（倒せる攻撃 → いちばん強い攻撃 → 条件の無い回避 → 防御）、C はランダム
  * - 構えは腕前より優先（aggressive は A でも守らない・守りを残さない。guard は守りを2枚残す）
  */
 
@@ -252,6 +255,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const windRide = chooseWindRide(state, side, options);
   if (windRide) return windRide;
 
+  // 2.9 デスオル（2026-10-31 指示書 AG）。カラスのめ
+  const crow = chooseCrowEye(state, side, options, skill);
+  if (crow) return crow;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
@@ -312,6 +319,30 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
 
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
+}
+
+/** カラスのめを使う、相手の手札の枚数の下限（2026-10-31 指示書 AG） */
+const CROW_EYE_MIN_HAND = 3;
+
+/**
+ * カラスのめ（デスオル 2026-10-31 指示書 AG）：その手番に相手を倒せる攻撃が無く、相手の手札が3枚以上のときに使う。
+ * 同じ手番に2回は使わない（デスオルは1手番に1回しか動けないので、もともと1回）。捨てさせる1枚は pickDiscardChoice
+ */
+function chooseCrowEye(state: BattleState, side: Side, options: Option[], skill: CpuSkill): BattleAction | null {
+  const crow = options.filter(isSkillOption).find((o) => o.def.effect.type === 'discardChoice');
+  if (!crow) return null;
+  if (state.sides[otherSide(side)].hand.length < CROW_EYE_MIN_HAND) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  const choice = pickDiscardChoice(state, side, skill);
+  return choice ? { type: 'useCard', side, cardUid: crow.card.uid, choice } : null;
+}
+
+/** カラスのめで捨てさせる相手の手札の uid（腕前 A・B は engine.ts の defaultDiscardChoice、C はランダムに1枚） */
+export function pickDiscardChoice(state: BattleState, side: Side, skill: CpuSkill = 'B'): string | null {
+  const hand = state.sides[otherSide(side)].hand;
+  if (hand.length === 0) return null;
+  if (skill === 'C') return hand[Math.floor(cpuRoll(state, side, 'crowEye') * hand.length)]?.uid ?? null;
+  return defaultDiscardChoice(state, side)?.uid ?? null;
 }
 
 /** 旅の手帳を使う山札の枚数の下限（2026-10-30 指示書 Z） */

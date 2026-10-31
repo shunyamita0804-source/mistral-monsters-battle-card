@@ -199,6 +199,8 @@ export interface BattleState {
    * 画面は seq が変わったときだけ表を見せる（手札そのものは動かさない。ふだん相手の手札は裏向きのまま）
    */
   readonly reveal?: { readonly seq: number; readonly viewer: Side; readonly cardIds: readonly string[] } | null;
+  /** カラスのめ（2026-10-31 指示書 AG）で最後に捨てさせたカード（画面が CPU のふきだしで知らせる。seq で同じものを2度出さない） */
+  readonly crowEye?: { readonly seq: number; readonly chooser: Side; readonly cardId: string } | null;
 }
 
 export type BattleAction =
@@ -460,7 +462,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   // じならし：1ターンに1回（2026-10-29 指示書）
   if (skill.effect.type === 'pin' && (state.sides[side].turnUsage[PIN_USAGE] ?? 0) >= 1) return NO(t('battle.ng.usedThisTurn'));
   // いたずら・不思議な嗅覚：相手の手札がないときは使えない（いたずらは 2026-10-24 ユーザー指示。嗅覚も同じ扱い）
-  if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'discardRandom' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
+  if ((skill.effect.type === 'handToDeck' || skill.effect.type === 'discardRandom' || skill.effect.type === 'discardChoice' || skill.effect.type === 'revealHand') && state.sides[otherSide(side)].hand.length === 0) {
     return NO(t('battle.ng.noOpponentHand'));
   }
   // みちしお（セレフィーン 2026-10-29）：山札が足りないときは使えない（灰色。使って負けにはしない）
@@ -1084,6 +1086,8 @@ function useCard(
       return handToDeck(next, otherSide(side));
     case 'discardRandom':
       return discardRandom(next, otherSide(side));
+    case 'discardChoice':
+      return discardChoice(next, side, choice);
     case 'redrawHand':
       return redrawHand(next, side);
     case 'revealHand':
@@ -1158,6 +1162,62 @@ function discardRandom(state: BattleState, side: Side): BattleState {
   const card = s.hand[pick.value] as HandCard;
   const next = updateSide({ ...state, seed: pick.seed }, side, { hand: s.hand.filter((c) => c.uid !== card.uid), discard: [...s.discard, card.cardId] });
   return addLog(next, t('battle.log.discardRandom', { player: s.name, card: nameOf(card.cardId) }));
+}
+
+/**
+ * カラスのめ（正式：デスオル 2026-10-31 指示書 AG）「相手の手札をすべて見て、1枚選んで捨てさせる」：
+ * side が相手の手札から選んだ1枚（choice＝相手の手札の uid）を、相手の捨て札へ。相手は補充しない。
+ * 選んだカードが手札に無い・指定が無いとき（試遊・テスト）は、CPU と同じ選び方（ai.ts の pickDiscardChoice と同じ順）の1枚。
+ * 相手の手札が0枚なら使えない（cardUsability。吠えると同じ）。捨てたカードは記録の帯に出し、画面に知らせる（state.crowEye）
+ */
+function discardChoice(state: BattleState, side: Side, choice: string | undefined): BattleState {
+  const victim = otherSide(side);
+  const s = state.sides[victim];
+  if (s.hand.length === 0) return state;
+  const card = s.hand.find((c) => c.uid === choice) ?? defaultDiscardChoice(state, side);
+  if (!card) return state;
+  const next: BattleState = {
+    ...updateSide(state, victim, { hand: s.hand.filter((c) => c.uid !== card.uid), discard: [...s.discard, card.cardId] }),
+    crowEye: { seq: (state.crowEye?.seq ?? 0) + 1, chooser: side, cardId: card.cardId },
+  };
+  return addLog(next, t('battle.log.discardChoice', { player: s.name, card: nameOf(card.cardId) }));
+}
+
+/**
+ * カラスのめで捨てさせる1枚の決まった選び方（CPU の腕前 A・B と同じ。ai.ts の pickDiscardChoice もこれを使う）：
+ * ① 次の相手の手番に払えるマナで使える攻撃技のうち、side のモンスターを倒せるもの（いちばんダメージの大きいもの）
+ * ② 無ければ、いちばんダメージの大きい攻撃技 → ③ 攻撃技が無ければ、条件の無い回避 → ④ 防御 → ⑤ 残りの左はし
+ */
+export function defaultDiscardChoice(state: BattleState, side: Side): HandCard | undefined {
+  const victim = otherSide(side);
+  const vs = state.sides[victim];
+  const hand = vs.hand;
+  const skillOf = (c: HandCard): SkillCard | null => {
+    const card = getPlayCard(c.cardId);
+    return card.kind === 'skill' ? card : null;
+  };
+  // 相手の生きているモンスターが使える攻撃技（持ち主が生きているもの）
+  const alive = vs.monsters.filter((m) => m.life > 0).map((m) => m.cardId);
+  const attacks = hand
+    .map((c) => ({ c, k: skillOf(c) }))
+    .filter((x): x is { c: HandCard; k: SkillCard } => !!x.k && x.k.effect.type === 'attack' && !!x.k.stat && alive.includes(x.k.monsterId));
+  const power = (k: SkillCard): number => k.stat?.value ?? 0;
+  // 次の相手の手番に払えるマナ：いまの相手のマナ（マナ化は攻撃のあとなので、次の手番の攻撃には使えない）
+  const mana = manaOf(vs);
+  const mine = state.sides[side].monsters.filter((m) => m.life > 0);
+  const kills = attacks
+    .filter((x) => x.k.cost <= mana && mine.some((m) => m.life <= power(x.k)))
+    .sort((a, b) => power(b.k) - power(a.k));
+  if (kills[0]) return kills[0].c;
+  const strongest = [...attacks].sort((a, b) => power(b.k) - power(a.k))[0];
+  if (strongest) return strongest.c;
+  const evade = hand.find((c) => {
+    const k = skillOf(c);
+    return !!k && k.effect.type === 'evade' && !k.effect.minCost && guardMaxCost(k) === null;
+  });
+  if (evade) return evade;
+  const defense = hand.find((c) => skillOf(c)?.effect.type === 'defense');
+  return defense ?? hand[0];
 }
 
 /**

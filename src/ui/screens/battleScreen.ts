@@ -143,6 +143,7 @@ function showcaseSound(card: PlayCard): SoundId {
     case 'taunt':
     case 'handToDeck':
     case 'discardRandom':
+    case 'discardChoice':
     case 'shield':
     case 'healSelf':
     case 'healAlly':
@@ -630,6 +631,8 @@ export const battleScreen: ScreenDefinition = {
 
     /** 見せ終えた「相手の手札の確認」（engine の reveal の seq。同じものを2度出さない） */
     let shownRevealSeq = 0;
+    /** ふきだしで言い終えたカラスのめ（engine の crowEye の seq） */
+    let shownCrowSeq = 0;
     /** 不思議な嗅覚（正式：ノビトン 2026-10-25）：相手の手札をすべて表で見せる窓。手札そのものは裏向きのまま動かさない */
     const showReveal = (cardIds: readonly string[]): void => {
       const handle = openModal(element, {
@@ -657,6 +660,13 @@ export const battleScreen: ScreenDefinition = {
       state = next;
       targeting = null;
       // 自分が不思議な嗅覚を使ったら、カードを大きく見せたあとに相手の手札を表で見せる（相手が使ったときは経過の1行だけ）
+      // 相手（CPU）がカラスのめを使ったら、捨てさせたカードをふきだしで言う（記録の帯にも出る。プレイヤーが何を失ったか分かるように。2026-10-31 指示書 AG）
+      const crow = state.crowEye;
+      if (crow && crow.chooser === 'opponent' && crow.seq !== shownCrowSeq) {
+        shownCrowSeq = crow.seq;
+        sayText(t('battle.talk.crowEye', { card: cardName(getPlayCard(crow.cardId)) }));
+        cpuLineUntil = talkUntil;
+      }
       const reveal = state.reveal;
       if (reveal && reveal.viewer === 'player' && reveal.seq !== shownRevealSeq) {
         shownRevealSeq = reveal.seq;
@@ -1034,6 +1044,11 @@ export const battleScreen: ScreenDefinition = {
         pickSupportCard(cardUid, card.effect.type);
         return;
       }
+      // カラスのめ（デスオル 2026-10-31 指示書 AG）：相手の手札を見せて1枚選ぶ（相手は選ばない）
+      if (card.kind === 'skill' && card.effect.type === 'discardChoice') {
+        pickCrowEye(cardUid);
+        return;
+      }
       // 相手全体への攻撃（試遊中：ジオルの地ひびき）は相手を選ばない
       const allTargets = card.kind === 'skill' && card.effect.type === 'attack' && !!card.effect.allTargets;
       // 投石（サポート）も相手1体を選ぶ
@@ -1102,6 +1117,58 @@ export const battleScreen: ScreenDefinition = {
           ),
         ],
         actions: [{ label: t('battle.pick.cancel'), onTap: () => handle.close() }],
+      });
+    };
+
+    /**
+     * カラスのめ（デスオル 2026-10-31 指示書 AG）：不思議な嗅覚と同じ窓に相手の手札を表で並べ、1枚をタップ →「これを捨てさせる」で決める。
+     * 「使う」を押したら使ったことになるので、やめるボタンは無く、窓の外を押しても閉じない（かならず1枚）
+     */
+    const pickCrowEye = (cardUid: string): void => {
+      if (!state) return;
+      const hand = state.sides.opponent.hand;
+      let picked: string | null = null;
+      const items = hand.map((c) =>
+        h(
+          'button',
+          {
+            class: 'battle-pick__item battle-crow__item',
+            attrs: { type: 'button', 'aria-label': cardName(c.cardId), 'aria-pressed': 'false' },
+            dataset: { uid: c.uid },
+            on: {
+              click: () => {
+                picked = c.uid;
+                for (const el of items) {
+                  const on = el.dataset.uid === c.uid;
+                  el.classList.toggle('is-picked', on);
+                  el.setAttribute('aria-pressed', on ? 'true' : 'false');
+                }
+                const ok = handle.element.querySelector<HTMLButtonElement>('.modal__actions .btn');
+                if (ok) ok.disabled = false;
+              },
+            },
+          },
+          createBattleCard(getPlayCard(c.cardId), { width: 74, size: 'hand' }),
+          h('span', { class: 'battle-pick__name', text: cardName(c.cardId) }),
+        ),
+      );
+      const handle = openModal(element, {
+        title: t('battle.crow.title'),
+        className: 'battle-pick battle-crow',
+        closeOnBackdrop: false,
+        body: [h('p', { class: 'modal__text', text: t('battle.crow.lead') }), h('div', { class: 'battle-pick__grid' }, ...items)],
+        actions: [
+          {
+            label: t('battle.crow.confirm'),
+            primary: true,
+            disabled: true,
+            onTap: () => {
+              if (picked === null) return;
+              handle.close();
+              dispatch({ type: 'useCard', side: 'player', cardUid, choice: picked });
+            },
+          },
+        ],
       });
     };
 

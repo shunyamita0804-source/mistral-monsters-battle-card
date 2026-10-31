@@ -10,6 +10,7 @@ import { TSUMUJI_MONSTER, TSUMUJI_SKILLS } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER, HYOUZUKU_SKILLS } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER, SHISHIEN_SKILLS } from './shishien.ts';
 import { HAKURAN_MONSTER, HAKURAN_SKILLS } from './hakuran.ts';
+import { DESUORU_MONSTER, DESUORU_SKILLS } from './desuoru.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -35,6 +36,7 @@ import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
  * 2026-10-30：ヒョウズクと技14種を足した（src/data/hyouzuku.ts。指示書 W）
  * 2026-10-31：シシエンと技14種を足した（src/data/shishien.ts。指示書 AB）
  * 2026-10-31：ハクランと技14種を足した（src/data/hakuran.ts。指示書 AF。手に入れ方はまだ無い）
+ * 2026-10-31：デスオルと技14種を足した（src/data/desuoru.ts。指示書 AG。初めての内部ランク A。手に入れ方はまだ無い）
  */
 
 interface MonsterSeed {
@@ -171,6 +173,7 @@ export const MONSTERS: readonly MonsterCard[] = [
   HYOUZUKU_MONSTER,
   SHISHIEN_MONSTER,
   HAKURAN_MONSTER,
+  DESUORU_MONSTER,
 ];
 
 export const SKILLS: readonly SkillCard[] = [
@@ -190,6 +193,7 @@ export const SKILLS: readonly SkillCard[] = [
   ...HYOUZUKU_SKILLS,
   ...SHISHIEN_SKILLS,
   ...HAKURAN_SKILLS,
+  ...DESUORU_SKILLS,
 ];
 
 /**
