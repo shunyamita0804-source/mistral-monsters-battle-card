@@ -206,7 +206,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     expect(Object.values(RUN_DUNGEONS).map((c) => c.bossId).sort()).toEqual(Object.keys(ACES).sort());
   });
 
-  it('ボス8人の lifeScale（直す前の勝つ割合から ±3 ポイントに合わせ直した。イヴァン・バルカは入らず、いちばん近い値）', () => {
+  it('ボス8人の lifeScale（直す前の勝つ割合から ±3 ポイントに合わせ直した。イヴァン・テオは入らず、いちばん近い値）', () => {
     expect(Object.fromEntries(Object.keys(ACES).map((id) => [id, ENCOUNTERS[id]?.lifeScale]))).toEqual({
       // 2026-10-30 指示書 Y：サポートの入れ替えで最初の箱が変わったので、8人とも合わせ直した（ゼフィラは ±3 に入らない）
       // 指示書 Z：CPU の腕前を足して合わせ直した（テオは ±3 に入らない）
@@ -215,7 +215,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       'enc-water-boss': 1.25,
       'enc-wind-boss': 1.22,
       'enc-ice-boss': 1.05,
-      'enc-fire-boss': 1.09,
+      'enc-fire-boss': 1.08, // 2026-10-31 指示書 AC【2】：1.09 → 1.08（21.0％。V の目標 18.1％ ±3 に入った）
       'enc-machine-boss': 1.07,
       'enc-holy-boss': 1.08,
     });
