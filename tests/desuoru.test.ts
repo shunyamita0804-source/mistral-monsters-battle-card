@@ -40,6 +40,18 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
     expect(readFileSync('assets/images/cards/monsters/desuoru_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/desuoru_battleart.png`))).toBe(true);
   });
 
+  it('AG2 で直す前の JSON・CSV は _v1_20261031 として残す（しのささやき 3・めいかいのかぜ 4）', () => {
+    const v1 = JSON.parse(readFileSync(`${ORIGINAL_DIR}/desuoru14_skills_OFFICIAL_20261031_v1_20261031.json`, 'utf8'));
+    expect(v1.skills[3].damage).toBe('3');
+    expect(v1.skills[4].damage).toBe('4');
+    expect(csvRows(`${ORIGINAL_DIR}/desuoru14_skills_OFFICIAL_20261031_v1_20261031.csv`)[4]?.[4]).toBe('4');
+    expect(desuoruJson.life).toBe(7);
+  });
+
+  it('技カードの名前の帯は紺に寄せる（AG2。skillcard_simple_build.py の LIGHT_MIX）', () => {
+    expect(readFileSync('tools/art/skillcard_simple_build.py', 'utf8')).toContain("LIGHT_MIX = {'desuoru': 0.22}");
+  });
+
   it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 特殊技: 'special', 防御技: 'defense', 回避技: 'evade' } as const;
     const rows = csvRows('src/data/official/desuoru14_skills_OFFICIAL_20261031.csv');
@@ -68,8 +80,8 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
       ['いしづきでつく', 'force', 0, 1],
       ['てっこうのつめ', 'force', 1, 2],
       ['やみがらす', 'wisdom', 1, 2],
-      ['しのささやき', 'wisdom', 2, 3],
-      ['めいかいのかぜ', 'wisdom', 3, 4],
+      ['しのささやき', 'wisdom', 2, 4], // 2026-11-01 指示書 AG2：ダメージ 3→4
+      ['めいかいのかぜ', 'wisdom', 3, 5], // 2026-11-01 指示書 AG2：ダメージ 4→5
       ['しのゆびさし', 'wisdom', 4, 4],
       ['やみのやり', 'force', 5, 5],
       ['ヘルのもん', 'wisdom', 5, 7],
