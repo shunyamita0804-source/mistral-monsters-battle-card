@@ -15,13 +15,13 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * ガチャのシリーズは economy.ts の GACHA_SERIES に1行あるが、モンスターカードを持つまで並ばない
  *
  * 2026-10-31 指示書 AF2（ユーザー決定）：LIFE 6→7・4 ひづめげり ダメージ 2→3・9 てんをかける ダメージ 4→5。JSON・CSV を直し、前の版は
- *   design-parts/cards-original/hakuran/*_v1_20261031.* に残す。正式モンスターカードの絵は LIFE 7 の版が届くまで今の「LIFE 6」の絵のまま
- *   （届いたら tools/art/official_card_webp.py で hakuran_official.webp を作り直す）。モンスターカードの枠・パックの縁はハクランだけ暗く（ミュロルと見分けるため）
+ *   design-parts/cards-original/hakuran/*_v1_20261031.* に残す。正式モンスターカードの絵は LIFE 7 の版に差し替えた（下の「絵」）。モンスターカードの枠・パックの縁はハクランだけ暗く（ミュロルと見分けるため）
  *
  * ゲーム内 ID：mon-hakuran（ライフ7・内部ランク B。画面には出さない）、skl-hakuran-01〜14（JSON の no）
  * 絵（原本は design-parts/cards-original/hakuran/ に無改変）：
  * - 技 hakuran_sk_01〜14.webp（届いた hakuran_sk_NN.png を tools/art/card_art_webp.py で幅 827 の WebP に。番号＝技番号）
- * - 正式モンスターカード hakuran_official.webp（届いた hakuran_official_monstercard_LIFE6.png〔970×1622〕を tools/art/official_card_webp.py で 508×849 に）
+ * - 正式モンスターカード hakuran_official.webp（届いた hakuran_official_monstercard_LIFE6.png〔970×1622〕を tools/art/official_card_webp.py で 508×849 に）。
+ *   2026-10-31 指示書 AF2 の追加：LIFE 7 に直した hakuran_official_monstercard_LIFE7.png から作り直した（LIFE6 の原本も残す）
  * - バトル用 hakuran_battlecard.png（届いた hakuran_battleart.png を無改変。1169×1346）
  * 色：青緑（ティール）#237C7A（モンスターカード枠・技カード枠とも）
  * ガチャのレアの枠（JSON の gacha_slot）：08 らいうん・10 せいなるいかずち・14 かすみのあゆみ（HAKURAN_GACHA_RARE）
