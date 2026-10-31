@@ -1,12 +1,13 @@
-# 引き継ぎメモ（2026-10-31：AD のセッション終わり・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-10-31：AE のセッション終わり・次のセッションへの引き継ぎ用）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-10-31 AD のセッション終わり。同じセッションで AC→AD）
+### まず読む：いまの状態（2026-10-31 AE のセッション終わり。同じセッションで AC→AD→AE）
 
-- **main は AD まで取り込み済み・公開はまだ**（公開中は AB まで＝`static/index-DHXdFPGf.js`）。ユーザーの「公開して」を待つ。
+- **公開中：`main`（AE まで＝AC・AD・AE をまとめて公開。2026-10-31 指示書 AE「AD とまとめて公開」で公開。公開ページは `static/index-Bll-MbQ-.js`。deploy-pages の実行 152）**
+- AE（記録 `docs/rooms-ad-20261031.md` の最後）：花屋の観葉植物2つ・花台、仕立て屋の小物の棚・低い棚を調べられるように（当たり・今ある調べる所はそのまま）。写真の道具 `tools/e2e/shop_checks_ae_shot.cjs`。テスト 1052件
 - AD（記録 `docs/rooms-ad-20261031.md`）：研究所・花屋・仕立て屋を正面向きの絵に（`rooms4_build.py` の v2・`rooms_shop_build.py`。原本 `design-parts/rooms-frontfacing-20261031/`）。
   家3つの床と壁を左右まっすぐの壁に（`seimon_world_build.py` の `SHELL`・原本 `room_shell_*_frontwall_20261031.png`）。調べる所の名前・文は今のまま（花屋の花台・鉢植え、仕立て屋の左の棚2つは足していない）。
   報告 ZIP「AD作業報告_20261031.zip」。ブランチ `ad-rooms` は main に取り込み済み。写真の道具 `tools/e2e/rooms_ad_shot.cjs`
@@ -20,11 +21,11 @@
 - 写真の道具：`tools/e2e/battle_layout_ac_shot.cjs`（対戦の乱数の種を決めて撮る）・`card_art_ac_shot.cjs`。正式モンスターカードを 508×849 にする道具 `tools/art/official_card_webp.py`
 - AB の返事待ちだった「バルカの強さ」は AC【2】で決着。AB の報告への感想（炭色の枠・説明の欄・薄く出す直前のカード）は AC の指示で返事が来た（説明の欄は AC【1】で直した）
 - **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は main から新しいブランチを切る
-- **ユーザーの返事待ち**：AC・AD の報告への感想・「公開して」
+- **ユーザーの返事待ち**：AC・AE の報告への感想（AD は合格）
 - 作業のこつ：Node 24 は `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` で入る（今回も自動では入らなかった）。街と部屋の絵の作り直し（`seimon_world_build.py`）は scipy と matplotlib が要る（`pip install scipy matplotlib`。約4分半）。
   前の版の写真は `git worktree add /tmp/wt_ab main` → 別のポートで `npx vite`（worktree が main を使っていると main に切り替えられないので、終わったら `git checkout --detach` するか消す）
 - **待っているもの**：部屋の家具の描き直し（まだ依頼していない）
-- **未完了**：iPhone 実機での確認（R〜AD）
+- **未完了**：iPhone 実機での確認（R〜AE）
 
 ### その前（2026-10-31 AB のセッション終わり）
 
