@@ -6,26 +6,30 @@
 
 ### まず読む：いまの状態（2026-10-31 AE のセッション終わり。同じセッションで AC→AD→AE）
 
-- **公開中：`main`（AE まで＝AC・AD・AE をまとめて公開。2026-10-31 指示書 AE「AD とまとめて公開」で公開。公開ページは `static/index-Bll-MbQ-.js`。deploy-pages の実行 152）**
-- AE（記録 `docs/rooms-ad-20261031.md` の最後）：花屋の観葉植物2つ・花台、仕立て屋の小物の棚・低い棚を調べられるように（当たり・今ある調べる所はそのまま）。写真の道具 `tools/e2e/shop_checks_ae_shot.cjs`。テスト 1052件
-- AD（記録 `docs/rooms-ad-20261031.md`）：研究所・花屋・仕立て屋を正面向きの絵に（`rooms4_build.py` の v2・`rooms_shop_build.py`。原本 `design-parts/rooms-frontfacing-20261031/`）。
-  家3つの床と壁を左右まっすぐの壁に（`seimon_world_build.py` の `SHELL`・原本 `room_shell_*_frontwall_20261031.png`）。調べる所の名前・文は今のまま（花屋の花台・鉢植え、仕立て屋の左の棚2つは足していない）。
-  報告 ZIP「AD作業報告_20261031.zip」。ブランチ `ad-rooms` は main に取り込み済み。写真の道具 `tools/e2e/rooms_ad_shot.cjs`
-- 公開は deploy-pages.yml を手動で動かす。セーブ version 31 のまま（AC・AD で変えていない）。テスト 1051件
+- **公開中：`main`（AE まで。AC・AD・AE をまとめて 2026-10-31 に公開。公開ページは `static/index-Bll-MbQ-.js`。deploy-pages の実行 152・成功）**。
+  **セーブ version 31**（AC〜AE で変えていない）。**テスト 1052件**。作業ブランチ（`ac1-battle-layout`・`ac2-barca-strength`・`ac3-card-art`・`ad-rooms`・`ae-shop-checks`）はすべて main に取り込み済み・使い終わり
 - AC【1】（記録 `docs/battle-layout-ac-20261031.md`）：相手3体と自分3体のあいだ 43→16・説明の欄 200→227・大きなカード 140×212（技を使った演出も同じ大きさ）。
   守りの選択はカメラ `defense`：相手のカードと説明は上の相手の大きなカードの欄のまま（176×266）、相手の手札の段を 0.3 秒でたたみ、自分3体の下に守りのカード（98 幅・使えないカードは薄く「使えない」1行・多いと重ねる）。守れるカードが無いときは上の説明に文
-- AC【2】（記録 `docs/barca-ac-20261031.md`）：バルカの lifeScale 1.09→**1.08**（ライフ 6・8・6・21.0%。目標 15.1〜21.1% に入った）。AB の「3体ともライフ7」は誤り（ガウル・ラズック 6、シシエン 7）
-- AC【3】【4】（記録 `docs/card-art-ac-20261031.md`）：ミュロルの正式モンスターカード `myurol_official.webp`（974×1615 を 508 幅＋上下に白 3・4）・バトル用の絵・パック（`pack_tint.py` の `WINDOW_FIT` で前と同じ収め方）・販売機の窓・ショップの棚。シシエンの正式カードを枠の金色なしの v2 に。
-  寝かせたカード `shop_card_*` は作り直したが、今のショップの絵には使われていない
-- 報告：ZIP「AC作業報告_20261031.zip」（報告書.html・写真・資料）をユーザーに渡した。作業ブランチ `ac1-battle-layout`・`ac2-barca-strength`・`ac3-card-art` は main に取り込み済み
-- 写真の道具：`tools/e2e/battle_layout_ac_shot.cjs`（対戦の乱数の種を決めて撮る）・`card_art_ac_shot.cjs`。正式モンスターカードを 508×849 にする道具 `tools/art/official_card_webp.py`
-- AB の返事待ちだった「バルカの強さ」は AC【2】で決着。AB の報告への感想（炭色の枠・説明の欄・薄く出す直前のカード）は AC の指示で返事が来た（説明の欄は AC【1】で直した）
+- AC【2】（記録 `docs/barca-ac-20261031.md`）：バルカの lifeScale 1.09→**1.08**（ライフ 6・8・6・21.0%。目標 15.1〜21.1% の上のはし寄り）。AB の「3体ともライフ7」は誤り（ガウル・ラズック 6、シシエン 7）
+- AC【3】【4】（記録 `docs/card-art-ac-20261031.md`）：ミュロルの正式モンスターカード `myurol_official.webp`（974×1615 を 508 幅＋上下に白 3・4）・バトル用の絵・パック（`pack_tint.py` の `WINDOW_FIT` で前と同じ収め方）・販売機の窓・ショップの棚。
+  シシエンの正式カードを枠の金色なしの v2 に。寝かせたカード `shop_card_*` は作り直したが、今のショップの絵には使われていない（報告済み）
+- AD（記録 `docs/rooms-ad-20261031.md`。**進行の検品で合格**）：研究所・花屋・仕立て屋を正面向きの絵に（`rooms4_build.py` の v2〔`v2src`〕・`rooms_shop_build.py`。原本 `design-parts/rooms-frontfacing-20261031/`）。
+  家3つの床と壁を左右まっすぐの壁に（`seimon_world_build.py` の `SHELL`・原本 `design-parts/seimon-world/room_shell_*_frontwall_20261031.png`）
+- AE（記録 `docs/rooms-ad-20261031.md` の最後）：花屋の観葉植物2つ・花台、仕立て屋の小物の棚・低い棚を調べられるように（範囲は家具の当たりの所だけ。当たり・今ある調べる所はそのまま。英語は仮訳）
+- 報告：AC・AD は ZIP（報告書.html・写真・資料）、AE は写真6枚をユーザーに渡した
+- 写真の道具：`tools/e2e/battle_layout_ac_shot.cjs`（対戦の乱数の種を決めて撮る）・`card_art_ac_shot.cjs`・`rooms_ad_shot.cjs`（部屋の当たりの網目は `?qa=1&hit=1`）・`shop_checks_ae_shot.cjs`。
+  正式モンスターカードを 508×849 にする道具 `tools/art/official_card_webp.py`
 - **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は main から新しいブランチを切る
 - **ユーザーの返事待ち**：AC・AE の報告への感想（AD は合格）
-- 作業のこつ：Node 24 は `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` で入る（今回も自動では入らなかった）。街と部屋の絵の作り直し（`seimon_world_build.py`）は scipy と matplotlib が要る（`pip install scipy matplotlib`。約4分半）。
-  前の版の写真は `git worktree add /tmp/wt_ab main` → 別のポートで `npx vite`（worktree が main を使っていると main に切り替えられないので、終わったら `git checkout --detach` するか消す）
 - **待っているもの**：部屋の家具の描き直し（まだ依頼していない）
 - **未完了**：iPhone 実機での確認（R〜AE）
+- 作業のこつ（AC〜AE で分かったこと）
+  - Node 24 は自動では入らなかった → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → 以後 `export PATH=/opt/nvm/versions/node/v24.22.2/bin:$PATH` を付けて `npm install`
+  - 街と部屋の絵の作り直し（`seimon_world_build.py`）は scipy と matplotlib が要る（`pip install scipy matplotlib`。約4分半）。部屋3つだけなら `rooms4_build.py`・`rooms_shop_build.py`（数秒。引数に確認画像の出力先）
+  - `npm run check` で、絵のファイルを1バイトずつ比べるテスト（kalshell・lazuck）が時間切れで落ちることがある（開発用サーバー・写真を同時に動かしているとき）。やり直すと通る
+  - 前の版の写真：`git worktree add --detach /tmp/wt_main main` → `node_modules` をリンク → 別のポートで `npx vite`（`--detach` にしないと main に切り替えられない）。終わったら `git worktree remove --force`
+  - 写真のセーブは、ページの中で `createNewSave` から作って `addInitScript` で入れる（開いていたタブを閉じるときに前のセーブが書き戻されることがあるので、新しいタブで読み込みの前に入れる）
+  - 公開：`deploy-pages.yml` を GitHub の道具（MCP）の `actions_run_trigger` で main に。`npm run build:pages` で手元の `dist/static/index-*.js` の名前を出しておくと、公開ページの切り替わりを curl で確かめられる
 
 ### その前（2026-10-31 AB のセッション終わり）
 
