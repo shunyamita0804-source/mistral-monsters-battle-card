@@ -189,9 +189,11 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale は V で直す前の勝つ割合 21.2％ から ±3 を目ざしたが、1.1 より上はライフを上げても 33〜36％ から下がらない（プレイヤーはほぼボスの山札切れでしか勝たない）。
   // 測った中でいちばん近い 1.3（1000回で 32.7％）にした。±3 には入っていない（docs/hyouzuku-w-20261030.md・npm run playtest:bosses）。指示書 Y で 1.2（20.1％）に
   'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.05, skill: 'A' },
-  // 炎の火山のボス（2026-10-31 指示書 AB）：切り札をガウルからシシエンに（真ん中）。ノビトンは外した。lifeScale は V の目標（18.1％ ±3）を目ざしたが、3体ともライフ7なので
-  // 1.0（29.1％）と 1.08 より上（11.0％）の2段にしか変わらず ±3 に入らない。いちばん近い今の 1.09 のまま（docs/shishien-ab-20261031.md・npm run playtest:barca）
-  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.09, skill: 'A' },
+  // 炎の火山のボス（2026-10-31 指示書 AB）：切り札をガウルからシシエンに（真ん中）。ノビトンは外した。
+  // lifeScale（2026-10-31 指示書 AC【2】）：ガウル・ラズックはライフ6、シシエンは7なので、ライフは3段に変わる（Math.round）。
+  // 1.0＝6・7・6（29.1％）、1.0714〜1.0833＝6・8・6（1.08 で 21.0％）、1.0834〜＝7・8・7（1.09 で 11.0％）。V の目標 18.1％ ±3 に入る 1.08 にした
+  // （最初の手持ち3箱 × 1000回・プレイヤー側は腕前 B・バルカは腕前 A。docs/design/barca-ac-20261031/・npm run playtest:barca。AB では「3体ともライフ7」と測り違えて 1.09 にしていた）
+  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
