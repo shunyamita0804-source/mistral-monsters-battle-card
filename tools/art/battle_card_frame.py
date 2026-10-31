@@ -24,6 +24,8 @@ SPECK_MAX, SPECK_SAT, SPECK_BR = 90, 70, 170
 TINT_STRENGTH = 0.95
 # この明るさ（0〜255）より暗い色は、枠の明るさもその色に寄せる（ほかの色は前と同じ）
 DARK = 90
+# 色はこの明るさより明るいが、暗い色と同じしかたで枠の明るさもその色に寄せるモンスター（2026-10-31 指示書 AF2：ハクランの青緑はそのままだとミュロルの水色と見分けにくい）
+FORCE_DARK = {'hakuran'}
 
 
 def clean_checker(im: np.ndarray) -> np.ndarray:
@@ -78,13 +80,13 @@ def clean_checker(im: np.ndarray) -> np.ndarray:
     return out
 
 
-def tint(im: np.ndarray, mask: np.ndarray, color: tuple[int, int, int]) -> np.ndarray:
+def tint(im: np.ndarray, mask: np.ndarray, color: tuple[int, int, int], dark: bool = False) -> np.ndarray:
     rgb = im[..., :3].astype(float)
     weights = np.array([0.3, 0.59, 0.11])
     lum = (rgb @ weights)[..., None]
     target = np.array(color, float)
     col = np.clip(target + (lum - target @ weights), 0, 255)
-    if target @ weights < DARK:
+    if dark or target @ weights < DARK:
         # 暗い色（シシエンの炭色）：明るさを残すと銀の枠（ヒョウズク）と見分けられないので、明るさもその色に寄せる。濃淡（金の明暗・輪郭）は少し残す（2026-10-31 指示書 AB）
         ref = float(np.median(lum[mask > 0.5]))
         col = np.clip(target + (lum - ref) * 0.6, 0, 255)
@@ -112,7 +114,7 @@ def main() -> None:
     for spec in colors:
         name, hex_color = spec.split('=')
         rgb = tuple(int(hex_color.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
-        Image.fromarray(tint(base, mask, rgb)).save(out / f'frame_{name}.png', optimize=True)
+        Image.fromarray(tint(base, mask, rgb, name in FORCE_DARK)).save(out / f'frame_{name}.png', optimize=True)
     print('ok')
 
 

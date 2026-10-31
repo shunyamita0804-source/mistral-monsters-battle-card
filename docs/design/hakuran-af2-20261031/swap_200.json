@@ -1,0 +1,443 @@
+{
+ "games": 200,
+ "skill": "A",
+ "base": {
+  "games": 1800,
+  "winA": 48.9,
+  "ko": 50.4,
+  "deckOut": 49.6,
+  "draws": 0,
+  "avgTurns": 35.6,
+  "attacksPerGame": 20.9,
+  "evaded": 3.8,
+  "defended": 15.1,
+  "hesitatePerGame": 0,
+  "misguardPerGame": 0,
+  "tsutaPerGame": 0,
+  "recoilPerGame": 0,
+  "recoilKoPerGame": 0,
+  "recoilLossGames": 0,
+  "winKo": 24,
+  "winDeckOut": 24.9,
+  "loseKo": 26.4,
+  "loseDeckOut": 24.6,
+  "undodgeablePerGame": 0.41,
+  "undodgeableBlockedPerGame": 0.03,
+  "undodgeableByMonsterPerGame": {
+   "mon-lazuck": 0.15,
+   "mon-nobiton": 0.26
+  },
+  "undodgeableBlockedByMonsterPerGame": {
+   "mon-lazuck": 0.01,
+   "mon-nobiton": 0.02
+  },
+  "supportsPerGame": {
+   "S01": 1.12,
+   "S02": 1.29
+  }
+ },
+ "subjects": {
+  "mon-hakuran": {
+   "name": "ハクラン",
+   "cards": [
+    {
+     "id": "skl-hakuran-01",
+     "copies": 2
+    },
+    {
+     "id": "skl-hakuran-02",
+     "copies": 2
+    },
+    {
+     "id": "skl-hakuran-03",
+     "copies": 2
+    },
+    {
+     "id": "skl-hakuran-04",
+     "copies": 2
+    },
+    {
+     "id": "skl-hakuran-05",
+     "copies": 2
+    },
+    {
+     "id": "skl-hakuran-06",
+     "copies": 1
+    },
+    {
+     "id": "skl-hakuran-07",
+     "copies": 1
+    },
+    {
+     "id": "skl-hakuran-09",
+     "copies": 1
+    },
+    {
+     "id": "skl-hakuran-11",
+     "copies": 1
+    },
+    {
+     "id": "skl-hakuran-12",
+     "copies": 1
+    },
+    {
+     "id": "skl-hakuran-13",
+     "copies": 1
+    }
+   ],
+   "all": {
+    "games": 5400,
+    "winA": 66.7,
+    "ko": 63.5,
+    "deckOut": 36.5,
+    "draws": 0,
+    "avgTurns": 33.7,
+    "attacksPerGame": 21.2,
+    "evaded": 3.6,
+    "defended": 14.4,
+    "hesitatePerGame": 0,
+    "misguardPerGame": 0,
+    "tsutaPerGame": 0,
+    "recoilPerGame": 0,
+    "recoilKoPerGame": 0,
+    "recoilLossGames": 0,
+    "winKo": 49.1,
+    "winDeckOut": 17.6,
+    "loseKo": 14.3,
+    "loseDeckOut": 19,
+    "undodgeablePerGame": 1.94,
+    "undodgeableBlockedPerGame": 0.13,
+    "undodgeableByMonsterPerGame": {
+     "mon-hakuran": 1.65,
+     "mon-lazuck": 0.11,
+     "mon-nobiton": 0.18
+    },
+    "undodgeableBlockedByMonsterPerGame": {
+     "mon-hakuran": 0.11,
+     "mon-lazuck": 0.01,
+     "mon-nobiton": 0.01
+    },
+    "supportsPerGame": {
+     "S01": 1.06,
+     "S02": 1.29
+    }
+   },
+   "rows": {
+    "booster-1#0": {
+     "out": "ソラモ",
+     "games": 600,
+     "winA": 64.3,
+     "ko": 67.8,
+     "deckOut": 32.2,
+     "draws": 0,
+     "avgTurns": 33.1,
+     "attacksPerGame": 21.4,
+     "evaded": 3.4,
+     "defended": 13.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 49.5,
+     "winDeckOut": 14.8,
+     "loseKo": 18.3,
+     "loseDeckOut": 17.3,
+     "undodgeablePerGame": 2.23,
+     "undodgeableBlockedPerGame": 0.17,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 2.23
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.17
+     },
+     "supportsPerGame": {
+      "S01": 1.11,
+      "S02": 1.27
+     }
+    },
+    "booster-1#1": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 74.5,
+     "ko": 66.8,
+     "deckOut": 33.2,
+     "draws": 0,
+     "avgTurns": 33.2,
+     "attacksPerGame": 21.6,
+     "evaded": 4.5,
+     "defended": 13.3,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 55,
+     "winDeckOut": 19.5,
+     "loseKo": 11.8,
+     "loseDeckOut": 13.7,
+     "undodgeablePerGame": 2.31,
+     "undodgeableBlockedPerGame": 0.17,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 2.31
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.17
+     },
+     "supportsPerGame": {
+      "S01": 1.07,
+      "S02": 1.28
+     }
+    },
+    "booster-1#2": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 66.2,
+     "ko": 63,
+     "deckOut": 37,
+     "draws": 0,
+     "avgTurns": 34.5,
+     "attacksPerGame": 21,
+     "evaded": 4.6,
+     "defended": 16.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 47,
+     "winDeckOut": 19.2,
+     "loseKo": 16,
+     "loseDeckOut": 17.8,
+     "undodgeablePerGame": 2.65,
+     "undodgeableBlockedPerGame": 0.16,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 2.65
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.16
+     },
+     "supportsPerGame": {
+      "S01": 1.09,
+      "S02": 1.31
+     }
+    },
+    "booster-2#0": {
+     "out": "ガウル",
+     "games": 600,
+     "winA": 72.7,
+     "ko": 72.8,
+     "deckOut": 27.2,
+     "draws": 0,
+     "avgTurns": 31.5,
+     "attacksPerGame": 19.8,
+     "evaded": 3.7,
+     "defended": 12.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 59.2,
+     "winDeckOut": 13.5,
+     "loseKo": 13.7,
+     "loseDeckOut": 13.7,
+     "undodgeablePerGame": 2.01,
+     "undodgeableBlockedPerGame": 0.11,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 0.92,
+      "mon-lazuck": 0.38,
+      "mon-nobiton": 0.71
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.03,
+      "mon-lazuck": 0.04,
+      "mon-nobiton": 0.03
+     },
+     "supportsPerGame": {
+      "S01": 1.08,
+      "S02": 1.28
+     }
+    },
+    "booster-2#1": {
+     "out": "ラズック",
+     "games": 600,
+     "winA": 55.2,
+     "ko": 62.2,
+     "deckOut": 37.8,
+     "draws": 0,
+     "avgTurns": 34.8,
+     "attacksPerGame": 22,
+     "evaded": 3,
+     "defended": 12.8,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 39,
+     "winDeckOut": 16.2,
+     "loseKo": 23.2,
+     "loseDeckOut": 21.7,
+     "undodgeablePerGame": 3.34,
+     "undodgeableBlockedPerGame": 0.26,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 2.4,
+      "mon-nobiton": 0.94
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.18,
+      "mon-nobiton": 0.08
+     },
+     "supportsPerGame": {
+      "S01": 1.18,
+      "S02": 1.29
+     }
+    },
+    "booster-2#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 86.7,
+     "ko": 91.7,
+     "deckOut": 8.3,
+     "draws": 0,
+     "avgTurns": 28.8,
+     "attacksPerGame": 19.1,
+     "evaded": 4.5,
+     "defended": 14.6,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 82.7,
+     "winDeckOut": 4,
+     "loseKo": 9,
+     "loseDeckOut": 4.3,
+     "undodgeablePerGame": 2.24,
+     "undodgeableBlockedPerGame": 0.16,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 1.62,
+      "mon-lazuck": 0.63
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.11,
+      "mon-lazuck": 0.06
+     },
+     "supportsPerGame": {
+      "S01": 0.85,
+      "S02": 1.2
+     }
+    },
+    "booster-3#0": {
+     "out": "カルシェル",
+     "games": 600,
+     "winA": 56.7,
+     "ko": 47.5,
+     "deckOut": 52.5,
+     "draws": 0,
+     "avgTurns": 36,
+     "attacksPerGame": 22.4,
+     "evaded": 3.2,
+     "defended": 12.2,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 32.3,
+     "winDeckOut": 24.3,
+     "loseKo": 15.2,
+     "loseDeckOut": 28.2,
+     "undodgeablePerGame": 1.01,
+     "undodgeableBlockedPerGame": 0.09,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 1.01
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.09
+     },
+     "supportsPerGame": {
+      "S01": 1.1,
+      "S02": 1.31
+     }
+    },
+    "booster-3#1": {
+     "out": "ミュロル",
+     "games": 600,
+     "winA": 56.7,
+     "ko": 42,
+     "deckOut": 58,
+     "draws": 0,
+     "avgTurns": 36.7,
+     "attacksPerGame": 21.9,
+     "evaded": 2.6,
+     "defended": 17.2,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 30,
+     "winDeckOut": 26.7,
+     "loseKo": 12,
+     "loseDeckOut": 31.3,
+     "undodgeablePerGame": 0.94,
+     "undodgeableBlockedPerGame": 0.04,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 0.94
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.04
+     },
+     "supportsPerGame": {
+      "S01": 1.05,
+      "S02": 1.36
+     }
+    },
+    "booster-3#2": {
+     "out": "ノビトン",
+     "games": 600,
+     "winA": 67.7,
+     "ko": 57.3,
+     "deckOut": 42.7,
+     "draws": 0,
+     "avgTurns": 35.3,
+     "attacksPerGame": 21.4,
+     "evaded": 2.7,
+     "defended": 16.1,
+     "hesitatePerGame": 0,
+     "misguardPerGame": 0,
+     "tsutaPerGame": 0,
+     "recoilPerGame": 0,
+     "recoilKoPerGame": 0,
+     "recoilLossGames": 0,
+     "winKo": 47.7,
+     "winDeckOut": 20,
+     "loseKo": 9.7,
+     "loseDeckOut": 22.7,
+     "undodgeablePerGame": 0.76,
+     "undodgeableBlockedPerGame": 0.04,
+     "undodgeableByMonsterPerGame": {
+      "mon-hakuran": 0.76
+     },
+     "undodgeableBlockedByMonsterPerGame": {
+      "mon-hakuran": 0.04
+     },
+     "supportsPerGame": {
+      "S01": 1.06,
+      "S02": 1.32
+     }
+    }
+   }
+  }
+ }
+}
