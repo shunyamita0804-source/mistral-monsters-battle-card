@@ -24,7 +24,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / 'assets' / 'images' / 'ui' / 'gacha'
-PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'tools']
+PACKS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'tools']
 # パックの絵がほかの所にあるもの：道具のパック（仮）は届いた窓の絵 pack_art_tools.png から pack_tint.py で作った袋（2026-10-30 指示書 Z）
 PACK_PATH = {'tools': Path(__file__).resolve().parents[2] / 'design-parts' / 'support-art-z-20261030' / 'build' / 'pack_tools.png'}
 PACK_SIZE = (600, 1080)

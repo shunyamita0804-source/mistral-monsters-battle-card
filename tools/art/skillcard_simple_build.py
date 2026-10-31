@@ -47,6 +47,7 @@ MONSTER_COLORS = {
     'tsumuji': '#8FA3B8',  # 2026-10-30 ツムジ（くすんだ青みの灰）
     'hyouzuku': '#C8CCD4',  # 2026-10-30 ヒョウズク（銀に近い白。指示書 W）
     'shishien': '#3E3A3F',  # 2026-10-31 シシエン（炭色。指示書 AB）
+    'hakuran': '#237C7A',  # 2026-10-31 ハクラン（青緑・ティール。指示書 AF）
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

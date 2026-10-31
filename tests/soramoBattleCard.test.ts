@@ -125,7 +125,7 @@ describe('ソラモのバトル用カード（2026-10-25 正式素材）', () =>
   }, 30000);
 
   it('バトル用カードは、いまはソラモ・ラズック・ノビトン・ミュロル・カルシェル・ガウル（2026-10-27）', () => {
-    expect(Object.keys(BATTLE_CARDS)).toEqual([SORAMO_MONSTER_ID, 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-gauul']);
+    expect(Object.keys(BATTLE_CARDS)).toEqual([SORAMO_MONSTER_ID, 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran', 'mon-gauul']);
     // 正式モンスターはすべてバトル用カードがある（対戦で枠・名前・ライフのないカードが出ない）
     for (const id of ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell']) expect(BATTLE_CARDS[id], id).toBeDefined();
     expect(MONSTERS.some((m) => m.id === SORAMO_MONSTER_ID)).toBe(true);

@@ -31,8 +31,8 @@ const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
-  it('14シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'tools']);
+  it('15シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン・ハクラン）。どれも 150G・5枚', () => {
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'tools']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -70,6 +70,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       tsumuji: ['かまいたち', 'ストームブレイド', 'かぜよみ'],
       hyouzuku: ['ふぶき', 'ひょうが', 'おとなきはばたき'],
       shishien: ['れんごくのとっしん', 'ほのおのほうこう', 'かげろう'],
+      hakuran: ['らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
     };
     for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
   });

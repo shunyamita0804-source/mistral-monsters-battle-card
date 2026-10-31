@@ -34,6 +34,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-hyouzuku': { x: 0.64, y: 0.34, zoom: 1.6 },
   // シシエン（2026-10-31 指示書 AB）：顔は絵の上のほうの真ん中
   'mon-shishien': { x: 0.5, y: 0.3, zoom: 1.6 },
+  // ハクラン（2026-10-31 指示書 AF）：顔は絵の上のほうの真ん中より右（角とひげが切れすぎないように）
+  'mon-hakuran': { x: 0.74, y: 0.24, zoom: 1.6 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {
