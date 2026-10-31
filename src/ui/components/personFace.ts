@@ -40,6 +40,8 @@ import faceOtto from '@assets/images/characters/face_battler_machine_otto.webp';
 import faceMina from '@assets/images/characters/face_battler_holy_mina.webp';
 import faceZephyra from '@assets/images/characters/face_guardian_wind_zephyra.webp';
 import faceNiko from '@assets/images/characters/face_battler_wind.webp';
+import faceStella from '@assets/images/characters/face_guardian_thunder_stella.webp';
+import faceLuka from '@assets/images/characters/face_battler_thunder.webp';
 import type { Person } from '../../data/people.ts';
 import { h } from '../dom.ts';
 
@@ -93,6 +95,8 @@ const PERSON_FACES: Readonly<Record<string, string>> = {
   mina: faceMina,
   zephyra: faceZephyra,
   niko: faceNiko,
+  stella: faceStella,
+  luka: faceLuka,
 };
 
 export function personFaceUrl(person: Person): string | undefined {

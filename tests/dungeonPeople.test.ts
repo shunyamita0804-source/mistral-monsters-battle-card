@@ -7,7 +7,7 @@ import { getPerson, PEOPLE, personOfOpponent } from '../src/data/people.ts';
 const KEEPERS = ['grant', 'sera', 'lucia', 'ivan', 'balka', 'teo', 'aurelio'];
 const BATTLERS = ['pia', 'hans', 'zack', 'otto', 'mina'];
 /** RUN_DUNGEON_IDS の並び（風の渓谷〔2026-10-30 指示書 U〕は水の神殿の次）の守り手 */
-const KEEPERS_IN_RUN_ORDER = ['grant', 'sera', 'lucia', 'zephyra', 'ivan', 'balka', 'teo', 'aurelio'];
+const KEEPERS_IN_RUN_ORDER = ['grant', 'sera', 'lucia', 'zephyra', 'ivan', 'balka', 'stella', 'teo', 'aurelio'];
 
 describe('ダンジョンの人物12人（2026-10-28）', () => {
   it('名刺図鑑の No. は 29〜40（今の 1〜28 は変えない）。どの人もせりふが日本語と英語の両方', () => {
@@ -24,7 +24,7 @@ describe('ダンジョンの人物12人（2026-10-28）', () => {
   });
 
   it('8つのダンジョン（2026-10-30 に風の渓谷）のボスは、そのダンジョンの守り手（編成・強さは変えない）。勝ったあとのひと言（祭壇へ）がある', () => {
-    expect(RUN_DUNGEON_IDS).toHaveLength(8);
+    expect(RUN_DUNGEON_IDS).toHaveLength(9); // 2026-11-01 指示書 AH：雷の高原
     RUN_DUNGEON_IDS.forEach((id, i) => {
       const boss = runBossOpponent(id);
       const person = personOfOpponent(boss);
@@ -36,7 +36,7 @@ describe('ダンジョンの人物12人（2026-10-28）', () => {
     // 遺跡のボスのモンスターはジオル（2026-10-29 から）、森はフルーネ（2026-10-29 フルーネの最終から）
     expect(runBossOpponent('dungeon-01').monsters[1]).toBe('mon-geol');
     expect(runBossOpponent('dungeon-02').monsters[1]).toBe('mon-flune');
-    expect(DUNGEONS).toHaveLength(8);
+    expect(DUNGEONS).toHaveLength(9);
   });
 
   it('新しい5つのバトラーは「そのダンジョンの人＋今の3人のうち2人」（1つの階で同じ人は出ない）。遺跡・森は今の3人のまま', () => {

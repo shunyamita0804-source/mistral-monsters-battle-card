@@ -17,6 +17,12 @@ export type FloorDecorKind =
   | 'mill'
   | 'leaves'
   | 'stake'
+  // 雷の高原（2026-11-01 指示書 AH）：小さな石の柱・倒れた柱のかけら・焦げた岩・草むら・避雷の鉄の棒（イベントの 'pillar' と分けるため名前を変えた）
+  | 'stonepillar'
+  | 'fallenpillar'
+  | 'scorched'
+  | 'tuft'
+  | 'rod'
   // 2026-10-29 イベントのダンジョン3つ（まだダンジョンとしては足していない。src/ui/components/eventDungeonArt.ts）
   | 'rail'
   | 'ore'
@@ -66,6 +72,17 @@ const DECOR_RULES: Readonly<Record<string, DecorRule>> = {
       { kind: 'mill', variants: 1, weight: 1 },
       { kind: 'stake', variants: 1, weight: 1 },
       { kind: 'bridge', variants: 1, weight: 1 },
+    ],
+  },
+  // 雷の高原（2026-11-01 指示書 AH）：草むらを多めに、石の柱・倒れた柱・焦げた岩・避雷の鉄の棒を少し
+  'dungeon-09': {
+    rate: 0.06,
+    kinds: [
+      { kind: 'tuft', variants: 1, weight: 3 },
+      { kind: 'stonepillar', variants: 1, weight: 1 },
+      { kind: 'fallenpillar', variants: 1, weight: 1 },
+      { kind: 'scorched', variants: 1, weight: 1 },
+      { kind: 'rod', variants: 1, weight: 1 },
     ],
   },
   // イベントのダンジョン3つ（2026-10-29。ID は仮で、まだどの階にも出ない。src/ui/components/eventDungeonArt.ts）

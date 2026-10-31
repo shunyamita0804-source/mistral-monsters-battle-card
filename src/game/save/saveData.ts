@@ -1,4 +1,5 @@
 import { readSavedName } from '../player/playerName.ts';
+import type { ThunderState } from '../dungeon/thunder.ts';
 import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
 import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
@@ -35,7 +36,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
 import { EMPTY_PEOPLE_BOOK, normalizePeopleBook, ownedCardIds, rescuePeopleBook, type PeopleBook } from '../people/peopleBook.ts';
 import { grantPendingBooster, LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
 import type { StarterDeckKey } from '../../data/introV2.ts';
-import { START_DATE } from '../../data/calendar.ts';
+import { START_DATE, THUNDER_BOSS_WAIVED_FLAG } from '../../data/calendar.ts';
 
 /**
  * セーブデータ（カード所持・通貨・パック解放・欠片・大会実績・ダンジョン進捗・デッキを一元管理）。
@@ -44,7 +45,7 @@ import { START_DATE } from '../../data/calendar.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 31;
+export const SAVE_VERSION = 32;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -170,6 +171,8 @@ export interface DungeonRun {
   readonly sealedCard: string | null;
   /** スイッチを押して扉を開けた階（機械の塔。その階にいる間だけ開いたまま。下りたら閉じた扉の新しい階） */
   readonly switchFloor: number | null;
+  /** 雷の高原（2026-11-01 指示書 AH）の落雷の予告（ほかのダンジョン・前のセーブは無い。src/game/dungeon/thunder.ts） */
+  readonly thunder?: ThunderState | null;
 }
 
 /** 挑戦を始めたときの道具の効き目（どれも効いていない） */
@@ -747,6 +750,17 @@ function migrateShishienAltarV31(raw: RawObject): RawObject {
   return { ...raw, storyFlags: owe ? [...flags, BARCA_ALTAR_OWED_FLAG] : flags };
 }
 
+/**
+ * v31 → v32（2026-11-01 指示書 AH）：B の大会の条件に雷の高原のボスを足した。
+ * すでに B 以上のセーブは、雷の高原のボスを倒していなくても今までどおり B の大会に出られるよう、条件からはずす記録（THUNDER_BOSS_WAIVED_FLAG）を付ける
+ */
+function migrateThunderBossWaiverV32(raw: RawObject): RawObject {
+  const rank = typeof raw.rank === 'string' && (RANK_ORDER as readonly string[]).includes(raw.rank) ? (raw.rank as RankId) : null;
+  const flags = Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]) : [];
+  if (!rank || !rankAtLeast(rank, 'B') || flags.includes(THUNDER_BOSS_WAIVED_FLAG)) return raw;
+  return { ...raw, storyFlags: [...flags, THUNDER_BOSS_WAIVED_FLAG] };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -781,6 +795,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   28: (raw) => ({ ...raw, calendar: START_DATE }),
   29: migrateHyouzukuAltarV30,
   30: migrateShishienAltarV31,
+  31: migrateThunderBossWaiverV32,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -933,7 +948,16 @@ function normalizeDungeonRun(v: unknown): DungeonRun | null {
     sealBoxUsed: asBool(v.sealBoxUsed, false) || typeof v.sealedCard === 'string',
     sealedCard: typeof v.sealedCard === 'string' && cardCatalog.get(v.sealedCard) ? v.sealedCard : null,
     switchFloor: asFloorOrNull(v.switchFloor),
+    // 雷の高原の予告があるときだけ（ほかのダンジョンの挑戦は今までと同じ形）
+    ...(normalizeThunder(v.thunder) ? { thunder: normalizeThunder(v.thunder) } : {}),
   };
+}
+
+/** 雷の高原の落雷の予告（2026-11-01 指示書 AH）。形がおかしければ無し（次の1歩から新しく出る） */
+function normalizeThunder(v: unknown): ThunderState | null {
+  if (!isObject(v) || !Array.isArray(v.marks)) return null;
+  const marks = (v.marks as unknown[]).flatMap((p) => (isObject(p) && typeof p.x === 'number' && typeof p.y === 'number' ? [{ x: Math.floor(p.x), y: Math.floor(p.y) }] : []));
+  return { floor: asCount(v.floor), step: asCount(v.step), marks };
 }
 
 const asFloorOrNull = (v: unknown): number | null => (typeof v === 'number' && Number.isInteger(v) && v >= 0 ? v : null);

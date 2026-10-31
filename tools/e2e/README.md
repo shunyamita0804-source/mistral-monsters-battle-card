@@ -131,3 +131,11 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 | スクリプト | 内容 |
 | --- | --- |
 | `desuoru_ag_shot.cjs` | 図鑑・大きなカード（6・7・10・14）・手札（セレフィーン・ラズック・シシエンの枠と並べる）・技14枚・カラスのめ（プレイヤーが選ぶ窓・CPU のふきだし）・やみのやり・かげにとける・ガチャ・アイコン。開発用サーバー。`ONLY` でしぼれる |
+
+## 2026-11-01 雷の高原（指示書 AH。`docs/thunder-plateau-ah-20261101.md`）
+
+| スクリプト | 内容 |
+| --- | --- |
+| `thunder_plateau_shot.cjs` | ダンジョンを選ぶ所・入るときの絵・床と飾り・落雷（予告・稲妻・「雷に打たれた！」→ 番人）・ルカ・ステラ・祭壇でハクラン。セーブのフォルダに base.json・thunder_safe.json・thunder_strike.json・thunder_floor.json（__dir）・npc_dungeon-09.json・boss_dungeon-09.json |
+
+- 大会の受付は `{hall,49,29,up}`、掲示板は `{bureau,16,19,left}`（calendar_shot.cjs の場所は部屋の作り直しで古い）

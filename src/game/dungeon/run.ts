@@ -8,6 +8,7 @@ import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
 import { generateFloor, isWalkableTile, isWindTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 import { advanceMonth } from '../calendar/calendar.ts';
+import { strikeGuardianId, thunderStep } from './thunder.ts';
 
 /**
  * ランダム生成のダンジョンの挑戦（2026-10-26 試作。GB 版のダンジョンを参考に）。DOM に依存しない純粋関数。
@@ -177,8 +178,12 @@ export interface MoveResult {
   readonly gust?: Direction | null;
   /** 見えない番人の気配（近い） */
   readonly omen: boolean;
-  /** 見えない番人が対戦を挑んできた */
+  /** 見えない番人が対戦を挑んできた（雷の高原で雷に打たれたときも。thunderStruck） */
   readonly guardian: FloorEntity | null;
+  /** 雷の高原（2026-11-01 指示書 AH）：この1歩のあとに稲妻が落ちたマス（前の予告） */
+  readonly strikes?: readonly Point[];
+  /** 雷の高原：稲妻が落ちたマスに主人公がいた（雷に打たれた → 見えない番人との対戦） */
+  readonly thunderStruck?: boolean;
 }
 
 /** 近くの見えない番人（上下左右のマス数の合計がいちばん小さいもの）と、その距離 */
@@ -221,11 +226,23 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
       if (r.value < runConfig(run.dungeonId).guardianRate) guardian = near.guardian;
     }
   }
+  // 雷の高原（2026-11-01 指示書 AH）：前の予告のマスに稲妻が落ち、新しい予告を出す。打たれたら（ふだんの番人の抽選の代わりに）見えない番人との対戦
+  let strikes: readonly Point[] = [];
+  let thunderStruck = false;
+  if (runConfig(run.dungeonId).gimmick === 'thunder') {
+    const t = thunderStep(run.thunder, f, end, activeEntities(next, f), run.seed, run.floor);
+    next = { ...next, thunder: t.state };
+    strikes = t.strikes;
+    if (t.struck) {
+      thunderStruck = true;
+      guardian = { id: strikeGuardianId(run.floor, t.state.step), kind: 'guardian', x: end.x, y: end.y };
+    }
+  }
   const onStairs = !!f.stairs && f.stairs.x === end.x && f.stairs.y === end.y;
   // 風のマスで押し流された：通ったマス（最後のマスを除く）に風のマスがある
   const gustAt = [...path.slice(0, -1)].reverse().find((p) => isWindTile(f.tiles[p.y]?.[p.x]));
   const gust = gustAt ? WIND_DIRECTION[f.tiles[gustAt.y]?.[gustAt.x] ?? ''] ?? null : null;
-  return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian, gust };
+  return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian, gust, strikes, thunderStruck };
 }
 
 /** スイッチを調べた（機械の塔）：その階の扉が開く。もう開いていれば何もしない（opened: false） */
@@ -256,7 +273,7 @@ export function descend(run: DungeonRun): DungeonRun {
   const floor = run.floor + 1;
   const f = runFloor({ seed: run.seed, floor, dungeonId: run.dungeonId });
   // たいまつ・遺跡の地図は下りると切れる（使った階を覚えているので、別の階では効かない）
-  return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start, viewRadiusOf({ ...run, floor })) };
+  return { ...run, floor, x: f.start.x, y: f.start.y, dir: 'down', explored: reveal('', f, f.start, viewRadiusOf({ ...run, floor })), thunder: null };
 }
 
 /**
@@ -510,5 +527,7 @@ export function sanitizeRun(run: DungeonRun): DungeonRun | null {
   const fixed: DungeonRun = { ...run, floor, losses: Math.min(run.losses, maxLossesOf(run.dungeonId) - 1) };
   const onFloor = isWalkableTile(f.tiles[fixed.y]?.[fixed.x], doorsOpen(fixed)) && !entityAt(fixed, f, fixed.x, fixed.y);
   const at = onFloor && floor === run.floor ? { x: fixed.x, y: fixed.y } : f.start;
-  return { ...fixed, x: at.x, y: at.y, explored: reveal(floor === run.floor ? fixed.explored : '', f, at, viewRadiusOf(fixed)) };
+  // 雷の高原の予告は、階が変わった・位置を直したときは消す（次の1歩から新しく出る）
+  const thunder = run.thunder && run.thunder.floor === floor && at.x === run.x && at.y === run.y ? run.thunder : null;
+  return { ...fixed, x: at.x, y: at.y, explored: reveal(floor === run.floor ? fixed.explored : '', f, at, viewRadiusOf(fixed)), thunder };
 }

@@ -25,6 +25,7 @@ NAMES = [
     'guardian_fire_balka', 'guardian_machine_teo', 'guardian_holy_aurelio',
     'battler_water_pia', 'battler_ice_hans', 'battler_fire_zack', 'battler_machine_otto', 'battler_holy_mina',
     'guardian_wind_zephyra', 'battler_wind',
+    'guardian_thunder_stella', 'battler_thunder',  # 2026-11-01 指示書 AH：雷の高原のステラ・ルカ（顔の原本は 384×384）
 ]
 
 

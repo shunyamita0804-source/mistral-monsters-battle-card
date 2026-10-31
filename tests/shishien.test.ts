@@ -354,8 +354,8 @@ describe('炎の火山のボス（バルカ）・入手の流れ', () => {
     };
     const s = normalizeSave(JSON.parse(JSON.stringify(old)));
     if (!s) throw new Error('load');
-    expect(SAVE_VERSION).toBe(31);
-    expect(s.version).toBe(31);
+    expect(SAVE_VERSION).toBeGreaterThanOrEqual(31); // 2026-11-01 指示書 AH で 32 に
+    expect(s.version).toBe(SAVE_VERSION);
     expect(s.storyFlags).toEqual(expect.arrayContaining([BARCA_BEATEN_FLAG, BARCA_ALTAR_OWED_FLAG]));
     expect(availableGachaSeriesFor(s).map((x) => x.id)).not.toContain('shishien');
     expect(bossRewardCandidates(s, FIRE, BARCA_TEAM)).toEqual([]);

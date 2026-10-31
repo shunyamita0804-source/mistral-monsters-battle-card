@@ -1,4 +1,4 @@
-import { OFFICIAL_MONTHS, RANK_BOSS_DUNGEONS, START_DATE, TEAM_MONTH } from '../../data/calendar.ts';
+import { OFFICIAL_MONTHS, RANK_BOSS_DUNGEONS, START_DATE, TEAM_MONTH, WAIVED_BOSS_DUNGEONS } from '../../data/calendar.ts';
 import type { RankId } from '../../data/economy.ts';
 import type { GameDate, SaveData } from '../save/saveData.ts';
 
@@ -75,6 +75,8 @@ export function requiredBossDungeons(rank: RankId): readonly string[] {
 }
 
 /** そのランクの公式戦に出るのに、まだボスを倒していないダンジョン */
-export function missingBosses(save: Pick<SaveData, 'dungeons'>, rank: RankId): string[] {
-  return requiredBossDungeons(rank).filter((id) => save.dungeons[id]?.bossDefeated !== true);
+export function missingBosses(save: Pick<SaveData, 'dungeons'> & { readonly storyFlags?: readonly string[] }, rank: RankId): string[] {
+  // 前のセーブで条件からはずしたダンジョン（雷の高原。src/data/calendar.ts の WAIVED_BOSS_DUNGEONS）
+  const waived = new Set((save.storyFlags ?? []).flatMap((f) => WAIVED_BOSS_DUNGEONS[f] ?? []));
+  return requiredBossDungeons(rank).filter((id) => !waived.has(id) && save.dungeons[id]?.bossDefeated !== true);
 }

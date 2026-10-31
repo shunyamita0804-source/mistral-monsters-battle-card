@@ -290,10 +290,11 @@ describe('相手の CPU：今の思考のまま（回避されない攻撃は少
   });
 });
 
-describe('手に入れ方（まだ無い）', () => {
-  it('どのダンジョン・相手・箱にも入っていない', () => {
-    const text = JSON.stringify({ DUNGEONS, ENCOUNTERS, BOOSTERS });
-    expect(text).not.toContain('hakuran');
+describe('手に入れ方（2026-11-01 指示書 AH から雷の高原。それまではまだ無かった）', () => {
+  it('雷の高原（dungeon-09）の祭壇とボスのステラだけに入っている。箱には入っていない', () => {
+    expect(DUNGEONS.filter((d) => JSON.stringify(d).includes('hakuran')).map((d) => d.id)).toEqual(['dungeon-09']);
+    expect(Object.keys(ENCOUNTERS).filter((id) => JSON.stringify(ENCOUNTERS[id]).includes('hakuran'))).toEqual(['enc-thunder-boss']);
+    expect(JSON.stringify(BOOSTERS)).not.toContain('hakuran');
   });
 
   it('ガチャのシリーズ：シシエンのあとに1行（thunder-boss-beaten）。今のゲームでは並ばない。ハクランを持てば並ぶ', () => {
@@ -314,10 +315,10 @@ describe('手に入れ方（まだ無い）', () => {
     expect(gachaSeenFlag('hakuran')).toBeTruthy();
   });
 
-  it('src のどこにも thunder-boss-beaten を立てる所は無い（GACHA_SERIES の1行だけ）', () => {
+  it('thunder-boss-beaten は GACHA_SERIES と、雷の高原のボスに勝った記録（dungeons.ts の STELLA_BEATEN_FLAG）だけ', () => {
     const files = readdirSync('src', { recursive: true, encoding: 'utf8' }).filter((f) => f.endsWith('.ts'));
     const users = files.filter((f) => readFileSync(`src/${f}`, 'utf8').includes("'thunder-boss-beaten'"));
-    expect(users).toEqual(['data/economy.ts']);
+    expect(users.sort()).toEqual(['data/dungeons.ts', 'data/economy.ts']);
     expect(readFileSync('src/data/economy.ts', 'utf8').match(/'thunder-boss-beaten'/g)).toHaveLength(1);
   });
 });

@@ -26,6 +26,9 @@ import holyIntroTitle from '@assets/images/ui/dungeon_intro/holy_title.webp';
 import windIntroArt from '@assets/images/ui/dungeon_intro/wind_art.webp';
 import windIntroOverlay from '@assets/images/ui/dungeon_intro/wind_overlay.webp';
 import windIntroTitle from '@assets/images/ui/dungeon_intro/wind_title.webp';
+import thunderIntroArt from '@assets/images/ui/dungeon_intro/thunder_art.webp';
+import thunderIntroOverlay from '@assets/images/ui/dungeon_intro/thunder_overlay.webp';
+import thunderIntroTitle from '@assets/images/ui/dungeon_intro/thunder_title.webp';
 import { EVENT_DUNGEON_ART } from './eventDungeonArt.ts';
 
 /**
@@ -47,6 +50,8 @@ const DUNGEON_INTRO: Readonly<Record<string, { readonly art: string; readonly ti
   'dungeon-07': { art: holyIntroArt, title: holyIntroTitle, overlay: holyIntroOverlay, artX: '50%' },
   // 2026-10-30 指示書 U：風の渓谷
   'dungeon-08': { art: windIntroArt, title: windIntroTitle, overlay: windIntroOverlay, artX: '50%' },
+  // 2026-11-01 指示書 AH：雷の高原
+  'dungeon-09': { art: thunderIntroArt, title: thunderIntroTitle, overlay: thunderIntroOverlay, artX: '50%' },
   ...Object.fromEntries(EVENT_DUNGEON_ART.map((d) => [d.id, d.intro])),
 };
 /** 絵の読み込みを待つ長さの上限（ミリ秒。遅い回線でも札がいつまでも残らないように） */

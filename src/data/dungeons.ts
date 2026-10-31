@@ -12,6 +12,7 @@ import { SORAMO_MONSTER_ID } from './soramo.ts';
 import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER_ID } from './shishien.ts';
+import { HAKURAN_MONSTER_ID } from './hakuran.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
@@ -78,6 +79,8 @@ export const IVAN_ALTAR_OWED_FLAG = 'ivan-altar-owed';
 export const BARCA_BEATEN_FLAG = 'barca-beaten';
 /** 炎の火山の祭壇のシシエンをまだ受け取っていない（前に炎の火山をクリアしていたセーブ。IVAN_ALTAR_OWED_FLAG と同じ形） */
 export const BARCA_ALTAR_OWED_FLAG = 'barca-altar-owed';
+/** 雷の高原のステラに初めて勝った（2026-11-01 指示書 AH：ハクランのガチャのシリーズの開く条件。AF で GACHA_SERIES に入れた記録。BARCA_BEATEN_FLAG と同じ形） */
+export const STELLA_BEATEN_FLAG = 'thunder-boss-beaten';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
   {
@@ -151,6 +154,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     altarOwedFlag: BARCA_ALTAR_OWED_FLAG,
     isPlaceholder: true,
   },
+  // 2026-11-01 指示書 AH：B ランクの2つ目のダンジョン（炎の火山と同じ段）。仕掛けは落雷のマス。ボスは守り手ステラ・切り札はハクラン。ダンジョンを選ぶ所では炎の火山の次
+  {
+    id: 'dungeon-09',
+    name: '雷の高原',
+    description: '雷雲のかかる岩の台地。地面が光ったら、次の一歩でそこに雷が落ちる。最奥のボスを倒すとクリア。',
+    floors: [],
+    // 初回クリアは最奥の祭壇でハクランのモンスターカード1枚。2回目からはハクランの技カード1枚・宝箱もハクランの技（炎の火山と同じ形）
+    firstClearCards: [{ cardId: HAKURAN_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: STELLA_BEATEN_FLAG,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
   { id: 'dungeon-07', name: '天の聖域', description: '強い番人が守る最後の試練。2回負けると戻される。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(SORAMO_MONSTER_ID), isPlaceholder: true },
 ];
@@ -194,6 +209,10 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 1.0＝6・7・6（29.1％）、1.0714〜1.0833＝6・8・6（1.08 で 21.0％）、1.0834〜＝7・8・7（1.09 で 11.0％）。V の目標 18.1％ ±3 に入る 1.08 にした
   // （最初の手持ち3箱 × 1000回・プレイヤー側は腕前 B・バルカは腕前 A。docs/design/barca-ac-20261031/・npm run playtest:barca。AB では「3体ともライフ7」と測り違えて 1.09 にしていた）
   'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
+  // 雷の高原のボス（2026-11-01 指示書 AH）：ハクランを真ん中に、左右はノビトン・プカリム。腕前 A。
+  // lifeScale は試遊でバルカと同じ目標（最初の手持ち3箱・プレイヤー側は腕前 B・1000回で 18.1％ ±3）に合わせた：1.0 でプレイヤーの勝ち 18.3％（0.95〜1.05 は同じ。1.1 で 6.1％）
+  // （docs/thunder-plateau-ah-20261101.md・npm run playtest:stella）
+  'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1, skill: 'A' },
   'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。

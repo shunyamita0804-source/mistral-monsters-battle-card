@@ -13,6 +13,8 @@
   maps/dungeon/machine_door_{closed,open}.webp・machine_switch_{off,on}.webp
   maps/dungeon/holy_feather_{1..3}.webp・holy_candle_{1,2}.webp・holy_light_{1,2}.webp
   maps/dungeon/wind_{bridge,vane,mill,leaves,stake}.webp                風の渓谷の飾り（2026-10-30 指示書 U。つり橋の切れはし・風見の石の柱・小さな風車・木の葉の吹きだまり・ロープの杭）
+  maps/dungeon/thunder_{pillar,fallen,rock,grass,rod}.webp            雷の高原の飾り（2026-11-01 指示書 AH。小さな石の柱・倒れた柱のかけら・焦げた岩・草むら・避雷の鉄の棒）
+  maps/dungeon/thunder_mark.webp・thunder_bolt.webp                     雷の高原の落雷の予告の印（strike の左）・落ちる稲妻（strike の右）
   maps/dungeon/boss_mark_{d}.webp                                      ボスの間のしるし（いまの boss_mark_ruins と同じ高さ 320）
   backgrounds/battle_{d}.webp                                          対戦の背景（1024×1536 のまま）
   ui/dungeon_intro/{d}_art.webp・{d}_overlay.webp                      入ったときの挿絵（縦長のまま）と重ねる輪
@@ -28,9 +30,9 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
-DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy', 'wind')
-# 原本のファイル名の頭（風の渓谷だけ wind_valley_*.png。2026-10-30 指示書 U。原本の名前は変えない）
-PREFIX = {'wind': 'wind_valley'}
+DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy', 'wind', 'thunder')
+# 原本のファイル名の頭（風の渓谷は wind_valley_*.png・雷の高原は thunder_plateau_*.png。原本の名前は変えない）
+PREFIX = {'wind': 'wind_valley', 'thunder': 'thunder_plateau'}
 # 見えるとみなす透明度（これより薄い所は部品の外）
 ALPHA_SOLID = 16
 # 部品を1つにまとめるときに、どれだけ離れたかけらまで同じ部品とみなすか（px）
@@ -161,6 +163,9 @@ def build_parts(src: str, d: str, save: Saver) -> None:
         # 下り階段と上り階段の間が狭いので、かけらをまとめる幅を小さく
         build_wind_parts(sheet, components(sheet, gap=4), save)
         return
+    if d == 'thunder':
+        build_thunder_parts(sheet, components(sheet, gap=4), save)
+        return
     comps = components(sheet)
     if d == 'machine' and len(comps) == 5:
         # 上り階段と閉じた扉がくっついている
@@ -218,6 +223,33 @@ def build_wind_parts(sheet: Image.Image, comps: list, save: Saver) -> None:
         save(im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS), f'maps/dungeon/wind_{name}.webp')
 
 
+def build_thunder_parts(sheet: Image.Image, comps: list, save: Saver) -> None:
+    """雷の高原（2026-11-01 指示書 AH）：左から下り階段・上り階段、右に2列の飾り5つ
+    （左の列：小さな石の柱・焦げた岩、右の列：倒れた柱のかけら・避雷の鉄の棒〔先が草むらより上〕・草むら）。風の渓谷と同じく、透明でない部分ごとに切り出し、列と上からの順で名前を決める"""
+    assert len(comps) == 7, ('thunder', len(comps))
+    comps = sorted(comps, key=lambda c: (c[0] + c[2]) / 2)
+    save(fit(trim(cut(sheet, comps[0])), height=256), 'maps/dungeon/thunder_stairs_down.webp')
+    deco = comps[2:]
+    mid = sum((c[0] + c[2]) / 2 for c in deco) / len(deco)
+    left = sorted([c for c in deco if (c[0] + c[2]) / 2 < mid], key=lambda c: c[1])
+    right = sorted([c for c in deco if (c[0] + c[2]) / 2 >= mid], key=lambda c: c[1])
+    assert (len(left), len(right)) == (2, 3), ('thunder', len(left), len(right))
+    # 5つの大きさの比を変えないよう、どれも同じ割合で縮める（いちばん高いもの〔避雷の鉄の棒〕が高さ 240）
+    ims = [trim(cut(sheet, c)) for c in [*left, *right]]
+    k = 240 / max(im.height for im in ims)
+    for im, name in zip(ims, ('pillar', 'rock', 'fallen', 'rod', 'grass')):
+        save(im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS), f'maps/dungeon/thunder_{name}.webp')
+
+
+def build_thunder_strike(src: str, save: Saver) -> None:
+    """雷の高原の落雷（2026-11-01 指示書 AH）：strike.png の左＝予告の印、右＝落ちる稲妻。座標では切らず、透明でない部分ごとに（左右の順）"""
+    sheet = Image.open(os.path.join(src, 'thunder', 'thunder_plateau_strike.png')).convert('RGBA')
+    comps = sorted(components(sheet, gap=24), key=lambda c: c[0])
+    assert len(comps) == 2, ('thunder strike', len(comps))
+    save(fit(trim(cut(sheet, comps[0])), width=256), 'maps/dungeon/thunder_mark.webp')
+    save(fit(trim(cut(sheet, comps[1])), height=512), 'maps/dungeon/thunder_bolt.webp')
+
+
 def main() -> None:
     src, out = sys.argv[1], sys.argv[2]
     save = Saver(out)
@@ -225,7 +257,12 @@ def main() -> None:
         build_tiles(src, d, save)
         build_parts(src, d, save)
         f = PREFIX.get(d, d)
-        boss = trim(Image.open(os.path.join(src, d, f'{f}_boss_mark.png')).convert('RGBA'))
+        boss = Image.open(os.path.join(src, d, f'{f}_boss_mark.png')).convert('RGBA')
+        if d == 'thunder':
+            # 雷の高原（指示書 AH）：届いた絵は高さが1多い（1206×1305）ので、下を1切る
+            boss = boss.crop((0, 0, boss.width, boss.height - 1))
+            build_thunder_strike(src, save)
+        boss = trim(boss)
         save(fit(boss, height=320), f'maps/dungeon/boss_mark_{d}.webp')
         save(Image.open(os.path.join(src, d, f'{f}_battle_bg.png')).convert('RGB'), f'backgrounds/battle_{d}.webp', quality=84)
         save(Image.open(os.path.join(src, d, f'{f}_art.png')).convert('RGB'), f'ui/dungeon_intro/{d}_art.webp', quality=84)
