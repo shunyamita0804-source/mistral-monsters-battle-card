@@ -231,6 +231,13 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:florist-steps-r:message': 'Blue flowers are blooming happily. A watering can sits nearby.',
   'object:florist-shelf:label': 'Back shelf',
   'object:florist-shelf:message': 'Wrapping paper and ribbons for bouquets are rolled up by color.',
+  // 2026-10-31 指示書 AE（英語は仮訳）
+  'object:florist-plant-l:label': 'Houseplant',
+  'object:florist-plant-l:message': 'A houseplant with big leaves. Each leaf has been wiped clean with care.',
+  'object:florist-plant-stand:label': 'Plant stand',
+  'object:florist-plant-stand:message': "A single pot of white flowers sits on the little stand. It seems to be today's top pick.",
+  'object:florist-plant-r:label': 'Houseplant',
+  'object:florist-plant-r:message': 'Beside the entrance, a big potted plant welcomes the customers.',
   'object:florist-exit:label': 'Exit',
   'object:tailor-cloth-shelf:label': 'Fabric shelf',
   'object:tailor-cloth-shelf:message': 'Rolls of fabric are sorted by color. Mostly navy and red.',
@@ -244,6 +251,11 @@ export const CONTENT_EN: Readonly<Record<string, string>> = {
   'object:tailor-torso-r:message': 'It wears a green dress. The embroidery on the hem is lovely.',
   'object:tailor-cloth-table:label': 'Fabric table',
   'object:tailor-cloth-table:message': 'Folded clothes and fabric are stacked neatly.',
+  // 2026-10-31 指示書 AE（英語は仮訳）
+  'object:tailor-box-cabinet:label': 'Notions cabinet',
+  'object:tailor-box-cabinet:message': 'The little blue box is packed with buttons of every color.',
+  'object:tailor-low-cabinet:label': 'Low cabinet',
+  'object:tailor-low-cabinet:message': 'Tape measures and spools of thread are neatly put away in the drawers.',
   'object:tailor-exit:label': 'Exit',
   // カードショップ
   'object:shop-counter:label': 'Counter',
