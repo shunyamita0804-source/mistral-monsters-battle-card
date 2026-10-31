@@ -1,6 +1,8 @@
 import { getPlayCard, getSkill } from '../../src/data/cards.ts';
 import { chooseAction } from '../../src/game/battle/ai.ts';
-import { actingSide, applyAction, createBattle, type BattleState, type Side } from '../../src/game/battle/engine.ts';
+import { actingSide, applyAction, cardUsability, createBattle, guardCost, manaOf, type BattleState, type Side } from '../../src/game/battle/engine.ts';
+import { guardMaxCost, guardMinCost } from '../../src/game/cards/cardTypes.ts';
+import { t } from '../../src/i18n/i18n.ts';
 import type { Deck } from '../../src/game/deck/deck.ts';
 import type { AiStyle, CpuSkill } from '../../src/data/tournaments.ts';
 
@@ -28,9 +30,21 @@ export interface MatchCount {
   recoil: number;
   recoilKo: number;
   recoilLoss: number;
+  /** 決着の理由（a＝player の側から。2026-10-31 指示書 AF）：倒して勝ち・山札切れで勝ち（負けは ko−winKo・deckOut−winDeckOut） */
+  winKo: number;
+  winDeckOut: number;
+  /**
+   * 「回避されない」攻撃（カードの undodgeable。2026-10-31 指示書 AF。ハクラン）：a（player）の側が使った回数・
+   * そのうち、狙われた相手が「回避されない」でなければ使えた回避のカードを手札に持っていた回数（持っていたのに使えなかった）
+   */
+  undodgeableA: number;
+  undodgeableBlockedA: number;
+  /** 上の2つを、技のモンスターごとに（ハクランの技だけを見るため） */
+  undodgeableByMonster: Record<string, number>;
+  undodgeableBlockedByMonster: Record<string, number>;
 }
 
-export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0, recoil: 0, recoilKo: 0, recoilLoss: 0 });
+export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0, recoil: 0, recoilKo: 0, recoilLoss: 0, winKo: 0, winDeckOut: 0, undodgeableA: 0, undodgeableBlockedA: 0, undodgeableByMonster: {}, undodgeableBlockedByMonster: {} });
 
 /** a（player）と b（opponent）の1対戦を最後まで進めて数える */
 /** skill：両方の腕前（b の構え・腕前を opponent で別にできる。大会の常連など） */
@@ -59,10 +73,15 @@ export function playCounted(a: Deck, b: Deck, seed: number, first: Side, c: Matc
     const before = state;
     state = applyAction(state, action);
     countRecoil(before, state, c);
+    if (side === 'player' && action.type === 'useCard' && before.phase === 'main') countUndodgeable(state, c);
   }
   c.games++;
   c.turns += state.turn;
-  if (state.winner === 'player') c.winsA++;
+  if (state.winner === 'player') {
+    c.winsA++;
+    if (state.endReason === 'deckOut') c.winDeckOut++;
+    else c.winKo++;
+  }
   if (state.winner === 'player' || state.winner === 'opponent') {
     if (state.endReason === 'deckOut') c.deckOut++;
     else c.ko++;
@@ -81,9 +100,35 @@ function countRecoil(before: BattleState, after: BattleState, c: MatchCount): vo
   }
 }
 
+/** a（player）の「回避されない」攻撃で守りの番になったとき：数える。相手が「回避されない」でなければ使えた回避のカードを持っていたら、使えなかった回数も数える */
+function countUndodgeable(state: BattleState, c: MatchCount): void {
+  const pending = state.pending;
+  if (state.phase !== 'defense' || !pending || pending.attacker !== 'player') return;
+  // 投石（サポート）の攻撃もここに来るので、技カードだけを見る
+  const attack = getPlayCard(pending.cardId);
+  if (attack.kind !== 'skill' || attack.effect.type !== 'attack' || !attack.effect.undodgeable) return;
+  c.undodgeableA++;
+  c.undodgeableByMonster[attack.monsterId] = (c.undodgeableByMonster[attack.monsterId] ?? 0) + 1;
+  const blocked = t('battle.ng.undodgeable');
+  const def = state.sides.opponent;
+  const could = def.hand.some((h) => {
+    const card = getPlayCard(h.cardId);
+    if (card.kind !== 'skill' || card.effect.type !== 'evade') return false;
+    if (cardUsability(state, 'opponent', h.uid).reason !== blocked) return false;
+    // 「回避されない」の判定のあとの条件（必要マナ・残りのマナ）も合うものだけ
+    const max = guardMaxCost(card);
+    return attack.cost >= guardMinCost(card) && (max === null || attack.cost <= max) && !pending.pinned && manaOf(def) >= guardCost(state, card);
+  });
+  if (!could) return;
+  c.undodgeableBlockedA++;
+  c.undodgeableBlockedByMonster[attack.monsterId] = (c.undodgeableBlockedByMonster[attack.monsterId] ?? 0) + 1;
+}
+
 export function addCount(to: MatchCount, c: MatchCount): void {
-  for (const k of ['winsA', 'games', 'ko', 'deckOut', 'draws', 'turns', 'attacks', 'evaded', 'defended', 'hesitate', 'misguard', 'tsuta', 'recoil', 'recoilKo', 'recoilLoss'] as const) to[k] += c[k];
+  for (const k of ['winsA', 'games', 'ko', 'deckOut', 'draws', 'turns', 'attacks', 'evaded', 'defended', 'hesitate', 'misguard', 'tsuta', 'recoil', 'recoilKo', 'recoilLoss', 'winKo', 'winDeckOut', 'undodgeableA', 'undodgeableBlockedA'] as const) to[k] += c[k];
   for (const [k, v] of Object.entries(c.supports)) to.supports[k] = (to.supports[k] ?? 0) + v;
+  for (const [k, v] of Object.entries(c.undodgeableByMonster)) to.undodgeableByMonster[k] = (to.undodgeableByMonster[k] ?? 0) + v;
+  for (const [k, v] of Object.entries(c.undodgeableBlockedByMonster)) to.undodgeableBlockedByMonster[k] = (to.undodgeableBlockedByMonster[k] ?? 0) + v;
 }
 
 const pct = (n: number, of: number): number => (of === 0 ? 0 : Math.round((n / of) * 1000) / 10);
@@ -105,6 +150,15 @@ export function summarize(c: MatchCount): Record<string, unknown> {
     recoilPerGame: Math.round((c.recoil / Math.max(1, c.games)) * 100) / 100,
     recoilKoPerGame: Math.round((c.recoilKo / Math.max(1, c.games)) * 100) / 100,
     recoilLossGames: pct(c.recoilLoss, c.games),
+    // 決着の理由の表（a の側から。％）
+    winKo: pct(c.winKo, c.games),
+    winDeckOut: pct(c.winDeckOut, c.games),
+    loseKo: pct(c.ko - c.winKo, c.games),
+    loseDeckOut: pct(c.deckOut - c.winDeckOut, c.games),
+    undodgeablePerGame: Math.round((c.undodgeableA / Math.max(1, c.games)) * 100) / 100,
+    undodgeableBlockedPerGame: Math.round((c.undodgeableBlockedA / Math.max(1, c.games)) * 100) / 100,
+    undodgeableByMonsterPerGame: Object.fromEntries(Object.entries(c.undodgeableByMonster).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
+    undodgeableBlockedByMonsterPerGame: Object.fromEntries(Object.entries(c.undodgeableBlockedByMonster).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
     supportsPerGame: Object.fromEntries(Object.entries(c.supports).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
   };
 }

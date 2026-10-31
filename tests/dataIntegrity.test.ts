@@ -40,6 +40,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-tsumuji',
       'mon-hyouzuku',
       'mon-shishien',
+      'mon-hakuran',
       ...skillIds('soramo14', all.slice(0, 14)),
       ...lazuck,
       ...skillIds('gauul14', all.slice(0, 14)),
@@ -63,6 +64,8 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...skillIds('hyouzuku', all.slice(0, 14)),
       // シシエン（2026-10-31 指示書 AB）：01〜14
       ...skillIds('shishien', all.slice(0, 14)),
+      // ハクラン（2026-10-31 指示書 AF）：01〜14
+      ...skillIds('hakuran', all.slice(0, 14)),
       // サポート11種類（2026-10-30 指示書 Y。表示の番号 S01〜S07・F01〜F04 の順）
       ...[7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map((n) => `sup-${n}`),
     ]);
@@ -108,6 +111,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-tsumuji',
       'mon-hyouzuku',
       'mon-shishien',
+      'mon-hakuran',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
       // サポート11種類（2026-10-30 指示書 Z で絵が入った）
       ...SUPPORTS.map((s) => s.id),

@@ -28,6 +28,7 @@
     "playtest:swap": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/swap_200.json vitest run tests/swapPlaytest.test.ts",
     "playtest:bosses": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/bosses_200.json vitest run tests/bossPlaytest.test.ts",
     "playtest:shishien": "PLAYTEST=200 PLAYTEST_SUBJECTS=mon-shishien PLAYTEST_OUT=docs/design/shishien-ab-20261031/swap_200.json vitest run tests/swapPlaytest.test.ts",
+    "playtest:hakuran": "PLAYTEST=200 PLAYTEST_SUBJECTS=mon-hakuran PLAYTEST_OUT=docs/design/hakuran-af-20261031/swap_200.json vitest run tests/swapPlaytest.test.ts",
     "playtest:barca": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-fire-boss PLAYTEST_SCALES=1.0:1.09:0.01 PLAYTEST_OUT=docs/design/barca-ac-20261031/barca_scan_1000.json vitest run tests/bossPlaytest.test.ts",
     "playtest:regulars": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/regulars_200.json vitest run tests/regularsPlaytest.test.ts"
   },

@@ -26,8 +26,8 @@ describe('カードデータ（仮）', () => {
   it('仮データであることが明示されている（正式カードはソラモ・ラズック・ガウルだけ）', () => {
     for (const c of [...MONSTERS, ...SKILLS, ...SUPPORTS]) {
       const official =
-        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien'].includes(c.id) ||
-        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-', 'skl-shishien-'].some((p) => c.id.startsWith(p)) ||
+        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran'].includes(c.id) ||
+        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-', 'skl-shishien-', 'skl-hakuran-'].some((p) => c.id.startsWith(p)) ||
         // サポート11種類（2026-10-30 指示書 Y）
         c.kind === 'support';
       expect(c.isPlaceholder).toBe(!official);

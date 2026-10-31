@@ -8,6 +8,7 @@ import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER_ID } from './shishien.ts';
+import { HAKURAN_MONSTER_ID } from './hakuran.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -65,6 +66,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [HYOUZUKU_MONSTER_ID]: { art: 'hyouzuku_battlecard.png', frame: 'hyouzuku', scale: 0.8, offsetY: -0.02 },
   // シシエン（2026-10-31 指示書 AB）：枠は炭色（#3E3A3F）。絵は届いた shishien_battleart.png（1169×1346。ヒョウズクと同じ大きさ・縦横比）を無改変
   [SHISHIEN_MONSTER_ID]: { art: 'shishien_battlecard.png', frame: 'shishien', scale: 0.8, offsetY: -0.02 },
+  // ハクラン（2026-10-31 指示書 AF）：枠は青緑（ティール。#237C7A）。絵は届いた hakuran_battleart.png（1169×1346。シシエンと同じ大きさ・縦横比）を無改変
+  [HAKURAN_MONSTER_ID]: { art: 'hakuran_battlecard.png', frame: 'hakuran', scale: 0.8, offsetY: -0.02 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },
