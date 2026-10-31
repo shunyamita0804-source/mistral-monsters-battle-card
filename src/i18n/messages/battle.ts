@@ -297,9 +297,18 @@ export const BATTLE = {
   'battle.defense.damageUsed': { ja: 'いまのダメージ {n}（使った守備：{used}）', en: 'Damage now: {n} (used: {used})' },
   'battle.defense.cardAria': { ja: '{name}で守備', en: 'Defend with {name}' },
   'battle.defense.pass': { ja: '受ける', en: 'Take it' },
-  /** 2026-10-29 夜：手札に守りのカードが1枚も無いとき（自動では進めず「受ける」を待つ） */
-  'battle.defense.none': { ja: '手札に守りのカード（防御・回避）がありません。「受ける」を押してください', en: 'No Guard/Dodge cards in hand. Tap "Take it".' },
+  /**
+   * 2026-10-29 夜：手札に守りのカードが1枚も無いとき（自動では進めず「受ける」を待つ）。
+   * 2026-10-31 指示書 AC【1】：守りの選択の欄に出す。「受ける」を押す案内は上の説明（noneTop）に出すので、ここは短く
+   */
+  'battle.defense.none': { ja: '手札に守りのカード（防御・回避）がありません', en: 'No Guard/Dodge cards in hand.' },
   'battle.defense.done': { ja: '守備を終える', en: 'Done' },
+  /** 2026-10-31 指示書 AC【1】：使えない守りのカードの1行（理由はボタンの読み上げに） */
+  'battle.defense.unusable': { ja: '使えない', en: "Can't use" },
+  /** 2026-10-31 指示書 AC【1】：守れるカードが無いとき、上の相手の大きなカードの欄の説明に */
+  'battle.defense.noneTop': { ja: '守れるカードがありません。「受ける」を押してください', en: 'No cards can defend. Tap "Take it".' },
+  /** 2026-10-31 指示書 AC【1】：守りのカードを使ったあと、ほかに使えるカードが無いとき */
+  'battle.defense.noneMore': { ja: 'ほかに使える守りのカードはありません。「守備を終える」を押してください', en: 'No more cards can defend. Tap "Done".' },
 
   // 結果
   'battle.result.win': { ja: '勝利！', en: 'Victory!' },
