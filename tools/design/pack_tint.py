@@ -19,6 +19,8 @@ COLORS = {
 
 # この明るさより暗い色は、縁の明るさもその色に寄せる（ほかの色は前と同じ）
 DARK = 0.35
+# 縁の明るさをさらに下げるモンスター（下げる量。2026-10-31 指示書 AF2：ハクランの縁がミュロルの水色に近く見えたので、今より暗い青緑に）
+DEEPER = {'hakuran': 0.12}
 
 # 窓の絵を、型の窓（左・上・幅・高さ。型の px）にちょうど収めるもの（cover で型いっぱいに広げない）。
 # ミュロル：前の完成のパック（デザイン担当が型に入れた版。design-parts/gacha-20261029/art_v1/pack_myurol.png）は、窓の絵を 695×1218 に縮めて
@@ -40,7 +42,7 @@ def hls_to_rgb(h, l, s):
                np.where(hh < 2 / 3, m1 + (m2 - m1) * (2 / 3 - hh) * 6, m1)))
     return np.stack([v(h + 1 / 3), v(h), v(h - 1 / 3)], -1)
 
-def tint_template(tpl: np.ndarray, hexcol: str) -> np.ndarray:
+def tint_template(tpl: np.ndarray, hexcol: str, deeper: float = 0.0) -> np.ndarray:
     rgb = tpl[..., :3] / 255.0
     mx, mn = rgb.max(2), rgb.min(2)
     sat = (mx - mn) / np.maximum(mx, 1e-6)
@@ -52,7 +54,7 @@ def tint_template(tpl: np.ndarray, hexcol: str) -> np.ndarray:
     l_new = 0.5 + (l_orig - 0.5) * 0.72  # 明るさの濃淡は残し、少しだけ下げて色を見せる
     if lc < DARK:
         # 暗い色（シシエンの炭色）：色味が少ないので、明るさもその色に寄せないと銀の縁（ヒョウズク）と見分けられない（2026-10-31 指示書 AB）
-        l_new = lc + (l_orig - 0.5) * 0.35
+        l_new = lc + (l_orig - 0.5) * 0.35 - deeper
     tinted = hls_to_rgb(h, l_new, min(sc, 0.8))
     keep = 0.15 if lc < DARK else 0.35  # 元の明るさを混ぜる割合（暗い色は少なく）
     mixed = keep * rgb + (1 - keep) * tinted
@@ -87,7 +89,7 @@ def main(tpl_path, src, dst):
             else:
                 art = cover(window, (tpl.shape[1], tpl.shape[0]))
         assert art.size == (tpl.shape[1], tpl.shape[0]), name
-        frame = Image.fromarray(tint_template(tpl, hexcol), 'RGBA')
+        frame = Image.fromarray(tint_template(tpl, hexcol, DEEPER.get(name, 0.0)), 'RGBA')
         out = art.copy()
         out.alpha_composite(frame)
         # 型の外（透明な所）は透明のまま

@@ -93,7 +93,7 @@ const myu = (n) => `skl-myurol-${String(n).padStart(2, '0')}`;
     await center(hak(12));
     await page.waitForTimeout(500);
     await shot('book_skills_2');
-    for (const id of ['mon-hakuran', hak(2), hak(8), hak(10), hak(14)]) {
+    for (const id of ['mon-hakuran', hak(2), hak(4), hak(8), hak(9), hak(10), hak(14)]) {
       await center(id);
       await page.waitForTimeout(400);
       await page.locator(`.card-book__item[data-id="${id}"]`).first().click();

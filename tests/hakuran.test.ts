@@ -42,6 +42,15 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     expect(readFileSync('assets/images/cards/monsters/hakuran_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/hakuran_battleart.png`))).toBe(true);
   });
 
+  it('AF2 で直す前の JSON・CSV は _v1_20261031 として残す（LIFE 6・ひづめげり 2・てんをかける 4）', () => {
+    const v1 = JSON.parse(readFileSync(`${ORIGINAL_DIR}/hakuran14_skills_OFFICIAL_20261031_v1_20261031.json`, 'utf8'));
+    expect(v1.life).toBe(6);
+    expect(v1.skills[3].damage).toBe('2');
+    expect(v1.skills[8].damage).toBe('4');
+    expect(csvRows(`${ORIGINAL_DIR}/hakuran14_skills_OFFICIAL_20261031_v1_20261031.csv`)[3]?.[4]).toBe('2');
+    expect(hakuranJson.life).toBe(7);
+  });
+
   it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 防御技: 'defense', 回避技: 'evade' } as const;
     const rows = csvRows('src/data/official/hakuran14_skills_OFFICIAL_20261031.csv');
@@ -71,12 +80,12 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
       ['ひづめならし', 'force', 0, 1, false],
       ['つのでこづく', 'force', 1, 1, true],
       ['くもだま', 'wisdom', 1, 1, false],
-      ['ひづめげり', 'force', 2, 2, false],
+      ['ひづめげり', 'force', 2, 3, false], // 2026-10-31 指示書 AF2：ダメージ 2→3
       ['みぬくひとみ', 'wisdom', 2, 2, true],
       ['くもをける', 'force', 3, 3, false],
       ['つのつき', 'force', 3, 3, true],
       ['らいうん', 'wisdom', 4, 3, true],
-      ['てんをかける', 'force', 4, 4, false],
+      ['てんをかける', 'force', 4, 5, false], // 2026-10-31 指示書 AF2：ダメージ 4→5
       ['せいなるいかずち', 'wisdom', 5, 5, true],
       ['くものころも', 'defense', 2, null, false],
       ['ひらりとはねる', 'evade', 2, null, false],
@@ -104,8 +113,8 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     for (const n of [1, 3, 4, 6, 9]) expect(getSkill(hak(n)).effectTextJa ?? null).toBe(null);
   });
 
-  it('モンスター：ライフ6・青緑（ティール）・ID mon-hakuran。内部ランク B。レアの枠は 08・10・14。枠の絵がある', () => {
-    expect(HAKURAN_MONSTER).toMatchObject({ id: 'mon-hakuran', life: 6, name: 'ハクラン', isPlaceholder: false });
+  it('モンスター：ライフ7（2026-10-31 指示書 AF2 で 6→7）・青緑（ティール）・ID mon-hakuran。内部ランク B。レアの枠は 08・10・14。枠の絵がある', () => {
+    expect(HAKURAN_MONSTER).toMatchObject({ id: 'mon-hakuran', life: 7, name: 'ハクラン', isPlaceholder: false });
     expect(hakuranJson.monster_rank).toBe('B');
     expect(HAKURAN_COLOR).toBe('#237C7A');
     expect(HAKURAN_GACHA_RARE).toEqual([hak(8), hak(10), hak(14)]);
@@ -164,6 +173,9 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     expect(readFileSync('tools/design/gacha_panel_build.py', 'utf8')).toContain("'hakuran': (");
     expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).not.toContain("'hakuran'");
     for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hakuran': '#237C7A'");
+    // 2026-10-31 指示書 AF2：モンスターカードの枠とパックの縁はハクランだけ暗く（シシエンの暗い色と同じしかた）
+    expect(readFileSync('tools/art/battle_card_frame.py', 'utf8')).toContain("FORCE_DARK = {'hakuran'}");
+    expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("DEEPER = {'hakuran': 0.12}");
   });
 
   it('試遊用の16枚（Claude の仮）：レア以外の11種を1枚ずつ＋安い攻撃5種の2枚目。レアは入れない', () => {
@@ -176,7 +188,7 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
   });
 });
 
-// 自分：ハクラン（p-m1 ライフ6）・ソラモ（p-m2）・ノビトン（p-m3）。相手も同じ（o-m1〜3）
+// 自分：ハクラン（p-m1 ライフ7）・ソラモ（p-m2）・ノビトン（p-m3）。相手も同じ（o-m1〜3）
 const MONS = [HAKURAN_MONSTER_ID, 'mon-soramo', 'mon-nobiton'];
 
 function scene(hand: Partial<Record<Side, string[]>>, active: Side = 'player', turn = 3, opponentMonsters: readonly string[] = MONS): BattleState {
@@ -215,7 +227,7 @@ describe('回避されない（02・05・07・08・10）：ガウルの聖なる
       for (const guard of [hak(12), hak(13), hak(14)]) {
         const r = attackWith(hak(n), guard);
         expect(r.usable, `${n} ${guard}`).toBe(false);
-        expect(monster(r.after, 'o-m1').life, `${n} ${guard}`).toBe(6 - (getSkill(hak(n)).stat?.value ?? 0));
+        expect(monster(r.after, 'o-m1').life, `${n} ${guard}`).toBe(7 - (getSkill(hak(n)).stat?.value ?? 0));
       }
       const r = attackWith(hak(n), hak(14));
       expect(r.reason).toBeTruthy();
@@ -226,7 +238,7 @@ describe('回避されない（02・05・07・08・10）：ガウルの聖なる
     for (const n of [2, 5, 7, 8, 10]) {
       const r = attackWith(hak(n), hak(11));
       expect(r.usable, String(n)).toBe(true);
-      expect(monster(r.after, 'o-m1').life, String(n)).toBe(6 - Math.max(0, (getSkill(hak(n)).stat?.value ?? 0) - 2));
+      expect(monster(r.after, 'o-m1').life, String(n)).toBe(7 - Math.max(0, (getSkill(hak(n)).stat?.value ?? 0) - 2));
     }
   });
 
@@ -234,7 +246,7 @@ describe('回避されない（02・05・07・08・10）：ガウルの聖なる
     for (const [n, guard] of [[1, hak(12)], [4, hak(12)], [6, hak(14)], [9, hak(14)], [3, hak(13)]] as const) {
       const r = attackWith(hak(n), guard);
       expect(r.usable, String(n)).toBe(true);
-      expect(monster(r.after, 'o-m1').life, String(n)).toBe(6);
+      expect(monster(r.after, 'o-m1').life, String(n)).toBe(7);
     }
   });
 });
@@ -260,7 +272,7 @@ describe('守り（11〜14）：今ある防御・回避と同じ', () => {
     for (const n of [11, 12, 13, 14]) expect(getSkill(hak(n)).effect, String(n)).toEqual(getSkill(`skl-serephine-${n}`).effect);
     expect(attackWith(hak(3), hak(12)).usable).toBe(false);
     expect(attackWith(hak(4), hak(13)).usable).toBe(false);
-    expect(monster(attackWith(hak(9), hak(11)).after, 'o-m1').life).toBe(6 - 2);
+    expect(monster(attackWith(hak(9), hak(11)).after, 'o-m1').life).toBe(7 - (5 - 2));
   });
 });
 
