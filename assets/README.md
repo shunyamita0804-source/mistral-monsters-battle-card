@@ -130,3 +130,10 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | `images/cards/monsters/myurol_battlecard.png` | ミュロルのバトル用の絵（足4本・えら片側3本の描き直し。800×920） | 原本と同じバイト列（前の版の原本は `myurol14-20261027/MONSTER/` に残る） |
 | `images/ui/gacha/{pack,panel}_myurol.webp`・`panel_shop.webp`・`images/maps/rooms/cardshop_{left_wall,right_wall,back_left_shelf,gacha_machine}.webp` | ミュロルのパック・販売機の窓・ショップの棚 | 新しい窓の絵 `pack_art_myurol.png` から今と同じ道具で作り直した（前の窓の絵は `pack_art_myurol_v1.png`、前のパックは `art_v1/pack_myurol.png`） |
 | `images/cards/monsters/shishien_official.webp` | シシエンの正式モンスターカード（枠の金色をなくした版） | 原本 `design-parts/cards-original/shishien/shishien_official_monstercard_LIFE7_v2_20261031.png`（無改変。前の版も残す）を幅 508 に縮めた |
+
+## 配置した素材（2026-10-31 指示書 AD）
+
+| パス | 内容 | 状態 |
+| --- | --- | --- |
+| `images/maps/rooms/room4_lab_*.webp`・`room_florist_*.webp`・`room_tailor_*.webp` | 研究所・花屋・仕立て屋の正面向きの新しい絵（床と壁・家具・手前の層） | 原本 `design-parts/rooms-frontfacing-20261031/` を `rooms4_build.py`・`rooms_shop_build.py` で切り抜いた（描き直していない） |
+| `images/maps/rooms/{player,guide,house}_shell.webp` | 家3つの床と壁（左右の壁をまっすぐ縦の細い壁に） | 原本 `design-parts/seimon-world/room_shell_*_frontwall_20261031.png`（書き出しと同じ大きさ・無改変） |

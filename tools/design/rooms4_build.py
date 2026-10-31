@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """部屋4つ（大会会場・管理局・練習場・研究所）の新しい絵（2026-10-28 ZIP「Mistral_Rooms4_ClaudeCode_20261028」）。
-2026-10-30 指示書 X：大会会場・管理局・練習場は正面向きの新しい絵（design-parts/rooms-frontfacing-20261030/。部屋の設定の v2。下の _build_v2）。研究所は前のまま。
+2026-10-30 指示書 X：大会会場・管理局・練習場は正面向きの新しい絵（design-parts/rooms-frontfacing-20261030/。部屋の設定の v2。下の _build_v2）。
+2026-10-31 指示書 AD：研究所も正面向きの新しい絵（design-parts/rooms-frontfacing-20261031/lab/。v2src）。花屋・仕立て屋（rooms_shop_build.py）も同じ作り。
 
 使い方：python3 -I tools/design/rooms4_build.py [確認画像の出力先]
 原本：design-parts/rooms-20261028/（無改変）。絵は描き直さない（重ねる・切り抜く・形式を変えるだけ。色の処理もかけない）。
@@ -30,6 +31,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/rooms-20261028')
 # 2026-10-30 指示書 X：正面向きの新しい絵（大会会場・管理局・練習場）
 SRC_V2 = os.path.join(ROOT, 'design-parts/rooms-frontfacing-20261030')
+# 2026-10-31 指示書 AD：正面向きの新しい絵（研究所・花屋・仕立て屋）。部屋の設定の v2src に書く
+SRC_AD = os.path.join(ROOT, 'design-parts/rooms-frontfacing-20261031')
 OUT_ROOMS = os.path.join(ROOT, 'assets/images/maps/rooms')
 OUT_TS = os.path.join(ROOT, 'src/data/rooms4Art.generated.ts')
 WEBP_Q = 88
@@ -179,42 +182,52 @@ ROOMS: dict[str, dict] = {
         spots={'TEACHER_SPOT': dict(logic=(640, 652))},
         spawn=(765, 770), exit_bottom=1024,
     ),
-    # 研究所：奥に本棚（図鑑）、左奥にガラスの飾り棚、中央に机、右奥に機械と青い画面、右の壁ぞいに実験台と図形の板（黒板）
-    # 2026-10-29 夜：白い研究施設の絵（v2。ZIP「Mistral_Room_lab_v2_parts」）に替えた。前の木の絵は design-parts/rooms-20261028/lab_v1_wood/。
-    # 部屋の形・家具の置き場所と大きさは前と同じなので、床・家具の当たりはそのまま。奥の壁ぞいの植木鉢2つ（shell の絵）の足もとを足し、
-    # 図形の板（右の壁。前の黒板の所より右）を調べる所を合わせた
+    # 研究所（2026-10-31 指示書 AD【1】：正面向きの新しい絵。design-parts/rooms-frontfacing-20261031/lab/）。
+    # 前の絵（白い研究施設の v2・木の v1）の部品は design-parts/rooms-20261028/ に残す。
+    # 奥の壁に本棚（図鑑）と植木2つ（shell）、左の壁ぞいにガラスの棚、真ん中に机（ルーカスはその奥）、奥の右に記録の投影機（金の機械）、
+    # 右の壁ぞいに立つ図形の板、右の手前寄りに解析台（実験台）。手前の低い壁・入口の柱と柱の上の植木は shell から切り抜く
     'lab': dict(
-        dir='Mistral_Room_lab_parts', prefix='lab',
-        furniture={'01_glass_cabinet': 420, '02_desk': 580, '03_machine': 405, '04_lab_counter': 500},
-        # 2026-10-30 点検 L：左のはし（x 0 の列）まで歩けて主人公が画面の外に半分出ていたので、左のはしを x 26 に（前は 0）
-        floor=[(80, 310), (1300, 310), (1536, 690), (1536, 762), (26, 762), (26, 560)],  # 下のふち：手前の低い壁の上のふちまで（2026-10-29）
-        passage=(595, 778, 940, 1024),
+        v2='lab', v2src=SRC_AD,
+        furniture=[
+            ('lab_01_glass_cabinet', 'glass_cabinet', 545, None),
+            ('lab_02_desk', 'desk', 615, None),
+            ('lab_03_machine', 'machine', 445, None),
+            ('lab_04_lab_counter', 'lab_counter', 755, None),
+            ('lab_05_diagram_board', 'diagram_board', 520, None),
+        ],
+        extra=[],
+        # 手前の低い壁（上のふち y 約790）・入口の柱（柱の上の植木の上 y 約687）。入口の通り道（x 577〜953）は切り抜かない
+        front_cut=[(0, 788, 432, 1024), (428, 685, 577, 1024), (953, 685, 1102, 1024), (1098, 788, 1536, 1024)],
+        # 床：奥の壁の下（y 約310）から手前の低い壁の上のふち（y 約790）まで。左右の壁はまっすぐ（内側のふち x 約40・約1496）
+        floor=[(40, 310), (1496, 310), (1496, 790), (40, 790)],
+        passage=(577, 780, 953, 1024),
         blocks=[
-            [(0, 290), (305, 290), (305, 425), (95, 475), (0, 600)],  # ガラスの飾り棚と左の壁
-            (0, 440, 86, 572),                                         # 左の植木
-            (500, 450, 862, 578),                                      # 中央の机
-            (740, 400, 862, 450),                                      # 机の奥の研究員の所（後ろに回っても人に重ならない）
-            (438, 292, 512, 328),                                      # 奥の壁ぞいの植木鉢（本棚の左）
-            (848, 292, 926, 328),                                      # 奥の壁ぞいの植木鉢（本棚の右）
-            ellipse(1148, 348, 122, 60),                               # 機械の台
-            [(1265, 300), (1536, 300), (1536, 790), (1385, 790), (1140, 615), (1140, 495), (1265, 452)],  # 実験台・右の壁・植木
-            (438, 690, 595, 1024),                                     # 入口の左の柱と植木
-            (940, 690, 1082, 1024),                                    # 入口の右の柱と植木
+            (36, 300, 358, 545),                 # ガラスの棚（奥の壁・左の壁とのすき間もふさぐ）
+            (440, 300, 540, 330),                # 奥の壁ぞいの植木（本棚の左。shell）
+            (985, 300, 1090, 330),               # 奥の壁ぞいの植木（本棚の右。shell）
+            (535, 455, 960, 612),                # 真ん中の机
+            (800, 395, 940, 460),                # 机の奥のルーカスの所（後ろに回っても人に重ならない）
+            (990, 300, 1240, 445),               # 記録の投影機（奥の壁とのすき間もふさぐ）
+            (1230, 300, 1500, 520),              # 図形の板（板の裏・右の壁とのすき間もふさぐ）
+            # 解析台（右の壁とのすき間・手前の低い壁とのすき間〔1列。入口の柱にふさがれて出られなくなる〕もふさぐ）
+            (1100, 640, 1500, 800),
+            (428, 700, 577, 1024),               # 入口の左の柱
+            (953, 700, 1102, 1024),              # 入口の右の柱
         ],
         items={
-            'BIG_SHELF': (515, 30, 845, 320),
-            'CABINET': (72, 132, 301, 469),
-            'DESK': (500, 450, 862, 578),
-            # 機械と浮かぶ青い画面。右はしは図形の板に重ならないよう、右の柱の手前まで
-            'PROJECTOR': (1024, 93, 1250, 413),
-            'ANALYSIS': (1140, 440, 1536, 777),
-            # 右の壁の図形の板（v2）：右奥の植木鉢と実験台の奥。実験台の左上の床（x 1265 の左）から調べる
-            'BLACKBOARD': (1265, 230, 1520, 450),
+            'BIG_SHELF': (545, 30, 985, 325),
+            'CABINET': (72, 170, 358, 545),
+            'DESK': (535, 455, 960, 612),
+            'PROJECTOR': (990, 214, 1240, 445),
+            # 図形の板（右の壁ぞいに立つ板）：板の前（下の床）から調べる
+            'BLACKBOARD': (1230, 349, 1490, 520),
+            'ANALYSIS': (1100, 578, 1480, 755),
         },
         marks={},
-        # 研究員ルーカス：見た目は中央の机の奥（左の大きなレンズに隠れないよう右寄り）。話しかけるマスは机の一番手前の行
-        spots={'RESEARCHER_SPOT': dict(logic=(800, 572), look=(800, 500))},
-        spawn=(768, 752), exit_bottom=1024,
+        # ルーカス：見た目は真ん中の机の奥（足もとは天板の奥の線 y 約460 より約65px手前。左の大きなレンズに隠れないよう右寄り）。
+        # 話しかけるマスは机の一番手前の行（机の手前の床から話す）
+        spots={'RESEARCHER_SPOT': dict(logic=(870, 600), look=(870, 525))},
+        spawn=(768, 770), exit_bottom=1024,
     ),
 }
 
@@ -254,7 +267,7 @@ def _v2_open(room: dict, name: str) -> Image.Image:
     # 「フォルダ/名前」と書いたものは design-parts/ の下のそのフォルダから（あとから届いた家具。2026-10-30 指示書 Z の対戦表の板）
     if '/' in name:
         return Image.open(os.path.join(ROOT, 'design-parts', f'{name}.png'))
-    return Image.open(os.path.join(SRC_V2, room['v2'], f'{name}.png'))
+    return Image.open(os.path.join(room.get('v2src', SRC_V2), room['v2'], f'{name}.png'))
 
 
 def _build_v2(room: dict, pre: str) -> tuple[list[dict], list[dict]]:
@@ -370,7 +383,10 @@ def build_room(key: str, check: str | None, rooms: dict[str, dict] | None = None
 def _check_image(key: str, room: dict, art: dict, offsets: dict, out: str) -> None:
     """確認画像：見本に、歩けるマス（緑）・調べる物（黄の枠）・人の所（話す＝赤、見た目＝水色）を重ねる"""
     if room.get('v2'):
-        im = Image.open(os.path.join(SRC_V2, room['v2'], f"review_{room['v2']}.jpg")).convert('RGBA')
+        # 見本：X の部屋は review_*.jpg、AD の部屋は *_preview.png
+        v2dir = os.path.join(room.get('v2src', SRC_V2), room['v2'])
+        review = os.path.join(v2dir, f"review_{room['v2']}.jpg")
+        im = Image.open(review if os.path.exists(review) else os.path.join(v2dir, f"{room['v2']}_preview.png")).convert('RGBA')
     else:
         im = Image.open(os.path.join(room.get('src', SRC), room['dir'], f"{room['prefix']}_preview.png")).convert('RGBA')
     ov = Image.new('RGBA', im.size, (0, 0, 0, 0))

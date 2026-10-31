@@ -95,9 +95,11 @@ def shade_building(part: Image.Image) -> Image.Image:
 # 部屋の箱の絵（1024×1024）の中の床の範囲：奥の壁の下 top、手前の壁の上 bottom、
 # 左右の壁（奥 lt/rt・手前 lb/rb）、手前の壁の出入口の左右 door
 SHELL = {
-    'ROOM_PLAYER': dict(file='room_shell_player', top=300, bottom=938, lt=70, rt=955, lb=25, rb=1000, door=(444, 582)),
-    'ROOM_GUIDE': dict(file='room_shell_guide', top=250, bottom=932, lt=50, rt=975, lb=12, rb=1012, door=(444, 582)),
-    'ROOM_HOUSE': dict(file='room_shell_house', top=290, bottom=905, lt=95, rt=930, lb=25, rb=1000, door=(416, 608)),
+    # 2026-10-31 指示書 AD【2】：家3つは左右のななめの壁をまっすぐ縦の細い壁にした床と壁（*_frontwall_20261031.png。前の版は残す）。
+    # 届いた絵は書き出しと同じ大きさ（主人公の家・となりの家 864×864、住人の家 720×720）。床の範囲は 1024 の座標のまま（左右の壁のふちは上も下も同じ）
+    'ROOM_PLAYER': dict(file='room_shell_player_frontwall_20261031', top=300, bottom=938, lt=25, rt=1000, lb=25, rb=1000, door=(444, 582)),
+    'ROOM_GUIDE': dict(file='room_shell_guide_frontwall_20261031', top=250, bottom=932, lt=24, rt=1000, lb=24, rb=1000, door=(444, 582)),
+    'ROOM_HOUSE': dict(file='room_shell_house_frontwall_20261031', top=290, bottom=905, lt=27, rt=997, lb=27, rb=997, door=(416, 608)),
     'ROOM_SHOP': dict(file='room_shell_shop', top=335, bottom=888, lt=95, rt=932, lb=18, rb=1008, door=(414, 612)),
     'ROOM_LAB': dict(file='room_shell_lab', top=340, bottom=905, lt=75, rt=950, lb=22, rb=1002, door=(416, 610)),
     'ROOM_TRAINING': dict(file='room_shell_training', top=318, bottom=932, lt=75, rt=950, lb=22, rb=1002, door=(448, 576)),
@@ -173,6 +175,7 @@ def build_room(parts: str, room: dict, furn: dict[str, Image.Image], check_dir: 
     # 書き出しの細かさ：表示（論理px＝単位×0.5625）の約2倍、元の大きさまで
     out_scale = min(1.0, 2 * 0.5625 * W / 1024)
     shell = Image.open(f'{parts}/{sh["file"]}.png').convert('RGB')
+    # 書き出しと同じ大きさで届いた絵（2026-10-31 指示書 AD の家3つ）は、縮めずにそのまま
     shell.resize((round(1024 * out_scale), round(1024 * out_scale)), Image.LANCZOS).save(
         f'{OUT_ROOMS}/{slug}_shell.webp', quality=WEBP_Q + 4, method=6)
 

@@ -4,7 +4,7 @@ import { SHOP_ROOMS_ART } from '../src/data/shopRoomsArt.generated.ts';
 import { createNewSave, normalizeSave } from '../src/game/save/saveData.ts';
 import { adjacentCellOf, isBlocked, objectsAt, reachable } from '../src/game/world/world.ts';
 
-/** 花屋・仕立て屋の中の新しい絵（2026-10-29。tools/design/rooms_shop_build.py） */
+/** 花屋・仕立て屋の中の新しい絵（2026-10-29。tools/design/rooms_shop_build.py）。2026-10-31 指示書 AD【1】で正面向きの絵に */
 const ROOMS: readonly MapDefinition[] = [FLORIST, TAILOR];
 const all = (): boolean => true;
 const area = (map: MapDefinition): Set<string> => reachable(map, map.spawn, (x, y) => isBlocked(map, x, y, all));
@@ -56,8 +56,8 @@ describe('花屋・仕立て屋の新しい部屋', () => {
       expect(a.has(`${exit.x},${exit.y}`), m.id).toBe(true);
       expect(Math.abs(exit.x + exit.w / 2 - (m.art?.cols ?? 0) / 2)).toBeLessThanOrEqual(2);
       expect(m.spawn.y).toBeLessThan(exit.y);
-      // カウンターの手前（y 580〜690。その下は入口の柱の高さ）は x 400〜1150 がすべて歩ける
-      for (let px = 400; px <= 1150; px += 25.6) for (let py = 590; py <= 690; py += 25.6) expect(a.has(cellOf(px, py)), `${m.id} ${px},${py}`).toBe(true);
+      // 作業台の手前（y 595〜680。その下は入口の柱の高さ）は x 430〜1140 がすべて歩ける（2026-10-31 指示書 AD：左右の花のひな壇・布の陳列台のあいだ）
+      for (let px = 430; px <= 1140; px += 25.6) for (let py = 595; py <= 680; py += 25.6) expect(a.has(cellOf(px, py)), `${m.id} ${px},${py}`).toBe(true);
     }
   });
 
@@ -74,7 +74,10 @@ describe('花屋・仕立て屋の新しい部屋', () => {
     }
     expect(area(FLORIST).has(cellOf(250, 450))).toBe(false); // 左の花の段
     expect(area(FLORIST).has(cellOf(1380, 450))).toBe(false); // 右の花の段
-    expect(area(TAILOR).has(cellOf(300, 560))).toBe(false); // 布の台
+    expect(area(TAILOR).has(cellOf(300, 650))).toBe(false); // 布の陳列台（左の手前）
+    expect(area(TAILOR).has(cellOf(150, 520))).toBe(false); // 左の壁ぞいの低い棚
+    expect(area(TAILOR).has(cellOf(180, 350))).toBe(false); // 左奥の収納棚
+    expect(area(FLORIST).has(cellOf(140, 704))).toBe(false); // 左の手前の鉢植え
     expect(area(TAILOR).has(cellOf(1280, 350))).toBe(false); // 試着の囲い
     expect(area(TAILOR).has(cellOf(1460, 600))).toBe(false); // 姿見
   });
