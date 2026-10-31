@@ -1503,17 +1503,10 @@
   border-radius: 8px;
 }
 
-/* 守りの選択：手札は場所だけ残して見せず（帯の高さを変えない）、守りの選択の欄が説明の欄と手札の場所をまとめて使う */
+/* 守りの選択：手札は場所だけ残して見せない（帯の高さを変えない） */
 .battle.is-defending .battle-camera .battle__hand {
   display: flex;
   visibility: hidden;
-}
-
-.battle-camera .battle-detail.battle__defense {
-  height: calc(var(--detail-h, 220px) + var(--hand-h, 147px));
-  margin-bottom: calc(var(--hand-h, 147px) * -1);
-  position: relative;
-  z-index: 2;
 }
 
 /* 自分の手札：帯の中で画面の幅いっぱい */
@@ -1522,8 +1515,171 @@
   margin: 0 -10px;
 }
 
+/* ===== 2026-10-31 指示書 AC【1】：大きなカードを欄の高さいっぱいに・相手の番と守りの選択は相手のカードを相手の側で大きく =====
+ * ・説明の欄は相手3体と自分3体のあいだを 16 に戻した分だけ高く（390×844 で約 227。battleScreen.ts の layoutCamera）。大きなカードは欄の高さいっぱい（約140×213）
+ * ・自分の技を使った演出も、「誰が誰に」の1行を説明の列の頭に入れて、カードを同じ大きさに
+ * ・守りの選択（.battle-camera[data-focus='defense']）：上の相手の大きなカードの欄（相手の番と同じ大きさ・位置）に相手の攻撃のカードと説明。
+ *   相手の手札の段を 0.3 秒でたたみ、相手3体・自分3体の下に守りの選択の欄（たたんだ段と同じ高さ。守りのカードは手札と同じ 98 幅） */
+.battle-detail .battle-spot__info .battle-spot__line {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+  padding: 3px 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* 相手の手札の段：守りの選択の間はたたむ（下のすき間も詰めて、相手3体が相手の大きなカードの欄のすぐ下に来る） */
+.battle-camera .battle-hand--opponent {
+  transition:
+    height 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    padding 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    margin-bottom 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 200ms ease-out;
+}
+
+.battle-camera[data-focus='defense'] .battle-hand--opponent {
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: -4px;
+  border-bottom-width: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* 守りの選択の、相手の攻撃の説明（相手の大きなカードの欄の右） */
+.battle__defense-info {
+  cursor: default;
+}
+
+.battle__defense-info .battle-spot__info {
+  gap: 4px;
+  text-align: left;
+}
+
+.battle__defense-info .battle__defense-title {
+  font-size: 17px;
+}
+
+.battle__defense-info .battle__defense-text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.battle__defense-damage {
+  align-self: flex-start;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.1);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.battle__defense-info .battle__defense-hint {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.battle__defense-info .battle__defense-none {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  color: #ffd6a0;
+}
+
+/* 守りの選択の欄（自分3体の下）。自分の守りのカードを見せる間も同じ大きさ */
+.battle-camera .battle-detail.battle__defense-area {
+  height: var(--def-h, 133px);
+  padding: 2px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.battle-camera .battle-detail.battle__defense-area:not(.battle-spot) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.battle__defense-area .battle__defense-cards {
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 6px;
+  overflow: visible;
+}
+
+/* 多いときは手札と同じく重ねる（battleScreen.ts の defensePanel が --def-overlap を決める） */
+.battle__defense-area .battle__defense-card + .battle__defense-card {
+  margin-left: var(--def-overlap, 0px);
+}
+
+.battle__defense-area .battle__defense-card {
+  position: relative;
+  min-height: 0;
+  padding: 2px;
+  border-radius: 9px;
+}
+
+/* 守りの数値（−3・回避 など）／「使えない」はカードの下のはしに重ねて1行で */
+.battle__defense-area .battle__defense-label {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  max-width: calc(100% - 8px);
+  padding: 1px 7px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: rgb(8 10 16 / 0.85);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #b9f0a8;
+}
+
+.battle__defense-area .battle__defense-card.is-unusable {
+  opacity: 1;
+}
+
+.battle__defense-area .battle__defense-card.is-unusable .skill-card {
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+
+.battle__defense-area .battle__defense-card.is-unusable .battle__defense-label {
+  max-width: calc(100% - 8px);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffb0a8;
+}
+
+/* 重ねて並べているとき：「使えない」の文は隣のカードに隠れるので、いちばん右のカードだけに出す（ほかは薄くするだけ） */
+.battle__defense-cards.is-overlap .battle__defense-card:not(:last-child) .battle__defense-label {
+  display: none;
+}
+
+.battle__defense-empty {
+  margin: 0;
+  padding: 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--ps-text-sub, #d8d2c0);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .battle-camera__lens {
+  .battle-camera__lens,
+  .battle-camera .battle-hand--opponent {
     transition: none;
   }
 }

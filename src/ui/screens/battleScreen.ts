@@ -27,8 +27,6 @@ import { faceKeyOf, opponentFace, opponentFaceUrl } from '../components/opponent
 import {
   categoryLabel,
   describePlayCard,
-  effectLabel,
-  guardReduction,
   skillCategory,
   statLabel,
   supportShortText,
@@ -193,9 +191,12 @@ const DETAIL_CARD_W = 176;
  * 技の演出で大きく見せるカードの幅。2026-10-26 ユーザー指示「大きく見せて」で 112→150（欄に入りきらないときは fitFocusCards が縮める）
  */
 const SPOT_CARD_W = 176;
-/** 守備の選択で、相手の攻撃のカード・守備のカードの幅 */
-const DEFENSE_ATTACK_W = 112;
-const DEFENSE_CARD_W = 76; // 2026-10-31 指示書 AB【3】：守りの選択の欄が手札の場所も使うので 60 → 76
+/**
+ * 守備の選択で、守備のカードの幅（2026-10-31 指示書 AC【1】：76 → 手札と同じ 98。相手の攻撃のカードは相手の大きなカードの欄に SPOT_CARD_W で）
+ */
+const DEFENSE_CARD_W = HAND_CARD_W;
+/** 守備のカードどうしのすき間（CSS の .battle__defense-area .battle__defense-cards の gap と同じ） */
+const DEFENSE_GAP = 6;
 /**
  * 相手の手札の裏向きのカードが、フォーカスエリアのカードの場所へ大きくなりながら動く時間（ミリ秒。見た目だけ。ルールの処理は先に済んでいる）。
  * 2026-10-26 ユーザー指示「大きく見せて裏返しから表向きに。モンスターファームバトルカードをもっと参考に」：着いたら裏から表へ返す（OPP_CARD_FLIP_MS）
@@ -443,12 +444,15 @@ export const battleScreen: ScreenDefinition = {
     const lens = h('div', { class: 'battle-camera__lens' });
     const camera = h('div', { class: 'battle-camera', dataset: { focus: 'none' } }, lens);
     /**
-     * カメラを寄せる側（2026-10-31 指示書 AB【3】）：使ったカードを見せている間はその側（相手のカード＝上・自分のカード＝下）。
-     * 守りの場面は下（自分が守る＝守りに使えるカードを見せる。自分の攻撃を相手が守る間も自分の側のまま）。ほかは手番の側。終わったら下
+     * カメラを寄せる側（2026-10-31 指示書 AB【3】）：使ったカードを見せている間はその側（相手のカード＝上・自分のカード＝下）。ほかは手番の側。終わったら下。
+     * 相手の攻撃を守る選択の間は 'defense'（2026-10-31 指示書 AC【1】：相手のカードは上の相手の大きなカードの欄に出したまま、相手の手札の段をたたんで、
+     * 自分3体の下に守りのカードを並べる。自分の守りのカードを見せる間も同じ）。自分の攻撃を相手が守る間は自分の側のまま
      */
-    const cameraFocus = (s: BattleState): 'top' | 'bottom' | 'none' => {
+    const cameraFocus = (s: BattleState): 'top' | 'bottom' | 'defense' | 'none' => {
       if (s.phase === 'ended') return 'none';
-      if (spotlight && Date.now() < spotlight.until) return spotlight.side === 'opponent' ? 'top' : 'bottom';
+      const showing = spotlight && Date.now() < spotlight.until ? spotlight : null;
+      if (canChooseDefense(s) && showing?.side !== 'opponent') return 'defense';
+      if (showing) return showing.side === 'opponent' ? 'top' : 'bottom';
       if (s.phase === 'defense') return 'bottom';
       return s.active === 'opponent' ? 'top' : 'bottom';
     };
@@ -456,15 +460,22 @@ export const battleScreen: ScreenDefinition = {
     const OPP_HAND_PEEK = 0.42;
     /** 説明の欄・相手の大きなカードの欄の、いちばん小さい高さ（小さい画面でも、これより小さくしない） */
     const DETAIL_MIN_H = 108;
-    /** 説明の欄のいちばん大きい高さ（2026-10-31 指示書 AB【3】「欄の高さは今より小さく」。それより余る分は相手3体と自分3体のあいだを空ける） */
-    const DETAIL_MAX_H = 200;
-    /** 相手3体と自分3体のあいだ（いちばん小さい値。論理px） */
-    const FIELD_GAP_MIN = 4;
     /**
-     * カメラの帯の高さとずらす量を、いまの画面の高さから決める（2026-10-31 指示書 AB【3】）。
+     * 説明の欄のいちばん大きい高さ（2026-10-31 指示書 AB【3】で 200。指示書 AC【1】で、相手3体と自分3体のあいだを 16 に戻して浮いた分を回すので上げた。
+     * 390×844 では約 227。それより余る分は相手3体と自分3体のあいだを空ける）
+     */
+    const DETAIL_MAX_H = 240;
+    /** 相手3体と自分3体のあいだ（帯のすき間も含めた見た目の値。2026-10-31 指示書 AC【1】：43 → 16 に戻す。小さい画面では FIELD_GAP_MIN まで詰める。論理px） */
+    const FIELD_GAP = 16;
+    const FIELD_GAP_MIN = 6;
+    /** 相手の手札の段の高さ（守りの選択の間はたたむので、たたむ前に測った値を覚えておく） */
+    let oppHandH = 0;
+    /**
+     * カメラの帯の高さとずらす量を、いまの画面の高さから決める（2026-10-31 指示書 AB【3】・AC【1】）。
      * 上（相手の側）：相手の大きなカードの欄〜自分3体がカメラにちょうど入る。下（自分の側）：相手の手札の下のはし〜自分の手札がちょうど入る。
-     * 説明の欄は DETAIL_MAX_H まで。余る分は相手3体と自分3体のあいだに回す（モンスターが向かい合って戦っている感じに）。
-     * 値はレンズの変数（--opp-detail-h・--detail-h・--field-gap・--cam-shift）にして、描き直しても変わらないようにする
+     * 守りの選択（defense）：上と同じ相手の大きなカードの欄の下に、相手の手札の段をたたんで、相手3体・自分3体・守りの選択の欄（たたんだ段と同じ高さ）。
+     * 相手3体と自分3体のあいだは FIELD_GAP、残りを説明の欄に（DETAIL_MAX_H まで。余る分はあいだに回す）。
+     * 値はレンズの変数（--opp-detail-h・--detail-h・--def-h・--field-gap・--cam-shift）にして、描き直しても変わらないようにする
      */
     const layoutCamera = (): void => {
       const board = lens.querySelector<HTMLElement>('.battle-board');
@@ -475,26 +486,40 @@ export const battleScreen: ScreenDefinition = {
       const view = camera.clientHeight;
       if (!board || !oppHand || !oppRow || !playerRow || !handEl || view <= 0) return;
       const g = parseFloat(getComputedStyle(board).rowGap) || 0;
-      const rows = oppRow.offsetHeight + playerRow.offsetHeight;
-      let peek = Math.round(oppHand.offsetHeight * OPP_HAND_PEEK);
-      // 下（自分の側）：相手の手札の見える分＋2列＋説明の欄＋手札（すき間は5つ）
-      const room = view - (peek + rows + handEl.offsetHeight + 4 * g + FIELD_GAP_MIN);
-      let detailH = Math.min(DETAIL_MAX_H, room);
-      if (detailH < DETAIL_MIN_H) {
-        // 小さい画面：相手の手札を見せる分を減らして、説明の欄を残す
-        peek = Math.max(0, peek - (DETAIL_MIN_H - detailH));
-        detailH = Math.max(DETAIL_MIN_H, view - (peek + rows + handEl.offsetHeight + 4 * g + FIELD_GAP_MIN));
+      // たたんでいる間（守りの選択）は、前に測った高さを使う（まだ測っていなければ手札のカードの高さから）
+      if (camera.dataset.focus !== 'defense' || oppHandH <= 0) {
+        const measured = oppHand.offsetHeight;
+        oppHandH = camera.dataset.focus !== 'defense' && measured > 0 ? measured : Math.round(battleCardHeight(HAND_CARD_W, 'tall') + 10);
       }
-      const fieldGap = FIELD_GAP_MIN + Math.max(0, room - detailH);
-      // 上（相手の側）：相手の大きなカードの欄＋相手の手札＋2列（すき間は3つ）
-      const oppDetailH = Math.max(DETAIL_MIN_H, view - (oppHand.offsetHeight + rows + 2 * g + fieldGap));
-      const shift = oppDetailH + g + oppHand.offsetHeight - peek;
+      const rows = oppRow.offsetHeight + playerRow.offsetHeight;
+      let peek = Math.round(oppHandH * OPP_HAND_PEEK);
+      // 下（自分の側）：相手の手札の見える分＋2列＋説明の欄＋手札（すき間は4つ＋相手と自分のあいだ）
+      const fixed = (): number => peek + rows + handEl.offsetHeight + 4 * g;
+      // fieldGap は自分3体の上の余白（帯のすき間 g の分を引く）
+      let fieldGap = Math.max(0, FIELD_GAP - g);
+      let detailH = view - fixed() - fieldGap;
+      if (detailH > DETAIL_MAX_H) {
+        fieldGap += detailH - DETAIL_MAX_H;
+        detailH = DETAIL_MAX_H;
+      } else if (detailH < DETAIL_MIN_H) {
+        // 小さい画面：まず相手と自分のあいだを詰め、それでも足りなければ相手の手札を見せる分を減らして、説明の欄を残す
+        const take = Math.min(Math.max(0, fieldGap - Math.max(0, FIELD_GAP_MIN - g)), DETAIL_MIN_H - detailH);
+        fieldGap -= take;
+        detailH += take;
+        if (detailH < DETAIL_MIN_H) {
+          peek = Math.max(0, peek - (DETAIL_MIN_H - detailH));
+          detailH = Math.max(DETAIL_MIN_H, view - fixed() - fieldGap);
+        }
+      }
+      // 上（相手の側）：相手の大きなカードの欄＋相手の手札＋2列（すき間は3つ＋相手と自分のあいだ）
+      const oppDetailH = Math.max(DETAIL_MIN_H, view - (oppHandH + rows + 3 * g + fieldGap));
+      const shift = oppDetailH + g + oppHandH - peek;
       lens.style.setProperty('--opp-detail-h', `${oppDetailH}px`);
       lens.style.setProperty('--detail-h', `${detailH}px`);
       lens.style.setProperty('--field-gap', `${fieldGap}px`);
       lens.style.setProperty('--cam-shift', `${Math.max(0, shift)}px`);
-      // 守りの選択の欄は、説明の欄と手札の場所をまとめて使う（手札は場所だけ残して見せない）
-      lens.style.setProperty('--hand-h', `${handEl.offsetHeight + g}px`);
+      // 守りの選択の欄：たたんだ相手の手札の段と同じ高さ（相手の大きなカードの欄の大きさ・位置は相手の番と同じまま）
+      lens.style.setProperty('--def-h', `${Math.max(DETAIL_MIN_H, view - (oppDetailH + rows + 3 * g + fieldGap))}px`);
     };
     /** 画面を描き直す（演出の層・カメラ・開いている窓は外さずに残す。外すとアニメーションが最初からになる／窓がすぐ閉じてしまう） */
     const replaceView = (...nodes: (Node | string)[]): void => {
@@ -787,7 +812,8 @@ export const battleScreen: ScreenDefinition = {
     };
 
     /** 演出の中身：上に1行、左に名前・種類・威力・効果の文、右にカードを大きく。タップで飛ばす */
-    const spotlightPanel = (s: BattleState, sp: NonNullable<typeof spotlight>): HTMLElement => {
+    /** extra：守りの選択の間に自分の守りのカードを見せるとき 'battle__defense-area'（自分3体の下の、守りの選択の欄の大きさで見せる。2026-10-31 指示書 AC【1】） */
+    const spotlightPanel = (s: BattleState, sp: NonNullable<typeof spotlight>, extra = ''): HTMLElement => {
       const card = getPlayCard(sp.cardId);
       const kind = card.kind === 'skill' ? categoryLabel(skillCategory(card)) : t(card.duration === 'field' ? 'card.supportKind.field' : 'card.kind.support');
       // 数値の行（skillValueBadge のきまり）：ダメージ＝「ちから 3」、防御＝「防御 −3」、回避＝「回避」、特殊＝「効果」
@@ -804,26 +830,24 @@ export const battleScreen: ScreenDefinition = {
       const arriving = sp.arriveAt !== null && Date.now() < sp.arriveAt + OPP_CARD_FLIP_MS;
       // 相手のカードは相手の場所（上。相手の手札と列の上に重ねる）で、カードを左・説明を右に（PS版の 2P 側と同じ向かい合わせ）
       const where = sp.side === 'opponent' ? 'battle-opp-spot' : 'battle-detail';
-      // 「誰が誰に」の1行：自分のカードは上に横長で、相手のカードは説明の列の頭に（カードを場所の高さいっぱいに出すため）
+      // 「誰が誰に」の1行：説明の列の頭に（カードを欄の高さいっぱいに出すため。2026-10-31 指示書 AC【1】で自分のカードも同じに。前は自分のカードだけ上に横長）
       const line = h('p', { class: 'battle-spot__line', text: spotlightLine(s, sp) });
-      const inInfo = sp.side === 'opponent';
       const panel = h(
         'div',
         {
-          class: `${where} battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}`,
+          class: `${where} battle-spot battle-spot--${sp.side}${arriving ? ' is-arriving' : ''}${extra ? ` ${extra}` : ''}`,
           attrs: { role: 'button', 'aria-label': t('battle.spot.skip') },
           // 使ったカードを大きく見せている所（カードの演出）。ボタンの音は付けない
           dataset: { se: 'none' },
           on: { click: skipSpotlight },
         },
-        inInfo ? null : line,
         h(
           'div',
           { class: 'battle-spot__body' },
           h(
             'div',
             { class: 'battle-spot__info' },
-            inInfo ? line : null,
+            line,
             h('p', { class: 'battle-spot__name', text: cardName(card) }),
             h('p', { class: 'battle-spot__power', text: power }),
             h('p', { class: 'battle-spot__desc' }, phraseText(describePlayCard(card))),
@@ -1629,6 +1653,9 @@ export const battleScreen: ScreenDefinition = {
      */
     const oppDetailPanel = (s: BattleState): HTMLElement => {
       if (spotlight && spotlight.side === 'opponent' && Date.now() < spotlight.until) return h('div', { class: 'battle-opp-detail' }, spotlightPanel(s, spotlight));
+      // 相手の攻撃を守る選択の間も、相手のカードは相手の側に大きく（2026-10-31 指示書 AC【1】）
+      const defense = defenseInfoPanel(s);
+      if (defense) return h('div', { class: 'battle-opp-detail' }, defense);
       const last = lastShown.opponent;
       return h(
         'div',
@@ -1650,7 +1677,10 @@ export const battleScreen: ScreenDefinition = {
     const detailPanel = (s: BattleState): HTMLElement => {
       // 技を使った演出の間は、そのカードを大きく（パートC）。相手の攻撃に守れるときは、攻撃のカードの下に守備の選択
       // 自分の使ったカードだけここで大きく見せる（相手のカードは相手の場所＝上で見せる：opponentSpot）
-      if (spotlight && spotlight.side === 'player' && Date.now() < spotlight.until) return spotlightPanel(s, spotlight);
+      if (spotlight && spotlight.side === 'player' && Date.now() < spotlight.until) {
+        // 守りの選択の間に使った自分の守りのカードは、守りの選択の欄で見せる（相手のカードは上に出したまま）
+        return spotlightPanel(s, spotlight, canChooseDefense(s) ? 'battle__defense-area' : '');
+      }
       // 守備の選択は、相手のカードを上で見せ終わってから出す（それまでは説明の欄に攻撃の文だけ）
       const defense = spotlight && Date.now() < spotlight.until ? null : defensePanel(s);
       if (defense) return defense;
@@ -1825,37 +1855,40 @@ export const battleScreen: ScreenDefinition = {
     const canChooseDefense = (s: BattleState): boolean =>
       !auto && s.phase === 'defense' && !!s.pending && s.pending.attacker === 'opponent';
 
-    /**
-     * 守備の選択（2026-10-25 リデザイン パートC：それまでの画面全体の窓をやめ、フォーカスエリアに。働きは同じ）。
-     * 上に攻撃の1行、攻撃のカードを大きく、その横に威力・いまのダメージ、下に守備に使えるカード。「守備しない／守備を終える」は下の操作のボタン
-     */
-    const defensePanel = (s: BattleState): HTMLElement | null => {
-      if (!canChooseDefense(s) || !s.pending) return null;
-      const pending = s.pending;
-      const target = s.sides.player.monsters.find((m) => m.uid === pending.targetUid);
-      // 手札の守りのカード（防御・回避・かばう）をすべて並べ、使えないカードは理由を出す（2026-10-29 夜：マナが足りない・この技には効かない など）。
-      // 使えるカードを先に
-      const options = s.sides.player.hand
+    /** 手札の守りのカード（防御・回避・かばう）。使えるカードを先に（2026-10-29 夜：使えないカードも並べる） */
+    const defenseOptions = (s: BattleState): BattleState['sides']['player']['hand'] =>
+      s.sides.player.hand
         .filter((c) => {
           const card = getPlayCard(c.cardId);
           return card.kind === 'skill' && ['defense', 'evade', 'cover'].includes(card.effect.type);
         })
         .sort((a, b) => Number(cardUsability(s, 'player', b.uid).usable) - Number(cardUsability(s, 'player', a.uid).usable));
+
+    /**
+     * 守備の選択の、相手の攻撃の説明（2026-10-31 指示書 AC【1】：前は自分の側の説明の欄に出していたのを、上の相手の大きなカードの欄へ。
+     * 相手の番に相手が使ったカードを見せるのと同じ形＝カードを左に大きく・説明を右）。守りのカードを使うと「いまのダメージ」がここで変わる。
+     * 守れるカードが無いときは、そのことと「受ける」を押すことをここに出す
+     */
+    const defenseInfoPanel = (s: BattleState): HTMLElement | null => {
+      if (!canChooseDefense(s) || !s.pending) return null;
+      const pending = s.pending;
+      const target = s.sides.player.monsters.find((m) => m.uid === pending.targetUid);
       const used = pending.responses.map((id) => cardName(id)).join(t('common.listSeparator'));
       const attacker = findMonster(s, pending.userUid);
+      const none = noDefensePossible(s);
       return h(
         'div',
-        { class: 'battle-detail battle-spot battle-spot--opponent battle__defense' },
-        h('p', {
-          class: 'battle-spot__line',
-          text: spotlightLine(s, { cardId: pending.cardId, side: 'opponent', userUid: attacker ? pending.userUid : null, targetUid: pending.targetUid, until: 0, arriveAt: null }),
-        }),
+        { class: 'battle-opp-spot battle-spot battle-spot--opponent battle__defense-info' },
         h(
           'div',
           { class: 'battle-spot__body' },
           h(
             'div',
             { class: 'battle-spot__info' },
+            h('p', {
+              class: 'battle-spot__line',
+              text: spotlightLine(s, { cardId: pending.cardId, side: 'opponent', userUid: attacker ? pending.userUid : null, targetUid: pending.targetUid, until: 0, arriveAt: null }),
+            }),
             h('p', { class: 'battle__defense-title', text: t('battle.defense.title') }),
             h('p', {
               class: 'battle__defense-text',
@@ -1864,44 +1897,66 @@ export const battleScreen: ScreenDefinition = {
                 : t('battle.defense.textNoTarget', { skill: cardName(pending.cardId), stat: statLabel(pending.stat), power: pending.power }),
             }),
             h('p', {
-              class: 'battle__defense-hint',
+              class: 'battle__defense-damage',
               text: used ? t('battle.defense.damageUsed', { n: incomingDamage(s, pending), used }) : t('battle.defense.damage', { n: incomingDamage(s, pending) }),
             }),
-            h('p', { class: 'battle__defense-hint', text: t('battle.defense.hint', { stat: statLabel(pending.stat), n: manaOf(s.sides.player) }) }),
+            none
+              ? h('p', { class: 'battle__defense-none', text: t(pending.responses.length > 0 ? 'battle.defense.noneMore' : 'battle.defense.noneTop') })
+              : h('p', { class: 'battle__defense-hint', text: t('battle.defense.hint', { stat: statLabel(pending.stat), n: manaOf(s.sides.player) }) }),
           ),
-          h('div', { class: 'battle-spot__card' }, createBattleCard(getPlayCard(pending.cardId), { width: DEFENSE_ATTACK_W, size: 'focus' })),
+          h('div', { class: 'battle-spot__card' }, createBattleCard(getPlayCard(pending.cardId), { width: SPOT_CARD_W, size: 'focus' })),
         ),
-        options.length === 0 ? h('p', { class: 'battle__defense-none', text: t('battle.defense.none') }) : null,
-        h(
-          'div',
-          { class: 'battle__defense-cards' },
-          ...options.map((c) => {
-            const usable = cardUsability(s, 'player', c.uid);
-            const skill = getSkill(c.cardId);
-            const label =
-              skill.effect.type === 'evade'
-                ? effectLabel('evade')
-                : skill.effect.type === 'cover'
-                  ? t('battle.defense.cover')
-                  : skill.effect.type === 'defense' && skill.effect.nullify
-                    ? t('battle.defense.nullify')
-                    : `-${guardReduction(skill)}`;
-            const b = h(
-              'button',
-              {
-                class: `battle__defense-card${usable.usable ? '' : ' is-unusable'}`,
-                attrs: { type: 'button', 'aria-label': t('battle.defense.cardAria', { name: cardName(skill) }) },
-                // 守りのカードを使う操作（カードの音がある）
-                dataset: { se: 'none' },
-                on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
+      );
+    };
+
+    /**
+     * 守備の選択の欄（2026-10-25 リデザイン パートC：それまでの画面全体の窓をやめ、フォーカスエリアに。働きは同じ）。
+     * 2026-10-31 指示書 AC【1】：自分3体の下に、守りに使えるカードを手札と同じ大きさで並べるだけにした（相手の攻撃の説明は上の相手の大きなカードの欄）。
+     * 使えないカードは薄くして「使えない」と1行（理由はボタンの読み上げに）。多いときは手札と同じく重ねて並べる。「受ける／守備を終える」は下の操作のボタン
+     */
+    const defensePanel = (s: BattleState): HTMLElement | null => {
+      if (!canChooseDefense(s) || !s.pending) return null;
+      const options = defenseOptions(s);
+      const row = h(
+        'div',
+        { class: 'battle__defense-cards' },
+        ...options.map((c) => {
+          const usable = cardUsability(s, 'player', c.uid);
+          const skill = getSkill(c.cardId);
+          const b = h(
+            'button',
+            {
+              class: `battle__defense-card${usable.usable ? '' : ' is-unusable'}`,
+              attrs: {
+                type: 'button',
+                'aria-label': usable.usable
+                  ? t('battle.defense.cardAria', { name: cardName(skill) })
+                  : `${cardName(skill)}：${usable.reason ?? t('battle.defense.unusable')}`,
               },
-              createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'hand' }),
-              h('span', { class: 'battle__defense-label', text: usable.usable ? label : (usable.reason ?? '') }),
-            );
-            b.disabled = !usable.usable;
-            return b;
-          }),
-        ),
+              // 守りのカードを使う操作（カードの音がある）
+              dataset: { se: 'none' },
+              on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
+            },
+            // 守りの数値（−3・回避 など）はカードの絵に出ているので、使えないカードにだけ「使えない」と1行
+            createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'tall' }),
+            usable.usable ? null : h('span', { class: 'battle__defense-label', text: t('battle.defense.unusable') }),
+          );
+          b.disabled = !usable.usable;
+          return b;
+        }),
+      );
+      // 入りきらないときは手札と同じく重ねる（ボタンの幅＝カード＋枠と内側の余白 8。帯の左右の余白 10 ずつの内側に入れる）
+      const room = (element.offsetWidth || 390) - 20;
+      const overlap = handOverlap(options.length, DEFENSE_CARD_W + 8, DEFENSE_GAP, room, HAND_MIN_STEP);
+      if (overlap < 0) {
+        row.style.setProperty('--def-overlap', `${overlap.toFixed(1)}px`);
+        // 重ねているときは「使えない」の文が隣のカードに隠れるので、文は出さずに薄くするだけ（いちばん右のカードは出す）
+        row.classList.add('is-overlap');
+      }
+      return h(
+        'div',
+        { class: 'battle-detail battle__defense-area' },
+        options.length === 0 ? h('p', { class: 'battle__defense-empty', text: t('battle.defense.none') }) : row,
       );
     };
 
@@ -2369,7 +2424,8 @@ export const battleScreen: ScreenDefinition = {
           if (!holding || before === undefined) prevLife.set(m.uid, m.life);
         }
       }
-      element.classList.toggle('is-defending', canChooseDefense(s) && !(spotlight && Date.now() < spotlight.until));
+      // 守りの選択の間（相手のカード・自分の守りのカードを見せている間も。手札は場所だけ残して見せない）
+      element.classList.toggle('is-defending', canChooseDefense(s));
       element.dataset.phase = s.phase;
       element.dataset.active = s.active;
       element.dataset.acting = blocked ? 'dealing' : (actingSide(s) ?? 'none');
