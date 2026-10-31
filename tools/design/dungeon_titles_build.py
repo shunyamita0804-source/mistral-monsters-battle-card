@@ -15,9 +15,12 @@ import sys
 
 from PIL import Image
 
-DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy', 'wind')
+DUNGEONS = ('water', 'ice', 'fire', 'machine', 'holy', 'wind', 'thunder')
 # 名前の絵がほかの所にあるもの（src からの相対パス）
-TITLE_FILES = {'wind': os.path.join('..', 'dungeons5-20261028', 'wind', 'wind_valley_title.png')}
+TITLE_FILES = {
+    'wind': os.path.join('..', 'dungeons5-20261028', 'wind', 'wind_valley_title.png'),
+    'thunder': os.path.join('..', 'dungeons5-20261028', 'thunder', 'thunder_plateau_title.png'),  # 2026-11-01 指示書 AH
+}
 # 名前の絵の幅の上限（遺跡・森と同じ）
 MAX_W = 1000
 

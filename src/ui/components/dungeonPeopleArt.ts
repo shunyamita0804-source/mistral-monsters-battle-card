@@ -4,6 +4,7 @@ import standZack from '@assets/images/characters/stand_battler_fire_zack.webp';
 import standOtto from '@assets/images/characters/stand_battler_machine_otto.webp';
 import standMina from '@assets/images/characters/stand_battler_holy_mina.webp';
 import standNiko from '@assets/images/characters/stand_battler_wind.webp';
+import standLuka from '@assets/images/characters/stand_battler_thunder.webp';
 import { opponentFaceUrl } from './opponentFace.ts';
 import { h } from '../dom.ts';
 
@@ -20,6 +21,8 @@ const BATTLER_STANDS: Readonly<Record<string, string>> = {
   'battler-mina': standMina,
   // 2026-10-30 指示書 U：風の渓谷のニコ
   'battler-niko': standNiko,
+  // 2026-11-01 指示書 AH：雷の高原のルカ（ステラの立ち姿はほかの守り手と同じく保管だけ）
+  'battler-luka': standLuka,
 };
 
 export function battlerStandUrl(face: string): string | undefined {

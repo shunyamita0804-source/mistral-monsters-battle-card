@@ -61,8 +61,9 @@ export const DUNGEON_RUN = {
  * - switch：階段（最後の階はボスの間）の手前に閉じた扉。同じ階のスイッチを調べると開く
  * - holy：見えない番人が強く、負けられる回数が少ない
  * - wind（2026-10-30 指示書 U・風の渓谷。ユーザー決定）：強い風のマス。乗ると風の向きに2マス押し流される（src/game/dungeon/generate.ts の windPush）
+ * - thunder（2026-11-01 指示書 AH・雷の高原）：落雷のマス。1歩ごとに予告 → 次の1歩のあとに落雷。打たれたら見えない番人との対戦（src/game/dungeon/thunder.ts）
  */
-export type DungeonGimmick = 'none' | 'water' | 'ice' | 'lava' | 'switch' | 'holy' | 'wind';
+export type DungeonGimmick = 'none' | 'water' | 'ice' | 'lava' | 'switch' | 'holy' | 'wind' | 'thunder';
 
 /** 【仮】ダンジョンごとの値（階・開放・強さ・相手）。名前・説明は src/data/dungeons.ts */
 export interface RunDungeonConfig {
@@ -129,6 +130,12 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
     floors: 5, gimmick: 'lava', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 2, guardianRate: 0.45, maxLosses: 3,
     guardianLifeBonus: -0.2, npcTeams: [[GAU, LAZ, NOB], [LAZ, GAU, SOR]], guardianTeam: [GAU, LAZ, NOB], bossId: 'enc-fire-boss',
   },
+  // 雷の高原（B ランク・2026-11-01 指示書 AH。炎の火山の次に並べる）：落雷のマス。強さは炎の火山と同じ段（地下5階・floorLife 1〜1.4・負けられる回数 3）。
+  // 見える範囲 1。落雷で番人が出るので、ふだんの番人は火山より少なめ（0.3）。バトラー・見えない番人の編成は指示書の仮（ハクランは使わない〔ボスの切り札〕）
+  'dungeon-09': {
+    floors: 5, gimmick: 'thunder', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: -0.2, npcTeams: [[NOB, PUK, KAL], [PUK, NOB, MYU]], guardianTeam: [NOB, KAL, PUK], bossId: 'enc-thunder-boss',
+  },
   // 機械の塔（A ランク）：スイッチで開く扉
   'dungeon-06': {
     floors: 5, gimmick: 'switch', unlockRank: 'A', floorLife: [1.1, 1.2, 1.3, 1.4, 1.5], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
@@ -175,6 +182,8 @@ const LOCAL_BATTLERS: Readonly<Record<string, { readonly face: string; readonly 
   'dungeon-07': { face: 'battler-mina', guest: 2 },
   // 2026-10-30 指示書 U：風の渓谷のニコ＋フローラ（水の神殿と同じ割り振り）
   'dungeon-08': { face: 'battler-niko', guest: 1 },
+  // 2026-11-01 指示書 AH：雷の高原のルカ＋オスカー
+  'dungeon-09': { face: 'battler-luka', guest: 2 },
 };
 
 /**
@@ -202,6 +211,8 @@ const RUN_CPU_SKILL: Readonly<Record<string, CpuSkill | 'CB'>> = {
   'dungeon-01': 'B',
   'dungeon-04': 'B',
   'dungeon-05': 'B',
+  // 雷の高原（2026-11-01 指示書 AH）：炎の火山と同じ
+  'dungeon-09': 'B',
   'dungeon-06': 'A',
   'dungeon-07': 'A',
 };

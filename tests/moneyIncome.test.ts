@@ -22,7 +22,7 @@ import { createNewSave, type SaveData } from '../src/game/save/saveData.ts';
  * ダンジョンの1勝ごとのお金・宝箱の中身・ボスのお金
  */
 
-const DUNGEON_IDS = ['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07'];
+const DUNGEON_IDS = ['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-09', 'dungeon-06', 'dungeon-07'];
 
 function inRun(dungeonId: string, seed = 777): SaveData {
   return startRun(createNewSave(), dungeonId, seed);
@@ -41,6 +41,8 @@ describe('ダンジョンごとのお金の表（src/data/economy.ts の DUNGEON
       'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
       // 風の渓谷（2026-10-30 指示書 U）：水の神殿と同じ段
       'dungeon-08': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
+      // 雷の高原（2026-11-01 指示書 AH）：炎の火山と同じ段
+      'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
     });
     expect(CHEST_RULES.rates).toEqual({ coins: 70, item: 25, card: 5 });
     expect(CHEST_RULES.items).toEqual(['torch', 'incense', 'smokeBall', 'returnFeather']);

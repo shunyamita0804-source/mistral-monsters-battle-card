@@ -80,6 +80,7 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
       'dungeon-08': 0,
       'dungeon-04': -0.2,
       'dungeon-05': -0.2,
+      'dungeon-09': -0.2, // 2026-11-01 指示書 AH：雷の高原（炎の火山と同じ）
       'dungeon-06': -0.3,
       'dungeon-07': 0.3,
     });
@@ -119,7 +120,7 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
   });
 
   it('セーブの version は上げていない（デッキ・カードは書きかえないので。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(31); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に
+    expect(SAVE_VERSION).toBe(32); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に
   });
 });
 
@@ -191,6 +192,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     'enc-wind-boss': 'mon-tsumuji',
     'enc-ice-boss': 'mon-hyouzuku', // 2026-10-30 指示書 W：カルシェルからヒョウズクに
     'enc-fire-boss': 'mon-shishien', // 2026-10-31 指示書 AB：ガウルからシシエンに
+    'enc-thunder-boss': 'mon-hakuran', // 2026-11-01 指示書 AH：雷の高原のステラ
     'enc-machine-boss': 'mon-lazuck',
     'enc-holy-boss': 'mon-soramo',
   };
@@ -216,6 +218,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       'enc-wind-boss': 1.22,
       'enc-ice-boss': 1.05,
       'enc-fire-boss': 1.08, // 2026-10-31 指示書 AC【2】：1.09 → 1.08（21.0％。V の目標 18.1％ ±3 に入った）
+      'enc-thunder-boss': 1, // 2026-11-01 指示書 AH：試遊で 1.0（18.3％。バルカと同じ目標 18.1％ ±3 に入った）
       'enc-machine-boss': 1.07,
       'enc-holy-boss': 1.08,
     });

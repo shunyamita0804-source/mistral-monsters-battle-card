@@ -28,7 +28,7 @@ const DIRS: readonly Direction[] = ['up', 'down', 'left', 'right'];
 
 describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ」。値は仮）', () => {
   it('7つ（2026-10-30 に風の渓谷を足して8つ。水の神殿の次）：階・仕掛け・開放のランク', () => {
-    expect(DUNGEONS.map((d) => d.id)).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07']);
+    expect(DUNGEONS.map((d) => d.id)).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-09', 'dungeon-06', 'dungeon-07']);
     expect(DUNGEONS.map((d) => [d.name, runConfig(d.id).floors, runConfig(d.id).gimmick, runConfig(d.id).unlockRank])).toEqual([
       // 2026-10-29 ジオルの最終：遺跡は C ランクで開く地下4階（氷の洞窟と同じ段）
       ['太古の遺跡', 4, 'none', 'C'],
@@ -37,6 +37,7 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
       ['風の渓谷', 4, 'wind', 'D'],
       ['氷の洞窟', 4, 'ice', 'C'],
       ['炎の火山', 5, 'lava', 'B'],
+      ['雷の高原', 5, 'thunder', 'B'], // 2026-11-01 指示書 AH
       ['機械の塔', 5, 'switch', 'A'],
       ['天の聖域', 5, 'holy', 'S'],
     ]);
@@ -99,7 +100,7 @@ describe('開放', () => {
     const old = { ...rest, version: 18, rank: 'A', activeDungeon: { dungeonId: 'dungeon-02', floor: 1, defeatedEnemies: [] }, location: { mapId: 'dungeon-02-b2', x: 5, y: 5, dir: 'up' } };
     const s = normalizeSave(old);
     expect(s?.version).toBe(SAVE_VERSION);
-    expect(s?.unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-06']);
+    expect(s?.unlockedDungeons).toEqual(['dungeon-01', 'dungeon-02', 'dungeon-03', 'dungeon-08', 'dungeon-04', 'dungeon-05', 'dungeon-09', 'dungeon-06']);
     expect(s?.activeDungeon).toBeNull();
     expect(s?.location.mapId).toBe('home');
   });

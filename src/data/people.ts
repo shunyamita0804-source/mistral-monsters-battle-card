@@ -2,8 +2,9 @@ import type { NpcId } from './maps.ts';
 import type { OpponentDefinition } from './tournaments.ts';
 
 /**
- * 登場人物42人（28人は 2026-10-27 ユーザー承認の指示書「人物の名前・名刺図鑑・カード図鑑」、29〜40 は 2026-10-28 指示書「ダンジョンの人物12人」、
- * 41・42 は 2026-10-30 指示書 U「風の渓谷とツムジ」の守り手ゼフィラ・バトラーのニコ。せりふは Claude の案）。
+ * 登場人物44人（28人は 2026-10-27 ユーザー承認の指示書「人物の名前・名刺図鑑・カード図鑑」、29〜40 は 2026-10-28 指示書「ダンジョンの人物12人」、
+ * 41・42 は 2026-10-30 指示書 U「風の渓谷とツムジ」の守り手ゼフィラ・バトラーのニコ。せりふは Claude の案。
+ * 43・44 は 2026-11-01 指示書 AH「雷の高原」の守り手ステラ・バトラーのルカ。せりふは進行の案〔試遊でユーザーが直す〕）。
  * 名前・二つ名・肩書き・ひとことは指示書のとおり（言い回しを変えない）。英語は Claude の仮訳。
  * No. は名刺図鑑の番号。顔の絵は src/ui/components/personFace.ts（絵が無い人は人影）。
  *
@@ -268,6 +269,37 @@ export const PEOPLE: readonly Person[] = [
       ['よし、いこうか。', "Alright, let's go."],
       ['ぼくの勝ちだね。足もとの風に気をつけて進むんだよ。', 'I win this one. Mind the wind at your feet as you go.'],
       ['まいったな、君は強いね。この先も、気をつけて。', "You got me. You're strong. Take care up ahead."],
+    ),
+  }),
+  // ---------- 雷の高原（2026-11-01 指示書 AH）。ステラは守り手＝ボス、ルカはバトラー（ステラの弟子）。せりふは進行の案（試遊でユーザーが直す。英語は仮訳） ----------
+  // ステラ：理屈っぽく早口・自信のある天文の学者。一族の記録係
+  p(43, 'stella', 'dungeon', ['ステラ', 'Stella'], ['高原の守り手・一族の記録係', 'Plateau Keeper, clan archivist'], ['雷は気まぐれじゃないの。計算すれば、ちゃんと当たるわ。', "Lightning isn't random. Do the math, and you can call where it lands."], {
+    opponentIds: ['enc-thunder-boss'],
+    lines: lines(
+      [
+        'あら、予報どおりの時刻に到着ね。雷に打たれずに来たのなら、計算の才能があるわ。守り手として、あなたの力を測らせてもらうわね。',
+        "Oh, right on the forecast. If you made it here without getting struck, you've got a head for numbers. As a keeper, let me measure your strength.",
+      ],
+      ['勝つ確率は計算済みよ。さあ、始めましょう。', "I've already calculated my odds. Now, let's begin."],
+      ['計算どおりね。次は、雲の流れをもう少し読んでからいらっしゃい。', 'Just as calculated. Next time, read the clouds a little better before you come.'],
+      ['計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。', "My numbers... don't add up? ...No. It was my ruler for measuring you that was off."],
+      [
+        '祭壇は星図の門の先よ。ハクランが待っているわ。……今日のことは、ちゃんと記録しておかないとね。',
+        "The altar lies past the star-chart gate. Hakuran is waiting. ...I'll have to record today properly.",
+      ],
+    ),
+  }),
+  // ルカ：元気でまじめな見習いの少年。ステラの弟子
+  p(44, 'luka', 'dungeon', ['ルカ', 'Luka'], ['観測所の見習い', 'Observatory Apprentice'], ['雲の形と風の向き、毎日ちゃんと書き留めてます！', 'I write down the cloud shapes and wind every single day!'], {
+    opponentFaces: ['battler-luka'],
+    lines: lines(
+      [
+        'こんにちは！ ぼく、観測所の見習いのルカです。光った地面には近づかないでくださいね、次にそこへ雷が落ちますから！ ……あの、よかったら一戦どうですか？',
+        "Hello! I'm Luka, an apprentice at the observatory. Stay away from glowing ground, okay? Lightning strikes there next! ...Um, would you like a battle?",
+      ],
+      ['よろしくお願いします！', 'Nice to battle you!'],
+      ['やった！ 先生に報告しなきゃ！', 'Yes! I have to tell my teacher!'],
+      ['うわあ、負けちゃった……。記録帳に書いておきます、あなたの勝ちって！', "Aww, I lost... I'll write it in my logbook: you win!"],
     ),
   }),
 ];

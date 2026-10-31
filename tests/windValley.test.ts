@@ -218,7 +218,7 @@ describe('人：守り手ゼフィラ・バトラーのニコ', () => {
     const n = getPerson('niko');
     expect(z).toMatchObject({ no: 41, group: 'dungeon', name: { ja: 'ゼフィラ', en: 'Zephyra' }, title: { ja: '渓谷の守り手・一族でいちばん若い' } });
     expect(n).toMatchObject({ no: 42, group: 'dungeon', name: { ja: 'ニコ', en: 'Niko' }, title: { ja: 'つり橋の番', en: 'Bridge Keeper' } });
-    expect(Math.max(...PEOPLE.filter((p) => p.id !== 'zephyra' && p.id !== 'niko').map((p) => p.no))).toBe(40);
+    expect(Math.max(...PEOPLE.filter((p) => p.no <= 42 && p.id !== 'zephyra' && p.id !== 'niko').map((p) => p.no))).toBe(40);
     expect(personOfOpponent(ENCOUNTERS['enc-wind-boss'] as never)?.id).toBe('zephyra');
     const lines = Object.values(z?.lines ?? {}).map((l) => (l as { ja: string }).ja);
     expect(lines.filter((l) => l.includes('ほかの聖地')).length).toBe(1);
@@ -321,6 +321,6 @@ describe('D の大会の出場条件・セーブ', () => {
   });
 
   it('セーブの version は上げていない（ダンジョン・人・モンスターを足しただけ。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(31); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に
+    expect(SAVE_VERSION).toBe(32); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に
   });
 });

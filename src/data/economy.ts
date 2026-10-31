@@ -220,6 +220,8 @@ export const DUNGEON_MONEY: Readonly<Record<string, DungeonMoney>> = {
   'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
   // 風の渓谷（2026-10-30 指示書 U）：水の神殿と同じ段
   'dungeon-08': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
+  // 雷の高原（2026-11-01 指示書 AH）：炎の火山と同じ段
+  'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
 };
 
 /** そのダンジョンのお金（表に無いダンジョンは太古の遺跡と同じ） */

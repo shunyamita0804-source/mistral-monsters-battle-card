@@ -66,6 +66,7 @@ import fireBattleBg from '@assets/images/backgrounds/battle_fire.webp';
 import machineBattleBg from '@assets/images/backgrounds/battle_machine.webp';
 import holyBattleBg from '@assets/images/backgrounds/battle_holy.webp';
 import windBattleBg from '@assets/images/backgrounds/battle_wind.webp';
+import thunderBattleBg from '@assets/images/backgrounds/battle_thunder.webp';
 import encounterFx1 from '@assets/images/effects/fx_encounter_1.webp';
 import encounterFx2 from '@assets/images/effects/fx_encounter_2.webp';
 import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
@@ -169,6 +170,8 @@ const RUN_BGM: Readonly<Record<string, BgmId>> = {
   'dungeon-07': 'dungeonHoly',
   // 2026-10-30 指示書 U：風の渓谷
   'dungeon-08': 'dungeonWind',
+  // 2026-11-01 指示書 AH：雷の高原
+  'dungeon-09': 'dungeonThunder',
 };
 
 /**
@@ -185,10 +188,11 @@ const RUN_BATTLE_BG: Readonly<Record<string, string>> = {
   'dungeon-06': machineBattleBg,
   'dungeon-07': holyBattleBg,
   'dungeon-08': windBattleBg,
+  'dungeon-09': thunderBattleBg,
 };
 
 /** ボス戦もそのダンジョンの対戦の背景にするダンジョン（2026-10-28 ユーザー：新しい5つ） */
-const BOSS_OWN_BG: readonly string[] = ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07', 'dungeon-08'];
+const BOSS_OWN_BG: readonly string[] = ['dungeon-03', 'dungeon-04', 'dungeon-05', 'dungeon-06', 'dungeon-07', 'dungeon-08', 'dungeon-09'];
 
 /** 風のマスの文字 → 絵の向きのクラス（右向きの形をまわす。dungeonRun.css の drun__tile--wind-*） */
 const WIND_CLASS: Readonly<Record<string, string>> = { '>': 'r', '<': 'l', '^': 'u', v: 'd' };
@@ -204,7 +208,9 @@ const isShore = (ch: string | undefined): boolean => ch !== undefined && ch !== 
  */
 const rowZ = (y: number, front: boolean): string => String(100 + y * 2 + (front ? 1 : 0));
 /** 床に置く平らな飾り（行の順にせず、いつも人や物より奥） */
-const FLAT_DECOR: readonly string[] = ['crack', 'feather', 'rug', 'emblem', 'fog', 'leaves', 'bridge', 'rail', 'slab'];
+const FLAT_DECOR: readonly string[] = ['crack', 'feather', 'rug', 'emblem', 'fog', 'leaves', 'bridge', 'rail', 'slab', 'tuft', 'fallenpillar'];
+/** 雷の高原（2026-11-01 指示書 AH）：稲妻が落ちる演出の長さ（ミリ秒。0.3 秒ほど・画面が一瞬だけ白く光る） */
+const BOLT_MS = 320;
 
 const KEY_DIR: Readonly<Record<string, Direction>> = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
 
@@ -215,6 +221,9 @@ class DungeonRunView {
   /** マス・置いてあるものを並べる層（主人公が真ん中に来るように動かす） */
   readonly #world = h('div', { class: 'drun__world' });
   readonly #view = h('div', { class: 'drun__view' }, this.#world);
+  /** 雷の高原（2026-11-01 指示書 AH）の予告の印と稲妻を描く層。暗さ（drun__light）の上に重ねて、暗い所でも見えるように。動きは床（#world）と同じ */
+  readonly #thunderPan = h('div', { class: 'drun__thunder-pan' });
+  readonly #thunderLayer = h('div', { class: 'drun__thunder-layer', attrs: { 'aria-hidden': 'true' } }, this.#thunderPan);
   readonly #player = h('div', { class: 'drun__player', attrs: { 'aria-hidden': 'true' } });
   readonly #omenMark = h('div', { class: 'drun__omen-mark', attrs: { 'aria-hidden': 'true' } });
   readonly #omenEdge = h('div', { class: 'drun__omen-edge', attrs: { 'aria-hidden': 'true' } });
@@ -290,6 +299,7 @@ class DungeonRunView {
     this.#root.append(
       this.#view,
       h('div', { class: 'drun__light', attrs: { 'aria-hidden': 'true' } }),
+      this.#thunderLayer,
       // 主人公のまわりのあたたかい明かり（2026-10-27 デザイン33点の 1。加算で重ねる。ui33.css）
       h('div', { class: 'drun__glow', attrs: { 'aria-hidden': 'true' } }),
       this.#omenEdge,
@@ -548,11 +558,15 @@ class DungeonRunView {
     }
     // 扉：スイッチを押した階では開いている
     this.#root.classList.toggle('is-doors-open', doorsOpen(run));
+    // 雷の高原（2026-11-01 指示書 AH）：落雷の予告の印（次の1歩のあとにここへ雷が落ちる。うすく点滅）
+    this.#drawThunderMarks();
     // カメラ：主人公のマスが画面の真ん中
     const cx = this.#view.clientWidth / 2 || 195;
     const cy = this.#view.clientHeight / 2 || 300;
     this.#world.style.transition = animate ? `transform ${STEP_MS * steps}ms linear` : 'none';
     this.#world.style.transform = `translate(${Math.round(cx - (run.x + 0.5) * TILE)}px, ${Math.round(cy - (run.y + 0.5) * TILE)}px)`;
+    this.#thunderPan.style.transition = this.#world.style.transition;
+    this.#thunderPan.style.transform = this.#world.style.transform;
     // 主人公：足元がマスの下の方に来るように
     const viewTop = this.#view.offsetTop;
     this.#player.style.left = `${Math.round(cx - PLAYER_W / 2)}px`;
@@ -699,14 +713,56 @@ class DungeonRunView {
     }
     this.#refresh(r.moved, steps);
     if (r.gust) this.#gust(r.gust);
+    if (r.strikes) this.#thunderStrikes(r.strikes, !!r.thunderStruck);
     this.#setOmen(r.omen);
-    if (r.guardian) {
+    if (r.guardian && r.thunderStruck) {
+      // 雷に打たれた（雷の高原）：稲妻を見せてから、見えない番人との対戦（今の番人と同じ。煙玉で逃げられる）
+      this.#release();
+      this.#busy = true;
+      const g = r.guardian;
+      setTimeout(() => {
+        if (this.#destroyed) return;
+        this.#busy = false;
+        this.#guardianAppears(g, 'dungeonRun.thunderGuardian');
+      }, BOLT_MS + 120);
+    } else if (r.guardian) {
       this.#release();
       this.#guardianAppears(r.guardian);
     } else if (r.onStairs) {
       this.#release();
       this.#askStairs();
     }
+  }
+
+  /** 雷の高原の予告の印をいまの予告に合わせる（印の要素は前のものを消して置きなおす） */
+  #drawThunderMarks(): void {
+    for (const el of this.#thunderPan.querySelectorAll('.drun__thunder-mark')) el.remove();
+    const run = this.#run;
+    if (!run.thunder || run.thunder.floor !== run.floor) return;
+    for (const p of run.thunder.marks) {
+      const el = h('div', { class: 'drun__thunder-mark', attrs: { 'aria-hidden': 'true' } });
+      el.style.left = `${p.x * TILE}px`;
+      el.style.top = `${p.y * TILE}px`;
+      this.#thunderPan.append(el);
+    }
+  }
+
+  /** 雷の高原：予告していたマスに稲妻が落ちる（0.3 秒ほど）。画面が一瞬だけ白く光り、打撃の強い音（雷の音の素材は無いので） */
+  #thunderStrikes(strikes: readonly { readonly x: number; readonly y: number }[], struck: boolean): void {
+    if (strikes.length === 0) return;
+    for (const p of strikes) {
+      const el = h('div', { class: 'drun__thunder-bolt', attrs: { 'aria-hidden': 'true' } });
+      el.style.left = `${p.x * TILE}px`;
+      el.style.top = `${p.y * TILE}px`;
+      this.#thunderPan.append(el);
+      setTimeout(() => el.remove(), BOLT_MS + 40);
+    }
+    this.#root.classList.remove('is-thunder');
+    void this.#root.offsetWidth;
+    this.#root.classList.add('is-thunder');
+    setTimeout(() => this.#root.classList.remove('is-thunder'), BOLT_MS);
+    sound.play('hitStrong');
+    if (struck) this.#live.textContent = t('dungeonRun.thunderStruck');
   }
 
   /** 強い風のマスで押し流された（風の渓谷）：風の線が一瞬走り、風を切る音（風の音の素材は無いので、今の効果音のうち回避の「ヒュッ」） */
@@ -806,10 +862,10 @@ class DungeonRunView {
     this.#startBattle(e.kind === 'boss' ? 'boss' : 'npc', e.id, opponent, key);
   }
 
-  #guardianAppears(g: FloorEntity): void {
+  #guardianAppears(g: FloorEntity, key: 'dungeonRun.guardianAppear' | 'dungeonRun.thunderGuardian' = 'dungeonRun.guardianAppear'): void {
     this.#showMark();
     this.#showGuardian();
-    this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor, this.#run.dungeonId), 'dungeonRun.guardianAppear');
+    this.#startBattle('guardian', g.id, runGuardianOpponent(this.#run.floor, this.#run.dungeonId), key);
   }
 
   /**
@@ -836,7 +892,7 @@ class DungeonRunView {
     this.#world.append(el);
   }
 
-  #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear'): void {
+  #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear' | 'dungeonRun.thunderGuardian'): void {
     const store = this.#store;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
       this.#message(deckInvalidText(store.save.deck, 'world.deckInvalidBattle'));

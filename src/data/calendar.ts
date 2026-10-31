@@ -22,11 +22,19 @@ export const TEAM_REQUIREMENT = { rank: 'C' as RankId } as const;
  * 公式戦の出場の条件：そのランクで開いているダンジョンのボスを、すべて倒していること。
  * 新しいダンジョン（D・B・A・S に1つずつ）や物語のダンジョン（霧の廃坑・忘れられた書庫）が入ったら、そのランクの一覧に足すだけでよい
  */
+/**
+ * 前のセーブ（v31 まで）ですでに B 以上だった人は、雷の高原（2026-11-01 指示書 AH で B の条件に足した）のボスを倒していなくても、
+ * B の大会の条件からはずす（読み込むときに1回だけこの記録を付ける。src/game/save/saveData.ts の v32。風の渓谷の D と同じく、今いるランクの大会に出られなくならないように）
+ */
+export const THUNDER_BOSS_WAIVED_FLAG = 'thunder-boss-waived';
+/** 上の記録があるとき、条件からはずすダンジョン */
+export const WAIVED_BOSS_DUNGEONS: Readonly<Record<string, readonly string[]>> = { [THUNDER_BOSS_WAIVED_FLAG]: ['dungeon-09'] };
+
 export const RANK_BOSS_DUNGEONS: Readonly<Record<RankId, readonly string[]>> = {
   E: ['dungeon-02'], // 精霊の森
   D: ['dungeon-03', 'dungeon-08'], // 水の神殿・風の渓谷（2026-10-30 指示書 U）
   C: ['dungeon-04', 'dungeon-01'], // 氷の洞窟・太古の遺跡
-  B: ['dungeon-05'], // 炎の火山
+  B: ['dungeon-05', 'dungeon-09'], // 炎の火山・雷の高原（2026-11-01 指示書 AH）
   A: ['dungeon-06'], // 機械の塔
   S: ['dungeon-07'], // 天の聖域
 };

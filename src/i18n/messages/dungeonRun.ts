@@ -14,6 +14,9 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.buttonB': { ja: 'メニュー', en: 'Menu' },
   'dungeonRun.omen': { ja: 'なにかの気配がする…', en: 'You sense something nearby...' },
   'dungeonRun.gust': { ja: '強い風に押し流された！', en: 'A strong gust pushed you along!' },
+  // 雷の高原（2026-11-01 指示書 AH。英語は仮訳）
+  'dungeonRun.thunderStruck': { ja: '雷に打たれた！', en: 'You were struck by lightning!' },
+  'dungeonRun.thunderGuardian': { ja: '雷に打たれた！\n{name}が姿を現した！\n（{monsters}）', en: 'You were struck by lightning!\n{name} reveals itself!\n({monsters})' },
   'dungeonRun.omenMark': { ja: '！', en: '!' },
   'dungeonRun.npcTalk': { ja: '{name}が勝負を挑んできた！\n（{monsters}）', en: '{name} challenges you!\n({monsters})' },
   'dungeonRun.guardianAppear': { ja: '{name}が姿を現した！\n（{monsters}）', en: '{name} reveals itself!\n({monsters})' },

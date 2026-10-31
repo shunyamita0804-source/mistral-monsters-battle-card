@@ -13,6 +13,7 @@ import dungeonFireMp3 from '@assets/audio/bgm/bgm_dungeon_fire.mp3';
 import dungeonMachineMp3 from '@assets/audio/bgm/bgm_dungeon_machine.mp3';
 import dungeonHolyMp3 from '@assets/audio/bgm/bgm_dungeon_holy.mp3';
 import dungeonWindMp3 from '@assets/audio/bgm/bgm_dungeon_wind.mp3';
+import dungeonThunderMp3 from '@assets/audio/bgm/bgm_dungeon_thunder.mp3';
 import shopMp3 from '@assets/audio/bgm/bgm_shop.mp3';
 import practiceMp3 from '@assets/audio/bgm/bgm_practice.mp3';
 import labMp3 from '@assets/audio/bgm/bgm_lab.mp3';
@@ -49,6 +50,7 @@ export type BgmId =
   | 'dungeonMachine'
   | 'dungeonHoly'
   | 'dungeonWind'
+  | 'dungeonThunder'
   | 'shop'
   | 'practice'
   | 'lab'
@@ -100,6 +102,9 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   // 風の渓谷（2026-10-30 指示書 U）：風のダンジョン / ハヤシユウ（OpenTracks〔旧 DOVA-SYNDROME〕。1分00秒・ループ対応のまま）。
   // 測った音量 -9.4 LUFS（水の神殿の曲 -9.3 LUFS と同じくらい）→ 水の神殿と同じ gain で約 -18.5 LUFS
   dungeonWind: { src: dungeonWindMp3, gain: 0.35 },
+  // 雷の高原（2026-11-01 指示書 AH）：Dungeon_Tower / むつき醒（PeriTune・CC BY 4.0。84.8 秒・ファイル全体でくり返す）。
+  // 測った音量 -8.5 LUFS（風の渓谷 -9.4・炎の火山 -8.8 より大きい）→ 約 -18.4 LUFS になる 0.32（docs/audio-credits.md）
+  dungeonThunder: { src: dungeonThunderMp3, gain: 0.32 },
   // カードショップ（店の中とショップの画面）：セールストーク / BGMer
   shop: { src: shopMp3, gain: 0.48 },
   // カード練習場（ユーザーの言う「教習所」）：無心になれる作業 / BGMer

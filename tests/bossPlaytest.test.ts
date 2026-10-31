@@ -228,6 +228,6 @@ describe('ボス8人の試遊（自動の対戦）', () => {
       mkdirSync(dirname(process.env.PLAYTEST_OUT), { recursive: true });
       writeFileSync(process.env.PLAYTEST_OUT, JSON.stringify({ games: GAMES, bosses }, null, 1));
     }
-    expect(Object.keys(bosses)).toHaveLength(only ? only.length : 8);
+    expect(Object.keys(bosses)).toHaveLength(only ? only.length : 9); // 2026-11-01 指示書 AH：雷の高原のステラで9人
   }, 3_600_000);
 });

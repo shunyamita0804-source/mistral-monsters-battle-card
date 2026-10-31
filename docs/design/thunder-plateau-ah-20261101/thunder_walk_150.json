@@ -1,0 +1,23 @@
+{
+ "seeds": 150,
+ "result": {
+  "straight": {
+   "floors": 750,
+   "steps": 54115,
+   "forecasts": 54115,
+   "marks": 157069,
+   "struck": 3945,
+   "struckPerFloor": 5.26,
+   "stepsPerFloor": 72.2
+  },
+  "avoid": {
+   "floors": 750,
+   "steps": 61663,
+   "forecasts": 61663,
+   "marks": 179563,
+   "struck": 0,
+   "struckPerFloor": 0,
+   "stepsPerFloor": 82.2
+  }
+ }
+}
