@@ -9,7 +9,8 @@
 - **AF・AF2 を main に取り込み済み・未公開**（公開はユーザーの「公開して」待ち。公開中は AE まで）。セーブ version 31。テスト 1073件。作業ブランチ `af-hakuran`・`af2-hakuran-fix` は取り込み済み
 - AF は検品合格。AF2（記録 `docs/hakuran-af-20261031.md` の後半）：ハクラン LIFE 6→7・ひづめげり 2→3・てんをかける 4→5（JSON・CSV を直し、前の版は `_v1_20261031`）。
   モンスターカードの枠（`battle_card_frame.py` の `FORCE_DARK`）とパックの縁（`pack_tint.py` の `DEEPER`）をハクランだけ暗い青緑に。試遊 51.0% → **66.7%**（B の目安の中）
-- **待っているもの**：正式モンスターカードの LIFE 7 版 `hakuran_official_monstercard_LIFE7.png`（届いたら原本を `design-parts/cards-original/hakuran/` に置き、`official_card_webp.py` で `hakuran_official.webp`。shop_card も `shop_products.py` で作り直す）。部屋の家具の描き直し
+- AF2 の追加：正式モンスターカードを LIFE 7 の版に差し替えた（原本 `hakuran_official_monstercard_LIFE7.png`。LIFE6 の版も残す。作業ブランチ `af2b-hakuran-card-life7` は取り込み済み）。報告は ZIP「AF2追加作業報告_20261031.zip」
+- **待っているもの**：部屋の家具の描き直し
 - **ユーザーの返事待ち**：AF2 の報告・AC・AE の報告への感想
 - 報告は ZIP「AF2作業報告_20261031.zip」
 

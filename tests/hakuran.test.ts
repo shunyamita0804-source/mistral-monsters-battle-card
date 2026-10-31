@@ -141,7 +141,8 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     }
     expect(HAKURAN_MONSTER.art?.file).toBe('hakuran_official.webp');
     expect(existsSync('assets/images/cards/monsters/hakuran_official.webp')).toBe(true);
-    for (const f of ['hakuran_official_monstercard_LIFE6.png', 'hakuran_original_approved.png', 'hakuran_3view_approved.png', 'pack_art_hakuran.png', 'AF_instruction_ja.md']) {
+    // 2026-10-31 指示書 AF2 の追加：LIFE 7 の版（ゲームの hakuran_official.webp はこちらから作る）。LIFE6 の版も残す
+    for (const f of ['hakuran_official_monstercard_LIFE6.png', 'hakuran_official_monstercard_LIFE7.png', 'AF2_card_ja.md', 'hakuran_original_approved.png', 'hakuran_3view_approved.png', 'pack_art_hakuran.png', 'AF_instruction_ja.md']) {
       expect(existsSync(`${ORIGINAL_DIR}/${f}`), f).toBe(true);
     }
     expect(readFileSync('design-parts/gacha-20261029/pack_art/pack_art_hakuran.png').equals(readFileSync(`${ORIGINAL_DIR}/pack_art_hakuran.png`))).toBe(true);
@@ -320,3 +321,4 @@ describe('手に入れ方（まだ無い）', () => {
     expect(readFileSync('src/data/economy.ts', 'utf8').match(/'thunder-boss-beaten'/g)).toHaveLength(1);
   });
 });
+

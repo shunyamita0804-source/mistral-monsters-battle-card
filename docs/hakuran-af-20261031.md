@@ -95,8 +95,9 @@ AF の検品は合格。指示書 AF2（チャット）のとおり。セーブ 
 
 - LIFE 6 → **7**・4 ひづめげり（マナ2）ダメージ 2 → **3**・9 てんをかける（マナ4）ダメージ 4 → **5**
 - 正本の JSON・CSV（`design-parts/cards-original/hakuran/` と `src/data/official/`）を直した。直す前の版は `hakuran14_skills_OFFICIAL_20261031_v1_20261031.{json,csv}` として残した（JSON の status にも直したことを書いた）
-- **正式モンスターカードの絵はまだ「LIFE 6」**（デザイン担当に `hakuran_official_monstercard_LIFE7.png` を依頼中。届いたら `tools/art/official_card_webp.py` で `hakuran_official.webp` を作り直す）。
-  図鑑の説明・対戦のライフの数字は 7 と出る
+- 正式モンスターカード：**AF2 の追加（ZIP「Mistral_CC_AF2_Hakuran_Card_LIFE7_20261031」の `AF2_card_ja.md`）で LIFE 7 の版に差し替えた**。
+  原本 `hakuran_official_monstercard_LIFE7.png`（970×1622）を `design-parts/cards-original/hakuran/` に無改変で足し（LIFE6 の版も残す）、`official_card_webp.py` で `hakuran_official.webp`（508×849）を作り直した。
+  図鑑・大きなカード・対戦でモンスターを押したときなど、正式カードが出る所すべてで LIFE 7（写真）。寝かせたカード `shop_card_hakuran.png` も作り直した（今のショップの絵には使われていない）
 
 ## 【2】枠の色をハクランだけ濃く
 
@@ -126,5 +127,4 @@ AF の検品は合格。指示書 AF2（チャット）のとおり。セーブ 
 
 ## 未完了
 
-- 正式モンスターカードの絵の LIFE 7 版（届いたら差し替え）
 - 雷の高原・手に入れ方・ショップの棚の絵・iPhone 実機での確認
