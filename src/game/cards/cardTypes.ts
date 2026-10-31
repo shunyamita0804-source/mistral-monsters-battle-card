@@ -145,6 +145,8 @@ export type SkillEffect =
   | { readonly type: 'handToDeck' }
   /** 特殊（正式：ソラモ14技の吠える 2026-10-25）：相手の手札からランダムに1枚を相手の捨て札へ。相手は補充しない */
   | { readonly type: 'discardRandom' }
+  /** 特殊（正式：デスオルのカラスのめ 2026-10-31 指示書 AG）：相手の手札をすべて見て、1枚選んで相手の捨て札へ。相手は補充しない。相手の手札が0枚なら使えない */
+  | { readonly type: 'discardChoice' }
   /** 特殊（正式：ノビトンの考える 2026-10-25）：自分の手札をすべて山札へ戻してシャッフルし、戻した枚数だけ引く */
   | { readonly type: 'redrawHand' }
   /** 特殊（正式：ノビトンの不思議な嗅覚 2026-10-25）：相手の手札をすべて確認する（画面に表を見せる。手札は動かさない） */
@@ -404,8 +406,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

@@ -42,9 +42,12 @@ export interface MatchCount {
   /** 上の2つを、技のモンスターごとに（ハクランの技だけを見るため） */
   undodgeableByMonster: Record<string, number>;
   undodgeableBlockedByMonster: Record<string, number>;
+  /** カラスのめ（2026-10-31 指示書 AG。デスオル）：a（player）の側が使った回数と、捨てさせたカードの種類（attack・guard・special・support） */
+  crowEye: number;
+  crowEyeDiscards: Record<string, number>;
 }
 
-export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0, recoil: 0, recoilKo: 0, recoilLoss: 0, winKo: 0, winDeckOut: 0, undodgeableA: 0, undodgeableBlockedA: 0, undodgeableByMonster: {}, undodgeableBlockedByMonster: {} });
+export const emptyCount = (): MatchCount => ({ winsA: 0, games: 0, ko: 0, deckOut: 0, draws: 0, turns: 0, attacks: 0, evaded: 0, defended: 0, supports: {}, hesitate: 0, misguard: 0, tsuta: 0, recoil: 0, recoilKo: 0, recoilLoss: 0, winKo: 0, winDeckOut: 0, undodgeableA: 0, undodgeableBlockedA: 0, undodgeableByMonster: {}, undodgeableBlockedByMonster: {}, crowEye: 0, crowEyeDiscards: {} });
 
 /** a（player）と b（opponent）の1対戦を最後まで進めて数える */
 /** skill：両方の腕前（b の構え・腕前を opponent で別にできる。大会の常連など） */
@@ -74,6 +77,11 @@ export function playCounted(a: Deck, b: Deck, seed: number, first: Side, c: Matc
     state = applyAction(state, action);
     countRecoil(before, state, c);
     if (side === 'player' && action.type === 'useCard' && before.phase === 'main') countUndodgeable(state, c);
+    if (side === 'player' && state.crowEye && state.crowEye.seq !== before.crowEye?.seq) {
+      c.crowEye++;
+      const kind = discardKind(state.crowEye.cardId);
+      c.crowEyeDiscards[kind] = (c.crowEyeDiscards[kind] ?? 0) + 1;
+    }
   }
   c.games++;
   c.turns += state.turn;
@@ -124,11 +132,23 @@ function countUndodgeable(state: BattleState, c: MatchCount): void {
   c.undodgeableBlockedByMonster[attack.monsterId] = (c.undodgeableBlockedByMonster[attack.monsterId] ?? 0) + 1;
 }
 
+/** カラスのめで捨てさせたカードの種類：攻撃・守り（防御・回避など）・特殊・サポート */
+function discardKind(cardId: string): string {
+  const card = getPlayCard(cardId);
+  if (card.kind === 'support') return 'support';
+  const type = card.effect.type;
+  if (type === 'attack') return 'attack';
+  if (type === 'defense' || type === 'evade' || type === 'cover') return 'guard';
+  return 'special';
+}
+
 export function addCount(to: MatchCount, c: MatchCount): void {
   for (const k of ['winsA', 'games', 'ko', 'deckOut', 'draws', 'turns', 'attacks', 'evaded', 'defended', 'hesitate', 'misguard', 'tsuta', 'recoil', 'recoilKo', 'recoilLoss', 'winKo', 'winDeckOut', 'undodgeableA', 'undodgeableBlockedA'] as const) to[k] += c[k];
   for (const [k, v] of Object.entries(c.supports)) to.supports[k] = (to.supports[k] ?? 0) + v;
   for (const [k, v] of Object.entries(c.undodgeableByMonster)) to.undodgeableByMonster[k] = (to.undodgeableByMonster[k] ?? 0) + v;
   for (const [k, v] of Object.entries(c.undodgeableBlockedByMonster)) to.undodgeableBlockedByMonster[k] = (to.undodgeableBlockedByMonster[k] ?? 0) + v;
+  to.crowEye += c.crowEye;
+  for (const [k, v] of Object.entries(c.crowEyeDiscards)) to.crowEyeDiscards[k] = (to.crowEyeDiscards[k] ?? 0) + v;
 }
 
 const pct = (n: number, of: number): number => (of === 0 ? 0 : Math.round((n / of) * 1000) / 10);
@@ -159,6 +179,8 @@ export function summarize(c: MatchCount): Record<string, unknown> {
     undodgeableBlockedPerGame: Math.round((c.undodgeableBlockedA / Math.max(1, c.games)) * 100) / 100,
     undodgeableByMonsterPerGame: Object.fromEntries(Object.entries(c.undodgeableByMonster).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
     undodgeableBlockedByMonsterPerGame: Object.fromEntries(Object.entries(c.undodgeableBlockedByMonster).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
+    crowEyePerGame: Math.round((c.crowEye / Math.max(1, c.games)) * 100) / 100,
+    crowEyeDiscards: { ...c.crowEyeDiscards },
     supportsPerGame: Object.fromEntries(Object.entries(c.supports).sort().map(([k, v]) => [k, Math.round((v / Math.max(1, c.games)) * 100) / 100])),
   };
 }

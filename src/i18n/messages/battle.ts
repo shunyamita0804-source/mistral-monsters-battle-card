@@ -90,6 +90,12 @@ export const BATTLE = {
   },
   'battle.log.revealHand': { ja: '{side}は{other}の手札{n}枚を確認した。', en: "{side} looked at {other}'s hand ({n} {n|card|cards})." },
   'battle.reveal.title': { ja: '相手の手札', en: "Opponent's hand" },
+  // カラスのめ（デスオル 2026-10-31 指示書 AG。英語は仮訳）
+  'battle.log.discardChoice': { ja: 'カラスのめ：{player}の手札から「{card}」を捨てさせた。', en: "Raven's Eye: made {player} discard {card}." },
+  'battle.crow.title': { ja: 'カラスのめ', en: "Raven's Eye" },
+  'battle.crow.lead': { ja: '相手の手札をすべて見た。捨てさせる1枚をタップして選んでください。', en: "You see every card in the opponent's hand. Tap one card to make them discard it." },
+  'battle.crow.confirm': { ja: 'これを捨てさせる', en: 'Discard this' },
+  'battle.talk.crowEye': { ja: 'カラスのめ：「{card}」を捨てさせた', en: "Raven's Eye: I made you discard {card}." },
   'battle.reveal.lead': { ja: '不思議な嗅覚で、相手の手札をすべて確認した。', en: 'Curious Sniff revealed every card in the opponent’s hand.' },
 
   // 使えない理由（engine.ts の cardUsability）

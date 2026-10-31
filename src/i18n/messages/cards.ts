@@ -34,6 +34,7 @@ export const CARDS = {
   'card.effect.taunt': { ja: '特殊', en: 'Special' },
   'card.effect.handToDeck': { ja: '特殊', en: 'Special' },
   'card.effect.discardRandom': { ja: '特殊', en: 'Special' },
+  'card.effect.discardChoice': { ja: '特殊', en: 'Special' },
   'card.effect.redrawHand': { ja: '特殊', en: 'Special' },
   'card.effect.revealHand': { ja: '特殊', en: 'Special' },
   'card.effect.shield': { ja: '特殊', en: 'Special' },

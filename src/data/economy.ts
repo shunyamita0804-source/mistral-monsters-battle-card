@@ -166,6 +166,9 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // ハクラン（2026-10-31 指示書 AF）：雷の高原のボスに初めて勝ったあと（thunder-boss-beaten。まだどこでも立たない。雷の高原のボスを作るときに立てる）。
   // 並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く）なので、今のゲームでは並ばない。JSON の gacha_slot も同じ（hakuran14_skills_OFFICIAL_20261031.json）
   { id: 'hakuran', monsterId: 'mon-hakuran', rareSkillNames: ['らいうん', 'せいなるいかずち', 'かすみのあゆみ'], unlockFlag: 'thunder-boss-beaten' },
+  // デスオル（2026-10-31 指示書 AG）：置き場所を決めたときに desuoru-unlocked を立てる（まだどこでも立たない）。
+  // 並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く）なので、今のゲームでは並ばない。JSON の gacha_slot も同じ
+  { id: 'desuoru', monsterId: 'mon-desuoru', rareSkillNames: ['ヘルのもん', 'カラスのめ', 'かげにとける'], unlockFlag: 'desuoru-unlocked' },
   // 道具のパック（仮。2026-10-30 指示書 Y）：サポート11種類。レアの枠は思い出の箱・熱気。最初から並ぶ。値段・確率・枚数はほかと同じ。
   // パックの絵（pack_tools.webp）・販売機の窓（panel_tools.webp）は 2026-10-30 指示書 Z で入れた（袋の色は銀 #B8BCC4。それまでは封をしたパック・店の中のパネル）
   { id: 'tools', monsterId: '', cardIds: [7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map(supportId), rareSkillNames: ['思い出の箱', '熱気'] },

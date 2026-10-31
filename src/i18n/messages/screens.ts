@@ -176,8 +176,8 @@ export const SCREENS = {
   'collection.title': { ja: '図鑑', en: 'Card Album' },
   'collection.progress': { ja: '集めた割合 {n}%', en: 'Collected {n}%' },
   'collection.count': {
-    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ・ヒョウズク・シシエン・ハクラン。ほかは仮データ）',
-    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune, Serephine, Tsumuji, Hyozuku, Shishien and Hakuran cards are official; others are temporary)',
+    ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ・ヒョウズク・シシエン・ハクラン・デスオル。ほかは仮データ）',
+    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune, Serephine, Tsumuji, Hyozuku, Shishien, Hakuran and Desuoru cards are official; others are temporary)',
   },
   'cardList.title': { ja: 'カード一覧', en: 'Card List' },
   'cardList.heading': { ja: 'カードを見る', en: 'View Cards' },

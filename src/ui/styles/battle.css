@@ -1071,3 +1071,10 @@
   text-align: center;
   word-break: break-all;
 }
+
+/* カラスのめ（デスオル 2026-10-31 指示書 AG）：選んだ1枚を光らせる。やめるボタンは無い */
+.battle-crow__item.is-picked {
+  border-color: #ffd27a;
+  background: rgba(255, 210, 122, 0.22);
+  box-shadow: 0 0 0 2px #ffd27a, 0 0 12px rgba(255, 210, 122, 0.6);
+}
