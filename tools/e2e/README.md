@@ -139,3 +139,7 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 | `thunder_plateau_shot.cjs` | ダンジョンを選ぶ所・入るときの絵・床と飾り・落雷（予告・稲妻・「雷に打たれた！」→ 番人）・ルカ・ステラ・祭壇でハクラン。セーブのフォルダに base.json・thunder_safe.json・thunder_strike.json・thunder_floor.json（__dir）・npc_dungeon-09.json・boss_dungeon-09.json |
 
 - 大会の受付は `{hall,49,29,up}`、掲示板は `{bureau,16,19,left}`（calendar_shot.cjs の場所は部屋の作り直しで古い）
+
+## 2026-11-01 指示書 AJ
+
+- `aj_shot.cjs`：居場所の印（置き場所の案 a・b・c）・場が水中の表示・記録の文（みちしお・しのレクイエム）・図鑑の番号・ガチャの ○/13・箱を開けた一覧。開発用サーバー（npx vite）で動かす

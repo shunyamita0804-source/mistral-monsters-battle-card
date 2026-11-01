@@ -73,3 +73,9 @@
   height: 7px;
   background: radial-gradient(circle at 3px 7px, transparent 3px, #bfeaff 3.5px, transparent 4.5px) 0 0 / 6px 7px repeat-x;
 }
+/* 対戦の場のモンスター（カードが小さいので、印は決まった大きさ） */
+.battle__monster .habitat-mark {
+  width: 19px;
+  height: 19px;
+  border-width: 1.5px;
+}
