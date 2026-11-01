@@ -1,11 +1,14 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, REMOVED_SKILL_IDS, SKILLS, skillsOf } from '../src/data/cards.ts';
 import { PACKS } from '../src/data/economy.ts';
 import { KALSHELL_COLOR, KALSHELL_MONSTER, KALSHELL_SKILLS, KALSHELL_STARTER, kalshellSkillId } from '../src/data/kalshell.ts';
 import kalshellJson from '../src/data/official/kalshell14_skills_OFFICIAL_20261027.json';
 import { soramoSkillId } from '../src/data/soramo.ts';
+import { lazuckSkillId } from '../src/data/lazuck.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
+import { INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, cardUsability, createBattle, manaOf, targetsFor, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { skillCardFace } from '../src/game/cards/cardFace.ts';
@@ -13,10 +16,11 @@ import { getPlayCard } from '../src/data/cards.ts';
 import { createNewSave } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
-import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 
 const kal = (n: number): string => kalshellSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
+/** 指示書 AJ の表のカルシェルの12枚（ゲームのカードの正本） */
+const AJ = AJ_SKILLS['mon-kalshell'] ?? [];
 const ORIGINAL_DIR = 'design-parts/cards-original/kalshell14-20261027';
 
 /** 届いた CSV の行（BOM 付き・カンマ区切り。効果の文にカンマは無い） */
@@ -34,26 +38,50 @@ describe('カルシェル正式14技：データ（2026-10-27。届いた JSON�
     expect(readFileSync('src/data/official/kalshell14_initial_OFFICIAL_20261027.csv').equals(readFileSync(`${ORIGINAL_DIR}/03_DATA/02_初期配布16枚_UTF8.csv`))).toBe(true);
   });
 
-  it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
+  it('番号・技名・分類・マナ・ダメージ・効果が、CSV の14行と JSON（前の14技のデータ）ですべて一致する', () => {
     const rows = csvRows('src/data/official/kalshell14_skills_OFFICIAL_20261027.csv');
     expect(rows).toHaveLength(14);
     rows.forEach(([no, name, cat, mana, damage, effect], i) => {
       const n = i + 1;
       expect(Number(no)).toBe(n);
       expect(kalshellJson.skills[i]).toEqual({ no: n, name, category: cat, mana: Number(mana), damage, effect });
-      const s = getSkill(kal(n));
-      expect(s.displayNo).toBe(n);
-      expect(s.name).toBe(name);
-      expect(s.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
-      expect(s.cost).toBe(Number(mana));
-      expect(s.monsterId).toBe('mon-kalshell');
-      expect(s.isPlaceholder).toBe(false);
-      expect(s.stat).toEqual(damage === 'なし' ? null : { type: s.category, value: Number(damage) });
-      expect(s.effectTextJa).toBe(SKILL_CARD_TEXT[s.id] ?? (effect === 'なし' ? null : effect));
-      expect(s.art).toEqual({ category: 'skillCards', file: `kal_sk_${String(n).padStart(2, '0')}.png`, layout: 'frame' });
+      const s = KALSHELL_SKILLS[i];
+      expect(s?.displayNo).toBe(n);
+      expect(s?.name).toBe(name);
+      expect(s?.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
+      expect(s?.cost).toBe(Number(mana));
+      expect(s?.art).toEqual({ category: 'skillCards', file: `kal_sk_${String(n).padStart(2, '0')}.png`, layout: 'frame' });
     });
     expect(KALSHELL_SKILLS).toHaveLength(14);
     expect(new Set(KALSHELL_SKILLS.map((s) => s.id)).size).toBe(14);
+  });
+
+  it('ゲームのカードは指示書 AJ の表の12枚（並び・技名・分類・マナ・ダメージ・効果・効果の文）。絵は同じ ID の前の絵（みちしおは仮の絵）', () => {
+    const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(AJ).toHaveLength(12);
+    expect(skillsOf('mon-kalshell').map((s) => s.id)).toEqual(AJ.map((r) => r.id));
+    AJ.forEach((row, i) => {
+      const s = getSkill(row.id);
+      expect(s.displayNo).toBe(i + 1);
+      expect(s.name).toBe(row.name);
+      expect(s.category).toBe(AJ_CATEGORY[row.cat]);
+      expect(s.cost).toBe(row.mana);
+      expect(s.monsterId).toBe('mon-kalshell');
+      expect(s.isPlaceholder).toBe(false);
+      expect(s.stat).toEqual(row.damage === null ? null : { type: s.category, value: row.damage });
+      expect(s.effect).toEqual(row.effect ?? { type: 'attack' });
+      expect(s.effectTextJa).toBe(row.text);
+      const legacy = KALSHELL_SKILLS.find((k) => k.id === row.id);
+      expect(s.art).toEqual(legacy ? legacy.art : { category: 'skillCards', file: row.tempArt, layout: 'frame' });
+    });
+    // 新しい技：みちしお（場を水中にする。絵が届くまでタイダルクラッシュの絵）
+    expect(getSkill('skl-kalshell-15')).toMatchObject({ name: 'みちしお', category: 'special', cost: 2, effect: { type: 'tide' } });
+    expect(getSkill('skl-kalshell-15').art?.file).toBe('kal_sk_08.png');
+    // 外した技（アクアバースト・いかくのハサミ・しおのステップ）はゲームに無い
+    for (const n of [7, 9, 14]) {
+      expect(REMOVED_SKILL_IDS).toContain(kal(n));
+      expect(() => getSkill(kal(n))).toThrow();
+    }
   });
 
   it('技の構成：ちから5・かしこさ3・特殊2・防御3・回避1', () => {
@@ -90,7 +118,7 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
     ];
     files.forEach((name, i) => {
       const nn = String(i + 1).padStart(2, '0');
-      const game = readFileSync(`assets/images/cards/skills/${getSkill(kal(i + 1)).art?.file}`);
+      const game = readFileSync(`assets/images/cards/skills/${KALSHELL_SKILLS[i]?.art?.file}`);
       expect(game.equals(readFileSync(`${ORIGINAL_DIR}/02_ASSETS/Skills/Kalshell_SK${nn}_${name}_ArtV2.png`))).toBe(true);
       expect([game.readUInt32BE(16), game.readUInt32BE(20)]).toEqual([827, 937]);
     });
@@ -115,34 +143,41 @@ describe('カルシェル：モンスター・初期配布16枚', () => {
     expect(existsSync('assets/images/cards/monsters/kalshell_official.webp')).toBe(true);
     expect(existsSync('design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png')).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-kalshell')).toHaveLength(1);
-    expect(SKILLS.filter((s) => s.monsterId === 'mon-kalshell')).toHaveLength(14);
+    // 指示書 AJ：技カードは12枚
+    expect(SKILLS.filter((s) => s.monsterId === 'mon-kalshell')).toHaveLength(12);
   });
 
-  it('初期配布16枚：01・02・03・06・07・09・10 が2枚、11・12 が1枚', () => {
-    const byNo = Object.fromEntries(KALSHELL_STARTER.map((s) => [getSkill(s.id).displayNo, s.copies]));
-    expect(byNo).toEqual({ 1: 2, 2: 2, 3: 2, 6: 2, 7: 2, 9: 2, 10: 2, 11: 1, 12: 1 });
-    expect(KALSHELL_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
+  it('初期配布16枚（指示書 AJ の箱の枚数）：はさむ2・シェルタックル3・クラッシュクロー3・シェルブレイカー1・あわだま1・すなをほる2・からにこもる2・あわのまく2', () => {
+    const cards = INITIAL_DISTRIBUTION.find((d) => d.monsterId === 'mon-kalshell')?.cards ?? [];
+    const byNo = Object.fromEntries(cards.map((s) => [getSkill(s.id).displayNo, s.copies]));
+    expect(byNo).toEqual({ 1: 2, 2: 3, 4: 3, 5: 1, 6: 1, 8: 2, 10: 2, 11: 2 });
+    expect(cards.reduce((n, s) => n + s.copies, 0)).toBe(16);
+    expect(cards).toEqual(AJ.filter((r) => (r.box ?? 0) > 0).map((r) => ({ id: r.id, copies: r.box })));
+    // 前の配布（JSON の initial_distribution）は保管のまま：01・02・03・06・07・09・10 が2枚、11・12 が1枚
+    const legacyByNo = Object.fromEntries(KALSHELL_STARTER.map((s) => [Number(s.id.slice(-2)), s.copies]));
+    expect(legacyByNo).toEqual({ 1: 2, 2: 2, 3: 2, 6: 2, 7: 2, 9: 2, 10: 2, 11: 1, 12: 1 });
     const csv = csvRows('src/data/official/kalshell14_initial_OFFICIAL_20261027.csv').filter((r) => /^\d+$/.test(r[0] ?? ''));
     expect(csv.map(([no, , c]) => [Number(no), Number(c)])).toEqual(kalshellJson.initial_distribution.map((d) => [d.no, d.count]));
-    for (const s of KALSHELL_SKILLS) expect(s.availability).toBe(byNo[s.displayNo ?? 0] ? 'initial' : 'collect');
   });
 
   it('新しく始めたときの所持カードにだけ入る（初期デッキ60枚・モンスターカード本体・パックには入れない）', () => {
     const save = createNewSave();
-    for (const s of KALSHELL_STARTER) expect(save.collection[s.id]).toBe(s.copies);
-    for (const n of [4, 5, 8, 13, 14]) expect(save.collection[kal(n)]).toBeUndefined();
+    for (const r of AJ) expect(save.collection[r.id]).toBe((r.box ?? 0) > 0 ? r.box : undefined);
+    // 箱に0枚の技（コーラルスピア・タイダルクラッシュ・みちしお・てっぺきシェル）と外した技は持っていない
+    for (const id of [kal(4), kal(8), kal(15), kal(13), kal(7), kal(9), kal(14)]) expect(save.collection[id]).toBeUndefined();
     expect(save.collection['mon-kalshell']).toBeUndefined();
     expect(save.deck.skills.some((id) => id.startsWith('skl-kalshell-'))).toBe(false);
     for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('kalshell'))).toBe(false);
   });
 
-  it('日本語は JSON の効果の文のまま。英語は仮訳で、日本語が残らない', () => {
+  it('日本語は指示書 AJ の表の効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(kal(10))).description).toBe('次のターン攻撃対象にならない');
-    expect(skillCardFace(getSkill(kal(14))).description).toBe('消費マナ2以上のちから技を回避');
+    expect(skillCardFace(getSkill(kal(10))).description).toBe('次のターン攻撃の的にならない');
+    expect(skillCardFace(getSkill(kal(15))).description).toBe('次の相手のターン終了まで、全モンスターを水中にする');
+    expect(skillCardFace(getSkill(kal(13))).description).toBe('ちから技・かしこさ技に効く');
     setLanguage('en');
     expect(cardName(KALSHELL_MONSTER)).toBe('Kalshell');
-    for (const s of KALSHELL_SKILLS) {
+    for (const s of skillsOf('mon-kalshell')) {
       expect(cardName(s)).not.toMatch(/[ぁ-んァ-ン一-龯]/);
       expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
     }
@@ -177,9 +212,9 @@ const withMonster = (s: BattleState, uid: string, patch: Partial<BattleMonster>)
 };
 
 /** player が o-m1（カルシェル）に attack を使い、opponent が guards を使ったあとの状態 */
-function attackWith(attack: string, guards: string[], from: BattleState | null = null): BattleState {
+function attackWith(attack: string, guards: string[], from: BattleState | null = null, targetUid = 'o-m1'): BattleState {
   let s = from ?? scene({ player: [attack], opponent: guards });
-  s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+  s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid });
   expect(s.phase).toBe('defense');
   guards.forEach((_, i) => {
     s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: `o${i}` });
@@ -188,8 +223,8 @@ function attackWith(attack: string, guards: string[], from: BattleState | null =
   return s;
 }
 
-function underAttack(attack: string, guards: string[]): BattleState {
-  const s = applyAction(scene({ player: [attack], opponent: guards }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+function underAttack(attack: string, guards: string[], targetUid = 'o-m1'): BattleState {
+  const s = applyAction(scene({ player: [attack], opponent: guards }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid });
   expect(s.phase).toBe('defense');
   return s;
 }
@@ -201,24 +236,30 @@ function passTurn(s: BattleState, side: Side): BattleState {
 }
 
 describe('カルシェル正式14技：効果（細かい裁定は docs/battle-rules.md「正式カード（カルシェル）」）', () => {
-  it('01〜08 攻撃：守らなければ書かれたダメージがそのまま入る', () => {
-    const expected = [1, 2, 3, 2, 5, 2, 3, 5];
-    expected.forEach((dmg, i) => {
-      const s = attackWith(kal(i + 1), []);
-      expect(monster(s, 'o-m1').life).toBe(8 - dmg);
-      expect(manaOf(s.sides.player)).toBe(10 - getSkill(kal(i + 1)).cost);
-    });
+  it('攻撃の7枚（指示書 AJ）：守らなければ表のダメージがそのまま入る（タイダルクラッシュは場が水中でなければ5）', () => {
+    const attacks = AJ.filter((r) => r.damage !== null);
+    expect(attacks.map((r) => [r.name, r.mana, r.damage])).toEqual([
+      ['はさむ', 1, 1], ['シェルタックル', 2, 2], ['コーラルスピア', 3, 3], ['クラッシュクロー', 3, 4],
+      ['シェルブレイカー', 5, 6], ['あわだま', 1, 2], ['タイダルクラッシュ', 4, 5],
+    ]);
+    for (const r of attacks) {
+      const s = attackWith(r.id, []);
+      expect(monster(s, 'o-m1').life).toBe(8 - (r.damage ?? 0));
+      expect(manaOf(s.sides.player)).toBe(10 - r.mana);
+    }
   });
 
-  it('04 コーラルスピア：回避されない（しおのステップは使えない）。防御は使える', () => {
-    const s = underAttack(kal(4), [kal(14), kal(11)]);
+  it('コーラルスピア：回避されない（ソラモの星影ステップは使えない）。防御は使える', () => {
+    // 指示書 AJ でカルシェルの回避（しおのステップ）を外したので、回避はソラモ（o-m2）で確かめる
+    const s = underAttack(kal(4), [sor(14), sor(12)], 'o-m2');
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(false);
     expect(cardUsability(s, 'opponent', 'o1').usable).toBe(true);
     expect(monster(attackWith(kal(4), [kal(11)]), 'o-m1').life).toBe(8);
   });
 
-  it('09 いかくのハサミ：選んだ相手1体は、持ち主の次の手番に攻撃の技を使えない', () => {
-    let s = scene({ player: [kal(9)], opponent: [kal(1)] });
+  // 指示書 AJ で外した技（skl-kalshell-09 いかくのハサミ）と同じ封じ：ソラモのすなかけ（skl-soramo14-09）で確かめる
+  it('封じ（すなかけ）：選んだ相手1体は、持ち主の次の手番に攻撃の技を使えない', () => {
+    let s = scene({ player: [sor(9)], opponent: [kal(1)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(monster(s, 'o-m1').sealedTurn).toBe(s.turn + 1);
     s = passTurn(s, 'player');
@@ -239,7 +280,7 @@ describe('カルシェル正式14技：効果（細かい裁定は docs/battle-r
     expect(targets).not.toContain('p-m1');
     expect(targets).toContain('p-m2');
     // 特殊の技（攻撃でない）は選べる
-    expect(targetsFor(s, 'opponent', getPlayCard(kal(9))).map((m) => m.uid)).toContain('p-m1');
+    expect(targetsFor(s, 'opponent', getPlayCard(sor(9))).map((m) => m.uid)).toContain('p-m1');
     // 相手の思考も隠れたカルシェルを狙わない
     const ai = chooseAction(s, 'opponent');
     if (ai?.type === 'useCard' && ai.targetUid) expect(ai.targetUid).not.toBe('p-m1');
@@ -257,20 +298,23 @@ describe('カルシェル正式14技：効果（細かい裁定は docs/battle-r
     expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: '相手はもぐっていて攻撃できません' });
   });
 
-  it('11〜13 防御：ちから−3／かしこさ−3／両方−5。0未満にならない', () => {
-    expect(monster(attackWith(kal(5), [kal(11)]), 'o-m1').life).toBe(6);
+  it('防御（指示書 AJ）：からにこもる ちから−5／あわのまく かしこさ−3／てっぺきシェル 両方0に。0未満にならない', () => {
+    expect(monster(attackWith(kal(5), [kal(11)]), 'o-m1').life).toBe(7);
     expect(monster(attackWith(kal(8), [kal(12)]), 'o-m1').life).toBe(6);
     expect(monster(attackWith(kal(5), [kal(13)]), 'o-m1').life).toBe(8);
     expect(monster(attackWith(kal(8), [kal(13)]), 'o-m1').life).toBe(8);
     expect(monster(attackWith(kal(1), [kal(11)]), 'o-m1').life).toBe(8);
+    // てっぺきシェルは回避ではないので「回避されない」攻撃にも使える
+    expect(monster(attackWith(kal(4), [kal(13)]), 'o-m1').life).toBe(8);
     expect(cardUsability(underAttack(kal(6), [kal(11)]), 'opponent', 'o0').usable).toBe(false);
     expect(cardUsability(underAttack(kal(1), [kal(12)]), 'opponent', 'o0').usable).toBe(false);
   });
 
-  it('14 しおのステップ：攻撃カードの必要マナが2以上のちから技だけ回避。1マナのちから技・かしこさ技には使えない', () => {
-    expect(monster(attackWith(kal(2), [kal(14)]), 'o-m1').life).toBe(8);
-    expect(monster(attackWith(kal(5), [kal(14)]), 'o-m1').life).toBe(8);
-    expect(cardUsability(underAttack(kal(1), [kal(14)]), 'opponent', 'o0').usable).toBe(false);
-    expect(cardUsability(underAttack(kal(6), [kal(14)]), 'opponent', 'o0').usable).toBe(false);
+  // 指示書 AJ で外した技（skl-kalshell-14 しおのステップ）と同じ「マナ2以上の回避」：ラズック（o-m3）のシャドウスリップ（skl-lazuck-15）で確かめる
+  it('マナ2以上の回避（シャドウスリップ）：攻撃カードの必要マナが2以上なら回避。1マナの技には使えない', () => {
+    expect(monster(attackWith(kal(2), [lazuckSkillId(15)], null, 'o-m3'), 'o-m3').life).toBe(6);
+    expect(monster(attackWith(kal(5), [lazuckSkillId(15)], null, 'o-m3'), 'o-m3').life).toBe(6);
+    expect(cardUsability(underAttack(kal(1), [lazuckSkillId(15)], 'o-m3'), 'opponent', 'o0').usable).toBe(false);
+    expect(cardUsability(underAttack(kal(6), [lazuckSkillId(15)], 'o-m3'), 'opponent', 'o0').usable).toBe(false);
   });
 });

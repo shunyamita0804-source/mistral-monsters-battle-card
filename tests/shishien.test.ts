@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, REMOVED_SKILL_IDS, SKILLS } from '../src/data/cards.ts';
 import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { BARCA_ALTAR_OWED_FLAG, BARCA_BEATEN_FLAG, DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { RUN_DUNGEONS } from '../src/data/dungeonRun.ts';
@@ -10,6 +10,7 @@ import shishienJson from '../src/data/official/shishien14_skills_OFFICIAL_202610
 import { SHISHIEN_COLOR, SHISHIEN_GACHA_RARE, SHISHIEN_MONSTER, SHISHIEN_MONSTER_ID, SHISHIEN_PLAYTEST_16, SHISHIEN_SKILLS, shishienSkillId } from '../src/data/shishien.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction, CPU_SKILL } from '../src/game/battle/ai.ts';
 import { applyAction, cardUsability, createBattle, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
@@ -25,6 +26,9 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 
 const shi = (n: number): string => shishienSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
+/** 指示書 AJ の表のシシエンの12枚（ゲームのカードの正本） */
+const AJ = AJ_SKILLS['mon-shishien'] ?? [];
+const AJ_IDS = AJ.map((r) => r.id);
 const ORIGINAL_DIR = 'design-parts/cards-original/shishien';
 const FIRE = 'dungeon-05';
 const BARCA_TEAM = ['mon-gauul', SHISHIEN_MONSTER_ID, 'mon-lazuck'];
@@ -67,12 +71,32 @@ describe('シシエン：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('カードに書く短い文：捨て身は「当たると自分のライフ−1」・14 はかぜよみと同じ文。JSON の文は変えない', () => {
-    for (const n of [7, 8, 9]) expect(getSkill(shi(n)).effectTextJa).toBe('当たると自分のライフ−1');
-    expect(getSkill(shi(14)).effectTextJa).toBe(getSkill('skl-tsumuji-14').effectTextJa);
+  it('ゲームのカードは指示書 AJ の表の12枚（並び・技名・マナ・ダメージ・効果・効果の文）。とびのく・かげろうは外した', () => {
+    const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(AJ).toHaveLength(12);
+    AJ.forEach((row, i) => {
+      const k = getSkill(row.id);
+      expect(k.displayNo).toBe(i + 1);
+      expect(k.name).toBe(row.name);
+      expect(k.category).toBe(AJ_CATEGORY[row.cat]);
+      expect(k.cost).toBe(row.mana);
+      expect(k.stat?.value ?? null).toBe(row.damage);
+      expect(k.effect).toEqual(row.effect ?? { type: 'attack' });
+      expect(k.effectTextJa).toBe(row.text);
+    });
+    for (const n of [13, 14]) {
+      expect(REMOVED_SKILL_IDS).toContain(shi(n));
+      expect(() => getSkill(shi(n))).toThrow();
+    }
+  });
+
+  it('カードに書く短い文（指示書 AJ）：捨て身は「当たると自分のライフ−1／−2／−3／−2」。JSON の文は変えない', () => {
+    expect(getSkill(shi(7)).effectTextJa).toBe('当たると自分のライフ−1');
+    expect(getSkill(shi(8)).effectTextJa).toBe('当たると自分のライフ−2');
+    expect(getSkill(shi(9)).effectTextJa).toBe('当たると自分のライフ−3');
+    expect(getSkill(shi(10)).effectTextJa).toBe('当たると自分のライフ−2');
     expect(getSkill(shi(11)).effectTextJa).toBe('ちから技に効く');
     expect(getSkill(shi(12)).effectTextJa).toBe('ちから技・かしこさ技に効く');
-    expect(getSkill(shi(13)).effectTextJa).toBe('ちから技を回避');
     expect(shishienJson.skills[6]?.effect).toBe('当たったら自分のライフ−1（捨て身）');
   });
 
@@ -80,25 +104,28 @@ describe('シシエン：データ（届いた JSON・CSV を無改変で置き�
     expect(SHISHIEN_MONSTER).toMatchObject({ id: 'mon-shishien', life: 7, name: 'シシエン', isPlaceholder: false });
     expect(shishienJson.monster_rank).toBe('B');
     expect(SHISHIEN_COLOR).toBe('#3E3A3F');
+    // 前の14技のデータのレアの枠（ガチャのレアは指示書 AJ の★。下の「ガチャのシリーズ」のテスト）
     expect(SHISHIEN_GACHA_RARE).toEqual([shi(9), shi(10), shi(14)]);
     expect(BATTLE_CARDS[SHISHIEN_MONSTER_ID]?.frame).toBe('shishien');
     expect(existsSync('assets/images/ui/battlecard/frame_shishien.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_shishien.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はヒョウズクのあと（No.181〜195）', () => {
+  it('ふつうの一覧に入り、図鑑の番号はヒョウズクのあと（No.157〜169。指示書 AJ で1体13番）', () => {
     expect(MONSTERS.some((m) => m.id === SHISHIEN_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === SHISHIEN_MONSTER_ID).map((s) => s.id)).toEqual(SHISHIEN_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === SHISHIEN_MONSTER_ID).map((s) => s.id)).toEqual(AJ_IDS);
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === SHISHIEN_MONSTER_ID)?.no).toBe(181);
-    expect(book.find((e) => e.card.id === shi(14))?.no).toBe(195);
-    expect(book.find((e) => e.card.id === 'skl-hyouzuku-14')?.no).toBe(180);
+    expect(book.find((e) => e.card.id === SHISHIEN_MONSTER_ID)?.no).toBe(157);
+    expect(book.find((e) => e.card.id === shi(12))?.no).toBe(169);
+    expect(book.find((e) => e.card.id === 'skl-hyouzuku-14')?.no).toBe(156);
   });
 
   it('絵：技14枚・正式モンスターカード・投石の描き直し。原本は無改変で保管（パックの窓の絵は gacha-20261029/ にも）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(shi(n)).art?.file).toBe(`shishien_sk_${nn}.webp`);
+      expect(SHISHIEN_SKILLS[n - 1]?.art?.file).toBe(`shishien_sk_${nn}.webp`);
+      // ゲームのカード（指示書 AJ で残した技）も同じ絵
+      if (AJ_IDS.includes(shi(n))) expect(getSkill(shi(n)).art?.file).toBe(`shishien_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/shishien_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/shishien_sk_${nn}.png`)).toBe(true);
     }
@@ -121,7 +148,7 @@ describe('シシエン：データ（届いた JSON・CSV を無改変で置き�
     try {
       expect(cardName(SHISHIEN_MONSTER_ID)).toBe('Shishien');
       expect(cardName(shi(9))).toBe('Inferno Rush');
-      expect(cardName(shi(14))).toBe('Heat Haze');
+      expect(cardName(shi(12))).toBe('Heat Veil');
     } finally {
       setLanguage('ja');
     }
@@ -179,38 +206,38 @@ function attackWith(attack: string, guard: string | null, target = 'o-m1', start
   return { usable, after };
 }
 
-describe('07・08・09 捨て身：当たったら自分のライフ−1（selfDamageOnHit）', () => {
-  it('当たると、相手にダメージ・使ったシシエンのライフ−1。反動の演出（recoil）と記録が出る', () => {
-    for (const [no, dmg] of [[7, 5], [8, 6], [9, 7]] as const) {
-      expect(getSkill(shi(no)).effect).toEqual({ type: 'attack', selfDamageOnHit: 1 });
-      const s = withLife(scene({ player: [shi(no)] }), { 'o-m1': 9 });
+describe('捨て身（指示書 AJ）：すてみタックル−1・もえるたてがみ−2・れんごくのとっしん−3・ほのおのほうこう−2（selfDamageOnHit）', () => {
+  it('当たると、相手にダメージ・使ったシシエンのライフが減る。反動の演出（recoil）と記録が出る', () => {
+    for (const [no, dmg, recoil] of [[7, 4, 1], [8, 6, 2], [9, 9, 3], [10, 8, 2]] as const) {
+      expect(getSkill(shi(no)).effect).toEqual({ type: 'attack', selfDamageOnHit: recoil });
+      const s = withLife(scene({ player: [shi(no)] }), { 'o-m1': 12 });
       const after = attackWith(shi(no), null, 'o-m1', s).after;
-      expect(monster(after, 'o-m1').life, String(no)).toBe(9 - dmg);
-      expect(monster(after, 'p-m1').life, String(no)).toBe(6);
+      expect(monster(after, 'o-m1').life, String(no)).toBe(12 - dmg);
+      expect(monster(after, 'p-m1').life, String(no)).toBe(7 - recoil);
       expect(after.fx?.some((f) => f.kind === 'recoil')).toBe(true);
     }
   });
 
-  it('回避されたら反動なし（とびのく・かげろう）', () => {
-    for (const [atk, guard] of [[shi(7), shi(13)], [shi(8), shi(14)], [shi(9), shi(14)]] as const) {
-      const r = attackWith(atk, guard);
+  it('回避されたら反動なし（ソラモの星影ステップ。指示書 AJ でシシエンの回避〔とびのく・かげろう〕は外した）', () => {
+    for (const atk of [shi(7), shi(8), shi(9), shi(10)]) {
+      const r = attackWith(atk, sor(14), 'o-m2');
       expect(r.usable, atk).toBe(true);
-      expect(monster(r.after, 'o-m1').life).toBe(7);
+      expect(monster(r.after, 'o-m2').life).toBe(7);
       expect(monster(r.after, 'p-m1').life).toBe(7);
     }
   });
 
   it('防御で0なら反動なし。防御で減っても1以上当たれば反動あり', () => {
-    // すてみタックル5 を、ソラモの防御で…（ここではシシエンの防御2枚を続けて出せないので、ダメージ1以上の場合と、威力を下げて0の場合を確かめる）
+    // すてみタックル4 から たてがみでうける−3 → 1 当たる（反動−1）
     const partial = attackWith(shi(7), shi(11));
     expect(partial.usable).toBe(true);
-    expect(monster(partial.after, 'o-m1').life).toBe(7 - 2);
+    expect(monster(partial.after, 'o-m1').life).toBe(7 - 1);
     expect(monster(partial.after, 'p-m1').life).toBe(6);
-    // もえるたてがみ6 から ねつのとばり−2 → 4 当たる（反動あり）
+    // もえるたてがみ6 から ねつのとばり−3 → 3 当たる（反動−2）
     const partial2 = attackWith(shi(8), shi(12));
-    expect(monster(partial2.after, 'o-m1').life).toBe(7 - 4);
-    expect(monster(partial2.after, 'p-m1').life).toBe(6);
-    // 威力を2に下げたすてみタックル（相手の いかく などの代わりに、受けるダメージ−3 のしめったはだで0にする）
+    expect(monster(partial2.after, 'o-m1').life).toBe(7 - 3);
+    expect(monster(partial2.after, 'p-m1').life).toBe(5);
+    // すてみタックルを、受けるダメージ−5 の守り（しめったはだと同じ仕組み）で0にする → 反動なし
     let s = scene({ player: [shi(7)] });
     s = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid === 'o-m1' ? { ...m, shield: { reduce: 5, against: 'all', untilTurn: s.turn + 1 } } : m)) } } };
     const zero = attackWith(shi(7), null, 'o-m1', s).after;
@@ -237,24 +264,26 @@ describe('07・08・09 捨て身：当たったら自分のライフ−1（selfD
   });
 });
 
-describe('守り（11〜14）', () => {
-  it('14 かげろう：マナに関係なく、ちから技・かしこさ技を回避（ツムジのかぜよみと同じ）', () => {
-    expect(getSkill(shi(14)).effect).toEqual(getSkill('skl-tsumuji-14').effect);
+describe('守り（指示書 AJ：11・12）', () => {
+  // かげろう（skl-shishien-14）は外したので、同じ「マナに関係なく両方を回避」はソラモ（o-m2）の星影ステップで確かめる
+  it('マナに関係なく、ちから技・かしこさ技を回避（星影ステップ。前のかげろう・ツムジのかぜよみと同じ）', () => {
+    expect(getSkill(sor(14)).effect).toEqual(getSkill('skl-tsumuji-14').effect);
     for (const atk of [shi(1), shi(9), shi(3), shi(10)]) {
-      const r = attackWith(atk, shi(14));
+      const r = attackWith(atk, sor(14), 'o-m2');
       expect(r.usable, atk).toBe(true);
-      expect(monster(r.after, 'o-m1').life, atk).toBe(7);
+      expect(monster(r.after, 'o-m2').life, atk).toBe(7);
     }
   });
 
-  it('11 たてがみでうける：ちから技 −3。12 ねつのとばり：両方 −2。13 とびのく：ちから技だけ回避', () => {
-    expect(getSkill(shi(11)).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
-    expect(getSkill(shi(12)).effect).toEqual({ type: 'defense', reduce: 2, against: 'all' });
+  it('11 たてがみでうける：ちから技 −3（マナ1）。12 ねつのとばり：両方 −3（マナ2）', () => {
+    expect(getSkill(shi(11))).toMatchObject({ cost: 1, effect: { type: 'defense', reduce: 3, against: 'force' } });
+    expect(getSkill(shi(12))).toMatchObject({ cost: 2, effect: { type: 'defense', reduce: 3, against: 'all' } });
     expect(attackWith(shi(3), shi(11)).usable).toBe(false);
-    expect(monster(attackWith(shi(5), shi(11)).after, 'o-m1').life).toBe(7);
-    expect(attackWith(shi(3), shi(13)).usable).toBe(false);
-    expect(attackWith(shi(1), shi(13)).usable).toBe(true);
+    expect(monster(attackWith(shi(5), shi(11)).after, 'o-m1').life).toBe(7 - 1);
+    expect(monster(attackWith(shi(2), shi(11)).after, 'o-m1').life).toBe(7);
+    expect(monster(attackWith(shi(4), shi(12)).after, 'o-m1').life).toBe(7);
   });
+  // 指示書 AJ で外した技（skl-shishien-13 とびのく）のテストは消した（ちから技だけの回避は tests/serephine.test.ts のすいっとよける）
 });
 
 describe('相手の CPU：捨て身の技の使い方', () => {
@@ -324,11 +353,11 @@ describe('炎の火山のボス（バルカ）・入手の流れ', () => {
     expect(w).toMatchObject({ cleared: true, firstClear: true });
     expect(w.clearCards).toEqual([{ cardId: SHISHIEN_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[SHISHIEN_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, FIRE, BARCA_TEAM)).toEqual(SHISHIEN_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, FIRE, BARCA_TEAM)).toEqual(AJ_IDS);
     const again = beatBarca(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills(FIRE)).toEqual(SHISHIEN_SKILLS.map((k) => k.id));
+    expect(bossTrumpSkills(FIRE)).toEqual(AJ_IDS);
     const chestCards = new Set<string>();
     for (let i = 0; i < 3000; i++) {
       const r = rollChest(FIRE, i, 'f1-chest-1');
@@ -367,7 +396,7 @@ describe('炎の火山のボス（バルカ）・入手の流れ', () => {
     expect(w.save.collection['skl-gauul14-01']).toBe(3);
     expect(w.save.storyFlags).not.toContain(BARCA_ALTAR_OWED_FLAG);
     expect(availableGachaSeriesFor(w.save).map((x) => x.id)).toContain('shishien');
-    expect(bossRewardCandidates(w.save, FIRE, BARCA_TEAM)).toEqual(SHISHIEN_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, FIRE, BARCA_TEAM)).toEqual(AJ_IDS);
     expect(beatBarca(w.save, 52).clearCards).toEqual([]);
   });
 
@@ -388,13 +417,13 @@ describe('炎の火山のボス（バルカ）・入手の流れ', () => {
 });
 
 describe('シシエンのガチャのシリーズ', () => {
-  it('ヒョウズクのあとに1行。レア枠はれんごくのとっしん・ほのおのほうこう・かげろう。barca-beaten のあと（シシエンのカードを受け取ってから）だけ並ぶ', () => {
+  it('ヒョウズクのあとに1行。レア枠（指示書 AJ の★）はれんごくのとっしん・もえるたてがみ・ほのおのほうこう・ねつのとばり。barca-beaten のあと（シシエンのカードを受け取ってから）だけ並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('shishien')).toBe(ids.indexOf('hyouzuku') + 1);
     expect(GACHA_SERIES.find((s) => s.id === 'shishien')).toEqual({
       id: 'shishien',
       monsterId: 'mon-shishien',
-      rareSkillNames: ['れんごくのとっしん', 'ほのおのほうこう', 'かげろう'],
+      rareSkillNames: ['れんごくのとっしん', 'もえるたてがみ', 'ほのおのほうこう', 'ねつのとばり'],
       unlockFlag: 'barca-beaten',
     });
     const b = base();

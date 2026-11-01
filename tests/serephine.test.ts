@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, REMOVED_SKILL_IDS, SKILLS } from '../src/data/cards.ts';
 import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { DUNGEONS, ENCOUNTERS, LUCIA_ALTAR_OWED_FLAG, LUCIA_BEATEN_FLAG } from '../src/data/dungeons.ts';
 import { RUN_DUNGEONS } from '../src/data/dungeonRun.ts';
@@ -18,8 +18,10 @@ import {
 } from '../src/data/serephine.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
+import { kalshellSkillId } from '../src/data/kalshell.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
-import { applyAction, cardUsability, createBattle, manaOf, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
+import { applyAction, cardUsability, createBattle, isTideActive, manaOf, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { seriesLineup } from '../src/game/economy/gachaSeries.ts';
 import { bossRewardCandidates, bossTrumpSkills, rollChest, runFloor, startRun, winRunBattle } from '../src/game/dungeon/run.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, type SaveData } from '../src/game/save/saveData.ts';
@@ -33,6 +35,10 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 
 const ser = (n: number): string => serephineSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
+const kal = (n: number): string => kalshellSkillId(n);
+/** 指示書 AJ の表のセレフィーンの12枚（ゲームのカードの正本） */
+const AJ = AJ_SKILLS['mon-serephine'] ?? [];
+const AJ_IDS = AJ.map((r) => r.id);
 const ORIGINAL_DIR = 'design-parts/cards-original/serephine';
 
 function csvRows(path: string): string[][] {
@@ -70,11 +76,31 @@ describe('セレフィーン：データ（届いた JSON・CSV を無改変で�
     });
   });
 
-  it('カードに書く短い文（指示書の表のとおり）。JSON の文は変えない', () => {
+  it('ゲームのカードは指示書 AJ の表の12枚（並び・技名・マナ・ダメージ・効果・効果の文）。アクアカッター・ミストヴェールは外した', () => {
+    const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(AJ).toHaveLength(12);
+    AJ.forEach((row, i) => {
+      const k = getSkill(row.id);
+      expect(k.displayNo).toBe(i + 1);
+      expect(k.name).toBe(row.name);
+      expect(k.category).toBe(AJ_CATEGORY[row.cat]);
+      expect(k.cost).toBe(row.mana);
+      expect(k.stat?.value ?? null).toBe(row.damage);
+      expect(k.effect).toEqual(row.effect ?? { type: 'attack' });
+      expect(k.effectTextJa).toBe(row.text);
+    });
+    for (const n of [6, 11]) {
+      expect(REMOVED_SKILL_IDS).toContain(ser(n));
+      expect(() => getSkill(ser(n))).toThrow();
+    }
+  });
+
+  it('カードに書く短い文（指示書 AJ の表のとおり）。JSON の文は変えない', () => {
     expect(getSkill(ser(5)).effectTextJa).toBe('回避されない');
     expect(getSkill(ser(7)).effectTextJa).toBe('回避されない');
-    expect(getSkill(ser(10)).effectTextJa).toBe('山札の上から1枚をマナにする');
-    expect(getSkill(ser(11)).effectTextJa).toBe('ちから技・かしこさ技に効く');
+    expect(getSkill(ser(8)).effectTextJa).toBe('水中の相手には防御されない');
+    expect(getSkill(ser(9)).effectTextJa).toBe('水中の相手は回避できない');
+    expect(getSkill(ser(10)).effectTextJa).toBe('次の相手のターン終了まで、全モンスターを水中にする');
     expect(getSkill(ser(12)).effectTextJa).toBe('ちから技を回避');
     expect(getSkill(ser(13)).effectTextJa).toBe('かしこさ技を回避');
     expect(getSkill(ser(14)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
@@ -84,25 +110,28 @@ describe('セレフィーン：データ（届いた JSON・CSV を無改変で�
   it('モンスター：ライフ6・月の青紫・ID mon-serephine。レアの枠は 07・09・14。枠の絵がある', () => {
     expect(SEREPHINE_MONSTER).toMatchObject({ id: 'mon-serephine', life: 6, name: 'セレフィーン', isPlaceholder: false });
     expect(SEREPHINE_COLOR).toBe('#8FA6E8');
+    // 前の14技のデータのレアの枠（ガチャのレアは指示書 AJ の★。下の「ガチャのシリーズ」のテスト）
     expect(SEREPHINE_GACHA_RARE).toEqual([ser(7), ser(9), ser(14)]);
     expect(BATTLE_CARDS[SEREPHINE_MONSTER_ID]?.frame).toBe('serephine');
     expect(existsSync('assets/images/ui/battlecard/frame_serephine.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_serephine.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はフルーネのあと（No.136〜150）', () => {
+  it('ふつうの一覧に入り、図鑑の番号はフルーネのあと（No.118〜130。指示書 AJ で1体13番）', () => {
     expect(MONSTERS.some((m) => m.id === SEREPHINE_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === SEREPHINE_MONSTER_ID).map((s) => s.id)).toEqual(SEREPHINE_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === SEREPHINE_MONSTER_ID).map((s) => s.id)).toEqual(AJ_IDS);
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === SEREPHINE_MONSTER_ID)?.no).toBe(136);
-    expect(book.find((e) => e.card.id === ser(14))?.no).toBe(150);
-    expect(book.find((e) => e.card.id === 'skl-flune-14')?.no).toBe(135);
+    expect(book.find((e) => e.card.id === SEREPHINE_MONSTER_ID)?.no).toBe(118);
+    expect(book.find((e) => e.card.id === ser(14))?.no).toBe(130);
+    expect(book.find((e) => e.card.id === 'skl-flune-12')?.no).toBe(117);
   });
 
   it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パック・ショップの原本も）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(ser(n)).art?.file).toBe(`serephine_sk_${nn}.webp`);
+      expect(SEREPHINE_SKILLS[n - 1]?.art?.file).toBe(`serephine_sk_${nn}.webp`);
+      // ゲームのカード（指示書 AJ で残した技）も同じ絵
+      if (AJ_IDS.includes(ser(n))) expect(getSkill(ser(n)).art?.file).toBe(`serephine_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/serephine_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/serephine_sk_${nn}.png`)).toBe(true);
     }
@@ -133,8 +162,8 @@ describe('セレフィーン：データ（届いた JSON・CSV を無改変で�
 // 自分：セレフィーン（p-m1 ライフ6）・ソラモ（p-m2 ライフ7）・ノビトン（p-m3 ライフ8）。相手も同じ（o-m1〜3）
 const MONS = ['mon-serephine', 'mon-soramo', 'mon-nobiton'];
 
-function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, active: Side = 'player', deckSize = 40): BattleState {
-  const deck = { monsters: [...MONS], skills: Array.from({ length: 60 }, () => sor(1)) };
+function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, active: Side = 'player', deckSize = 40, mons: string[] = MONS): BattleState {
+  const deck = { monsters: [...mons], skills: Array.from({ length: 60 }, () => sor(1)) };
   const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
@@ -151,25 +180,20 @@ const monster = (s: BattleState, uid: string): BattleMonster => {
   return m;
 };
 
-const withMonster = (s: BattleState, uid: string, patch: Partial<BattleMonster>): BattleState => {
-  const side: Side = uid.startsWith('p-') ? 'player' : 'opponent';
-  return { ...s, sides: { ...s.sides, [side]: { ...s.sides[side], monsters: s.sides[side].monsters.map((m) => (m.uid === uid ? { ...m, ...patch } : m)) } } };
-};
-
 /** 相手の手札に足す（守りのカード。uid は g0〜） */
 const giveOpponent = (s: BattleState, cards: string[]): BattleState => ({
   ...s,
   sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [...s.sides.opponent.hand, ...cards.map((cardId, i) => ({ uid: `g${i}`, cardId }))] } },
 });
 
-describe('10 みちしお：山札のいちばん上の1枚を、手札に入れずにそのままマナにする', () => {
-  it('山札の上の1枚がマナになる。手札は増えない（みちしおの分だけ減る）。マナ0で使える', () => {
-    const s0 = scene({ player: [ser(10), sor(1)] }, { player: 0 });
-    const top = s0.sides.player.deck[0];
+describe('10 みちしお（指示書 AJ）：次の相手の手番の終わりまで、場が水中（前の「山札の上の1枚をマナに」はやめた）', () => {
+  it('マナ2で使う。場が水中になり（期限は次の相手の手番）、手札・山札・マナの置き場は増えない', () => {
+    const s0 = scene({ player: [ser(10), sor(1)] }, { player: 2 });
     const s = applyAction(s0, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m1' });
-    expect(manaOf(s.sides.player)).toBe(1);
-    expect(s.sides.player.manaPile.at(-1)).toBe(top);
-    expect(s.sides.player.deck).toHaveLength(s0.sides.player.deck.length - 1);
+    expect(manaOf(s.sides.player)).toBe(0);
+    expect(s.tide).toEqual({ untilTurn: s0.turn + 1, by: 'player' });
+    expect(isTideActive(s)).toBe(true);
+    expect(s.sides.player.deck).toHaveLength(s0.sides.player.deck.length);
     expect(s.sides.player.hand.map((c) => c.cardId)).toEqual([sor(1)]);
     expect(s.sides.player.discard).toContain(ser(10));
     expect(s.phase).toBe('main');
@@ -183,12 +207,11 @@ describe('10 みちしお：山札のいちばん上の1枚を、手札に入れ
     expect(cardUsability(s, 'player', 'p2').usable).toBe(true);
   });
 
-  it('山札が0枚なら使えない（灰色。負けにならない）', () => {
-    const s = scene({ player: [ser(10)] }, { player: 3 }, 'player', 0);
-    const u = cardUsability(s, 'player', 'p0');
-    expect(u.usable).toBe(false);
+  it('マナが2に足りなければ使えない。山札の枚数には関係なく使える（山札0枚でも使える）', () => {
+    const s = scene({ player: [ser(10)] }, { player: 1 });
+    expect(cardUsability(s, 'player', 'p0').usable).toBe(false);
     expect(applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m1' })).toBe(s);
-    expect(cardUsability(scene({ player: [ser(10)] }, { player: 3 }, 'player', 1), 'player', 'p0').usable).toBe(true);
+    expect(cardUsability(scene({ player: [ser(10)] }, { player: 2 }, 'player', 0), 'player', 'p0').usable).toBe(true);
   });
 });
 
@@ -209,22 +232,19 @@ describe('回避（12・13・14）', () => {
     expect(guardAgainst(ser(1), ser(13)).usable).toBe(false);
   });
 
-  it('12 すいっとよける：ちから技だけ。14 ウェーブダンス：マナに関係なく両方', () => {
+  it('12 すいっとよける：ちから技だけ。14 ウェーブダンス：マナに関係なく両方（どちらもマナ1・2）', () => {
+    expect(getSkill(ser(12)).cost).toBe(1);
+    expect(getSkill(ser(13)).cost).toBe(1);
+    expect(getSkill(ser(14)).cost).toBe(2);
     expect(guardAgainst(ser(1), ser(12)).usable).toBe(true);
     expect(guardAgainst(ser(4), ser(12)).usable).toBe(false);
     expect(guardAgainst(ser(1), ser(14)).usable).toBe(true);
     expect(guardAgainst(ser(4), ser(14)).usable).toBe(true);
-    expect(guardAgainst(ser(9), ser(14)).usable).toBe(true);
+    // マナ4のルナタイド（回避の条件は無い）もよけられる
+    expect(guardAgainst(ser(8), ser(14)).usable).toBe(true);
   });
 
-  it('11 ミストヴェール：ちから技・かしこさ技のダメージを2軽減', () => {
-    expect(getSkill(ser(11)).effect).toEqual({ type: 'defense', reduce: 2, against: 'all' });
-    const r = guardAgainst(ser(6), ser(11));
-    expect(r.usable).toBe(true);
-    let s = applyAction(r.s, { type: 'defend', side: 'opponent', cardUid: 'g0' });
-    if (s.phase === 'defense') s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(monster(s, 'o-m1').life).toBe(6);
-  });
+  // 指示書 AJ で外した技（skl-serephine-11 ミストヴェール）のテストは消した（「2軽減」の防御は今のカードに無い）
 });
 
 describe('05 なみ打ち・07 アクアニードル：回避されない（防御はできる）', () => {
@@ -232,28 +252,37 @@ describe('05 なみ打ち・07 アクアニードル：回避されない（防�
     for (const atk of [ser(5), ser(7)]) {
       expect(guardAgainst(atk, ser(13)).usable, atk).toBe(false);
       expect(guardAgainst(atk, ser(14)).usable, atk).toBe(false);
-      expect(guardAgainst(atk, ser(11)).usable, atk).toBe(true);
+      // 指示書 AJ でセレフィーンの防御（ミストヴェール）を外したので、防御はソラモ（o-m2）の星のまもりで確かめる
+      expect(guardAgainst(atk, sor(12), 'o-m2').usable, atk).toBe(true);
     }
     // ソラモの星影ステップでも避けられない
     expect(guardAgainst(ser(7), sor(14), 'o-m2').usable).toBe(false);
   });
+
+  it('09 オーシャンウェーブ：水中の相手（セレフィーン）は回避できない。地上の相手（ソラモ）は回避できる', () => {
+    expect(guardAgainst(ser(9), ser(14)).usable).toBe(false);
+    expect(guardAgainst(ser(9), sor(14), 'o-m2').usable).toBe(true);
+  });
 });
 
 describe('相手の CPU（みちしお）', () => {
-  it('倒せる攻撃が無く、大きい技（ルナタイド）が次の手番もマナ不足なら、みちしおを使う', () => {
-    const s = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 1 }, 'opponent');
+  // 相手：セレフィーン（o-m1）・カルシェル（o-m2）・ノビトン（o-m3）
+  const WATER = ['mon-serephine', 'mon-kalshell', 'mon-nobiton'];
+
+  it('この手番に別の味方（カルシェル）が水中で強くなる攻撃（タイダルクラッシュ）を続けて使えるなら、みちしおを使う', () => {
+    const s = scene({ opponent: [ser(10), kal(8), ser(1)] }, { opponent: 6 }, 'opponent', 40, WATER);
     expect(chooseAction(s, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o0', userUid: 'o-m1' });
   });
 
-  it('使わない：倒せる相手がいる／大きい技が無い／次の手番にマナが足りる／山札が残り少ない', () => {
-    const kill = withMonster(scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 1 }, 'opponent'), 'p-m2', { life: 1 });
-    expect(chooseAction(kill, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
-    const noBig = scene({ opponent: [ser(10), ser(1), ser(2)] }, { opponent: 1 }, 'opponent');
-    expect(chooseAction(noBig, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
-    const rich = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 3 }, 'opponent');
-    expect(chooseAction(rich, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
-    const shortDeck = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 1 }, 'opponent', 9);
-    expect(chooseAction(shortDeck, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
+  it('使わない：マナが2つ合わせて足りない／続けて使えるのが同じセレフィーンの技だけ／もう水中（次の相手の手番まで続く）', () => {
+    const poor = scene({ opponent: [ser(10), kal(8), ser(1)] }, { opponent: 5 }, 'opponent', 40, WATER);
+    expect(chooseAction(poor, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
+    // ルナタイドもセレフィーンの技なので、みちしおを使ったセレフィーンは同じ手番に続けて使えない
+    const self = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 6 }, 'opponent');
+    expect(chooseAction(self, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
+    const base = scene({ opponent: [ser(10), kal(8), ser(1)] }, { opponent: 6 }, 'opponent', 40, WATER);
+    const wet: BattleState = { ...base, tide: { untilTurn: base.turn + 1, by: 'opponent' } };
+    expect(chooseAction(wet, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
   });
 });
 
@@ -297,11 +326,11 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
     expect(w).toMatchObject({ cleared: true, firstClear: true });
     expect(w.clearCards).toEqual([{ cardId: SEREPHINE_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[SEREPHINE_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(SEREPHINE_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(AJ_IDS);
     const again = beatLucia(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills('dungeon-03')).toEqual(SEREPHINE_SKILLS.map((k) => k.id));
+    expect(bossTrumpSkills('dungeon-03')).toEqual(AJ_IDS);
     const chestCards = new Set<string>();
     for (let i = 0; i < 3000; i++) {
       const r = rollChest('dungeon-03', i, 'f1-chest-1');
@@ -334,7 +363,7 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
     // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く
     expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
     // その次からはふつうの2回目と同じ（セレフィーンの技カード）
-    expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(SEREPHINE_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(AJ_IDS);
     expect(beatLucia(w.save, 52).clearCards).toEqual([]);
   });
 
@@ -354,16 +383,17 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
 });
 
 describe('セレフィーンのガチャのシリーズとショップ', () => {
-  it('フルーネのあとに1行。レア枠はアクアニードル・オーシャンウェーブ・ウェーブダンス。lucia-beaten のあとだけ並ぶ', () => {
+  it('フルーネのあとに1行。レア枠（指示書 AJ の★）はアクアニードル・ルナタイド・オーシャンウェーブ・ウェーブダンス。lucia-beaten のあとだけ並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('serephine')).toBe(ids.indexOf('flune') + 1);
     const series = GACHA_SERIES.find((s) => s.id === 'serephine');
-    expect(series).toEqual({ id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' });
+    expect(series).toEqual({ id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'ルナタイド', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' });
     if (!series) throw new Error('series');
     const lineup = seriesLineup(series);
     expect(lineup.errors).toEqual([]);
-    expect(lineup.rareIds).toEqual([ser(7), ser(9), ser(14)]);
-    expect(lineup.all).toHaveLength(15);
+    expect(lineup.rareIds).toEqual([ser(7), ser(8), ser(9), ser(14)]);
+    // モンスター1＋技12
+    expect(lineup.all).toHaveLength(13);
     // 2026-10-30（指示書 K）：セレフィーンのモンスターカードを初めて手に入れたら並ぶ
     const base = createNewSave();
     expect(availableGachaSeriesFor(base).map((s) => s.id)).not.toContain('serephine');
