@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cardCatalog, getMonster, REMOVED_SKILL_IDS, skillsOf } from '../src/data/cards.ts';
 import { cardBookEntries, NUMBERED_MONSTERS } from '../src/data/cardNumbers.ts';
@@ -77,6 +77,22 @@ describe('AJ：15体×12枚のカード', () => {
     }
     expect(art('skl-serephine-10')).toBe(art('skl-serephine-10')); // みちしおの絵は今の serephine_sk_10 のまま
     expect(art('skl-serephine-10')).toMatch(/10/);
+  });
+
+  it('追加その2：描き直した絵2枚（みちしお〔セレフィーン〕・しっぽまわし）。ID・名前・効果はそのまま、原本は design-parts に無改変', () => {
+    const dir = 'design-parts/cards-original/aj-redraw2-20261101';
+    expect(readFileSync('assets/images/cards/skills/myu14_sk_03.png').equals(readFileSync(`${dir}/myu14_sk_03.png`))).toBe(true);
+    expect(existsSync(`${dir}/serephine_sk_10.png`)).toBe(true);
+    const art = (id: string): string => {
+      const c = cardCatalog.get(id);
+      return c && c.kind === 'skill' ? (c.art?.file ?? '') : '';
+    };
+    expect(art('skl-serephine-10')).toBe('serephine_sk_10.webp');
+    expect(art('skl-myurol-03')).toBe('myu14_sk_03.png');
+    // WebP（RIFF・VP8）で、幅 827・高さ 937（tools/art/card_art_webp.py で変換）
+    const webp = readFileSync('assets/images/cards/skills/serephine_sk_10.webp');
+    expect(webp.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(webp.toString('ascii', 8, 12)).toBe('WEBP');
   });
 
   it('外した33枚はカードの一覧に無い', () => {

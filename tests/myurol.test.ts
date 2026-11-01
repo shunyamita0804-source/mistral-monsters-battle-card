@@ -175,7 +175,7 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
 });
 
 describe('ミュロル正式14技：画像（届いた PNG を無改変）', () => {
-  it('ゲームの絵14枚は届いた原本と1バイトも違わず、画像監査の SHA-256 どおり。827×937 の PNG', () => {
+  it('ゲームの絵14枚は届いた原本と1バイトも違わず、画像監査の SHA-256 どおり（03 は AJ の追加その2で描き直した絵）。827×937 の PNG', () => {
     const audit = csvRows(`${ORIGINAL_DIR}/04_画像監査_SHA256_UTF8.csv`);
     expect(audit).toHaveLength(14);
     for (const [no, file, , , size, hash] of audit) {
@@ -186,9 +186,14 @@ describe('ミュロル正式14技：画像（届いた PNG を無改変）', () 
       if (REMOVED_SKILL_IDS.includes(id)) expect(SKILLS.some((k) => k.id === id)).toBe(false);
       else expect(getSkill(id).art).toEqual(old?.art);
       const game = readFileSync(`assets/images/cards/skills/${old?.art?.file}`);
-      expect(game.equals(readFileSync(`${ORIGINAL_DIR}/SKILLS/${file}`))).toBe(true);
-      expect(sha256(game)).toBe(hash);
-      expect(game.length).toBe(Number(size));
+      // 指示書 AJ の追加その2（2026-11-01）：03 しっぽまわしは描き直した絵（原本 design-parts/cards-original/aj-redraw2-20261101/。前の絵の原本はそのまま残す）
+      if (n === 3) {
+        expect(game.equals(readFileSync('design-parts/cards-original/aj-redraw2-20261101/myu14_sk_03.png'))).toBe(true);
+      } else {
+        expect(game.equals(readFileSync(`${ORIGINAL_DIR}/SKILLS/${file}`))).toBe(true);
+        expect(sha256(game)).toBe(hash);
+        expect(game.length).toBe(Number(size));
+      }
       expect(game.readUInt32BE(0)).toBe(0x89504e47);
       expect([game.readUInt32BE(16), game.readUInt32BE(20)]).toEqual([827, 937]);
     }
