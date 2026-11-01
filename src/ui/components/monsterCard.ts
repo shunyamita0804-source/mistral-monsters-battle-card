@@ -4,6 +4,7 @@ import { t } from '../../i18n/i18n.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
 import { createBattleMonsterCard, hasBattleCard } from './battleMonsterCard.ts';
+import { habitatMark } from './habitatMark.ts';
 
 /**
  * モンスターカードの表示。
@@ -46,6 +47,8 @@ function createArtMonsterCard(monster: MonsterCard, options: MonsterCardOptions,
         )
       : null,
     life && life.current <= 0 ? h('div', { class: 'monster-card__down', text: t('card.down') }) : null,
+    // 居場所の印（2026-11-01 指示書 AJ。正式カードの絵は描き直さず、枠の上に重ねる）
+    habitatMark(monster.habitat),
   );
   card.style.setProperty('--theme', monster.themeColor);
   card.style.width = `${options.width}px`;

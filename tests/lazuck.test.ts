@@ -36,6 +36,7 @@ import { createNewSave, migrate, normalizeSave } from '../src/game/save/saveData
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 
 const laz = (n: number): string => lazuckSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
@@ -63,9 +64,8 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
     expect(LAZUCK_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
   });
 
-  it('技名・マナ・ダメージ・分類・効果の文・表示の番号・区分が JSON とすべて一致する。初期0枚の技も収集できるカードとして残す', () => {
+  it('前の14技（ファイルの LAZUCK_SKILLS）は JSON とすべて一致する（絵と前のデータを引くためだけに残す）', () => {
     expect(LAZUCK_SKILLS).toHaveLength(14);
-    expect(skillsOf('mon-lazuck').map((s) => s.id)).toEqual(LAZUCK_SKILLS.map((s) => s.id));
     for (const r of LAZUCK14_ROWS) {
       const s = LAZUCK_SKILLS[r.number - 1] as SkillCard;
       expect(s.name).toBe(r.name_ja);
@@ -77,8 +77,27 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
       expect(s.availability).toBe(r.initial_copies > 0 ? 'initial' : 'collect');
       expect(s.monsterId).toBe('mon-lazuck');
       expect(s.isPlaceholder).toBe(false);
-      expect(cardCatalog.get(s.id)).toBe(s);
     }
+  });
+
+  it('指示書 AJ：ゲームの技カードは AJ の表の12枚（技名・マナ・ダメージ・分類・効果・効果の文・表示の番号が表のとおり）', () => {
+    const rows = AJ_SKILLS['mon-lazuck'] ?? [];
+    const cat = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(rows).toHaveLength(12);
+    expect(skillsOf('mon-lazuck').map((s) => s.id)).toEqual(rows.map((r) => r.id));
+    rows.forEach((r, i) => {
+      const s = getSkill(r.id);
+      expect(s.name).toBe(r.name);
+      expect(s.cost).toBe(r.mana);
+      expect(s.stat?.value ?? null).toBe(r.damage);
+      expect(s.category).toBe(cat[r.cat]);
+      expect(s.effect).toEqual(r.effect ?? { type: 'attack' });
+      expect(s.effectTextJa).toBe(r.text);
+      expect(s.displayNo).toBe(i + 1);
+      expect(s.monsterId).toBe('mon-lazuck');
+      expect(s.isPlaceholder).toBe(false);
+      expect(cardCatalog.get(s.id)).toBe(s);
+    });
   });
 
   it('ゲーム内 ID は、それまでの同じ名前の技の ID のまま（表示の番号が変わっても入れ替えない）。旧05 の ID はしっぷうタックルに使わない', () => {
@@ -120,12 +139,13 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
     expect(readFileSync('assets/images/cards/monsters/lazuck_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/08_BATTLE_MONSTER_CARD_ASSETS/02_Razuk_Battle_800x920_RGBA.png`))).toBe(true);
   });
 
-  it('初期デッキのラズックは16枚（ひっかき3・かみつき3・しっぷうタックル3・ちょうはつ2・ダストキック2・しっぽいなし1・シャドウガード1・シャドウスリップ1）', () => {
+  // 2026-11-01 指示書 AJ：AJ の表の box（仮のラズック16枚）
+  it('初期デッキのラズックは16枚（ひっかき2・かみつき3・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ2）', () => {
     const lazuck = createStarterDeck().skills.filter((id) => id.startsWith('skl-lazuck-'));
     expect(lazuck).toHaveLength(16);
     const counts: Record<string, number> = {};
     for (const id of lazuck) counts[id] = (counts[id] ?? 0) + 1;
-    expect(counts).toEqual({ [laz(1)]: 3, [laz(2)]: 3, [laz(6)]: 3, [laz(7)]: 2, [laz(8)]: 2, [laz(11)]: 1, [laz(12)]: 1, [laz(15)]: 1 });
+    expect(counts).toEqual({ [laz(1)]: 2, [laz(2)]: 3, [laz(3)]: 3, [laz(4)]: 2, [laz(6)]: 2, [laz(7)]: 1, [laz(8)]: 1, [laz(15)]: 2 });
   });
 
   it('パックには入れていない（入手方法・排出率は未定）', () => {
@@ -150,8 +170,8 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
 // 技の決まりを試す場面：ソラモ・ラズック・ソラモ（2026-10-30 指示書 V で初期デッキは3体ともちがうモンスターになったが、ここは対戦の決まりだけを見るので前の並びのまま）
 const mixedDeck = { ...createStarterDeck(), monsters: ['mon-soramo', 'mon-lazuck', 'mon-soramo'] };
 
-function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}): BattleState {
-  const s = createBattle({ name: 'P', deck: mixedDeck }, { name: 'O', deck: mixedDeck }, 7, 'player');
+function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, deck = mixedDeck): BattleState {
+  const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 7, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
     hand: (hand[k] ?? []).map((cardId, i) => ({ uid: `${k[0]}${i}`, cardId })),
@@ -188,8 +208,8 @@ function opponentTurn(s: BattleState, turn: number, hand: string[], only?: strin
 }
 
 /** player が攻撃し、opponent が guards を順に使って守備を終えたあとの、狙われたモンスターのライフ */
-function attackAndGuard(attack: string, target: string, guards: string[]): BattleState {
-  let s = scene({ player: [attack], opponent: guards });
+function attackAndGuard(attack: string, target: string, guards: string[], deck = mixedDeck): BattleState {
+  let s = scene({ player: [attack], opponent: guards }, {}, deck);
   s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: target });
   guards.forEach((_, i) => {
     s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: `o${i}` });
@@ -199,45 +219,54 @@ function attackAndGuard(attack: string, target: string, guards: string[]): Battl
 
 describe('ラズックの技の効果（正式14技。ID は同じ名前の技のまま：シャドウスリップ＝laz(15)・しっぷうタックル＝laz(6)）', () => {
   it('みだれづめ（回避されない）：回避は使えないが、防御は使える', () => {
-    let s = scene({ player: [laz(4)], opponent: [laz(14), laz(15), laz(11)] });
+    // ラズックの回避（フェイントステップ・シャドウスリップ）は使えない
+    let s = scene({ player: [laz(4)], opponent: [laz(14), laz(15)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
-    expect(s.pending?.power).toBe(2);
+    expect(s.pending?.power).toBe(3);
     expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false });
     expect(cardUsability(s, 'opponent', 'o1')).toMatchObject({ usable: false });
-    expect(cardUsability(s, 'opponent', 'o2').usable).toBe(true);
-    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o2' });
+    // 指示書 AJ でラズックの防御（しっぽいなし）を外したので、防御はソラモ（o-m1）で見る：星影ステップ（回避）は不可・星のまもり（−3）は使える
+    s = scene({ player: [laz(4)], opponent: ['skl-soramo14-14', 'skl-soramo14-12'] });
+    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+    expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false });
+    expect(cardUsability(s, 'opponent', 'o1').usable).toBe(true);
+    s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o1' });
     s = applyAction(s, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(lifeOf(s, 'o-m2')).toBe(6); // みだれづめ 2 − しっぽいなし 3 → 0
+    expect(lifeOf(s, 'o-m1')).toBe(7); // みだれづめ 3 − 星のまもり 3 → 0
   });
 
-  it('6 トリックショット・7 シャドウバースト：2026-10-29 夜の数字（2マナ2・3マナ4）。効果の文・絵は同じ', () => {
-    expect([getSkill(laz(9)).cost, getSkill(laz(9)).stat?.value]).toEqual([2, 2]);
-    expect([getSkill(laz(10)).cost, getSkill(laz(10)).stat?.value]).toEqual([3, 4]);
+  it('トリックショット・シャドウバースト：指示書 AJ の数字（2マナ3・4マナ4）。絵は同じ', () => {
+    expect([getSkill(laz(9)).cost, getSkill(laz(9)).stat?.value]).toEqual([2, 3]);
+    expect([getSkill(laz(10)).cost, getSkill(laz(10)).stat?.value]).toEqual([4, 4]);
     // 元の版（2026-10-26）は残す
     const old = JSON.parse(readFileSync('src/data/official/lazuck14_skills_OFFICIAL_20261026.json', 'utf8')) as { skill_cards: { number: number; mana: number; damage: number }[] };
     expect(old.skill_cards.filter((r) => r.number === 6 || r.number === 7).map((r) => [r.mana, r.damage])).toEqual([[2, 3], [4, 5]]);
   });
 
-  it('11 しっぽいなし（マナ2・ちから技だけ−3）・12 シャドウガード（マナ2・かしこさ技だけ−3）。0 未満にならない', () => {
-    expect([getSkill(laz(11)).cost, getSkill(laz(12)).cost]).toEqual([2, 2]);
-    expect(getSkill(laz(11)).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
-    expect(getSkill(laz(12)).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
-    // とびかかり：ちから3 → 0、シャドウバースト：かしこさ4 → 1、トリックショット：かしこさ2 → 0（2026-10-29 夜の数字）
-    expect(lifeOf(attackAndGuard(laz(3), 'o-m2', [laz(11)]), 'o-m2')).toBe(6);
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(12)]), 'o-m2')).toBe(5);
-    expect(lifeOf(attackAndGuard(laz(9), 'o-m2', [laz(12)]), 'o-m2')).toBe(6);
+  // 指示書 AJ でしっぽいなし（ちから技だけ−3）・シャドウガード（かしこさ技だけ−3）を外したので、同じ守りのミュロルの技（しっぽガード・みずのまく）で見る
+  it('ちから技だけ−3（ミュロルのしっぽガード）・かしこさ技だけ−3（みずのまく）。どちらもマナ0。0 未満にならない', () => {
+    const myurolDeck = { ...createStarterDeck(), monsters: ['mon-soramo', 'mon-myurol', 'mon-soramo'] };
+    const [force, wisdom] = ['skl-myurol-10', 'skl-myurol-11'];
+    expect([getSkill(force).cost, getSkill(wisdom).cost]).toEqual([0, 0]);
+    expect(getSkill(force).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
+    expect(getSkill(wisdom).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
+    // しっぽうち：ちから3 → 0、たいあたり：ちから2 → 0（0 未満にならない）、スターダストレイ：かしこさ4 → 1、ソラモビーム：かしこさ3 → 0
+    expect(lifeOf(attackAndGuard('skl-soramo14-04', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
+    expect(lifeOf(attackAndGuard('skl-soramo14-03', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
+    expect(lifeOf(attackAndGuard('skl-soramo14-07', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(6);
+    expect(lifeOf(attackAndGuard('skl-soramo14-06', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(7);
     // 効かない種類の攻撃には使えない
-    let s = scene({ player: [laz(10)], opponent: [laz(11)] });
+    let s = scene({ player: ['skl-soramo14-07'], opponent: [force] }, {}, myurolDeck);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(false);
-    s = scene({ player: [laz(3)], opponent: [laz(12)] });
+    s = scene({ player: ['skl-soramo14-04'], opponent: [wisdom] }, {}, myurolDeck);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(false);
   });
 
-  it('13 シャドウスリップ（マナ2）：相手の消費マナ2以上のちから技・かしこさ技を回避。マナ0〜1 の攻撃は回避しない', () => {
-    expect(getSkill(laz(15)).cost).toBe(2);
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // シャドウバースト（マナ3・かしこさ）
+  it('シャドウスリップ（マナ1）：相手の消費マナ2以上のちから技・かしこさ技を回避。マナ0〜1 の攻撃は回避しない', () => {
+    expect(getSkill(laz(15)).cost).toBe(1);
+    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // シャドウバースト（マナ4・かしこさ）
     expect(lifeOf(attackAndGuard(laz(3), 'o-m2', [laz(15)]), 'o-m2')).toBe(6); // とびかかり（マナ2・ちから）＝境目の2は回避できる
     for (const cheap of [laz(1), laz(2)]) {
       // ひっかき（マナ0）・かみつき（マナ1）には使えず、理由が出る
@@ -247,12 +276,12 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
     }
   });
 
-  it('14 フェイントステップ（マナ2）：相手のちから技・かしこさ技を、消費マナに関係なく回避（マナ0 も高いマナも）', () => {
+  it('フェイントステップ（マナ2）：相手のちから技・かしこさ技を、消費マナに関係なく回避（マナ0 も高いマナも）', () => {
     expect(getSkill(laz(14)).cost).toBe(2);
     expect(getSkill(laz(14)).effect).toEqual({ type: 'evade', against: 'all' });
     expect(lifeOf(attackAndGuard(laz(1), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // ひっかき（マナ0・ちから）
     expect(lifeOf(attackAndGuard(laz(6), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // しっぷうタックル（マナ4・ちから）
-    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // シャドウバースト（マナ3・かしこさ）
+    expect(lifeOf(attackAndGuard(laz(10), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // シャドウバースト（マナ4・かしこさ）
     expect(lifeOf(attackAndGuard(laz(9), 'o-m2', [laz(14)]), 'o-m2')).toBe(6); // トリックショット（マナ2・かしこさ）
   });
 
@@ -348,7 +377,7 @@ describe('ラズックの技カードの面と日英', () => {
     expect(cardName(getSkill(laz(4)))).toBe('Fury Claws');
     expect(cardName(LAZUCK_MONSTER)).toBe('Lazuck');
     expect(skillCardFace(getSkill(laz(7))).description).toMatch(/Lazuck/);
-    for (const s of LAZUCK_SKILLS) expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
+    for (const s of skillsOf('mon-lazuck')) expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
     setLanguage('ja');
   });
 });
@@ -366,7 +395,7 @@ describe('テスト用の編成とセーブ（version 7）', () => {
     if (!save) throw new Error('save');
     expect(save.deck).toEqual(createStarterDeck());
     expect(save.collection['mon-lazuck']).toBe(1);
-    expect(save.collection[laz(1)]).toBe(3); // 初期デッキ（2026-10-26 からラズックの初期配布で3枚）
+    expect(save.collection[laz(1)]).toBe(2); // 初期デッキ（2026-11-01 指示書 AJ からラズックの初期配布で2枚）
     expect(save.collection[sor(2)]).toBe(4); // 持っていた枚数は減らさない
     expect(save.collection['skl-soramo-01']).toBeUndefined();
     expect(validateDeck(save.deck, save.collection)).toEqual([]);
@@ -406,7 +435,7 @@ describe('正式14技への置き換えと旧セーブ（version 11・2026-10-26
     if (!loaded) throw new Error('読み込めない');
     expect(loaded.collection[laz(5)]).toBeUndefined();
     expect(loaded.collection[laz(16)]).toBeUndefined();
-    expect(loaded.collection[laz(1)]).toBe(3);
+    expect(loaded.collection[laz(1)]).toBe(2); // 初期デッキのひっかき（指示書 AJ の箱で2枚）
     expect(loaded.deck.skills).not.toContain(laz(5));
     expect(loaded.deck.skills).not.toContain(laz(16));
     expect(loaded.deck.skills).toHaveLength(60);

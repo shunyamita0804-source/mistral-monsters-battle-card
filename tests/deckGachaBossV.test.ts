@@ -120,7 +120,7 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
   });
 
   it('セーブの version は上げていない（デッキ・カードは書きかえないので。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(32); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に
+    expect(SAVE_VERSION).toBe(33); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に
   });
 });
 
@@ -224,7 +224,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     });
   });
 
-  it('デッキは60枚で、切り札の技14種が2枚ずつ。ほかのモンスターの技も入る。ほかの相手（ボス以外）は今の作り方のまま', () => {
+  it('デッキは60枚で、切り札の技12種（指示書 AJ）が2枚ずつ。ほかのモンスターの技も入る。ほかの相手（ボス以外）は今の作り方のまま', () => {
     for (const [id, ace] of Object.entries(ACES)) {
       const boss = ENCOUNTERS[id];
       if (!boss) throw new Error(id);
@@ -236,11 +236,13 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       for (const m of boss.monsters.filter((x) => x !== ace)) expect(skillsOf(m).some((k) => (counts[k.id] ?? 0) > 0), `${id} ${m}`).toBe(true);
       expect(isDeckValid(deck), id).toBe(true);
     }
-    // 切り札の無い相手（大会のノエル）は前と同じ作り方（左のモンスターの技が多い）
+    // 切り札の無い相手（大会のノエル）は前と同じ作り方（左のモンスターの技が多い）。
+    // 指示書 AJ で技が1体12枚（3体で36種）になったので、2枚目が入るのは左の12種と真ん中の前の8種まで。右のモンスターの技は1枚ずつ
     const noel = getTournament('tournament-e')?.rounds[0];
     if (!noel) throw new Error('noel');
     const counts = countCards(buildOpponentDeck(noel).skills);
-    expect(counts[skillsOf(noel.monsters[0] as string)[0]?.id ?? '']).toBe(2);
-    expect(counts[skillsOf(noel.monsters[1] as string)[0]?.id ?? '']).toBe(1);
+    expect(skillsOf(noel.monsters[0] as string).every((k) => counts[k.id] === 2)).toBe(true);
+    expect(counts[skillsOf(noel.monsters[1] as string)[0]?.id ?? '']).toBe(2);
+    expect(skillsOf(noel.monsters[2] as string).every((k) => counts[k.id] === 1)).toBe(true);
   });
 });

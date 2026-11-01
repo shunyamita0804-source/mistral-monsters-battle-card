@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
 import { GACHA, GACHA_SERIES, gachaSeenFlag } from '../src/data/economy.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import {
   availableGachaSeriesFor,
   canReselectSeries,
@@ -37,43 +38,46 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(GACHA.cardsPerPack).toBe(5);
   });
 
-  it('中身はそのモンスターの技14種＋モンスターカード＝15枠。レア枠の名前はすべて今のデータにある', () => {
+  it('中身はそのモンスターの技12種＋モンスターカード＝13枠（指示書 AJ）。レア枠の名前はすべて今のデータにある', () => {
     for (const series of GACHA_SERIES.filter((s) => !s.cardIds)) {
       const lineup = seriesLineup(series);
       expect(lineup.errors).toEqual([]);
-      expect(lineup.skillIds).toHaveLength(14);
-      expect(lineup.all).toHaveLength(15);
+      expect(lineup.skillIds).toHaveLength(12);
+      expect(lineup.all).toHaveLength(13);
       expect(lineup.rareIds).toHaveLength(series.rareSkillNames.length);
       expect(lineup.skillIds).toEqual(skillsOf(series.monsterId).map((s) => s.id));
     }
   });
 
-  it('レア枠はユーザー決定の技', () => {
+  it('レア枠はユーザー決定の技（指示書 AJ の表の★。どのモンスターもレア4つ）', () => {
     const names = (id: string): string[] => {
       const series = GACHA_SERIES.find((s) => s.id === id);
       if (!series) throw new Error(id);
       const lineup = seriesLineup(series);
       return skillsOf(series.monsterId).filter((s) => lineup.rareIds.includes(s.id)).map((s) => s.name);
     };
-    // 2026-10-29 夜：「いちばん大きい攻撃はレア」を足し、どのモンスターもレア3つ
+    // 2026-11-01 指示書 AJ：表の★（rare）の4つ
     const want: Record<string, string[]> = {
-      soramo: ['ソラモビーム', 'スターフォール', '星影ステップ'],
-      gauul: ['スパイラルダイブ', '聖なる炎', '高速飛行'],
-      lazuck: ['とびかかり', 'シャドウバースト', 'フェイントステップ'],
-      nobiton: ['まきつく', 'ギガントノーズ', 'ダウナーミスト'],
-      myurol: ['アクアテール', 'スリップガード', 'すべってよける'],
-      kalshell: ['シェルブレイカー', 'タイダルクラッシュ', 'てっぺきシェル'],
-      pukarim: ['ぷはーっ', 'おおつむじ', 'ぷかぷか'],
-      geol: ['ナックル', 'グランドハンマー', 'うけとめる'],
-      flune: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'],
-      serephine: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'],
-      tsumuji: ['かまいたち', 'ストームブレイド', 'かぜよみ'],
-      hyouzuku: ['ふぶき', 'ひょうが', 'おとなきはばたき'],
-      shishien: ['れんごくのとっしん', 'ほのおのほうこう', 'かげろう'],
-      hakuran: ['らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
-      desuoru: ['ヘルのもん', 'カラスのめ', 'かげにとける'],
+      soramo: ['連続ひっかき', 'ソラモビーム', 'スターフォール', '星影ステップ'],
+      gauul: ['火の粉', '聖なる炎', 'フレアレイ', '高速飛行'],
+      lazuck: ['トリックショット', 'シャドウバースト', 'いたずら', 'フェイントステップ'],
+      nobiton: ['まきつく', 'ギガントノーズ', 'ダウナーミスト', '不思議な嗅覚'],
+      myurol: ['しっぽまわし', 'アクアテール', 'みずあび', 'スリップガード'],
+      kalshell: ['シェルブレイカー', 'あわだま', 'タイダルクラッシュ', 'てっぺきシェル'],
+      pukarim: ['ぷはーっ', 'おおつむじ', 'おいかぜ', 'くうきのクッション'],
+      geol: ['ナックル', '地ひびき', 'グランドハンマー', 'うけとめる'],
+      flune: ['かふん', 'はなびらストーム', 'フラワードレイン', 'いやしのみつ'],
+      serephine: ['アクアニードル', 'ルナタイド', 'オーシャンウェーブ', 'ウェーブダンス'],
+      tsumuji: ['ストームブレイド', 'かまいたち', 'かぜのり', 'かぜよみ'],
+      hyouzuku: ['こおりのいき', 'ふぶき', 'ひょうが', 'おとなきはばたき'],
+      shishien: ['れんごくのとっしん', 'もえるたてがみ', 'ほのおのほうこう', 'ねつのとばり'],
+      hakuran: ['てんをかける', 'らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
+      desuoru: ['しのゆびさし', 'ヘルのもん', 'カラスのめ', 'やみにまぎれる'],
     };
-    for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
+    for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) {
+      expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
+      expect((AJ_SKILLS[s.monsterId] ?? []).filter((r) => r.rare).map((r) => r.name).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
+    }
   });
 
   it('1パック5枚。シリーズのカードだけが出て、開ける順はノーマル → レア → モンスター', () => {
@@ -154,7 +158,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     }
   });
 
-  it('プカリムはモンスターカード（ピートに勝つと受け取る）を手に入れたあとだけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・14 ぷかぷか', () => {
+  it('プカリムはモンスターカード（ピートに勝つと受け取る）を手に入れたあとだけ並び、買える。レア枠は 7 ぷはーっ・8 おおつむじ・10 おいかぜ・12 くうきのクッション（指示書 AJ）', () => {
     const before = { ...newSaveWithoutPukarim(), coins: 150 };
     expect(availableGachaSeriesFor(before).map((s) => s.id)).not.toContain('pukarim');
     expect(purchaseSeriesPack(before, 'pukarim', 'tx-p', 3).status).toBe('error');
@@ -165,7 +169,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(purchaseSeriesPack(after, 'pukarim', 'tx-p', 3).status).toBe('ok');
     const pukarim = GACHA_SERIES.find((s) => s.id === 'pukarim');
     if (!pukarim) throw new Error('pukarim');
-    expect(seriesLineup(pukarim).rareIds).toEqual(['skl-pukarim-07', 'skl-pukarim-08', 'skl-pukarim-14']);
+    expect(seriesLineup(pukarim).rareIds).toEqual(['skl-pukarim-07', 'skl-pukarim-08', 'skl-pukarim-10', 'skl-pukarim-12']);
   });
 
   it('「パックを選び直す」は払う前だけ', () => {
@@ -173,12 +177,12 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(canReselectSeries(true)).toBe(false);
   });
 
-  it('そろった数：15枠のうち持っている種類', () => {
+  it('そろった数：13枠（指示書 AJ）のうち持っている種類', () => {
     const lineup = seriesLineup(SORAMO);
     const save = { ...createNewSave(), collection: {} as Record<string, number> };
-    expect(seriesOwned(save, SORAMO)).toEqual({ owned: 0, total: 15 });
+    expect(seriesOwned(save, SORAMO)).toEqual({ owned: 0, total: 13 });
     const some = { ...save, collection: { [lineup.skillIds[0] ?? '']: 3, [lineup.monsterId]: 1 } };
-    expect(seriesOwned(some, SORAMO)).toEqual({ owned: 2, total: 15 });
+    expect(seriesOwned(some, SORAMO)).toEqual({ owned: 2, total: 13 });
   });
 });
 
@@ -199,7 +203,8 @@ const series = (id: string) => {
 
 describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決定）', () => {
   it('最初から並ぶのは、管理局で選んだ箱の3体のシリーズだけ', () => {
-    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'gauul', 'myurol', 'tools']);
+    // 指示書 AJ の箱：旅立ち＝ソラモ・ノビトン・ラズック／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン（並びはシリーズの順）
+    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'lazuck', 'nobiton', 'tools']);
     expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton', 'tools']);
     expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
     // 箱の3体には NEW を出さない
@@ -214,7 +219,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
 
   it('そのモンスターのモンスターカードを初めて手に入れたら開き、NEW が出る（ショップで箱を買った・ボスから受け取った など）', () => {
     const s = addCards(boxSave('booster-1'), [{ cardId: 'mon-kalshell', count: 1 }, { cardId: 'mon-geol', count: 1 }]);
-    expect(ids(s)).toEqual(['soramo', 'gauul', 'myurol', 'kalshell', 'geol', 'tools']);
+    expect(ids(s)).toEqual(['soramo', 'lazuck', 'nobiton', 'kalshell', 'geol', 'tools']);
     expect(isNewGachaSeries(s, series('kalshell'))).toBe(true);
     expect(isNewGachaSeries(s, series('geol'))).toBe(true);
     // 技カードだけでは開かない

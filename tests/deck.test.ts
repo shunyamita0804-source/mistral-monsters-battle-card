@@ -4,6 +4,7 @@ import { skillCategory } from '../src/game/cards/cardTypes.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
 import { DECK_RULES } from '../src/data/rules.ts';
+import { ajBoxRows } from '../src/data/skillRebuildAJ.ts';
 import {
   buildAutoDeck,
   buildDeckFromCollection,
@@ -100,7 +101,7 @@ describe('デッキ編集の表の枚数（攻撃・守り・計）', () => {
 });
 
 describe('初期配布96枚と初期デッキ60枚（別の仕様）', () => {
-  it('初期配布は全6体×16枚＝96枚。どれも正式の技カードで、そのモンスターの技だけ', () => {
+  it('初期配布は全6体×16枚＝96枚。どれも正式の技カードで、そのモンスターの技だけ（指示書 AJ：表の box の枚数）', () => {
     expect(INITIAL_DISTRIBUTION.map((d) => d.monsterId)).toEqual(['mon-soramo', 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-gauul']);
     for (const d of INITIAL_DISTRIBUTION) {
       expect(d.cards.reduce((n, c) => n + c.copies, 0)).toBe(16);
@@ -108,8 +109,8 @@ describe('初期配布96枚と初期デッキ60枚（別の仕様）', () => {
         const s = SKILLS.find((k) => k.id === c.id);
         expect(s?.monsterId).toBe(d.monsterId);
         expect(s?.isPlaceholder).toBe(false);
-        expect(s?.availability).toBe('initial');
       }
+      expect(d.cards.map((c) => [c.id, c.copies])).toEqual(ajBoxRows(d.monsterId));
     }
     expect(INITIAL_DISTRIBUTION.flatMap((d) => d.cards).reduce((n, c) => n + c.copies, 0)).toBe(96);
   });

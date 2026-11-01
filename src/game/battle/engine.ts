@@ -1,4 +1,4 @@
-import { cardCatalog, getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
+import { cardCatalog, getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { BATTLE_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -10,6 +10,7 @@ import {
   skillValue,
   statLabel,
   targetsEnemy,
+  type Habitat,
   type PlayCard,
   type SkillCard,
   type StatType,
@@ -110,10 +111,20 @@ export interface BattleSide {
   readonly turnUsage: Readonly<Record<string, number>>;
 }
 
-/** 場に出ている全体カード（場に1枚だけ） */
+/**
+ * 場（場の枠は1つだけ。2026-11-01 指示書 AJ の追加その3・ユーザー決定）。サポートの場のカード（重い空気・守りの陣 など）も、みちしおの水中も、
+ * これから入れる場のカード（場を地上・空中・水中にする など）も同じ1つの枠を使い、新しい場が出たら前の場は上書きされる（期限もそこから数え直す）。
+ * 場の種類と効果は cardId のカード（サポートの場のカード、または みちしお などの技）から、だれが出したかは owner
+ */
 export interface FieldCard {
+  /** 場を出したカード（サポートの場のカード、またはみちしお などの技） */
   readonly cardId: string;
+  /** だれが出したか */
   readonly owner: Side;
+  /** 場の居場所（場全体をその居場所として扱う。みちしお＝水中）。無ければ居場所は変えない */
+  readonly habitat?: Habitat;
+  /** 期限：この手番の終わりまで（無ければ、ほかの場に上書きされるまで続く） */
+  readonly untilTurn?: number;
 }
 
 /** いまのマナの量 */
@@ -182,7 +193,7 @@ export interface BattleState {
   readonly phase: BattlePhase;
   readonly pending: PendingAttack | null;
   readonly sides: Readonly<Record<Side, BattleSide>>;
-  /** 場の全体カード（なければ null） */
+  /** 場（場の枠は1つだけ。サポートの場のカード・みちしおの水中など。なければ null） */
   readonly field: FieldCard | null;
   readonly winner: BattleWinner | null;
   /** knockout＝3体KO、deckOut＝引くべきカードを引けなかった（山札切れ） */
@@ -440,10 +451,9 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     const against = guardAgainst(skill);
     if (against !== 'all' && against !== pending.stat) return NO(t('battle.ng.wrongStat', { stat: statLabel(pending.stat) }));
     const attackCard = attackCardOf(pending.cardId);
-    const attack = attackCard.effect;
-    if (attack.type === 'attack' && type === 'defense' && attack.unblockable) return NO(t('battle.ng.unblockable'));
-    // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）
-    if (attack.type === 'attack' && type === 'evade' && (attack.undodgeable || pending.undodgeable)) return NO(t('battle.ng.undodgeable'));
+    if (type === 'defense' && unblockableAgainst(state, attackCard, target)) return NO(t('battle.ng.unblockable'));
+    // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）。水中・空中の相手には回避できない攻撃も（指示書 AJ）
+    if (type === 'evade' && (undodgeableAgainst(state, attackCard, target) || pending.undodgeable)) return NO(t('battle.ng.undodgeable'));
     // じならしをかけられたモンスターは、この手番の次の攻撃1回を回避できない（防御はできる）
     if (type === 'evade' && pending.pinned) return NO(t('battle.ng.pinned'));
     // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
@@ -485,6 +495,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   }
   // すなをほる：相手が全員隠れていれば攻撃の技は使えない
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
+  // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
+  if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
   return YES;
 }
 
@@ -503,7 +515,8 @@ export function coverUser(state: BattleState, side: Side, skill: SkillCard): Bat
  */
 function coverUsability(state: BattleState, side: Side, skill: SkillCard, pending: PendingAttack): Usability {
   const attack = attackCardOf(pending.cardId).effect;
-  if (attack.type === 'attack' && attack.unblockable) return NO(t('battle.ng.unblockable'));
+  const targeted = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
+  if (unblockableAgainst(state, attackCardOf(pending.cardId), targeted)) return NO(t('battle.ng.unblockable'));
   if (attack.type === 'attack' && attack.allTargets) return NO(t('battle.ng.coverAllTargets'));
   if (pending.coveredFrom) return NO(t('battle.ng.coverOnce'));
   if (pending.responses.length > 0) return NO(t('battle.ng.coverFirst'));
@@ -531,6 +544,63 @@ export function attackableMonsters(state: BattleState, side: Side): BattleMonste
   return aliveMonsters(state.sides[side]).filter((m) => m.hiddenTurn !== state.turn);
 }
 
+/** いまの場（期限が過ぎていれば null） */
+export function activeField(state: BattleState): FieldCard | null {
+  const f = state.field;
+  return f && (f.untilTurn === undefined || state.turn <= f.untilTurn) ? f : null;
+}
+
+/** 場のサポートカード（場がサポートの場のカードのときだけ。みちしお などの技の場なら null） */
+export function fieldSupport(state: BattleState): SupportCard | null {
+  const f = activeField(state);
+  const card = f ? cardCatalog.get(f.cardId) : undefined;
+  return card && card.kind === 'support' ? card : null;
+}
+
+/** 場が全体を変えている居場所（無ければ null） */
+export function fieldHabitat(state: BattleState): Habitat | null {
+  return activeField(state)?.habitat ?? null;
+}
+
+/** 場が水中か（みちしおの期限の手番の終わりまで。2026-11-01 指示書 AJ） */
+export function isTideActive(state: BattleState): boolean {
+  return fieldHabitat(state) === 'water';
+}
+
+/** モンスターのいまの居場所（場が水中なら全員水中。居場所の無い仮モンスターは null） */
+export function habitatOf(state: BattleState, monster: BattleMonster | undefined): Habitat | null {
+  if (!monster) return null;
+  const base = getMonster(monster.cardId).habitat ?? null;
+  // 場が居場所を変えていれば、全員その居場所（みちしお＝水中）
+  const field = fieldHabitat(state);
+  return base && field ? field : base;
+}
+
+/** その攻撃は、この相手には防御されないか（カードの「防御されない」・水中の相手への「防御されない」） */
+export function unblockableAgainst(state: BattleState, card: SkillCard, target: BattleMonster | undefined): boolean {
+  const e = card.effect;
+  return e.type === 'attack' && (!!e.unblockable || (!!e.unblockableVsWater && habitatOf(state, target) === 'water'));
+}
+
+/** その攻撃は、この相手には回避されないか（カードの「回避されない」・水中／空中の相手への「回避できない」。ためているときのぷはーっは pending.undodgeable） */
+export function undodgeableAgainst(state: BattleState, card: SkillCard, target: BattleMonster | undefined): boolean {
+  const e = card.effect;
+  if (e.type !== 'attack') return false;
+  const where = habitatOf(state, target);
+  return !!e.undodgeable || (!!e.undodgeableVsWater && where === 'water') || (!!e.undodgeableVsAir && where === 'air');
+}
+
+/** 倒れている味方の数（ししゃのたむけ。使ったモンスターの側） */
+export function fallenAllies(state: BattleState, user: BattleMonster | undefined): number {
+  const side = user ? findMonster(state, user.uid)?.side : undefined;
+  return side ? state.sides[side].monsters.filter((m) => m.life <= 0).length : 0;
+}
+
+/** 死のレクイエムで倒れるモンスター（ライフ1以下で生きている、使ったモンスター以外。味方も相手も） */
+export function requiemVictims(state: BattleState, userUid: string): BattleMonster[] {
+  return [...state.sides.player.monsters, ...state.sides.opponent.monsters].filter((m) => m.uid !== userUid && m.life > 0 && m.life <= 1);
+}
+
 /**
  * 対象を選ぶ必要があるカードなら、選べる対象を返す。
  * 攻撃の技は、ちょうはつで相手が限られていればそれに従う。user を渡さなければ、使えるモンスターのだれかが攻撃できる相手すべて。
@@ -539,8 +609,9 @@ export function attackableMonsters(state: BattleState, side: Side): BattleMonste
 export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?: BattleMonster): BattleMonster[] {
   if (card.kind === 'skill' && targetsEnemy(card)) {
     if (card.effect.type !== 'attack') return aliveMonsters(state.sides[otherSide(side)]);
-    // 攻撃の技は、すなをほるで隠れている相手を選べない
-    const enemies = attackableMonsters(state, otherSide(side));
+    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）
+    const ground = card.effect.groundOnly;
+    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !ground || habitatOf(state, m) === 'ground');
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -582,9 +653,8 @@ export function cheerOf(state: BattleState, user: BattleMonster | undefined): nu
 
 /** 場のカード「守りの陣」（2026-10-30 指示書 Y）：防御・回避のカードの必要マナを減らす量（場に無ければ 0） */
 export function guardDiscountOf(state: BattleState): number {
-  if (!state.field) return 0;
-  const e = getSupport(state.field.cardId).effect;
-  return e.type === 'guardDiscount' ? e.value : 0;
+  const e = fieldSupport(state)?.effect;
+  return e?.type === 'guardDiscount' ? e.value : 0;
 }
 
 /** 守りのカード（防御・回避・かばう）か */
@@ -619,9 +689,8 @@ export function energyOf(state: BattleState, user: BattleMonster | undefined, sk
 
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
 export function fieldModifier(state: BattleState, stat: StatType): number {
-  if (!state.field) return 0;
-  const e = getSupport(state.field.cardId).effect;
-  if (e.type !== 'field') return 0;
+  const e = fieldSupport(state)?.effect;
+  if (!e || e.type !== 'field') return 0;
   return e.stat === 'all' || e.stat === stat ? e.modifier : 0;
 }
 
@@ -644,8 +713,12 @@ export function weakenTurnOf(state: BattleState, user: BattleMonster | undefined
  */
 export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
   if (!skill.stat) return 0;
-  const base = skill.stat.value * (energyOf(state, user, skill) ? 2 : 1);
-  const boost = chargeOf(user) + tailwindOf(state, user) + cheerOf(state, user);
+  // 2倍（エネルギーをためる・場が水中のタイダルクラッシュ）はカードのダメージにかける。両方なら4倍【要確認：指示書 AJ】
+  const water = skill.effect.type === 'attack' && skill.effect.doubleInWater && isTideActive(state);
+  const base = skill.stat.value * (energyOf(state, user, skill) ? 2 : 1) * (water ? 2 : 1);
+  // ししゃのたむけ：倒れている味方1体につき＋（使った瞬間に数える）
+  const fallen = skill.effect.type === 'attack' && skill.effect.fallenAllyBonus ? skill.effect.fallenAllyBonus * fallenAllies(state, user) : 0;
+  const boost = chargeOf(user) + tailwindOf(state, user) + cheerOf(state, user) + fallen;
   return Math.max(0, base + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
 }
 
@@ -743,11 +816,12 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
  */
 export function pendingDamage(pending: PendingAttack): number {
   const cards = pending.responses.map(getSkill);
-  if (cards.some((c) => c.effect.type === 'evade')) {
-    const attack = attackCardOf(pending.cardId).effect;
-    return attack.type === 'attack' && attack.halfOnEvade ? Math.floor(pending.power / 2) : 0;
-  }
   const reduction = cards.filter((c) => c.effect.type === 'defense').reduce((sum, c) => sum + guardReduction(c), 0);
+  if (cards.some((c) => c.effect.type === 'evade')) {
+    // 回避されても半分（指示書 AJ）：回避されたら元の値の半分（切り捨て）、防御もあればそこから防御を引く
+    const attack = attackCardOf(pending.cardId).effect;
+    return attack.type === 'attack' && attack.halfOnEvade ? Math.max(0, Math.floor(pending.power / 2) - reduction) : 0;
+  }
   return Math.max(0, pending.power - reduction);
 }
 
@@ -852,6 +926,11 @@ function startTurn(state: BattleState, side: Side): BattleState {
   const monsters = s.monsters.map((m) => ({ ...m, acted: false }));
   let next: BattleState = { ...state, active: side, phase: 'main', manaConvertLimit: null };
   next = addLog(updateSide(next, side, { monsters, turnUsage: {} }), t(`battle.log.turn.${side}`));
+  // 場の期限が過ぎたら、場はなくなる（みちしお：使った側の次の自分の手番が終わったら、場の水が引く。指示書 AJ の追加その3）
+  if (state.field?.untilTurn !== undefined && state.turn > state.field.untilTurn) {
+    next = { ...next, field: null };
+    if (state.field.habitat === 'water') next = addLog(next, t('battle.log.tideEnd'));
+  }
   const need = BATTLE_RULES.refillHandTo - s.hand.length;
   if (need > 0) {
     if (s.deck.length < need) return loseByDeckOut(next, side);
@@ -1082,6 +1161,13 @@ function useCard(
       next = updateMonster(next, user.uid, { windRide: { discount: skill.effect.discount, turn: state.turn + 2 } });
       return addLog(next, t('battle.log.windRide', { name: nameOf(user.cardId), n: skill.effect.discount }));
     }
+    case 'tide': {
+      // みちしお（指示書 AJ の追加その3）：使った側の次の自分の手番（turn + 2）の終わりまで場が水中。場の枠は1つで、前の場は上書き（期限もここから数え直す）
+      next = setField(next, { cardId: skill.id, owner: side, habitat: 'water', untilTurn: state.turn + 2 });
+      return addLog(next, t('battle.log.tide', { name: nameOf(user.cardId) }));
+    }
+    case 'requiem':
+      return requiem(next, user.uid);
     case 'handToDeck':
       return handToDeck(next, otherSide(side));
     case 'discardRandom':
@@ -1097,6 +1183,44 @@ function useCard(
     case 'cover':
       return state;
   }
+}
+
+/**
+ * 場の枠に新しい場を出す（場の枠は1つだけ。前の場は上書き。2026-11-01 指示書 AJ の追加その3）。
+ * 前の場がサポートの場のカードなら、出した側の捨て札へ（今までどおり）。みちしお の水中なら水が引く（技のカードは使ったときに捨て札へ行っている）
+ */
+function setField(state: BattleState, field: FieldCard): BattleState {
+  let next = state;
+  const old = activeField(state);
+  if (old) {
+    const oldCard = cardCatalog.get(old.cardId);
+    if (oldCard?.kind === 'support') {
+      const owner = next.sides[old.owner];
+      next = updateSide(next, old.owner, { discard: [...owner.discard, old.cardId] });
+      next = addLog(next, t('battle.log.fieldDiscard', { card: nameOf(old.cardId) }));
+    } else if (old.habitat === 'water') {
+      next = addLog(next, t('battle.log.tideEnd'));
+    }
+  } else if (state.field) {
+    // 期限の過ぎた場が残っていた（ふつうは手番の始めに消える）
+    const oldCard = cardCatalog.get(state.field.cardId);
+    if (oldCard?.kind === 'support') next = updateSide(next, state.field.owner, { discard: [...next.sides[state.field.owner].discard, state.field.cardId] });
+  }
+  return { ...next, field };
+}
+
+/**
+ * 死のレクイエム（指示書 AJ：デスオル）：ライフ1以下の、使ったモンスター以外のモンスター（味方も相手も）をすべて倒す。特殊技なので守れない。
+ * 倒れた数を記録に書く。両方が全滅したら、いまの手番の側の勝ち（checkKnockout。使ったデスオルは残るので、ふつうは起きない）
+ */
+function requiem(state: BattleState, userUid: string): BattleState {
+  const victims = requiemVictims(state, userUid);
+  let next = state;
+  for (const m of victims) {
+    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null });
+  }
+  next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
+  return checkKnockout(next);
 }
 
 /**
@@ -1353,15 +1477,8 @@ function useSupport(state: BattleState, side: Side, cardUid: string, card: Suppo
       next = updateMonster(next, target.uid, { cheer: { amount: e.value, turn: state.turn } });
       return addLog(next, t('battle.log.cheer', { name: nameOf(target.cardId), n: e.value }));
     case 'guardDiscount':
-    case 'field': {
-      const old = next.field;
-      if (old) {
-        const owner = next.sides[old.owner];
-        next = updateSide(next, old.owner, { discard: [...owner.discard, old.cardId] });
-        next = addLog(next, t('battle.log.fieldDiscard', { card: nameOf(old.cardId) }));
-      }
-      return addLog({ ...next, field: { cardId: card.id, owner: side } }, t('battle.log.fieldEnter', { card: cardName(card) }));
-    }
+    case 'field':
+      return addLog(setField(next, { cardId: card.id, owner: side }), t('battle.log.fieldEnter', { card: cardName(card) }));
   }
 }
 

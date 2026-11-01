@@ -1,6 +1,6 @@
 import { readSavedName } from '../player/playerName.ts';
 import type { ThunderState } from '../dungeon/thunder.ts';
-import { cardCatalog, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
+import { cardCatalog, REMOVED_SKILL_IDS, TMP_FLUNE_ID, TMP_FLUNE_SKILL_IDS, TMP_GEOL_ID, TMP_GEOL_SKILL_IDS } from '../../data/cards.ts';
 import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
@@ -45,7 +45,7 @@ import { START_DATE, THUNDER_BOSS_WAIVED_FLAG } from '../../data/calendar.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 32;
+export const SAVE_VERSION = 33;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -430,6 +430,8 @@ export const REMOVED_CARD_IDS: readonly string[] = [
   ...TMP_GEOL_SKILL_IDS,
   TMP_FLUNE_ID,
   ...TMP_FLUNE_SKILL_IDS,
+  // 2026-11-01 指示書 AJ：技を12枚にして外した技（33枚）
+  ...REMOVED_SKILL_IDS,
 ];
 
 /**
@@ -761,6 +763,25 @@ function migrateThunderBossWaiverV32(raw: RawObject): RawObject {
   return { ...raw, storyFlags: [...flags, THUNDER_BOSS_WAIVED_FLAG] };
 }
 
+/**
+ * v32 → v33（2026-11-01 指示書 AJ）：どのモンスターも技を12枚にした。外した技（REMOVED_SKILL_IDS・33枚）は、ユーザー決定で
+ * 持っているカードから消し、デッキに入っていたら抜く。デッキの抜けた分は、持っているカードで埋める（v8 のクロスガードと同じ。topUpDeck）。
+ * それでも60枚に足りなければ足りないまま（デッキ編集の「おまかせ」で直せる）【要確認：足りないデッキの扱い】。
+ * 名前・数字を変えた技は ID が同じなのでそのまま
+ */
+function migrateSkillRebuildV33(raw: RawObject): RawObject {
+  const removed = new Set(REMOVED_SKILL_IDS);
+  const collection: Record<string, number> = isObject(raw.collection) ? { ...(raw.collection as Record<string, number>) } : {};
+  for (const id of removed) delete collection[id];
+  const deck = raw.deck;
+  if (!isObject(deck) || !Array.isArray(deck.skills) || !Array.isArray(deck.monsters)) return { ...raw, collection };
+  const skills = (deck.skills as unknown[]).filter((id) => !(typeof id === 'string' && removed.has(id)));
+  if (skills.length === deck.skills.length) return { ...raw, collection };
+  const counts = Object.fromEntries(Object.entries(collection).filter(([, n]) => typeof n === 'number')) as Record<string, number>;
+  const filled = topUpDeck({ monsters: deck.monsters as string[], skills: skills as string[] }, counts);
+  return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -796,6 +817,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   29: migrateHyouzukuAltarV30,
   30: migrateShishienAltarV31,
   31: migrateThunderBossWaiverV32,
+  32: migrateSkillRebuildV33,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

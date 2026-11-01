@@ -1,3 +1,4 @@
+import { ajRareNames } from './skillRebuildAJ.ts';
 import { HIDDEN_MONSTER_ID, monsterId, skillId, supportId } from './cards.ts';
 import type { ItemId } from './items.ts';
 
@@ -142,33 +143,34 @@ export interface GachaSeries {
  * ここに1行足すだけでシリーズが増える
  */
 export const GACHA_SERIES: readonly GachaSeries[] = [
-  // レア枠（2026-10-29 夜 ユーザー決定）：「そのモンスターのいちばん大きい攻撃はレア」を足し、どのモンスターもレアを3つにそろえた
-  { id: 'soramo', monsterId: 'mon-soramo', rareSkillNames: ['ソラモビーム', 'スターフォール', '星影ステップ'] },
-  { id: 'gauul', monsterId: 'mon-gauul', rareSkillNames: ['スパイラルダイブ', '聖なる炎', '高速飛行'] },
-  { id: 'lazuck', monsterId: 'mon-lazuck', rareSkillNames: ['とびかかり', 'シャドウバースト', 'フェイントステップ'] },
-  { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ['まきつく', 'ギガントノーズ', 'ダウナーミスト'] },
-  { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ['アクアテール', 'スリップガード', 'すべってよける'] },
-  { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ['シェルブレイカー', 'タイダルクラッシュ', 'てっぺきシェル'] },
+  // レア枠（2026-10-29 夜 ユーザー決定）：「そのモンスターのいちばん大きい攻撃はレア」を足し、どのモンスターもレアを3つにそろえた。
+  // 2026-11-01 指示書 AJ：レアは各モンスター4つ（src/data/skillRebuildAJ.ts の rare）
+  { id: 'soramo', monsterId: 'mon-soramo', rareSkillNames: ajRareNames('mon-soramo') },
+  { id: 'gauul', monsterId: 'mon-gauul', rareSkillNames: ajRareNames('mon-gauul') },
+  { id: 'lazuck', monsterId: 'mon-lazuck', rareSkillNames: ajRareNames('mon-lazuck') },
+  { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ajRareNames('mon-nobiton') },
+  { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ajRareNames('mon-myurol') },
+  { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ajRareNames('mon-kalshell') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
-  { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ['ぷはーっ', 'おおつむじ', 'ぷかぷか'], unlockFlag: 'pete-beaten' },
+  { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
-  { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ['ナックル', 'グランドハンマー', 'うけとめる'], unlockFlag: 'grant-beaten' },
+  { id: 'geol', monsterId: 'mon-geol', rareSkillNames: ajRareNames('mon-geol'), unlockFlag: 'grant-beaten' },
   // フルーネ：セラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（flune14_skills_OFFICIAL_20261029_rare3.json）
-  { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' },
+  { id: 'flune', monsterId: 'mon-flune', rareSkillNames: ajRareNames('mon-flune'), unlockFlag: 'sera-beaten' },
   // セレフィーン（2026-10-29 セレフィーンの最終）：ルシアに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（serephine14_skills_OFFICIAL_20261029.json）
-  { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ['アクアニードル', 'オーシャンウェーブ', 'ウェーブダンス'], unlockFlag: 'lucia-beaten' },
+  { id: 'serephine', monsterId: 'mon-serephine', rareSkillNames: ajRareNames('mon-serephine'), unlockFlag: 'lucia-beaten' },
   // ツムジ（2026-10-30 指示書 U）：風の渓谷のゼフィラに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（tsumuji14_skills_OFFICIAL_20261030.json）
-  { id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['かまいたち', 'ストームブレイド', 'かぜよみ'], unlockFlag: 'zephyra-beaten' },
+  { id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ajRareNames('mon-tsumuji'), unlockFlag: 'zephyra-beaten' },
   // ヒョウズク（2026-10-30 指示書 W）：氷の洞窟のイヴァンに初めて勝ったあと（祭壇でカードを受け取ると）並ぶ。JSON の gacha_slot も同じ（hyouzuku14_skills_OFFICIAL_20261030.json）
-  { id: 'hyouzuku', monsterId: 'mon-hyouzuku', rareSkillNames: ['ふぶき', 'ひょうが', 'おとなきはばたき'], unlockFlag: 'ivan-beaten' },
+  { id: 'hyouzuku', monsterId: 'mon-hyouzuku', rareSkillNames: ajRareNames('mon-hyouzuku'), unlockFlag: 'ivan-beaten' },
   // シシエン（2026-10-31 指示書 AB）：炎の火山のバルカに初めて勝ったあと（祭壇でカードを受け取ると）並ぶ。JSON の gacha_slot も同じ（shishien14_skills_OFFICIAL_20261030.json）
-  { id: 'shishien', monsterId: 'mon-shishien', rareSkillNames: ['れんごくのとっしん', 'ほのおのほうこう', 'かげろう'], unlockFlag: 'barca-beaten' },
+  { id: 'shishien', monsterId: 'mon-shishien', rareSkillNames: ajRareNames('mon-shishien'), unlockFlag: 'barca-beaten' },
   // ハクラン（2026-10-31 指示書 AF）：雷の高原のボスに初めて勝ったあと（thunder-boss-beaten。まだどこでも立たない。雷の高原のボスを作るときに立てる）。
   // 並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く）なので、今のゲームでは並ばない。JSON の gacha_slot も同じ（hakuran14_skills_OFFICIAL_20261031.json）
-  { id: 'hakuran', monsterId: 'mon-hakuran', rareSkillNames: ['らいうん', 'せいなるいかずち', 'かすみのあゆみ'], unlockFlag: 'thunder-boss-beaten' },
+  { id: 'hakuran', monsterId: 'mon-hakuran', rareSkillNames: ajRareNames('mon-hakuran'), unlockFlag: 'thunder-boss-beaten' },
   // デスオル（2026-10-31 指示書 AG）：置き場所を決めたときに desuoru-unlocked を立てる（まだどこでも立たない）。
   // 並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く）なので、今のゲームでは並ばない。JSON の gacha_slot も同じ
-  { id: 'desuoru', monsterId: 'mon-desuoru', rareSkillNames: ['ヘルのもん', 'カラスのめ', 'かげにとける'], unlockFlag: 'desuoru-unlocked' },
+  { id: 'desuoru', monsterId: 'mon-desuoru', rareSkillNames: ajRareNames('mon-desuoru'), unlockFlag: 'desuoru-unlocked' },
   // 道具のパック（仮。2026-10-30 指示書 Y）：サポート11種類。レアの枠は思い出の箱・熱気。最初から並ぶ。値段・確率・枚数はほかと同じ。
   // パックの絵（pack_tools.webp）・販売機の窓（panel_tools.webp）は 2026-10-30 指示書 Z で入れた（袋の色は銀 #B8BCC4。それまでは封をしたパック・店の中のパネル）
   { id: 'tools', monsterId: '', cardIds: [7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map(supportId), rareSkillNames: ['思い出の箱', '熱気'] },

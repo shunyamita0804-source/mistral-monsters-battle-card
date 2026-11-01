@@ -4,6 +4,8 @@ import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
+import { habitatMark } from './habitatMark.ts';
+import type { Habitat } from '../../game/cards/cardTypes.ts';
 import backgroundUrl from '@assets/images/backgrounds/battlecard_bg_common.png';
 
 const FRAME_URLS = import.meta.glob<string>('/assets/images/ui/battlecard/frame_*.png', { eager: true, query: '?url', import: 'default' });
@@ -21,7 +23,13 @@ export function hasBattleCard(monsterId: string): boolean {
  * バトル用カード（2026-10-25）：共通の背景 → モンスター → モンスターの色の枠 → 名前とライフ（文字はゲームが描く。画像に焼き込まない）。
  * life を渡すと対戦の場の形（右上のライフの札は出さない。読み上げだけ「いま／最大」）
  */
-export function createBattleMonsterCard(monster: MonsterCard, width: number, life?: { current: number; max: number }): HTMLElement {
+export function createBattleMonsterCard(
+  monster: MonsterCard,
+  width: number,
+  life?: { current: number; max: number },
+  /** 対戦中のいまの居場所（場が水中なら水中。指示書 AJ）。省略時はモンスターの居場所 */
+  habitat?: Habitat | null,
+): HTMLElement {
   const spec = battleCardOf(monster.id);
   const artUrl = spec ? resolveCardArt({ category: 'monsterCards', file: spec.art, layout: 'full' }) : undefined;
   const frameUrl = spec ? FRAME_URLS[`/assets/images/ui/battlecard/frame_${spec.frame}.png`] : undefined;
@@ -39,6 +47,8 @@ export function createBattleMonsterCard(monster: MonsterCard, width: number, lif
     // 対戦の場（life を渡したとき）は右上のライフの札を出さない（2026-10-29 ユーザー指示。ライフはカードの下の「いま/最大」で見せる）
     life ? null : h('span', { class: 'battle-card__life' }, h('span', { class: 'battle-card__life-label', text: 'LIFE' }), h('b', { class: 'battle-card__life-value', text: lifeText })),
     h('span', { class: 'battle-card__name', text: name }),
+    // 居場所の印（2026-11-01 指示書 AJ。枠の上に重ねる）
+    habitatMark(habitat === undefined ? monster.habitat : habitat, { tide: habitat !== undefined && habitat !== null && habitat !== monster.habitat }),
   );
   // 枠の外形で切り抜く（枠の外の角に背景が出ないように）
   const shapeUrl = FRAME_URLS['/assets/images/ui/battlecard/frame_shape.png'];

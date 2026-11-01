@@ -10,6 +10,7 @@ import hakuranJson from '../src/data/official/hakuran14_skills_OFFICIAL_20261031
 import { HAKURAN_COLOR, HAKURAN_GACHA_RARE, HAKURAN_MONSTER, HAKURAN_MONSTER_ID, HAKURAN_PLAYTEST_16, HAKURAN_SKILLS, hakuranSkillId } from '../src/data/hakuran.ts';
 import { portraitFocus } from '../src/data/monsterPortraits.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, cardUsability, createBattle, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
@@ -51,7 +52,7 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     expect(hakuranJson.life).toBe(7);
   });
 
-  it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
+  it('CSV の14行・JSON・前の14技（ファイルの HAKURAN_SKILLS）で、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 防御技: 'defense', 回避技: 'evade' } as const;
     const rows = csvRows('src/data/official/hakuran14_skills_OFFICIAL_20261031.csv');
     expect(rows).toHaveLength(14);
@@ -75,25 +76,26 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('指示書の表のとおり（技名・分類・マナ・ダメージ・回避されない・レア）', () => {
-    const want: readonly [string, string, number, number | null, boolean][] = [
-      ['ひづめならし', 'force', 0, 1, false],
-      ['つのでこづく', 'force', 1, 1, true],
-      ['くもだま', 'wisdom', 1, 1, false],
-      ['ひづめげり', 'force', 2, 3, false], // 2026-10-31 指示書 AF2：ダメージ 2→3
-      ['みぬくひとみ', 'wisdom', 2, 2, true],
-      ['くもをける', 'force', 3, 3, false],
-      ['つのつき', 'force', 3, 3, true],
-      ['らいうん', 'wisdom', 4, 3, true],
-      ['てんをかける', 'force', 4, 5, false], // 2026-10-31 指示書 AF2：ダメージ 4→5
-      ['せいなるいかずち', 'wisdom', 5, 5, true],
-      ['くものころも', 'defense', 2, null, false],
-      ['ひらりとはねる', 'evade', 2, null, false],
-      ['くもがくれ', 'evade', 2, null, false],
-      ['かすみのあゆみ', 'evade', 2, null, false],
+  // 2026-11-01 指示書 AJ の表（12枚。並び＝表示の番号）。くものころも（旧11）・くもがくれ（旧13）は外した
+  it('指示書 AJ の表のとおり（技名・分類・マナ・ダメージ・回避されない・表示の番号）', () => {
+    const want: readonly [number, string, string, number, number | null, boolean][] = [
+      [1, 'ひづめならし', 'force', 0, 1, false],
+      [2, 'つのでこづく', 'force', 1, 1, true],
+      [4, 'ひづめげり', 'force', 2, 3, false],
+      [7, 'つのつき', 'force', 3, 3, true],
+      [6, 'くもをける', 'force', 3, 4, false],
+      [9, 'てんをかける', 'force', 4, 6, false],
+      [3, 'くもだま', 'wisdom', 1, 1, false],
+      [5, 'みぬくひとみ', 'wisdom', 2, 2, true],
+      [8, 'らいうん', 'wisdom', 4, 4, true],
+      [10, 'せいなるいかずち', 'wisdom', 5, 7, false],
+      [12, 'ひらりとはねる', 'evade', 1, null, false],
+      [14, 'かすみのあゆみ', 'evade', 2, null, false],
     ];
-    want.forEach(([name, category, cost, dmg, undodgeable], i) => {
-      const s = getSkill(hak(i + 1));
+    expect((AJ_SKILLS[HAKURAN_MONSTER_ID] ?? []).map((r) => r.id)).toEqual(want.map(([n]) => hak(n)));
+    want.forEach(([n, name, category, cost, dmg, undodgeable], i) => {
+      const s = getSkill(hak(n));
+      expect(s.displayNo).toBe(i + 1);
       expect(s.name).toBe(name);
       expect(s.category).toBe(category);
       expect(s.cost).toBe(cost);
@@ -104,13 +106,11 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('カードに書く短い文：回避されないは JSON の文のまま。11〜14 は今の言い方', () => {
-    for (const n of [2, 5, 7, 8, 10]) expect(getSkill(hak(n)).effectTextJa).toBe('回避されない');
-    expect(getSkill(hak(11)).effectTextJa).toBe(getSkill('skl-serephine-11').effectTextJa);
-    expect(getSkill(hak(12)).effectTextJa).toBe('ちから技を回避');
-    expect(getSkill(hak(13)).effectTextJa).toBe('かしこさ技を回避');
+  it('カードに書く短い文（指示書 AJ の表の文）：回避されない・ひらりとはねる・かすみのあゆみ。ほかは文なし', () => {
+    for (const n of [2, 5, 7, 8]) expect(getSkill(hak(n)).effectTextJa).toBe('回避されない');
+    expect(getSkill(hak(12)).effectTextJa).toBe('マナ3以上のちから技・かしこさ技を回避');
     expect(getSkill(hak(14)).effectTextJa).toBe(getSkill('skl-tsumuji-14').effectTextJa);
-    for (const n of [1, 3, 4, 6, 9]) expect(getSkill(hak(n)).effectTextJa ?? null).toBe(null);
+    for (const n of [1, 3, 4, 6, 9, 10]) expect(getSkill(hak(n)).effectTextJa ?? null).toBe(null);
   });
 
   it('モンスター：ライフ7（2026-10-31 指示書 AF2 で 6→7）・青緑（ティール）・ID mon-hakuran。内部ランク B。レアの枠は 08・10・14。枠の絵がある', () => {
@@ -123,22 +123,25 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_hakuran.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はシシエンのあと（No.196〜210）', () => {
+  // 2026-11-01 指示書 AJ：1体13枚（モンスター＋技12枚）になったので、シシエン（13番目）のあとは No.170〜182
+  it('ふつうの一覧に入り、図鑑の番号はシシエンのあと（No.170〜182）', () => {
     expect(MONSTERS.some((m) => m.id === HAKURAN_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === HAKURAN_MONSTER_ID).map((s) => s.id)).toEqual(HAKURAN_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === HAKURAN_MONSTER_ID).map((s) => s.id)).toEqual((AJ_SKILLS[HAKURAN_MONSTER_ID] ?? []).map((r) => r.id));
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === 'skl-shishien-14')?.no).toBe(195);
-    expect(book.find((e) => e.card.id === HAKURAN_MONSTER_ID)?.no).toBe(196);
-    expect(book.find((e) => e.card.id === hak(14))?.no).toBe(210);
+    expect(book.find((e) => e.card.id === 'skl-shishien-12')?.no).toBe(169);
+    expect(book.find((e) => e.card.id === HAKURAN_MONSTER_ID)?.no).toBe(170);
+    expect(book.find((e) => e.card.id === hak(14))?.no).toBe(182);
   });
 
   it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パックの窓の絵は gacha-20261029/ にも）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(hak(n)).art?.file).toBe(`hakuran_sk_${nn}.webp`);
+      expect(HAKURAN_SKILLS[n - 1]?.art?.file).toBe(`hakuran_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/hakuran_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/hakuran_sk_${nn}.png`)).toBe(true);
     }
+    // ゲームの技カード（指示書 AJ）は ID と絵がそのまま
+    for (const k of SKILLS.filter((x) => x.monsterId === HAKURAN_MONSTER_ID)) expect(k.art?.file).toBe(`hakuran_sk_${k.id.slice(-2)}.webp`);
     expect(HAKURAN_MONSTER.art?.file).toBe('hakuran_official.webp');
     expect(existsSync('assets/images/cards/monsters/hakuran_official.webp')).toBe(true);
     // 2026-10-31 指示書 AF2 の追加：LIFE 7 の版（ゲームの hakuran_official.webp はこちらから作る）。LIFE6 の版も残す
@@ -221,11 +224,13 @@ function attackWith(attack: string, guard: string | null, target = 'o-m1', oppon
   return { usable: u.usable, reason: 'reason' in u ? (u.reason as string | undefined) : undefined, after };
 }
 
-describe('回避されない（02・05・07・08・10）：ガウルの聖なる炎と同じ', () => {
+describe('回避されない（02・05・07・08）：ガウルの聖なる炎と同じ', () => {
   it('どの回避でも避けられない（条件の合う回避でも不可・理由の文が出る）。当たってダメージどおり', () => {
-    for (const n of [2, 5, 7, 8, 10]) {
+    // 指示書 AJ：10 せいなるいかずち はふつうの攻撃になった
+    expect(getSkill(hak(10)).effect).toEqual({ type: 'attack' });
+    for (const n of [2, 5, 7, 8]) {
       expect(getSkill(hak(n)).effect).toEqual({ type: 'attack', undodgeable: true });
-      for (const guard of [hak(12), hak(13), hak(14)]) {
+      for (const guard of [hak(12), hak(14)]) {
         const r = attackWith(hak(n), guard);
         expect(r.usable, `${n} ${guard}`).toBe(false);
         expect(monster(r.after, 'o-m1').life, `${n} ${guard}`).toBe(7 - (getSkill(hak(n)).stat?.value ?? 0));
@@ -235,16 +240,17 @@ describe('回避されない（02・05・07・08・10）：ガウルの聖なる
     }
   });
 
-  it('防御はできる（くものころも −2）', () => {
-    for (const n of [2, 5, 7, 8, 10]) {
-      const r = attackWith(hak(n), hak(11));
+  // 指示書 AJ でハクランの防御（くものころも −2）を外したので、ソラモ（o-m2・ライフ7）の星のまもり（−3）で見る
+  it('防御はできる（ソラモの星のまもり −3）', () => {
+    for (const n of [2, 5, 7, 8]) {
+      const r = attackWith(hak(n), 'skl-soramo14-12', 'o-m2');
       expect(r.usable, String(n)).toBe(true);
-      expect(monster(r.after, 'o-m1').life, String(n)).toBe(7 - Math.max(0, (getSkill(hak(n)).stat?.value ?? 0) - 2));
+      expect(monster(r.after, 'o-m2').life, String(n)).toBe(7 - Math.max(0, (getSkill(hak(n)).stat?.value ?? 0) - 3));
     }
   });
 
   it('回避されない攻撃でないものは、条件の合う回避でよけられる', () => {
-    for (const [n, guard] of [[1, hak(12)], [4, hak(12)], [6, hak(14)], [9, hak(14)], [3, hak(13)]] as const) {
+    for (const [n, guard] of [[6, hak(12)], [9, hak(12)], [10, hak(12)], [1, hak(14)], [4, hak(14)], [3, hak(14)]] as const) {
       const r = attackWith(hak(n), guard);
       expect(r.usable, String(n)).toBe(true);
       expect(monster(r.after, 'o-m1').life, String(n)).toBe(7);
@@ -253,35 +259,49 @@ describe('回避されない（02・05・07・08・10）：ガウルの聖なる
 });
 
 describe('01 ひづめならし：マナ0の攻撃（フルーネのつたはたきと同じ扱い）', () => {
-  it('マナ0で使える。「消費マナ2以上」の回避（カルシェルのよけ）ではよけられない。ひづめげり（マナ2）はよけられる', () => {
+  // 指示書 AJ でカルシェルのよけ（skl-kalshell-14）を外したので、同じ「消費マナ2以上を回避」のラズックのシャドウスリップで見る
+  it('マナ0で使える。「消費マナ2以上」の回避（ラズックのシャドウスリップ）ではよけられない。ひづめげり（マナ2）はよけられる', () => {
     expect(getSkill(hak(1)).cost).toBe(0);
     expect(getSkill(hak(1)).cost).toBe(getSkill('skl-flune-01').cost);
-    expect(getSkill('skl-kalshell-14').effect).toEqual({ type: 'evade', against: 'force', minCost: 2 });
-    // 相手の先頭はカルシェル（ライフ8。カルシェルの技はカルシェルが使う）
-    const KAL = ['mon-kalshell', 'mon-soramo', 'mon-nobiton'];
-    const zero = attackWith(hak(1), 'skl-kalshell-14', 'o-m1', KAL);
+    expect(getSkill('skl-lazuck-15').effect).toEqual({ type: 'evade', against: 'all', minCost: 2 });
+    // 相手の先頭はラズック（ライフ6。ラズックの技はラズックが使う）
+    const LAZ = ['mon-lazuck', 'mon-soramo', 'mon-nobiton'];
+    const zero = attackWith(hak(1), 'skl-lazuck-15', 'o-m1', LAZ);
     expect(zero.usable).toBe(false);
-    expect(monster(zero.after, 'o-m1').life).toBe(8 - 1);
-    const two = attackWith(hak(4), 'skl-kalshell-14', 'o-m1', KAL);
+    expect(monster(zero.after, 'o-m1').life).toBe(6 - 1);
+    const two = attackWith(hak(4), 'skl-lazuck-15', 'o-m1', LAZ);
     expect(two.usable).toBe(true);
-    expect(monster(two.after, 'o-m1').life).toBe(8);
+    expect(monster(two.after, 'o-m1').life).toBe(6);
   });
 });
 
-describe('守り（11〜14）：今ある防御・回避と同じ', () => {
-  it('11＝ミストヴェール・12＝すいっとよける・13＝ゆらりとかわす・14＝ウェーブダンス', () => {
-    for (const n of [11, 12, 13, 14]) expect(getSkill(hak(n)).effect, String(n)).toEqual(getSkill(`skl-serephine-${n}`).effect);
+describe('守り（指示書 AJ：ひらりとはねる・かすみのあゆみ）', () => {
+  it('ひらりとはねる＝消費マナ3以上のちから技・かしこさ技を回避（2以上と同じ仕組み）。かすみのあゆみ＝ウェーブダンスと同じ', () => {
+    expect(getSkill(hak(12)).effect).toEqual({ type: 'evade', against: 'all', minCost: 3 });
+    expect(getSkill(hak(14)).effect).toEqual(getSkill('skl-serephine-14').effect);
+    // マナ2（ひづめげり）・マナ1（くもだま）は回避できない。境目の3（くもをける）は回避できる
+    expect(attackWith(hak(4), hak(12))).toMatchObject({ usable: false, reason: '必要マナ3以上の攻撃にしか使えません' });
     expect(attackWith(hak(3), hak(12)).usable).toBe(false);
-    expect(attackWith(hak(4), hak(13)).usable).toBe(false);
-    expect(monster(attackWith(hak(9), hak(11)).after, 'o-m1').life).toBe(7 - (5 - 2));
+    expect(attackWith(hak(6), hak(12)).usable).toBe(true);
   });
+
+  // 指示書 AJ でくもがくれ（旧13・かしこさ技だけ回避）を外したので、同じ回避のセレフィーンのゆらりとかわす（skl-serephine-13）で見る
+  it('かしこさ技だけ回避（セレフィーンのゆらりとかわす）：ちから技には使えない。かしこさ技はよけられる', () => {
+    const SER = ['mon-serephine', 'mon-soramo', 'mon-nobiton'];
+    expect(attackWith(hak(4), 'skl-serephine-13', 'o-m1', SER).usable).toBe(false);
+    const w = attackWith(hak(3), 'skl-serephine-13', 'o-m1', SER);
+    expect(w.usable).toBe(true);
+    expect(monster(w.after, 'o-m1').life).toBe(6);
+  });
+  // くものころも（旧11・−2）の防御は「防御はできる」のテスト（ソラモの星のまもり）で見る
 });
 
 describe('相手の CPU：今の思考のまま（回避されない攻撃は少し強い攻撃として先に選ぶ）', () => {
-  it('同じ威力なら、回避されない攻撃（つのつき）をふつうの攻撃（くもをける）より先に使う', () => {
+  // 指示書 AJ でくもをける（4）とつのつき（3）の威力が違うようになったので、同じマナ・威力のくもだまとつのでこづく（マナ1・1）で見る
+  it('同じ威力なら、回避されない攻撃（つのでこづく）をふつうの攻撃（くもだま）より先に使う', () => {
     let picked = 0;
     for (let seed = 1; seed <= 20; seed++) {
-      const s0 = scene({ opponent: [hak(6), hak(7)] }, 'opponent');
+      const s0 = scene({ opponent: [hak(3), hak(2)] }, 'opponent');
       const s = { ...s0, seed, sides: { ...s0.sides, player: { ...s0.sides.player, monsters: s0.sides.player.monsters.map((m) => ({ ...m, life: 6 })) } } };
       const a = chooseAction(s, 'opponent', 'normal', 'B');
       if (a?.type === 'useCard' && a.cardUid === 'o1') picked++;
@@ -303,7 +323,7 @@ describe('手に入れ方（2026-11-01 指示書 AH から雷の高原。それ�
     expect(GACHA_SERIES.find((s) => s.id === 'hakuran')).toEqual({
       id: 'hakuran',
       monsterId: 'mon-hakuran',
-      rareSkillNames: ['らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
+      rareSkillNames: ['てんをかける', 'らいうん', 'せいなるいかずち', 'かすみのあゆみ'], // 指示書 AJ の★
       unlockFlag: 'thunder-boss-beaten',
     });
     const b = base();

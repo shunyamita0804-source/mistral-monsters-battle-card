@@ -60,10 +60,12 @@ describe('効果の帯の文字', () => {
 
   it('効果のある攻撃技は、その部分だけ', () => {
     expect(skillBandText(getSkill('skl-lazuck-04'))).toBe('回避されない');
-    expect(skillBandText(getSkill('skl-pukarim-07'))).toBe('ほっぺにためているときに使うと、回避されない');
+    // 指示書 AJ の表の文
+    expect(skillBandText(getSkill('skl-pukarim-07'))).toBe('ためているときは回避されない');
   });
 
   it('防御・回避・特殊は今の説明の文', () => {
-    for (const id of ['skl-soramo14-11', 'skl-soramo14-13', 'skl-soramo14-09']) expect(skillBandText(getSkill(id))).not.toBe('');
+    // 指示書 AJ で まるまる（11）・ひらりジャンプ（13）を外したので、星のまもり（12・防御）・星影ステップ（14・回避）・すなかけ（09・特殊）
+    for (const id of ['skl-soramo14-12', 'skl-soramo14-14', 'skl-soramo14-09']) expect(skillBandText(getSkill(id))).not.toBe('');
   });
 });

@@ -9,6 +9,7 @@ import { isValidAssetFileName } from '../src/core/assetCategories.ts';
 import { checkCardData } from '../src/game/cards/dataChecks.ts';
 import type { CardDefinition, MonsterCard, SkillCard } from '../src/game/cards/cardTypes.ts';
 import { CONTENT_EN } from '../src/i18n/contentEn.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 
 const options = {
   artExists: (path: string) => existsSync(join('assets', path)),
@@ -20,13 +21,9 @@ describe('カードデータの点検（正式データを入れる前の土台�
     expect(checkCardData(cardCatalog.all(), options)).toEqual([]);
   });
 
-  it('正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ（技14種ずつ）とそのモンスターだけで、ほかはすべて仮', () => {
+  it('正式カードは15体（ソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ・ヒョウズク・シシエン・ハクラン・デスオル）と、指示書 AJ の表の技12種ずつ・サポートだけで、ほかはすべて仮', () => {
     const official = [...MONSTERS, ...SKILLS, ...SUPPORTS].filter((c) => !c.isPlaceholder).map((c) => c.id);
-    const skillIds = (key: string, nos: readonly number[]): string[] => nos.map((n) => `skl-${key}-${String(n).padStart(2, '0')}`);
-    const all = Array.from({ length: 16 }, (_, i) => i + 1);
-    // ラズックは正式14技の番号の順（2026-10-26）。ID は同じ名前の技のまま（05＝旧06・13＝旧15 など）。旧05・旧13・旧16 は削除
-    const lazuck = [...skillIds('lazuck', [1, 2, 3, 4, 6, 9, 10, 7, 8]), 'skl-lazuck-itazura', ...skillIds('lazuck', [11, 12, 15, 14])];
-    expect(official).toEqual([
+    const monsters = [
       'mon-soramo',
       'mon-lazuck',
       'mon-gauul',
@@ -42,33 +39,13 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-shishien',
       'mon-hakuran',
       'mon-desuoru',
-      ...skillIds('soramo14', all.slice(0, 14)),
-      ...lazuck,
-      ...skillIds('gauul14', all.slice(0, 14)),
-      // ノビトンは正式14技の番号の順（2026-10-26）。ID は同じ名前の技のまま（11＝旧12・12＝旧13・13＝旧15・14＝旧16）。旧11・旧14 は削除
-      ...skillIds('nobiton', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 16]),
-      // ミュロルは正式14技の番号の順（2026-10-27）。ID は同じ名前の技のまま（12＝旧14・13＝旧15・14＝旧16）。旧12・旧13 は削除
-      ...skillIds('myurol', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16]),
-      // カルシェル（2026-10-27）：正式の番号どおり 01〜14
-      ...skillIds('kalshell', all.slice(0, 14)),
-      // プカリム（2026-10-29 最終）：01〜14
-      ...skillIds('pukarim', all.slice(0, 14)),
-      // ジオル（2026-10-29 最終）：01〜14
-      ...skillIds('geol', all.slice(0, 14)),
-      // フルーネ（2026-10-29 最終）：01〜14
-      ...skillIds('flune', all.slice(0, 14)),
-      // セレフィーン（2026-10-29 最終）：01〜14
-      ...skillIds('serephine', all.slice(0, 14)),
-      // ツムジ（2026-10-30 指示書 U）：01〜14
-      ...skillIds('tsumuji', all.slice(0, 14)),
-      // ヒョウズク（2026-10-30 指示書 W）：01〜14
-      ...skillIds('hyouzuku', all.slice(0, 14)),
-      // シシエン（2026-10-31 指示書 AB）：01〜14
-      ...skillIds('shishien', all.slice(0, 14)),
-      // ハクラン（2026-10-31 指示書 AF）：01〜14
-      ...skillIds('hakuran', all.slice(0, 14)),
-      // デスオル（2026-10-31 指示書 AG）：01〜14
-      ...skillIds('desuoru', all.slice(0, 14)),
+    ];
+    // 2026-11-01 指示書 AJ：技はモンスターの並びの順に、表（src/data/skillRebuildAJ.ts）の12枚ずつ（表の順＝表示の番号）
+    const skills = monsters.flatMap((m) => (AJ_SKILLS[m] ?? []).map((r) => r.id));
+    expect(skills).toHaveLength(15 * 12);
+    expect(official).toEqual([
+      ...monsters,
+      ...skills,
       // サポート11種類（2026-10-30 指示書 Y。表示の番号 S01〜S07・F01〜F04 の順）
       ...[7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map((n) => `sup-${n}`),
     ]);

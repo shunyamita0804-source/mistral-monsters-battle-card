@@ -16,6 +16,8 @@ export type Rarity = 'C' | 'U' | 'R';
  * 仮カードは種別を持たず、stat.type（ちから or かしこさ）をそのまま使う
  */
 export type SkillCategory = StatType | 'special' | 'defense' | 'evade';
+/** モンスターの居場所（2026-11-01 指示書 AJ【2】）：地上・空中・水中。場が水中（みちしお）のあいだは全員を水中として扱う */
+export type Habitat = 'ground' | 'air' | 'water';
 
 /* 表示名はいまの言語で返す（辞書は src/i18n/messages/cards.ts） */
 export const kindLabel = (kind: CardKind): string => t(`card.kind.${kind}`);
@@ -69,6 +71,8 @@ export interface MonsterCard extends CardBase {
    * バトルでは battleArt に、ゲーム側で名前とライフを重ねる
    */
   readonly battleArt?: CardArt;
+  /** 居場所（2026-11-01 指示書 AJ。src/data/skillRebuildAJ.ts の MONSTER_HABITAT。仮モンスターには無い＝居場所の決まりに当てはまらない） */
+  readonly habitat?: Habitat;
 }
 
 /**
@@ -103,6 +107,18 @@ export type SkillEffect =
        * 続けて使えるのはこの技 → この技の1回だけ（1ターンに最大2回）。2枚目もマナを払う。この技のあとにほかの技は使えない
        */
       readonly chain?: boolean;
+      /** 地上の相手にしか使えない（指示書 AJ：ガウルの急降下アタック。allTargets と一緒なら「地上の相手全員」＝ジオルの地ひびき） */
+      readonly groundOnly?: boolean;
+      /** 水中の相手には防御されない（指示書 AJ：セレフィーンのルナタイド） */
+      readonly unblockableVsWater?: boolean;
+      /** 水中の相手は回避できない（指示書 AJ：セレフィーンのオーシャンウェーブ） */
+      readonly undodgeableVsWater?: boolean;
+      /** 空中の相手は回避できない（指示書 AJ：ツムジのあらし） */
+      readonly undodgeableVsAir?: boolean;
+      /** 場が水中ならダメージ2倍（指示書 AJ：カルシェルのタイダルクラッシュ） */
+      readonly doubleInWater?: boolean;
+      /** 倒れている味方1体につきダメージ＋この値（使った瞬間に数える。指示書 AJ：デスオルのししゃのたむけ） */
+      readonly fallenAllyBonus?: number;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -201,6 +217,13 @@ export type SkillEffect =
    * amount（正式：セレフィーンのみちしお 2026-10-29）＝動かす枚数。山札が足りないときは使えない（負けにはしない）
    */
   | { readonly type: 'mana'; readonly amount?: number }
+  /**
+   * 特殊（指示書 AJ：カルシェル・セレフィーンのみちしお）：次の相手のターンの終わりまで、場を水中にする（全モンスターを水中として扱う）。
+   * 重ならない（新しく使ったら上書き＝期限を延ばす）
+   */
+  | { readonly type: 'tide' }
+  /** 特殊（指示書 AJ：デスオルの死のレクイエム）：ライフ1以下の、使ったモンスター以外のモンスター（味方も相手も）をすべて倒す。守れない */
+  | { readonly type: 'requiem' }
   | { readonly type: 'draw' };
 
 export type SkillEffectType = SkillEffect['type'];
@@ -406,8 +429,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover' | 'tide' | 'requiem';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover', 'tide', 'requiem'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

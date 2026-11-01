@@ -144,3 +144,7 @@ PLAYWRIGHT_MODULE=/path/to/node_modules/playwright E2E_OUT=/tmp/e2e node tools/e
 
 - `ai_walk_shot.cjs`：歩く様子の連続写真（練習場の自動歩行・大会会場の受付と対戦表）。1マスずつキーを押して、セーブの位置で止める。`HIT=1` で当たりの網目
 - `town_shot.cjs`：画面の下の案内（`.world__hint`）を隠すようにした
+
+## 2026-11-01 指示書 AJ
+
+- `aj_shot.cjs`：居場所の印（置き場所の案 a・b・c）・場が水中の表示・記録の文（みちしお・死のレクイエム）・図鑑の番号・ガチャの ○/13・箱を開けた一覧。開発用サーバー（npx vite）で動かす

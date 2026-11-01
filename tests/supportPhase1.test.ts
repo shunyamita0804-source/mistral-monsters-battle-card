@@ -26,11 +26,12 @@ const S = (code: string): string => {
   if (!c) throw new Error(code);
   return c.id;
 };
-// ソラモの技：01 体当たり（ちから1・マナ1）・11 まるまる（ちから技の防御）・12 星のまもり（かしこさ技の防御）・13 ひらりジャンプ（マナ2以上を回避）・14 星影ステップ（マナに関係なく回避）
+// ソラモの技（指示書 AJ）：01 ひっかき（ちから1・マナ0）・04 しっぽうち（ちから3・マナ3）・12 星のまもり（ちから技・かしこさ技の防御−3・マナ1）・14 星影ステップ（マナに関係なく回避・マナ2）
+// 指示書 AJ で 11 まるまる・13 ひらりジャンプ を外したので、ちから技だけ・かしこさ技だけの防御、「マナ2以上」の回避はほかのモンスターの技で確かめる
 const MONS = ['mon-soramo', 'mon-soramo', 'mon-soramo'];
 
-function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, discard: string[] = []): BattleState {
-  const deck = { monsters: [...MONS], skills: Array.from({ length: 60 }, () => sor(1)) };
+function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, discard: string[] = [], mons: readonly string[] = MONS): BattleState {
+  const deck = { monsters: [...mons], skills: Array.from({ length: 60 }, () => sor(1)) };
   const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
@@ -104,16 +105,17 @@ describe('S01 投石：ちから技（マナ1・ダメージ1）として相手1
   });
 
   it('相手は「ちから技に効く」防御・回避を使える。かしこさ技の防御は使えない。「消費マナ2以上」の回避は使えない（投石のマナ1で判定）', () => {
-    const base = scene({ player: [S('S01')] });
-    const at = (g: string) => guard(applyAction(giveOpponent(base, [g]), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' }), true);
-    const blocked = at(sor(11));
+    // 相手：o-m1 ミュロル（10 しっぽガード＝ちから技−3・11 みずのまく＝かしこさ技−3）・o-m2 ガウル（13 上に飛ぶ＝マナ2以上を回避）・o-m3 ソラモ（14 星影ステップ）
+    const base = scene({ player: [S('S01')] }, {}, [], ['mon-myurol', 'mon-gauul', 'mon-soramo']);
+    const at = (g: string, target = 'o-m1') => guard(applyAction(giveOpponent(base, [g]), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: target }), true);
+    const blocked = at('skl-myurol-10');
     expect(blocked.usable).toBe(true);
     expect(monster(blocked.after, 'o-m1').life).toBe(monster(blocked.after, 'o-m1').maxLife);
-    expect(at(sor(12)).usable).toBe(false);
-    expect(at(sor(13)).usable).toBe(false);
-    const dodged = at(sor(14));
+    expect(at('skl-myurol-11').usable).toBe(false);
+    expect(at('skl-gauul14-13', 'o-m2').usable).toBe(false);
+    const dodged = at(sor(14), 'o-m3');
     expect(dodged.usable).toBe(true);
-    expect(monster(dodged.after, 'o-m1').life).toBe(monster(dodged.after, 'o-m1').maxLife);
+    expect(monster(dodged.after, 'o-m3').life).toBe(monster(dodged.after, 'o-m3').maxLife);
   });
 
   it('場の増減は今の決まりどおり：重い空気で0、熱気で2', () => {
@@ -202,9 +204,9 @@ describe('F04 守りの陣：場にある間、双方の防御・回避のカー
     let s = scene({ player: [S('F04')] }, { opponent: 1 });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(s.field).toEqual({ cardId: S('F04'), owner: 'player' });
-    // ひらりジャンプ（マナ2）→ 1。体当たり（攻撃）は変わらない
-    expect(getSkill(sor(13)).cost).toBe(2);
-    expect(handSkillCost(s, 'opponent', getSkill(sor(13)))).toBe(1);
+    // 星影ステップ（マナ2）→ 1。ひっかき（攻撃）は変わらない
+    expect(getSkill(sor(14)).cost).toBe(2);
+    expect(handSkillCost(s, 'opponent', getSkill(sor(14)))).toBe(1);
     expect(handSkillCost(s, 'opponent', getSkill(sor(1)))).toBe(getSkill(sor(1)).cost);
   });
 
@@ -218,14 +220,15 @@ describe('F04 守りの陣：場にある間、双方の防御・回避のカー
 });
 
 describe('入手・デッキ（2026-10-30 指示書 Y）', () => {
-  it('最初の箱：技56枚＋旅の手帳×2・投石×2＝60枚', async () => {
+  it('最初の箱（指示書 AJ・仮）：技48枚＋旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2＝60枚', async () => {
     const { boosterDeck } = await import('../src/game/story/introV2.ts');
     const { countCards } = await import('../src/game/deck/deck.ts');
     for (const key of ['booster-1', 'booster-2', 'booster-3'] as const) {
       const d = boosterDeck(key);
       expect(d.skills).toHaveLength(60);
       const sup = countCards(d.skills.filter((id) => id.startsWith('sup-')));
-      expect(sup).toEqual({ [S('S02')]: 2, [S('S01')]: 2 });
+      expect(sup).toEqual({ [S('S02')]: 3, [S('S01')]: 3, [S('S03')]: 2, [S('S05')]: 2, [S('S07')]: 2 });
+      expect(d.skills.filter((id) => !id.startsWith('sup-'))).toHaveLength(48);
     }
   });
 
@@ -290,7 +293,8 @@ describe('CPU の思考（2026-10-30 指示書 Y の仮の思考）', () => {
 
   it('守りのカードを残す枚数（指示書 Y でふつう 1→2、指示書 Z で腕前ごとに C 0・B 1・A 2）', async () => {
     const { chooseAction } = await import('../src/game/battle/ai.ts');
-    let s = scene({ player: [sor(11), sor(14), sor(13), sor(4)] }, { player: 3 });
+    // 指示書 AJ で まるまる（11）・ひらりジャンプ（13）を外したので、守りは 星のまもり（12）×2・星影ステップ（14）
+    let s = scene({ player: [sor(12), sor(14), sor(12), sor(4)] }, { player: 3 });
     s = { ...s, phase: 'mana' };
     const keptGuards = (skill: 'C' | 'B' | 'A'): number => {
       let x = s;
@@ -299,7 +303,7 @@ describe('CPU の思考（2026-10-30 指示書 Y の仮の思考）', () => {
         if (!a || a.type !== 'convertToMana') break;
         x = applyAction(x, a);
       }
-      return x.sides.player.hand.filter((c) => [sor(11), sor(14), sor(13)].includes(c.cardId)).length;
+      return x.sides.player.hand.filter((c) => [sor(12), sor(14)].includes(c.cardId)).length;
     };
     expect([keptGuards('C'), keptGuards('B'), keptGuards('A')]).toEqual([0, 1, 2]);
   });

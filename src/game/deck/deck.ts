@@ -1,11 +1,8 @@
 import { cardCatalog, LEGACY_SUPPORT_IDS, monsterId, skillId, skillsOf, supportId, SUPPORTS } from '../../data/cards.ts';
-import { GAUUL_STARTER } from '../../data/gauul.ts';
 import { getStarterDeck, STARTER_TEMP_SUPPORTS, type StarterDeckKey } from '../../data/introV2.ts';
-import { LAZUCK_MONSTER_ID, LAZUCK_OLD16_IDS, LAZUCK_STARTER, lazuckSkillId } from '../../data/lazuck.ts';
-import { KALSHELL_STARTER } from '../../data/kalshell.ts';
-import { MYUROL_STARTER } from '../../data/myurol.ts';
-import { NOBITON_STARTER } from '../../data/nobiton.ts';
-import { SORAMO_MONSTER_ID, SORAMO_OLD_SKILL_IDS, SORAMO_STARTER, SORAMO_TEAM } from '../../data/soramo.ts';
+import { LAZUCK_MONSTER_ID, LAZUCK_OLD16_IDS, lazuckSkillId } from '../../data/lazuck.ts';
+import { SORAMO_MONSTER_ID, SORAMO_OLD_SKILL_IDS, SORAMO_TEAM } from '../../data/soramo.ts';
+import { ajBoxRows } from '../../data/skillRebuildAJ.ts';
 import { TEST_TEAM } from '../../data/testTeams.ts';
 import { DECK_RULES } from '../../data/rules.ts';
 import { skillCategory, skillValue, type SkillCard } from '../cards/cardTypes.ts';
@@ -206,6 +203,14 @@ export function createMixedTestDeck(): Deck {
   return { monsters: [...LEGACY_TEST_TEAM], skills };
 }
 
+/**
+ * モンスターの初期配布16枚（2026-11-01 指示書 AJ：最初の箱の枚数 src/data/skillRebuildAJ.ts の box。ラズック・ノビトンは仮の16枚）。
+ * 前は各モンスターのファイルの *_STARTER（外した技が入っていた）
+ */
+function starterOf(monsterId: string): { readonly id: string; readonly copies: number }[] {
+  return ajBoxRows(monsterId).map(([id, copies]) => ({ id, copies }));
+}
+
 /** 初期デッキの3体目の技の枚数・サポートの枚数（2026-10-25 ユーザー指示：3体分の技45枚＋サポート15枚＝60枚。ソラモ16枚・ラズック16枚） */
 export const STARTER_THIRD_SKILLS = 13;
 export const STARTER_SUPPORT_COUNT = 15;
@@ -219,17 +224,20 @@ export const STARTER_SUPPORT_COUNT = 15;
  * - 2026-10-30 指示書 V（同じモンスターは1体まで）：仮の編成の3体目をプカリムにしたので、3体目の技13枚はプカリムの技（TEST_TEAM[2]）
  */
 export function createStarterDeck(): Deck {
-  const soramo = SORAMO_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
-  const lazuck = LAZUCK_STARTER.flatMap((s) => Array<string>(s.copies).fill(s.id));
+  const soramo = starterOf(SORAMO_MONSTER_ID).flatMap((s) => Array<string>(s.copies).fill(s.id));
+  const lazuck = starterOf(LAZUCK_MONSTER_ID).flatMap((s) => Array<string>(s.copies).fill(s.id));
   const third = TEST_TEAM[2] as string;
   const used = countCards([...soramo, ...lazuck]);
   const pool = skillsOf(third).map((s) => s.id);
   const extra: string[] = [];
-  for (const id of [...pool.filter((id) => !used[id]), ...pool.filter((id) => used[id])]) {
-    if (extra.length >= STARTER_THIRD_SKILLS) break;
-    if ((used[id] ?? 0) < DECK_RULES.maxCopies) {
-      used[id] = (used[id] ?? 0) + 1;
-      extra.push(id);
+  // 2026-11-01 指示書 AJ：技が12枚になったので、1周で13枚に届かないときはもう1周（同じカード3枚まで）
+  for (let round = 0; round < DECK_RULES.maxCopies && extra.length < STARTER_THIRD_SKILLS; round++) {
+    for (const id of [...pool.filter((id) => !used[id]), ...pool.filter((id) => used[id])]) {
+      if (extra.length >= STARTER_THIRD_SKILLS) break;
+      if ((used[id] ?? 0) <= round && (used[id] ?? 0) < DECK_RULES.maxCopies) {
+        used[id] = (used[id] ?? 0) + 1;
+        extra.push(id);
+      }
     }
   }
   const supports: string[] = [];
@@ -251,13 +259,8 @@ export function createPlaceholderStarterCollection(): Record<string, number> {
  * 技カードだけを配る（モンスターカード本体は配らない）。新しく始めたときだけで、いまのセーブには配らない
  */
 export const INITIAL_DISTRIBUTION: readonly { readonly monsterId: string; readonly cards: readonly { readonly id: string; readonly copies: number }[] }[] = [
-  { monsterId: 'mon-soramo', cards: SORAMO_STARTER },
-  { monsterId: 'mon-lazuck', cards: LAZUCK_STARTER },
-  { monsterId: 'mon-nobiton', cards: NOBITON_STARTER },
-  { monsterId: 'mon-myurol', cards: MYUROL_STARTER },
-  { monsterId: 'mon-kalshell', cards: KALSHELL_STARTER },
-  { monsterId: 'mon-gauul', cards: GAUUL_STARTER },
-];
+  'mon-soramo', 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-gauul',
+].map((monsterId) => ({ monsterId, cards: starterOf(monsterId) }));
 
 /**
  * 【仮】導入イベントV2で選ぶ初期デッキ（2026-10-27）：モンスター3体は決定（src/data/introV2.ts）。

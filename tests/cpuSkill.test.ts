@@ -120,7 +120,8 @@ describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
     let text = '';
     const n = 300;
     for (let t = 0; t < n; t++) {
-      const s0 = { ...scene({ player: [sor(4)], opponent: [sor(11)] }), turn: t + 3 };
+      // 指示書 AJ で まるまる（11）を外したので、守りは 星のまもり（12）
+      const s0 = { ...scene({ player: [sor(4)], opponent: [sor(12)] }), turn: t + 3 };
       const s = applyAction(s0, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
       expect(s.phase).toBe('defense');
       expect(chooseAction(s, 'opponent', 'normal', 'B')).toEqual({ type: 'defend', side: 'opponent', cardUid: 'o0' });
@@ -139,7 +140,7 @@ describe('CPU の腕前（2026-10-30 指示書 Z）', () => {
   });
 
   it('構えは腕前より優先：aggressive は A でも倒されそうなときしか守らない・守りを残さない', () => {
-    const s0 = scene({ player: [sor(4)], opponent: [sor(11)] });
+    const s0 = scene({ player: [sor(4)], opponent: [sor(12)] });
     const s = applyAction(s0, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(chooseAction(s, 'opponent', 'aggressive', 'A')).toEqual({ type: 'defend', side: 'opponent', cardUid: null });
   });
@@ -174,21 +175,21 @@ describe('旅の手帳の CPU の使い方（2026-10-30 指示書 Z）', () => {
 });
 
 describe('フルーネの新しい数字（2026-10-30 指示書 Z・ユーザー決定）', () => {
-  it('つたはたき 0・1／ねっこづき 2・1／ねっこムチ 3・2／ねっこラッシュ 4・3。ほかの技・LIFE は変えない', () => {
-    expect([1, 2, 3, 4].map((n) => [getSkill(fluneSkillId(n)).cost, skillValue(getSkill(fluneSkillId(n)))])).toEqual([[0, 1], [2, 1], [3, 2], [4, 3]]);
+  it('指示書 AJ の数字：つたはたき 0・1／ねっこづき 1・1／ねっこムチ 2・2／ねっこラッシュ 3・3。LIFE は変えない', () => {
+    expect([1, 2, 3, 4].map((n) => [getSkill(fluneSkillId(n)).cost, skillValue(getSkill(fluneSkillId(n)))])).toEqual([[0, 1], [1, 1], [2, 2], [3, 3]]);
     expect(FLUNE_SKILLS).toHaveLength(14);
     expect(getSkill(fluneSkillId(5))).toMatchObject({ cost: 1 });
   });
 
-  it('つたはたき（マナ0）はマナ0で使え、「消費マナ2以上」の回避（ソラモのひらりジャンプ）ではよけられない', () => {
+  it('つたはたき（マナ0）はマナ0で使え、「消費マナ2以上」の回避（ガウルの上に飛ぶ。指示書 AJ でソラモのひらりジャンプを外した）ではよけられない', () => {
     const deck = { monsters: ['mon-flune', 'mon-soramo', 'mon-soramo'], skills: Array.from({ length: 60 }, () => sor(1)) };
-    const b = createBattle({ name: 'P', deck }, { name: 'O', deck: { monsters: [...MONS], skills: deck.skills } }, 3, 'player');
+    const b = createBattle({ name: 'P', deck }, { name: 'O', deck: { monsters: ['mon-gauul', 'mon-soramo', 'mon-soramo'], skills: deck.skills } }, 3, 'player');
     let s: BattleState = { ...b, turn: 3, phase: 'main', active: 'player', manaConvertLimit: null };
     s = {
       ...s,
       sides: {
         player: { ...s.sides.player, hand: [{ uid: 'p0', cardId: fluneSkillId(1) }], manaPile: [] },
-        opponent: { ...s.sides.opponent, hand: [{ uid: 'o0', cardId: sor(13) }], manaPile: Array.from({ length: 5 }, () => sor(1)) },
+        opponent: { ...s.sides.opponent, hand: [{ uid: 'o0', cardId: 'skl-gauul14-13' }], manaPile: Array.from({ length: 5 }, () => sor(1)) },
       },
     };
     expect(cardUsability(s, 'player', 'p0').usable).toBe(true);

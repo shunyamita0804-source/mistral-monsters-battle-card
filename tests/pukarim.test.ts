@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { cardCatalog, getSkill, MONSTERS, QA_MONSTERS, SKILLS, skillsOf } from '../src/data/cards.ts';
+import { cardCatalog, getSkill, MONSTERS, QA_MONSTERS, REMOVED_SKILL_IDS, SKILLS, skillsOf } from '../src/data/cards.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import pukarimJson from '../src/data/official/pukarim14_skills_DRAFT_20261028.json';
 import {
   PUKARIM_COLOR,
@@ -28,6 +29,8 @@ import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
  */
 
 const puk = (n: number): string => pukarimSkillId(n);
+/** 指示書 AJ の表のプカリムの12枚の ID（ゲームのカードはこの表から作る） */
+const AJ_PUKARIM_IDS = (AJ_SKILLS[PUKARIM_MONSTER_ID] ?? []).map((r) => r.id);
 const sor = (n: number): string => soramoSkillId(n);
 const ORIGINAL_DIR = 'design-parts/cards-original/pukarim';
 const FINAL_DIR = 'design-parts/cards-original/pukarim/final-20261028';
@@ -75,22 +78,27 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
 
   it('ふつうのカードの一覧に入る（図鑑・デッキ編集・所持カード）。初期配布・ブースターの箱・新しいセーブには入らない（2026-10-29 最終）', () => {
     expect(MONSTERS.some((m) => m.id === PUKARIM_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(PUKARIM_SKILLS.map((s) => s.id));
+    // 指示書 AJ：ゲームの技は表の12枚（13 ぷかっとうく・14 ぷかぷか は外した）
+    expect(AJ_PUKARIM_IDS).toHaveLength(12);
+    expect(SKILLS.filter((s) => s.monsterId === PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(AJ_PUKARIM_IDS);
     expect(INITIAL_DISTRIBUTION.some((d) => d.monsterId === PUKARIM_MONSTER_ID)).toBe(false);
     for (const b of BOOSTERS) expect(b.monsters).not.toContain(PUKARIM_MONSTER_ID);
     expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('pukarim'))).toBe(false);
     expect(QA_MONSTERS.some((m) => m.id === 'mon-pukarim')).toBe(false);
     expect(cardCatalog.get(PUKARIM_MONSTER_ID)?.kind).toBe('monster');
-    expect(skillsOf(PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(PUKARIM_SKILLS.map((s) => s.id));
+    expect(skillsOf(PUKARIM_MONSTER_ID).map((s) => s.id)).toEqual(AJ_PUKARIM_IDS);
   });
 
-  it('絵：技14枚・正式モンスターカードがあり、原本は無改変で保管。レアリティ未定の印は外した', () => {
+  it('絵：技12枚（指示書 AJ）・正式モンスターカードがあり、原本（14枚）は無改変で保管。技はレアリティ未定の印（指示書 AJ）', () => {
     for (let n = 1; n <= 14; n++) {
-      const skill = getSkill(puk(n));
-      expect(skill.art?.file).toBe(`puk_sk_${String(n).padStart(2, '0')}.webp`);
       expect(existsSync(`assets/images/cards/skills/puk_sk_${String(n).padStart(2, '0')}.webp`)).toBe(true);
       expect(existsSync(`${FINAL_DIR}/art/skills/pukarim_sk_${String(n).padStart(2, '0')}.png`)).toBe(true);
-      expect(skill.pendingSpec ?? []).toEqual([]);
+    }
+    for (const id of AJ_PUKARIM_IDS) {
+      const skill = getSkill(id);
+      expect(skill.art?.file).toBe(`puk_sk_${id.slice(-2)}.webp`);
+      // 指示書 AJ の技は rarity: null・レアリティ未定（src/data/cards.ts の ajSkill）
+      expect(skill.pendingSpec ?? []).toEqual(['rarity']);
     }
     expect(PUKARIM_MONSTER.art?.file).toBe('pukarim_official.webp');
     expect(existsSync('assets/images/cards/monsters/pukarim_official.webp')).toBe(true);
@@ -98,9 +106,12 @@ describe('プカリム：データ（届いた JSON・CSV を無改変で置き�
     expect(existsSync(`${FINAL_DIR}/art/monster_card/pukarim_official_monstercard_LIFE6.png`)).toBe(true);
   });
 
-  it('試遊用の16枚（Claude の仮）：14種から、同じカード3枚まで、16枚。7・9・10 を入れる', () => {
+  it('試遊用の16枚（Claude の仮・前のデータ）：同じカード3枚まで、16枚。7・9・10 を入れる。指示書 AJ で外した技（13 ぷかっとうく）のほかは今の技', () => {
     expect(PUKARIM_PLAYTEST_16.reduce((n, c) => n + c.copies, 0)).toBe(16);
-    expect(PUKARIM_PLAYTEST_16.every((c) => c.copies >= 1 && c.copies <= 3 && skillsOf(PUKARIM_MONSTER_ID).some((s) => s.id === c.id))).toBe(true);
+    expect(PUKARIM_PLAYTEST_16.every((c) => c.copies >= 1 && c.copies <= 3)).toBe(true);
+    const outdated = PUKARIM_PLAYTEST_16.filter((c) => !skillsOf(PUKARIM_MONSTER_ID).some((s) => s.id === c.id)).map((c) => c.id);
+    expect(outdated).toEqual([puk(13)]);
+    expect(outdated.every((id) => REMOVED_SKILL_IDS.includes(id))).toBe(true);
     for (const n of [7, 9, 10]) expect(PUKARIM_PLAYTEST_16.some((c) => c.id === puk(n))).toBe(true);
   });
 
@@ -180,12 +191,14 @@ describe('09 ほっぺにためる：プカリムの次の攻撃技のダメー�
     s = nextOwnTurn(s, [puk(9)]);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'n0' });
     expect(monster(s, 'p-m1').charge).toBe(2);
-    expect(attackPower(s, getSkill(puk(8)), monster(s, 'p-m1'))).toBe(7);
+    // 指示書 AJ：おおつむじは 3。ためて 3＋2＝5
+    expect(attackPower(s, getSkill(puk(8)), monster(s, 'p-m1'))).toBe(5);
   });
 
   it('守られても・回避されても消える（ためた分はなくなる）', () => {
     const charged = withMonster(scene({ player: [puk(3)] }), 'p-m1', { charge: 2 });
-    const guarded = attack(charged, 'p0', [sor(11)]);
+    // 指示書 AJ で まるまる（11）を外したので、星のまもり（12）で守る
+    const guarded = attack(charged, 'p0', [sor(12)]);
     expect(monster(guarded, 'p-m1').charge ?? null).toBeNull();
     const evaded = attack(withMonster(scene({ player: [puk(1)] }), 'p-m1', { charge: 2 }), 'p0', [sor(14)]);
     expect(monster(evaded, 'p-m1').charge ?? null).toBeNull();
@@ -199,35 +212,36 @@ describe('09 ほっぺにためる：プカリムの次の攻撃技のダメー�
     expect(monster(s, 'p-m1').charge ?? null).toBeNull();
   });
 
-  it('ためてから「おおつむじ」で 5＋2＝7（ソラモを1回で倒せる）', () => {
+  it('ためてから「おおつむじ」で 3＋2＝5（指示書 AJ でおおつむじは 3。ソラモ ライフ7 は 2 残る）', () => {
     const s = attack(withMonster(scene({ player: [puk(8)] }), 'p-m1', { charge: 2 }), 'p0');
-    expect(monster(s, 'o-m2').life).toBe(0);
+    expect(monster(s, 'o-m2').life).toBe(SORAMO_LIFE - 5);
   });
 });
 
 describe('07 ぷはーっ：ためているときは回避されない', () => {
-  it('ためているとき：回避のカードは使えない。防御の軽減はふつうに受ける（3＋2−2＝3）', () => {
-    let s = withMonster(scene({ player: [puk(7)], opponent: [sor(14), puk(12)] }), 'p-m1', { charge: 2 });
-    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+  it('ためているとき：回避のカードは使えない。防御の軽減はふつうに受ける（3＋2−3＝2）', () => {
+    // 指示書 AJ でプカリムの回避（14 ぷかぷか）を外したので、相手のソラモ（o-m2）を狙い、ソラモの回避・防御で確かめる
+    let s = withMonster(scene({ player: [puk(7)], opponent: [sor(14), sor(12)] }), 'p-m1', { charge: 2 });
+    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(s.pending?.undodgeable).toBe(true);
     expect(s.pending?.power).toBe(5);
     expect(s.log.at(-1)?.text).toBe('プカリムはためた空気をいっきに吐き出した！ この攻撃は回避されない！');
-    // o-m1 は相手のプカリム：ぷかぷか（14）は使えず、くうきのクッション（12）は使える
-    const withEvade = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [{ uid: 'e', cardId: puk(14) }, { uid: 'd', cardId: puk(12) }] } } };
+    // o-m2 は相手のソラモ：星影ステップ（14・回避）は使えず、星のまもり（12・防御−3）は使える
+    const withEvade = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [{ uid: 'e', cardId: sor(14) }, { uid: 'd', cardId: sor(12) }] } } };
     expect(cardUsability(withEvade, 'opponent', 'e')).toMatchObject({ usable: false });
     expect(cardUsability(withEvade, 'opponent', 'd').usable).toBe(true);
     let after = applyAction(withEvade, { type: 'defend', side: 'opponent', cardUid: 'd' });
     after = applyAction(after, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(monster(after, 'o-m1').life).toBe(6 - 3);
+    expect(monster(after, 'o-m2').life).toBe(SORAMO_LIFE - 2);
   });
 
   it('ためていないとき：ふつうの 3 ダメージで、回避できる', () => {
-    let s = applyAction(scene({ player: [puk(7)], opponent: [puk(14)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+    let s = applyAction(scene({ player: [puk(7)], opponent: [sor(14)] }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(s.pending?.undodgeable ?? false).toBe(false);
     expect(s.pending?.power).toBe(3);
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(true);
     s = applyAction(applyAction(s, { type: 'defend', side: 'opponent', cardUid: 'o0' }), { type: 'defend', side: 'opponent', cardUid: null });
-    expect(monster(s, 'o-m1').life).toBe(6);
+    expect(monster(s, 'o-m2').life).toBe(SORAMO_LIFE);
   });
 });
 

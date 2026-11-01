@@ -40,6 +40,8 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
     rows.push([t('card.detail.mana'), String(card.cost)]);
   } else {
     rows.push([t('card.detail.life'), card.pendingSpec?.includes('life') ? t('card.provisionalValue', { n: card.life }) : String(card.life)]);
+    // 居場所（2026-11-01 指示書 AJ）
+    if (card.habitat) rows.push([t('card.detail.habitat'), t(`habitat.${card.habitat}`)]);
   }
   if (card.kind === 'skill' && card.displayNo !== undefined) rows.push([t('card.detail.number'), String(card.displayNo).padStart(2, '0')]);
   // サポートの表示の番号（S01〜・F01〜。2026-10-30 指示書 Y）

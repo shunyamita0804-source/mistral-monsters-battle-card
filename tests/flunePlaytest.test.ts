@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { REMOVED_SKILL_IDS } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { FLUNE_MONSTER_ID, FLUNE_PLAYTEST_16 } from '../src/data/flune.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
@@ -18,7 +19,12 @@ import { cardName } from '../src/i18n/content.ts';
  */
 const GAMES = Number(process.env.PLAYTEST ?? 4);
 const KEYS = BOOSTERS.map((b) => b.key);
-const fluneDeck = (key: (typeof KEYS)[number], slot: number): Deck => swapDeck(key, slot, FLUNE_MONSTER_ID, FLUNE_PLAYTEST_16);
+/**
+ * 指示書 AJ で外した技を除いた試遊用の16枚（前のデータ FLUNE_PLAYTEST_16 に外した技が残っているため。src は変えない）。
+ * 足りない枚数は swapDeck が並びの順に同じカードの2枚目・3枚目で埋める
+ */
+const FLUNE_CARDS = FLUNE_PLAYTEST_16.filter((c) => !REMOVED_SKILL_IDS.includes(c.id));
+const fluneDeck = (key: (typeof KEYS)[number], slot: number): Deck => swapDeck(key, slot, FLUNE_MONSTER_ID, FLUNE_CARDS);
 
 /** セラの編成の候補（2026-10-29 の表：前の編成・案1・案2。2026-10-29 夜に案2 に決めた） */
 const SERA = ENCOUNTERS['enc-forest-boss'];

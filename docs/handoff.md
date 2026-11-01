@@ -1,28 +1,32 @@
-# 引き継ぎメモ（2026-11-01：AI をブランチ ai-collision で作業・報告待ち。公開は AG2 まで）
+# 引き継ぎメモ（2026-11-01：AI・AJ〔追加1・2・3〕を main に入れて公開）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-11-01 AI のセッション終わり）
+### まず読む：いまの状態（2026-11-01 AJ のセッション終わり。同じセッションで AI → AJ → main に入れて公開）
 
-- **作業中：ブランチ `ai-collision`（指示書 AI。main に取り込む前。報告 ZIP を渡して検品待ち）**。記録 `docs/collision-ai-20261101.md`。
-  練習場の机を奥へ・ガレスを机の右・入口 → 先生の短い道、案内の道の曲がる回数を減らす（`TURN_COST`）、街の建物の入口の段を歩ける、
-  大会会場の長いす・対戦表・受付・入口の柱の当たり、点検の道具 `tools/design/collision_audit.py`。**セーブ version 32（変えていない）**・**テスト 1172件**
-- **公開中：`main`（AG2 まで。公開ページは `static/index-CmH6ON_x.js`）**。AI は「公開して」まで公開しない
-- 前のセッションでしたこと：AF・AF2（ハクラン）・AG・AG2（デスオル）・AH（雷の高原）。くわしくは各記録と下の「その前」
+- **main に入れて公開した（ユーザー決定 2026-11-01）**：ブランチ `ai-collision`（指示書 AI）→ `aj-skill-rebuild`（指示書 AJ ＋追加1・2・3）の順。公開ページは「公開中」の行
+  - AI：練習場の机を奥へ・ガレスを机の右・入口 → 先生の短い道、案内の道の曲がる回数を減らす（`TURN_COST`）、街の建物の入口の段を歩ける、
+    大会会場の長いす・対戦表・受付・入口の柱の当たり、点検の道具 `tools/design/collision_audit.py`。記録 `docs/collision-ai-20261101.md`
+  - AJ：技カードの作り直し（15体×12枚・レア4・図鑑13番）・居場所（地上・空中・水中）とみちしお・新しい効果・CPU・箱の仮の中身・セーブ **version 33**・居場所の印（【仮】コードの印）・
+    追加その1（技名「死のレクイエム」・新しい技の絵3枚）・追加その2（描き直した絵2枚）・追加その3（みちしおは次の自分の手番の終わりまで・場の枠は1つで上書き〔`FieldCard`〕）。
+    記録 `docs/skill-rebuild-aj-20261101.md`、カードの正本 `src/data/skillRebuildAJ.ts`、決まり `docs/battle-rules.md`「指示書 AJ」、試遊の数 `docs/design/skill-rebuild-aj-20261101/`
+- **公開中：`main`（AI・AJ まで。公開ページは `static/index-BJcfKOZx.js`）**
+- **ユーザー決定**：ボス・大会の相手の勝つ割合が大きく下がっているのは分かったうえで公開。合わせ直しは、新しいモンスター（ピンクの枠・牧神）ができてから15体とまとめて行う（それまで数字を変えない）
 - **ユーザーの返事**（2026-11-01 指示書 AI の【0】）：AG2 のレアありの入れ替え 69.4% は「このままでよい」（物差しはレア抜き＝72.0% で合格）。
   雷の高原の地図の印・落雷の多さ・せりふ・曲の音量は、ユーザーの実機確認のあとに別に指示がある（それまで触らない）
-- **ユーザーの返事待ち**：AI の報告（大会会場の柱の金の飾りの後ろを歩けるようにしたこと など）。AF2 以前：AC・AE の報告への感想
+- **ユーザーの返事待ち**：AJ の要確認（今あるサポートの場のカード4枚もみちしおと同じ枠で上書き・箱の足りない8枚・足りなくなったデッキ ほか）。AI の報告（大会会場の柱の金の飾りの後ろを歩けるようにしたこと など）。AF2 以前：AC・AE の報告への感想
+- **待っているもの**：新しいモンスター（ピンクの枠・牧神）・部屋の家具の描き直し（まだ依頼していない）
 - **まだ決まっていないこと**：デスオルの置き場所・手に入れ方（`GACHA_SERIES` に `desuoru-unlocked` の1行だけ。どこでも立たない）。ハクラン・デスオルはショップの棚の絵に入れていない（ユーザー決定 2026-10-31）
-- **待っているもの**：部屋の家具の描き直し（まだ依頼していない）
-- **未完了**：iPhone 実機での確認（R〜AI）
+- **未完了**：iPhone 実機での確認（R〜AJ）
 - **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は `git fetch origin main` で最新の main に合わせてから、新しいブランチを切る
 - 作業のこつ（このセッションで分かったこと）：
   - Node 24 は自動で入らないことがある → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → 以後 `export PATH=/opt/nvm/versions/node/v24.22.2/bin:$PATH` → `npm install`。絵の道具は `pip install scipy matplotlib`
   - 新しいモンスターの足し方は `src/data/hakuran.ts`・`desuoru.ts` と同じ形（JSON を読む・枠の色の表 `skillcard_simple_build.py`・`skillcard_v3_build.py`・`battle_card_frame.py`・`pack_tint.py`・`gacha_panel_build.py`・`gacha_series_build.py` に1行ずつ）。作り直したらほかの絵が同じバイト列か `cmp` で確かめる
   - 当たりを変えたら：街と古い部屋は `python3 tools/design/seimon_world_build.py design-parts/seimon-world`（約4分。絵は同じバイト列のまま）、
     新しい部屋は `python3 -I tools/design/rooms4_build.py`・`rooms_shop_build.py`。点検は `python3 -I tools/design/collision_audit.py 出力フォルダ`（透明なのに当たり・細い通り道）
+  - AJ の試遊：`PLAYTEST=50 PLAYTEST_OUT=… npx vitest run tests/ajPlaytest.test.ts`（約3分。`PLAYTEST_SUBJECTS=mon-kalshell,mon-serephine` でしぼれる）。写真：`tools/e2e/aj_shot.cjs`（開発用サーバー）
   - 試遊：`npm run playtest:hakuran`・`playtest:desuoru`・`playtest:desuoru-rare`・`playtest:stella`・`playtest:thunder`。`tests/support/boxCount.ts` で決着の理由・回避されない攻撃・カラスのめを数える
   - 写真：`tools/e2e/hakuran_af_shot.cjs`・`desuoru_ag_shot.cjs`・`thunder_plateau_shot.cjs`（`ONLY=` でしぼれる）。手札のカードは重なるので名前（aria-label の頭）で選び、押したあと「やめる」で戻す
   - 写真のセーブは `createNewSave(日付, 'balance')` に `story.introV2.state: 'completed'` などを入れる（入れないと、はじめの物語から始まる）。大会の受付は `{hall,49,29,up}`・掲示板は `{bureau,16,19,left}`

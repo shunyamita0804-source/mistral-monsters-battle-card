@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, SKILLS, skillsOf } from '../src/data/cards.ts';
 import { PACKS } from '../src/data/economy.ts';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
 import { NOBITON_MONSTER, NOBITON_REMOVED_14_IDS, NOBITON_SKILLS, NOBITON_STARTER, nobitonSkillId, parseNobiton14Csv } from '../src/data/nobiton.ts';
@@ -9,11 +9,13 @@ import { soramoSkillId } from '../src/data/soramo.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { actingSide, applyAction, cardUsability, createBattle, manaOf, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { skillCardFace } from '../src/game/cards/cardFace.ts';
-import { createStarterDeck } from '../src/game/deck/deck.ts';
+import { createStarterDeck, INITIAL_DISTRIBUTION } from '../src/game/deck/deck.ts';
 import { createNewSave, migrate, SAVE_VERSION } from '../src/game/save/saveData.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
+import type { SkillCard } from '../src/game/cards/cardTypes.ts';
 
 const nob = (n: number): string => nobitonSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
@@ -22,6 +24,12 @@ const sor = (n: number): string => soramoSkillId(n);
 const ID_NO: Readonly<Record<number, number>> = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 12, 12: 13, 13: 15, 14: 16 };
 /** 正式の番号の技（ゲーム内 ID） */
 const n14 = (no: number): string => nob(ID_NO[no] as number);
+/** 前の14技（ファイルの NOBITON_SKILLS。絵と前のデータを引くためだけに残す）の1枚 */
+const legacy = (id: string): SkillCard => {
+  const s = NOBITON_SKILLS.find((k) => k.id === id);
+  if (!s) throw new Error(id);
+  return s;
+};
 
 describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で保管し、そのまま読む）', () => {
   const csv = readFileSync('src/data/official/nobiton14_skills_OFFICIAL_20261026.csv', 'utf8');
@@ -33,11 +41,11 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     expect(rows.map((r) => r.number)).toEqual(Array.from({ length: 14 }, (_, i) => i + 1));
   });
 
-  it('技名・分類・マナ・ダメージ・特殊効果の文・表示の番号が CSV のとおり。ID は同じ名前の技を引き継ぐ', () => {
+  it('前の14技（ファイルの NOBITON_SKILLS）：技名・分類・マナ・ダメージ・特殊効果の文・表示の番号が CSV のとおり。ID は同じ名前の技を引き継ぐ', () => {
     expect(NOBITON_SKILLS).toHaveLength(14);
     expect(new Set(NOBITON_SKILLS.map((s) => s.id)).size).toBe(14);
     for (const r of rows) {
-      const s = getSkill(n14(r.number));
+      const s = legacy(n14(r.number));
       expect(s.name).toBe(r.name_ja);
       expect(s.category).toBe(r.category);
       expect(s.cost).toBe(r.mana);
@@ -57,6 +65,29 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     ]);
   });
 
+  it('指示書 AJ：ゲームの技カードは AJ の表の12枚（技名・分類・マナ・ダメージ・効果・効果の文・表示の番号が表のとおり。デザイン ID は前の同じ ID の技から）', () => {
+    const aj = AJ_SKILLS['mon-nobiton'] ?? [];
+    const cat = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(aj).toHaveLength(12);
+    expect(skillsOf('mon-nobiton').map((s) => s.id)).toEqual(aj.map((r) => r.id));
+    aj.forEach((r, i) => {
+      const s = getSkill(r.id);
+      expect(s.name).toBe(r.name);
+      expect(s.category).toBe(cat[r.cat]);
+      expect(s.cost).toBe(r.mana);
+      expect(s.stat?.value ?? null).toBe(r.damage);
+      expect(s.effect).toEqual(r.effect ?? { type: 'attack' });
+      expect(s.effectTextJa).toBe(r.text);
+      expect(s.displayNo).toBe(i + 1);
+      expect(s.designId).toBe(legacy(r.id).designId);
+      expect(s.monsterId).toBe('mon-nobiton');
+      expect(s.isPlaceholder).toBe(false);
+      expect(s.rarity).toBeNull();
+    });
+    // 指示書 AJ で外したのは ぐっとがまん（旧12）・横によける（旧13）
+    expect(SKILLS.some((s) => s.id === n14(12) || s.id === n14(13))).toBe(false);
+  });
+
   it('正式14技の外になったのは旧11 サイコガード・旧14 ねばりガードだけ（カードの一覧にない）', () => {
     expect(NOBITON_REMOVED_14_IDS).toEqual([nob(11), nob(14)]);
     for (const id of NOBITON_REMOVED_14_IDS) expect(SKILLS.some((s) => s.id === id)).toBe(false);
@@ -69,15 +100,25 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
       const original = readFileSync(`design-parts/cards-original/nobiton14-20261026/01_SKILL_ART/Nobiton_SK${no}.jpg`);
       expect(readFileSync(`assets/images/cards/skills/nob14_sk_${no}.jpg`).equals(original)).toBe(true);
       expect(r.art).toBe(`01_SKILL_ART/Nobiton_SK${no}.jpg`);
-      expect(getSkill(n14(r.number)).art?.file).toBe(`nob14_sk_${no}.jpg`);
+      expect(legacy(n14(r.number)).art?.file).toBe(`nob14_sk_${no}.jpg`);
     }
+    // ゲームの技カード（指示書 AJ）は ID と絵がそのまま
+    for (const s of skillsOf('mon-nobiton')) expect(s.art).toEqual(legacy(s.id).art);
   });
 
-  it('初期配布16枚：01・02・05 が3枚、03 が1枚、08・10・13 が2枚。ほかは0枚（技の一覧からは消さない）', () => {
-    const byNo = Object.fromEntries(NOBITON_STARTER.map((s) => [getSkill(s.id).displayNo, s.copies]));
+  it('前の初期配布16枚（ファイルの NOBITON_STARTER）：01・02・05 が3枚、03 が1枚、08・10・13 が2枚。ほかは0枚', () => {
+    const byNo = Object.fromEntries(NOBITON_STARTER.map((s) => [legacy(s.id).displayNo, s.copies]));
     expect(byNo).toEqual({ 1: 3, 2: 3, 3: 1, 5: 3, 8: 2, 10: 2, 13: 2 });
     expect(NOBITON_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
     expect(NOBITON_SKILLS.filter((s) => s.availability === 'initial').map((s) => s.displayNo)).toEqual([1, 2, 3, 5, 8, 10, 13]);
+  });
+
+  it('指示書 AJ の初期配布16枚（仮の箱）：はなビンタ3・ずつき3・くしゃみ2・ミラージュノーズ2・考える1・鼻でまもる2・のびのびガード2・必死によける1', () => {
+    const cards = INITIAL_DISTRIBUTION.find((d) => d.monsterId === 'mon-nobiton')?.cards ?? [];
+    expect(Object.fromEntries(cards.map((c) => [c.id, c.copies]))).toEqual({
+      [nob(1)]: 3, [nob(2)]: 3, [nob(5)]: 2, [nob(6)]: 2, [nob(8)]: 1, [nob(10)]: 2, [nob(12)]: 2, [nob(16)]: 1,
+    });
+    expect(cards.reduce((n, c) => n + c.copies, 0)).toBe(16);
   });
 
   it('新しく始めたとき：所持カードにノビトンの技16枚。初期デッキ60枚・モンスターカード本体は変えない。何度作っても16枚', () => {
@@ -115,7 +156,7 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     expect(NOBITON_MONSTER.life).toBe(8);
     expect(NOBITON_MONSTER.name).toBe('ノビトン');
     expect(MONSTERS.filter((m) => m.id === 'mon-nobiton')).toHaveLength(1);
-    expect(SKILLS.filter((s) => s.monsterId === 'mon-nobiton')).toHaveLength(14);
+    expect(SKILLS.filter((s) => s.monsterId === 'mon-nobiton')).toHaveLength(12); // 指示書 AJ で12枚
     expect(BATTLE_CARDS['mon-nobiton']).toMatchObject({ art: 'nobiton_battlecard.png', frame: 'nobiton' });
     const original = readFileSync('design-parts/cards-original/nobiton14-20261026/04_BATTLE_MONSTER_CARD/01_Nobiton_Battle_Original_RGBA.png');
     expect(readFileSync('assets/images/cards/monsters/nobiton_battlecard.png').equals(original)).toBe(true);
@@ -130,14 +171,14 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     expect(createNewSave().deck.monsters).not.toContain('mon-nobiton');
   });
 
-  it('日本語は CSV の特殊効果の文のまま。英語は仮訳で、日本語が残らない', () => {
+  it('日本語は指示書 AJ の効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(n14(3))).description).toBe('相手は次のターン行動不可');
+    expect(skillCardFace(getSkill(n14(3))).description).toBe('相手は次のターン行動できない');
     expect(skillCardFace(getSkill(n14(8))).description).toBe('手札をすべて交換');
-    expect(skillCardFace(getSkill(n14(12))).mana).toBe(0);
+    expect(skillCardFace(getSkill(n14(10))).mana).toBe(0);
     setLanguage('en');
     expect(cardName(NOBITON_MONSTER)).toBe('Nobiton');
-    for (const s of NOBITON_SKILLS) {
+    for (const s of skillsOf('mon-nobiton')) {
       expect(cardName(s)).not.toMatch(/[ぁ-んァ-ン一-龯]/);
       expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
     }
@@ -150,8 +191,8 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
 // 自分：ノビトン（m1）・ソラモ（m2）・ラズック（m3）。相手も同じ
 const deck = { monsters: ['mon-nobiton', 'mon-soramo', 'mon-lazuck'], skills: Array.from({ length: 60 }, () => sor(1)) };
 
-function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}): BattleState {
-  const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
+function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, d = deck): BattleState {
+  const s = createBattle({ name: 'P', deck: d }, { name: 'O', deck: d }, 11, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
     hand: (hand[k] ?? []).map((cardId, i) => ({ uid: `${k[0]}${i}`, cardId })),
@@ -231,7 +272,7 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
   });
 
   it('08 考える：使ったカード以外の手札をすべて山札へ戻してシャッフルし、同じ枚数を引く。戻す手札がなければ使えない', () => {
-    let s = scene({ player: [nob(8), nob(1), n14(13), n14(14)] });
+    let s = scene({ player: [nob(8), nob(1), nob(10), n14(14)] });
     const deckBefore = s.sides.player.deck;
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(s.sides.player.hand).toHaveLength(3);
@@ -240,7 +281,7 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
     expect(monster(s, 'p-m1').acted).toBe(true);
     expect(s.log.at(-1)?.text).toBe('あなたは手札3枚を山札に戻してシャッフルし、3枚引いた。');
     // 山札（ひっかき60枚）＋戻した3枚から引くので、戻した3枚のどれかが戻ってくることもある
-    expect([...s.sides.player.deck, ...s.sides.player.hand.map((c) => c.cardId)].sort()).toEqual([...deckBefore, nob(1), n14(13), n14(14)].sort());
+    expect([...s.sides.player.deck, ...s.sides.player.hand.map((c) => c.cardId)].sort()).toEqual([...deckBefore, nob(1), nob(10), n14(14)].sort());
     expect(cardUsability(scene({ player: [nob(8)] }), 'player', 'p0')).toMatchObject({ usable: false, reason: '戻す手札がありません' });
   });
 
@@ -250,17 +291,16 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(s.reveal).toEqual({ seq: 1, viewer: 'player', cardIds: [nob(1), n14(14)] });
     expect(s.sides.opponent.hand).toEqual(handBefore);
-    expect(manaOfPlayer(s)).toBe(7);
+    expect(manaOfPlayer(s)).toBe(8); // 指示書 AJ でマナ2
     expect(s.log.at(-1)?.text).toBe('あなたは相手の手札2枚を確認した。');
     expect(cardUsability(scene({ player: [nob(9)] }), 'player', 'p0')).toMatchObject({ usable: false, reason: '相手は手札がありません' });
   });
 
-  it('12 ぐっとがまん：マナ0でも使える（−1）。10〜12 の防御は 0 未満にならない', () => {
-    const s = attackWith(nob(1), [n14(12)], { opponent: 0 });
-    expect(monster(s, 'o-m1').life).toBe(8);
-    expect(monster(attackWith(nob(4), [n14(12)]), 'o-m1').life).toBe(5);
-    expect(monster(attackWith(nob(4), [n14(11)]), 'o-m1').life).toBe(7);
-    expect(monster(attackWith(nob(2), [nob(10)]), 'o-m1').life).toBe(8);
+  // 指示書 AJ で外した技（skl-nobiton-13 ぐっとがまん）のテストは消した
+  it('鼻でまもる（マナ0・ちから技−3）・のびのびガード（マナ2・−3）：防御は 0 未満にならない', () => {
+    expect(monster(attackWith(nob(2), [nob(10)], { opponent: 0 }), 'o-m1').life).toBe(8); // ずつき 2 − 3 → 0（マナ0でも使える）
+    expect(monster(attackWith(nob(4), [n14(11)]), 'o-m1').life).toBe(6); // ギガントノーズ 5 − 3 → 2
+    expect(monster(attackWith(nob(4), [nob(10)]), 'o-m1').life).toBe(6);
     // 鼻でまもるはちから技だけ（のびのびガードはかしこさにも使える）
     let w = scene({ player: [nob(5)], opponent: [nob(10), n14(11)] });
     w = applyAction(w, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
@@ -268,20 +308,34 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
     expect(cardUsability(w, 'opponent', 'o1').usable).toBe(true);
   });
 
-  it('13 横によける：ちから技だけ回避。14 必死によける：ちから・かしこさとも回避（条件なし）', () => {
-    let f = scene({ player: [nob(1)], opponent: [n14(13), n14(14)] });
+  it('必死によける：ちから・かしこさとも回避（条件なし）', () => {
+    let f = scene({ player: [nob(1)], opponent: [n14(14)] });
     f = applyAction(f, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
     expect(cardUsability(f, 'opponent', 'o0').usable).toBe(true);
-    expect(cardUsability(f, 'opponent', 'o1').usable).toBe(true);
-    let w = scene({ player: [nob(5)], opponent: [n14(13), n14(14)] });
+    let w = scene({ player: [nob(5)], opponent: [n14(14)] });
     w = applyAction(w, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
-    expect(cardUsability(w, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
-    expect(cardUsability(w, 'opponent', 'o1').usable).toBe(true);
-    expect(monster(attackWith(nob(1), [n14(13)]), 'o-m1').life).toBe(8);
+    expect(cardUsability(w, 'opponent', 'o0').usable).toBe(true);
+    expect(monster(attackWith(nob(1), [n14(14)]), 'o-m1').life).toBe(8);
   });
 
-  it('ノビトン同士で、相手の思考どうしが最後まで対戦できる（14種すべてを含むデッキ）', () => {
-    const skills = [...Array.from({ length: 42 }, (_, i) => n14((i % 14) + 1)), ...Array.from({ length: 18 }, () => sor(1))];
+  // 指示書 AJ で横によける（旧13）を外したので、同じ「ちから技だけ回避」のミュロルのすべってよける（skl-myurol-16）で見る
+  it('ちから技だけ回避（ミュロルのすべってよける）：ちから技はよけられる。かしこさ技には使えない', () => {
+    const withMyurol = { ...deck, monsters: ['mon-nobiton', 'mon-myurol', 'mon-lazuck'] };
+    const run = (attack: string): BattleState => {
+      const s = scene({ player: [attack], opponent: ['skl-myurol-16'] }, {}, withMyurol);
+      return applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
+    };
+    const f = run(nob(1));
+    expect(cardUsability(f, 'opponent', 'o0').usable).toBe(true);
+    let evaded = applyAction(f, { type: 'defend', side: 'opponent', cardUid: 'o0' });
+    if (evaded.phase === 'defense') evaded = applyAction(evaded, { type: 'defend', side: 'opponent', cardUid: null });
+    expect(monster(evaded, 'o-m2').life).toBe(7); // よけたのでミュロルのライフ 7 のまま
+    expect(cardUsability(run(nob(5)), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
+  });
+
+  it('ノビトン同士で、相手の思考どうしが最後まで対戦できる（指示書 AJ の12種すべてを含むデッキ）', () => {
+    const ids = skillsOf('mon-nobiton').map((k) => k.id);
+    const skills = [...Array.from({ length: 36 }, (_, i) => ids[i % 12] as string), ...Array.from({ length: 24 }, () => sor(1))];
     const d = { monsters: ['mon-nobiton', 'mon-soramo', 'mon-lazuck'], skills };
     for (const [seed, first] of [[1, 'player'], [2, 'opponent'], [3, 'player']] as const) {
       let s = createBattle({ name: 'P', deck: d }, { name: 'O', deck: d }, seed, first);

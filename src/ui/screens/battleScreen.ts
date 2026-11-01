@@ -1,4 +1,4 @@
-import { getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
+import { getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { provisionalRuleNotes } from '../../data/rules.ts';
 import { chooseAction, cpuRoll } from '../../game/battle/ai.ts';
 import { pickCpuLine } from '../../data/cpuLines.ts';
@@ -10,6 +10,10 @@ import {
   createBattle,
   findMonster,
   guardCost,
+  activeField,
+  fieldSupport,
+  habitatOf,
+  isTideActive,
   handSkillCost,
   recallChoices,
   manaOf,
@@ -1525,7 +1529,7 @@ export const battleScreen: ScreenDefinition = {
               'span',
               { class: 'battle__monster-icon' },
               hasBattleCard(m.cardId)
-                ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? barLife, max: m.maxLife })
+                ? createBattleMonsterCard(getMonster(m.cardId), MONSTER_ICON, { current: lifeShown.get(m.uid) ?? barLife, max: m.maxLife }, habitatOf(s, m))
                 : createMonsterPortrait(getMonster(m.cardId), MONSTER_ICON, MONSTER_ICON_H),
               // 戦闘不能の印・行動済の印（2026-10-26 デザイン第9弾。文字も残す）
               down
@@ -2143,7 +2147,7 @@ export const battleScreen: ScreenDefinition = {
         'header',
         { class: `battle__header${s ? ` battle__header--${s.phase === 'ended' ? 'ended' : s.active}` : ''}` },
         req.allowSurrender ? topButton('surrender', t('battle.surrender'), surrender) : h('span'),
-        h('div', { class: 'battle__heading' }, s?.field ? fieldChip(s) : null, ticker(s)),
+        h('div', { class: 'battle__heading' }, s && fieldSupport(s) ? fieldChip(s) : null, s && isTideActive(s) ? tideChip(s) : null, ticker(s)),
         topButton('rules', t('battle.rules'), showRules),
       );
 
@@ -2201,10 +2205,14 @@ export const battleScreen: ScreenDefinition = {
       return null;
     };
 
+    /** 場が水中（みちしお。指示書 AJ）：上の帯に「水中 あと○手番」 */
+    const tideChip = (s: BattleState): HTMLElement =>
+      h('span', { class: 'battle-turn__tide', attrs: { role: 'status' }, text: t('battle.tide.chip', { n: Math.max(1, (activeField(s)?.untilTurn ?? s.turn) - s.turn + 1) }) });
+
     /** 場の全体カード（上の帯の左に出す。タップで詳しく） */
     const fieldChip = (s: BattleState): HTMLElement => {
-      if (!s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
-      const card = getSupport(s.field.cardId);
+      const card = fieldSupport(s);
+      if (!card || !s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
       return h(
         'button',
         {
@@ -2493,6 +2501,7 @@ export const battleScreen: ScreenDefinition = {
       }
       // 守りの選択の間（相手のカード・自分の守りのカードを見せている間も。手札は場所だけ残して見せない）
       element.classList.toggle('is-defending', canChooseDefense(s));
+      element.classList.toggle('is-tide', isTideActive(s));
       element.dataset.phase = s.phase;
       element.dataset.active = s.active;
       element.dataset.acting = blocked ? 'dealing' : (actingSide(s) ?? 'none');

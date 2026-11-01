@@ -58,6 +58,11 @@ export const BATTLE = {
     en: "{name}'s next {stat} skill deals {n} less damage.",
   },
   'battle.log.seal': { ja: '{name}は次のターン攻撃できない。', en: "{name} can't attack next turn." },
+  'battle.log.tide': { ja: '{name}のみちしお！ 場が水中になった（次の自分のターンの終わりまで、全員が水中）。', en: "{name}'s High Tide! The field is underwater (everyone counts as underwater until the end of its side's next turn)." },
+  'battle.tide.chip': { ja: '場が水中 あと{n}手番', en: 'Underwater: {n} more {n|turn|turns}' },
+  'battle.log.tideEnd': { ja: '場の水が引いた。', en: 'The water receded from the field.' },
+  'battle.log.requiem': { ja: '死のレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },
+  'battle.log.requiemNone': { ja: '死のレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
@@ -71,7 +76,7 @@ export const BATTLE = {
   'battle.log.chain': { ja: '{name}は続けて{skill}を使った！', en: '{name} followed up with {skill}!' },
   'battle.log.energyDouble': { ja: '{name}はためたエネルギーを放った！ ダメージ2倍！', en: '{name} released its stored energy! Double damage!' },
   'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
-  'battle.log.nullify': { ja: '{side}は「{skill}」でうけとめた（ダメージ0）！', en: '{side} caught it with {skill} (no damage)!' },
+  'battle.log.nullify': { ja: '{side}は「{skill}」でダメージを0にした！', en: '{side} reduced the damage to 0 with {skill}!' },
   'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',
@@ -164,6 +169,7 @@ export const BATTLE = {
   'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
+  'battle.ng.groundOnly': { ja: '地上の相手がいません（地上の相手だけに使える技）', en: 'No ground enemies (this skill can only target ground enemies)' },
   'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
   'battle.defense.cover': { ja: 'かばう', en: 'Cover' },
   'battle.defense.nullify': { ja: '0に', en: 'To 0' },

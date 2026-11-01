@@ -9,6 +9,7 @@ import { GACHA_SERIES, gachaSeenFlag } from '../src/data/economy.ts';
 import { HYOUZUKU_COLOR, HYOUZUKU_GACHA_RARE, HYOUZUKU_MONSTER, HYOUZUKU_MONSTER_ID, HYOUZUKU_SKILLS, hyouzukuSkillId } from '../src/data/hyouzuku.ts';
 import hyouzukuJson from '../src/data/official/hyouzuku14_skills_OFFICIAL_20261030.json';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { applyAction, cardUsability, createBattle, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
@@ -28,6 +29,8 @@ const ORIGINAL_DIR = 'design-parts/cards-original/hyouzuku';
 const ICE = 'dungeon-04';
 const IVAN_TEAM = ['mon-myurol', HYOUZUKU_MONSTER_ID, 'mon-kalshell'];
 const base = (): SaveData => createNewSave(new Date('2026-10-30T00:00:00Z'), 'balance');
+/** 指示書 AJ のヒョウズクの技12枚（表の並び） */
+const AJ_IDS: readonly string[] = (AJ_SKILLS[HYOUZUKU_MONSTER_ID] ?? []).map((r) => r.id);
 
 function csvRows(path: string): string[][] {
   const text = readFileSync(path, 'utf8').replace(/^﻿/, '');
@@ -42,7 +45,7 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
     expect(readFileSync('assets/images/cards/monsters/hyouzuku_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/hyouzuku_battleart.png`))).toBe(true);
   });
 
-  it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
+  it('CSV の14行・JSON・前の14技（ファイルの HYOUZUKU_SKILLS）で、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 防御技: 'defense', 回避技: 'evade' } as const;
     const rows = csvRows('src/data/official/hyouzuku14_skills_OFFICIAL_20261030.csv');
     expect(rows).toHaveLength(14);
@@ -67,14 +70,13 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
     });
   });
 
-  it('カードに書く短い文（指示書の HYOUZUKU_CARD_TEXT）。JSON の文は変えない', () => {
-    expect(getSkill(hyo(5)).effectTextJa).toBe('相手は次のターン行動不可');
-    expect(getSkill(hyo(9)).effectTextJa).toBe('相手は次のターン行動不可');
+  it('カードに書く短い文（指示書 AJ の表の文）。JSON の文は変えない', () => {
+    expect(getSkill(hyo(5)).effectTextJa).toBe('相手は次のターン行動できない');
+    expect(getSkill(hyo(9)).effectTextJa).toBe('相手は次のターン行動できない');
     expect(getSkill(hyo(6)).effectTextJa).toBe('防御されない');
     expect(getSkill(hyo(14)).effectTextJa).toBe(getSkill('skl-tsumuji-14').effectTextJa);
-    expect(getSkill(hyo(11)).effectTextJa).toBe('ちから技・かしこさ技に効く');
-    expect(getSkill(hyo(12)).effectTextJa).toBe('ちから技に効く');
-    expect(getSkill(hyo(13)).effectTextJa).toBe('かしこさ技を回避');
+    // 指示書 AJ：まいあがるは両方を回避に。はねでつつむ（11）・つばさのたて（12）は外した
+    expect(getSkill(hyo(13)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
     expect(hyouzukuJson.skills[10]?.effect).toBe('ちから技・かしこさ技のダメージを2軽減');
   });
 
@@ -88,22 +90,40 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_hyouzuku.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はツムジのあと（No.166〜180）', () => {
+  it('指示書 AJ：ゲームの技カードは AJ の表の12枚（名前・分類・マナ・ダメージ・効果・効果の文・表示の番号が表のとおり）', () => {
+    const cat = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    (AJ_SKILLS[HYOUZUKU_MONSTER_ID] ?? []).forEach((r, i) => {
+      const k = getSkill(r.id);
+      expect(k.name).toBe(r.name);
+      expect(k.category).toBe(cat[r.cat]);
+      expect(k.cost).toBe(r.mana);
+      expect(k.stat?.value ?? null).toBe(r.damage);
+      expect(k.effect).toEqual(r.effect ?? { type: 'attack' });
+      expect(k.effectTextJa).toBe(r.text);
+      expect(k.displayNo).toBe(i + 1);
+    });
+    expect(AJ_IDS).toHaveLength(12);
+  });
+
+  // 2026-11-01 指示書 AJ：1体13枚（モンスター＋技12枚）になったので、ツムジ（11番目）のあとは No.144〜156
+  it('ふつうの一覧に入り、図鑑の番号はツムジのあと（No.144〜156）', () => {
     expect(MONSTERS.some((m) => m.id === HYOUZUKU_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === HYOUZUKU_MONSTER_ID).map((s) => s.id)).toEqual(HYOUZUKU_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === HYOUZUKU_MONSTER_ID).map((s) => s.id)).toEqual(AJ_IDS);
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === HYOUZUKU_MONSTER_ID)?.no).toBe(166);
-    expect(book.find((e) => e.card.id === hyo(14))?.no).toBe(180);
-    expect(book.find((e) => e.card.id === 'skl-tsumuji-14')?.no).toBe(165);
+    expect(book.find((e) => e.card.id === HYOUZUKU_MONSTER_ID)?.no).toBe(144);
+    expect(book.find((e) => e.card.id === hyo(14))?.no).toBe(156);
+    expect(book.find((e) => e.card.id === 'skl-tsumuji-14')?.no).toBe(143);
   });
 
   it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パック・ショップの原本も）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(hyo(n)).art?.file).toBe(`hyouzuku_sk_${nn}.webp`);
+      expect(HYOUZUKU_SKILLS[n - 1]?.art?.file).toBe(`hyouzuku_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/hyouzuku_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/hyouzuku_sk_${nn}.png`)).toBe(true);
     }
+    // ゲームの技カード（指示書 AJ）は ID と絵がそのまま
+    for (const id of AJ_IDS) expect(getSkill(id).art?.file).toBe(`hyouzuku_sk_${id.slice(-2)}.webp`);
     expect(HYOUZUKU_MONSTER.art?.file).toBe('hyouzuku_official.webp');
     expect(existsSync('assets/images/cards/monsters/hyouzuku_official.webp')).toBe(true);
     const originals = ['hyouzuku_official_monstercard_LIFE7.png', 'hyouzuku_original_approved.png', 'hyouzuku_3view_approved.png', 'pack_hyouzuku.png', 'pack_art_hyouzuku.png', 'shop_pack_hyouzuku.png', 'shop_card_hyouzuku.png'];
@@ -140,8 +160,8 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
 // 自分：ヒョウズク（p-m1 ライフ7）・ソラモ（p-m2）・ノビトン（p-m3）。相手も同じ（o-m1〜3）
 const MONS = [HYOUZUKU_MONSTER_ID, 'mon-soramo', 'mon-nobiton'];
 
-function scene(hand: Partial<Record<Side, string[]>>, active: Side = 'player', turn = 3): BattleState {
-  const deck = { monsters: [...MONS], skills: Array.from({ length: 60 }, () => sor(1)) };
+function scene(hand: Partial<Record<Side, string[]>>, active: Side = 'player', turn = 3, monsters: readonly string[] = MONS): BattleState {
+  const deck = { monsters: [...monsters], skills: Array.from({ length: 60 }, () => sor(1)) };
   const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
@@ -176,7 +196,7 @@ describe('05 こおりのいき・09 ふぶき：相手は次のターン行動�
       expect(getSkill(hyo(no)).effect).toEqual({ type: 'attack', stunTarget: true, stunMark: 'frozen' });
       let s = attackWith(hyo(no), null).after;
       expect(monster(s, 'o-m1').stunnedTurn).toBe(s.turn + 1);
-      expect(monster(s, 'o-m1').life).toBe(7 - (no === 5 ? 1 : 3));
+      expect(monster(s, 'o-m1').life).toBe(7 - (no === 5 ? 2 : 3)); // 指示書 AJ：こおりのいき 2・ふぶき 3
       s = { ...s, turn: s.turn + 1, active: 'opponent', phase: 'main' };
       s = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [hyo(1), sor(1)].map((cardId, i) => ({ uid: `o${i}`, cardId })) } } };
       expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'このターンは行動できません（行動不可）' });
@@ -204,19 +224,25 @@ describe('05 こおりのいき・09 ふぶき：相手は次のターン行動�
     }
   });
 
-  it('防御で0ダメージになってもかかる（はねでつつむ −2 で こおりのいき 1 を0に）', () => {
-    const r = attackWith(hyo(5), hyo(11));
+  // 指示書 AJ でヒョウズクの防御（はねでつつむ）を外したので、ソラモ（o-m2）の星のまもり（−3）で見る
+  it('防御で0ダメージになってもかかる（星のまもり −3 で こおりのいき 2 を0に）', () => {
+    const r = attackWith(hyo(5), 'skl-soramo14-12', 'o-m2');
     expect(r.usable).toBe(true);
-    expect(monster(r.after, 'o-m1').life).toBe(7);
-    expect(monster(r.after, 'o-m1').stunnedTurn).toBe(r.after.turn + 1);
+    expect(monster(r.after, 'o-m2').life).toBe(7);
+    expect(monster(r.after, 'o-m2').stunnedTurn).toBe(r.after.turn + 1);
   });
 
   it('行動不可のあいだも、守りのカード（防御・回避）は使える', () => {
     let s = scene({ player: [hyo(1)] });
-    s = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid === 'o-m1' ? { ...m, stunnedTurn: s.turn } : m)) } } };
-    const r = attackWith(hyo(1), hyo(11), 'o-m1', s);
-    expect(r.usable).toBe(true);
-    expect(monster(r.after, 'o-m1').life).toBe(7);
+    s = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid === 'o-m1' || m.uid === 'o-m2' ? { ...m, stunnedTurn: s.turn } : m)) } } };
+    // 回避：ヒョウズク（o-m1）のおとなきはばたき
+    const evade = attackWith(hyo(1), hyo(14), 'o-m1', s);
+    expect(evade.usable).toBe(true);
+    expect(monster(evade.after, 'o-m1').life).toBe(7);
+    // 防御：ソラモ（o-m2）の星のまもり（指示書 AJ でヒョウズクの防御は外した）
+    const guard = attackWith(hyo(1), 'skl-soramo14-12', 'o-m2', s);
+    expect(guard.usable).toBe(true);
+    expect(monster(guard.after, 'o-m2').life).toBe(7);
   });
 
   it('もう一度かけたら期限だけ新しく（重ならない。凍らせ続けを止める決まりは入れない）', () => {
@@ -231,15 +257,16 @@ describe('06 こおりわり：防御されない（ジオルのいわくだき�
   it('防御のカードは出せない。回避は出せる', () => {
     expect(getSkill(hyo(6)).effect).toEqual({ type: 'attack', unblockable: true });
     expect(getSkill(hyo(6)).effect).toEqual(getSkill('skl-geol-02').effect);
-    expect(attackWith(hyo(6), hyo(12)).usable).toBe(false);
-    expect(attackWith(hyo(6), hyo(11)).usable).toBe(false);
+    // 指示書 AJ でヒョウズクの防御を外したので、ソラモ（o-m2）の星のまもり・ノビトン（o-m3）の鼻でまもるで見る
+    expect(attackWith(hyo(6), 'skl-soramo14-12', 'o-m2').usable).toBe(false);
+    expect(attackWith(hyo(6), 'skl-nobiton-10', 'o-m3').usable).toBe(false);
     const evaded = attackWith(hyo(6), hyo(14));
     expect(evaded.usable).toBe(true);
     expect(monster(evaded.after, 'o-m1').life).toBe(7);
   });
 });
 
-describe('守り（11〜14）', () => {
+describe('守り（指示書 AJ：まいあがる・おとなきはばたき）', () => {
   it('14 おとなきはばたき：マナに関係なく、ちから技・かしこさ技を回避（ツムジのかぜよみと同じ）', () => {
     expect(getSkill(hyo(14)).effect).toEqual(getSkill('skl-tsumuji-14').effect);
     for (const atk of [hyo(1), hyo(7), hyo(3), hyo(10)]) {
@@ -249,13 +276,25 @@ describe('守り（11〜14）', () => {
     }
   });
 
-  it('11 はねでつつむ：両方 −2。12 つばさのたて：ちから技 −3。13 まいあがる：かしこさ技だけ回避', () => {
-    expect(getSkill(hyo(11)).effect).toEqual({ type: 'defense', reduce: 2, against: 'all' });
-    expect(getSkill(hyo(12)).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
-    expect(attackWith(hyo(3), hyo(12)).usable).toBe(false);
-    expect(monster(attackWith(hyo(7), hyo(12)).after, 'o-m1').life).toBe(7);
-    expect(attackWith(hyo(1), hyo(13)).usable).toBe(false);
-    expect(attackWith(hyo(4), hyo(13)).usable).toBe(true);
+  it('13 まいあがる（マナ2）：指示書 AJ でマナに関係なく、ちから技・かしこさ技を回避に', () => {
+    expect(getSkill(hyo(13)).cost).toBe(2);
+    expect(getSkill(hyo(13)).effect).toEqual({ type: 'evade', against: 'all' });
+    for (const atk of [hyo(1), hyo(4)]) {
+      const r = attackWith(atk, hyo(13));
+      expect(r.usable, atk).toBe(true);
+      expect(monster(r.after, 'o-m1').life, atk).toBe(7);
+    }
+  });
+
+  // 指示書 AJ で外した技（skl-hyouzuku-11 はねでつつむ・両方 −2）のテストは消した
+  // つばさのたて（旧12・ちから技 −3）を外したので、同じ守りのミュロルのしっぽガード（skl-myurol-10）で見る
+  it('ちから技 −3（ミュロルのしっぽガード）：ちから技は0に。かしこさ技には使えない', () => {
+    const MYU = [HYOUZUKU_MONSTER_ID, 'mon-myurol', 'mon-nobiton'];
+    const start = (atk: string): BattleState => scene({ player: [atk] }, 'player', 3, MYU);
+    expect(attackWith(hyo(3), 'skl-myurol-10', 'o-m2', start(hyo(3))).usable).toBe(false); // こなゆき（かしこさ）
+    const f = attackWith(hyo(2), 'skl-myurol-10', 'o-m2', start(hyo(2))); // かぎづめ（ちから2）
+    expect(f.usable).toBe(true);
+    expect(monster(f.after, 'o-m2').life).toBe(7);
   });
 });
 
@@ -291,11 +330,11 @@ describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
     expect(w).toMatchObject({ cleared: true, firstClear: true });
     expect(w.clearCards).toEqual([{ cardId: HYOUZUKU_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[HYOUZUKU_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, ICE, IVAN_TEAM)).toEqual(HYOUZUKU_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, ICE, IVAN_TEAM)).toEqual(AJ_IDS);
     const again = beatIvan(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills(ICE)).toEqual(HYOUZUKU_SKILLS.map((k) => k.id));
+    expect(bossTrumpSkills(ICE)).toEqual(AJ_IDS);
     const chestCards = new Set<string>();
     for (let i = 0; i < 3000; i++) {
       const r = rollChest(ICE, i, 'f1-chest-1');
@@ -336,7 +375,7 @@ describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
     expect(w.save.storyFlags).not.toContain(IVAN_ALTAR_OWED_FLAG);
     expect(availableGachaSeriesFor(w.save).map((x) => x.id)).toContain('hyouzuku');
     // その次からはふつうの2回目と同じ（ヒョウズクの技カード）
-    expect(bossRewardCandidates(w.save, ICE, IVAN_TEAM)).toEqual(HYOUZUKU_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, ICE, IVAN_TEAM)).toEqual(AJ_IDS);
     expect(beatIvan(w.save, 52).clearCards).toEqual([]);
   });
 
@@ -357,13 +396,13 @@ describe('氷の洞窟のボス（イヴァン）・入手の流れ', () => {
 });
 
 describe('ヒョウズクのガチャのシリーズ', () => {
-  it('ツムジのあとに1行。レア枠はふぶき・ひょうが・おとなきはばたき。ivan-beaten のあと（ヒョウズクのカードを受け取ってから）だけ並ぶ', () => {
+  it('ツムジのあとに1行。レア枠（指示書 AJ の★）はこおりのいき・ふぶき・ひょうが・おとなきはばたき。ivan-beaten のあと（ヒョウズクのカードを受け取ってから）だけ並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('hyouzuku')).toBe(ids.indexOf('tsumuji') + 1);
     expect(GACHA_SERIES.find((s) => s.id === 'hyouzuku')).toEqual({
       id: 'hyouzuku',
       monsterId: 'mon-hyouzuku',
-      rareSkillNames: ['ふぶき', 'ひょうが', 'おとなきはばたき'],
+      rareSkillNames: ['こおりのいき', 'ふぶき', 'ひょうが', 'おとなきはばたき'],
       unlockFlag: 'ivan-beaten',
     });
     const b = base();

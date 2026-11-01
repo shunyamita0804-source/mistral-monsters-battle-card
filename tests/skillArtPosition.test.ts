@@ -9,18 +9,19 @@ describe('技の絵の横の位置', () => {
     expect(skillArtX('skl-kalshell-02')).toBe(75);
     expect(skillArtX('skl-kalshell-13')).toBe(40);
     expect(skillArtX('skl-soramo14-01')).toBe(50);
-    // 技15枚＋サポート4枚（2026-10-30 指示書 Z）＋シシエン03（2026-10-31 指示書 AB）
-    expect(Object.keys(SKILL_ART_X)).toHaveLength(20);
+    // 技15枚＋サポート4枚（2026-10-30 指示書 Z）＋シシエン03（2026-10-31 指示書 AB）。指示書 AJ でジオル09 じならし を外したので技14枚
+    expect(Object.keys(SKILL_ART_X)).toHaveLength(19);
     expect(skillArtX('skl-shishien-03')).toBe(70);
   });
 
-  it('点検の一覧の12枚（2026-10-29 夜。案の値のまま）', () => {
+  it('点検の一覧の12枚（2026-10-29 夜。案の値のまま。指示書 AJ でジオル09 じならし を外したので11枚）', () => {
     expect(skillArtX('skl-soramo14-09')).toBe(60);
     expect(skillArtX('skl-gauul14-14')).toBe(100);
     expect([1, 3, 5, 9].map((n) => skillArtX(`skl-nobiton-0${n}`))).toEqual([65, 60, 75, 60]);
     expect(skillArtX('skl-myurol-07')).toBe(65);
     expect(['03', '05', '10'].map((n) => skillArtX(`skl-pukarim-${n}`))).toEqual([70, 75, 70]);
-    expect(['06', '09'].map((n) => skillArtX(`skl-geol-${n}`))).toEqual([65, 100]);
+    expect(skillArtX('skl-geol-06')).toBe(65);
+    expect(cardCatalog.get('skl-geol-09')).toBeUndefined();
   });
 
   it('サポートの絵（2026-10-30 指示書 Z）：風まかせ 55・霧の香 100・声援 30・守りの陣 65。ほかは真ん中', () => {

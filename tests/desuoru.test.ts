@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, REMOVED_SKILL_IDS, SKILLS } from '../src/data/cards.ts';
 import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { DESUORU_COLOR, DESUORU_GACHA_RARE, DESUORU_MONSTER, DESUORU_MONSTER_ID, DESUORU_SKILLS, desuoruSkillId } from '../src/data/desuoru.ts';
 import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
@@ -11,6 +11,7 @@ import desuoruJson from '../src/data/official/desuoru14_skills_OFFICIAL_20261031
 import { portraitFocus } from '../src/data/monsterPortraits.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction, pickDiscardChoice } from '../src/game/battle/ai.ts';
 import { applyAction, cardUsability, createBattle, defaultDiscardChoice, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
@@ -25,6 +26,9 @@ import { setLanguage, t } from '../src/i18n/i18n.ts';
 
 const des = (n: number): string => desuoruSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
+/** 指示書 AJ の表のデスオルの12枚（ゲームのカードの正本） */
+const AJ = AJ_SKILLS['mon-desuoru'] ?? [];
+const AJ_IDS = AJ.map((r) => r.id);
 const ORIGINAL_DIR = 'design-parts/cards-original/desuoru';
 
 function csvRows(path: string): string[][] {
@@ -75,68 +79,78 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('指示書の表のとおり（技名・分類・マナ・ダメージ）と、今ある効果との対応', () => {
-    const want: readonly [string, string, number, number | null][] = [
-      ['いしづきでつく', 'force', 0, 1],
-      ['てっこうのつめ', 'force', 1, 2],
-      ['やみがらす', 'wisdom', 1, 2],
-      ['しのささやき', 'wisdom', 2, 4], // 2026-11-01 指示書 AG2：ダメージ 3→4
-      ['めいかいのかぜ', 'wisdom', 3, 5], // 2026-11-01 指示書 AG2：ダメージ 4→5
-      ['しのゆびさし', 'wisdom', 4, 4],
-      ['やみのやり', 'force', 5, 5],
-      ['ヘルのもん', 'wisdom', 5, 7],
-      ['にらみつける', 'special', 2, null],
-      ['カラスのめ', 'special', 3, null],
-      ['やみのころも', 'defense', 2, null],
-      ['ルーンのまもり', 'defense', 2, null],
-      ['マントでそらす', 'evade', 2, null],
-      ['かげにとける', 'evade', 1, null],
+  it('指示書 AJ の表のとおり（並び・技名・分類・マナ・ダメージ）と、今ある効果との対応', () => {
+    const want: readonly [string, string, string, number, number | null][] = [
+      [des(1), 'いしづきでつく', 'force', 0, 1],
+      [des(2), 'てっこうのつめ', 'force', 1, 2],
+      [des(3), 'やみがらす', 'wisdom', 1, 2],
+      [des(4), 'しのささやき', 'wisdom', 2, 4], // 2026-11-01 指示書 AG2：ダメージ 3→4
+      [des(15), 'ししゃのたむけ', 'wisdom', 3, 4], // 指示書 AJ の新しい技
+      [des(7), 'やみのやり', 'force', 4, 6],
+      [des(6), 'しのゆびさし', 'wisdom', 4, 5],
+      [des(8), 'ヘルのもん', 'wisdom', 6, 10],
+      [des(10), 'カラスのめ', 'special', 3, null],
+      [des(16), '死のレクイエム', 'special', 4, null], // 指示書 AJ の新しい技
+      [des(12), 'ルーンのまもり', 'defense', 0, null],
+      [des(14), 'やみにまぎれる', 'evade', 2, null], // 前の名前は かげにとける（マナ1）
     ];
-    want.forEach(([name, category, cost, dmg], i) => {
-      const s = getSkill(des(i + 1));
+    expect(AJ_IDS).toEqual(want.map((w) => w[0]));
+    want.forEach(([id, name, category, cost, dmg], i) => {
+      const s = getSkill(id);
+      expect(s.displayNo).toBe(i + 1);
       expect(s.name).toBe(name);
       expect(s.category).toBe(category);
       expect(s.cost).toBe(cost);
       expect(s.stat?.value ?? null).toBe(dmg);
+      expect(s.effectTextJa).toBe(AJ[i]?.text);
     });
     expect(getSkill(des(6)).effect).toEqual(getSkill('skl-gauul14-09').effect); // 回避されない（聖なる炎）
     expect(getSkill(des(7)).effect).toEqual(getSkill('skl-geol-02').effect); // 防御されない（いわくだき）
-    expect(getSkill(des(9)).effect).toEqual(getSkill('skl-soramo14-09').effect); // すなかけ
-    expect(getSkill(des(9)).effect).toEqual(getSkill('skl-gauul14-10').effect); // 威嚇
     expect(getSkill(des(10)).effect).toEqual({ type: 'discardChoice' });
-    expect(getSkill(des(11)).effect).toEqual(getSkill('skl-kalshell-11').effect);
+    expect(getSkill(des(15)).effect).toEqual({ type: 'attack', fallenAllyBonus: 2 });
+    expect(getSkill(des(16)).effect).toEqual({ type: 'requiem' });
     expect(getSkill(des(12)).effect).toEqual(getSkill('skl-kalshell-12').effect);
-    expect(getSkill(des(13)).effect).toEqual(getSkill('skl-kalshell-14').effect); // しおのステップ
     expect(getSkill(des(14)).effect).toEqual(getSkill('skl-serephine-14').effect); // ウェーブダンス
-    for (const n of [1, 2, 3, 4, 5, 8]) expect(getSkill(des(n)).effect, String(n)).toEqual({ type: 'attack' });
+    for (const n of [1, 2, 3, 4, 8]) expect(getSkill(des(n)).effect, String(n)).toEqual({ type: 'attack' });
+    // 外した技：めいかいのかぜ・にらみつける・やみのころも・マントでそらす
+    for (const n of [5, 9, 11, 13]) {
+      expect(REMOVED_SKILL_IDS).toContain(des(n));
+      expect(() => getSkill(des(n))).toThrow();
+    }
   });
 
   it('モンスター：ライフ7・紺・ID mon-desuoru。内部ランク A（初めての A）。レアの枠は 08・10・14。枠の絵がある', () => {
     expect(DESUORU_MONSTER).toMatchObject({ id: 'mon-desuoru', life: 7, name: 'デスオル', isPlaceholder: false });
     expect(desuoruJson.monster_rank).toBe('A');
     expect(DESUORU_COLOR).toBe('#1E2B58');
+    // 前の14技のデータのレアの枠（ガチャのレアは指示書 AJ の★。下の「ガチャのシリーズ」のテスト）
     expect(DESUORU_GACHA_RARE).toEqual([des(8), des(10), des(14)]);
     expect(BATTLE_CARDS[DESUORU_MONSTER_ID]?.frame).toBe('desuoru');
     expect(existsSync('assets/images/ui/battlecard/frame_desuoru.png')).toBe(true);
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_desuoru.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はハクランのあと（No.211〜225）', () => {
+  it('ふつうの一覧に入り、図鑑の番号はハクランのあと（No.183〜195。指示書 AJ で1体13番）', () => {
     expect(MONSTERS.some((m) => m.id === DESUORU_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === DESUORU_MONSTER_ID).map((s) => s.id)).toEqual(DESUORU_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === DESUORU_MONSTER_ID).map((s) => s.id)).toEqual(AJ_IDS);
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === 'skl-hakuran-14')?.no).toBe(210);
-    expect(book.find((e) => e.card.id === DESUORU_MONSTER_ID)?.no).toBe(211);
-    expect(book.find((e) => e.card.id === des(14))?.no).toBe(225);
+    expect(book.find((e) => e.card.id === 'skl-hakuran-14')?.no).toBe(182);
+    expect(book.find((e) => e.card.id === DESUORU_MONSTER_ID)?.no).toBe(183);
+    expect(book.find((e) => e.card.id === des(14))?.no).toBe(195);
   });
 
   it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パックの窓の絵は gacha-20261029/ にも）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(des(n)).art?.file).toBe(`desuoru_sk_${nn}.webp`);
+      expect(DESUORU_SKILLS[n - 1]?.art?.file).toBe(`desuoru_sk_${nn}.webp`);
+      // ゲームのカード（指示書 AJ で残した技）も同じ絵
+      if (AJ_IDS.includes(des(n))) expect(getSkill(des(n)).art?.file).toBe(`desuoru_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/desuoru_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/desuoru_sk_${nn}.png`)).toBe(true);
     }
+    // 新しい技の絵（指示書 AJ の追加その1。原本は design-parts/cards-original/aj-add1-20261101/）
+    expect(getSkill(des(15)).art?.file).toBe('desuoru_sk_15.webp');
+    expect(getSkill(des(16)).art?.file).toBe('desuoru_sk_16.webp');
     expect(DESUORU_MONSTER.art?.file).toBe('desuoru_official.webp');
     for (const f of ['desuoru_official_monstercard_LIFE7.png', 'desuoru_original_approved.png', 'desuoru_3view_approved.png', 'pack_art_desuoru.png', 'AG_instruction_ja.md']) {
       expect(existsSync(`${ORIGINAL_DIR}/${f}`), f).toBe(true);
@@ -156,7 +170,7 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
     try {
       expect(cardName(DESUORU_MONSTER_ID)).toBe('Desuoru');
       expect(cardName(des(10))).toBe("Raven's Eye");
-      expect(cardName(des(14))).toBe('Melt into Shadow');
+      expect(cardName(des(14))).toBe('Fade into Darkness'); // 指示書 AJ で名前を やみにまぎれる に
     } finally {
       setLanguage('ja');
     }
@@ -174,8 +188,8 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
 // 自分：デスオル（p-m1 ライフ7）・ソラモ（p-m2）・ノビトン（p-m3）。相手も同じ（o-m1〜3）
 const MONS = [DESUORU_MONSTER_ID, 'mon-soramo', 'mon-nobiton'];
 
-function scene(hand: Partial<Record<Side, string[]>>, active: Side = 'player', oppMana = 10): BattleState {
-  const deck = { monsters: [...MONS], skills: Array.from({ length: 60 }, () => sor(1)) };
+function scene(hand: Partial<Record<Side, string[]>>, active: Side = 'player', oppMana = 10, mons: string[] = MONS): BattleState {
+  const deck = { monsters: [...mons], skills: Array.from({ length: 60 }, () => sor(1)) };
   const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
   const side = (k: Side) => ({
     ...s.sides[k],
@@ -192,8 +206,8 @@ const monster = (s: BattleState, uid: string): BattleMonster => {
   return m;
 };
 
-function attackWith(attack: string, guard: string, target = 'o-m1'): { usable: boolean; reason: string | null; after: BattleState } {
-  let s = scene({ player: [attack] });
+function attackWith(attack: string, guard: string, target = 'o-m1', mons: string[] = MONS): { usable: boolean; reason: string | null; after: BattleState } {
+  let s = scene({ player: [attack] }, 'player', 10, mons);
   s = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [{ uid: 'g0', cardId: guard }] } } };
   s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m1', targetUid: target });
   const u = cardUsability(s, 'opponent', 'g0');
@@ -223,7 +237,8 @@ describe('10 カラスのめ（新しい効果 discardChoice）', () => {
   });
 
   it('選んだカードの指定が無いとき（試遊）は、CPU の決まった選び方の1枚', () => {
-    const s = scene({ player: [des(10)], opponent: [sor(11), sor(1), 'skl-soramo14-07'] });
+    // 指示書 AJ でソラモの 11・13 を外したので、防御は星のまもり（12）
+    const s = scene({ player: [des(10)], opponent: [sor(12), sor(1), 'skl-soramo14-07'] });
     const after = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(after.sides.opponent.discard.at(-1)).toBe(defaultDiscardChoice(s, 'player')?.cardId);
   });
@@ -238,17 +253,17 @@ describe('10 カラスのめ（新しい効果 discardChoice）', () => {
     };
     const attacks = [sor(1), sor(4), big].map((id) => getSkill(id)).sort((a, b) => (b.stat?.value ?? 0) - (a.stat?.value ?? 0));
     const strongest = attacks[0]?.id;
-    expect(kill(7, 10, [sor(11), sor(1), sor(4), big])).toBe(strongest);
+    expect(kill(7, 10, [sor(12), sor(1), sor(4), big])).toBe(strongest);
     // 払えるマナが少ないと、払える中で倒せるもの（ライフ1なら ひっかく〔ソラモ01〕でも倒せる）
     const cheapKill = kill(1, getSkill(sor(1)).cost, [sor(1), big]);
     expect(getSkill(cheapKill ?? '').cost).toBeLessThanOrEqual(getSkill(sor(1)).cost);
-    // 攻撃が無ければ条件の無い回避、無ければ防御
-    expect(kill(7, 10, [sor(11), 'skl-desuoru-14', 'skl-desuoru-13'])).toBe('skl-desuoru-14');
-    expect(kill(7, 10, ['skl-desuoru-13', sor(11)])).toBe(sor(11));
+    // 攻撃が無ければ条件の無い回避、無ければ防御（条件のある回避：マントでそらすは外したので、ラズックのシャドウスリップ〔マナ2以上〕）
+    expect(kill(7, 10, [sor(12), 'skl-desuoru-14', 'skl-lazuck-15'])).toBe('skl-desuoru-14');
+    expect(kill(7, 10, ['skl-lazuck-15', sor(12)])).toBe(sor(12));
   });
 
   it('CPU が使う時：相手を倒せる攻撃が無く、相手の手札が3枚以上（2枚なら使わない）。choice を付ける', () => {
-    const hand3 = [sor(1), sor(4), sor(11)];
+    const hand3 = [sor(1), sor(4), sor(12)];
     const s = scene({ opponent: [des(10)], player: hand3 }, 'opponent');
     const a = chooseAction(s, 'opponent', 'normal', 'A');
     expect(a).toMatchObject({ type: 'useCard', cardUid: 'o0' });
@@ -262,7 +277,7 @@ describe('10 カラスのめ（新しい効果 discardChoice）', () => {
   });
 
   it('腕前 C はランダムに1枚（相手の手札のどれか）', () => {
-    const s = scene({ opponent: [des(10)], player: [sor(1), sor(4), sor(11), 'skl-soramo14-13'] }, 'opponent');
+    const s = scene({ opponent: [des(10)], player: [sor(1), sor(4), sor(12), sor(14)] }, 'opponent');
     const pick = pickDiscardChoice(s, 'opponent', 'C');
     expect(s.sides.player.hand.some((c) => c.uid === pick)).toBe(true);
   });
@@ -279,10 +294,12 @@ describe('10 カラスのめ（新しい効果 discardChoice）', () => {
 
 describe('ほかの技（今ある効果）', () => {
   it('07 やみのやり：防御のカードは使えない（回避はできる）', () => {
-    const blocked = attackWith(des(7), 'skl-soramo14-11', 'o-m2');
+    const blocked = attackWith(des(7), sor(12), 'o-m2');
     expect(blocked.usable).toBe(false);
     expect(blocked.reason).toBe(t('battle.ng.unblockable'));
-    expect(monster(blocked.after, 'o-m2').life).toBe(monster(scene({}), 'o-m2').life - 5);
+    // 指示書 AJ：ダメージ 6
+    expect(monster(blocked.after, 'o-m2').life).toBe(monster(scene({}), 'o-m2').life - 6);
+    expect(attackWith(des(7), sor(14), 'o-m2').usable).toBe(true);
   });
 
   it('06 しのゆびさし：回避されない（防御はできる）', () => {
@@ -292,23 +309,29 @@ describe('ほかの技（今ある効果）', () => {
     expect(attackWith(des(6), des(12)).usable).toBe(true);
   });
 
-  it('14 かげにとける：マナ1で、ちから技・かしこさ技をマナに関係なく回避（いしづきでつく〔マナ0〕も）', () => {
-    for (const atk of [des(1), des(5), des(8)]) {
+  it('14 やみにまぎれる（前のかげにとける）：マナ2で、ちから技・かしこさ技をマナに関係なく回避（いしづきでつく〔マナ0〕も）', () => {
+    expect(getSkill(des(14)).cost).toBe(2);
+    for (const atk of [des(1), des(4), des(8)]) {
       const r = attackWith(atk, des(14));
       expect(r.usable, atk).toBe(true);
       expect(monster(r.after, 'o-m1').life, atk).toBe(7);
     }
   });
 
-  it('13 マントでそらす：消費マナ2以上のちから技だけ回避（いしづきでつく〔マナ0〕・てっこうのつめ〔マナ1〕はよけられない）', () => {
-    expect(attackWith(des(1), des(13)).usable).toBe(false);
-    expect(attackWith(des(2), des(13)).usable).toBe(false);
-    expect(attackWith(des(7), des(13)).usable).toBe(true);
-    expect(attackWith(des(3), des(13)).usable).toBe(false);
+  // 指示書 AJ で外した技（skl-desuoru-13 マントでそらす）と同じ「マナ2以上の回避」：ラズック（o-m3）のシャドウスリップ（skl-lazuck-15）で確かめる
+  it('マナ2以上の回避（シャドウスリップ）：いしづきでつく〔マナ0〕・てっこうのつめ〔マナ1〕・やみがらす〔マナ1〕はよけられない。やみのやり〔マナ4〕はよけられる', () => {
+    const team = [DESUORU_MONSTER_ID, 'mon-soramo', 'mon-lazuck'];
+    expect(attackWith(des(1), 'skl-lazuck-15', 'o-m3', team).usable).toBe(false);
+    expect(attackWith(des(2), 'skl-lazuck-15', 'o-m3', team).usable).toBe(false);
+    expect(attackWith(des(3), 'skl-lazuck-15', 'o-m3', team).usable).toBe(false);
+    const r = attackWith(des(7), 'skl-lazuck-15', 'o-m3', team);
+    expect(r.usable).toBe(true);
+    expect(monster(r.after, 'o-m3').life).toBe(6);
   });
 
-  it('09 にらみつける：選んだ相手1体は、次の手番に攻撃技を使えない（すなかけと同じ）', () => {
-    let s = scene({ player: [des(9)], opponent: [sor(1)] });
+  // 指示書 AJ で外した技（skl-desuoru-09 にらみつける）と同じ封じ：ソラモのすなかけ（skl-soramo14-09）で確かめる
+  it('封じ（すなかけ）：選んだ相手1体は、次の手番に攻撃技を使えない', () => {
+    let s = scene({ player: [sor(9)], opponent: [sor(1)] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
     expect(monster(s, 'o-m2').sealedTurn).toBe(s.turn + 1);
   });
@@ -319,13 +342,13 @@ describe('手に入れ方（まだ無い）', () => {
     expect(JSON.stringify({ DUNGEONS, ENCOUNTERS, BOOSTERS })).not.toContain('desuoru');
   });
 
-  it('ガチャのシリーズ：ハクランのあとに1行（desuoru-unlocked）。今のゲームでは並ばない。デスオルを持てば並ぶ', () => {
+  it('ガチャのシリーズ：ハクランのあとに1行（desuoru-unlocked）。レア枠は指示書 AJ の★。今のゲームでは並ばない。デスオルを持てば並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('desuoru')).toBe(ids.indexOf('hakuran') + 1);
     expect(GACHA_SERIES.find((s) => s.id === 'desuoru')).toEqual({
       id: 'desuoru',
       monsterId: 'mon-desuoru',
-      rareSkillNames: ['ヘルのもん', 'カラスのめ', 'かげにとける'],
+      rareSkillNames: ['しのゆびさし', 'ヘルのもん', 'カラスのめ', 'やみにまぎれる'],
       unlockFlag: 'desuoru-unlocked',
     });
     const b = createNewSave(new Date('2026-10-31T00:00:00Z'), 'balance');

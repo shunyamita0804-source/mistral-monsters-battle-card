@@ -1,4 +1,4 @@
-import { getPlayCard, getSupport, skillsOf } from '../../data/cards.ts';
+import { getPlayCard, skillsOf } from '../../data/cards.ts';
 import { guardAgainst, guardReduction, skillValue, type PlayCard, type SkillCard, type StatType, type SupportCard } from '../cards/cardTypes.ts';
 import {
   aliveMonsters,
@@ -20,6 +20,10 @@ import {
   shieldOf,
   skillCost,
   attackableMonsters,
+  findMonster,
+  requiemVictims,
+  activeField,
+  fieldSupport,
   tailwindTargets,
   targetsFor,
   undodgeableNow,
@@ -233,7 +237,8 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   if (supportPlay) return supportPlay;
 
   // 2. 全体カード：いまの場より自分に得になるときだけ出す（入れ替え合いでマナを無駄にしない）
-  const current = state.field ? fieldScore(state, side, getSupport(state.field.cardId)) : 0;
+  const fieldCard = fieldSupport(state);
+  const current = fieldCard ? fieldScore(state, side, fieldCard) : 0;
   const field = options
     .filter((o): o is Option & { def: SupportCard } => o.def.kind === 'support' && o.def.duration === 'field')
     .map((o) => ({ o, score: fieldScore(state, side, o.def) }))
@@ -247,9 +252,11 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const geol = chooseEnergyOrPin(state, side, options, enemies, style, skill);
   if (geol) return geol;
 
-  // 2.7 セレフィーン（2026-10-29）。みちしお
+  // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルの死のレクイエム
   const tide = chooseTide(state, side, options);
   if (tide) return tide;
+  const requiemPlay = chooseRequiem(state, side, options);
+  if (requiemPlay) return requiemPlay;
 
   // 2.8 ツムジ（2026-10-30 指示書 U）。かぜのり（Wひっかきの2回続けては、いちばん先に考える）
   const windRide = chooseWindRide(state, side, options);
@@ -413,32 +420,53 @@ function chooseSupportPlay(state: BattleState, side: Side, options: Option[], st
   return null;
 }
 
-/** みちしおを使うのに要る山札の枚数（これより少なければ山札が残り少ないので使わない） */
-const TIDE_MIN_DECK = 10;
-/** 大きい技（ルナタイド・オーシャンウェーブ）とみなす必要マナ */
-const TIDE_BIG_COST = 4;
+/** 場が水中で強くなる攻撃か（場が水中なら2倍・水中の相手に防御／回避されない） */
+const isWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.doubleInWater || k.effect.unblockableVsWater || k.effect.undodgeableVsWater);
 
 /**
- * みちしお（セレフィーン。2026-10-29 指示書）：その手番に攻撃で相手を倒せず、手札の大きい技（同じモンスターの必要マナ4以上の攻撃）が
- * 次の手番にマナが足りなくて使えないとき。次の手番のマナ＝いまのマナ＋この手番にマナにできる手札（みちしおと大きい技を除く）。
- * 山札が残り少ない（TIDE_MIN_DECK より少ない）ときは使わない
+ * みちしお（指示書 AJ の追加その3：カルシェル・セレフィーン。使った側の次の自分の手番の終わりまで水中）。手札に水中で強くなる攻撃があり、
+ * この手番に別の味方がすぐ使える（マナが足りる）か、次の自分の手番に使えそう（そのモンスターが生きていて、次の手番のマナで払えそう）なときに使う。
+ * もう水中で次の自分の手番まで続くとき・自分に得なサポートの場を上書きしてしまうときは使わない
  */
 function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
-  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'mana' && o.def.effect.amount !== undefined);
+  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'tide');
   if (!tide) return null;
+  const field = activeField(state);
+  if (field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 2) return null;
+  const support = fieldSupport(state);
+  if (support && field?.owner === side && fieldScore(state, side, support) > 0) return null;
   const mine = state.sides[side];
-  if (mine.deck.length < TIDE_MIN_DECK || canKillThisTurn(state, side, options)) return null;
-  const user = availableUsers(state, side, tide.def)[0];
+  const mana = manaOf(mine);
+  const caster = availableUsers(state, side, tide.def)[0];
+  if (!caster) return null;
+  // 次の自分の手番のマナ：いまのマナ − みちしお ＋ この手番の終わりにマナにできる手札（みちしお・水の攻撃のほかに1枚は残す）
+  const nextMana = mana - tide.def.cost + Math.max(0, mine.hand.length - 3);
+  const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+  for (const c of mine.hand) {
+    if (c.uid === tide.card.uid) continue;
+    const k = getPlayCard(c.cardId);
+    if (k.kind !== 'skill' || !isWaterAttack(k) || !alive.has(k.monsterId)) continue;
+    const now = tide.def.cost + k.cost <= mana && availableUsers(state, side, k).some((u) => u.uid !== caster.uid);
+    if (now || k.cost <= nextMana) return { type: 'useCard', side, cardUid: tide.card.uid, userUid: caster.uid };
+  }
+  return null;
+}
+
+/**
+ * 死のレクイエム（指示書 AJ：デスオル）：倒れる相手（ライフ1以下）が1体以上いて、倒れる味方より多いとき。
+ * 倒れる相手が1体だけなら、その手番に攻撃で倒せないときだけ
+ */
+function chooseRequiem(state: BattleState, side: Side, options: Option[]): BattleAction | null {
+  const req = options.filter(isSkillOption).find((o) => o.def.effect.type === 'requiem');
+  if (!req) return null;
+  const user = availableUsers(state, side, req.def)[0];
   if (!user) return null;
-  const big = mine.hand
-    .filter((c) => c.uid !== tide.card.uid)
-    .map((c) => ({ c, def: getPlayCard(c.cardId) }))
-    .filter(({ def }) => def.kind === 'skill' && def.monsterId === tide.def.monsterId && def.effect.type === 'attack' && def.cost >= TIDE_BIG_COST)
-    .sort((a, b) => a.def.cost - b.def.cost)[0];
-  if (!big) return null;
-  const nextMana = manaOf(mine) + mine.hand.length - 2;
-  if (big.def.cost <= nextMana) return null;
-  return { type: 'useCard', side, cardUid: tide.card.uid, userUid: user.uid };
+  const victims = requiemVictims(state, user.uid);
+  const foes = victims.filter((m) => findMonster(state, m.uid)?.side !== side).length;
+  const friends = victims.length - foes;
+  if (foes === 0 || foes <= friends) return null;
+  if (foes === 1 && canKillThisTurn(state, side, options)) return null;
+  return { type: 'useCard', side, cardUid: req.card.uid, userUid: user.uid };
 }
 
 /**
@@ -727,7 +755,11 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
     const card = getPlayCard(c.cardId);
     return card.kind === 'skill' ? guardCost(state, card) : card.cost;
   };
-  const guardKeep = style === 'aggressive' ? 0 : style === 'guard' ? 2 : CPU_SKILL[skill].guardKeep;
+  // 次の相手の手番も場が水中で、相手に水中で強くなる攻撃を持つモンスターがいれば、守りを1枚多く残す（指示書 AJ の追加その3。3枚まで）
+  const field = activeField(state);
+  const wetNext = field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 1;
+  const waterThreat = wetNext && aliveMonsters(state.sides[otherSide(side)]).some((m) => skillsOf(m.cardId).some(isWaterAttack));
+  const guardKeep = Math.min(3, (style === 'aggressive' ? 0 : style === 'guard' ? 2 : CPU_SKILL[skill].guardKeep) + (waterThreat && style !== 'aggressive' ? 1 : 0));
   // 腕前 A：相手の生きているモンスターの攻撃技の種類（ちから・かしこさの多い方）に効く守りを先に
   const theirs = otherSide(side);
   const force = attackersWith(state, theirs, 'force');
