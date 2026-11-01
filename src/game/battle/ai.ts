@@ -252,7 +252,7 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const geol = chooseEnergyOrPin(state, side, options, enemies, style, skill);
   if (geol) return geol;
 
-  // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルのしのレクイエム
+  // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルの死のレクイエム
   const tide = chooseTide(state, side, options);
   if (tide) return tide;
   const requiemPlay = chooseRequiem(state, side, options);
@@ -453,7 +453,7 @@ function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAc
 }
 
 /**
- * しのレクイエム（指示書 AJ：デスオル）：倒れる相手（ライフ1以下）が1体以上いて、倒れる味方より多いとき。
+ * 死のレクイエム（指示書 AJ：デスオル）：倒れる相手（ライフ1以下）が1体以上いて、倒れる味方より多いとき。
  * 倒れる相手が1体だけなら、その手番に攻撃で倒せないときだけ
  */
 function chooseRequiem(state: BattleState, side: Side, options: Option[]): BattleAction | null {

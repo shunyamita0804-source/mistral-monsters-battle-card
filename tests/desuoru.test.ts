@@ -90,7 +90,7 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
       [des(6), 'しのゆびさし', 'wisdom', 4, 5],
       [des(8), 'ヘルのもん', 'wisdom', 6, 10],
       [des(10), 'カラスのめ', 'special', 3, null],
-      [des(16), 'しのレクイエム', 'special', 4, null], // 指示書 AJ の新しい技
+      [des(16), '死のレクイエム', 'special', 4, null], // 指示書 AJ の新しい技
       [des(12), 'ルーンのまもり', 'defense', 0, null],
       [des(14), 'やみにまぎれる', 'evade', 2, null], // 前の名前は かげにとける（マナ1）
     ];

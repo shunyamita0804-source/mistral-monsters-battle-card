@@ -61,8 +61,8 @@ export const BATTLE = {
   'battle.log.tide': { ja: '{name}のみちしお！ 場が水中になった（次の自分のターンの終わりまで、全員が水中）。', en: "{name}'s High Tide! The field is underwater (everyone counts as underwater until the end of its side's next turn)." },
   'battle.tide.chip': { ja: '場が水中 あと{n}手番', en: 'Underwater: {n} more {n|turn|turns}' },
   'battle.log.tideEnd': { ja: '場の水が引いた。', en: 'The water receded from the field.' },
-  'battle.log.requiem': { ja: 'しのレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },
-  'battle.log.requiemNone': { ja: 'しのレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
+  'battle.log.requiem': { ja: '死のレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },
+  'battle.log.requiemNone': { ja: '死のレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },

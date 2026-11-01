@@ -596,7 +596,7 @@ export function fallenAllies(state: BattleState, user: BattleMonster | undefined
   return side ? state.sides[side].monsters.filter((m) => m.life <= 0).length : 0;
 }
 
-/** しのレクイエムで倒れるモンスター（ライフ1以下で生きている、使ったモンスター以外。味方も相手も） */
+/** 死のレクイエムで倒れるモンスター（ライフ1以下で生きている、使ったモンスター以外。味方も相手も） */
 export function requiemVictims(state: BattleState, userUid: string): BattleMonster[] {
   return [...state.sides.player.monsters, ...state.sides.opponent.monsters].filter((m) => m.uid !== userUid && m.life > 0 && m.life <= 1);
 }
@@ -1210,7 +1210,7 @@ function setField(state: BattleState, field: FieldCard): BattleState {
 }
 
 /**
- * しのレクイエム（指示書 AJ：デスオル）：ライフ1以下の、使ったモンスター以外のモンスター（味方も相手も）をすべて倒す。特殊技なので守れない。
+ * 死のレクイエム（指示書 AJ：デスオル）：ライフ1以下の、使ったモンスター以外のモンスター（味方も相手も）をすべて倒す。特殊技なので守れない。
  * 倒れた数を記録に書く。両方が全滅したら、いまの手番の側の勝ち（checkKnockout。使ったデスオルは残るので、ふつうは起きない）
  */
 function requiem(state: BattleState, userUid: string): BattleState {

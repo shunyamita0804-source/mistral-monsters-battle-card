@@ -327,7 +327,7 @@ describe('AJ：新しい効果', () => {
     expect(attackPower(s, card, mon(s, 'p-m1'))).toBe(8);
   });
 
-  it('しのレクイエム：ライフ1以下の、使ったデスオル以外のモンスター（味方も相手も）をすべて倒す。守れない', () => {
+  it('死のレクイエム：ライフ1以下の、使ったデスオル以外のモンスター（味方も相手も）をすべて倒す。守れない', () => {
     const d = { monsters: ['mon-desuoru', 'mon-soramo', 'mon-gauul'], skills: Array.from({ length: 60 }, () => 'skl-soramo14-01') };
     let s = createBattle({ name: 'P', deck: d }, { name: 'O', deck: oDeck }, 5, 'player');
     s = { ...s, phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player: { ...s.sides.player, hand: [{ uid: 'p0', cardId: 'skl-desuoru-16' }], manaPile: Array.from({ length: 10 }, () => 'x') } } };

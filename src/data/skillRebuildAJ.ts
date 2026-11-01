@@ -306,7 +306,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-desuoru-10', name: 'カラスのめ', cat: '特', mana: 3, damage: null, effect: { type: 'discardChoice' }, text: '相手の手札をすべて見て1枚選んで捨てさせる', rare: true },
     // 新しい技（絵はデザイン担当に依頼中。届くまで、外した やみのころも の絵）
     {
-      id: 'skl-desuoru-16', name: 'しのレクイエム', cat: '特', mana: 4, damage: null,
+      id: 'skl-desuoru-16', name: '死のレクイエム', cat: '特', mana: 4, damage: null,
       effect: { type: 'requiem' }, text: 'ライフ1以下の、デスオル以外のモンスターをすべて倒す', tempArt: 'desuoru_sk_11.webp',
     },
     { id: 'skl-desuoru-12', name: 'ルーンのまもり', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
