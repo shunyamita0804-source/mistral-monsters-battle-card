@@ -16,7 +16,7 @@ import {
   incomingDamage,
   isTideActive,
   requiemVictims,
-  RULE_VARIANTS,
+  activeField,
   type BattleState,
   type Side,
 } from '../src/game/battle/engine.ts';
@@ -27,7 +27,7 @@ import { boosterDeck } from '../src/game/story/introV2.ts';
 /**
  * 指示書 AJ【7】の試遊（数字は報告するだけ。カードの数字は変えない）。
  * PLAYTEST=回数 で、1体入れ替え（15体・レア抜き／レアあり）・箱どうし（腕前 A・B・C）・決着の理由・新しい効果の回数を数えて PLAYTEST_OUT に書く。
- * PLAYTEST_TIDE_FREE=1 で「みちしおを行動に数えない」場合（要確認の比べ用。ゲームでは使わない）
+ * 追加その3（みちしおは使った側の次の自分の手番の終わりまで）：tideTidal＝みちしおを使った側が、水中のあいだに水中で強くなる攻撃（2倍・水中の相手に防御／回避されない）を使った回数、tideTidalKo＝それで倒した回数
  */
 const GAMES = Number(process.env.PLAYTEST ?? 1);
 const KEYS = BOOSTERS.map((b) => b.key);
@@ -92,7 +92,7 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count, skillA: Cpu
         const e = card.effect;
         const user = action.userUid ? findMonster(s, action.userUid)?.monster : undefined;
         if (e.type === 'tide') c.tide++;
-        if (e.type === 'attack' && e.doubleInWater && isTideActive(s)) {
+        if (e.type === 'attack' && (e.doubleInWater || e.unblockableVsWater || e.undodgeableVsWater) && isTideActive(s) && activeField(s)?.owner === side) {
           c.tideTidal++;
           if (action.targetUid) watchTidal = { target: action.targetUid };
         }
@@ -182,9 +182,8 @@ describe('AJ の試遊', () => {
   });
 
   it(`入れ替え・箱どうし（各組み合わせ ${GAMES} 回）`, () => {
-    if (process.env.PLAYTEST_TIDE_FREE === '1') RULE_VARIANTS.tideFreeAction = true;
-    try {
-      const out: Record<string, unknown> = { games: GAMES, tideFreeAction: RULE_VARIANTS.tideFreeAction };
+    {
+      const out: Record<string, unknown> = { games: GAMES, tide: '使った側の次の自分の手番の終わりまで（追加その3）' };
       const subjects = process.env.PLAYTEST_SUBJECTS ? AJ_MONSTER_IDS.filter((id) => process.env.PLAYTEST_SUBJECTS?.split(',').includes(id)) : AJ_MONSTER_IDS;
       const all = empty();
       let seed = 1;
@@ -227,8 +226,6 @@ describe('AJ の試遊', () => {
         writeFileSync(file, JSON.stringify(out, null, 1));
       }
       expect(all.games).toBeGreaterThan(0);
-    } finally {
-      RULE_VARIANTS.tideFreeAction = false;
     }
   }, 3_600_000);
 });

@@ -28,7 +28,7 @@ const TEXTS: Readonly<Record<string, string>> = {
   'マナ3以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 3+ mana.',
   ちから技を回避: 'Dodge POW skills.',
   かしこさ技を回避: 'Dodge INT skills.',
-  '次の相手のターン終了まで、全モンスターを水中にする': 'Until the end of the next enemy turn, all monsters are underwater.',
+  '次の自分のターンの終わりまで、全モンスターを水中にする': 'Until the end of your next turn, all monsters are underwater.',
   相手の手札からランダムに1枚捨てさせる: 'The opponent discards 1 random card from their hand.',
   地上の相手だけに使える: 'Can only target ground enemies.',
   '次の相手のターン、受けるちから技すべて−3': 'Next enemy turn, every POW skill you take is -3.',

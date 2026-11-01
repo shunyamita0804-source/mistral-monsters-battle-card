@@ -1,4 +1,4 @@
-import { getPlayCard, getSupport, skillsOf } from '../../data/cards.ts';
+import { getPlayCard, skillsOf } from '../../data/cards.ts';
 import { guardAgainst, guardReduction, skillValue, type PlayCard, type SkillCard, type StatType, type SupportCard } from '../cards/cardTypes.ts';
 import {
   aliveMonsters,
@@ -22,7 +22,8 @@ import {
   attackableMonsters,
   findMonster,
   requiemVictims,
-  RULE_VARIANTS,
+  activeField,
+  fieldSupport,
   tailwindTargets,
   targetsFor,
   undodgeableNow,
@@ -236,7 +237,8 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   if (supportPlay) return supportPlay;
 
   // 2. 全体カード：いまの場より自分に得になるときだけ出す（入れ替え合いでマナを無駄にしない）
-  const current = state.field ? fieldScore(state, side, getSupport(state.field.cardId)) : 0;
+  const fieldCard = fieldSupport(state);
+  const current = fieldCard ? fieldScore(state, side, fieldCard) : 0;
   const field = options
     .filter((o): o is Option & { def: SupportCard } => o.def.kind === 'support' && o.def.duration === 'field')
     .map((o) => ({ o, score: fieldScore(state, side, o.def) }))
@@ -418,25 +420,34 @@ function chooseSupportPlay(state: BattleState, side: Side, options: Option[], st
   return null;
 }
 
+/** 場が水中で強くなる攻撃か（場が水中なら2倍・水中の相手に防御／回避されない） */
+const isWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.doubleInWater || k.effect.unblockableVsWater || k.effect.undodgeableVsWater);
+
 /**
- * みちしお（指示書 AJ：カルシェル・セレフィーン）：場を水中にすると強くなる攻撃（場が水中なら2倍・水中の相手に防御されない／回避されない）を、
- * この手番に別の味方（みちしおを使うモンスター以外。試遊の切り替えで行動に数えないなら同じモンスターも）が続けて使えるときに使う。
- * もう水中で、次の相手の手番まで続くなら使わない
+ * みちしお（指示書 AJ の追加その3：カルシェル・セレフィーン。使った側の次の自分の手番の終わりまで水中）。手札に水中で強くなる攻撃があり、
+ * この手番に別の味方がすぐ使える（マナが足りる）か、次の自分の手番に使えそう（そのモンスターが生きていて、次の手番のマナで払えそう）なときに使う。
+ * もう水中で次の自分の手番まで続くとき・自分に得なサポートの場を上書きしてしまうときは使わない
  */
 function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
   const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'tide');
   if (!tide) return null;
-  if (state.tide && state.tide.untilTurn >= state.turn + 1) return null;
-  const mana = manaOf(state.sides[side]);
-  const casters = availableUsers(state, side, tide.def);
-  for (const o of options.filter(isSkillOption)) {
-    const e = o.def.effect;
-    if (o.card.uid === tide.card.uid || e.type !== 'attack' || !(e.doubleInWater || e.unblockableVsWater || e.undodgeableVsWater)) continue;
-    if (tide.def.cost + o.def.cost > mana) continue;
-    for (const caster of casters) {
-      const follower = availableUsers(state, side, o.def).find((u) => u.uid !== caster.uid || RULE_VARIANTS.tideFreeAction);
-      if (follower) return { type: 'useCard', side, cardUid: tide.card.uid, userUid: caster.uid };
-    }
+  const field = activeField(state);
+  if (field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 2) return null;
+  const support = fieldSupport(state);
+  if (support && field?.owner === side && fieldScore(state, side, support) > 0) return null;
+  const mine = state.sides[side];
+  const mana = manaOf(mine);
+  const caster = availableUsers(state, side, tide.def)[0];
+  if (!caster) return null;
+  // 次の自分の手番のマナ：いまのマナ − みちしお ＋ この手番の終わりにマナにできる手札（みちしお・水の攻撃のほかに1枚は残す）
+  const nextMana = mana - tide.def.cost + Math.max(0, mine.hand.length - 3);
+  const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+  for (const c of mine.hand) {
+    if (c.uid === tide.card.uid) continue;
+    const k = getPlayCard(c.cardId);
+    if (k.kind !== 'skill' || !isWaterAttack(k) || !alive.has(k.monsterId)) continue;
+    const now = tide.def.cost + k.cost <= mana && availableUsers(state, side, k).some((u) => u.uid !== caster.uid);
+    if (now || k.cost <= nextMana) return { type: 'useCard', side, cardUid: tide.card.uid, userUid: caster.uid };
   }
   return null;
 }
@@ -744,7 +755,11 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
     const card = getPlayCard(c.cardId);
     return card.kind === 'skill' ? guardCost(state, card) : card.cost;
   };
-  const guardKeep = style === 'aggressive' ? 0 : style === 'guard' ? 2 : CPU_SKILL[skill].guardKeep;
+  // 次の相手の手番も場が水中で、相手に水中で強くなる攻撃を持つモンスターがいれば、守りを1枚多く残す（指示書 AJ の追加その3。3枚まで）
+  const field = activeField(state);
+  const wetNext = field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 1;
+  const waterThreat = wetNext && aliveMonsters(state.sides[otherSide(side)]).some((m) => skillsOf(m.cardId).some(isWaterAttack));
+  const guardKeep = Math.min(3, (style === 'aggressive' ? 0 : style === 'guard' ? 2 : CPU_SKILL[skill].guardKeep) + (waterThreat && style !== 'aggressive' ? 1 : 0));
   // 腕前 A：相手の生きているモンスターの攻撃技の種類（ちから・かしこさの多い方）に効く守りを先に
   const theirs = otherSide(side);
   const force = attackersWith(state, theirs, 'force');

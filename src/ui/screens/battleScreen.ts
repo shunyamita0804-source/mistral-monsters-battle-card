@@ -1,4 +1,4 @@
-import { getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
+import { getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { provisionalRuleNotes } from '../../data/rules.ts';
 import { chooseAction, cpuRoll } from '../../game/battle/ai.ts';
 import { pickCpuLine } from '../../data/cpuLines.ts';
@@ -10,6 +10,8 @@ import {
   createBattle,
   findMonster,
   guardCost,
+  activeField,
+  fieldSupport,
   habitatOf,
   isTideActive,
   handSkillCost,
@@ -2145,7 +2147,7 @@ export const battleScreen: ScreenDefinition = {
         'header',
         { class: `battle__header${s ? ` battle__header--${s.phase === 'ended' ? 'ended' : s.active}` : ''}` },
         req.allowSurrender ? topButton('surrender', t('battle.surrender'), surrender) : h('span'),
-        h('div', { class: 'battle__heading' }, s?.field ? fieldChip(s) : null, s && isTideActive(s) ? tideChip(s) : null, ticker(s)),
+        h('div', { class: 'battle__heading' }, s && fieldSupport(s) ? fieldChip(s) : null, s && isTideActive(s) ? tideChip(s) : null, ticker(s)),
         topButton('rules', t('battle.rules'), showRules),
       );
 
@@ -2205,12 +2207,12 @@ export const battleScreen: ScreenDefinition = {
 
     /** 場が水中（みちしお。指示書 AJ）：上の帯に「水中 あと○手番」 */
     const tideChip = (s: BattleState): HTMLElement =>
-      h('span', { class: 'battle-turn__tide', attrs: { role: 'status' }, text: t('battle.tide.chip', { n: Math.max(1, (s.tide?.untilTurn ?? s.turn) - s.turn + 1) }) });
+      h('span', { class: 'battle-turn__tide', attrs: { role: 'status' }, text: t('battle.tide.chip', { n: Math.max(1, (activeField(s)?.untilTurn ?? s.turn) - s.turn + 1) }) });
 
     /** 場の全体カード（上の帯の左に出す。タップで詳しく） */
     const fieldChip = (s: BattleState): HTMLElement => {
-      if (!s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
-      const card = getSupport(s.field.cardId);
+      const card = fieldSupport(s);
+      if (!card || !s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
       return h(
         'button',
         {

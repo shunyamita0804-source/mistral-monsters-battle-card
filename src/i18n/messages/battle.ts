@@ -58,7 +58,7 @@ export const BATTLE = {
     en: "{name}'s next {stat} skill deals {n} less damage.",
   },
   'battle.log.seal': { ja: '{name}は次のターン攻撃できない。', en: "{name} can't attack next turn." },
-  'battle.log.tide': { ja: '{name}のみちしお！ 場が水中になった（次の相手のターンの終わりまで、全員が水中）。', en: "{name}'s High Tide! The field is underwater (everyone counts as underwater until the end of the next enemy turn)." },
+  'battle.log.tide': { ja: '{name}のみちしお！ 場が水中になった（次の自分のターンの終わりまで、全員が水中）。', en: "{name}'s High Tide! The field is underwater (everyone counts as underwater until the end of its side's next turn)." },
   'battle.tide.chip': { ja: '場が水中 あと{n}手番', en: 'Underwater: {n} more {n|turn|turns}' },
   'battle.log.tideEnd': { ja: '場の水が引いた。', en: 'The water receded from the field.' },
   'battle.log.requiem': { ja: 'しのレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },

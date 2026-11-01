@@ -100,7 +100,7 @@ describe('セレフィーン：データ（届いた JSON・CSV を無改変で�
     expect(getSkill(ser(7)).effectTextJa).toBe('回避されない');
     expect(getSkill(ser(8)).effectTextJa).toBe('水中の相手には防御されない');
     expect(getSkill(ser(9)).effectTextJa).toBe('水中の相手は回避できない');
-    expect(getSkill(ser(10)).effectTextJa).toBe('次の相手のターン終了まで、全モンスターを水中にする');
+    expect(getSkill(ser(10)).effectTextJa).toBe('次の自分のターンの終わりまで、全モンスターを水中にする');
     expect(getSkill(ser(12)).effectTextJa).toBe('ちから技を回避');
     expect(getSkill(ser(13)).effectTextJa).toBe('かしこさ技を回避');
     expect(getSkill(ser(14)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
@@ -186,12 +186,12 @@ const giveOpponent = (s: BattleState, cards: string[]): BattleState => ({
   sides: { ...s.sides, opponent: { ...s.sides.opponent, hand: [...s.sides.opponent.hand, ...cards.map((cardId, i) => ({ uid: `g${i}`, cardId }))] } },
 });
 
-describe('10 みちしお（指示書 AJ）：次の相手の手番の終わりまで、場が水中（前の「山札の上の1枚をマナに」はやめた）', () => {
-  it('マナ2で使う。場が水中になり（期限は次の相手の手番）、手札・山札・マナの置き場は増えない', () => {
+describe('10 みちしお（指示書 AJ・追加その3）：使った側の次の自分の手番の終わりまで、場が水中（前の「山札の上の1枚をマナに」はやめた）', () => {
+  it('マナ2で使う。場が水中になり（期限は次の自分の手番の終わり。場の枠に入る）、手札・山札・マナの置き場は増えない', () => {
     const s0 = scene({ player: [ser(10), sor(1)] }, { player: 2 });
     const s = applyAction(s0, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m1' });
     expect(manaOf(s.sides.player)).toBe(0);
-    expect(s.tide).toEqual({ untilTurn: s0.turn + 1, by: 'player' });
+    expect(s.field).toEqual({ cardId: ser(10), owner: 'player', habitat: 'water', untilTurn: s0.turn + 2 });
     expect(isTideActive(s)).toBe(true);
     expect(s.sides.player.deck).toHaveLength(s0.sides.player.deck.length);
     expect(s.sides.player.hand.map((c) => c.cardId)).toEqual([sor(1)]);
@@ -274,14 +274,18 @@ describe('相手の CPU（みちしお）', () => {
     expect(chooseAction(s, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o0', userUid: 'o-m1' });
   });
 
-  it('使わない：マナが2つ合わせて足りない／続けて使えるのが同じセレフィーンの技だけ／もう水中（次の相手の手番まで続く）', () => {
+  it('追加その3：同じセレフィーンの技（ルナタイド）でも、次の自分の手番にマナが足りそうなら使う', () => {
+    // マナ6−みちしお2＝4、手札3枚なので、次の手番のマナは4。ルナタイド（マナ4）を使える
+    const self = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 6 }, 'opponent');
+    expect(chooseAction(self, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o0', userUid: 'o-m1' });
+  });
+
+  it('使わない：この手番にも次の手番にもマナが足りない／もう次の自分の手番まで水中', () => {
+    // マナ5：みちしお2＋タイダルクラッシュ4は足りない。次の手番も 5−2＝3 で足りない
     const poor = scene({ opponent: [ser(10), kal(8), ser(1)] }, { opponent: 5 }, 'opponent', 40, WATER);
     expect(chooseAction(poor, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
-    // ルナタイドもセレフィーンの技なので、みちしおを使ったセレフィーンは同じ手番に続けて使えない
-    const self = scene({ opponent: [ser(10), ser(8), ser(1)] }, { opponent: 6 }, 'opponent');
-    expect(chooseAction(self, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
     const base = scene({ opponent: [ser(10), kal(8), ser(1)] }, { opponent: 6 }, 'opponent', 40, WATER);
-    const wet: BattleState = { ...base, tide: { untilTurn: base.turn + 1, by: 'opponent' } };
+    const wet: BattleState = { ...base, field: { cardId: ser(10), owner: 'opponent', habitat: 'water', untilTurn: base.turn + 2 } };
     expect(chooseAction(wet, 'opponent')).not.toMatchObject({ cardUid: 'o0' });
   });
 });

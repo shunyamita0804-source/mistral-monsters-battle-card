@@ -13,7 +13,6 @@ import {
   createBattle,
   habitatOf,
   isTideActive,
-  RULE_VARIANTS,
   targetsFor,
   type BattleMonster,
   type BattleState,
@@ -219,21 +218,24 @@ describe('AJ：居場所の決まり', () => {
   it('急降下アタック（地上の相手だけ）：狙えるのは地上の相手だけ。場が水中なら使えない（理由を出す）', () => {
     const s = scene({ player: ['skl-gauul14-04'] });
     expect(targetsFor(s, 'player', cardCatalog.get('skl-gauul14-04') as never).map((m) => m.uid)).toEqual(['o-m2']);
-    const wet = { ...s, tide: { untilTurn: s.turn + 1, by: 'opponent' as const } };
+    const wet: BattleState = { ...s, field: { cardId: 'skl-serephine-10', owner: 'opponent', habitat: 'water', untilTurn: s.turn + 2 } };
     expect(isTideActive(wet)).toBe(true);
     const u = cardUsability(wet, 'player', 'p0');
     expect(u.usable).toBe(false);
     expect(u.reason).toContain('地上');
   });
 
-  it('みちしお：次の相手のターンの終わりまで全員水中。上書き（期限を延ばす）。期限が過ぎたら水が引く', () => {
+  it('みちしお（追加その3）：使った側の次の自分のターンの終わりまで全員水中。期限が過ぎたら水が引く', () => {
     let s = scene({ player: ['skl-serephine-10'] });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m3' });
-    expect(s.tide?.untilTurn).toBe(s.turn + 1);
+    expect(s.field).toEqual({ cardId: 'skl-serephine-10', owner: 'player', habitat: 'water', untilTurn: s.turn + 2 });
     expect(habitatOf(s, mon(s, 'o-m3'))).toBe('water'); // 空中のガウルも水中
     s = pass(s, 'player'); // 相手の手番（まだ水中）
     expect(isTideActive(s)).toBe(true);
-    s = pass(s, 'opponent'); // 自分の手番：水が引く
+    s = pass(s, 'opponent'); // 次の自分の手番（まだ水中）
+    expect(isTideActive(s)).toBe(true);
+    expect(s.log.some((l) => l.text.includes('水が引いた'))).toBe(false);
+    s = pass(s, 'player'); // 相手の手番：水が引く
     expect(isTideActive(s)).toBe(false);
     expect(s.log.some((l) => l.text.includes('水が引いた'))).toBe(true);
     expect(habitatOf(s, mon(s, 'o-m3'))).toBe('air');
@@ -243,7 +245,25 @@ describe('AJ：居場所の決まり', () => {
     const s = scene({ opponent: ['skl-kalshell-08'] }, 'opponent');
     const card = cardCatalog.get('skl-kalshell-08') as never;
     expect(attackPower(s, card, mon(s, 'o-m1'))).toBe(5);
-    expect(attackPower({ ...s, tide: { untilTurn: s.turn, by: 'opponent' } }, card, mon(s, 'o-m1'))).toBe(10);
+    expect(attackPower({ ...s, field: { cardId: 'skl-serephine-10', owner: 'opponent', habitat: 'water', untilTurn: s.turn } }, card, mon(s, 'o-m1'))).toBe(10);
+  });
+
+  it('場の枠は1つ（追加その3）：みちしおはサポートの場のカードを上書きする（そのカードは出した人の捨て札へ）。場のカードはみちしおを上書きする（水が引く）', () => {
+    const fieldCard = cardCatalog.all().find((c) => c.kind === 'support' && (c.effect.type === 'field' || c.effect.type === 'guardDiscount'));
+    if (!fieldCard) throw new Error('field card');
+    // サポートの場（相手が出した）→ みちしおで上書き
+    let s = scene({ player: ['skl-serephine-10'] });
+    s = { ...s, field: { cardId: fieldCard.id, owner: 'opponent' } };
+    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m3' });
+    expect(s.field).toMatchObject({ cardId: 'skl-serephine-10', owner: 'player', habitat: 'water' });
+    expect(s.sides.opponent.discard).toContain(fieldCard.id);
+    // みちしお → サポートの場で上書き（水が引く）
+    s = scene({ player: [fieldCard.id] });
+    s = { ...s, field: { cardId: 'skl-serephine-10', owner: 'opponent', habitat: 'water', untilTurn: s.turn + 2 } };
+    s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
+    expect(s.field).toEqual({ cardId: fieldCard.id, owner: 'player' });
+    expect(isTideActive(s)).toBe(false);
+    expect(s.log.some((l) => l.text.includes('水が引いた'))).toBe(true);
   });
 
   it('ルナタイド：水中の相手には防御されない／オーシャンウェーブ：水中の相手は回避できない／あらし：空中の相手は回避できない', () => {
@@ -257,7 +277,7 @@ describe('AJ：居場所の決まり', () => {
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(true);
     // オーシャンウェーブ：場が水中ならソラモも回避できない
     s = scene({ player: ['skl-serephine-09'], opponent: ['skl-soramo14-14'] });
-    s = { ...s, tide: { untilTurn: s.turn + 1, by: 'player' } };
+    s = { ...s, field: { cardId: 'skl-serephine-10', owner: 'player', habitat: 'water', untilTurn: s.turn + 2 } };
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m3', targetUid: 'o-m2' });
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(false);
   });
@@ -337,18 +357,23 @@ describe('AJ：新しい効果', () => {
     expect(geol && geol.kind === 'skill' && geol.effect.type === 'defense' ? [geol.effect.reduce, geol.effect.nullify ?? false] : null).toEqual([5, false]);
   });
 
-  it('CPU：みちしおは、この手番に別の味方が水中で強くなる攻撃を続けて使えるときに使う（行動に数えない試遊の切り替えも）', () => {
-    // 相手（CPU）：カルシェル（o-m1）のみちしお・タイダルクラッシュ。カルシェルは1体なので、ふつうは使わない
-    let s = scene({ opponent: ['skl-kalshell-15', 'skl-kalshell-08'] }, 'opponent');
+  it('CPU（追加その3）：みちしおは、次の自分の手番に水中で強くなる攻撃を使えそうなら使う。もう次の手番まで水中なら使わない', () => {
+    // 相手（CPU）：カルシェル（o-m1）だけでも、次の手番にタイダルクラッシュ（水中で2倍）を使えるので、みちしおを使う
+    const s = scene({ opponent: ['skl-kalshell-15', 'skl-kalshell-08'] }, 'opponent');
     const a = chooseAction(s, 'opponent', 'normal', 'A');
-    expect(a?.type === 'useCard' ? s.sides.opponent.hand.find((c) => c.uid === a.cardUid)?.cardId : null).not.toBe('skl-kalshell-15');
-    RULE_VARIANTS.tideFreeAction = true;
-    try {
-      s = scene({ opponent: ['skl-kalshell-15', 'skl-kalshell-08'] }, 'opponent');
-      const b = chooseAction(s, 'opponent', 'normal', 'A');
-      expect(b?.type === 'useCard' ? s.sides.opponent.hand.find((c) => c.uid === b.cardUid)?.cardId : null).toBe('skl-kalshell-15');
-    } finally {
-      RULE_VARIANTS.tideFreeAction = false;
-    }
+    expect(a?.type === 'useCard' ? s.sides.opponent.hand.find((c) => c.uid === a.cardUid)?.cardId : null).toBe('skl-kalshell-15');
+    const wet: BattleState = { ...s, field: { cardId: 'skl-serephine-10', owner: 'opponent', habitat: 'water', untilTurn: s.turn + 2 } };
+    const b = chooseAction(wet, 'opponent', 'normal', 'A');
+    expect(b?.type === 'useCard' ? wet.sides.opponent.hand.find((c) => c.uid === b.cardUid)?.cardId : null).not.toBe('skl-kalshell-15');
+  });
+
+  it('CPU（追加その3）：次の相手の手番が水中で、相手に水中で強くなる攻撃があれば、守りのカードを残す', () => {
+    // 自分側（ソラモ・ガウル・セレフィーン）を腕前 B の CPU で動かす。相手にはカルシェル（タイダルクラッシュ）がいる。手札は守り2枚＋攻撃1枚
+    const dry: BattleState = { ...scene({ player: ['skl-soramo14-12', 'skl-soramo14-14', 'skl-soramo14-01'] }), phase: 'mana' };
+    // 水中でない：守りは1枚だけ残すので、もう1枚の守りをマナにする
+    expect(chooseAction(dry, 'player', 'normal', 'B')).toMatchObject({ type: 'convertToMana' });
+    // 次の相手の手番も水中：守りを2枚とも残す（マナにしないで手番を終える）
+    const wet: BattleState = { ...dry, field: { cardId: 'skl-serephine-10', owner: 'player', habitat: 'water', untilTurn: dry.turn + 2 } };
+    expect(chooseAction(wet, 'player', 'normal', 'B')).toMatchObject({ type: 'endTurn' });
   });
 });

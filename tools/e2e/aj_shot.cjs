@@ -68,7 +68,7 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
         const player = { ...s.sides.player, monsters: s.sides.player.monsters.map(life), hand: cards, manaPile: s.sides.player.deck.slice(0, mana), deck: s.sides.player.deck.slice(mana) };
         const oppHand = (o.oppHand ?? []).map((id, i) => ({ uid: `y${i}`, cardId: id }));
         const opponent = { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map(life), hand: oppHand, manaPile: s.sides.opponent.deck.slice(0, 3), deck: s.sides.opponent.deck.slice(3) };
-        return { ...s, seed: 20261101, turn: 3, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player, opponent }, ...(o.tide ? { tide: { untilTurn: 4, by: 'player' } } : {}) };
+        return { ...s, seed: 20261101, turn: 3, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player, opponent }, ...(o.tide ? { field: { cardId: 'skl-serephine-10', owner: 'player', habitat: 'water', untilTurn: 5 } } : {}) };
       };
       const { createNewSave } = await import('/src/game/save/saveData.ts');
       localStorage.setItem('mistria-battle-card/save', JSON.stringify(createNewSave(new Date(2026, 10, 1))));
@@ -117,7 +117,7 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
   }
 
   if (want('tide')) {
-    // 場が水中（みちしおのあと）：上の帯に「場が水中 あと2手番」・全員の印が水中
+    // 場が水中（みちしおのあと）：上の帯に「場が水中 あと3手番」（使った手番。追加その3）・全員の印が水中
     await start({ monsters: ['mon-soramo', 'mon-gauul', 'mon-myurol'], hand: ['skl-soramo14-03'], tide: true });
     await shot('tide_field');
     // 場が水中だと、急降下アタックは使えない（理由が出る）

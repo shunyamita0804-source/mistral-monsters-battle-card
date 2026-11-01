@@ -68,7 +68,7 @@ const T_BOTH = 'ちから技・かしこさ技に効く';
 const T_DODGE_ALL = 'マナに関係なく、ちから技・かしこさ技を回避';
 const T_DODGE_2 = 'マナ2以上のちから技・かしこさ技を回避';
 const T_DODGE_FORCE = 'ちから技を回避';
-const T_TIDE = '次の相手のターン終了まで、全モンスターを水中にする';
+const T_TIDE = '次の自分のターンの終わりまで、全モンスターを水中にする';
 
 /** 15体の12枚（並び＝表示の番号 1〜12） */
 export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {

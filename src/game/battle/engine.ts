@@ -1,4 +1,4 @@
-import { cardCatalog, getMonster, getPlayCard, getSkill, getSupport } from '../../data/cards.ts';
+import { cardCatalog, getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { BATTLE_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -111,10 +111,20 @@ export interface BattleSide {
   readonly turnUsage: Readonly<Record<string, number>>;
 }
 
-/** 場に出ている全体カード（場に1枚だけ） */
+/**
+ * 場（場の枠は1つだけ。2026-11-01 指示書 AJ の追加その3・ユーザー決定）。サポートの場のカード（重い空気・守りの陣 など）も、みちしおの水中も、
+ * これから入れる場のカード（場を地上・空中・水中にする など）も同じ1つの枠を使い、新しい場が出たら前の場は上書きされる（期限もそこから数え直す）。
+ * 場の種類と効果は cardId のカード（サポートの場のカード、または みちしお などの技）から、だれが出したかは owner
+ */
 export interface FieldCard {
+  /** 場を出したカード（サポートの場のカード、またはみちしお などの技） */
   readonly cardId: string;
+  /** だれが出したか */
   readonly owner: Side;
+  /** 場の居場所（場全体をその居場所として扱う。みちしお＝水中）。無ければ居場所は変えない */
+  readonly habitat?: Habitat;
+  /** 期限：この手番の終わりまで（無ければ、ほかの場に上書きされるまで続く） */
+  readonly untilTurn?: number;
 }
 
 /** いまのマナの量 */
@@ -171,12 +181,6 @@ export interface BattleFx {
   readonly side: Side;
 }
 
-/**
- * 試遊だけで使う決まりの切り替え（2026-11-01 指示書 AJ の要確認。ゲームではいつも false）。
- * tideFreeAction：みちしおを使ってもそのモンスターの「1ターンに技1回」を使わない（同じターンにタイダルクラッシュも使える）
- */
-export const RULE_VARIANTS: { tideFreeAction: boolean } = { tideFreeAction: false };
-
 /** 強攻撃（命中の音を「強」にする）とみなす必要マナ。仮の基準（ユーザー指定 2026-10-22。正式な技が決まったら見直す） */
 export const STRONG_ATTACK_COST = 3;
 
@@ -189,7 +193,7 @@ export interface BattleState {
   readonly phase: BattlePhase;
   readonly pending: PendingAttack | null;
   readonly sides: Readonly<Record<Side, BattleSide>>;
-  /** 場の全体カード（なければ null） */
+  /** 場（場の枠は1つだけ。サポートの場のカード・みちしおの水中など。なければ null） */
   readonly field: FieldCard | null;
   readonly winner: BattleWinner | null;
   /** knockout＝3体KO、deckOut＝引くべきカードを引けなかった（山札切れ） */
@@ -208,11 +212,6 @@ export interface BattleState {
   readonly reveal?: { readonly seq: number; readonly viewer: Side; readonly cardIds: readonly string[] } | null;
   /** カラスのめ（2026-10-31 指示書 AG）で最後に捨てさせたカード（画面が CPU のふきだしで知らせる。seq で同じものを2度出さない） */
   readonly crowEye?: { readonly seq: number; readonly chooser: Side; readonly cardId: string } | null;
-  /**
-   * 場が水中（2026-11-01 指示書 AJ：みちしお）。untilTurn の手番の終わりまで（使った次の相手の手番）。そのあいだ全モンスターを水中として扱う。
-   * 重ならない（新しく使ったら上書き＝期限を延ばす）。by＝使った側
-   */
-  readonly tide?: { readonly untilTurn: number; readonly by: Side } | null;
 }
 
 export type BattleAction =
@@ -545,16 +544,36 @@ export function attackableMonsters(state: BattleState, side: Side): BattleMonste
   return aliveMonsters(state.sides[side]).filter((m) => m.hiddenTurn !== state.turn);
 }
 
+/** いまの場（期限が過ぎていれば null） */
+export function activeField(state: BattleState): FieldCard | null {
+  const f = state.field;
+  return f && (f.untilTurn === undefined || state.turn <= f.untilTurn) ? f : null;
+}
+
+/** 場のサポートカード（場がサポートの場のカードのときだけ。みちしお などの技の場なら null） */
+export function fieldSupport(state: BattleState): SupportCard | null {
+  const f = activeField(state);
+  const card = f ? cardCatalog.get(f.cardId) : undefined;
+  return card && card.kind === 'support' ? card : null;
+}
+
+/** 場が全体を変えている居場所（無ければ null） */
+export function fieldHabitat(state: BattleState): Habitat | null {
+  return activeField(state)?.habitat ?? null;
+}
+
 /** 場が水中か（みちしおの期限の手番の終わりまで。2026-11-01 指示書 AJ） */
 export function isTideActive(state: BattleState): boolean {
-  return !!state.tide && state.turn <= state.tide.untilTurn;
+  return fieldHabitat(state) === 'water';
 }
 
 /** モンスターのいまの居場所（場が水中なら全員水中。居場所の無い仮モンスターは null） */
 export function habitatOf(state: BattleState, monster: BattleMonster | undefined): Habitat | null {
   if (!monster) return null;
   const base = getMonster(monster.cardId).habitat ?? null;
-  return base && isTideActive(state) ? 'water' : base;
+  // 場が居場所を変えていれば、全員その居場所（みちしお＝水中）
+  const field = fieldHabitat(state);
+  return base && field ? field : base;
 }
 
 /** その攻撃は、この相手には防御されないか（カードの「防御されない」・水中の相手への「防御されない」） */
@@ -634,9 +653,8 @@ export function cheerOf(state: BattleState, user: BattleMonster | undefined): nu
 
 /** 場のカード「守りの陣」（2026-10-30 指示書 Y）：防御・回避のカードの必要マナを減らす量（場に無ければ 0） */
 export function guardDiscountOf(state: BattleState): number {
-  if (!state.field) return 0;
-  const e = getSupport(state.field.cardId).effect;
-  return e.type === 'guardDiscount' ? e.value : 0;
+  const e = fieldSupport(state)?.effect;
+  return e?.type === 'guardDiscount' ? e.value : 0;
 }
 
 /** 守りのカード（防御・回避・かばう）か */
@@ -671,9 +689,8 @@ export function energyOf(state: BattleState, user: BattleMonster | undefined, sk
 
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
 export function fieldModifier(state: BattleState, stat: StatType): number {
-  if (!state.field) return 0;
-  const e = getSupport(state.field.cardId).effect;
-  if (e.type !== 'field') return 0;
+  const e = fieldSupport(state)?.effect;
+  if (!e || e.type !== 'field') return 0;
   return e.stat === 'all' || e.stat === stat ? e.modifier : 0;
 }
 
@@ -909,8 +926,11 @@ function startTurn(state: BattleState, side: Side): BattleState {
   const monsters = s.monsters.map((m) => ({ ...m, acted: false }));
   let next: BattleState = { ...state, active: side, phase: 'main', manaConvertLimit: null };
   next = addLog(updateSide(next, side, { monsters, turnUsage: {} }), t(`battle.log.turn.${side}`));
-  // みちしおの期限が過ぎたら、場の水が引く（指示書 AJ）
-  if (state.tide && state.turn > state.tide.untilTurn) next = addLog({ ...next, tide: null }, t('battle.log.tideEnd'));
+  // 場の期限が過ぎたら、場はなくなる（みちしお：使った側の次の自分の手番が終わったら、場の水が引く。指示書 AJ の追加その3）
+  if (state.field?.untilTurn !== undefined && state.turn > state.field.untilTurn) {
+    next = { ...next, field: null };
+    if (state.field.habitat === 'water') next = addLog(next, t('battle.log.tideEnd'));
+  }
   const need = BATTLE_RULES.refillHandTo - s.hand.length;
   if (need > 0) {
     if (s.deck.length < need) return loseByDeckOut(next, side);
@@ -1005,9 +1025,7 @@ function useCard(
   // Wひっかき：その手番の最初の技なら、もう1回続けて使える印を付ける。2回目を使ったら印を消す（3回目は使えない）
   const chained = user.acted;
   const chain = !chained && skill.effect.type === 'attack' && skill.effect.chain ? { turn: state.turn, cardId: skill.id } : null;
-  // みちしおを行動に数えない試遊の切り替え（RULE_VARIANTS。ゲームでは数える）
-  const free = skill.effect.type === 'tide' && RULE_VARIANTS.tideFreeAction;
-  next = updateMonster(next, user.uid, { acted: free ? user.acted : true, chain });
+  next = updateMonster(next, user.uid, { acted: true, chain });
   next = addLog(next, t('battle.log.skill', { name: nameOf(user.cardId), skill: cardName(skill) }));
   if (chained) next = addLog(next, t('battle.log.chain', { name: nameOf(user.cardId), skill: cardName(skill) }));
   if (cost < skill.cost) next = addLog(next, t('battle.log.windRideCost', { name: nameOf(user.cardId), n: cost }));
@@ -1144,8 +1162,8 @@ function useCard(
       return addLog(next, t('battle.log.windRide', { name: nameOf(user.cardId), n: skill.effect.discount }));
     }
     case 'tide': {
-      // みちしお（指示書 AJ）：次の相手の手番（turn + 1）の終わりまで場が水中。重ならない（上書き＝期限を延ばす）
-      next = { ...next, tide: { untilTurn: state.turn + 1, by: side } };
+      // みちしお（指示書 AJ の追加その3）：使った側の次の自分の手番（turn + 2）の終わりまで場が水中。場の枠は1つで、前の場は上書き（期限もここから数え直す）
+      next = setField(next, { cardId: skill.id, owner: side, habitat: 'water', untilTurn: state.turn + 2 });
       return addLog(next, t('battle.log.tide', { name: nameOf(user.cardId) }));
     }
     case 'requiem':
@@ -1165,6 +1183,30 @@ function useCard(
     case 'cover':
       return state;
   }
+}
+
+/**
+ * 場の枠に新しい場を出す（場の枠は1つだけ。前の場は上書き。2026-11-01 指示書 AJ の追加その3）。
+ * 前の場がサポートの場のカードなら、出した側の捨て札へ（今までどおり）。みちしお の水中なら水が引く（技のカードは使ったときに捨て札へ行っている）
+ */
+function setField(state: BattleState, field: FieldCard): BattleState {
+  let next = state;
+  const old = activeField(state);
+  if (old) {
+    const oldCard = cardCatalog.get(old.cardId);
+    if (oldCard?.kind === 'support') {
+      const owner = next.sides[old.owner];
+      next = updateSide(next, old.owner, { discard: [...owner.discard, old.cardId] });
+      next = addLog(next, t('battle.log.fieldDiscard', { card: nameOf(old.cardId) }));
+    } else if (old.habitat === 'water') {
+      next = addLog(next, t('battle.log.tideEnd'));
+    }
+  } else if (state.field) {
+    // 期限の過ぎた場が残っていた（ふつうは手番の始めに消える）
+    const oldCard = cardCatalog.get(state.field.cardId);
+    if (oldCard?.kind === 'support') next = updateSide(next, state.field.owner, { discard: [...next.sides[state.field.owner].discard, state.field.cardId] });
+  }
+  return { ...next, field };
 }
 
 /**
@@ -1435,15 +1477,8 @@ function useSupport(state: BattleState, side: Side, cardUid: string, card: Suppo
       next = updateMonster(next, target.uid, { cheer: { amount: e.value, turn: state.turn } });
       return addLog(next, t('battle.log.cheer', { name: nameOf(target.cardId), n: e.value }));
     case 'guardDiscount':
-    case 'field': {
-      const old = next.field;
-      if (old) {
-        const owner = next.sides[old.owner];
-        next = updateSide(next, old.owner, { discard: [...owner.discard, old.cardId] });
-        next = addLog(next, t('battle.log.fieldDiscard', { card: nameOf(old.cardId) }));
-      }
-      return addLog({ ...next, field: { cardId: card.id, owner: side } }, t('battle.log.fieldEnter', { card: cardName(card) }));
-    }
+    case 'field':
+      return addLog(setField(next, { cardId: card.id, owner: side }), t('battle.log.fieldEnter', { card: cardName(card) }));
   }
 }
 
