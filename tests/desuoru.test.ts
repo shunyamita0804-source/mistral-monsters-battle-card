@@ -148,9 +148,9 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
       expect(existsSync(`assets/images/cards/skills/desuoru_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/desuoru_sk_${nn}.png`)).toBe(true);
     }
-    // 新しい技の絵は届くまで仮（外した めいかいのかぜ・やみのころも の絵）
-    expect(getSkill(des(15)).art?.file).toBe('desuoru_sk_05.webp');
-    expect(getSkill(des(16)).art?.file).toBe('desuoru_sk_11.webp');
+    // 新しい技の絵（指示書 AJ の追加その1。原本は design-parts/cards-original/aj-add1-20261101/）
+    expect(getSkill(des(15)).art?.file).toBe('desuoru_sk_15.webp');
+    expect(getSkill(des(16)).art?.file).toBe('desuoru_sk_16.webp');
     expect(DESUORU_MONSTER.art?.file).toBe('desuoru_official.webp');
     for (const f of ['desuoru_official_monstercard_LIFE7.png', 'desuoru_original_approved.png', 'desuoru_3view_approved.png', 'pack_art_desuoru.png', 'AG_instruction_ja.md']) {
       expect(existsSync(`${ORIGINAL_DIR}/${f}`), f).toBe(true);

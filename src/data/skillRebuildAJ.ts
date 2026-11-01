@@ -49,6 +49,8 @@ export interface AjSkillRow {
   readonly rare?: boolean;
   /** 最初の箱の枚数 */
   readonly box?: number;
+  /** 新しい技の絵（assets/images/cards/skills/ のファイル名。指示書 AJ の追加その1。原本は design-parts/cards-original/aj-add1-20261101/） */
+  readonly art?: string;
   /** 新しい技の仮の絵（assets/images/cards/skills/ のファイル名。正式な絵が届くまで） */
   readonly tempArt?: string;
 }
@@ -131,7 +133,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-kalshell-08', name: 'タイダルクラッシュ', cat: 'か', mana: 4, damage: 5, effect: atk({ doubleInWater: true }), text: '場が水中なら2倍', rare: true, box: 0 },
     { id: 'skl-kalshell-10', name: 'すなをほる', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '次のターン攻撃の的にならない', box: 2 },
     // 新しい技（絵はデザイン担当に依頼中。届くまでタイダルクラッシュの絵）
-    { id: 'skl-kalshell-15', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, box: 0, tempArt: 'kal_sk_08.png' },
+    { id: 'skl-kalshell-15', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, box: 0, art: 'kal_sk_15.png' },
     { id: 'skl-kalshell-11', name: 'からにこもる', cat: '防', mana: 1, damage: null, effect: guard(5, 'force'), text: T_FORCE, box: 2 },
     { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 2 },
     { id: 'skl-kalshell-13', name: 'てっぺきシェル', cat: '防', mana: 3, damage: null, effect: { type: 'defense', against: 'all', nullify: true }, text: T_BOTH, rare: true, box: 0 },
@@ -298,7 +300,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 新しい技（絵はデザイン担当に依頼中。届くまで、外した めいかいのかぜ の絵）
     {
       id: 'skl-desuoru-15', name: 'ししゃのたむけ', cat: 'か', mana: 3, damage: 4,
-      effect: atk({ fallenAllyBonus: 2 }), text: '倒れている味方1体につき＋2', tempArt: 'desuoru_sk_05.webp',
+      effect: atk({ fallenAllyBonus: 2 }), text: '倒れている味方1体につき＋2', art: 'desuoru_sk_15.webp',
     },
     { id: 'skl-desuoru-07', name: 'やみのやり', cat: 'ち', mana: 4, damage: 6, effect: atk({ unblockable: true }), text: T_UNBLOCK },
     { id: 'skl-desuoru-06', name: 'しのゆびさし', cat: 'か', mana: 4, damage: 5, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true },
@@ -307,7 +309,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 新しい技（絵はデザイン担当に依頼中。届くまで、外した やみのころも の絵）
     {
       id: 'skl-desuoru-16', name: '死のレクイエム', cat: '特', mana: 4, damage: null,
-      effect: { type: 'requiem' }, text: 'ライフ1以下の、デスオル以外のモンスターをすべて倒す', tempArt: 'desuoru_sk_11.webp',
+      effect: { type: 'requiem' }, text: 'ライフ1以下の、デスオル以外のモンスターをすべて倒す', art: 'desuoru_sk_16.webp',
     },
     { id: 'skl-desuoru-12', name: 'ルーンのまもり', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
     { id: 'skl-desuoru-14', name: 'やみにまぎれる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },

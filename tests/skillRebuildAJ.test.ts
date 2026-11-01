@@ -58,7 +58,7 @@ describe('AJ：15体×12枚のカード', () => {
     }
   });
 
-  it('名前を変えた技も ID と絵はそのまま（しっぽうち・しっぽまわし・おびきよせ・やみにまぎれる）。新しい3枚は仮の絵', () => {
+  it('名前を変えた技も ID と絵はそのまま（しっぽうち・しっぽまわし・おびきよせ・やみにまぎれる）。新しい3枚は追加その1の絵（もう仮ではない）', () => {
     const name = (id: string): string => cardCatalog.get(id)?.name ?? '';
     expect(name('skl-soramo14-04')).toBe('しっぽうち');
     expect(name('skl-myurol-03')).toBe('しっぽまわし');
@@ -71,8 +71,16 @@ describe('AJ：15体×12枚のカード', () => {
     expect(art('skl-soramo14-04')).toBe('sor14v2_sk_04.png');
     for (const id of ['skl-kalshell-15', 'skl-desuoru-15', 'skl-desuoru-16']) {
       const c = cardCatalog.get(id);
-      expect(c?.pendingSpec, id).toContain('art');
+      expect(c?.pendingSpec, id).not.toContain('art');
       expect(existsSync(`assets/images/cards/skills/${art(id)}`), id).toBe(true);
+    }
+    expect(['skl-kalshell-15', 'skl-desuoru-15', 'skl-desuoru-16'].map(art)).toEqual(['kal_sk_15.png', 'desuoru_sk_15.webp', 'desuoru_sk_16.webp']);
+    // 原本は design-parts に無改変。カルシェルはそのまま（ほかのカルシェルの絵と同じ PNG）、デスオルは WebP（幅 827・高さ 937）
+    const dir = 'design-parts/cards-original/aj-add1-20261101';
+    expect(readFileSync('assets/images/cards/skills/kal_sk_15.png').equals(readFileSync(`${dir}/kalshell_sk_15.png`))).toBe(true);
+    for (const n of [15, 16]) {
+      expect(existsSync(`${dir}/desuoru_sk_${n}.png`)).toBe(true);
+      expect(readFileSync(`assets/images/cards/skills/desuoru_sk_${n}.webp`).toString('ascii', 8, 12)).toBe('WEBP');
     }
     expect(art('skl-serephine-10')).toBe(art('skl-serephine-10')); // みちしおの絵は今の serephine_sk_10 のまま
     expect(art('skl-serephine-10')).toMatch(/10/);

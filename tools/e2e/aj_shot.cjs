@@ -1,7 +1,7 @@
 // 指示書 AJ（2026-11-01）の写真。開発用サーバー（npx vite）で動かす（desuoru_ag_shot.cjs と同じ作り）。
 // 撮るもの：居場所の印（対戦中のモンスター：置き場所の案 a・b・c／大きなモンスターカード）・場が水中の表示・新しい効果の記録の帯（みちしお・死のレクイエム）・
 //   図鑑の番号（13番ずつ）・ガチャの ○/13・箱を開けた一覧（旅立ちのきらめき）
-// 使い方: node tools/e2e/aj_shot.cjs http://127.0.0.1:5173/ 出力フォルダ（ONLY=habitat,tide,log,redraw,book,gacha,box でしぼれる。redraw＝追加その2の描き直した絵2枚）
+// 使い方: node tools/e2e/aj_shot.cjs http://127.0.0.1:5173/ 出力フォルダ（ONLY=habitat,tide,log,redraw,add1,book,gacha,box でしぼれる。redraw＝追加その2の描き直した絵2枚・add1＝追加その1の新しい絵3枚）
 const { chromium } = require('playwright');
 const fs = require('fs');
 const [base, out] = process.argv.slice(2);
@@ -150,6 +150,21 @@ const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`,
       await tap(page.locator(`.battle__hand-card[aria-label^="${label}"]`).first());
       await page.waitForTimeout(1000);
       await shot(`redraw_${id}`);
+      await page.locator('button:has-text("やめる")').first().click({ timeout: 1000 }).catch(() => {});
+      await page.waitForTimeout(500);
+    }
+  }
+
+  if (want('add1')) {
+    // 追加その1：新しい技の絵3枚をカードの枠に入れた見た目・死のレクイエムの名前（手札を押して大きく出す）
+    const ids = ['skl-kalshell-15', 'skl-desuoru-15', 'skl-desuoru-16'];
+    await start({ monsters: ['mon-kalshell', 'mon-desuoru', 'mon-soramo'], hand: ids, mana: 8 });
+    await shot('add1_hand');
+    for (const id of ids) {
+      const label = await page.evaluate(async (id) => (await import('/src/data/cards.ts')).getSkill(id).name, id);
+      await tap(page.locator(`.battle__hand-card[aria-label^="${label}"]`).first());
+      await page.waitForTimeout(1000);
+      await shot(`add1_${id}`);
       await page.locator('button:has-text("やめる")').first().click({ timeout: 1000 }).catch(() => {});
       await page.waitForTimeout(500);
     }

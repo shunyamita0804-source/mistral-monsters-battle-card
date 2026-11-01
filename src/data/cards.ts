@@ -208,7 +208,7 @@ const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense
 
 /**
  * 指示書 AJ の表の1行を技カードにする。名前・マナ・ダメージ・分類・効果・効果の文は表のとおり（表示の番号＝表の順 1〜12）。
- * 絵とデザイン ID は前の同じ ID の技から（名前を変えた技も ID と絵はそのまま）。新しい技は表の仮の絵（pendingSpec に 'art'）
+ * 絵とデザイン ID は前の同じ ID の技から（名前を変えた技も ID と絵はそのまま）。新しい技は表の絵（art。仮の絵 tempArt なら pendingSpec に 'art'）
  */
 function ajSkill(monsterId: string, row: AjSkillRow, index: number): SkillCard {
   const old = legacyById.get(row.id);
@@ -217,7 +217,8 @@ function ajSkill(monsterId: string, row: AjSkillRow, index: number): SkillCard {
   if (attack !== (row.damage !== null)) throw new Error(`AJ の技のダメージと分類が合いません: ${row.id}`);
   const effect: SkillEffect = row.effect ?? { type: 'attack' };
   if (attack !== (effect.type === 'attack')) throw new Error(`AJ の技の分類と動きが合いません: ${row.id}`);
-  const art = row.tempArt ? ({ category: 'skillCards', file: row.tempArt, layout: 'frame' } as const) : old?.art;
+  const file = row.art ?? row.tempArt;
+  const art = file ? ({ category: 'skillCards', file, layout: 'frame' } as const) : old?.art;
   if (!art) throw new Error(`AJ の技の絵がありません: ${row.id}`);
   return {
     kind: 'skill',

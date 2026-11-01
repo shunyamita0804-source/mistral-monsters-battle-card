@@ -56,7 +56,7 @@ describe('カルシェル正式14技：データ（2026-10-27。届いた JSON�
     expect(new Set(KALSHELL_SKILLS.map((s) => s.id)).size).toBe(14);
   });
 
-  it('ゲームのカードは指示書 AJ の表の12枚（並び・技名・分類・マナ・ダメージ・効果・効果の文）。絵は同じ ID の前の絵（みちしおは仮の絵）', () => {
+  it('ゲームのカードは指示書 AJ の表の12枚（並び・技名・分類・マナ・ダメージ・効果・効果の文）。絵は同じ ID の前の絵（みちしおは追加その1の新しい絵）', () => {
     const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
     expect(AJ).toHaveLength(12);
     expect(skillsOf('mon-kalshell').map((s) => s.id)).toEqual(AJ.map((r) => r.id));
@@ -72,11 +72,11 @@ describe('カルシェル正式14技：データ（2026-10-27。届いた JSON�
       expect(s.effect).toEqual(row.effect ?? { type: 'attack' });
       expect(s.effectTextJa).toBe(row.text);
       const legacy = KALSHELL_SKILLS.find((k) => k.id === row.id);
-      expect(s.art).toEqual(legacy ? legacy.art : { category: 'skillCards', file: row.tempArt, layout: 'frame' });
+      expect(s.art).toEqual(legacy ? legacy.art : { category: 'skillCards', file: row.art, layout: 'frame' });
     });
-    // 新しい技：みちしお（場を水中にする。絵が届くまでタイダルクラッシュの絵）
+    // 新しい技：みちしお（場を水中にする。指示書 AJ の追加その1の絵）
     expect(getSkill('skl-kalshell-15')).toMatchObject({ name: 'みちしお', category: 'special', cost: 2, effect: { type: 'tide' } });
-    expect(getSkill('skl-kalshell-15').art?.file).toBe('kal_sk_08.png');
+    expect(getSkill('skl-kalshell-15').art?.file).toBe('kal_sk_15.png');
     // 外した技（アクアバースト・いかくのハサミ・しおのステップ）はゲームに無い
     for (const n of [7, 9, 14]) {
       expect(REMOVED_SKILL_IDS).toContain(kal(n));
