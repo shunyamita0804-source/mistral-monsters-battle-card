@@ -11,6 +11,7 @@ import { geolSkillId } from '../src/data/geol.ts';
 import fluneJson from '../src/data/official/flune14_skills_OFFICIAL_20261030_z.json';
 import { pukarimSkillId } from '../src/data/pukarim.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { applyAction, createBattle, manaOf, targetsFor, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
@@ -42,7 +43,7 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
     expect(readFileSync('assets/images/cards/monsters/flune_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/flune_battleart.png`))).toBe(true);
   });
 
-  it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
+  it('CSV の14行・JSON・前の14技（ファイルの FLUNE_SKILLS）で、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {
     const CATEGORY = { ちから技: 'force', かしこさ技: 'wisdom', 特殊技: 'special', 防御技: 'defense', 回避技: 'evade' } as const;
     // 2026-10-30 指示書 Z：技1〜4の数字を変えた新しい版（JSON・CSV）で照らし合わせる
     const rows = csvRows('src/data/official/flune14_skills_OFFICIAL_20261030_z.csv');
@@ -65,14 +66,13 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
     });
   });
 
-  it('大きなカード・対戦中の説明の効果の文（07・09・10）。守りは今の言い方', () => {
-    expect(getSkill(flu(7)).effectTextJa).toBe('相手のマナを1減らす');
-    expect(getSkill(flu(9)).effectTextJa).toBe('与えたダメージぶん、自分のライフを回復');
-    expect(getSkill(flu(10)).effectTextJa).toBe('味方1体のライフを2回復');
+  it('大きなカード・対戦中の説明の効果の文（07・09・10。指示書 AJ の文）。守りは今の言い方', () => {
+    expect(getSkill(flu(7)).effectTextJa).toBe('相手のマナ−3');
+    expect(getSkill(flu(9)).effectTextJa).toBe('与えたダメージぶん回復');
+    expect(getSkill(flu(10)).effectTextJa).toBe('味方1体のライフ＋2');
     expect(getSkill(flu(11)).effectTextJa).toBe('ちから技に効く');
     expect(getSkill(flu(12)).effectTextJa).toBe('かしこさ技に効く');
-    expect(getSkill(flu(13)).effectTextJa).toBe('ちから技・かしこさ技に効く');
-    expect(getSkill(flu(14)).effectTextJa).toBe('ちから技を回避');
+    // 13・14 は指示書 AJ で外した
     // JSON の文は変えていない
     expect(fluneJson.skills[8]?.effect).toBe('与えたダメージぶん、フルーネのライフを回復');
   });
@@ -89,22 +89,42 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
     expect(REMOVED_CARD_IDS).toEqual(expect.arrayContaining([TMP_FLUNE_ID, ...TMP_FLUNE_SKILL_IDS]));
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はジオルのあと（No.121〜135）', () => {
+  it('指示書 AJ：ゲームの技カードは AJ の表の12枚（名前・分類・マナ・ダメージ・効果・効果の文・表示の番号が表のとおり）', () => {
+    const rows = AJ_SKILLS[FLUNE_MONSTER_ID] ?? [];
+    const cat = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    expect(rows).toHaveLength(12);
+    rows.forEach((r, i) => {
+      const k = getSkill(r.id);
+      expect(k.name).toBe(r.name);
+      expect(k.category).toBe(cat[r.cat]);
+      expect(k.cost).toBe(r.mana);
+      expect(k.stat?.value ?? null).toBe(r.damage);
+      expect(k.effect).toEqual(r.effect ?? { type: 'attack' });
+      expect(k.effectTextJa).toBe(r.text);
+      expect(k.displayNo).toBe(i + 1);
+    });
+    expect(SKILLS.some((k) => k.id === flu(13) || k.id === flu(14))).toBe(false);
+  });
+
+  // 2026-11-01 指示書 AJ：1体13枚（モンスター＋技12枚）になったので、ジオル（8番目）のあとは No.105〜117
+  it('ふつうの一覧に入り、図鑑の番号はジオルのあと（No.105〜117）', () => {
     expect(MONSTERS.some((m) => m.id === FLUNE_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === FLUNE_MONSTER_ID).map((s) => s.id)).toEqual(FLUNE_SKILLS.map((s) => s.id));
+    expect(SKILLS.filter((s) => s.monsterId === FLUNE_MONSTER_ID).map((s) => s.id)).toEqual((AJ_SKILLS[FLUNE_MONSTER_ID] ?? []).map((r) => r.id));
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === FLUNE_MONSTER_ID)?.no).toBe(121);
-    expect(book.find((e) => e.card.id === flu(14))?.no).toBe(135);
-    expect(book.find((e) => e.card.id === 'skl-geol-14')?.no).toBe(120);
+    expect(book.find((e) => e.card.id === FLUNE_MONSTER_ID)?.no).toBe(105);
+    expect(book.find((e) => e.card.id === flu(12))?.no).toBe(117);
+    expect(book.find((e) => e.card.id === 'skl-geol-14')?.no).toBe(104);
   });
 
   it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パック・ショップの原本も）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(flu(n)).art?.file).toBe(`flune_sk_${nn}.webp`);
+      expect(FLUNE_SKILLS[n - 1]?.art?.file).toBe(`flune_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/flune_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/flune_sk_${nn}.png`)).toBe(true);
     }
+    // ゲームの技カード（指示書 AJ）は ID と絵がそのまま
+    for (const k of skillsOf(FLUNE_MONSTER_ID)) expect(k.art?.file).toBe(`flune_sk_${k.id.slice(-2)}.webp`);
     expect(FLUNE_MONSTER.art?.file).toBe('flune_official.webp');
     expect(existsSync('assets/images/cards/monsters/flune_official.webp')).toBe(true);
     for (const f of ['flune_official_monstercard_LIFE10.png', 'flune_design_sheet_approved.png', 'pack_flune.png', 'pack_art_flune.png', 'shop_pack_flune.png', 'shop_card_flune.png']) {
@@ -175,12 +195,14 @@ describe('09 フラワードレイン：相手のライフが実際に減った�
     expect(monster(s, 'p-m1').life).toBe(5 + 3);
   });
 
-  it('防御のあとは実際に減った分だけ（3軽減なら0・2軽減なら1）', () => {
-    // 相手のフルーネ（o-m1）が自分の防御を使う
+  it('防御のあとは実際に減った分だけ（3を3軽減なら0・おいかぜで4を3軽減なら1）', () => {
+    // 相手のフルーネ（o-m1）が自分の防御（はなびらのまく −3）を使う
     const full = drain(5, 'o-m1', flu(12));
     expect(monster(full, 'o-m1').life).toBe(10);
     expect(monster(full, 'p-m1').life).toBe(5);
-    const part = drain(5, 'o-m1', flu(13));
+    // 指示書 AJ で −2 の防御（旧13）を外したので、おいかぜ＋1 で4にして −3（残り1）を見る
+    const base = withMonster(scene({ player: [flu(9)] }), 'p-m1', { tailwind: { amount: 1, turn: 1 } });
+    const part = drain(5, 'o-m1', flu(12), { ...base, turn: 1 });
     expect(monster(part, 'o-m1').life).toBe(10 - 1);
     expect(monster(part, 'p-m1').life).toBe(5 + 1);
   });
@@ -236,7 +258,7 @@ describe('10 いやしのみつ：味方1体（フルーネも可）のライフ
     let a = withMonster(scene({ player: [flu(10)] }), 'p-m2', { life: 3 });
     a = applyAction(a, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m2' });
     expect(monster(a, 'p-m2').life).toBe(5);
-    expect(manaOf(a.sides.player)).toBe(10 - 3);
+    expect(manaOf(a.sides.player)).toBe(10 - 2); // 指示書 AJ でマナ2
     let full = withMonster(scene({ player: [flu(10)] }), 'p-m2', { life: 6 });
     full = applyAction(full, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m2' });
     expect(monster(full, 'p-m2').life).toBe(7);
@@ -254,11 +276,11 @@ describe('10 いやしのみつ：味方1体（フルーネも可）のライフ
   });
 });
 
-describe('07 かふん：相手のマナを1減らす（ノビトンのくしゃみと同じ）', () => {
-  it('当たれば相手のマナ−1。回避されたら減らない', () => {
+describe('07 かふん：相手のマナを3減らす（指示書 AJ。ノビトンのダウナーミストと同じ）', () => {
+  it('当たれば相手のマナ−3。回避されたら減らない', () => {
     let s = scene({ player: [flu(7)] }, { opponent: 5 });
     s = endDefense(applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' }));
-    expect(manaOf(s.sides.opponent)).toBe(4);
+    expect(manaOf(s.sides.opponent)).toBe(5 - 3);
     expect(monster(s, 'o-m1').life).toBe(10 - 1);
     let e = giveOpponent(scene({ player: [flu(7)] }, { opponent: 5 }), [sor(14)]);
     e = applyAction(e, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
@@ -278,8 +300,8 @@ describe('相手の CPU（フルーネ）', () => {
     expect(chooseAction(hurt, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o1' });
     const fine = withMonster(scene({ opponent: [flu(4), flu(9)] }, { opponent: 10 }, 'opponent'), 'o-m1', { life: 9 });
     expect(chooseAction(fine, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o0' });
-    // マナが6より少なければ使えない
-    const poor = withMonster(scene({ opponent: [flu(9), flu(1)] }, { opponent: 5 }, 'opponent'), 'o-m1', { life: 5 });
+    // マナが5より少なければ使えない（指示書 AJ でマナ5）
+    const poor = withMonster(scene({ opponent: [flu(9), flu(1)] }, { opponent: 4 }, 'opponent'), 'o-m1', { life: 5 });
     expect(chooseAction(poor, 'opponent')).toMatchObject({ type: 'useCard', cardUid: 'o1' });
   });
 
@@ -326,11 +348,12 @@ describe('精霊の森のボス（セラ）・入手の流れ', () => {
     expect(w).toMatchObject({ cleared: true, firstClear: true });
     expect(w.clearCards).toEqual([{ cardId: FLUNE_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[FLUNE_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-lazuck', FLUNE_MONSTER_ID, 'mon-soramo'])).toEqual(FLUNE_SKILLS.map((k) => k.id));
+    const fluneSkills = (AJ_SKILLS[FLUNE_MONSTER_ID] ?? []).map((r) => r.id);
+    expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-lazuck', FLUNE_MONSTER_ID, 'mon-soramo'])).toEqual(fluneSkills);
     const again = beatSera(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills('dungeon-02')).toEqual(FLUNE_SKILLS.map((k) => k.id));
+    expect(bossTrumpSkills('dungeon-02')).toEqual(fluneSkills);
   });
 
   it('セラに初めて勝つと sera-beaten（1つだけ）。前に森をクリアしたセーブは読み込むと付く', () => {
@@ -345,16 +368,16 @@ describe('精霊の森のボス（セラ）・入手の流れ', () => {
 });
 
 describe('フルーネのガチャのシリーズとショップ', () => {
-  it('ジオルのあとに1行。レア枠ははなびらストーム・フラワードレイン・いやしのみつ。sera-beaten のあとだけ並ぶ', () => {
+  it('ジオルのあとに1行。レア枠（指示書 AJ の★）はかふん・はなびらストーム・フラワードレイン・いやしのみつ。sera-beaten のあとだけ並ぶ', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('flune')).toBe(ids.indexOf('geol') + 1);
     const series = GACHA_SERIES.find((s) => s.id === 'flune');
-    expect(series).toEqual({ id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' });
+    expect(series).toEqual({ id: 'flune', monsterId: 'mon-flune', rareSkillNames: ['かふん', 'はなびらストーム', 'フラワードレイン', 'いやしのみつ'], unlockFlag: 'sera-beaten' });
     if (!series) throw new Error('series');
     const lineup = seriesLineup(series);
     expect(lineup.errors).toEqual([]);
-    expect(lineup.rareIds).toEqual([flu(8), flu(9), flu(10)]);
-    expect(lineup.all).toHaveLength(15);
+    expect(lineup.rareIds).toEqual([flu(7), flu(8), flu(9), flu(10)]);
+    expect(lineup.all).toHaveLength(13);
     // 2026-10-30（指示書 K）：フルーネのモンスターカードを初めて手に入れたら並ぶ
     const base = createNewSave();
     expect(availableGachaSeriesFor(base).map((s) => s.id)).not.toContain('flune');

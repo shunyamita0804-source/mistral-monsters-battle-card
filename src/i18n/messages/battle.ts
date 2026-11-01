@@ -76,7 +76,7 @@ export const BATTLE = {
   'battle.log.chain': { ja: '{name}は続けて{skill}を使った！', en: '{name} followed up with {skill}!' },
   'battle.log.energyDouble': { ja: '{name}はためたエネルギーを放った！ ダメージ2倍！', en: '{name} released its stored energy! Double damage!' },
   'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
-  'battle.log.nullify': { ja: '{side}は「{skill}」でうけとめた（ダメージ0）！', en: '{side} caught it with {skill} (no damage)!' },
+  'battle.log.nullify': { ja: '{side}は「{skill}」でダメージを0にした！', en: '{side} reduced the damage to 0 with {skill}!' },
   'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
     ja: '{name}は次のターン、{stat}の技のダメージ−{n}。',

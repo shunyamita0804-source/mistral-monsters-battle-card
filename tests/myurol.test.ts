@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
-import { getSkill, MONSTERS, SKILLS } from '../src/data/cards.ts';
+import { getSkill, MONSTERS, REMOVED_SKILL_IDS, SKILLS, skillsOf } from '../src/data/cards.ts';
 import { PACKS } from '../src/data/economy.ts';
 import {
   MYUROL14_ROWS,
@@ -32,11 +32,12 @@ import { createNewSave, migrate, REMOVED_CARD_IDS, SAVE_VERSION } from '../src/g
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS, ajBoxRows, ajRareNames } from '../src/data/skillRebuildAJ.ts';
 
 /** ゲーム内 ID で引く（それまでの番号。旧14〜16 のスリップガード・ひらりよける・すべってよけるは ID 14〜16 のまま） */
 const myu = (n: number): string => myurolSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
-/** 正式の番号（表示の番号）で引く */
+/** 前の14技（MYUROL_SKILLS）の表示の番号で引く（2026-11-01 指示書 AJ からゲームの表示の番号は AJ の表の順） */
 const m14 = (displayNo: number): string => {
   const s = MYUROL_SKILLS.find((x) => x.displayNo === displayNo);
   if (!s) throw new Error(String(displayNo));
@@ -62,7 +63,7 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
     expect(readFileSync('src/data/official/myurol14_skills_OFFICIAL_20261027.csv').equals(readFileSync(`${ORIGINAL_DIR}/01_正式技一覧と初期配布_UTF8.csv`))).toBe(true);
   });
 
-  it('番号・技名・分類・マナ・ダメージ・効果・画像・初期配布が、CSV の14行と JSON とゲームのカードですべて一致する', () => {
+  it('番号・技名・分類・マナ・ダメージ・効果・画像・初期配布が、CSV の14行と JSON と前の14技（MYUROL_SKILLS）ですべて一致する', () => {
     const rows = csvRows(`${ORIGINAL_DIR}/01_正式技一覧と初期配布_UTF8.csv`);
     expect(rows).toHaveLength(14);
     expect(myurol14Json.skills).toHaveLength(14);
@@ -80,7 +81,9 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
         image,
         initial_count: Number(copies),
       });
-      const s = getSkill(m14(n));
+      // 2026-11-01 指示書 AJ からゲームのカードは AJ の表（下のテスト）。前の14技は絵と前のデータのためだけに残す
+      const s = MYUROL_SKILLS.find((x) => x.id === m14(n));
+      if (!s) throw new Error(String(n));
       expect(s.displayNo).toBe(n);
       expect(s.name).toBe(name);
       expect(s.category).toBe(CATEGORY[cat as keyof typeof CATEGORY]);
@@ -101,6 +104,36 @@ describe('ミュロル正式14技：データ（2026-10-27。届いた JSON・CS
     expect(MYUROL_SKILLS).toHaveLength(14);
     expect(MYUROL14_ROWS).toHaveLength(14);
     expect(new Set(MYUROL_SKILLS.map((s) => s.id)).size).toBe(14);
+  });
+
+  it('ゲームのカード12枚は指示書 AJ の表どおり（名前・分類・マナ・ダメージ・効果・効果の文・表示の番号）。絵は前の同じ ID の技から', () => {
+    const CAT = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+    const rows = AJ_SKILLS['mon-myurol'] ?? [];
+    expect(rows).toHaveLength(12);
+    expect(skillsOf('mon-myurol').map((s) => s.id)).toEqual(rows.map((r) => r.id));
+    expect(rows.map((r) => r.id)).toEqual([1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 14, 16].map(myu));
+    rows.forEach((r, i) => {
+      const s = getSkill(r.id);
+      const old = MYUROL_SKILLS.find((k) => k.id === r.id);
+      expect(s.name).toBe(r.name);
+      expect(s.category).toBe(CAT[r.cat]);
+      expect(s.cost).toBe(r.mana);
+      expect(s.stat?.value ?? null).toBe(r.damage);
+      expect(s.effect).toEqual(r.effect ?? { type: 'attack' });
+      expect(s.effectTextJa).toBe(r.text);
+      expect(s.displayNo).toBe(i + 1);
+      expect(s.monsterId).toBe('mon-myurol');
+      expect(s.isPlaceholder).toBe(false);
+      expect(s.art).toEqual(old?.art);
+    });
+    // 03 は名前が「しっぽまわし」に（ID・絵はそのまま）。06 バブルショット・15 ひらりよけるは外した
+    expect(getSkill(myu(3)).name).toBe('しっぽまわし');
+    for (const n of [6, 15]) {
+      expect(SKILLS.some((s) => s.id === myu(n))).toBe(false);
+      expect(REMOVED_SKILL_IDS).toContain(myu(n));
+      expect(REMOVED_CARD_IDS).toContain(myu(n));
+    }
+    expect(ajRareNames('mon-myurol')).toEqual(['しっぽまわし', 'アクアテール', 'みずあび', 'スリップガード']);
   });
 
   it('ID は同じ名前の技を引き継ぐ：01〜11 は同じ番号、12＝旧14・13＝旧15・14＝旧16。旧12・旧13 はゲームから外した', () => {
@@ -147,7 +180,12 @@ describe('ミュロル正式14技：画像（届いた PNG を無改変）', () 
     expect(audit).toHaveLength(14);
     for (const [no, file, , , size, hash] of audit) {
       const n = Number(no);
-      const game = readFileSync(`assets/images/cards/skills/${getSkill(m14(n)).art?.file}`);
+      // 指示書 AJ で外した技（06 バブルショット・13 ひらりよける）は前の14技の絵で確かめる。残った技はゲームのカードも同じ絵
+      const id = m14(n);
+      const old = MYUROL_SKILLS.find((x) => x.id === id);
+      if (REMOVED_SKILL_IDS.includes(id)) expect(SKILLS.some((k) => k.id === id)).toBe(false);
+      else expect(getSkill(id).art).toEqual(old?.art);
+      const game = readFileSync(`assets/images/cards/skills/${old?.art?.file}`);
       expect(game.equals(readFileSync(`${ORIGINAL_DIR}/SKILLS/${file}`))).toBe(true);
       expect(sha256(game)).toBe(hash);
       expect(game.length).toBe(Number(size));
@@ -167,8 +205,8 @@ describe('ミュロル正式14技：画像（届いた PNG を無改変）', () 
 });
 
 describe('ミュロル正式14技：初期配布16枚・モンスター', () => {
-  it('初期配布16枚（2026-10-26 正式確定）：01・02・05・06・08・12・13 が2枚、03・07 が1枚。9種類', () => {
-    const byNo = Object.fromEntries(MYUROL_STARTER.map((s) => [getSkill(s.id).displayNo, s.copies]));
+  it('前の初期配布16枚（2026-10-26 正式確定。前のデータとして残す）：01・02・05・06・08・12・13 が2枚、03・07 が1枚。9種類', () => {
+    const byNo = Object.fromEntries(MYUROL_STARTER.map((s) => [MYUROL_SKILLS.find((x) => x.id === s.id)?.displayNo, s.copies]));
     expect(byNo).toEqual({ 1: 2, 2: 2, 3: 1, 5: 2, 6: 2, 7: 1, 8: 2, 12: 2, 13: 2 });
     expect(MYUROL_STARTER.reduce((n, s) => n + s.copies, 0)).toBe(16);
     expect(MYUROL_STARTER).toHaveLength(9);
@@ -178,8 +216,11 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
 
   it('新しく始めたときの所持カードにだけ入る（初期デッキ60枚・モンスターカード本体には入れない）', () => {
     const save = createNewSave();
-    for (const s of MYUROL_STARTER) expect(save.collection[s.id]).toBe(s.copies);
-    for (const id of [4, 9, 10, 11].map(m14)) expect(save.collection[id]).toBeUndefined();
+    // 2026-11-01 指示書 AJ：最初の箱（蒼海の守り）の枚数。02・05・07 が3枚、08・10・11 が2枚、04 が1枚（16枚）
+    const box: [number, number][] = [[2, 3], [4, 1], [5, 3], [7, 3], [8, 2], [10, 2], [11, 2]];
+    expect(ajBoxRows('mon-myurol')).toEqual(box.map(([n, c]) => [myu(n), c]));
+    for (const [n, c] of box) expect(save.collection[myu(n)]).toBe(c);
+    for (const id of [1, 3, 9, 14, 16].map(myu)) expect(save.collection[id]).toBeUndefined();
     expect(save.collection['mon-myurol']).toBeUndefined();
     expect(save.deck.skills.some((id) => id.startsWith('skl-myurol-'))).toBe(false);
     expect(save.deck.monsters).not.toContain('mon-myurol');
@@ -213,7 +254,7 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(existsSync('assets/images/cards/monsters/myurol_official.webp')).toBe(true);
     expect(existsSync(`${NEW_ORIGINAL_DIR}/myurol_official_monstercard_LIFE7.png`)).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-myurol')).toHaveLength(1);
-    expect(SKILLS.filter((s) => s.monsterId === 'mon-myurol')).toHaveLength(14);
+    expect(SKILLS.filter((s) => s.monsterId === 'mon-myurol')).toHaveLength(12); // 指示書 AJ から12枚
     expect(BATTLE_CARDS['mon-myurol']).toMatchObject({ art: 'myurol_battlecard.png', frame: 'myurol' });
     // 2026-10-31 指示書 AC【3】：足4本・えら片側3本の描き直し（前の版は ORIGINAL_DIR/MONSTER/Myurol_Battle_800x920_RGBA.png に残る）
     expect(existsSync(`${ORIGINAL_DIR}/MONSTER/Myurol_Battle_800x920_RGBA.png`)).toBe(true);
@@ -226,12 +267,13 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
 
   it('日本語はカードに書く短い文（skillCardText.ts）か JSON の効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(m14(8))).description).toBe('今と次のターン、ちから技を1軽減（重ねられない）');
-    expect(skillCardFace(getSkill(m14(14))).description).toBe('マナ2以下のちから技・かしこさ技を回避');
-    for (const s of MYUROL_SKILLS) expect(skillCardFace(s).mana).toBe(s.cost);
+    // 指示書 AJ の効果の文
+    expect(skillCardFace(getSkill(myu(8))).description).toBe('次の相手のターン、受けるちから技すべて−3');
+    expect(skillCardFace(getSkill(myu(16))).description).toBe('ちから技を回避');
+    for (const s of skillsOf('mon-myurol')) expect(skillCardFace(s).mana).toBe(s.cost);
     setLanguage('en');
     expect(cardName(MYUROL_MONSTER)).toBe('Myurol');
-    for (const s of MYUROL_SKILLS) {
+    for (const s of skillsOf('mon-myurol')) {
       expect(cardName(s)).not.toMatch(/[ぁ-んァ-ン一-龯]/);
       expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);
     }
@@ -291,25 +333,25 @@ function passTurn(s: BattleState, side: Side): BattleState {
   return ended;
 }
 
-describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rules.md「正式カード（ミュロル）」。ID の番号で書く：12 スリップガード＝ID 14 など）', () => {
-  it('01〜07 攻撃：守らなければ書かれたダメージがそのまま入る（ちから 1〜4・かしこさ 1〜3）', () => {
-    const expected = [1, 2, 3, 4, 1, 2, 3];
-    expected.forEach((dmg, i) => {
-      const s = attackWith(myu(i + 1), []);
+describe('ミュロルの技：効果（指示書 AJ。細かい裁定は docs/battle-rules.md「指示書 AJ」。ID の番号で書く：スリップガード＝ID 14 など）', () => {
+  it('攻撃（ID 01〜05・07）：守らなければ書かれたダメージがそのまま入る（ちから 1・2・3・5・かしこさ 2・4）', () => {
+    const expected: [number, number][] = [[1, 1], [2, 2], [3, 3], [4, 5], [5, 2], [7, 4]];
+    for (const [n, dmg] of expected) {
+      const s = attackWith(myu(n), []);
       expect(monster(s, 'o-m1').life).toBe(7 - dmg);
-      expect(manaOf(s.sides.player)).toBe(10 - getSkill(myu(i + 1)).cost);
-    });
+      expect(manaOf(s.sides.player)).toBe(10 - getSkill(myu(n)).cost);
+    }
   });
 
-  it('08 しめったはだ：使った手番と相手の次の手番、受けるちから技のダメージ−1。かしこさ技には効かない。最低0', () => {
+  it('08 しめったはだ：使った手番と相手の次の手番、受けるちから技のダメージ−3（指示書 AJ）。かしこさ技には効かない。最低0', () => {
     // 相手（ミュロル）が自分の手番に使う
     let s = scene({ opponent: [myu(8)] }, {}, 'opponent');
     const turn = s.turn;
     s = applyAction(s, { type: 'useCard', side: 'opponent', cardUid: 'o0' });
-    expect(monster(s, 'o-m1').shield).toEqual({ against: 'force', reduce: 1, untilTurn: turn + 1 });
-    expect(manaOf(s.sides.opponent)).toBe(8);
-    expect(s.log.at(-1)?.text).toBe('ミュロルが受けるちから技のダメージ-1（相手の次のターンまで）。');
-    // 次の手番（こちら）：ちから3 → 2、かしこさ3 → 3、ちから1 → 0
+    expect(monster(s, 'o-m1').shield).toEqual({ against: 'force', reduce: 3, untilTurn: turn + 1 });
+    expect(manaOf(s.sides.opponent)).toBe(9); // マナ1
+    expect(s.log.at(-1)?.text).toBe('ミュロルが受けるちから技のダメージ-3（相手の次のターンまで）。');
+    // 次の手番（こちら）：ちから5 → 2、ちから3 → 0、かしこさ4 → 4、ちから1 → 0
     s = passTurn(s, 'opponent');
     expect(s.turn).toBe(turn + 1);
     const at = (attack: string, guards: string[] = []): BattleState => {
@@ -318,11 +360,23 @@ describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rule
       const base = { ...s, sides: { player: { ...s.sides.player, hand }, opponent: { ...s.sides.opponent, hand: opp } } };
       return attackWith(attack, guards, {}, base);
     };
-    expect(monster(at(myu(3)), 'o-m1').life).toBe(5);
-    expect(monster(at(myu(7)), 'o-m1').life).toBe(4);
+    expect(monster(at(myu(4)), 'o-m1').life).toBe(5);
+    expect(monster(at(myu(3)), 'o-m1').life).toBe(7);
+    expect(monster(at(myu(7)), 'o-m1').life).toBe(3);
     expect(monster(at(myu(1)), 'o-m1').life).toBe(7);
-    // 防御（しっぽガード −2）と合わせても0未満にならない：ちから2 −2 −1 → 0
-    expect(monster(at(myu(2), [myu(10)]), 'o-m1').life).toBe(7);
+    // 防御（しっぽガード −3）と合わせても0未満にならない：ちから5 −3 −3 → 0
+    expect(monster(at(myu(4), [myu(10)]), 'o-m1').life).toBe(7);
+    // 何回受けても毎回−3：ミュロル（アクアテール 5 → 2）とソラモ（しっぽうち 3 → 0）が続けて攻撃
+    {
+      const hand = [myu(4), sor(4)].map((cardId, i) => ({ uid: `p${i}`, cardId }));
+      let twice: BattleState = { ...s, sides: { player: { ...s.sides.player, hand }, opponent: { ...s.sides.opponent, hand: [] } } };
+      twice = applyAction(twice, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+      twice = applyAction(twice, { type: 'defend', side: 'opponent', cardUid: null });
+      expect(monster(twice, 'o-m1').life).toBe(5);
+      twice = applyAction(twice, { type: 'useCard', side: 'player', cardUid: 'p1', targetUid: 'o-m1' });
+      twice = applyAction(twice, { type: 'defend', side: 'opponent', cardUid: null });
+      expect(monster(twice, 'o-m1').life).toBe(5);
+    }
     // さらに次の手番（相手）→ その次（こちら）では切れている
     const later = passTurn(passTurn(s, 'player'), 'opponent');
     expect(later.turn).toBe(turn + 3);
@@ -331,7 +385,7 @@ describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rule
     expect(monster(expired, 'o-m1').life).toBe(4);
   });
 
-  it('08 しめったはだ：重ねがけはしない（もう一度使っても −1 のまま、期限だけ新しく）。守備待ちの表示のダメージにも反映', () => {
+  it('08 しめったはだ：重ねがけはしない（もう一度使っても −3 のまま、期限だけ新しく）。守備待ちの表示のダメージにも反映', () => {
     let s = scene({ opponent: [myu(8), myu(8)] }, {}, 'opponent');
     s = applyAction(s, { type: 'useCard', side: 'opponent', cardUid: 'o0' });
     // 同じ手番にもう一度：ミュロルは行動済みなので使えない
@@ -339,27 +393,27 @@ describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rule
     // 2手番あとにもう一度使う
     const again = withMonster({ ...s, turn: s.turn + 2 }, 'o-m1', { acted: false });
     const used = applyAction(again, { type: 'useCard', side: 'opponent', cardUid: 'o1' });
-    expect(monster(used, 'o-m1').shield).toEqual({ against: 'force', reduce: 1, untilTurn: again.turn + 1 });
-    // 守備待ちのダメージ：ちから4 → 3（しめったはだ）
-    const shielded = withMonster(underAttack(myu(4), []), 'o-m1', { shield: { against: 'force', reduce: 1, untilTurn: 99 } });
-    expect(shielded.pending && incomingDamage(shielded, shielded.pending)).toBe(3);
+    expect(monster(used, 'o-m1').shield).toEqual({ against: 'force', reduce: 3, untilTurn: again.turn + 1 });
+    // 守備待ちのダメージ：ちから5 → 2（しめったはだ）
+    const shielded = withMonster(underAttack(myu(4), []), 'o-m1', { shield: { against: 'force', reduce: 3, untilTurn: 99 } });
+    expect(shielded.pending && incomingDamage(shielded, shielded.pending)).toBe(2);
   });
 
-  it('09 みずあび：使ったミュロルのライフ+1。最大ライフ（7）を超えない', () => {
-    let s = withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 5 });
+  it('09 みずあび：使ったミュロルのライフ+2（指示書 AJ。マナ2）。最大ライフ（7）を超えない', () => {
+    let s = withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 4 });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(monster(s, 'p-m1').life).toBe(6);
-    expect(manaOf(s.sides.player)).toBe(7);
-    expect(s.log.at(-1)?.text).toBe('ミュロルのライフが1回復。');
+    expect(manaOf(s.sides.player)).toBe(8);
+    expect(s.log.at(-1)?.text).toBe('ミュロルのライフが2回復。');
     const full = applyAction(scene({ player: [myu(9)] }), { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(monster(full, 'p-m1').life).toBe(7);
     const almost = applyAction(withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 6 }), { type: 'useCard', side: 'player', cardUid: 'p0' });
     expect(monster(almost, 'p-m1').life).toBe(7);
   });
 
-  it('10・11 防御：ちから−2／かしこさ−2。0未満にならない。種類が違えば使えない', () => {
-    expect(monster(attackWith(myu(4), [myu(10)]), 'o-m1').life).toBe(5);
-    expect(monster(attackWith(myu(7), [myu(11)]), 'o-m1').life).toBe(6);
+  it('10 しっぽガード・11 みずのまく：ちから−3／かしこさ−3（指示書 AJ。マナ0）。0未満にならない。種類が違えば使えない', () => {
+    expect(monster(attackWith(myu(4), [myu(10)]), 'o-m1').life).toBe(5); // 5 − 3 → 2
+    expect(monster(attackWith(myu(7), [myu(11)]), 'o-m1').life).toBe(6); // 4 − 3 → 1
     expect(monster(attackWith(myu(1), [myu(10)]), 'o-m1').life).toBe(7);
     const w = underAttack(myu(5), [myu(10), myu(11)]);
     expect(cardUsability(w, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
@@ -369,42 +423,30 @@ describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rule
     expect(cardUsability(f, 'opponent', 'o1')).toMatchObject({ usable: false, reason: 'ちから攻撃には使えません' });
   });
 
-  it('12 スリップガード（ID 14）：攻撃カードの必要マナが3以上のときだけ使える（−4）。攻撃側・守備側のいまのマナの残りでは決まらない', () => {
-    expect(monster(attackWith(myu(4), [myu(14)]), 'o-m1').life).toBe(7);
-    expect(monster(attackWith(myu(7), [myu(14)]), 'o-m1').life).toBe(7);
+  it('スリップガード（ID 14）：ちから技・かしこさ技とも−5（指示書 AJ。必要マナの条件は無くなった）', () => {
+    expect(monster(attackWith(myu(4), [myu(14)]), 'o-m1').life).toBe(7); // 5 − 5 → 0
+    expect(monster(attackWith(myu(7), [myu(14)]), 'o-m1').life).toBe(7); // 4 − 5 → 0
     expect(monster(attackWith(myu(3), [myu(14)]), 'o-m1').life).toBe(7);
-    // 必要マナ2の攻撃には使えない（攻撃側のマナが10残っていても、守備側のマナが十分でも）
-    const cheap = underAttack(myu(2), [myu(14)], { player: 10, opponent: 10 });
-    expect(cardUsability(cheap, 'opponent', 'o0')).toMatchObject({ usable: false, reason: '必要マナ3以上の攻撃にしか使えません' });
-    expect(cardUsability(underAttack(myu(6), [myu(14)]), 'opponent', 'o0').usable).toBe(false);
-    // 必要マナ3の攻撃を、ちょうど3マナで撃って残り0：それでも使える
-    const exact = underAttack(myu(3), [myu(14)], { player: 3, opponent: 2 });
-    expect(manaOf(exact.sides.player)).toBe(0);
-    expect(cardUsability(exact, 'opponent', 'o0').usable).toBe(true);
+    // 必要マナ2・1の攻撃にも使える
+    expect(cardUsability(underAttack(myu(2), [myu(14)]), 'opponent', 'o0').usable).toBe(true);
+    expect(cardUsability(underAttack(myu(5), [myu(14)]), 'opponent', 'o0').usable).toBe(true);
+    expect(cardUsability(underAttack(myu(1), [myu(14)]), 'opponent', 'o0').usable).toBe(true);
     // 守備側のマナが足りなければ使えない（スリップガードは2マナ）
     expect(cardUsability(underAttack(myu(4), [myu(14)], { opponent: 1 }), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'マナが足りません' });
   });
 
-  it('13 ひらりよける（ID 15）：ちから技を完全回避。かしこさ技には使えない', () => {
-    expect(monster(attackWith(myu(4), [myu(15)]), 'o-m1').life).toBe(7);
-    const w = underAttack(myu(5), [myu(15)]);
+  // 指示書 AJ で外した技（skl-myurol-15 ひらりよける）の「ちから技を完全回避」は、すべってよける（ID 16）で確かめる。
+  // 前のすべってよける（必要マナ2以下だけ回避）の決まりは無くなったので、そのテストは消した
+  it('すべってよける（ID 16）：ちから技を完全回避（必要マナに関係なく）。かしこさ技・回避されない攻撃には使えない', () => {
+    for (const n of [1, 2, 4]) expect(monster(attackWith(myu(n), [myu(16)]), 'o-m1').life).toBe(7);
+    const w = underAttack(myu(5), [myu(16)]);
     expect(cardUsability(w, 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
-  });
-
-  it('14 すべってよける（ID 16）：攻撃カードの必要マナが2以下のちから・かしこさ技を完全回避。3以上には使えない（いまのマナの残りでは決まらない）', () => {
-    for (const n of [1, 2, 5, 6]) expect(monster(attackWith(myu(n), [myu(16)]), 'o-m1').life).toBe(7);
-    for (const n of [3, 4, 7]) {
-      const s = underAttack(myu(n), [myu(16)], { player: 10 });
-      expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: '必要マナ2以下の攻撃にしか使えません' });
-    }
-    // 攻撃側のマナが残り0でも、必要マナ2の攻撃なら回避できる
-    const low = underAttack(myu(2), [myu(16)], { player: 2 });
-    expect(manaOf(low.sides.player)).toBe(0);
-    expect(cardUsability(low, 'opponent', 'o0').usable).toBe(true);
+    // 03 しっぽまわし（回避されない）
+    expect(cardUsability(underAttack(myu(3), [myu(16)]), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'この攻撃は回避できません' });
   });
 
   it('守備に使えるのは狙われたミュロルのカードだけ。攻撃の手番には防御・回避を使えない', () => {
-    const s = scene({ player: [myu(10), myu(15)] });
+    const s = scene({ player: [myu(10), myu(16)] });
     expect(cardUsability(s, 'player', 'p0')).toMatchObject({ usable: false });
     expect(cardUsability(s, 'player', 'p1')).toMatchObject({ usable: false });
     // ソラモ（o-m2）が狙われたときは、ミュロルの防御は使えない
@@ -413,8 +455,10 @@ describe('ミュロル正式14技：効果（細かい裁定は docs/battle-rule
     expect(cardUsability(other, 'opponent', 'o0').usable).toBe(false);
   });
 
-  it('ミュロル同士で、相手の思考どうしが最後まで対戦できる（14種すべてを含むデッキ）', () => {
-    const skills = [...Array.from({ length: 42 }, (_, i) => MYUROL_SKILLS[i % 14]?.id as string), ...Array.from({ length: 18 }, () => sor(1))];
+  it('ミュロル同士で、相手の思考どうしが最後まで対戦できる（指示書 AJ の12種すべてを含むデッキ）', () => {
+    const aj = (AJ_SKILLS['mon-myurol'] ?? []).map((r) => r.id);
+    expect(aj).toHaveLength(12);
+    const skills = [...Array.from({ length: 36 }, (_, i) => aj[i % 12] as string), ...Array.from({ length: 24 }, () => sor(1))];
     const d = { monsters: ['mon-myurol', 'mon-soramo', 'mon-lazuck'], skills };
     const used = new Set<string>();
     for (const [seed, first] of [[1, 'player'], [2, 'opponent'], [3, 'player'], [4, 'opponent']] as const) {
