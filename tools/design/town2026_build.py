@@ -108,19 +108,22 @@ BUILDINGS = [
     # 2026-10-30 iPhone の試遊（指示書 S4）「管理局の土台が前の石畳にかぶる」：建物の土台の下のふちで石畳が始まるよう、管理局を 75・研究所を 30 上へ
     # （土台の下のふちは敷居より 管理局 約84・研究所 約67 下。前の道の上のふちは 1840・1560。入口の段だけは道につながる）
     dict(no=2, id='BUREAU', file='building_bureau', door=(511, 669, 874), door_h=240, at=(5420, 1755), door_w=150),
-    dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1490), door_w=150),
-    dict(no=4, id='TRAINING', file='building_practice', door=(768, 585, 824), door_h=240, at=(1100, 2960), door_w=170),
-    dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=200),
-    dict(no=6, id='HOUSE_A', file='building_florist', door=(516, 575, 828), door_h=215, at=(5800, 2890), door_w=100),
-    dict(no=7, id='HOUSE_D', file='building_tailor', door=(480, 606, 848), door_h=215, at=(4500, 4240), door_w=100),
-    dict(no=8, id='HOUSE_B', file='building_house_pete', door=(512, 621, 868), door_h=215, at=(900, 4240), door_w=100),
-    dict(no=9, id='HOUSE_E', file='building_house_harold', door=(512, 630, 872), door_h=215, at=(2000, 4240), door_w=100),
-    dict(no=10, id='PLAYER_HOME', file='building_home', door=(512, 630, 862), door_h=215, at=(1000, 5800), door_w=100),
-    dict(no=11, id='GUIDE_HOME', file='building_neighbor', door=(513, 615, 872), door_h=215, at=(2050, 5800), door_w=100),
+    dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1490), door_w=150, steps=[(-94, 98, 14, 78)]),
+    dict(no=4, id='TRAINING', file='building_practice', door=(768, 585, 824), door_h=240, at=(1100, 2960), door_w=170, steps=[(-108, 116, 16, 48), (-140, 116, 48, 80)]),
+    dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=200, steps=[(-152, 200, -10, 22), (-184, 200, 22, 54)]),
+    dict(no=6, id='HOUSE_A', file='building_florist', door=(516, 575, 828), door_h=215, at=(5800, 2890), door_w=100, steps=[(-72, 56, 22, 54), (-104, 88, 54, 86)]),
+    dict(no=7, id='HOUSE_D', file='building_tailor', door=(480, 606, 848), door_h=215, at=(4500, 4240), door_w=100, steps=[(-84, 44, 16, 80)]),
+    dict(no=8, id='HOUSE_B', file='building_house_pete', door=(512, 621, 868), door_h=215, at=(900, 4240), door_w=100, steps=[(-68, 92, 16, 48), (-100, 92, 48, 80)]),
+    dict(no=9, id='HOUSE_E', file='building_house_harold', door=(512, 630, 872), door_h=215, at=(2000, 4240), door_w=100, steps=[(-80, 80, 16, 48), (-112, 80, 48, 80)]),
+    dict(no=10, id='PLAYER_HOME', file='building_home', door=(512, 630, 862), door_h=215, at=(1000, 5800), door_w=100, steps=[(-72, 88, 24, 88)]),
+    dict(no=11, id='GUIDE_HOME', file='building_neighbor', door=(513, 615, 872), door_h=215, at=(2050, 5800), door_w=100, steps=[(-98, 94, 56, 88)]),
     # 12 大工の作業小屋：入れない（見た目だけ）。2026-10-30：正面向きの新しい絵（front-facing-20261030。戸を測り直した）。
     # 前より横に広いので、北の高台の東のふち（x 4300）にかからないよう少し東へ（前は 4700）
     dict(no=12, id='SHED', file='building_shed', door=(505, 357, 562), door_h=215, at=(4820, 1000), door_w=0),
 ]
+# steps：入口の段（踏み面）で歩ける所（2026-11-01 指示書 AI【3】「入口まわりの当たりが広すぎる」）。扉の真ん中 x・敷居 z からの (x1, x2, y1, y2) 単位。
+# 中心がこの中にあるマスは歩ける（扉の列のほかに、段の左右のはしまで）。段の両はしのふち・柱の台・扉の枠はふさいだまま。
+# 大会会場・管理局は段の幅が扉と同じなので無し。値は当たりの網目（tools/design/collision_audit.py）で段の絵に合わせて測った
 # カードショップの自動ドア（instructions/cardshop/cardshop_layout.json。シートの px）
 SHOP_DOORS = dict(left=(646, 546), right=(766, 546), clip=(648, 548, 238, 250), travel=120)
 
@@ -374,6 +377,8 @@ PROP_PARTS = {
     'conifer_e': ('props_nature', (1174, 36, 1517, 686), 0.8), 'tree_e': ('props_nature', (661, 137, 1159, 691), 0.78),
     'bush_e': ('props_nature', (23, 718, 329, 985), 0.62),
 }
+# 建物の当たり：マスの中ほどのうち、絵の所がこの割合をこえたらふさぐ（2026-11-01 指示書 AI。前は1点でもあればふさいでいた）
+BUILDING_BLOCK_FRAC = 0.4
 # 当たり（足元の何マス分をふさぐか：幅の割合・奥行きの単位）
 PROP_BLOCK = {
     'tree_big': (0.30, 70), 'tree_mid': (0.30, 64), 'conifer': (0.35, 64), 'bush_big': (0.9, 90), 'bush_small': (0.9, 70),
@@ -428,6 +433,10 @@ def mask_rects(size: tuple[int, int], rects, circle=None) -> Image.Image:
         cx, cy, r = circle
         d.ellipse([P(cx - r), P(cy - r), P(cx + r), P(cy + r)], fill=255)
     return m
+
+
+# 小川の当たり：水の範囲から外へ広げる量（単位。両岸の合計。石垣の上の面までをふさぐ）
+STREAM_BLOCK_WIDEN = 20
 
 
 def stream_rects(widen: float = 0) -> list[tuple[float, float, float, float]]:
@@ -810,18 +819,24 @@ class Town:
         cy = (ys >= y1) & (ys < y2)
         self.block[np.ix_(cy, cx)] = value
 
-    def block_alpha(self, im: Image.Image, x: float, y: float, s_units: float, y_from: float, y_to: float, keep=None) -> None:
-        """絵（書き出しの px の絵。左上 x,y 単位・1px = s_units 単位）の透明でない所のうち、y_from〜y_to（単位）のマスをふさぐ"""
+    def block_alpha(self, im: Image.Image, x: float, y: float, s_units: float, y_from: float, y_to: float, keep=None,
+                    min_frac: float = 0.0, x_from: float = -1e9, x_to: float = 1e9) -> int:
+        """絵（書き出しの px の絵。左上 x,y 単位・1px = s_units 単位）の透明でない所のうち、y_from〜y_to・x_from〜x_to（単位）のマスをふさぐ。
+        min_frac：マスの中ほど（9×9 の点）のうち、絵の所がこの割合をこえたらふさぐ（0 はどこか1点でも）。ふさいだマスの数を返す"""
         a = np.array(im.getchannel('A')) > 100
         xs, ys = self.cell_centers()
+        n = 0
         for r in np.where((ys >= max(y_from, y)) & (ys < min(y_to, y + im.height * s_units)))[0]:
             py = int((ys[r] - y) / s_units)
-            for c in np.where((xs >= x) & (xs < x + im.width * s_units))[0]:
+            for c in np.where((xs >= max(x, x_from)) & (xs < min(x + im.width * s_units, x_to)))[0]:
                 px = int((xs[c] - x) / s_units)
-                # マスの中ほど（3×3 の点）のどこかが絵なら、ふさぐ
-                if a[max(0, py - 4):py + 5, max(0, px - 4):px + 5].any():
+                # マスの中ほど（9×9 の点）が絵なら、ふさぐ
+                win = a[max(0, py - 4):py + 5, max(0, px - 4):px + 5]
+                if (win.mean() > min_frac) if min_frac > 0 else win.any():
                     if keep is None or not keep(c, r):
                         self.block[r, c] = True
+                        n += 1
+        return n
 
     def save_sprite(self, im: Image.Image, name: str) -> str:
         """書き出しの px の絵を保存（同じ名前は1回だけ）"""
@@ -1063,7 +1078,8 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
     for ux in (700, 1150, 2250, 3500, 4300, 4700, 5300, 5900):
         im = resize(rng.choice(pads), 0.4 * K)
         base.alpha_composite(im, (P(ux) - im.width // 2, P(stream_y(ux) + rng.randint(-20, 40)) - im.height // 2))
-    sblock = np.array(stream_mask(size, 60).resize((t.cols, t.rows), Image.BILINEAR)) > 40
+    # 2026-11-01 指示書 AI【6】：小川の当たりを石垣の上のふちまでに（前は水から 30 単位ずつ広げていて、北の岸の草の1列までふさいでいた）
+    sblock = np.array(stream_mask(size, STREAM_BLOCK_WIDEN).resize((t.cols, t.rows), Image.BILINEAR)) > 40
     t.block |= sblock
     # 石の橋の下の道（小川の上に塗る。左右は橋の柱で隠れる）
     base.paste(st_img, (0, 0), gap_mask)
@@ -1228,11 +1244,12 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         building_shadow(base, part, (P(x), P(y)))
         z = b['at'][1]
         t.add_sprite(part, b['id'].lower(), x, y, z)
-        # 当たり：建物の下の方（敷居から上へ奥行きぶん）。扉の真ん中の列だけ、敷居まで通れる
+        # 当たり：建物の下の方（敷居から上へ奥行きぶん）。扉の真ん中の列だけ、敷居まで通れる。
+        # 2026-11-01 指示書 AI【3】：マスの中ほどの4割をこえて絵があるときだけふさぐ（土台の下のふちが中ほどにかかっただけのマス〔足もとは地面〕は歩ける）
         depth = 0.42 * part.height / K
         half = b['door_w'] / 2
         door_c = [c for c in range(t.cols) if b['at'][0] - half <= xs[c] <= b['at'][0] + half] if b['door_w'] else []
-        t.block_alpha(part, x, y, 1 / K, z - depth, y + part.height / K + 1)
+        t.block_alpha(part, x, y, 1 / K, z - depth, y + part.height / K + 1, min_frac=BUILDING_BLOCK_FRAC)
         if door_c:
             r0 = int((z - 1) // CELL)                # 扉のマス（敷居のすぐ上の行）
             for r in range(r0, t.rows):
@@ -1243,6 +1260,9 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
             t.door_cols[b['id']] = (door_c[0], len(door_c), r0)
             for c in door_c:
                 t.block[r0 - 1, c] = True
+            # 入口の段の踏み面（扉の列の左右。BUILDINGS の steps）
+            for sx1, sx2, sy1, sy2 in b.get('steps', ()):
+                t.block_rect(b['at'][0] + sx1, z + sy1, b['at'][0] + sx2, z + sy2, False)
             t.doors[b['id']] = dict(x=door_c[0], y=r0, w=len(door_c), h=1,
                                     back=dict(x=(door_c[0] + door_c[-1] + 1) // 2, y=r0 + 1),
                                     label=dict(x=round(b['at'][0]), y=round(y + 40)))
@@ -1333,7 +1353,11 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         key = name if (l, tp, r) == (0, 0, im.width) else f'{name}_c{l}_{tp}_{im.width - r}'
         t.add_sprite(im.crop((l, tp, r, im.height)), key, x + l / K, y + tp / K, uy - 10)
         fw, fd = PROP_BLOCK[name]
-        t.block_rect(ux - im.width / K * fw / 2, uy - fd, ux + im.width / K * fw / 2, uy + 4)
+        # 2026-11-01 指示書 AI【3】【6】：足元の範囲のうち、絵のある所だけふさぐ（ベンチの脚のあいだ・旗の柱のまわりの透明な所は歩ける）。
+        # 1マスもかからない細い物（街灯の柱など）は、足元の真ん中のマスをふさぐ
+        bx1, bx2 = ux - im.width / K * fw / 2, ux + im.width / K * fw / 2
+        if not t.block_alpha(im, x, y, 1 / K, uy - fd, uy + 4, x_from=bx1, x_to=bx2):
+            t.block[min(t.rows - 1, int(uy // CELL)), min(t.cols - 1, int(ux // CELL))] = True
 
     check_props(rects)
 

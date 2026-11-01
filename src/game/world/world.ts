@@ -202,26 +202,46 @@ function wallDistance(map: MapDefinition): Uint8Array {
 }
 
 /**
- * isGoal までの経路で、道の真ん中を通るもの（2026-10-28 点検：ユーザー「チュートリアルで練習所に行くとき道の真ん中を歩かせたい」）。
- * 道の端（歩けないマスの近く）のマスと草地は遠回りに数えるので、少し長くても石畳の道の真ん中を通る。案内で連れて歩くときに使う
+ * 曲がるたびに足す遠回り（マスの数。2026-11-01 指示書 AI【2】：案内で連れて歩く道が細かく曲がりすぎ〔ジグザグ〕だったので、
+ * 曲がる回数を減らす。少し長くても「まっすぐ → 1〜2回曲がる」道を選ぶ）
  */
-export function findPathCentered(
+export const TURN_COST = 5;
+
+/** 道を探すときの決まり（searchPath） */
+interface SearchOptions {
+  readonly steps: readonly Point[];
+  readonly maxNodes: number;
+  /** 道の真ん中・石畳を好む（街の案内） */
+  readonly center: boolean;
+  /** 曲がるたびに足す遠回り（マス） */
+  readonly turnCost: number;
+  /** 歩き始める前に向いている向き（steps の番号）。最初の1歩がこの向きでないときも1回曲がったと数える。-1 は数えない */
+  readonly startDir: number;
+}
+
+/**
+ * isGoal を満たすマスまでの、遠回りの重さが一番小さい道（start を含まない。見つからなければ null）。
+ * 向き（最後に進んだ向き）ごとに数えるので、曲がった回数を重さに足せる
+ */
+function searchPath(
   map: MapDefinition,
   start: Point,
   isGoal: (x: number, y: number) => boolean,
   blocked: (x: number, y: number) => boolean,
-  steps: readonly Point[] = STEPS_4,
-  maxNodes = 120000,
+  opt: SearchOptions,
 ): Point[] | null {
   if (isGoal(start.x, start.y)) return [];
   const { width, height } = mapSize(map);
-  const wall = wallDistance(map);
-  const startKey = start.y * width + start.x;
-  const cost = new Float64Array(width * height).fill(Infinity);
-  const prev = new Int32Array(width * height).fill(-1);
-  cost[startKey] = 0;
-  // 小さい順に取り出すヒープ（[コスト, マス]）
-  const heap: [number, number][] = [[0, startKey]];
+  const wall = opt.center ? wallDistance(map) : null;
+  const dirs = opt.steps.length;
+  // 状態＝マス×（最後に進んだ向き＋1。0 は出発のとき）
+  const per = dirs + 1;
+  const startState = (start.y * width + start.x) * per + (opt.startDir >= 0 ? opt.startDir + 1 : 0);
+  const cost = new Float64Array(width * height * per).fill(Infinity);
+  const prev = new Int32Array(width * height * per).fill(-1);
+  cost[startState] = 0;
+  // 小さい順に取り出すヒープ（[コスト, 状態]）
+  const heap: [number, number][] = [[0, startState]];
   const push = (item: [number, number]): void => {
     heap.push(item);
     let i = heap.length - 1;
@@ -253,32 +273,98 @@ export function findPathCentered(
     return top;
   };
   let visited = 0;
-  while (heap.length > 0 && visited < maxNodes) {
-    const [c, k] = pop();
-    if (c > (cost[k] as number)) continue;
+  while (heap.length > 0 && visited < opt.maxNodes) {
+    const [c, st] = pop();
+    if (c > (cost[st] as number)) continue;
     visited += 1;
+    const k = Math.floor(st / per);
+    const lastDir = (st % per) - 1;
     const x = k % width;
     const y = (k - x) / width;
-    if (k !== startKey && isGoal(x, y)) {
+    if (st !== startState && isGoal(x, y)) {
       const path: Point[] = [];
-      for (let p = k; p !== startKey; p = prev[p] as number) path.unshift({ x: p % width, y: Math.floor(p / width) });
+      for (let p = st; p !== startState; p = prev[p] as number) {
+        const pk = Math.floor(p / per);
+        path.unshift({ x: pk % width, y: Math.floor(pk / width) });
+      }
       return path;
     }
-    for (const d of steps) {
+    for (let di = 0; di < dirs; di++) {
+      const d = opt.steps[di] as Point;
       const nx = x + d.x;
       const ny = y + d.y;
       if (nx < 0 || ny < 0 || nx >= width || ny >= height || !canStep({ x, y }, d.x, d.y, blocked)) continue;
       const nk = ny * width + nx;
-      const offroad = tileAt(map, nx, ny) === ',' ? OFFROAD_WEIGHT : 0;
-      const nc = c + Math.hypot(d.x, d.y) + CENTER_WEIGHT * (CENTER_CAP - (wall[nk] as number)) + offroad;
-      if (nc < (cost[nk] as number)) {
-        cost[nk] = nc;
-        prev[nk] = k;
-        push([nc, nk]);
+      let nc = c + Math.hypot(d.x, d.y);
+      if (wall) nc += CENTER_WEIGHT * (CENTER_CAP - (wall[nk] as number)) + (tileAt(map, nx, ny) === ',' ? OFFROAD_WEIGHT : 0);
+      if (lastDir >= 0 && lastDir !== di) nc += opt.turnCost;
+      const ns = nk * per + di + 1;
+      if (nc < (cost[ns] as number)) {
+        cost[ns] = nc;
+        prev[ns] = st;
+        push([nc, ns]);
       }
     }
   }
   return null;
+}
+
+/**
+ * isGoal までの経路で、道の真ん中を通るもの（2026-10-28 点検：ユーザー「チュートリアルで練習所に行くとき道の真ん中を歩かせたい」）。
+ * 道の端（歩けないマスの近く）のマスと草地は遠回りに数えるので、少し長くても石畳の道の真ん中を通る。案内で連れて歩くときに使う。
+ * 2026-11-01 指示書 AI【2】：曲がるたびに turnCost マス分を足す（ジグザグにならず、まっすぐ → 1〜2回曲がる道）
+ */
+export function findPathCentered(
+  map: MapDefinition,
+  start: Point,
+  isGoal: (x: number, y: number) => boolean,
+  blocked: (x: number, y: number) => boolean,
+  steps: readonly Point[] = STEPS_4,
+  maxNodes = 240000,
+  turnCost = TURN_COST,
+): Point[] | null {
+  return searchPath(map, start, isGoal, blocked, { steps, maxNodes, center: true, turnCost, startDir: -1 });
+}
+
+/**
+ * isGoal までの、曲がる回数の少ない短い道（部屋の中で人の前まで連れて歩くとき。道の真ん中は気にしない）。
+ * facing（いま向いている向き）を渡すと、その向きにまっすぐ歩き出す道を先に選ぶ（入口から入って奥を向いているときは、まず上へ）。
+ * 2026-11-01 指示書 AI【1】【2】：練習場の入口 → 先生の前、管理局の入口 → 受付の前
+ */
+export function findPathStraight(
+  map: MapDefinition,
+  start: Point,
+  isGoal: (x: number, y: number) => boolean,
+  blocked: (x: number, y: number) => boolean,
+  facing?: Direction,
+  steps: readonly Point[] = STEPS_4,
+  turnCost = TURN_COST,
+): Point[] | null {
+  const f = facing ? DIR_DELTA[facing] : null;
+  const startDir = f ? steps.findIndex((d) => d.x === f.x && d.y === f.y) : -1;
+  return searchPath(map, start, isGoal, blocked, { steps, maxNodes: 60000, center: false, turnCost, startDir });
+}
+
+/** 道の曲がった回数（向きが変わった回数。start から path の順に歩いたとき） */
+export function countTurns(start: Point, path: readonly Point[]): number {
+  let turns = 0;
+  let last: string | null = null;
+  let prev = start;
+  for (const p of path) {
+    const dir = `${p.x - prev.x},${p.y - prev.y}`;
+    if (last !== null && dir !== last) turns += 1;
+    last = dir;
+    prev = p;
+  }
+  return turns;
+}
+
+/**
+ * 練習場の先生の前（話せる近さで、先生の絵に重ならない所）。先生の左右 3マス・同じ高さから2マス手前まで。
+ * 左（主人公が入口から入ってくる側）を先に探し、無ければ右（2026-11-01 指示書 AI【1】：先生を机の右へ動かした。ミレイユは先生の右）
+ */
+export function teacherSideGoal(teacher: Point, side: -1 | 1 | 0, reachX = 3, reachY = 2): (x: number, y: number) => boolean {
+  return (x, y) => (side === 0 ? Math.abs(x - teacher.x) === reachX : x === teacher.x + side * reachX) && y >= teacher.y && y <= teacher.y + reachY;
 }
 
 /**

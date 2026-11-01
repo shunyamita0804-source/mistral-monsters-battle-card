@@ -236,9 +236,20 @@ def build_room(parts: str, room: dict, furn: dict[str, Image.Image], check_dir: 
         c1, c2 = int(bx1 // CELL), int(-(-bx2 // CELL))
         r1, r2 = int(y1 // CELL), int(-(-y2 // CELL))
         if it['kind'] == 'furniture':
+            # 2026-11-01 指示書 AI【6】：家具の絵の上半分で、絵がほとんど無いマス（テーブルの奥の床など）は歩ける。
+            # 下半分（脚のあいだ・テーブルの下。立つと人が家具に隠れる）はふさいだまま
+            alpha = None
+            if key:
+                sp = sprites[-1]
+                alpha = np.array(src.convert('RGBA').resize((max(1, round(sp['w'])), max(1, round(sp['h'])))).getchannel('A')) > 100
             for ry in range(max(r1, 0), min(r2, rows)):
                 for cx in range(max(c1, 0), min(c2, cols)):
                     if ry * CELL + CELL / 2 < y2 + 4:
+                        if alpha is not None and ry * CELL + CELL / 2 < sp['y'] + sp['h'] / 2:
+                            ax1, ay1 = max(0, cx * CELL - sp['x']), max(0, ry * CELL - sp['y'])
+                            win = alpha[ay1:max(ay1, (ry + 1) * CELL - sp['y']), ax1:max(ax1, (cx + 1) * CELL - sp['x'])]
+                            if win.size == 0 or win.mean() < 0.1:
+                                continue
                         grid[ry][cx] = '#'
         # 調べる範囲（マス）：家具の枠。上が歩けないマスなら絵の上までのばす（壁ぎわの家具・壁の物）
         rr1 = r1

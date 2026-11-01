@@ -48,12 +48,13 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
     // 大会会場の舞台の左奥は、指示書 Z の対戦表の板でふさがった。板の前（長いすとのあいだ）へは左の通路から回り込める
     expect(area(HALL).has(cellOf(300, 330))).toBe(false);
     expect(area(HALL).has(cellOf(300, 422))).toBe(true);
-    expect(area(PRACTICE).has(cellOf(760, 330))).toBe(true);
+    // 練習場の真ん中の机は 2026-11-01（指示書 AI【1】）に黒板の前まで奥へ動かした。机と黒板のあいだは通れない
+    expect(area(PRACTICE).has(cellOf(760, 200))).toBe(false);
     expect(area(LAB).has(cellOf(560, 400))).toBe(true);
     expect(area(BUREAU).has(cellOf(1200, 500))).toBe(true);
     // 家具の足もとは通れない
     expect(area(HALL).has(cellOf(768, 430))).toBe(false);
-    expect(area(PRACTICE).has(cellOf(870, 480))).toBe(false);
+    expect(area(PRACTICE).has(cellOf(870, 330))).toBe(false);
     expect(area(LAB).has(cellOf(680, 520))).toBe(false);
     expect(area(BUREAU).has(cellOf(768, 420))).toBe(false);
   });
@@ -82,7 +83,7 @@ describe('部屋4つの新しい絵（大会会場・管理局・練習場・研
     expect(isBlocked({ ...BUREAU, objects: [] }, guide.x, guide.y, all)).toBe(false);
   });
 
-  it('練習場：対戦机は3つ・ベンチは無い。先生は真ん中の机のすぐ手前、ミレイユは先生の右', () => {
+  it('練習場：対戦机は3つ・ベンチは無い。先生は真ん中の机の右（2026-11-01 指示書 AI）、ミレイユは先生の右', () => {
     const ids = PRACTICE.objects.map((o) => o.id);
     expect(ids.filter((id) => id.startsWith('practice-table-'))).toHaveLength(3);
     expect(ids.some((id) => id.includes('bench'))).toBe(false);

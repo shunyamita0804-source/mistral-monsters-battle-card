@@ -17,7 +17,7 @@ const shots = JSON.parse(fs.readFileSync(shotsFile, 'utf8'));
     const page = await ctx.newPage();
     page.on('pageerror', (e) => console.log('PAGEERROR', sh.name, e.message));
     await page.goto(base + (sh.qa ? '?qa=1' + (sh.qs || '') : ''));
-    await page.addStyleTag({ content: '.stage-diag{display:none!important}' }).catch(() => {});
+    await page.addStyleTag({ content: '.stage-diag{display:none!important} .world__hint{display:none!important}' }).catch(() => {});
     await page.waitForTimeout(800);
     const cont = page.locator('text=続きから').first();
     if (await cont.count()) await cont.click();
