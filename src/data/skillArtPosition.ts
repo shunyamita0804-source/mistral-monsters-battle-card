@@ -29,7 +29,6 @@ export const SKILL_ART_X: Readonly<Record<string, number>> = {
   'skl-pukarim-10': 70,
   // ジオル 06 グランドハンマー・09 じならし
   'skl-geol-06': 65,
-  'skl-geol-09': 100,
   // 2026-10-31 指示書 AB：シシエン 03 ひのこ（顔が右はしで切れかける）
   'skl-shishien-03': 70,
   // 2026-10-30 指示書 Z：サポートカードの絵（キーはサポートの ID）。見せ場が切れないように

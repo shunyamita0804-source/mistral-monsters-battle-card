@@ -15,6 +15,7 @@ import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
 import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
+import { AJ_SKILLS, MONSTER_HABITAT, type AjSkillRow } from './skillRebuildAJ.ts';
 
 /**
  * 【仮データ】カード一覧。
@@ -156,9 +157,8 @@ export const TMP_GEOL_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no)
 export const TMP_FLUNE_ID = monsterId('tmp-flune');
 export const TMP_FLUNE_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-flune', no));
 
-export const MONSTERS: readonly MonsterCard[] = [
-  ...MONSTER_SEEDS.map(makeMonster),
-  HIDDEN_MONSTER,
+/** 正式の15体（並び＝図鑑・一覧の順）。2026-11-01 指示書 AJ で居場所（habitat）を持たせた */
+const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   SORAMO_MONSTER,
   LAZUCK_MONSTER,
   GAUUL_MONSTER,
@@ -174,11 +174,18 @@ export const MONSTERS: readonly MonsterCard[] = [
   SHISHIEN_MONSTER,
   HAKURAN_MONSTER,
   DESUORU_MONSTER,
-];
+].map((m): MonsterCard => {
+  const habitat = MONSTER_HABITAT[m.id];
+  return habitat ? { ...m, habitat } : m;
+});
 
-export const SKILLS: readonly SkillCard[] = [
-  ...MONSTER_SEEDS.flatMap((seed, i) => makeSkills(seed.key, seed.main, skillSeeds(i))),
-  ...HIDDEN_SKILLS,
+export const MONSTERS: readonly MonsterCard[] = [...MONSTER_SEEDS.map(makeMonster), HIDDEN_MONSTER, ...OFFICIAL_MONSTERS];
+
+/**
+ * 指示書 AJ の前の技（各モンスターのファイルの14技）。絵・デザイン ID を引くためと、外した技の ID（REMOVED_SKILL_IDS。前のセーブから消す）を知るためだけに使う。
+ * ゲームの技カードは AJ_SKILLS（src/data/skillRebuildAJ.ts）から作る
+ */
+const LEGACY_OFFICIAL_SKILLS: readonly SkillCard[] = [
   ...SORAMO_SKILLS,
   ...LAZUCK_SKILLS,
   ...GAUUL_SKILLS,
@@ -194,6 +201,53 @@ export const SKILLS: readonly SkillCard[] = [
   ...SHISHIEN_SKILLS,
   ...HAKURAN_SKILLS,
   ...DESUORU_SKILLS,
+];
+const legacyById = new Map(LEGACY_OFFICIAL_SKILLS.map((k) => [k.id, k]));
+
+const AJ_CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
+
+/**
+ * 指示書 AJ の表の1行を技カードにする。名前・マナ・ダメージ・分類・効果・効果の文は表のとおり（表示の番号＝表の順 1〜12）。
+ * 絵とデザイン ID は前の同じ ID の技から（名前を変えた技も ID と絵はそのまま）。新しい技は表の仮の絵（pendingSpec に 'art'）
+ */
+function ajSkill(monsterId: string, row: AjSkillRow, index: number): SkillCard {
+  const old = legacyById.get(row.id);
+  const category = AJ_CATEGORY[row.cat];
+  const attack = category === 'force' || category === 'wisdom';
+  if (attack !== (row.damage !== null)) throw new Error(`AJ の技のダメージと分類が合いません: ${row.id}`);
+  const effect: SkillEffect = row.effect ?? { type: 'attack' };
+  if (attack !== (effect.type === 'attack')) throw new Error(`AJ の技の分類と動きが合いません: ${row.id}`);
+  const art = row.tempArt ? ({ category: 'skillCards', file: row.tempArt, layout: 'frame' } as const) : old?.art;
+  if (!art) throw new Error(`AJ の技の絵がありません: ${row.id}`);
+  return {
+    kind: 'skill',
+    id: row.id,
+    ...(old?.designId ? { designId: old.designId } : {}),
+    name: row.name,
+    monsterId,
+    rarity: null,
+    cost: row.mana,
+    stat: attack && row.damage !== null ? { type: category as StatType, value: row.damage } : null,
+    category,
+    effectTextJa: row.text,
+    displayNo: index + 1,
+    effect,
+    isPlaceholder: false,
+    art,
+    pendingSpec: row.tempArt ? ['rarity', 'art'] : ['rarity'],
+  };
+}
+
+/** 指示書 AJ の15体の技（各12枚） */
+const AJ_OFFICIAL_SKILLS: readonly SkillCard[] = OFFICIAL_MONSTERS.flatMap((m) => (AJ_SKILLS[m.id] ?? []).map((row, i) => ajSkill(m.id, row, i)));
+
+/** 指示書 AJ で外した技の ID（前のセーブの持っているカード・デッキから消す。src/game/save/saveData.ts の変換） */
+export const REMOVED_SKILL_IDS: readonly string[] = LEGACY_OFFICIAL_SKILLS.map((k) => k.id).filter((id) => !AJ_OFFICIAL_SKILLS.some((k) => k.id === id));
+
+export const SKILLS: readonly SkillCard[] = [
+  ...MONSTER_SEEDS.flatMap((seed, i) => makeSkills(seed.key, seed.main, skillSeeds(i))),
+  ...HIDDEN_SKILLS,
+  ...AJ_OFFICIAL_SKILLS,
 ];
 
 /**

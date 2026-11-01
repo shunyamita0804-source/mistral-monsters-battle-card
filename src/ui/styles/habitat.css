@@ -1,0 +1,75 @@
+/* 居場所の印（2026-11-01 指示書 AJ【2】。【仮】コードで描く印）。カードの枠の上に重ねる。--u はカードの大きさの倍率（battle-card） */
+.habitat-mark {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: calc(30px * var(--u, 1));
+  height: calc(30px * var(--u, 1));
+  min-width: 13px;
+  min-height: 13px;
+  border: 2px solid #fff6dc;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
+.habitat-mark svg {
+  width: 72%;
+  height: 72%;
+  fill: #fff;
+}
+.habitat-mark--ground {
+  background: #8a5a2b;
+}
+.habitat-mark--air {
+  background: #4b9ad8;
+}
+.habitat-mark--water {
+  background: #1f5fa8;
+}
+/* 場が水中のとき（もとは地上・空中）：波のふち */
+.habitat-mark.is-tide {
+  border-color: #9fe3ff;
+  box-shadow: 0 0 0 2px rgb(40 140 220 / 0.7), 0 1px 3px rgb(0 0 0 / 0.55);
+}
+/* 置き場所の案：a＝右下の角（名前の帯の右）・b＝左上の角・c＝右の辺の真ん中 */
+.habitat-mark--pos-a {
+  right: 7%;
+  bottom: 6%;
+}
+.habitat-mark--pos-b {
+  left: 7%;
+  top: 5.5%;
+}
+.habitat-mark--pos-c {
+  right: 4.5%;
+  top: 46%;
+}
+/* 正式カードの1枚絵（名前・LIFE 入り。508×849）：下の角の飾りの内側 */
+.monster-card--art .habitat-mark {
+  --u: 0.75;
+}
+
+/* 場が水中（みちしお）：場のまわりに波 */
+.battle.is-tide .battle-row {
+  background-image: linear-gradient(0deg, rgb(40 130 220 / 0.35), rgb(40 130 220 / 0) 38%);
+}
+.battle-turn__tide {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid #9fe3ff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #2b7fd0, #164f93);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.battle-turn__tide::before {
+  content: '';
+  width: 12px;
+  height: 7px;
+  background: radial-gradient(circle at 3px 7px, transparent 3px, #bfeaff 3.5px, transparent 4.5px) 0 0 / 6px 7px repeat-x;
+}

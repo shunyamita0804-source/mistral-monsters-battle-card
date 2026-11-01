@@ -20,6 +20,9 @@ import {
   shieldOf,
   skillCost,
   attackableMonsters,
+  findMonster,
+  requiemVictims,
+  RULE_VARIANTS,
   tailwindTargets,
   targetsFor,
   undodgeableNow,
@@ -247,9 +250,11 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const geol = chooseEnergyOrPin(state, side, options, enemies, style, skill);
   if (geol) return geol;
 
-  // 2.7 セレフィーン（2026-10-29）。みちしお
+  // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルのしのレクイエム
   const tide = chooseTide(state, side, options);
   if (tide) return tide;
+  const requiemPlay = chooseRequiem(state, side, options);
+  if (requiemPlay) return requiemPlay;
 
   // 2.8 ツムジ（2026-10-30 指示書 U）。かぜのり（Wひっかきの2回続けては、いちばん先に考える）
   const windRide = chooseWindRide(state, side, options);
@@ -413,32 +418,44 @@ function chooseSupportPlay(state: BattleState, side: Side, options: Option[], st
   return null;
 }
 
-/** みちしおを使うのに要る山札の枚数（これより少なければ山札が残り少ないので使わない） */
-const TIDE_MIN_DECK = 10;
-/** 大きい技（ルナタイド・オーシャンウェーブ）とみなす必要マナ */
-const TIDE_BIG_COST = 4;
-
 /**
- * みちしお（セレフィーン。2026-10-29 指示書）：その手番に攻撃で相手を倒せず、手札の大きい技（同じモンスターの必要マナ4以上の攻撃）が
- * 次の手番にマナが足りなくて使えないとき。次の手番のマナ＝いまのマナ＋この手番にマナにできる手札（みちしおと大きい技を除く）。
- * 山札が残り少ない（TIDE_MIN_DECK より少ない）ときは使わない
+ * みちしお（指示書 AJ：カルシェル・セレフィーン）：場を水中にすると強くなる攻撃（場が水中なら2倍・水中の相手に防御されない／回避されない）を、
+ * この手番に別の味方（みちしおを使うモンスター以外。試遊の切り替えで行動に数えないなら同じモンスターも）が続けて使えるときに使う。
+ * もう水中で、次の相手の手番まで続くなら使わない
  */
 function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
-  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'mana' && o.def.effect.amount !== undefined);
+  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'tide');
   if (!tide) return null;
-  const mine = state.sides[side];
-  if (mine.deck.length < TIDE_MIN_DECK || canKillThisTurn(state, side, options)) return null;
-  const user = availableUsers(state, side, tide.def)[0];
+  if (state.tide && state.tide.untilTurn >= state.turn + 1) return null;
+  const mana = manaOf(state.sides[side]);
+  const casters = availableUsers(state, side, tide.def);
+  for (const o of options.filter(isSkillOption)) {
+    const e = o.def.effect;
+    if (o.card.uid === tide.card.uid || e.type !== 'attack' || !(e.doubleInWater || e.unblockableVsWater || e.undodgeableVsWater)) continue;
+    if (tide.def.cost + o.def.cost > mana) continue;
+    for (const caster of casters) {
+      const follower = availableUsers(state, side, o.def).find((u) => u.uid !== caster.uid || RULE_VARIANTS.tideFreeAction);
+      if (follower) return { type: 'useCard', side, cardUid: tide.card.uid, userUid: caster.uid };
+    }
+  }
+  return null;
+}
+
+/**
+ * しのレクイエム（指示書 AJ：デスオル）：倒れる相手（ライフ1以下）が1体以上いて、倒れる味方より多いとき。
+ * 倒れる相手が1体だけなら、その手番に攻撃で倒せないときだけ
+ */
+function chooseRequiem(state: BattleState, side: Side, options: Option[]): BattleAction | null {
+  const req = options.filter(isSkillOption).find((o) => o.def.effect.type === 'requiem');
+  if (!req) return null;
+  const user = availableUsers(state, side, req.def)[0];
   if (!user) return null;
-  const big = mine.hand
-    .filter((c) => c.uid !== tide.card.uid)
-    .map((c) => ({ c, def: getPlayCard(c.cardId) }))
-    .filter(({ def }) => def.kind === 'skill' && def.monsterId === tide.def.monsterId && def.effect.type === 'attack' && def.cost >= TIDE_BIG_COST)
-    .sort((a, b) => a.def.cost - b.def.cost)[0];
-  if (!big) return null;
-  const nextMana = manaOf(mine) + mine.hand.length - 2;
-  if (big.def.cost <= nextMana) return null;
-  return { type: 'useCard', side, cardUid: tide.card.uid, userUid: user.uid };
+  const victims = requiemVictims(state, user.uid);
+  const foes = victims.filter((m) => findMonster(state, m.uid)?.side !== side).length;
+  const friends = victims.length - foes;
+  if (foes === 0 || foes <= friends) return null;
+  if (foes === 1 && canKillThisTurn(state, side, options)) return null;
+  return { type: 'useCard', side, cardUid: req.card.uid, userUid: user.uid };
 }
 
 /**
