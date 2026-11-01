@@ -6,6 +6,7 @@ import { cardBookEntries } from '../src/data/cardNumbers.ts';
 import { GACHA_SERIES } from '../src/data/economy.ts';
 import tsumujiJson from '../src/data/official/tsumuji14_skills_OFFICIAL_20261030.json';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS, ajRareNames } from '../src/data/skillRebuildAJ.ts';
 import { soramoSkillId } from '../src/data/soramo.ts';
 import { TSUMUJI_COLOR, TSUMUJI_GACHA_RARE, TSUMUJI_MONSTER, TSUMUJI_MONSTER_ID, TSUMUJI_SKILLS, tsumujiSkillId } from '../src/data/tsumuji.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
@@ -22,6 +23,8 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 const tsu = (n: number): string => tsumujiSkillId(n);
 const sor = (n: number): string => soramoSkillId(n);
 const ORIGINAL_DIR = 'design-parts/cards-original/tsumuji';
+/** 指示書 AJ の表のツムジの12枚の ID（ゲームのカードはこの表から作る。11 かぜのまく・13 すりぬける は外した） */
+const AJ_TSUMUJI_IDS = (AJ_SKILLS[TSUMUJI_MONSTER_ID] ?? []).map((r) => r.id);
 
 function csvRows(path: string): string[][] {
   const text = readFileSync(path, 'utf8').replace(/^﻿/, '');
@@ -63,12 +66,11 @@ describe('ツムジ：データ（届いた JSON・CSV を無改変で置き、�
     expect(SKILLS.find((s) => s.name === 'おいかぜ')?.monsterId).toBe('mon-pukarim');
   });
 
-  it('カードに書く短い文（指示書の表のとおり）。JSON の文は変えない', () => {
-    expect(getSkill(tsu(2)).effectTextJa).toBe('同じターンに、もう1枚の「Wひっかき」を続けて使える');
+  it('カードに書く短い文（指示書 AJ の表のとおり）。JSON の文は変えない', () => {
+    expect(getSkill(tsu(2)).effectTextJa).toBe('同じターンにもう1枚続けて使える');
     expect(getSkill(tsu(4)).effectTextJa).toBe('回避されない');
-    expect(getSkill(tsu(8)).effectTextJa).toBe('次のターン、ツムジの攻撃技のマナ−1');
-    expect(getSkill(tsu(11)).effectTextJa).toBe('ちから技・かしこさ技に効く');
-    expect(getSkill(tsu(14)).effectTextJa).toBe('ちから技・かしこさ技を、消費マナに関係なく回避');
+    expect(getSkill(tsu(8)).effectTextJa).toBe('次のターン、ツムジの攻撃のマナ−1');
+    expect(getSkill(tsu(14)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
     expect(tsumujiJson.skills[7]?.effect).toBe('次の自分のターン、ツムジの攻撃技の消費マナを1減らす（0より下にはならない・重ねられない）');
   });
 
@@ -81,22 +83,23 @@ describe('ツムジ：データ（届いた JSON・CSV を無改変で置き、�
     for (const size of ['normal', 'hand']) expect(existsSync(`assets/images/ui/skillcard_simple/frame_${size}_tsumuji.webp`)).toBe(true);
   });
 
-  it('ふつうの一覧に入り、図鑑の番号はセレフィーンのあと（No.151〜165）', () => {
+  it('ふつうの一覧に入り、図鑑の番号はセレフィーンのあと（指示書 AJ で1体13枚：No.131〜143）', () => {
     expect(MONSTERS.some((m) => m.id === TSUMUJI_MONSTER_ID)).toBe(true);
-    expect(SKILLS.filter((s) => s.monsterId === TSUMUJI_MONSTER_ID).map((s) => s.id)).toEqual(TSUMUJI_SKILLS.map((s) => s.id));
+    expect(AJ_TSUMUJI_IDS).toHaveLength(12);
+    expect(SKILLS.filter((s) => s.monsterId === TSUMUJI_MONSTER_ID).map((s) => s.id)).toEqual(AJ_TSUMUJI_IDS);
     const book = cardBookEntries();
-    expect(book.find((e) => e.card.id === TSUMUJI_MONSTER_ID)?.no).toBe(151);
-    expect(book.find((e) => e.card.id === tsu(14))?.no).toBe(165);
-    expect(book.find((e) => e.card.id === 'skl-serephine-14')?.no).toBe(150);
+    expect(book.find((e) => e.card.id === TSUMUJI_MONSTER_ID)?.no).toBe(131);
+    expect(book.find((e) => e.card.id === tsu(14))?.no).toBe(143);
+    expect(book.find((e) => e.card.id === 'skl-serephine-14')?.no).toBe(130);
   });
 
-  it('絵：技14枚・正式モンスターカード。原本は無改変で保管（パック・ショップの原本も）', () => {
+  it('絵：技12枚（指示書 AJ）・正式モンスターカード。原本（14枚）は無改変で保管（パック・ショップの原本も）', () => {
     for (let n = 1; n <= 14; n++) {
       const nn = String(n).padStart(2, '0');
-      expect(getSkill(tsu(n)).art?.file).toBe(`tsumuji_sk_${nn}.webp`);
       expect(existsSync(`assets/images/cards/skills/tsumuji_sk_${nn}.webp`)).toBe(true);
       expect(existsSync(`${ORIGINAL_DIR}/tsumuji_sk_${nn}.png`)).toBe(true);
     }
+    for (const id of AJ_TSUMUJI_IDS) expect(getSkill(id).art?.file).toBe(`tsumuji_sk_${id.slice(-2)}.webp`);
     expect(TSUMUJI_MONSTER.art?.file).toBe('tsumuji_official.webp');
     expect(existsSync('assets/images/cards/monsters/tsumuji_official.webp')).toBe(true);
     const originals = ['tsumuji_official_monstercard_LIFE6.png', 'tsumuji_original_approved.png', 'tsumuji_3view_approved.png', 'pack_tsumuji.png', 'pack_art_tsumuji.png', 'shop_pack_tsumuji.png', 'shop_card_tsumuji.png'];
@@ -258,9 +261,10 @@ describe('08 かぜのり：次の自分のターン、ツムジの攻撃技の�
   });
 
   it('0より下にはならない（ひっかく：マナ0のまま）。守り・特殊の技は下がらない', () => {
-    const s = withMonster(scene({ player: [tsu(1), tsu(11), tsu(8)] }), 'p-m1', { windRide: { discount: 1, turn: 3 } });
+    // 指示書 AJ で かぜのまく（11）を外したので、守りは ひらりとかわす（12・マナ1）で確かめる
+    const s = withMonster(scene({ player: [tsu(1), tsu(12), tsu(8)] }), 'p-m1', { windRide: { discount: 1, turn: 3 } });
     expect(handSkillCost(s, 'player', getSkill(tsu(1)))).toBe(0);
-    expect(handSkillCost(s, 'player', getSkill(tsu(11)))).toBe(2);
+    expect(handSkillCost(s, 'player', getSkill(tsu(12)))).toBe(1);
     expect(handSkillCost(s, 'player', getSkill(tsu(8)))).toBe(0);
   });
 
@@ -314,10 +318,10 @@ function guardAgainst(attack: string, guard: string, target = 'o-m1'): { usable:
 describe('04 つむじかぜ：回避されない（防御はできる）', () => {
   it('どの回避でも避けられない。防御は使える', () => {
     expect(getSkill(tsu(4)).effect).toEqual({ type: 'attack', undodgeable: true });
-    expect(guardAgainst(tsu(4), tsu(13)).usable).toBe(false);
+    // 指示書 AJ で すりぬける（13）・かぜのまく（11）を外したので、防御はソラモの星のまもり（12）で確かめる
     expect(guardAgainst(tsu(4), tsu(14)).usable).toBe(false);
-    expect(guardAgainst(tsu(4), tsu(11)).usable).toBe(true);
     expect(guardAgainst(tsu(4), sor(14), 'o-m2').usable).toBe(false);
+    expect(guardAgainst(tsu(4), sor(12), 'o-m2').usable).toBe(true);
   });
 });
 
@@ -332,26 +336,25 @@ describe('14 かぜよみ：ちから技・かしこさ技を、消費マナに�
     }
   });
 
-  it('12 ひらりとかわす：ちから技だけ。13 すりぬける：かしこさ技だけ。11 かぜのまく：両方 −2', () => {
+  it('12 ひらりとかわす：ちから技だけ', () => {
     expect(guardAgainst(tsu(1), tsu(12)).usable).toBe(true);
     expect(guardAgainst(tsu(3), tsu(12)).usable).toBe(false);
-    expect(guardAgainst(tsu(3), tsu(13)).usable).toBe(true);
-    expect(guardAgainst(tsu(1), tsu(13)).usable).toBe(false);
-    expect(getSkill(tsu(11)).effect).toEqual({ type: 'defense', reduce: 2, against: 'all' });
   });
+  // 指示書 AJ で外した技（skl-tsumuji-13 すりぬける・skl-tsumuji-11 かぜのまく）のテストは消した
 });
 
 describe('ツムジのガチャのシリーズ', () => {
-  it('セレフィーンのあとに1行。レア枠はかまいたち・ストームブレイド・かぜよみ。zephyra-beaten', () => {
+  it('セレフィーンのあとに1行。レア枠は指示書 AJ の★（ストームブレイド・かまいたち・かぜのり・かぜよみ）。zephyra-beaten', () => {
     const ids = GACHA_SERIES.map((s) => s.id);
     expect(ids.indexOf('tsumuji')).toBe(ids.indexOf('serephine') + 1);
     const series = GACHA_SERIES.find((s) => s.id === 'tsumuji');
-    expect(series).toEqual({ id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['かまいたち', 'ストームブレイド', 'かぜよみ'], unlockFlag: 'zephyra-beaten' });
+    expect(series).toEqual({ id: 'tsumuji', monsterId: 'mon-tsumuji', rareSkillNames: ['ストームブレイド', 'かまいたち', 'かぜのり', 'かぜよみ'], unlockFlag: 'zephyra-beaten' });
     if (!series) throw new Error('series');
     const lineup = seriesLineup(series);
     expect(lineup.errors).toEqual([]);
-    expect(lineup.rareIds).toEqual([tsu(3), tsu(10), tsu(14)]);
-    expect(lineup.all).toHaveLength(15);
+    expect(series.rareSkillNames).toEqual(ajRareNames(TSUMUJI_MONSTER_ID));
+    expect(lineup.rareIds).toEqual([tsu(10), tsu(3), tsu(8), tsu(14)]);
+    expect(lineup.all).toHaveLength(13);
   });
 
   it('パックの色（pack_tint.py）・パックの絵（gacha_series_build.py）・ショップの棚（shop_goods_20261030.py）にツムジがある', () => {

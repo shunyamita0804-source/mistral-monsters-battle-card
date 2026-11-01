@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { cardCatalog } from '../src/data/cards.ts';
+import { cardCatalog, getSkill, REMOVED_SKILL_IDS } from '../src/data/cards.ts';
 import { SKILL_CARD_TEXT } from '../src/data/skillCardText.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 
 /** カードに書く短い効果の文（2026-10-29 ユーザー指示。src/data/skillCardText.ts） */
 describe('カードに書く短い効果の文', () => {
-  it('どれも実在する技で、技の効果の文になっている（JSON の文は変えない）', () => {
-    for (const [id, text] of Object.entries(SKILL_CARD_TEXT)) {
-      const card = cardCatalog.get(id);
-      expect(card?.kind, id).toBe('skill');
-      if (card?.kind === 'skill') expect(card.effectTextJa, id).toBe(text);
+  it('指示書 AJ：ゲームの技の効果の文は表の文（text）。JSON の文は変えない', () => {
+    for (const rows of Object.values(AJ_SKILLS)) {
+      for (const row of rows) expect(getSkill(row.id).effectTextJa ?? null, row.id).toBe(row.text);
+    }
+  });
+
+  it('SKILL_CARD_TEXT（前の14枚のときの短い文）の技は、今の技か、指示書 AJ で外した技', () => {
+    for (const id of Object.keys(SKILL_CARD_TEXT)) {
+      expect(cardCatalog.get(id)?.kind === 'skill' || REMOVED_SKILL_IDS.includes(id), id).toBe(true);
     }
   });
 
@@ -25,7 +30,7 @@ describe('カードに書く短い効果の文', () => {
     }
   });
 
-  it('ユーザーが決めた文', () => {
+  it('ユーザーが決めた文（前の14枚のときの文。SKILL_CARD_TEXT に残す）', () => {
     expect(SKILL_CARD_TEXT['skl-gauul14-14']).toBe('マナに関係なく、ちから技・かしこさ技を回避');
     expect(SKILL_CARD_TEXT['skl-pukarim-10']).toBe('プカリム以外の味方1体：次のターンの攻撃＋1');
     expect(SKILL_CARD_TEXT['skl-lazuck-itazura']).toBe('相手の手札1枚をランダムに山札へ混ぜる（補充なし）');

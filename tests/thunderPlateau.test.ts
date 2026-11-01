@@ -181,8 +181,8 @@ describe('B の大会の出場条件・セーブ', () => {
     expect(base().storyFlags).not.toContain(THUNDER_BOSS_WAIVED_FLAG);
   });
 
-  it('セーブの version は 32（B の大会の条件のため）', () => {
-    expect(SAVE_VERSION).toBe(32);
+  it('セーブの version は 33（B の大会の条件のため 32。指示書 AJ で外した技を消すために 33 に）', () => {
+    expect(SAVE_VERSION).toBe(33);
   });
 });
 

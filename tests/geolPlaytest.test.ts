@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { REMOVED_SKILL_IDS } from '../src/data/cards.ts';
 import { GEOL_MONSTER_ID, GEOL_PLAYTEST_16 } from '../src/data/geol.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
 import { emptyGeolStats, playGeolMatch, type GeolStats } from '../src/game/battle/geolPlaytest.ts';
@@ -15,7 +16,12 @@ import { cardName } from '../src/i18n/content.ts';
  */
 const GAMES = Number(process.env.PLAYTEST ?? 4);
 const KEYS = BOOSTERS.map((b) => b.key);
-const geolDeck = (key: (typeof KEYS)[number], slot: number): Deck => swapDeck(key, slot, GEOL_MONSTER_ID, GEOL_PLAYTEST_16);
+/**
+ * 指示書 AJ で外した技を除いた試遊用の16枚（前のデータ GEOL_PLAYTEST_16 に外した技が残っているため。src は変えない）。
+ * 足りない枚数は swapDeck が並びの順に同じカードの2枚目・3枚目で埋める
+ */
+const GEOL_CARDS = GEOL_PLAYTEST_16.filter((c) => !REMOVED_SKILL_IDS.includes(c.id));
+const geolDeck = (key: (typeof KEYS)[number], slot: number): Deck => swapDeck(key, slot, GEOL_MONSTER_ID, GEOL_CARDS);
 
 interface Tally {
   wins: number;

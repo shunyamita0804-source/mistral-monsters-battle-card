@@ -6,7 +6,8 @@ import { RUN_DUNGEONS, runBattlerFace, runBossOpponent, runConfig } from '../src
 import { DUNGEON_MONEY } from '../src/data/economy.ts';
 import { getPerson, PEOPLE, personOfOpponent } from '../src/data/people.ts';
 import { getTournament } from '../src/data/tournaments.ts';
-import { TSUMUJI_MONSTER_ID, TSUMUJI_SKILLS } from '../src/data/tsumuji.ts';
+import { TSUMUJI_MONSTER_ID } from '../src/data/tsumuji.ts';
+import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { DUNGEON_SPOTS } from '../src/data/worldMap.ts';
 import { missingBosses } from '../src/game/calendar/calendar.ts';
 import {
@@ -29,6 +30,9 @@ import { entryCheck } from '../src/game/progress/tournament.ts';
 import { createNewSave, normalizeSave, SAVE_VERSION, unlockedDungeonsFor, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
 import { dungeonName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+
+/** 指示書 AJ の表のツムジの12枚（ゲームの技カード） */
+const TSUMUJI_AJ_IDS = (AJ_SKILLS[TSUMUJI_MONSTER_ID] ?? []).map((r) => r.id);
 
 /**
  * 風の渓谷（2026-10-30 指示書 U「風の渓谷とツムジ」）：D ランクの2つ目のダンジョン・強い風のマス・守り手ゼフィラ・バトラーのニコ。
@@ -256,11 +260,11 @@ describe('入手の流れ', () => {
     expect(w).toMatchObject({ cleared: true, firstClear: true });
     expect(w.clearCards).toEqual([{ cardId: TSUMUJI_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[TSUMUJI_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, ID, ZEPHYRA_TEAM)).toEqual(TSUMUJI_SKILLS.map((k) => k.id));
+    expect(bossRewardCandidates(w.save, ID, ZEPHYRA_TEAM)).toEqual(TSUMUJI_AJ_IDS);
     const again = beatZephyra(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills(ID)).toEqual(TSUMUJI_SKILLS.map((k) => k.id));
+    expect(bossTrumpSkills(ID)).toEqual(TSUMUJI_AJ_IDS);
     const chestCards = new Set<string>();
     for (let i = 0; i < 3000; i++) {
       const r = rollChest(ID, i, 'f1-chest-1');
@@ -321,6 +325,6 @@ describe('D の大会の出場条件・セーブ', () => {
   });
 
   it('セーブの version は上げていない（ダンジョン・人・モンスターを足しただけ。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(32); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に
+    expect(SAVE_VERSION).toBe(33); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に
   });
 });

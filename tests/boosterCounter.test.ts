@@ -3,6 +3,8 @@ import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import contents from '../src/data/official/booster_contents_20261030.json';
 import before from '../src/data/official/booster_contents_20261029.json';
+import ajContents from '../src/data/official/booster_contents_20261101_AJ.json';
+import { ajBoxRows } from '../src/data/skillRebuildAJ.ts';
 import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
 import {
@@ -27,8 +29,9 @@ const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginE
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
 describe('ブースターの箱＝初期配布', () => {
-  it('箱の中身はモンスター3枚＋技56枚＋サポート4枚（旅の手帳×2・投石×2。2026-10-30 指示書 Y）。資料の技名・枚数どおり', () => {
-    for (const group of contents.booster_groups) {
+  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
+    expect(ajContents.booster_groups.map((g) => g.booster_key)).toEqual(BOOSTERS.map((b) => b.key));
+    for (const group of ajContents.booster_groups) {
       const key = group.booster_key as BoosterKey;
       const deck = boosterDeck(key);
       const def = BOOSTERS.find((b) => b.key === key);
@@ -36,9 +39,11 @@ describe('ブースターの箱＝初期配布', () => {
       expect(deck.skills).toHaveLength(60);
       const skills = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'skill');
       const supports = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'support');
-      expect(skills).toHaveLength(56);
-      expect(countCards(supports)).toEqual({ 'sup-2': 2, 'sup-7': 2 });
-      expect(supports.map(name).sort()).toEqual(['投石', '投石', '旅の手帳', '旅の手帳'].sort());
+      expect(skills).toHaveLength(48);
+      expect(group.skill_card_count).toBe(48);
+      expect(countCards(supports)).toEqual({ 'sup-2': 3, 'sup-7': 3, 'sup-1': 2, 'sup-3': 2, 'sup-10': 2 });
+      expect(countCards(supports)).toEqual(Object.fromEntries(group.support_cards.map((c) => [c.support_id, c.copies])));
+      expect([...new Set(supports.map(name))].sort()).toEqual(['旅の手帳', '投石', '薬草', '風まかせ', '声援'].sort());
       // 資料の行（モンスター名・技名・枚数）と、今のデータの技（名前で引く）が一致する
       const want: Record<string, number> = {};
       for (const row of group.card_rows) {
@@ -46,6 +51,7 @@ describe('ブースターの箱＝初期配布', () => {
         const hit = monster ? skillsOf(monster).filter((s) => s.name === row.skill_name) : [];
         expect(hit, `${row.monster} ${row.skill_name}`).toHaveLength(1);
         const id = hit[0]?.id ?? '';
+        expect(id).toBe(row.skill_id);
         want[id] = (want[id] ?? 0) + row.copies;
       }
       expect(countCards(skills)).toEqual(want);
@@ -72,11 +78,23 @@ describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとか
     }
   });
 
-  it('烈火の猛攻：ラズック ひっかき1・かみつき2・とびかかり3・みだれづめ2・トリックショット1・シャドウバースト3（案3に足した）、ノビトン くしゃみ1・ミラージュノーズ2', () => {
+  it('指示書 AJ の箱：どの箱も、3体それぞれの技は表の box の枚数（16枚ずつ。ラズック・ノビトンは仮の枚数）', () => {
+    for (const b of BOOSTERS) {
+      const c = ids(b.key);
+      for (const m of b.monsters) {
+        const want = Object.fromEntries(ajBoxRows(m));
+        const got = Object.fromEntries(skillsOf(m).map((k) => [k.id, c[k.id] ?? 0]).filter(([, n]) => (n as number) > 0));
+        expect(got, `${b.key} ${m}`).toEqual(want);
+        expect(Object.values(want).reduce((n, x) => n + x, 0), `${b.key} ${m}`).toBe(16);
+      }
+    }
+  });
+
+  it('烈火の猛攻（指示書 AJ・仮）：ラズック ひっかき2・かみつき3・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ2（レアのトリックショット・シャドウバーストは入らない）、ノビトン くしゃみ2・ミラージュノーズ2', () => {
     const c = ids('booster-2');
     const laz = (n: string): number => c[n] ?? 0;
-    expect([1, 2, 3, 4, 9, 10, 7, 8].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([1, 2, 3, 2, 1, 3, 0, 0]);
-    expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([1, 2]);
+    expect([1, 2, 3, 4, 6, 7, 8, 15, 9, 10].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([2, 3, 3, 2, 2, 1, 1, 2, 0, 0]);
+    expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([2, 2]);
   });
 
   it('前の中身で箱を開けたセーブは、所持カード・デッキを変えない（読み込み直しても同じ）', () => {
@@ -134,8 +152,10 @@ describe('カウンターで残りの2箱を買う', () => {
     s = r.save;
     // 中身は所持カードに足すだけ（デッキは変えない。同じカードが重なってもそのまま持つ）
     expect(s.deck).toEqual(boosterDeck('booster-1'));
-    const gauul = 'mon-gauul';
-    expect(s.collection[gauul]).toBe(2);
+    // ラズックは旅立ちのきらめき・烈火の猛攻の両方に入る（指示書 AJ の箱）
+    const lazuck = 'mon-lazuck';
+    expect(s.collection[lazuck]).toBe(2);
+    expect(s.collection['mon-gauul']).toBe(1);
     expect(boosterShelf(s)).toEqual([
       { key: 'booster-2', bought: true },
       { key: 'booster-3', bought: false },

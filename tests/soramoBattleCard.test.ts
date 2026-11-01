@@ -148,11 +148,11 @@ describe('数値の欄のきまり（2026-10-25：特殊は「効果」・回避
       else if (cat === 'evade') expect(skillValueBadgeText(b)).toBe('回避');
       else expect(skillValueBadgeText(b)).toBe('効果');
     }
-    // ソラモ14技：09 すなかけ・10 吠える（特殊）・11 まるまる（防御 -3）・13 ひらりジャンプ（回避）・01（攻撃）
+    // ソラモの技（指示書 AJ）：09 すなかけ・10 吠える（特殊）・12 星のまもり（防御 -3）・14 星影ステップ（回避）・01（攻撃）。11 まるまる・13 ひらりジャンプ は外した
     expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-09')))).toBe('効果');
     expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-10')))).toBe('効果');
-    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-11')))).toBe('-3');
-    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-13')))).toBe('回避');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-12')))).toBe('-3');
+    expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-14')))).toBe('回避');
     expect(skillValueBadge(getSkill('skl-soramo14-01')).kind).toBe('damage');
     setLanguage('en');
     expect(skillValueBadgeText(skillValueBadge(getSkill('skl-soramo14-09')))).toBe('Effect');

@@ -1,4 +1,4 @@
-import { getPlayCard, skillsOf } from '../../data/cards.ts';
+import { cardCatalog, getPlayCard, skillsOf } from '../../data/cards.ts';
 import type { BoosterKey } from '../../data/introV2.ts';
 import { PUKARIM_MONSTER_ID, PUKARIM_PLAYTEST_16, pukarimSkillId } from '../../data/pukarim.ts';
 import { DECK_RULES } from '../../data/rules.ts';
@@ -30,7 +30,9 @@ export function pukarimSwapDeck(key: BoosterKey, slot: number, pukarimCards: rea
  * 2026-10-30 指示書 Y で箱の技が56枚（1体あたり16〜20枚）になったので、抜いた枚数が16より多いときは、cards の順にもう1枚ずつ
  * （同じカード3枚まで）足して、抜いた枚数と同じにする
  */
-export function swapDeck(key: BoosterKey, slot: number, monsterId: string, cards: readonly { readonly id: string; readonly copies: number }[]): Deck {
+export function swapDeck(key: BoosterKey, slot: number, monsterId: string, cards0: readonly { readonly id: string; readonly copies: number }[]): Deck {
+  // 2026-11-01 指示書 AJ：前の16枚の表には外した技が入っていることがある（確認用の画面・試遊）。今のカードだけ使い、足りない分は下で足す
+  const cards = cards0.filter((c) => cardCatalog.get(c.id) !== undefined);
   const base = boosterDeck(key);
   const out = base.monsters[slot];
   if (!out) throw new Error(`入れ替えるモンスターがいません: ${key} ${slot}`);

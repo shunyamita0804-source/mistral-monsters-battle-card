@@ -1,7 +1,8 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { REMOVED_SKILL_IDS } from '../src/data/cards.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
-import { PUKARIM_MONSTER_ID } from '../src/data/pukarim.ts';
+import { PUKARIM_MONSTER_ID, PUKARIM_PLAYTEST_16 } from '../src/data/pukarim.ts';
 import { playMatch, pukarimSwapDeck, type PlaytestStats } from '../src/game/battle/playtest.ts';
 import { isDeckValid, countCards, type Deck } from '../src/game/deck/deck.ts';
 import { boosterDeck } from '../src/game/story/introV2.ts';
@@ -14,6 +15,11 @@ import { cardName } from '../src/i18n/content.ts';
  */
 const GAMES = Number(process.env.PLAYTEST ?? 4);
 const KEYS = BOOSTERS.map((b) => b.key);
+/**
+ * 指示書 AJ で外した技を除いた試遊用の16枚（前のデータ PUKARIM_PLAYTEST_16 に外した技〔13 ぷかっとうく〕が残っているため。src は変えない）。
+ * 足りない枚数は swapDeck が並びの順に同じカードの2枚目・3枚目で埋める
+ */
+const PUKARIM_CARDS = PUKARIM_PLAYTEST_16.filter((c) => !REMOVED_SKILL_IDS.includes(c.id));
 
 interface Tally {
   wins: number;
@@ -43,7 +49,7 @@ describe('プカリムの試遊（自動の対戦）', () => {
   it('入れ替えたデッキは、モンスター3体（1体がプカリム）・山札60枚で、ルールに合う', () => {
     for (const key of KEYS) {
       for (let slot = 0; slot < 3; slot++) {
-        const d = pukarimSwapDeck(key, slot);
+        const d = pukarimSwapDeck(key, slot, PUKARIM_CARDS);
         expect(d.monsters[slot]).toBe(PUKARIM_MONSTER_ID);
         expect(d.skills).toHaveLength(60);
         expect(isDeckValid(d, countCards([...d.monsters, ...d.skills]))).toBe(true);
@@ -69,7 +75,7 @@ describe('プカリムの試遊（自動の対戦）', () => {
         const name = `${a}#${slot}`;
         puk[name] = {};
         KEYS.forEach((b, j) => {
-          (puk[name] as Record<string, Tally>)[b] = series(pukarimSwapDeck(a, slot), boosterDeck(b), GAMES, 50000 + i * 1000 + slot * 100 + j * 10);
+          (puk[name] as Record<string, Tally>)[b] = series(pukarimSwapDeck(a, slot, PUKARIM_CARDS), boosterDeck(b), GAMES, 50000 + i * 1000 + slot * 100 + j * 10);
         });
       }
     });

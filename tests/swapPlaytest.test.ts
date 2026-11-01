@@ -23,7 +23,9 @@ import { addCount, emptyCount, playCounted, summarize } from './support/boxCount
 /**
  * 入れ替えの試遊（2026-10-30 指示書 Y の E-3。指示書 Z の F-2 で、腕前 A どうし・レア抜きの16枚に。報告だけで、値は直さない）。
  * 最初の箱のモンスター1体を入れ替えたデッキ（3箱 × 3通り＝9つ）で、元の3箱と対戦する（先攻・後攻は半分ずつ・両方とも腕前 A の CPU）。
- * 入れる16枚（6体とも同じ決め方）：レア以外の技（11種）を1枚ずつ＋マナの少ない攻撃技（レア以外。同じなら番号の小さい方）から2枚目を足して16枚
+ * 入れる16枚（6体とも同じ決め方）：レア以外の技を1枚ずつ＋マナの少ない攻撃技（レア以外。同じなら番号の小さい方）から2枚目を足して16枚。
+ * 2026-11-01 指示書 AJ で技が12枚（レア4・レア以外8）になり、攻撃技の2枚目だけでは16枚に届かない子がいるので、
+ * 足りなければ攻撃以外の技（マナの少ない順）の2枚目、それでも足りなければ攻撃技の3枚目を足す（Claude の仮の決め方）
  * ふだん（npm run check）は少ない回数で動くことだけ確かめる。npm run playtest:swap（PLAYTEST=200）で各組み合わせ 200 回（PLAYTEST_OUT に JSON）
  */
 const GAMES = Number(process.env.PLAYTEST ?? 2);
@@ -35,18 +37,25 @@ const WITH_RARE = process.env.PLAYTEST_WITH_RARE === '1';
 type Pick = readonly { readonly id: string; readonly copies: number }[];
 
 /**
- * レア以外の技を1枚ずつ＋マナの少ない攻撃技（レア以外）から2枚目を足して16枚。
- * withRare（2026-10-31 指示書 AG。PLAYTEST_WITH_RARE=1）：レア3種も1枚ずつ入れ（14種）、マナの少ない攻撃技（レア以外）から2枚目を足して16枚
+ * レア以外の技を1枚ずつ＋マナの少ない攻撃技（レア以外）から2枚目を足して16枚（足りなければ攻撃以外の2枚目・攻撃技の3枚目。上の説明）。
+ * withRare（2026-10-31 指示書 AG。PLAYTEST_WITH_RARE=1）：レア4種（指示書 AJ）も1枚ずつ入れ（12種）、マナの少ない攻撃技（レア以外）から2枚目を足して16枚
  */
 export function playtest16(monsterId: string, withRare = WITH_RARE): Pick {
   const rare = new Set(GACHA_SERIES.find((g) => g.monsterId === monsterId)?.rareSkillNames ?? []);
   const normal = skillsOf(monsterId).filter((k) => withRare || !rare.has(k.name));
-  const second = normal
-    .filter((k) => k.effect.type === 'attack' && !rare.has(k.name))
-    .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id))
-    .slice(0, 16 - normal.length)
-    .map((k) => k.id);
-  return normal.map((k) => ({ id: k.id, copies: second.includes(k.id) ? 2 : 1 }));
+  const byCost = (a: { cost: number; id: string }, b: { cost: number; id: string }): number => a.cost - b.cost || a.id.localeCompare(b.id);
+  const notRare = normal.filter((k) => !rare.has(k.name));
+  const extra = [...notRare.filter((k) => k.effect.type === 'attack').sort(byCost), ...notRare.filter((k) => k.effect.type !== 'attack').sort(byCost)];
+  const copies = new Map(normal.map((k) => [k.id, 1]));
+  let total = normal.length;
+  for (let n = 2; n <= 3 && total < 16; n++) {
+    for (const k of n === 2 ? extra : extra.filter((x) => x.effect.type === 'attack')) {
+      if (total >= 16) break;
+      copies.set(k.id, n);
+      total++;
+    }
+  }
+  return normal.map((k) => ({ id: k.id, copies: copies.get(k.id) ?? 1 }));
 }
 
 // 2026-10-31 指示書 AB：シシエンを足した（PLAYTEST_SUBJECTS=mon-shishien でしぼれる）。指示書 AF：ハクランを足した（PLAYTEST_SUBJECTS=mon-hakuran）。指示書 AG：デスオル（mon-desuoru。PLAYTEST_WITH_RARE=1 でレアありの16枚）
@@ -59,8 +68,9 @@ describe('入れ替えの試遊（腕前 A どうし・レア抜きの16枚）',
       const cards = playtest16(id);
       expect(cards.reduce((n, c) => n + c.copies, 0), id).toBe(16);
       const rare = GACHA_SERIES.find((g) => g.monsterId === id)?.rareSkillNames ?? [];
-      expect(rare, id).toHaveLength(3);
-      expect(cards.filter((c) => rare.includes(getSkill(c.id).name)).length, id).toBe(WITH_RARE ? 3 : 0);
+      expect(rare, id).toHaveLength(4); // 指示書 AJ：レアは4つ
+      expect(cards.filter((c) => rare.includes(getSkill(c.id).name)).length, id).toBe(WITH_RARE ? 4 : 0);
+      expect(Math.max(...cards.map((c) => c.copies)), id).toBeLessThanOrEqual(3);
     }
   });
 

@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { REMOVED_SKILL_IDS } from '../src/data/cards.ts';
 import { FLUNE_MONSTER_ID, FLUNE_PLAYTEST_16 } from '../src/data/flune.ts';
 import { GEOL_MONSTER_ID, GEOL_PLAYTEST_16 } from '../src/data/geol.ts';
 import { HYOUZUKU_MONSTER_ID, HYOUZUKU_PLAYTEST_16 } from '../src/data/hyouzuku.ts';
@@ -20,11 +21,17 @@ import { cardName } from '../src/i18n/content.ts';
  */
 const GAMES = Number(process.env.PLAYTEST ?? 2);
 const KEYS = BOOSTERS.map((b) => b.key);
+/**
+ * 指示書 AJ で外した技を除いた試遊用の16枚（前のデータ *_PLAYTEST_16 に外した技が残っているため。src は変えない）。
+ * 足りない枚数は swapDeck が並びの順に同じカードの2枚目・3枚目で埋める
+ */
+const current = (cards: readonly { readonly id: string; readonly copies: number }[]) => cards.filter((c) => !REMOVED_SKILL_IDS.includes(c.id));
+const HYOUZUKU_CARDS = current(HYOUZUKU_PLAYTEST_16);
 const SUBJECTS: readonly { readonly id: string; readonly cards: readonly { readonly id: string; readonly copies: number }[] }[] = [
-  { id: HYOUZUKU_MONSTER_ID, cards: HYOUZUKU_PLAYTEST_16 },
-  { id: GEOL_MONSTER_ID, cards: GEOL_PLAYTEST_16 },
-  { id: FLUNE_MONSTER_ID, cards: FLUNE_PLAYTEST_16 },
-  { id: PUKARIM_MONSTER_ID, cards: PUKARIM_PLAYTEST_16 },
+  { id: HYOUZUKU_MONSTER_ID, cards: HYOUZUKU_CARDS },
+  { id: GEOL_MONSTER_ID, cards: current(GEOL_PLAYTEST_16) },
+  { id: FLUNE_MONSTER_ID, cards: current(FLUNE_PLAYTEST_16) },
+  { id: PUKARIM_MONSTER_ID, cards: current(PUKARIM_PLAYTEST_16) },
 ];
 
 /** a（player 側）が b に games 回で勝った割合（％。先攻・後攻は半分ずつ） */
@@ -38,7 +45,7 @@ describe('ヒョウズクの試遊（自動の対戦）', () => {
   it('入れ替えたデッキは、モンスター3体（1体がヒョウズク）・山札60枚で、ルールに合う', () => {
     for (const key of KEYS) {
       for (let slot = 0; slot < 3; slot++) {
-        const d = swapDeck(key, slot, HYOUZUKU_MONSTER_ID, HYOUZUKU_PLAYTEST_16);
+        const d = swapDeck(key, slot, HYOUZUKU_MONSTER_ID, HYOUZUKU_CARDS);
         expect(d.monsters[slot]).toBe(HYOUZUKU_MONSTER_ID);
         expect(d.skills).toHaveLength(60);
         expect(isDeckValid(d, countCards([...d.monsters, ...d.skills]))).toBe(true);

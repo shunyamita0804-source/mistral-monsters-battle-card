@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { cardCatalog, LEGACY_SUPPORT_IDS, skillsOf } from '../src/data/cards.ts';
+import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import now from '../src/data/official/booster_contents_20261028.json';
@@ -14,6 +14,7 @@ import { boosterDeck } from '../src/game/story/introV2.ts';
  * 箱の技の中身を資料の JSON（前＝booster_contents_20261028.json、案・案3＝booster_contents_20261029_draft.json）から作り、
  * 仮サポート12枚・モンスターは今の箱のまま。両方とも相手の CPU と同じ思考で最後まで自動で対戦する（flunePlaytest.ts の playFluneMatch）。
  * ふだん（npm run check）は少ない回数で動くことだけ確かめる。npm run playtest:rekka（PLAYTEST=200）で各 200 回（先攻・後攻は半分ずつ）
+ * 2026-11-01 指示書 AJ：前の資料の箱は外した技が入っていて作れないので、いまの箱（booster_contents_20261101_AJ.json・仮）だけで表を出す
  */
 const GAMES = Number(process.env.PLAYTEST ?? 4);
 const KEYS = BOOSTERS.map((b) => b.key);
@@ -26,31 +27,14 @@ interface Row {
 
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
-/** 資料の行（モンスター名・技名・枚数）から箱のデッキを作る。サポートは 2026-10-29 の箱と同じ12枚（sup-1〜6 を2枚ずつ。中身は 2026-10-30 指示書 Y から新しいカード） */
-function deckFromRows(key: BoosterKey, rows: readonly Row[]): Deck {
-  const base = boosterDeck(key);
-  const skills: string[] = [];
-  for (const row of rows) {
-    const monster = base.monsters.find((m) => name(m) === row.monster);
-    const hit = monster ? skillsOf(monster).filter((s) => s.name === row.skill_name) : [];
-    if (hit.length !== 1 || !hit[0]) throw new Error(`${row.monster} ${row.skill_name}`);
-    for (let i = 0; i < row.copies; i++) skills.push(hit[0].id);
-  }
-  const supports = LEGACY_SUPPORT_IDS.flatMap((id) => [id, id]);
-  return { monsters: [...base.monsters], skills: [...skills, ...supports] };
-}
-
 const rowsOf = (data: { booster_groups: readonly { booster_key: string; card_rows: readonly Row[] }[] }, key: string): readonly Row[] =>
   data.booster_groups.find((g) => g.booster_key === key)?.card_rows ?? [];
 
-/** 案3（案2 で目安に入らなかったときの入れかえ。草案の JSON の trial_variants に同じものを書く） */
-const variantRows = (id: string): readonly Row[] | null => (draft as { trial_variants?: { id: string; card_rows: Row[] }[] }).trial_variants?.find((v) => v.id === id)?.card_rows ?? null;
-
-/** 試す烈火の猛攻：今・新しい（案）・案3 */
+// 指示書 AJ で外した技（skl-gauul14-11 翼の盾・skl-gauul14-12 炎の壁 など）が前の資料の行に入っていて、前の烈火の猛攻・案・案3 の箱はもう作れないので、
+// 資料の行から箱を作って比べるテスト（案3 と 2026-10-30 の箱の差が8枚）は消した。いまの箱（指示書 AJ・仮）だけで勝率の表を出す
+/** 試す烈火の猛攻：今の箱（指示書 AJ） */
 const REKKA: Readonly<Record<string, Deck>> = {
-  now: deckFromRows('booster-2', rowsOf(now, 'booster-2')),
-  draft: deckFromRows('booster-2', rowsOf(draft, 'booster-2')),
-  ...(variantRows('plan3') ? { plan3: deckFromRows('booster-2', variantRows('plan3') ?? []) } : {}),
+  now: boosterDeck('booster-2'),
 };
 
 interface Tally {
@@ -73,18 +57,20 @@ function series(a: Deck, b: Deck, games: number, seedBase: number, options: Flun
 }
 
 describe('烈火の猛攻の試遊（自動の対戦）', () => {
-  it('案3 は 2026-10-29 の箱と同じ（2026-10-30 指示書 Y で今の箱は技を8枚足した）。どれも技48枚・同じカード3枚まで・ルールに合う。ほかの箱の行は変えない', () => {
-    const plan3 = countCards((REKKA.plan3?.skills ?? []).filter((c) => cardCatalog.get(c)?.kind === 'skill'));
-    const now3 = countCards(boosterDeck('booster-2').skills.filter((c) => cardCatalog.get(c)?.kind === 'skill'));
-    const added = Object.entries(now3).filter(([id, n]) => n !== (plan3[id] ?? 0)).map(([id, n]) => n - (plan3[id] ?? 0));
-    expect(added).toEqual(Array(8).fill(1));
+  it('前の資料（20261028・20261029_draft）は変えない：ほかの箱の行は同じ。資料の行に、指示書 AJ で外した技が入っている。いまの烈火の猛攻は技48枚・同じカード3枚まで・ルールに合う', () => {
+    for (const key of ['booster-1', 'booster-3']) expect(rowsOf(draft, key)).toEqual(rowsOf(now, key));
+    const box = boosterDeck('booster-2');
+    const missing = rowsOf(now, 'booster-2').filter((row) => {
+      const monster = box.monsters.find((m) => name(m) === row.monster);
+      return !monster || !skillsOf(monster).some((s) => s.name === row.skill_name);
+    });
+    expect(missing.map((r) => r.skill_name)).toContain('翼の盾');
     for (const [id, deck] of Object.entries(REKKA)) {
       const skills = deck.skills.filter((c) => cardCatalog.get(c)?.kind === 'skill');
       expect(skills, id).toHaveLength(48);
       expect(Math.max(...Object.values(countCards(skills))), id).toBeLessThanOrEqual(3);
       expect(isDeckValid(deck, countCards([...deck.monsters, ...deck.skills])), id).toBe(true);
     }
-    for (const key of ['booster-1', 'booster-3']) expect(rowsOf(draft, key)).toEqual(rowsOf(now, key));
   });
 
   it(`各組み合わせ ${GAMES} 回ずつ：勝率の表`, () => {
