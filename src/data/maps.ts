@@ -462,7 +462,7 @@ export const CAMERA_LEANS: readonly { readonly mapId: string; readonly npcId: st
 const PRACTICE_ART = ROOMS4_ART.practice;
 /**
  * カード練習場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
- * 奥の黒板・左の壁ぞいのカードの棚3台
+ * 奥の黒板・左の壁ぞいのカードの棚3台。真ん中の机は 2026-11-01（指示書 AI）に黒板の前まで奥へ動かした
  */
 export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 'interior', PRACTICE_ART, [
   interactAt('practice-shelf', itemOf(PRACTICE_ART, 'SHELF'), '教材の棚', 'message', '練習用のカードがきちんと並んでいる。'),
@@ -470,9 +470,10 @@ export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 
   interactAt('practice-table-1', itemOf(PRACTICE_ART, 'TABLE_1'), '練習テーブル', 'practiceTable'),
   interactAt('practice-table-2', itemOf(PRACTICE_ART, 'TABLE_2'), '練習テーブル', 'practiceTable'),
   interactAt('practice-table-3', itemOf(PRACTICE_ART, 'TABLE_3'), '練習テーブル', 'practiceTable'),
-  // ガレス先生は真ん中の机のすぐ手前。案内役は最初の練習試合が終わるまで、先生の右どなりにいる
+  // ガレス先生は真ん中の机の右の辺の横（手前を向く）。案内役は最初の練習試合が終わるまで、先生の右（3マス右・2マス手前）にいる。
+  // 2026-11-01 指示書 AI【1】：机を奥へ動かし、先生を机の右へ。ミレイユは先生と、先生の左前に立つ主人公のどちらにも重ならない所
   npc('practice-teacher', spotOf(PRACTICE_ART, 'TEACHER_SPOT').x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y, 'teacher', 'practiceTable'),
-  npc('guide-practice', spotOf(PRACTICE_ART, 'TEACHER_SPOT', 5).x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y + 1, 'neighbor_guide'),
+  npc('guide-practice', spotOf(PRACTICE_ART, 'TEACHER_SPOT', 3).x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y + 2, 'neighbor_guide'),
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
 
