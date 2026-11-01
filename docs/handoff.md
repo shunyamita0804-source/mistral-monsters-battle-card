@@ -1,28 +1,31 @@
-# 引き継ぎメモ（2026-11-01：AG2 まで公開・次のセッションへの引き継ぎ用）
+# 引き継ぎメモ（2026-11-01：AI・AJ をそれぞれのブランチで作業・検品待ち。公開は AG2 まで）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-11-01 セッション終わり。同じセッションで AF→AF2→AF2 の追加→AG→AH→AG2→公開）
+### まず読む：いまの状態（2026-11-01 AJ のセッション終わり。同じセッションで AI → AJ）
 
-- **公開中：`main`（AG2 まで。2026-11-01 に AF・AF2・AG・AG2・AH をまとめて公開。公開ページは `static/index-CmH6ON_x.js`。deploy-pages の実行 153・成功）**。
-  雷の高原・カラスのめが公開ページに入っていること、新しい絵と曲が公開URLで 200 になることを確認。**セーブ version 32**・**テスト 1117件**。作業ブランチはすべて main に取り込み済み・使い終わり
-- このセッションでしたこと（くわしくは各記録）：
-  - AF・AF2（`docs/hakuran-af-20261031.md`）：ハクラン（mon-hakuran・LIFE 7・内部ランク B・青緑 #237C7A・図鑑 No.196〜210）。モンスターカードの枠とパックの縁はハクランだけ暗く。正式カードは LIFE 7 の版
-  - AG・AG2（`docs/desuoru-ag-20261031.md`）：デスオル（mon-desuoru・LIFE 7・**初めての内部ランク A**・紺 #1E2B58・No.211〜225）。新しい効果 **カラスのめ**（`discardChoice`）。AG2 でしのささやき 4・めいかいのかぜ 5・技カードの帯を紺に
-  - AH（`docs/thunder-plateau-ah-20261101.md`）：雷の高原（dungeon-09・B ランク）・落雷のマス（`src/game/dungeon/thunder.ts`）・ボス ステラ（ハクランが切り札・lifeScale 1.0）・バトラー ルカ・曲 Dungeon_Tower（CC BY 4.0）・B の大会の条件（前のセーブで B 以上ならはずす。v32）
-- **ユーザーの返事待ち**（報告はすべて ZIP で渡した）：
-  - AG2：デスオルのレアありの入れ替えが 69.4%（A の目安 70% に 0.6 届かない）でよいか
-  - AH：落雷の多さ（予告を見ずに歩くと1階に約5回番人。Claude の判断でとなりへの予告を減らした）・世界地図の印の場所（Claude の仮）・せりふ（進行の案のまま）
-  - AF2 以前：AC・AE の報告への感想
+- **作業中（どちらも main に入れる前・報告 ZIP を渡して検品待ち）**
+  - ブランチ `aj-skill-rebuild`（指示書 AJ。main から）：技カードの作り直し（15体×12枚・レア4・図鑑13番）・居場所（地上・空中・水中）とみちしお・新しい効果・CPU・
+    箱の仮の中身・セーブ **version 33**・居場所の印（【仮】コードの印）。**テスト 1154件**。記録 `docs/skill-rebuild-aj-20261101.md`（要確認10件）、
+    カードの正本 `src/data/skillRebuildAJ.ts`、決まり `docs/battle-rules.md`「指示書 AJ」、試遊の数 `docs/design/skill-rebuild-aj-20261101/`
+  - ブランチ `ai-collision`（指示書 AI。main から）：練習場の並び・案内の道の曲がる回数・街の入口と大会会場の当たり・当たりの点検の道具。記録は そのブランチの `docs/collision-ai-20261101.md`。
+    セーブ version は 32 のまま。AJ と同じ所を触っていないが、`docs/handoff.md` はどちらも書いたので、取り込むときに合わせる
+- **公開中：`main`（AG2 まで。公開ページは `static/index-CmH6ON_x.js`）**。AI・AJ は「公開して」まで公開しない
+- 前のセッションでしたこと：AF・AF2（ハクラン）・AG・AG2（デスオル）・AH（雷の高原）。くわしくは各記録と下の「その前」
+- **ユーザーの返事**（2026-11-01 指示書 AI の【0】）：AG2 のレアありの入れ替え 69.4% は「このままでよい」（物差しはレア抜き＝72.0% で合格）。
+  雷の高原の地図の印・落雷の多さ・せりふ・曲の音量は、ユーザーの実機確認のあとに別に指示がある（それまで触らない）
+- **ユーザーの返事待ち**：AI の報告・AJ の報告（要確認：みちしお＋タイダルクラッシュは同じターンにできない〔1体1回〕・箱の足りない8枚・足りなくなったデッキ ほか）。
+  AJ の試遊の数字は変えていない（蒼海が強すぎる・ボスと大会の常連に勝てない・デスオルは 63.7% など。合わせ直しは次の指示書）。AF2 以前：AC・AE の報告への感想
 - **まだ決まっていないこと**：デスオルの置き場所・手に入れ方（`GACHA_SERIES` に `desuoru-unlocked` の1行だけ。どこでも立たない）。ハクラン・デスオルはショップの棚の絵に入れていない（ユーザー決定 2026-10-31）
 - **待っているもの**：部屋の家具の描き直し（まだ依頼していない）
-- **未完了**：iPhone 実機での確認（R〜AH）
+- **未完了**：iPhone 実機での確認（R〜AJ）
 - **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は `git fetch origin main` で最新の main に合わせてから、新しいブランチを切る
 - 作業のこつ（このセッションで分かったこと）：
   - Node 24 は自動で入らないことがある → `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24` → 以後 `export PATH=/opt/nvm/versions/node/v24.22.2/bin:$PATH` → `npm install`。絵の道具は `pip install scipy matplotlib`
   - 新しいモンスターの足し方は `src/data/hakuran.ts`・`desuoru.ts` と同じ形（JSON を読む・枠の色の表 `skillcard_simple_build.py`・`skillcard_v3_build.py`・`battle_card_frame.py`・`pack_tint.py`・`gacha_panel_build.py`・`gacha_series_build.py` に1行ずつ）。作り直したらほかの絵が同じバイト列か `cmp` で確かめる
+  - AJ の試遊：`PLAYTEST=50 PLAYTEST_OUT=… npx vitest run tests/ajPlaytest.test.ts`（約3分。`PLAYTEST_TIDE_FREE=1` でみちしおを行動に数えない場合）。写真：`tools/e2e/aj_shot.cjs`（開発用サーバー）
   - 試遊：`npm run playtest:hakuran`・`playtest:desuoru`・`playtest:desuoru-rare`・`playtest:stella`・`playtest:thunder`。`tests/support/boxCount.ts` で決着の理由・回避されない攻撃・カラスのめを数える
   - 写真：`tools/e2e/hakuran_af_shot.cjs`・`desuoru_ag_shot.cjs`・`thunder_plateau_shot.cjs`（`ONLY=` でしぼれる）。手札のカードは重なるので名前（aria-label の頭）で選び、押したあと「やめる」で戻す
   - 写真のセーブは `createNewSave(日付, 'balance')` に `story.introV2.state: 'completed'` などを入れる（入れないと、はじめの物語から始まる）。大会の受付は `{hall,49,29,up}`・掲示板は `{bureau,16,19,left}`
