@@ -9,7 +9,7 @@ export type { Habitat };
  * - 名前を変えた技は、カードの ID と絵はそのまま（名前と数字・効果だけ変える）。新しい技（skl-kalshell-15・skl-desuoru-15・16）の絵は仮（art）
  * - 居場所（地上・空中・水中）：MONSTER_HABITAT。場が水中（みちしお）のあいだは全員を水中として扱う（src/game/battle/engine.ts）
  * - box：最初の箱（ブースター）に入れる枚数（箱が決まっている子だけ。ラズック・ノビトンは仮の箱の枚数。src/data/introV2.ts）
- * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
+ * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリルを足して16体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
  * 決まりの細かい所は docs/battle-rules.md「指示書 AJ」
  */
 /** モンスターの居場所（指示書 AJ【2】） */
@@ -26,6 +26,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-pukarim': 'air',
   'mon-hyouzuku': 'air',
   'mon-desuoru': 'air',
+  'mon-lilil': 'air', // 2026-11-02 指示書 AK
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -72,7 +73,7 @@ const T_DODGE_2 = 'マナ2以上のちから技・かしこさ技を回避';
 const T_DODGE_FORCE = 'ちから技を回避';
 const T_TIDE = '次の自分のターンの終わりまで、全モンスターを水中にする';
 
-/** 15体の12枚（並び＝表示の番号 1〜12） */
+/** 16体の12枚（並び＝表示の番号 1〜12。リリルは 2026-11-02 指示書 AK） */
 export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   // ソラモ（地上・LIFE 7）［箱：旅立ちのきらめき 16枚］
   'mon-soramo': [
@@ -314,9 +315,27 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-desuoru-12', name: 'ルーンのまもり', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
     { id: 'skl-desuoru-14', name: 'やみにまぎれる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
+  // リリル（空中・LIFE 5・C。2026-11-02 指示書 AK。正本は src/data/official/lilil12_skills_OFFICIAL_20261102.json。新しい効果は無い）
+  // ［箱：旅立ちのきらめき 16枚（box は JSON の box_copies）］。絵は lilil_sk_NN.webp（番号＝技番号）
+  'mon-lilil': [
+    { id: 'skl-lilil-01', name: 'しっぽはたき', cat: 'ち', mana: 0, damage: 1, text: null, box: 2, art: 'lilil_sk_01.webp' },
+    { id: 'skl-lilil-02', name: 'つめでひっかく', cat: 'ち', mana: 1, damage: 1, text: null, box: 2, art: 'lilil_sk_02.webp' },
+    { id: 'skl-lilil-03', name: 'こあくまだま', cat: 'か', mana: 1, damage: 1, text: null, box: 2, art: 'lilil_sk_03.webp' },
+    { id: 'skl-lilil-04', name: 'マナをくすねる', cat: 'か', mana: 2, damage: 1, effect: atk({ manaDrain: 1 }), text: '相手のマナ−1', box: 2, art: 'lilil_sk_04.webp' },
+    { id: 'skl-lilil-05', name: 'まどわしのひかり', cat: 'か', mana: 3, damage: 3, text: null, box: 2, art: 'lilil_sk_05.webp' },
+    { id: 'skl-lilil-06', name: 'デビーム', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 0, art: 'lilil_sk_06.webp' },
+    { id: 'skl-lilil-07', name: 'あまいかおり', cat: 'か', mana: 4, damage: 1, effect: atk({ manaDrain: 4 }), text: '相手のマナ−4', rare: true, box: 0, art: 'lilil_sk_07.webp' },
+    // ラズックの おびきよせ と同じ（taunt）
+    { id: 'skl-lilil-08', name: 'うっとりウインク', cat: '特', mana: 3, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、リリルしか攻撃できない', box: 2, art: 'lilil_sk_08.webp' },
+    // カルシェルの すなをほる と同じ（hide）
+    { id: 'skl-lilil-09', name: 'うそなき', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '相手は次のターン、リリルを攻撃できない', rare: true, box: 0, art: 'lilil_sk_09.webp' },
+    { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 2, art: 'lilil_sk_10.webp' },
+    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 1, art: 'lilil_sk_11.webp' },
+    { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 1, art: 'lilil_sk_12.webp' },
+  ],
 };
 
-/** 指示書 AJ で作り直した 15体（並び＝今までのモンスターの並び） */
+/** 指示書 AJ の形の技を持つモンスター（AJ で作り直した15体＋指示書 AK のリリル。並び＝今までのモンスターの並び） */
 export const AJ_MONSTER_IDS: readonly string[] = Object.keys(AJ_SKILLS);
 
 /** レアの枠の技の名前（ガチャのシリーズの rareSkillNames） */

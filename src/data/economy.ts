@@ -151,6 +151,9 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'nobiton', monsterId: 'mon-nobiton', rareSkillNames: ajRareNames('mon-nobiton') },
   { id: 'myurol', monsterId: 'mon-myurol', rareSkillNames: ajRareNames('mon-myurol') },
   { id: 'kalshell', monsterId: 'mon-kalshell', rareSkillNames: ajRareNames('mon-kalshell') },
+  // リリル（2026-11-02 指示書 AK）：並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く。旅立ちのきらめきを選んだ人）。unlockFlag は付けない。
+  // パックの窓の絵はまだ無い（届くまで封をしたパックの絵。販売機の窓も絵が無いときの出し方）。レアの枠は JSON の gacha_slot（デビーム・あまいかおり・うそなき・よつばねのまい）
+  { id: 'lilil', monsterId: 'mon-lilil', rareSkillNames: ajRareNames('mon-lilil') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）

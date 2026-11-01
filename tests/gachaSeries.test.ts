@@ -32,8 +32,8 @@ const SORAMO = GACHA_SERIES.find((s) => s.id === 'soramo');
 if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
-  it('16シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン・ハクラン・デスオル）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
+  it('16シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン・ハクラン・デスオル。2026-11-02 にリリル〔カルシェルのあと〕）。どれも 150G・5枚', () => {
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -73,6 +73,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       shishien: ['れんごくのとっしん', 'もえるたてがみ', 'ほのおのほうこう', 'ねつのとばり'],
       hakuran: ['てんをかける', 'らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
       desuoru: ['しのゆびさし', 'ヘルのもん', 'カラスのめ', 'やみにまぎれる'],
+      lilil: ['デビーム', 'あまいかおり', 'うそなき', 'よつばねのまい'],
     };
     for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) {
       expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
@@ -151,8 +152,8 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
     expect(r.save.coins).toBe(149);
   });
 
-  it('プカリム・ジオル・フルーネ以外は最初から選べる（新しいセーブでも買える）', () => {
-    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag)) {
+  it('プカリム・ジオル・フルーネ以外は最初から選べる（新しいセーブでも買える。リリル〔2026-11-02〕は旅立ちのきらめきを開けてから）', () => {
+    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag && s.id !== 'lilil')) {
       const r = purchaseSeriesPack({ ...createNewSave(), coins: 150 }, series.id, `tx-${series.id}`, 3);
       expect(r.status).toBe('ok');
     }
@@ -204,7 +205,8 @@ const series = (id: string) => {
 describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決定）', () => {
   it('最初から並ぶのは、管理局で選んだ箱の3体のシリーズだけ', () => {
     // 指示書 AJ の箱：旅立ち＝ソラモ・ノビトン・ラズック／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン（並びはシリーズの順）
-    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'lazuck', 'nobiton', 'tools']);
+    // 2026-11-02 指示書 AK：旅立ち＝ソラモ・リリル・ラズック
+    expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'lazuck', 'lilil', 'tools']);
     expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton', 'tools']);
     expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
     // 箱の3体には NEW を出さない
@@ -219,7 +221,7 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
 
   it('そのモンスターのモンスターカードを初めて手に入れたら開き、NEW が出る（ショップで箱を買った・ボスから受け取った など）', () => {
     const s = addCards(boxSave('booster-1'), [{ cardId: 'mon-kalshell', count: 1 }, { cardId: 'mon-geol', count: 1 }]);
-    expect(ids(s)).toEqual(['soramo', 'lazuck', 'nobiton', 'kalshell', 'geol', 'tools']);
+    expect(ids(s)).toEqual(['soramo', 'lazuck', 'kalshell', 'lilil', 'geol', 'tools']);
     expect(isNewGachaSeries(s, series('kalshell'))).toBe(true);
     expect(isNewGachaSeries(s, series('geol'))).toBe(true);
     // 技カードだけでは開かない
@@ -256,8 +258,46 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
     if (!s) throw new Error('load');
     expect(s.version).toBe(SAVE_VERSION);
     expect(SAVE_VERSION).toBeGreaterThanOrEqual(28);
-    expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'tools']);
+    expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'pukarim', 'tools']);
     for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
+  });
+});
+
+describe('リリルを入れた旅立ちのきらめき（2026-11-02 指示書 AK）', () => {
+  /** 前の中身（ソラモ・ノビトン・ラズック）で旅立ちを開けたセーブ */
+  const oldBox = (): SaveData => {
+    const base = createNewGameSave();
+    const withCards = addCards(base, ['mon-soramo', 'mon-nobiton', 'mon-lazuck'].map((cardId) => ({ cardId, count: 1 })));
+    return { ...withCards, coins: 1000, story: { ...withCards.story, introV2: { ...withCards.story.introV2, state: 'completed', selectedBoosterKey: 'booster-1', boosterClaimed: true, boosterGranted: true } } };
+  };
+
+  it('前のセーブ（前の中身で旅立ちを開けた）は今までと同じ：ソラモ・ラズック・ノビトン。リリルは並ばず買えない。NEW も出さない', () => {
+    const s = oldBox();
+    expect(ids(s)).toEqual(['soramo', 'lazuck', 'nobiton', 'tools']);
+    for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
+    expect(purchaseSeriesPack(s, 'lilil', 'tx-l', 1).status).toBe('error');
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(s)));
+    if (!loaded) throw new Error('load');
+    expect(loaded.collection['mon-lilil'] ?? 0).toBe(0);
+    expect(ids(loaded)).toEqual(['soramo', 'lazuck', 'nobiton', 'tools']);
+  });
+
+  it('新しく旅立ちを開けた人：ソラモ・ラズック・リリルが最初から並び（NEW なし）、リリルのパックが買える。ノビトンは並ばない', () => {
+    const s = boxSave('booster-1');
+    expect(ids(s)).not.toContain('nobiton');
+    for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
+    expect(purchaseSeriesPack(s, 'lilil', 'tx-l', 1).status).toBe('ok');
+    // あとでノビトンのモンスターカードを手に入れたら、ノビトンが並ぶ（前の箱のモンスターなので NEW の印は出ない）
+    const got = addCards(s, [{ cardId: 'mon-nobiton', count: 1 }]);
+    expect(ids(got)).toContain('nobiton');
+  });
+
+  it('ほかの箱を選んだ人は、リリルのモンスターカードを手に入れるまで並ばない', () => {
+    expect(ids(boxSave('booster-2'))).not.toContain('lilil');
+    expect(ids(boxSave('booster-3'))).not.toContain('lilil');
+    const got = addCards(boxSave('booster-2'), [{ cardId: 'mon-lilil', count: 1 }]);
+    expect(ids(got)).toContain('lilil');
+    expect(isNewGachaSeries(got, series('lilil'))).toBe(true);
   });
 });
 

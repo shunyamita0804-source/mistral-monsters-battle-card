@@ -3,7 +3,7 @@ import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import contents from '../src/data/official/booster_contents_20261030.json';
 import before from '../src/data/official/booster_contents_20261029.json';
-import ajContents from '../src/data/official/booster_contents_20261101_AJ.json';
+import ajContents from '../src/data/official/booster_contents_20261102_AK.json';
 import { ajBoxRows } from '../src/data/skillRebuildAJ.ts';
 import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
@@ -29,7 +29,7 @@ const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginE
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
 describe('ブースターの箱＝初期配布', () => {
-  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
+  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（指示書 AK の版〔旅立ちのノビトンをリリルに〕。サポートは指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
     expect(ajContents.booster_groups.map((g) => g.booster_key)).toEqual(BOOSTERS.map((b) => b.key));
     for (const group of ajContents.booster_groups) {
       const key = group.booster_key as BoosterKey;
@@ -78,7 +78,7 @@ describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとか
     }
   });
 
-  it('指示書 AJ の箱：どの箱も、3体それぞれの技は表の box の枚数（16枚ずつ。ラズック・ノビトンは仮の枚数）', () => {
+  it('指示書 AJ の箱：どの箱も、3体それぞれの技は表の box の枚数（16枚ずつ。ラズック・ノビトンは仮の枚数。リリルは指示書 AK の box_copies）', () => {
     for (const b of BOOSTERS) {
       const c = ids(b.key);
       for (const m of b.monsters) {
