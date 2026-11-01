@@ -42,6 +42,7 @@ const TEXTS: Readonly<Record<string, string>> = {
   相手は次のターン行動できない: "The target can't act next turn.",
   '相手のマナ−1': "Opponent's mana -1.",
   '相手のマナ−3': "Opponent's mana -3.",
+  '相手のマナ−4': "Opponent's mana -4.", // 2026-11-02 指示書 AK リリルのあまいかおり（仮訳）
   手札をすべて交換: 'Swap your whole hand.',
   相手の手札をすべて見る: "See the opponent's whole hand.",
   ためているときは回避されない: "Can't be dodged while charged.",
@@ -64,6 +65,9 @@ const TEXTS: Readonly<Record<string, string>> = {
   '倒れている味方1体につき＋2': '+2 for each fallen ally.',
   相手の手札をすべて見て1枚選んで捨てさせる: "See the opponent's hand and make them discard 1 card you choose.",
   'ライフ1以下の、デスオル以外のモンスターをすべて倒す': 'Knock out every monster with 1 life or less, except Desuoru.',
+  // 2026-11-02 指示書 AK リリル（仮訳）
+  '相手は次のターン、リリルしか攻撃できない': 'Next turn, the enemy can only attack Lilil.',
+  '相手は次のターン、リリルを攻撃できない': "Next turn, the enemy can't attack Lilil.",
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(

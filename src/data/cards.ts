@@ -11,6 +11,7 @@ import { HYOUZUKU_MONSTER, HYOUZUKU_SKILLS } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER, SHISHIEN_SKILLS } from './shishien.ts';
 import { HAKURAN_MONSTER, HAKURAN_SKILLS } from './hakuran.ts';
 import { DESUORU_MONSTER, DESUORU_SKILLS } from './desuoru.ts';
+import { LILIL_MONSTER } from './lilil.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -38,6 +39,7 @@ import { AJ_SKILLS, MONSTER_HABITAT, type AjSkillRow } from './skillRebuildAJ.ts
  * 2026-10-31：シシエンと技14種を足した（src/data/shishien.ts。指示書 AB）
  * 2026-10-31：ハクランと技14種を足した（src/data/hakuran.ts。指示書 AF。手に入れ方はまだ無い）
  * 2026-10-31：デスオルと技14種を足した（src/data/desuoru.ts。指示書 AG。初めての内部ランク A。手に入れ方はまだ無い）
+ * 2026-11-02：リリルと技12種を足した（src/data/lilil.ts。指示書 AK。技は初めから AJ の表〔src/data/skillRebuildAJ.ts〕だけに書く。最初の箱「旅立ちのきらめき」に入る）
  */
 
 interface MonsterSeed {
@@ -157,7 +159,7 @@ export const TMP_GEOL_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no)
 export const TMP_FLUNE_ID = monsterId('tmp-flune');
 export const TMP_FLUNE_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-flune', no));
 
-/** 正式の15体（並び＝図鑑・一覧の順）。2026-11-01 指示書 AJ で居場所（habitat）を持たせた */
+/** 正式の16体（並び＝図鑑・一覧の順）。2026-11-01 指示書 AJ で居場所（habitat）を持たせた。2026-11-02 指示書 AK でリリルを足した */
 const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   SORAMO_MONSTER,
   LAZUCK_MONSTER,
@@ -174,6 +176,7 @@ const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   SHISHIEN_MONSTER,
   HAKURAN_MONSTER,
   DESUORU_MONSTER,
+  LILIL_MONSTER,
 ].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;
@@ -239,7 +242,7 @@ function ajSkill(monsterId: string, row: AjSkillRow, index: number): SkillCard {
   };
 }
 
-/** 指示書 AJ の15体の技（各12枚） */
+/** 指示書 AJ の形の16体の技（各12枚。リリルは 2026-11-02 指示書 AK） */
 const AJ_OFFICIAL_SKILLS: readonly SkillCard[] = OFFICIAL_MONSTERS.flatMap((m) => (AJ_SKILLS[m.id] ?? []).map((row, i) => ajSkill(m.id, row, i)));
 
 /** 指示書 AJ で外した技の ID（前のセーブの持っているカード・デッキから消す。src/game/save/saveData.ts の変換） */

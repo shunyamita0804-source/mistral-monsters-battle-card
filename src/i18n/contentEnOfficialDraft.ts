@@ -319,6 +319,22 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-desuoru-14:name': 'Melt into Shadow',
   'card:skl-desuoru-14:effect': 'Dodge any POW or INT skill.',
 
+  // リリル（2026-11-02 指示書 AK。仮訳。効果の文は AJ の表の文から src/i18n/contentEnAJ.ts で作る）
+  'card:mon-lilil:name': 'Lilil',
+  'card:mon-lilil:description': 'A mischievous little imp.',
+  'card:skl-lilil-01:name': 'Tail Swat',
+  'card:skl-lilil-02:name': 'Claw Scratch',
+  'card:skl-lilil-03:name': 'Imp Orb',
+  'card:skl-lilil-04:name': 'Mana Pinch',
+  'card:skl-lilil-05:name': 'Bewitching Light',
+  'card:skl-lilil-06:name': 'Debeam',
+  'card:skl-lilil-07:name': 'Sweet Scent',
+  'card:skl-lilil-08:name': 'Dreamy Wink',
+  'card:skl-lilil-09:name': 'Fake Tears',
+  'card:skl-lilil-10:name': 'Wing Dodge',
+  'card:skl-lilil-11:name': 'Twirl Away',
+  'card:skl-lilil-12:name': 'Four-Wing Dance',
+
   // 指示書 AJ（2026-11-01）：名前を変えた技・新しい技の名前と、効果の文（src/i18n/contentEnAJ.ts。同じキーはこちらが勝つ）
   ...AJ_EN,
 };

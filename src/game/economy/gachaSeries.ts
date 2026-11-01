@@ -47,10 +47,19 @@ export function seriesLineup(series: GachaSeries): SeriesLineup & { readonly err
 /**
  * 最初から並ぶシリーズのモンスター（2026-10-30 指示書 K。ユーザー決定）：管理局で選んだ箱の3体。
  * 箱を選んでいないセーブ（チュートリアルをスキップした・前の形式）は、今までどおり6つ（SKIP_GACHA_SERIES_IDS）
+ * 2026-11-02 指示書 AK：箱の中身が変わった箱（旅立ち：ノビトン → リリル）は、前の中身と今の中身の両方にいるモンスターはそのまま。
+ * 片方にだけいるモンスター（ノビトン・リリル）は、そのモンスターカードを持っているときだけ（前のセーブでもう箱を開けた人に
+ * リリルのシリーズを出さない・ノビトンに NEW を出さない。新しく箱を開けた人はリリルを持っているのでリリルが並ぶ）
  */
 export function startingGachaMonsters(save: SaveData): readonly string[] {
   const box = BOOSTERS.find((b) => b.key === save.story.introV2.selectedBoosterKey);
-  if (box) return box.monsters;
+  if (box) {
+    const former = box.formerMonsters;
+    if (!former) return box.monsters;
+    const both = box.monsters.filter((m) => former.includes(m));
+    const changed = [...box.monsters, ...former].filter((m) => !both.includes(m));
+    return [...both, ...changed.filter((m) => (save.collection[m] ?? 0) > 0)];
+  }
   return GACHA_SERIES.filter((s) => SKIP_GACHA_SERIES_IDS.includes(s.id)).map((s) => s.monsterId);
 }
 
