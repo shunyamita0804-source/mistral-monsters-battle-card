@@ -53,7 +53,7 @@ export interface BoosterDefinition {
   readonly key: BoosterKey;
   /** 商品名（2026-10-27 正式デザインの箱の名前。英語は i18n の introV2.pack.name.*） */
   readonly name: string;
-  /** 箱の絵（assets/images/ui/booster/。正式デザインの3箱集合から切り出し。src/ui/components/boosterArt.ts） */
+  /** 箱の絵（assets/images/ui/booster/。2026-11-02 指示書 AR で今の中身の箱絵に。src/ui/components/boosterArt.ts） */
   readonly art: 'booster_tabidachi' | 'booster_rekka' | 'booster_soukai';
   /** 種類（バランス・攻撃・防御）と、箱に描かれたモンスター（商品のイメージ。封入の保証・排出率ではない） */
   readonly category: StarterDeckKey;
