@@ -1,0 +1,544 @@
+{
+ "town": {
+  "blocked": 16482,
+  "edge_empty": 820,
+  "reasoned": 820,
+  "reasoned_outer": 536,
+  "reasoned_manual": 284,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 82,
+  "narrow_groups": [
+   [
+    9,
+    21,
+    11,
+    22,
+    2
+   ],
+   [
+    190,
+    21,
+    191,
+    22,
+    1
+   ],
+   [
+    138,
+    23,
+    139,
+    24,
+    1
+   ],
+   [
+    75,
+    28,
+    76,
+    29,
+    1
+   ],
+   [
+    144,
+    33,
+    145,
+    34,
+    1
+   ],
+   [
+    129,
+    35,
+    130,
+    37,
+    2
+   ],
+   [
+    187,
+    37,
+    191,
+    40,
+    5
+   ],
+   [
+    9,
+    40,
+    10,
+    41,
+    1
+   ],
+   [
+    92,
+    43,
+    93,
+    44,
+    1
+   ],
+   [
+    77,
+    47,
+    79,
+    48,
+    2
+   ],
+   [
+    86,
+    47,
+    88,
+    48,
+    2
+   ],
+   [
+    112,
+    47,
+    114,
+    48,
+    2
+   ],
+   [
+    121,
+    47,
+    123,
+    48,
+    2
+   ],
+   [
+    154,
+    47,
+    155,
+    48,
+    1
+   ],
+   [
+    9,
+    48,
+    10,
+    49,
+    1
+   ],
+   [
+    21,
+    48,
+    26,
+    49,
+    5
+   ],
+   [
+    46,
+    48,
+    51,
+    49,
+    5
+   ],
+   [
+    51,
+    50,
+    52,
+    51,
+    1
+   ],
+   [
+    14,
+    56,
+    15,
+    57,
+    1
+   ],
+   [
+    9,
+    66,
+    10,
+    67,
+    1
+   ],
+   [
+    13,
+    82,
+    14,
+    84,
+    2
+   ],
+   [
+    169,
+    84,
+    170,
+    85,
+    1
+   ],
+   [
+    9,
+    101,
+    11,
+    103,
+    2
+   ],
+   [
+    188,
+    105,
+    189,
+    106,
+    1
+   ],
+   [
+    190,
+    117,
+    191,
+    118,
+    1
+   ],
+   [
+    186,
+    121,
+    191,
+    122,
+    5
+   ],
+   [
+    129,
+    123,
+    130,
+    124,
+    1
+   ],
+   [
+    38,
+    130,
+    39,
+    131,
+    1
+   ],
+   [
+    51,
+    131,
+    52,
+    132,
+    1
+   ],
+   [
+    152,
+    131,
+    154,
+    132,
+    2
+   ],
+   [
+    9,
+    135,
+    10,
+    136,
+    1
+   ],
+   [
+    190,
+    138,
+    191,
+    139,
+    1
+   ],
+   [
+    190,
+    140,
+    191,
+    141,
+    1
+   ],
+   [
+    9,
+    156,
+    13,
+    157,
+    4
+   ],
+   [
+    123,
+    159,
+    124,
+    160,
+    1
+   ],
+   [
+    88,
+    161,
+    89,
+    162,
+    1
+   ],
+   [
+    111,
+    161,
+    112,
+    162,
+    1
+   ],
+   [
+    112,
+    163,
+    114,
+    165,
+    2
+   ],
+   [
+    113,
+    169,
+    114,
+    172,
+    3
+   ],
+   [
+    73,
+    170,
+    74,
+    171,
+    1
+   ],
+   [
+    20,
+    177,
+    21,
+    180,
+    3
+   ],
+   [
+    87,
+    183,
+    88,
+    184,
+    1
+   ],
+   [
+    112,
+    184,
+    113,
+    185,
+    1
+   ],
+   [
+    23,
+    199,
+    24,
+    201,
+    2
+   ],
+   [
+    17,
+    200,
+    18,
+    201,
+    1
+   ],
+   [
+    188,
+    202,
+    191,
+    203,
+    3
+   ]
+  ]
+ },
+ "player": {
+  "blocked": 318,
+  "edge_empty": 57,
+  "reasoned": 57,
+  "reasoned_outer": 56,
+  "reasoned_manual": 1,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 6,
+  "narrow_groups": [
+   [
+    1,
+    16,
+    2,
+    19,
+    3
+   ],
+   [
+    22,
+    17,
+    23,
+    20,
+    3
+   ]
+  ]
+ },
+ "guide": {
+  "blocked": 286,
+  "edge_empty": 63,
+  "reasoned": 63,
+  "reasoned_outer": 56,
+  "reasoned_manual": 7,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 3,
+  "narrow_groups": [
+   [
+    1,
+    17,
+    2,
+    20,
+    3
+   ]
+  ]
+ },
+ "house": {
+  "blocked": 216,
+  "edge_empty": 56,
+  "reasoned": 56,
+  "reasoned_outer": 50,
+  "reasoned_manual": 6,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 0,
+  "narrow_groups": []
+ },
+ "shop": {
+  "blocked": 1797,
+  "edge_empty": 26,
+  "reasoned": 26,
+  "reasoned_outer": 26,
+  "reasoned_manual": 0,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 6,
+  "narrow_groups": [
+   [
+    9,
+    19,
+    10,
+    21,
+    2
+   ],
+   [
+    17,
+    27,
+    18,
+    29,
+    2
+   ],
+   [
+    50,
+    28,
+    52,
+    29,
+    2
+   ]
+  ]
+ },
+ "arena": {
+  "blocked": 1693,
+  "edge_empty": 139,
+  "reasoned": 139,
+  "reasoned_outer": 87,
+  "reasoned_manual": 52,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 30,
+  "narrow_groups": [
+   [
+    32,
+    10,
+    38,
+    11,
+    6
+   ],
+   [
+    4,
+    16,
+    16,
+    19,
+    13
+   ],
+   [
+    4,
+    30,
+    15,
+    31,
+    11
+   ]
+  ]
+ },
+ "bureau": {
+  "blocked": 1683,
+  "edge_empty": 50,
+  "reasoned": 50,
+  "reasoned_outer": 50,
+  "reasoned_manual": 0,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 0,
+  "narrow_groups": []
+ },
+ "practice": {
+  "blocked": 1678,
+  "edge_empty": 92,
+  "reasoned": 92,
+  "reasoned_outer": 87,
+  "reasoned_manual": 5,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 10,
+  "narrow_groups": [
+   [
+    44,
+    30,
+    54,
+    31,
+    10
+   ]
+  ]
+ },
+ "lab": {
+  "blocked": 1706,
+  "edge_empty": 71,
+  "reasoned": 71,
+  "reasoned_outer": 49,
+  "reasoned_manual": 22,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 0,
+  "narrow_groups": []
+ },
+ "florist": {
+  "blocked": 1787,
+  "edge_empty": 56,
+  "reasoned": 56,
+  "reasoned_outer": 51,
+  "reasoned_manual": 5,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 2,
+  "narrow_groups": [
+   [
+    2,
+    27,
+    3,
+    28,
+    1
+   ],
+   [
+    45,
+    27,
+    46,
+    28,
+    1
+   ]
+  ]
+ },
+ "tailor": {
+  "blocked": 1637,
+  "edge_empty": 62,
+  "reasoned": 62,
+  "reasoned_outer": 54,
+  "reasoned_manual": 8,
+  "flagged": 0,
+  "flagged_groups": [],
+  "narrow": 11,
+  "narrow_groups": [
+   [
+    4,
+    27,
+    15,
+    28,
+    11
+   ]
+  ]
+ }
+}

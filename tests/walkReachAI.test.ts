@@ -133,8 +133,35 @@ describe('大会会場（指示書 AI【4】【5】）', () => {
     const back = findPathStraight(HALL, desk, (x, y) => y === exit.y && x >= exit.x && x < exit.x + exit.w, blocked) as Point[];
     expect(back).not.toBeNull();
     expect(countTurns(desk, back)).toBeLessThanOrEqual(1);
-    // 受付の前の行（29行）は、入口の通り道から受付まで、家具・柱でふさがれない（セリアのまわりの人の間あけだけ）
+    // 受付の前の行（29行）は、入口の通り道から受付まで、家具・柱でふさがれない
     for (let x = 24; x <= 55; x++) expect(isBlocked(HALL, x, 29, () => false), `${x},29`).toBe(false);
+  });
+  // 2026-11-02 iPhone 試遊：カウンターの左のはしに主人公が重なって動けなくなる・入口の柱と低い壁の手前で引っかかる
+  it('カウンターの左右のはしの横（体がカウンターに重なる列）には立てない。前の行（29行）からは受付まで歩ける', () => {
+    for (let y = 24; y <= 28; y++) {
+      expect(isBlocked(HALL, 42, y, () => false), `42,${y}`).toBe(true);
+      expect(isBlocked(HALL, 56, y, () => false), `56,${y}`).toBe(true);
+    }
+    expect(isBlocked(HALL, 41, 28, () => false)).toBe(false);
+    expect(isBlocked(HALL, 42, 29, () => false)).toBe(false);
+    // セリアのまわりは本人のマスだけ：受付の前の行を、カウンターの左はしの前で止まらずに、セリアの真ん前まで歩ける
+    const celia = HALL.objects.find((o) => o.id === 'hall-receptionist') as NpcObject;
+    for (let x = 42; x <= 55; x++) expect(blocked(x, celia.y + 1), `${x},${celia.y + 1}`).toBe(false);
+    const path = findPathWhere(HALL, HALL.spawn, (x, y) => x === celia.x && y === celia.y + 1, blocked, 40000, STEPS_4);
+    expect(path).not.toBeNull();
+  });
+  it('入口の柱のまわりに行き止まり（下にも横にも進めないマス）が無い。柱のあいだの通り道は12マスのまま', () => {
+    // 30行（柱の頭・低い壁のすぐ上）：歩けるマスで、下が低い壁なら、左右のどちらかに歩けるマスがある（柱にはさまれた1マスの行き止まりが無い）
+    for (let x = 1; x < 59; x++) {
+      if (blocked(x, 30) || !blocked(x, 31)) continue;
+      expect(!blocked(x - 1, 30) || !blocked(x + 1, 30), `${x},30`).toBe(true);
+      // 柱のすぐ横（柱の頭がかかるマス）には立たない
+      expect(x === 20 || x === 39, `${x},30`).toBe(false);
+    }
+    for (let y = 31; y <= 39; y++) {
+      const open = Array.from({ length: 60 }, (_, x) => x).filter((x) => !blocked(x, y));
+      expect(open, `${y}`).toEqual(Array.from({ length: 12 }, (_, i) => 24 + i));
+    }
   });
 });
 

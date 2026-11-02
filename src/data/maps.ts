@@ -396,7 +396,10 @@ const COUNTER_NPC_SPACE = { x: 0, y: 0 } as const;
 /**
  * 何マス奥に見える人なら、まわりをふさがないか。カウンターのすぐ前に立ったとき、主人公の頭が人の体に重ならない深さ。
  * 研究所のルーカス（約3マス）・管理局のエレノア（約3.6）・花屋（約3）・仕立て屋（約2.8）はふさがない。
- * 大会会場のセリア（約2）・カードショップの店員（1）は浅く、真ん前に立つと頭が体に重なるので、今までどおり NPC_SPACE（その1つ手前の行を通れる）
+ * カードショップの店員（1）は浅く、真ん前に立つと頭が体に重なるので、今までどおり NPC_SPACE（その1つ手前の行を通れる）。
+ * 大会会場のセリア（約2）も浅いが、2026-11-02 iPhone 試遊「カウンターの左のはしに主人公が重なり、そこから動けなくなる」で、
+ * セリアのまわり（よこ2マス）が受付の前の行をふさぎ、カウンターの左寄りで見えない壁に止まっていたので、本人のマスだけにした
+ * （受付の前の行を歩いて、セリアの真ん前まで行ける。真ん前では主人公の帽子がセリアの足もとにかかるが、カウンターの手前に立って見える）
  */
 const COUNTER_NPC_DEPTH = 2.5;
 const SHOP_ART = artOf('shop');
@@ -424,10 +427,11 @@ export const SHOP: MapDefinition = artMap('shop', 'カードショップ', 'inte
 
 const LAB_ART = ROOMS4_ART.lab;
 /** カウンターの奥などに立つ人（話しかけるマスは家具の手前。見た目だけ奥にずらす） */
-const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: number; readonly dy: number } | undefined, npcId: NpcId, action?: InteractAction): NpcObject => {
+/** forceBehindCounter：奥行きが浅くても、まわりをふさがない（本人のマスだけ）。大会会場のセリア（2026-11-02） */
+const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: number; readonly dy: number } | undefined, npcId: NpcId, action?: InteractAction, forceBehindCounter = false): NpcObject => {
   const p = spotOf(art, spot);
   // 見た目がカウンターの奥（COUNTER_NPC_DEPTH マス以上奥）の人は、まわりをふさがない（カウンターの前を歩ける。2026-11-02）
-  const behindCounter = (offset?.dy ?? 0) <= -COUNTER_NPC_DEPTH;
+  const behindCounter = forceBehindCounter || (offset?.dy ?? 0) <= -COUNTER_NPC_DEPTH;
   return { ...npc(id, p.x, p.y, npcId, action, offset?.dy, offset?.dx), ...(behindCounter ? { space: COUNTER_NPC_SPACE } : {}) };
 };
 /**
@@ -467,7 +471,7 @@ export const HALL: MapDefinition = artMap('hall', '大会会場', 'interior', HA
   interactAt('hall-table', itemOf(HALL_ART, 'TABLE'), '対戦テーブル', 'message', '屋根付きの会場の中央にある対戦テーブル。大会の対戦はここで行われる。'),
   interactAt('hall-seats-l', itemOf(HALL_ART, 'SEATS_L'), '客席', 'message', '観客席。'),
   interactAt('hall-seats-r', itemOf(HALL_ART, 'SEATS_R'), '客席', 'message', '観客席。'),
-  spotNpc('hall-receptionist', HALL_ART, 'RECEPTIONIST_SPOT', ROOMS4_DRAW_OFFSET.arena.RECEPTIONIST_SPOT, 'receptionist', 'tournamentDesk'),
+  spotNpc('hall-receptionist', HALL_ART, 'RECEPTIONIST_SPOT', ROOMS4_DRAW_OFFSET.arena.RECEPTIONIST_SPOT, 'receptionist', 'tournamentDesk', true),
   roomExit('hall-exit', HALL_ART, 'ARENA'),
 ], entryOf(HALL_ART));
 
