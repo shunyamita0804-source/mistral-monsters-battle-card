@@ -361,7 +361,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-forn-12', name: 'みがわりのふえ', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける', rare: true, box: 0, art: 'forn_sk_12.webp' },
   ],
   // ウズリオ（地上・LIFE 6・C。2026-11-02 指示書 AQ。正本は src/data/official/uzurio12_and_support3_OFFICIAL_20261102.json）
-  // 最初の箱には入れない（box なし）。絵は uzurio_sk_NN.webp（番号＝技番号）。新しい効果は 04 うずまきショット（airBonus）・06 おおたつまき（allTargets＋airOnly）
+  // 最初の箱には入れない（box なし）。絵は uzurio_sk_NN.webp（番号＝技番号）。新しい効果は 04 うずまきショット（airBonus）・06 おおたつまき（allTargets＋airBonus。指示書 AS で変えた）
   'mon-uzurio': [
     { id: 'skl-uzurio-01', name: 'しっぽはらい', cat: 'ち', mana: 0, damage: 1, text: null, art: 'uzurio_sk_01.webp' },
     { id: 'skl-uzurio-02', name: 'ころがりアタック', cat: 'ち', mana: 2, damage: 2, text: null, art: 'uzurio_sk_02.webp' },
@@ -369,8 +369,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 新しい効果（airBonus）：ねらった相手がいま空中なら技のダメージ＋2
     { id: 'skl-uzurio-04', name: 'うずまきショット', cat: 'か', mana: 2, damage: 2, effect: atk({ airBonus: 2 }), text: '相手が空中なら +2（ダメージ4）', art: 'uzurio_sk_04.webp' },
     { id: 'skl-uzurio-05', name: 'かぜのうず', cat: 'か', mana: 3, damage: 4, text: null, rare: true, art: 'uzurio_sk_05.webp' },
-    // 新しい効果（airOnly）：ジオルの 地ひびき（allTargets）と同じ当て方で、いま空中の相手全員に。守りは1体ずつ
-    { id: 'skl-uzurio-06', name: 'おおたつまき', cat: 'か', mana: 4, damage: 2, effect: atk({ allTargets: true, airOnly: true }), text: '空中にいる相手全員に2ダメージ', rare: true, art: 'uzurio_sk_06.webp' },
+    // 2026-11-02 指示書 AS（ユーザー決定）：相手全員に1ダメージ・いま空中の相手には2（ジオルの 地ひびき と同じ当て方。守りは1体ずつ）。空中の相手がいなくても使える
+    { id: 'skl-uzurio-06', name: 'おおたつまき', cat: 'か', mana: 4, damage: 1, effect: atk({ allTargets: true, airBonus: 1 }), text: '相手全員に1ダメージ。空中の相手には2ダメージ', rare: true, art: 'uzurio_sk_06.webp' },
     // ソラモの すなかけ と同じ（seal）
     { id: 'skl-uzurio-07', name: 'すなけむり', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, art: 'uzurio_sk_07.webp' },
     // ラズックの いたずら と同じ（handToDeck）

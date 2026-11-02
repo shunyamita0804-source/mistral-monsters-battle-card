@@ -192,7 +192,7 @@ function fieldScore(state: BattleState, side: Side, card: SupportCard): number {
 }
 
 /** 空中の相手に強くなる技（うずまきショット・おおたつまき・あらし。2026-11-02 指示書 AQ） */
-const isAirStrong = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.airBonus || k.effect.airOnly || k.effect.undodgeableVsAir);
+const isAirStrong = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.airBonus || k.effect.undodgeableVsAir);
 /** 地上の相手に強くなる技（地上の相手だけに使える急降下アタック・地ひびき。今の効果で地上の相手に強くなるのはこの2つだけ） */
 const isGroundStrong = (k: SkillCard): boolean => k.effect.type === 'attack' && !!k.effect.groundOnly;
 
@@ -645,12 +645,15 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
     const target = rider ? pickTarget(state, side, targetsFor(state, side, ridden.def, rider), style, skill, 'ride') : undefined;
     if (rider && target) return { type: 'useCard', side, cardUid: ridden.card.uid, userUid: rider.uid, targetUid: target.uid };
   }
+  // おおたつまき（相手全員に1・空中の相手には2。2026-11-02 指示書 AS）：相手に与えるダメージの合計が3以上のとき（1体でも倒せるときは上の倒す所で使う）
+  const isTornado = (o: SkillOption): boolean => o.def.effect.type === 'attack' && !!o.def.effect.allTargets && !!o.def.effect.airBonus;
+  const tornado = byPower.find(isTornado);
+  if (tornado && reachable(tornado).reduce((sum, e) => sum + powerOn(tornado, e), 0) >= TORNADO_TOTAL) return attackAction(state, side, tornado, reachable(tornado)[0]?.uid ?? '');
   // 試遊中：ジオルの地ひびき（相手全体）。倒せる相手がいなければ、相手が2体以上生きているときに使う（2026-10-29 指示書）
-  const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets);
+  const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets && !isTornado(o));
   if (quake && reachable(quake).length >= 2) return attackAction(state, side, quake, reachable(quake)[0]?.uid ?? '');
-  // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える。
-  // おおたつまき（空中の相手全員。2026-11-02 指示書 AQ）は、空中の相手が2体以上のとき（上の地ひびきと同じ）か、1体でも倒せるとき（上の倒す所）だけ
-  const candidates = byPower.filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && (reachable(o).length >= 2 || o.def.effect.airOnly)));
+  // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える。おおたつまきは上の2つ（倒せる・合計3以上）のときだけ
+  const candidates = byPower.filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && (reachable(o).length >= 2 || isTornado(o))));
   // 腕前 C：一部の手番で、強くない技（使える技からばらばら）を選ぶ
   const weak = cpuRoll(state, side, 'weak') < CPU_SKILL[skill].weakSkill;
   const strongest = weak ? candidates[Math.min(candidates.length - 1, Math.floor(cpuRoll(state, side, 'weakPick') * candidates.length))] : candidates[0];
@@ -676,6 +679,9 @@ function recoilSafe(state: BattleState, side: Side, o: SkillOption, enemies: rea
   const last = enemies.length === 1 ? enemies[0] : undefined;
   return !!last && targetsFor(state, side, o.def, user).some((m) => m.uid === last.uid) && last.life <= attackPower(state, o.def, user);
 }
+
+/** おおたつまきを使う、相手に与えるダメージの合計（2026-11-02 指示書 AS） */
+const TORNADO_TOTAL = 3;
 
 /** 大技とみなすダメージ（腕前 A のマナを残す考え方） */
 const BIG_POWER = 3;

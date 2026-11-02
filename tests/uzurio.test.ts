@@ -68,7 +68,8 @@ describe('ウズリオのデータ（届いた JSON のとおり）', () => {
       expect(r.name).toBe(j.name_ja);
       expect(r.cat).toBe(CAT[j.class]);
       expect(r.mana).toBe(j.mana);
-      expect(r.damage).toBe(j.damage);
+      // 06 おおたつまきは 2026-11-02 指示書 AS で「相手全員に1・空中の相手には2」に変えた（JSON は届いたままの前の値 2）
+      expect(r.damage).toBe(j.no === 6 ? 1 : j.damage);
       expect(!!r.rare).toBe(j.rare);
       expect(r.box ?? 0).toBe(0);
       expect(r.art).toBe(uzurioArtFile(j.no));
@@ -215,29 +216,34 @@ describe('うずまきショット（相手がいま空中なら＋2）', () => 
   });
 });
 
-describe('おおたつまき（空中の相手全員に 2。守りは1体ずつ）', () => {
-  it('空中の相手（ガウル）だけに当たる。地上・水中の相手には当たらない', () => {
+describe('おおたつまき（相手全員に1・空中の相手には2。守りは1体ずつ。2026-11-02 指示書 AS）', () => {
+  /** 相手の uid のライフを変える */
+  const lives = (s: BattleState, l: Record<string, number>): BattleState => ({
+    ...s,
+    sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid in l ? { ...m, life: l[m.uid] as number } : m)) } },
+  });
+
+  it('相手全員に当たる：地上（ソラモ）・水中（カルシェル）には 1、空中（ガウル）には 2', () => {
     const s = scene({ player: [TORNADO] });
-    expect(targetsFor(s, 'player', getSkill(TORNADO)).map((m) => m.uid)).toEqual(['o-m3']);
+    expect(targetsFor(s, 'player', getSkill(TORNADO)).map((m) => m.uid)).toEqual(['o-m1', 'o-m2', 'o-m3']);
     const n = noGuard(use(s, 'p0', { userUid: U }));
+    expect(mon(s, 'o-m1').life - mon(n, 'o-m1').life).toBe(1);
+    expect(mon(s, 'o-m2').life - mon(n, 'o-m2').life).toBe(1);
     expect(mon(s, 'o-m3').life - mon(n, 'o-m3').life).toBe(2);
-    expect(mon(n, 'o-m1').life).toBe(mon(s, 'o-m1').life);
-    expect(mon(n, 'o-m2').life).toBe(mon(s, 'o-m2').life);
   });
 
-  it('まいあがる風があれば、生きている相手全員に当たる（地ひびきと同じく1体ずつ守りを聞く）', () => {
-    const s = withField(RISE, [TORNADO]);
-    expect(targetsFor(s, 'player', getSkill(TORNADO))).toHaveLength(3);
-    const n = noGuard(use(s, 'p1', { userUid: U }));
-    for (const id of ['o-m1', 'o-m2', 'o-m3']) expect(mon(s, id).life - mon(n, id).life, id).toBe(2);
-  });
-
-  it('空中の相手がいないとき（ガウルが倒れている・しずまる大地）は使えない。理由の文を出す', () => {
+  it('まいあがる風があれば全員に 2。しずまる大地なら全員に 1（いま扱われている居場所で決める）', () => {
+    const rise = withField(RISE, [TORNADO]);
+    const a = noGuard(use(rise, 'p1', { userUid: U }));
+    for (const id of ['o-m1', 'o-m2', 'o-m3']) expect(mon(rise, id).life - mon(a, id).life, id).toBe(2);
     const settle = withField(SETTLE, [TORNADO]);
-    expect(cardUsability(settle, 'player', 'p1')).toEqual({ usable: false, reason: '空中の相手がいません（空中にいる相手だけに当たる技）' });
-    const s = scene({ player: [TORNADO] });
-    const down = { ...s, sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid === 'o-m3' ? { ...m, life: 0 } : m)) } } };
-    expect(cardUsability(down, 'player', 'p0').usable).toBe(false);
+    const b = noGuard(use(settle, 'p1', { userUid: U }));
+    for (const id of ['o-m1', 'o-m2', 'o-m3']) expect(mon(settle, id).life - mon(b, id).life, id).toBe(1);
+  });
+
+  it('空中の相手がいなくても使える（使えない理由は出ない）', () => {
+    expect(cardUsability(withField(SETTLE, [TORNADO]), 'player', 'p1').usable).toBe(true);
+    expect(cardUsability(lives(scene({ player: [TORNADO] }), { 'o-m3': 0 }), 'player', 'p0').usable).toBe(true);
   });
 });
 
@@ -327,13 +333,19 @@ describe('CPU（2026-11-02 指示書 AQ）', () => {
     }
   });
 
-  it('おおたつまき：空中の相手が1体で倒せないときは使わない。2体以上なら使う。1体でも倒せるなら使う', () => {
-    const one = scene({ player: [TORNADO] });
-    expect(chooseAction(one, 'player', 'normal', 'B')).toMatchObject({ type: 'endAttack' });
-    const low = { ...one, sides: { ...one.sides, opponent: { ...one.sides.opponent, monsters: one.sides.opponent.monsters.map((m) => (m.uid === 'o-m3' ? { ...m, life: 2 } : m)) } } };
-    expect(chooseAction(low, 'player', 'normal', 'B')).toMatchObject({ type: 'useCard', cardUid: 'p0' });
-    const rise = withField(RISE, [TORNADO]);
-    expect(chooseAction(rise, 'player', 'normal', 'B')).toMatchObject({ type: 'useCard', cardUid: 'p1' });
+  it('おおたつまき（指示書 AS）：相手に与えるダメージの合計が3以上か、それで1体倒せるときに使う', () => {
+    const set = (s: BattleState, l: Record<string, number>): BattleState => ({
+      ...s,
+      sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => (m.uid in l ? { ...m, life: l[m.uid] as number } : m)) } },
+    });
+    // 3体（1＋1＋2＝4）→ 使う
+    expect(chooseAction(scene({ player: [TORNADO] }), 'player', 'normal', 'B')).toMatchObject({ type: 'useCard', cardUid: 'p0' });
+    // 地上・水中の2体だけ（1＋1＝2）で倒せない → 使わない
+    expect(chooseAction(set(scene({ player: [TORNADO] }), { 'o-m3': 0 }), 'player', 'normal', 'B')).toMatchObject({ type: 'endAttack' });
+    // 同じ2体でも、ライフ1の相手がいれば倒せるので使う
+    expect(chooseAction(set(scene({ player: [TORNADO] }), { 'o-m3': 0, 'o-m2': 1 }), 'player', 'normal', 'B')).toMatchObject({ type: 'useCard', cardUid: 'p0' });
+    // 地上1体＋空中1体（1＋2＝3）→ 使う
+    expect(chooseAction(set(scene({ player: [TORNADO] }), { 'o-m1': 0 }), 'player', 'normal', 'B')).toMatchObject({ type: 'useCard', cardUid: 'p0' });
   });
 
   it('まいあがる風：手札・山札に空中に強い技があり、空中でない相手がいるときに出す。無ければ出さない', () => {

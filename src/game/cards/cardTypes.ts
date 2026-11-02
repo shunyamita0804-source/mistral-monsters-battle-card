@@ -110,13 +110,8 @@ export type SkillEffect =
       /** 地上の相手にしか使えない（指示書 AJ：ガウルの急降下アタック。allTargets と一緒なら「地上の相手全員」＝ジオルの地ひびき） */
       readonly groundOnly?: boolean;
       /**
-       * 空中の相手にしか使えない（指示書 AQ：ウズリオのおおたつまき。allTargets と一緒で「空中の相手全員」）。
-       * 空中かどうかは「いま扱われている居場所」（場のカード まいあがる風・しずまる大地・みちしお で変わる。src/game/battle/engine.ts の habitatOf）
-       */
-      readonly airOnly?: boolean;
-      /**
-       * ねらった相手がいま空中なら、技そのもののダメージに＋この値（指示書 AQ：ウズリオのうずまきショット ＋2）。
-       * 「技のダメージ（＋込み）→ 今ある増減（場・声援など）→ 防御」の順（engine.ts の attackPower）
+       * ねらった相手がいま空中なら、技そのもののダメージに＋この値（指示書 AQ：ウズリオのうずまきショット ＋2。指示書 AS：おおたつまき ＋1〔相手全員に1・空中の相手には2〕）。
+       * 「技のダメージ（＋込み）→ 今ある増減（場・声援など）→ 防御」の順（engine.ts の attackPower）。空中かどうかは「いま扱われている居場所」（engine.ts の habitatOf）
        */
       readonly airBonus?: number;
       /** 水中の相手には防御されない（指示書 AJ：セレフィーンのルナタイド） */

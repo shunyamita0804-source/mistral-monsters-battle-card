@@ -1,0 +1,326 @@
+{
+  "games": 200,
+  "bossGames": 200,
+  "skill": "B",
+  "swapOut": "sup-3",
+  "swap": {
+    "noRare": {
+      "byOpponent": {
+        "rekka": {
+          "games": 200,
+          "win": 47,
+          "winKo": 43.5,
+          "winDeck": 3.5,
+          "loseKo": 50,
+          "loseDeck": 3,
+          "turns": 24.95,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        },
+        "soukai": {
+          "games": 200,
+          "win": 43,
+          "winKo": 33,
+          "winDeck": 10,
+          "loseKo": 49,
+          "loseDeck": 8,
+          "turns": 28.02,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        }
+      },
+      "total": {
+        "games": 400,
+        "win": 45,
+        "winKo": 38.3,
+        "winDeck": 6.8,
+        "loseKo": 49.5,
+        "loseDeck": 5.5,
+        "turns": 26.48,
+        "fieldPlays": 0,
+        "fieldTurnsPerPlay": 0,
+        "fieldDamage": 0,
+        "calmMine": 0,
+        "calmTheirs": 0,
+        "tornadoRise": 0,
+        "tornadoNoRise": 0,
+        "blockedRise": 0,
+        "blockedNoRise": 0
+      }
+    },
+    "rare": {
+      "byOpponent": {
+        "rekka": {
+          "games": 200,
+          "win": 49.5,
+          "winKo": 48,
+          "winDeck": 1.5,
+          "loseKo": 48,
+          "loseDeck": 2.5,
+          "turns": 24.77,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0.11,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        },
+        "soukai": {
+          "games": 200,
+          "win": 42.5,
+          "winKo": 29,
+          "winDeck": 13.5,
+          "loseKo": 43.5,
+          "loseDeck": 14,
+          "turns": 28.56,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0.11,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        }
+      },
+      "total": {
+        "games": 400,
+        "win": 46,
+        "winKo": 38.5,
+        "winDeck": 7.5,
+        "loseKo": 45.8,
+        "loseDeck": 8.3,
+        "turns": 26.66,
+        "fieldPlays": 0,
+        "fieldTurnsPerPlay": 0,
+        "fieldDamage": 0,
+        "calmMine": 0,
+        "calmTheirs": 0,
+        "tornadoRise": 0,
+        "tornadoNoRise": 0.11,
+        "blockedRise": 0,
+        "blockedNoRise": 0
+      }
+    },
+    "before": {
+      "byOpponent": {
+        "rekka": {
+          "games": 200,
+          "win": 46.5,
+          "winKo": 36.5,
+          "winDeck": 10,
+          "loseKo": 42,
+          "loseDeck": 11.5,
+          "turns": 27.9,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        },
+        "soukai": {
+          "games": 200,
+          "win": 47.5,
+          "winKo": 20,
+          "winDeck": 27.5,
+          "loseKo": 32,
+          "loseDeck": 20.5,
+          "turns": 31.37,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        }
+      },
+      "total": {
+        "games": 400,
+        "win": 47,
+        "winKo": 28.3,
+        "winDeck": 18.8,
+        "loseKo": 37,
+        "loseDeck": 16,
+        "turns": 29.63,
+        "fieldPlays": 0,
+        "fieldTurnsPerPlay": 0,
+        "fieldDamage": 0,
+        "calmMine": 0,
+        "calmTheirs": 0,
+        "tornadoRise": 0,
+        "tornadoNoRise": 0,
+        "blockedRise": 0,
+        "blockedNoRise": 0
+      }
+    }
+  },
+  "tornado": {
+    "noRise": {
+      "byOpponent": {
+        "rekka": {
+          "games": 200,
+          "win": 45.5,
+          "winKo": 43.5,
+          "winDeck": 2,
+          "loseKo": 51,
+          "loseDeck": 3.5,
+          "turns": 24.85,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0.09,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        },
+        "soukai": {
+          "games": 200,
+          "win": 44,
+          "winKo": 30.5,
+          "winDeck": 13.5,
+          "loseKo": 43.5,
+          "loseDeck": 12.5,
+          "turns": 28.77,
+          "fieldPlays": 0,
+          "fieldTurnsPerPlay": 0,
+          "fieldDamage": 0,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0,
+          "tornadoNoRise": 0.12,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        }
+      },
+      "total": {
+        "games": 400,
+        "win": 44.8,
+        "winKo": 37,
+        "winDeck": 7.8,
+        "loseKo": 47.3,
+        "loseDeck": 8,
+        "turns": 26.81,
+        "fieldPlays": 0,
+        "fieldTurnsPerPlay": 0,
+        "fieldDamage": 0,
+        "calmMine": 0,
+        "calmTheirs": 0,
+        "tornadoRise": 0,
+        "tornadoNoRise": 0.1,
+        "blockedRise": 0,
+        "blockedNoRise": 0
+      }
+    },
+    "rise": {
+      "byOpponent": {
+        "rekka": {
+          "games": 200,
+          "win": 43,
+          "winKo": 38,
+          "winDeck": 5,
+          "loseKo": 55.5,
+          "loseDeck": 1.5,
+          "turns": 25.33,
+          "fieldPlays": 0.46,
+          "fieldTurnsPerPlay": 15.84,
+          "fieldDamage": 0.27,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0.03,
+          "tornadoNoRise": 0.04,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        },
+        "soukai": {
+          "games": 200,
+          "win": 42.5,
+          "winKo": 28,
+          "winDeck": 14.5,
+          "loseKo": 48,
+          "loseDeck": 9.5,
+          "turns": 28.55,
+          "fieldPlays": 0.53,
+          "fieldTurnsPerPlay": 17.99,
+          "fieldDamage": 0.52,
+          "calmMine": 0,
+          "calmTheirs": 0,
+          "tornadoRise": 0.05,
+          "tornadoNoRise": 0.09,
+          "blockedRise": 0,
+          "blockedNoRise": 0
+        }
+      },
+      "total": {
+        "games": 400,
+        "win": 42.8,
+        "winKo": 33,
+        "winDeck": 9.8,
+        "loseKo": 51.8,
+        "loseDeck": 5.5,
+        "turns": 26.94,
+        "fieldPlays": 0.49,
+        "fieldTurnsPerPlay": 16.99,
+        "fieldDamage": 0.39,
+        "calmMine": 0,
+        "calmTheirs": 0,
+        "tornadoRise": 0.04,
+        "tornadoNoRise": 0.06,
+        "blockedRise": 0,
+        "blockedNoRise": 0
+      }
+    }
+  },
+  "habitat": {
+    "ground": [
+      "ソラモ",
+      "ラズック",
+      "ノビトン",
+      "ジオル",
+      "フルーネ",
+      "ツムジ",
+      "シシエン",
+      "ハクラン",
+      "フォルン",
+      "ウズリオ"
+    ],
+    "air": [
+      "ガウル",
+      "プカリム",
+      "ヒョウズク",
+      "デスオル",
+      "リリル"
+    ],
+    "water": [
+      "ミュロル",
+      "カルシェル",
+      "セレフィーン"
+    ]
+  }
+}

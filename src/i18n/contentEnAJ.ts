@@ -74,7 +74,7 @@ const TEXTS: Readonly<Record<string, string>> = {
   '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる': 'Draw until you have 5 cards in hand, then discard 1 card.',
   // 2026-11-02 指示書 AQ ウズリオ（仮訳）
   '相手が空中なら +2（ダメージ4）': '+2 if the target is airborne (4 dmg).',
-  '空中にいる相手全員に2ダメージ': '2 dmg to every airborne enemy.',
+  '相手全員に1ダメージ。空中の相手には2ダメージ': '1 dmg to every enemy, 2 dmg to airborne enemies.',
   '相手の手札1枚をランダムに山札へもどす': "Return 1 random card from the enemy's hand to their deck.",
   '条件なしで回避': 'Dodge any attack.',
 };

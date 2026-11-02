@@ -8,7 +8,7 @@ import uzurioData from './official/uzurio12_and_support3_OFFICIAL_20261102.json'
  *
  * 正本は src/data/official/uzurio12_and_support3_OFFICIAL_20261102.json（届いた JSON を無改変。同じ内容の CSV も無改変で並べて置く）。
  * 技12枚は指示書 AJ の形（src/data/skillRebuildAJ.ts の AJ_SKILLS['mon-uzurio']）に書き、JSON と合うかを tests/uzurio.test.ts で確かめる。
- * 新しい効果は 4 うずまきショット（airBonus）・6 おおたつまき（allTargets＋airOnly）。決まりは docs/battle-rules.md「ウズリオの効果の扱い」
+ * 新しい効果は 4 うずまきショット（airBonus）・6 おおたつまき（allTargets＋airBonus。2026-11-02 指示書 AS で「相手全員に1・空中の相手には2」に変えた。JSON は届いたままの前の効果）。決まりは docs/battle-rules.md「ウズリオの効果の扱い」
  *
  * ゲーム内 ID：mon-uzurio（ライフ6）、skl-uzurio-01〜12（JSON の no）。図鑑はフォルンのあと
  * 入手：風の渓谷の守り手ゼフィラの切り札（初回クリアで最奥の祭壇からモンスターカード＋技カード）・ガチャのシリーズ（モンスターカードを初めて手に入れたら並ぶ）。最初の箱には入れない

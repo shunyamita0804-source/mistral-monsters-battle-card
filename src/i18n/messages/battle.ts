@@ -63,7 +63,6 @@ export const BATTLE = {
   'battle.log.tideEnd': { ja: '場の水が引いた。', en: 'The water receded from the field.' },
   // 2026-11-02 指示書 AQ
   'battle.log.airBonus': { ja: '相手は空中！ ダメージ＋{n}。', en: 'The target is airborne! Damage +{n}.' },
-  'battle.field.habitat': { ja: '全員が{where}', en: 'All {where}' },
   'battle.log.fieldCleared': { ja: '場の「{card}」が取りのぞかれた。', en: '{card} was removed from the field.' },
   'battle.log.habitatField': { ja: '場にある間、すべてのモンスターが{where}になる。', en: 'While it stays on the field, all monsters count as {where}.' },
   'battle.log.requiem': { ja: '死のレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },
@@ -182,8 +181,7 @@ export const BATTLE = {
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
   'battle.ng.groundOnly': { ja: '地上の相手がいません（地上の相手だけに使える技）', en: 'No ground enemies (this skill can only target ground enemies)' },
-  // 2026-11-02 指示書 AQ：おおたつまき・しずめの祈り
-  'battle.ng.airOnly': { ja: '空中の相手がいません（空中にいる相手だけに当たる技）', en: 'No airborne enemies (this skill only hits airborne enemies)' },
+  // 2026-11-02 指示書 AQ：しずめの祈り
   'battle.ng.noField': { ja: '場にカードがありません', en: 'There is no field card' },
   'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
   'battle.defense.cover': { ja: 'かばう', en: 'Cover' },
