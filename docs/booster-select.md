@@ -11,6 +11,8 @@
 | booster-3 | 蒼海の守り | 防御 | カルシェル・ミュロル・ノビトン | `booster_soukai.png` |
 
 - 箱の絵はユーザーが会話に貼った背景なしの絵（`BoosterBoxes_3_Transparent_UserProvided.png`）から1箱ずつ切り出した（色は変えていない。ほぼ不透明の所を不透明にしただけ。白いふちは出ない）
+- **2026-11-02 指示書 AR**：箱の絵を今の中身（旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン）の新しい絵に差し替えた。
+  原本 `design-parts/booster-boxes-20261102/`（1060×1750・無改変）。ゲームの絵は透明な所だけを切って半分（幅 500）に縮めたもの。上の表のモンスターは 2026-10-27 の版（今の中身は `src/data/introV2.ts`）
 - 指の絵は `assets/images/ui/later/tutorial_pointer.webp` の1つ目を切り出したもの（`pointer_finger.webp`）
 - データ：`src/data/introV2.ts` の `BOOSTERS`。**中身（`cards`）は null のまま**。値段 `BOOSTER_SHOP_PRICE` も null（未定）
 
