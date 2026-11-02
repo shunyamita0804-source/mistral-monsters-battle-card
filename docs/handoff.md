@@ -16,6 +16,22 @@
 - **次の予定**：強さの合わせ直し（箱と17体・ボス・大会。別の指示書）・ダンジョンの並べ替え
 - **待っているもの**：部屋の家具の描き直し
 - **未完了**：iPhone 実機での確認（R〜AL）・正式な居場所の印の絵
+- **次のセッションの始め方**：`CLAUDE.md` とこのファイルだけ読んで待つ。作業は `git fetch origin main` で最新の main（`8e39ed2` 以降）に合わせてから、新しいブランチを切る
+- 作業のこつ（AK〜AL で分かったこと）：
+  - Node 24：`export PATH=/opt/nvm/versions/node/v24.22.2/bin:$PATH`（無ければ `export NVM_DIR=/opt/nvm; . /opt/nvm/nvm.sh; nvm install 24`）。絵の道具は `pip install scipy matplotlib`
+  - **新しいモンスターの足し方（リリル・フォルンの形）**：`src/data/<名前>.ts`（モンスターカードと JSON）＋AJ の表 `skillRebuildAJ.ts` に12行（`art` に絵のファイル）・`MONSTER_HABITAT`・
+    `cards.ts`（OFFICIAL_MONSTERS）・`cardNumbers.ts`・`battleCards.ts`・`monsterPortraits.ts`・`economy.ts`（GACHA_SERIES）・英語（`contentEnOfficialDraft.ts` の名前・`contentEnAJ.ts` の効果の文）・
+    `screens.ts` の collection.count。テストは `tests/forn.test.ts` を見本に、ほかに `skillRebuildAJ`・`gachaSeries`・`data`・`dataIntegrity`・`soramoBattleCard` の一覧に1つ足す
+  - 絵：`card_art_webp.py`（技）・`official_card_webp.py`（正式カード）・`battle_card_frame.py`（`design-parts/cards-original/soramo-battle-20261025/` の枠とマスク。出力は作業用フォルダにしてから1枚だけコピー）・
+    `npm run art:skillframes`（約3分）・色の表は `skillcard_simple_build.py`・`skillcard_v3_build.py`・`pack_tint.py`
+  - パック：`pack_tint.py`（作業用フォルダに pack_art_<名前>.png だけ置いて動かし、pack_<名前>.png を `design-parts/gacha-20261029/art/` へ）→ `shop_products.py`（棚の商品）→
+    `gacha_series_build.py`（PACKS に1行）→ `gacha_panel_build.py`（FACE に顔の位置）→ 棚は `shop_goods_20261030.py` の MONSTERS に足して `python3 tools/design/seimon_world_build.py design-parts/seimon-world`（約5分。変わるのはカードショップの家具の絵6枚だけ）
+  - 最初の箱の中身を変えるときは、`booster_contents_<日付>_<指示書>.json` を新しく作り（前の版は残す）、`introV2.ts` の `formerMonsters` に前の中身を書く（前のセーブのガチャを変えないため）。
+    新しいシリーズで unlockFlag を持たないものは `economy.ts` の `LATER_GACHA_SERIES_IDS` に足す（古いセーブの変換で開かないように）
+  - 試遊：`npm run playtest:lilil`・`playtest:lilil-ak2`・`playtest:forn`（どれも1〜3分）。写真：`tools/e2e/lilil_ak_shot.cjs`・`forn_al_shot.cjs`（開発用サーバー `npx vite --port 5173 --host 127.0.0.1`。`ONLY=` でしぼれる）
+  - `npm run check` で「確認用の画面の入口」（pukarim.test）・絵を1バイトずつ比べるテストが時間切れで落ちることがある（変更前の main でも同じ）。
+    そのときは `npm run typecheck && npx vitest run --maxWorkers=2 && npm run build` で同じ点検をする
+  - 報告の ZIP は作業用フォルダ（scratchpad）に作って渡す（リポジトリの中に置くと、記録していないファイルとして残る）
 
 ### その前（2026-11-02 AK2 のセッション終わり。同じセッションで AK → AK2）
 
