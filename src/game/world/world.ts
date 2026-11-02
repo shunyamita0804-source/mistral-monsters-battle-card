@@ -64,7 +64,8 @@ export function inReach(dx: number, dy: number, r: NpcReach): boolean {
  */
 export function isNearNpc(map: MapDefinition, x: number, y: number, isVisible: (obj: MapObject) => boolean, radius: NpcReach): boolean {
   if (typeof radius === 'number' ? radius <= 0 : radius.x <= 0 && radius.y <= 0) return false;
-  return map.objects.some((o) => o.type === 'npc' && isVisible(o) && inReach(o.x - x, o.y - y, radius));
+  // 人ごとの範囲（NpcObject.space。カウンターの奥の人など）があれば、それを使う（2026-11-02）
+  return map.objects.some((o) => o.type === 'npc' && isVisible(o) && inReach(o.x - x, o.y - y, o.space ?? radius));
 }
 
 /** p から range の中（たて・よこ・ななめ）にいる、いちばん近い人。同じ近さなら向いている方の人 */
@@ -81,7 +82,8 @@ export function nearestNpc(
     if (o.type !== 'npc' || !isVisible(o)) continue;
     const dx = o.x - p.x;
     const dy = o.y - p.y;
-    if (!inReach(dx, dy, range)) continue;
+    // 人ごとの話せる範囲（NpcObject.talkReach。練習場の先生など）があれば、それを使う（2026-11-02）
+    if (!inReach(dx, dy, o.talkReach ?? range)) continue;
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
     // 向いている方の人を少し優先（同じ近さのとき）
     const f = facing ? DIR_DELTA[facing] : { x: 0, y: 0 };
@@ -363,6 +365,11 @@ export function countTurns(start: Point, path: readonly Point[]): number {
  * 練習場の先生の前（話せる近さで、先生の絵に重ならない所）。先生の左右 3マス・同じ高さから2マス手前まで。
  * 左（主人公が入口から入ってくる側）を先に探し、無ければ右（2026-11-01 指示書 AI【1】：先生を机の右へ動かした。ミレイユは先生の右）
  */
+/** 練習場の先生の真ん前（上下に向かい合う所）：先生の列で、front マス手前（2026-11-02） */
+export function teacherFrontGoal(teacher: Point, front: number): (x: number, y: number) => boolean {
+  return (x, y) => x === teacher.x && y === teacher.y + front;
+}
+
 export function teacherSideGoal(teacher: Point, side: -1 | 1 | 0, reachX = 3, reachY = 2): (x: number, y: number) => boolean {
   return (x, y) => (side === 0 ? Math.abs(x - teacher.x) === reachX : x === teacher.x + side * reachX) && y >= teacher.y && y <= teacher.y + reachY;
 }

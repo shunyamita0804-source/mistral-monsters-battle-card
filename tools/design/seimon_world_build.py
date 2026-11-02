@@ -364,6 +364,8 @@ def main() -> None:
         os.makedirs(check, exist_ok=True)
     # 街：2026-10-28 の新しい部品（design-parts/town-20261028/。色の処理は town_tone_20261028.py）
     town = town2026.build_town(shade_building, check)
+    for bid, cells in town2026.HIDDEN_POCKETS.items():
+        print('隠れるくぼみをふさいだ', bid, len(cells), cells)
     furn = load_furniture(parts)
     # カードショップは 2026-10-27 の新しい内装（cardshop_v2）。
     # 大会会場・練習場・研究所は 2026-10-28 の新しい部屋の絵（tools/design/rooms4_build.py → src/data/rooms4Art.generated.ts）なので、ここでは作らない

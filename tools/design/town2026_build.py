@@ -110,7 +110,8 @@ BUILDINGS = [
     dict(no=2, id='BUREAU', file='building_bureau', door=(511, 669, 874), door_h=240, at=(5420, 1755), door_w=150),
     dict(no=3, id='LAB', file='building_lab', door=(508, 711, 861), door_h=215, at=(1150, 1490), door_w=150, steps=[(-94, 98, 14, 78)]),
     dict(no=4, id='TRAINING', file='building_practice', door=(768, 585, 824), door_h=240, at=(1100, 2960), door_w=170, steps=[(-108, 116, 16, 48), (-140, 116, 48, 80)]),
-    dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=200, steps=[(-152, 200, -10, 22), (-184, 200, 22, 54)]),
+    # 2026-11-02 iPhone 試遊「カードショップの入口が狭い」：扉の幅を自動ドアの絵の範囲（SHOP_DOORS の clip。x 4491〜4710）に合わせた（200 → 220。扉のマス 6 → 7）
+    dict(no=5, id='SHOP', file='cardshop_building_open', door=(767, 548, 798), door_h=230, at=(4600, 2890), door_w=220, steps=[(-152, 200, -10, 22), (-184, 200, 22, 54)]),
     dict(no=6, id='HOUSE_A', file='building_florist', door=(516, 575, 828), door_h=215, at=(5800, 2890), door_w=100, steps=[(-72, 56, 22, 54), (-104, 88, 54, 86)]),
     dict(no=7, id='HOUSE_D', file='building_tailor', door=(480, 606, 848), door_h=215, at=(4500, 4240), door_w=100, steps=[(-84, 44, 16, 80)]),
     dict(no=8, id='HOUSE_B', file='building_house_pete', door=(512, 621, 868), door_h=215, at=(900, 4240), door_w=100, steps=[(-68, 92, 16, 48), (-100, 92, 48, 80)]),
@@ -379,6 +380,38 @@ PROP_PARTS = {
 }
 # 建物の当たり：マスの中ほどのうち、絵の所がこの割合をこえたらふさぐ（2026-11-01 指示書 AI。前は1点でもあればふさいでいた）
 BUILDING_BLOCK_FRAC = 0.4
+# 2026-11-02 iPhone 試遊「大会会場の階段の脇で建物の中に入れる」：建物の土台の帯（敷居より奥）で、絵が透明な（草が見える）マスでも、
+# そこに立つと体が建物の絵に隠れるマスはふさぐ（塔と塔のあいだのくぼみ など。建物は1枚の絵で敷居の高さで前後を比べるので、
+# くぼみに立つと手前の塔ごと人の上に描かれて消えて見える）。体の範囲：足もとから上へ HIDE_BODY_UP、左右 HIDE_BODY_HALF 単位。
+# その範囲の絵の所が HIDE_FRAC をこえたら隠れるとみなす。屋根より奥（帯の外）は今までどおり（建物の後ろは歩ける）
+HIDE_BODY_UP = (16, 170)
+HIDE_BODY_HALF = 28
+HIDE_FRAC = 0.6
+HIDDEN_POCKETS: dict[str, list[tuple[int, int]]] = {}
+
+
+def block_hidden_pockets(t: 'Town', im: Image.Image, x: float, y: float, z: float, depth: float) -> list[tuple[int, int]]:
+    """建物の絵 im（書き出しの px・左上 x,y 単位）の土台の帯（z−depth〜z）で、まだ歩けるマスのうち、立つと体が絵に隠れるマスをふさぐ。ふさいだ (列, 行)"""
+    a = np.array(im.getchannel('A')) > 100
+    xs, ys = t.cell_centers()
+    out: list[tuple[int, int]] = []
+    for r in np.where((ys >= z - depth) & (ys < z))[0]:
+        for c in np.where((xs >= x) & (xs < x + im.width / K))[0]:
+            if t.block[r, c]:
+                continue
+            x1 = int((xs[c] - HIDE_BODY_HALF - x) * K)
+            x2 = int((xs[c] + HIDE_BODY_HALF - x) * K)
+            y1 = int((ys[r] - HIDE_BODY_UP[1] - y) * K)
+            y2 = int((ys[r] - HIDE_BODY_UP[0] - y) * K)
+            win = a[max(0, y1):max(0, y2), max(0, x1):max(0, x2)]
+            # 絵の外（上・左右にはみ出した所）は透明として数える
+            area = max(1, (y2 - y1) * (x2 - x1))
+            if win.sum() / area > HIDE_FRAC:
+                t.block[r, c] = True
+                out.append((int(c), int(r)))
+    return out
+
+
 # 当たり（足元の何マス分をふさぐか：幅の割合・奥行きの単位）
 PROP_BLOCK = {
     'tree_big': (0.30, 70), 'tree_mid': (0.30, 64), 'conifer': (0.35, 64), 'bush_big': (0.9, 90), 'bush_small': (0.9, 70),
@@ -1250,6 +1283,9 @@ def build_town(shade_building, check_dir: str | None = None) -> dict:
         half = b['door_w'] / 2
         door_c = [c for c in range(t.cols) if b['at'][0] - half <= xs[c] <= b['at'][0] + half] if b['door_w'] else []
         t.block_alpha(part, x, y, 1 / K, z - depth, y + part.height / K + 1, min_frac=BUILDING_BLOCK_FRAC)
+        hidden = block_hidden_pockets(t, part, x, y, z, depth)
+        if hidden:
+            HIDDEN_POCKETS[b['id']] = hidden
         if door_c:
             r0 = int((z - 1) // CELL)                # 扉のマス（敷居のすぐ上の行）
             for r in range(r0, t.rows):

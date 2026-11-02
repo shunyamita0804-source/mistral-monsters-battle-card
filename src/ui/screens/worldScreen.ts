@@ -1,7 +1,7 @@
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
-import { BUREAU_DESK_FRONT, CAMERA_LEANS, getMap, HALL_BOARD, isResidentId, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
+import { BUREAU_DESK_FRONT, CAMERA_LEANS, getMap, HALL_BOARD, isResidentId, TEACHER_FRONT_DY, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
@@ -32,6 +32,7 @@ import {
   DIR_DELTA,
   findPathCentered,
   findPathStraight,
+  teacherFrontGoal,
   teacherSideGoal,
   findPathWhere,
   inReach,
@@ -950,9 +951,10 @@ export class WorldView {
 
   /** 人の方を向いてから話しかける */
   #talkTo(npc: NpcObject): void {
-    // 2026-10-30 指示書 Y-F1：練習場の先生の真ん前（体が先生の顔に重なる所）から話しかけたら、先に先生の右どなり（なければ左どなり）へ歩く
+    // 2026-10-30 指示書 Y-F1：練習場の先生の真ん前（体が先生の顔に重なる所）から話しかけたら、先に重ならない所へ歩く。
+    // 2026-11-02 iPhone 試遊：先生の横ではなく、先生の真ん前の TEACHER_FRONT_DY マス手前（上下に向かい合う所）へ。行けなければ今までどおり横へ
     if (npc.npcId === 'teacher' && this.#map.id === 'practice' && this.#coversTeacher(npc)) {
-      const path = this.#teacherSidePath(npc);
+      const path = this.#teacherFacePath(npc) ?? this.#teacherSidePath(npc);
       if (path) {
         this.#autoWalk(path, () => {
           this.#dir = this.#dirTo(npc);
@@ -967,9 +969,14 @@ export class WorldView {
     this.#talk(npc);
   }
 
-  /** 主人公の絵が先生の絵に重なる所（よこ2マス以内で、先生より手前）に立っているか */
+  /** 主人公の絵が先生の絵に重なる所（よこ2マス以内で、先生より手前・向かい合う所より近い）に立っているか */
   #coversTeacher(teacher: Point): boolean {
-    return Math.abs(this.#tile.x - teacher.x) <= NPC_SPACE.x && this.#tile.y > teacher.y;
+    return Math.abs(this.#tile.x - teacher.x) <= NPC_SPACE.x && this.#tile.y > teacher.y && this.#tile.y < teacher.y + TEACHER_FRONT_DY;
+  }
+
+  /** 先生の真ん前の、上下に向かい合う所（TEACHER_FRONT_DY マス手前）までの道（2026-11-02。曲がる回数の少ない道） */
+  #teacherFacePath(teacher: Point): Point[] | null {
+    return findPathStraight(this.#map, this.#tile, teacherFrontGoal(teacher, TEACHER_FRONT_DY), this.#blocked, this.#dir);
   }
 
   /**
@@ -1433,7 +1440,7 @@ export class WorldView {
       const target = this.#afterPath;
       if (target.type === 'npc' && this.#map.art) {
         this.#afterPath = null;
-        if (this.#nearNpc()?.id === target.id || inReach(target.x - this.#tile.x, target.y - this.#tile.y, NPC_TALK_RANGE)) this.#talkTo(target);
+        if (this.#nearNpc()?.id === target.id || inReach(target.x - this.#tile.x, target.y - this.#tile.y, target.talkReach ?? NPC_TALK_RANGE)) this.#talkTo(target);
         return;
       }
       const cell = adjacentCellOf(this.#afterPath, this.#tile);
@@ -1840,7 +1847,7 @@ export class WorldView {
     // 話せる範囲の人・となりの家具だけ、その場で話す・調べる（向きだけ変える）。移動はスティック（画面をなぞる）だけ
     if (this.#move) return;
     if (person && this.#map.art) {
-      if (!inReach(this.#tile.x - person.x, this.#tile.y - person.y, NPC_TALK_RANGE)) return;
+      if (!inReach(this.#tile.x - person.x, this.#tile.y - person.y, person.talkReach ?? NPC_TALK_RANGE)) return;
       // 押したことが分かるよう小さな音（ボタンと同じ音）
       sound.tap();
       this.#talkTo(person);
@@ -2255,7 +2262,10 @@ export class WorldView {
   #teacherFrontPath(): Point[] | null {
     const teacher = this.#map.objects.find((o) => o.type === 'npc' && o.npcId === 'teacher');
     if (!teacher) return null;
+    // 2026-11-02 iPhone 試遊：先生と上下に向かい合う所（先生の真ん前の TEACHER_FRONT_DY マス手前）を先に。行けないときだけ、今までの横の所
+    if (teacher.x === this.#tile.x && teacher.y + TEACHER_FRONT_DY === this.#tile.y) return [];
     return (
+      this.#teacherFacePath(teacher) ??
       findPathStraight(this.#map, this.#tile, teacherSideGoal(teacher, -1, NPC_TALK_RANGE.x, NPC_TALK_RANGE.y), this.#blocked, this.#dir) ??
       this.#teacherSidePath(teacher) ??
       findPathWhere(this.#map, this.#tile, (x, y) => inReach(teacher.x - x, teacher.y - y, NPC_TALK_RANGE), this.#blocked, 40000, STEPS_4)
