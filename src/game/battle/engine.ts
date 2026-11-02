@@ -155,6 +155,11 @@ export interface PendingAttack {
   readonly coveredFrom?: string;
   /** エネルギーをためるで2倍になった攻撃（記録・試遊の数え用） */
   readonly energized?: boolean;
+  /**
+   * 相手全体への攻撃で、相手がいま空中かどうかで威力が変わるとき（おおたつまき 2026-11-02 指示書 AS）：空中でない相手・空中の相手への威力。
+   * 相手が替わるたびに、その相手の居場所で power を決め直す（使ったときの状態で計算した値）
+   */
+  readonly allPower?: { readonly base: number; readonly air: number };
 }
 
 /** main＝技を使う（攻撃）、defense＝相手の防御待ち、mana＝攻撃のあとのマナ化 */
@@ -507,8 +512,6 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
   // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
   if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
-  // 「空中の相手だけ」（おおたつまき 指示書 AQ）：いま空中の相手がいなければ使えない（しずまる大地が場にあるときも）
-  if (skill.effect.type === 'attack' && skill.effect.airOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.airOnly'));
   return YES;
 }
 
@@ -626,10 +629,9 @@ export function requiemVictims(state: BattleState, userUid: string): BattleMonst
 export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?: BattleMonster): BattleMonster[] {
   if (card.kind === 'skill' && targetsEnemy(card)) {
     if (card.effect.type !== 'attack') return aliveMonsters(state.sides[otherSide(side)]);
-    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）。
-    // 「空中の相手だけ」（おおたつまき 指示書 AQ）は、いま空中の相手だけ（まいあがる風なら全員・しずまる大地なら選べない）
-    const only: Habitat | null = card.effect.groundOnly ? 'ground' : card.effect.airOnly ? 'air' : null;
-    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !only || habitatOf(state, m) === only);
+    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）
+    const ground = card.effect.groundOnly;
+    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !ground || habitatOf(state, m) === 'ground');
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -915,7 +917,9 @@ function nextAllTarget(state: BattleState, done: PendingAttack): BattleState {
   if (!nextUid) return state;
   const target = findMonster(state, nextUid)?.monster;
   const { pinned: _p, coveredFrom: _c, ...base } = done;
-  const pending: PendingAttack = { ...base, targetUid: nextUid, responses: [], queue: more, ...(isPinned(state, target) ? { pinned: true } : {}) };
+  // おおたつまき（指示書 AS）：次の相手がいま空中なら空中の威力、そうでなければふつうの威力
+  const power = base.allPower ? (habitatOf(state, target) === 'air' ? base.allPower.air : base.allPower.base) : base.power;
+  const pending: PendingAttack = { ...base, power, targetUid: nextUid, responses: [], queue: more, ...(isPinned(state, target) ? { pinned: true } : {}) };
   return { ...state, phase: 'defense', pending };
 }
 
@@ -1067,9 +1071,12 @@ function useCard(
   switch (skill.effect.type) {
     case 'attack': {
       if (!target || !skill.stat) return state;
-      // 相手全体への攻撃（地ひびき・おおたつまき）は1つのダメージをみんなに。うずまきショットの＋は、ねらった相手で決める（かばうで代わっても変えない）
-      const power = attackPower(state, skill, user, allTargets ? undefined : target);
+      // うずまきショットの＋は、ねらった相手で決める（かばうで代わっても変えない）。
+      // 相手全体への攻撃（地ひびき・おおたつまき）：おおたつまき（指示書 AS）は、相手ごとにいま空中かどうかで威力を決める（allPower）
+      const power = attackPower(state, skill, user, target);
       const airBonus = allTargets ? 0 : airBonusAgainst(state, skill, target);
+      const airTarget = allTargets && skill.effect.airBonus ? targets.find((m) => airBonusAgainst(state, skill, m) > 0) : undefined;
+      const allPower = allTargets && skill.effect.airBonus ? { base: attackPower(state, skill, user), air: airTarget ? attackPower(state, skill, user, airTarget) : attackPower(state, skill, user) + skill.effect.airBonus } : undefined;
       const energized = energyOf(state, user, skill);
       const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
@@ -1107,6 +1114,7 @@ function useCard(
           ...(isPinned(state, target) ? { pinned: true } : {}),
           ...(allTargets ? { queue: targets.slice(1).map((m) => m.uid) } : {}),
           ...(energized ? { energized: true } : {}),
+          ...(allPower ? { allPower } : {}),
         },
       };
     }

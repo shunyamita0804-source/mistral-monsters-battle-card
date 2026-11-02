@@ -253,6 +253,32 @@ const uz = (n) => `skl-uzurio-${String(n).padStart(2, '0')}`;
     for (let i = 0; i < 6; i++) { await page.waitForTimeout(900); await shot(`tornado_after_${i}`); }
   }
 
+  if (want('tornado2')) {
+    // 2026-11-02 指示書 AS：おおたつまき（相手全員に1・空中の相手には2）。相手：ソラモ（地上）・ガウル（空中）・ミュロル（水中）
+    await start({ monsters: ['mon-uzurio', 'mon-soramo', 'mon-myurol'], mana: 6, hand: [uz(6), uz(1)] });
+    await shot('as_tornado_hand');
+    await openCard(uz(6));
+    await shot('as_tornado_detail');
+    await page.locator('button:has-text("使う")').first().click({ timeout: 3000 });
+    for (let i = 0; i < 8; i++) { await page.waitForTimeout(800); await shot(`as_tornado_after_${i}`); }
+  }
+
+  if (want('chips')) {
+    // 2026-11-02 指示書 AS：場の札（名前だけ）。場のカードごと・みちしお
+    const fields = [['sup-4', 'omoikuuki'], ['sup-5', 'yuragukiri'], ['sup-6', 'nekki'], ['sup-11', 'mamorinojin'], [RISE, 'rise'], [SETTLE, 'settle']];
+    for (const [id, n] of fields) {
+      await start({ monsters: ['mon-uzurio', 'mon-gauul', 'mon-myurol'], mana: 3, hand: [uz(1)], field: { cardId: id, owner: 'opponent', ...(id === RISE ? { habitat: 'air' } : id === SETTLE ? { habitat: 'ground' } : {}) }, wait: 2500 });
+      await shot(`as_chip_${n}`);
+    }
+    await start({ monsters: ['mon-uzurio', 'mon-gauul', 'mon-myurol'], mana: 3, hand: [uz(1)], oppMonsters: ['mon-kalshell', 'mon-soramo', 'mon-gauul'], field: { cardId: 'skl-kalshell-15', owner: 'opponent', habitat: 'water', untilTurn: 4 }, wait: 2500 });
+    await shot('as_chip_tide');
+    // まいあがる風の札をタップ → 効果の文
+    await start({ monsters: ['mon-uzurio', 'mon-gauul', 'mon-myurol'], mana: 3, hand: [uz(1)], field: { cardId: RISE, owner: 'opponent', habitat: 'air' }, wait: 2500 });
+    await page.locator('.battle-turn__field').first().click().catch(() => {});
+    await page.waitForTimeout(1000);
+    await shot('as_chip_rise_tap');
+  }
+
   if (want('field')) {
     await start({ monsters: ['mon-uzurio', 'mon-gauul', 'mon-myurol'], mana: 9, hand: [RISE, SETTLE, uz(1)] });
     await shot('field_before');

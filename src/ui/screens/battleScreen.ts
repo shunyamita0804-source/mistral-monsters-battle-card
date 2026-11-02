@@ -36,7 +36,6 @@ import {
   describePlayCard,
   skillCategory,
   statLabel,
-  supportShortText,
   targetsEnemy,
   type PlayCard,
   type StatType,
@@ -305,11 +304,6 @@ interface HandSwipe {
 
 const orderFace = (label: OrderLabel): string => t(label === 'first' ? 'battle.order.faceFirst' : 'battle.order.faceSecond');
 
-/** 場の全体カードの短い説明から、先頭の「場：」を外す（帯に「場」の札を別に出すため） */
-function withoutFieldPrefix(text: string): string {
-  const prefix = t('card.short.fieldPrefix');
-  return text.startsWith(prefix) ? text.slice(prefix.length) : text;
-}
 
 /**
  * カードバトル画面。ルールはすべて src/game/battle/engine.ts（純粋関数）に任せ、ここは表示と操作だけ。
@@ -2302,8 +2296,8 @@ export const battleScreen: ScreenDefinition = {
           on: { click: () => openCardDetail(element, card, { extra: [t(`battle.field.by.${s.field?.owner ?? 'player'}`)] }) },
         },
         h('span', { class: 'battle-turn__field-label', text: t('battle.field.label') }),
-        // まいあがる風・しずまる大地（2026-11-02 指示書 AQ）：カードの文は長いので、場の札は短く「全員が空中」（みちしおの「場が水中」と同じ考え方）
-        h('span', { class: 'battle-turn__field-text' }, phraseText(card.effect.type === 'habitat' ? t('battle.field.habitat', { where: t(`habitat.${card.effect.habitat}`) }) : withoutFieldPrefix(supportShortText(card)))),
+        // 2026-11-02 指示書 AS（ユーザー指示）：札にはカードの名前だけ（効果の文は札からはみ出すので、タップで出る詳しい表示で見る）
+        h('span', { class: 'battle-turn__field-text' }, phraseText(cardName(card))),
       );
     };
 
