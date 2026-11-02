@@ -160,26 +160,36 @@ function fillRest(tournament: TournamentDefinition, active: ActiveTournament, fr
   return next;
 }
 
-/** 対戦結果を記録する。matchRound は戦った回戦（同じ結果の二重記録を防ぐ）。won だけ渡しても動く（残り・ダメージは 0 扱い） */
-export function recordMatch(save: SaveData, matchRound: number, result: boolean | PlayerMatchResult): SaveData {
-  const active = save.activeTournament;
-  if (!active || active.status !== 'inProgress' || active.round !== matchRound) return save;
-  const tournament = getTournament(active.tournamentId);
-  if (!tournament) return save;
+/**
+ * 主人公の1試合の結果で、大会の進み方を1つ進める（セーブに触らない。2026-11-02 指示書 AU：強さを変えた大会の試遊でも同じ進み方にするため、recordMatch から分けた）。
+ * 参加中でない・回戦がちがうときは undefined
+ */
+export function advanceTournament(tournament: TournamentDefinition, active: ActiveTournament, matchRound: number, result: boolean | PlayerMatchResult): ActiveTournament | undefined {
+  if (active.status !== 'inProgress' || active.round !== matchRound) return undefined;
   const r: PlayerMatchResult = typeof result === 'boolean' ? { won: result } : result;
   let next = playRound(tournament, active, matchRound, r);
   const nextRound = matchRound + 1;
   if (tournament.format === 'league') {
-    if (nextRound < TOURNAMENT_ROUNDS) return { ...save, activeTournament: { ...next, round: nextRound } };
+    if (nextRound < TOURNAMENT_ROUNDS) return { ...next, round: nextRound };
     const won = leagueStandings(next)[0]?.id === PLAYER_ENTRANT;
-    return { ...save, activeTournament: { ...next, round: nextRound, status: won ? 'won' : 'lost' } };
+    return { ...next, round: nextRound, status: won ? 'won' : 'lost' };
   }
   if (!r.won) {
     next = fillRest(tournament, next, nextRound);
-    return { ...save, activeTournament: { ...next, status: 'lost' } };
+    return { ...next, status: 'lost' };
   }
-  if (nextRound >= TOURNAMENT_ROUNDS) return { ...save, activeTournament: { ...next, round: nextRound, status: 'won' } };
-  return { ...save, activeTournament: { ...next, round: nextRound } };
+  if (nextRound >= TOURNAMENT_ROUNDS) return { ...next, round: nextRound, status: 'won' };
+  return { ...next, round: nextRound };
+}
+
+/** 対戦結果を記録する。matchRound は戦った回戦（同じ結果の二重記録を防ぐ）。won だけ渡しても動く（残り・ダメージは 0 扱い） */
+export function recordMatch(save: SaveData, matchRound: number, result: boolean | PlayerMatchResult): SaveData {
+  const active = save.activeTournament;
+  if (!active) return save;
+  const tournament = getTournament(active.tournamentId);
+  if (!tournament) return save;
+  const next = advanceTournament(tournament, active, matchRound, result);
+  return next ? { ...save, activeTournament: next } : save;
 }
 
 /**

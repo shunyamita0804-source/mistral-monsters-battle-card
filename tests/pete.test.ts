@@ -24,10 +24,11 @@ describe('ピートとの勝負', () => {
     expect(canChallengePete({ ...legacy, story: { ...legacy.story, introV2: LEGACY_INTRO_V2 } })).toBe(true);
   });
 
-  it('ピートのデッキはプカリム・ソラモ・ノビトン。強さは大会 E のノエルと同じ', () => {
+  it('ピートのデッキはプカリム・ソラモ・ノビトン。強さは 0.6（大会 E のノエルのもとの値。2026-11-02 指示書 AU で大会 E の全体の倍率を上げたが、ピートは変えない）', () => {
     expect(PETE_OPPONENT.monsters).toEqual([PUK, SOR, NOB]);
     const noel = getTournament('tournament-e')?.rounds.find((r) => r.id === 'e-1');
-    expect(PETE_OPPONENT.lifeScale).toBe(noel?.lifeScale);
+    expect(PETE_OPPONENT.lifeScale).toBe(0.6);
+    expect(noel?.lifeScale).toBeGreaterThanOrEqual(PETE_OPPONENT.lifeScale);
   });
 
   it('初めて勝ったら：プカリムのモンスターカード1枚と、勝った記録（同じ勝ちは2回受け取らない）', () => {

@@ -1,0 +1,1615 @@
+{
+ "games": 1000,
+ "playerSkill": "B",
+ "siennaLeft": false,
+ "players": {
+  "first": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 15,
+      "guard": 2,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 16,
+      "guard": 7,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 11,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lilil": 5,
+     "mon-soramo": 2,
+     "mon-nobiton": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 14,
+      "guard": 2,
+      "other": 3
+     },
+     "ラズック": {
+      "attack": 14,
+      "guard": 3,
+      "other": 4
+     },
+     "ツムジ": {
+      "attack": 13,
+      "guard": 3,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-pukarim": 3,
+     "mon-lazuck": 4,
+     "mon-gauul": 1
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 10,
+      "guard": 6,
+      "other": 3
+     },
+     "ミュロル": {
+      "attack": 9,
+      "guard": 4,
+      "other": 3
+     },
+     "フォルン": {
+      "attack": 12,
+      "guard": 6,
+      "other": 3
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 2,
+     "mon-forn": 4,
+     "mon-pukarim": 2
+    }
+   }
+  },
+  "D": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 19,
+      "guard": 3,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 10,
+      "guard": 5,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 10,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-soramo": 9,
+     "mon-uzurio": 4,
+     "mon-nobiton": 8,
+     "mon-pukarim": 3,
+     "mon-lilil": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 17,
+      "guard": 4,
+      "other": 0
+     },
+     "ラズック": {
+      "attack": 13,
+      "guard": 4,
+      "other": 0
+     },
+     "ツムジ": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-uzurio": 4,
+     "mon-gauul": 9,
+     "mon-tsumuji": 5,
+     "mon-lazuck": 5,
+     "mon-pukarim": 2
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 18,
+      "guard": 6,
+      "other": 0
+     },
+     "ミュロル": {
+      "attack": 12,
+      "guard": 7,
+      "other": 0
+     },
+     "フォルン": {
+      "attack": 7,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-myurol": 3,
+     "mon-forn": 6,
+     "mon-kalshell": 8,
+     "mon-pukarim": 5,
+     "mon-uzurio": 3
+    }
+   }
+  },
+  "C": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 18,
+      "guard": 5,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 9,
+      "guard": 8,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 7,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-serephine": 6,
+     "mon-lilil": 12,
+     "mon-soramo": 9,
+     "mon-uzurio": 5,
+     "mon-pukarim": 2,
+     "mon-nobiton": 11
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 17,
+      "guard": 3,
+      "other": 0
+     },
+     "ツムジ": {
+      "attack": 14,
+      "guard": 4,
+      "other": 0
+     },
+     "ラズック": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lazuck": 11,
+     "mon-uzurio": 5,
+     "mon-gauul": 10,
+     "mon-serephine": 4,
+     "mon-tsumuji": 9,
+     "mon-flune": 3,
+     "mon-pukarim": 3
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 13,
+      "guard": 9,
+      "other": 0
+     },
+     "ミュロル": {
+      "attack": 11,
+      "guard": 11,
+      "other": 0
+     },
+     "フォルン": {
+      "attack": 6,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-uzurio": 4,
+     "mon-myurol": 14,
+     "mon-kalshell": 8,
+     "mon-flune": 3,
+     "mon-forn": 9,
+     "mon-serephine": 4,
+     "mon-pukarim": 3
+    }
+   }
+  },
+  "B": {
+   "booster-1": {
+    "monsters": [
+     "ノビトン",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 20,
+      "guard": 3,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 14,
+      "guard": 4,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 6,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-soramo": 4,
+     "mon-nobiton": 15,
+     "mon-shishien": 24,
+     "mon-flune": 2,
+     "mon-lilil": 2,
+     "mon-uzurio": 2,
+     "mon-hyouzuku": 17,
+     "mon-pukarim": 3,
+     "mon-serephine": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     },
+     "ガウル": {
+      "attack": 18,
+      "guard": 3,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 11,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-gauul": 19,
+     "mon-shishien": 14,
+     "mon-hyouzuku": 16,
+     "mon-tsumuji": 3,
+     "mon-pukarim": 3,
+     "mon-flune": 7,
+     "mon-uzurio": 5,
+     "mon-serephine": 2,
+     "mon-lazuck": 1
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "カルシェル",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 19,
+      "guard": 4,
+      "other": 0
+     },
+     "カルシェル": {
+      "attack": 11,
+      "guard": 9,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 10,
+      "guard": 3,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 14,
+     "mon-myurol": 3,
+     "mon-pukarim": 2,
+     "mon-shishien": 25,
+     "mon-hyouzuku": 14,
+     "mon-uzurio": 3,
+     "mon-serephine": 5,
+     "mon-flune": 4
+    }
+   }
+  },
+  "A": {
+   "booster-1": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 1,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 18,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-hakuran": 24,
+     "mon-lilil": 3,
+     "mon-geol": 30,
+     "mon-shishien": 16,
+     "mon-soramo": 4,
+     "mon-uzurio": 4,
+     "mon-flune": 2,
+     "mon-hyouzuku": 2,
+     "mon-pukarim": 3,
+     "mon-serephine": 4,
+     "mon-nobiton": 3
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 18,
+      "guard": 4,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-geol": 20,
+     "mon-lazuck": 6,
+     "mon-hyouzuku": 8,
+     "mon-tsumuji": 3,
+     "mon-hakuran": 19,
+     "mon-flune": 6,
+     "mon-shishien": 20,
+     "mon-gauul": 3,
+     "mon-serephine": 3,
+     "mon-pukarim": 4,
+     "mon-uzurio": 3
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 16,
+      "guard": 6,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 14,
+      "guard": 3,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 4,
+     "mon-uzurio": 3,
+     "mon-flune": 5,
+     "mon-hakuran": 27,
+     "mon-pukarim": 9,
+     "mon-geol": 15,
+     "mon-forn": 6,
+     "mon-shishien": 17,
+     "mon-myurol": 5,
+     "mon-serephine": 3,
+     "mon-hyouzuku": 1
+    }
+   }
+  },
+  "S": {
+   "booster-1": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 2,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-nobiton": 2,
+     "mon-lazuck": 6,
+     "mon-shishien": 33,
+     "mon-uzurio": 6,
+     "mon-geol": 27,
+     "mon-pukarim": 5,
+     "mon-hakuran": 28,
+     "mon-hyouzuku": 2,
+     "mon-lilil": 2,
+     "mon-serephine": 2,
+     "mon-flune": 2,
+     "mon-soramo": 5
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 3,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-shishien": 37,
+     "mon-hyouzuku": 6,
+     "mon-hakuran": 15,
+     "mon-lazuck": 4,
+     "mon-uzurio": 7,
+     "mon-geol": 30,
+     "mon-gauul": 4,
+     "mon-flune": 5,
+     "mon-serephine": 4,
+     "mon-pukarim": 6,
+     "mon-tsumuji": 2
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 2,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 18,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 15,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lazuck": 4,
+     "mon-forn": 2,
+     "mon-shishien": 28,
+     "mon-geol": 25,
+     "mon-flune": 8,
+     "mon-hakuran": 23,
+     "mon-pukarim": 9,
+     "mon-serephine": 4,
+     "mon-myurol": 6,
+     "mon-hyouzuku": 4,
+     "mon-uzurio": 3,
+     "mon-kalshell": 4
+    }
+   }
+  }
+ },
+ "tournaments": {
+  "tournament-e": {
+   "slot": "first",
+   "target": 45,
+   "current": {
+    "scale": 1.16,
+    "opponents": [
+     {
+      "id": "e-1",
+      "name": "ノエル",
+      "lifeScale": 0.7
+     },
+     {
+      "id": "e-2",
+      "name": "ヴィクトル",
+      "lifeScale": 0.75
+     },
+     {
+      "id": "e-3",
+      "name": "シエナ",
+      "lifeScale": 0.81
+     },
+     {
+      "id": "e-marie",
+      "name": "マリー",
+      "lifeScale": 0.81
+     }
+    ],
+    "rate": 43.3,
+    "byBox": {
+     "booster-1": 50.5,
+     "booster-2": 41.1,
+     "booster-3": 38.3
+    },
+    "roundWin": [
+     81.5,
+     72.6,
+     53
+    ],
+    "roundPlayed": [
+     3000,
+     3000,
+     3000
+    ],
+    "byOpponent": {
+     "e-1": {
+      "name": "ノエル",
+      "played": 3000,
+      "win": 81.5
+     },
+     "e-2": {
+      "name": "ヴィクトル",
+      "played": 3000,
+      "win": 72.6
+     },
+     "e-3": {
+      "name": "シエナ",
+      "played": 3000,
+      "win": 53
+     }
+    },
+    "summary": {
+     "games": 9000,
+     "win": 69,
+     "koWin": 68,
+     "deckOutWin": 1,
+     "koLoss": 31,
+     "deckOutLoss": 0,
+     "draw": 0,
+     "deckOut": 1,
+     "avgTurns": 18.41,
+     "playerAttackEvaded": 0.3,
+     "playerAttackDefended": 0.7,
+     "opponentAttackEvaded": 4.2,
+     "opponentAttackDefended": 10.7,
+     "playerGuardsPerGame": 1.05,
+     "opponentGuardsPerGame": 0.09
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 3000,
+      "win": 73.8,
+      "koWin": 73,
+      "deckOutWin": 0.8,
+      "koLoss": 26.2,
+      "deckOutLoss": 0,
+      "draw": 0,
+      "deckOut": 0.8,
+      "avgTurns": 18,
+      "playerAttackEvaded": 0.3,
+      "playerAttackDefended": 0.8,
+      "opponentAttackEvaded": 2.8,
+      "opponentAttackDefended": 16.7,
+      "playerGuardsPerGame": 1.32,
+      "opponentGuardsPerGame": 0.09
+     },
+     "booster-2": {
+      "games": 3000,
+      "win": 66.3,
+      "koWin": 66,
+      "deckOutWin": 0.4,
+      "koLoss": 33.7,
+      "deckOutLoss": 0,
+      "draw": 0,
+      "deckOut": 0.4,
+      "avgTurns": 17.2,
+      "playerAttackEvaded": 0.4,
+      "playerAttackDefended": 0.7,
+      "opponentAttackEvaded": 10.9,
+      "opponentAttackDefended": 0,
+      "playerGuardsPerGame": 0.7,
+      "opponentGuardsPerGame": 0.08
+     },
+     "booster-3": {
+      "games": 3000,
+      "win": 66.9,
+      "koWin": 65,
+      "deckOutWin": 2,
+      "koLoss": 33.1,
+      "deckOutLoss": 0,
+      "draw": 0,
+      "deckOut": 2,
+      "avgTurns": 20.04,
+      "playerAttackEvaded": 0.4,
+      "playerAttackDefended": 0.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 14.4,
+      "playerGuardsPerGame": 1.13,
+      "opponentGuardsPerGame": 0.08
+     }
+    }
+   }
+  },
+  "tournament-d": {
+   "slot": "D",
+   "target": 40,
+   "current": {
+    "scale": 0.86,
+    "opponents": [
+     {
+      "id": "d-1",
+      "name": "ダリオ",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "d-2",
+      "name": "イザベラ",
+      "lifeScale": 0.9
+     },
+     {
+      "id": "d-3",
+      "name": "ゴードン",
+      "lifeScale": 0.95
+     }
+    ],
+    "rate": 42.4,
+    "byBox": {
+     "booster-1": 39.4,
+     "booster-2": 39.9,
+     "booster-3": 47.8
+    },
+    "roundWin": [
+     68.1,
+     64.1,
+     60.1
+    ],
+    "roundPlayed": [
+     3000,
+     3000,
+     3000
+    ],
+    "byOpponent": {
+     "d-1": {
+      "name": "ダリオ",
+      "played": 3000,
+      "win": 68.1
+     },
+     "d-2": {
+      "name": "イザベラ",
+      "played": 3000,
+      "win": 64.1
+     },
+     "d-3": {
+      "name": "ゴードン",
+      "played": 3000,
+      "win": 60.1
+     }
+    },
+    "summary": {
+     "games": 9000,
+     "win": 64.1,
+     "koWin": 62.4,
+     "deckOutWin": 1.7,
+     "koLoss": 35.4,
+     "deckOutLoss": 0.5,
+     "draw": 0,
+     "deckOut": 2.2,
+     "avgTurns": 20.75,
+     "playerAttackEvaded": 2.2,
+     "playerAttackDefended": 3.7,
+     "opponentAttackEvaded": 4.2,
+     "opponentAttackDefended": 12.2,
+     "playerGuardsPerGame": 1.3,
+     "opponentGuardsPerGame": 0.51
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 3000,
+      "win": 61.9,
+      "koWin": 58.9,
+      "deckOutWin": 2.9,
+      "koLoss": 37.2,
+      "deckOutLoss": 1,
+      "draw": 0,
+      "deckOut": 3.9,
+      "avgTurns": 21.36,
+      "playerAttackEvaded": 2.2,
+      "playerAttackDefended": 3.6,
+      "opponentAttackEvaded": 1.6,
+      "opponentAttackDefended": 20.9,
+      "playerGuardsPerGame": 1.84,
+      "opponentGuardsPerGame": 0.52
+     },
+     "booster-2": {
+      "games": 3000,
+      "win": 62.1,
+      "koWin": 61.5,
+      "deckOutWin": 0.6,
+      "koLoss": 37.7,
+      "deckOutLoss": 0.1,
+      "draw": 0,
+      "deckOut": 0.7,
+      "avgTurns": 19.27,
+      "playerAttackEvaded": 2.2,
+      "playerAttackDefended": 3.5,
+      "opponentAttackEvaded": 11.6,
+      "opponentAttackDefended": 0,
+      "playerGuardsPerGame": 0.86,
+      "opponentGuardsPerGame": 0.5
+     },
+     "booster-3": {
+      "games": 3000,
+      "win": 68.3,
+      "koWin": 66.7,
+      "deckOutWin": 1.6,
+      "koLoss": 31.4,
+      "deckOutLoss": 0.3,
+      "draw": 0,
+      "deckOut": 1.9,
+      "avgTurns": 21.6,
+      "playerAttackEvaded": 2.2,
+      "playerAttackDefended": 4,
+      "opponentAttackEvaded": 0.2,
+      "opponentAttackDefended": 14.5,
+      "playerGuardsPerGame": 1.22,
+      "opponentGuardsPerGame": 0.53
+     }
+    }
+   }
+  },
+  "tournament-c": {
+   "slot": "C",
+   "target": 30,
+   "current": {
+    "scale": 0.86,
+    "opponents": [
+     {
+      "id": "reg-sienna",
+      "name": "シエナ",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "reg-dolf",
+      "name": "ドルフ",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "reg-leonard",
+      "name": "レナード",
+      "lifeScale": 0.99
+     },
+     {
+      "id": "gen-tobias",
+      "name": "トビアス",
+      "lifeScale": 0.82
+     },
+     {
+      "id": "gen-marie",
+      "name": "マリー",
+      "lifeScale": 0.82
+     },
+     {
+      "id": "gen-jean",
+      "name": "ジャン",
+      "lifeScale": 0.82
+     },
+     {
+      "id": "gen-helena",
+      "name": "ヘレナ",
+      "lifeScale": 0.82
+     },
+     {
+      "id": "c-gordon",
+      "name": "ゴードン",
+      "lifeScale": 0.82
+     }
+    ],
+    "rate": 28.9,
+    "byBox": {
+     "booster-1": 19.5,
+     "booster-2": 26.8,
+     "booster-3": 40.3
+    },
+    "roundWin": [
+     66.6,
+     64.1,
+     67.6
+    ],
+    "roundPlayed": [
+     3000,
+     1998,
+     1281
+    ],
+    "byOpponent": {
+     "gen-marie": {
+      "name": "マリー",
+      "played": 763,
+      "win": 68.7
+     },
+     "gen-tobias": {
+      "name": "トビアス",
+      "played": 782,
+      "win": 75.3
+     },
+     "reg-leonard": {
+      "name": "レナード",
+      "played": 1080,
+      "win": 44.4
+     },
+     "reg-sienna": {
+      "name": "シエナ",
+      "played": 1281,
+      "win": 67.6
+     },
+     "gen-jean": {
+      "name": "ジャン",
+      "played": 722,
+      "win": 81.2
+     },
+     "gen-helena": {
+      "name": "ヘレナ",
+      "played": 865,
+      "win": 65.5
+     },
+     "reg-dolf": {
+      "name": "ドルフ",
+      "played": 786,
+      "win": 67.9
+     }
+    },
+    "summary": {
+     "games": 6279,
+     "win": 66,
+     "koWin": 64.8,
+     "deckOutWin": 1.2,
+     "koLoss": 33,
+     "deckOutLoss": 1,
+     "draw": 0,
+     "deckOut": 2.2,
+     "avgTurns": 20.7,
+     "playerAttackEvaded": 2.1,
+     "playerAttackDefended": 10.9,
+     "opponentAttackEvaded": 4.8,
+     "opponentAttackDefended": 13.5,
+     "playerGuardsPerGame": 1.39,
+     "opponentGuardsPerGame": 1.02
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 1951,
+      "win": 58.7,
+      "koWin": 56.8,
+      "deckOutWin": 1.9,
+      "koLoss": 39.7,
+      "deckOutLoss": 1.5,
+      "draw": 0,
+      "deckOut": 3.4,
+      "avgTurns": 21.11,
+      "playerAttackEvaded": 2,
+      "playerAttackDefended": 10.2,
+      "opponentAttackEvaded": 2.5,
+      "opponentAttackDefended": 20.7,
+      "playerGuardsPerGame": 1.79,
+      "opponentGuardsPerGame": 1.03
+     },
+     "booster-2": {
+      "games": 2053,
+      "win": 64.3,
+      "koWin": 64,
+      "deckOutWin": 0.3,
+      "koLoss": 35.5,
+      "deckOutLoss": 0.2,
+      "draw": 0,
+      "deckOut": 0.5,
+      "avgTurns": 19.31,
+      "playerAttackEvaded": 2.4,
+      "playerAttackDefended": 11.2,
+      "opponentAttackEvaded": 13.1,
+      "opponentAttackDefended": 0,
+      "playerGuardsPerGame": 0.92,
+      "opponentGuardsPerGame": 0.97
+     },
+     "booster-3": {
+      "games": 2275,
+      "win": 73.8,
+      "koWin": 72.3,
+      "deckOutWin": 1.5,
+      "koLoss": 25,
+      "deckOutLoss": 1.2,
+      "draw": 0,
+      "deckOut": 2.7,
+      "avgTurns": 21.6,
+      "playerAttackEvaded": 1.9,
+      "playerAttackDefended": 11.3,
+      "opponentAttackEvaded": 0.2,
+      "opponentAttackDefended": 18.4,
+      "playerGuardsPerGame": 1.46,
+      "opponentGuardsPerGame": 1.05
+     }
+    }
+   }
+  },
+  "tournament-b": {
+   "slot": "B",
+   "target": 25,
+   "current": {
+    "scale": 0.9,
+    "opponents": [
+     {
+      "id": "reg-dolf",
+      "name": "ドルフ",
+      "lifeScale": 0.9
+     },
+     {
+      "id": "reg-leonard",
+      "name": "レナード",
+      "lifeScale": 1.03
+     },
+     {
+      "id": "reg-greta",
+      "name": "グレタ",
+      "lifeScale": 0.77
+     },
+     {
+      "id": "reg-julius",
+      "name": "ユリウス",
+      "lifeScale": 0.95
+     },
+     {
+      "id": "gen-tobias",
+      "name": "トビアス",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "gen-marie",
+      "name": "マリー",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "gen-jean",
+      "name": "ジャン",
+      "lifeScale": 0.86
+     },
+     {
+      "id": "gen-helena",
+      "name": "ヘレナ",
+      "lifeScale": 0.86
+     }
+    ],
+    "rate": 24.7,
+    "byBox": {
+     "booster-1": 14,
+     "booster-2": 20.4,
+     "booster-3": 39.6
+    },
+    "roundWin": [
+     78.7,
+     68.5,
+     45.7
+    ],
+    "roundPlayed": [
+     3000,
+     2362,
+     1619
+    ],
+    "byOpponent": {
+     "gen-helena": {
+      "name": "ヘレナ",
+      "played": 630,
+      "win": 86.7
+     },
+     "reg-dolf": {
+      "name": "ドルフ",
+      "played": 768,
+      "win": 89.5
+     },
+     "reg-julius": {
+      "name": "ユリウス",
+      "played": 2251,
+      "win": 30.7
+     },
+     "reg-leonard": {
+      "name": "レナード",
+      "played": 1129,
+      "win": 69.9
+     },
+     "reg-greta": {
+      "name": "グレタ",
+      "played": 578,
+      "win": 96
+     },
+     "gen-marie": {
+      "name": "マリー",
+      "played": 584,
+      "win": 87.3
+     },
+     "gen-jean": {
+      "name": "ジャン",
+      "played": 528,
+      "win": 93.2
+     },
+     "gen-tobias": {
+      "name": "トビアス",
+      "played": 513,
+      "win": 87.9
+     }
+    },
+    "summary": {
+     "games": 6981,
+     "win": 67.6,
+     "koWin": 67.2,
+     "deckOutWin": 0.4,
+     "koLoss": 31.9,
+     "deckOutLoss": 0.4,
+     "draw": 0,
+     "deckOut": 0.8,
+     "avgTurns": 17.95,
+     "playerAttackEvaded": 1.6,
+     "playerAttackDefended": 8.7,
+     "opponentAttackEvaded": 2.7,
+     "opponentAttackDefended": 16.4,
+     "playerGuardsPerGame": 1.18,
+     "opponentGuardsPerGame": 0.64
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 2215,
+      "win": 61.2,
+      "koWin": 60.7,
+      "deckOutWin": 0.5,
+      "koLoss": 38.4,
+      "deckOutLoss": 0.5,
+      "draw": 0,
+      "deckOut": 0.9,
+      "avgTurns": 17.91,
+      "playerAttackEvaded": 1.8,
+      "playerAttackDefended": 8.5,
+      "opponentAttackEvaded": 1.9,
+      "opponentAttackDefended": 17.9,
+      "playerGuardsPerGame": 1.23,
+      "opponentGuardsPerGame": 0.63
+     },
+     "booster-2": {
+      "games": 2277,
+      "win": 65,
+      "koWin": 65,
+      "deckOutWin": 0.1,
+      "koLoss": 34.9,
+      "deckOutLoss": 0.1,
+      "draw": 0,
+      "deckOut": 0.2,
+      "avgTurns": 17.11,
+      "playerAttackEvaded": 1.5,
+      "playerAttackDefended": 8.5,
+      "opponentAttackEvaded": 5.4,
+      "opponentAttackDefended": 11.3,
+      "playerGuardsPerGame": 0.97,
+      "opponentGuardsPerGame": 0.64
+     },
+     "booster-3": {
+      "games": 2489,
+      "win": 75.7,
+      "koWin": 75.2,
+      "deckOutWin": 0.6,
+      "koLoss": 23.5,
+      "deckOutLoss": 0.7,
+      "draw": 0,
+      "deckOut": 1.3,
+      "avgTurns": 18.75,
+      "playerAttackEvaded": 1.7,
+      "playerAttackDefended": 9.1,
+      "opponentAttackEvaded": 1.3,
+      "opponentAttackDefended": 19.4,
+      "playerGuardsPerGame": 1.33,
+      "opponentGuardsPerGame": 0.66
+     }
+    }
+   }
+  },
+  "tournament-a": {
+   "slot": "A",
+   "target": 20,
+   "current": {
+    "scale": 1.06,
+    "opponents": [
+     {
+      "id": "reg-leonard",
+      "name": "レナード",
+      "lifeScale": 1.22
+     },
+     {
+      "id": "reg-greta",
+      "name": "グレタ",
+      "lifeScale": 0.9
+     },
+     {
+      "id": "reg-julius",
+      "name": "ユリウス",
+      "lifeScale": 1.11
+     },
+     {
+      "id": "reg-camilla",
+      "name": "カミラ",
+      "lifeScale": 1.17
+     },
+     {
+      "id": "gen-claude",
+      "name": "クロード",
+      "lifeScale": 1.01
+     },
+     {
+      "id": "gen-beatrice",
+      "name": "ベアトリス",
+      "lifeScale": 1.01
+     },
+     {
+      "id": "gen-zara",
+      "name": "ザラ",
+      "lifeScale": 1.01
+     },
+     {
+      "id": "gen-walter",
+      "name": "ウォルター",
+      "lifeScale": 1.01
+     }
+    ],
+    "rate": 20.4,
+    "byBox": {
+     "booster-1": 25.1,
+     "booster-2": 21.6,
+     "booster-3": 14.4
+    },
+    "roundWin": [
+     76.9,
+     60.7,
+     43.7
+    ],
+    "roundPlayed": [
+     3000,
+     2306,
+     1399
+    ],
+    "byOpponent": {
+     "reg-greta": {
+      "name": "グレタ",
+      "played": 500,
+      "win": 97.4
+     },
+     "reg-julius": {
+      "name": "ユリウス",
+      "played": 1536,
+      "win": 48.5
+     },
+     "gen-claude": {
+      "name": "クロード",
+      "played": 527,
+      "win": 91.1
+     },
+     "reg-camilla": {
+      "name": "カミラ",
+      "played": 1705,
+      "win": 32.7
+     },
+     "reg-leonard": {
+      "name": "レナード",
+      "played": 951,
+      "win": 69
+     },
+     "gen-beatrice": {
+      "name": "ベアトリス",
+      "played": 548,
+      "win": 91.8
+     },
+     "gen-zara": {
+      "name": "ザラ",
+      "played": 419,
+      "win": 95.2
+     },
+     "gen-walter": {
+      "name": "ウォルター",
+      "played": 519,
+      "win": 94
+     }
+    },
+    "summary": {
+     "games": 6705,
+     "win": 64.4,
+     "koWin": 64.4,
+     "deckOutWin": 0,
+     "koLoss": 35.1,
+     "deckOutLoss": 0.6,
+     "draw": 0,
+     "deckOut": 0.6,
+     "avgTurns": 17.92,
+     "playerAttackEvaded": 4,
+     "playerAttackDefended": 8.1,
+     "opponentAttackEvaded": 0,
+     "opponentAttackDefended": 9.5,
+     "playerGuardsPerGame": 0.56,
+     "opponentGuardsPerGame": 0.8
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 2298,
+      "win": 67.4,
+      "koWin": 67.4,
+      "deckOutWin": 0,
+      "koLoss": 32.1,
+      "deckOutLoss": 0.5,
+      "draw": 0,
+      "deckOut": 0.5,
+      "avgTurns": 17.12,
+      "playerAttackEvaded": 3.8,
+      "playerAttackDefended": 7.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 2.8,
+      "playerGuardsPerGame": 0.15,
+      "opponentGuardsPerGame": 0.76
+     },
+     "booster-2": {
+      "games": 2250,
+      "win": 65.2,
+      "koWin": 65.2,
+      "deckOutWin": 0,
+      "koLoss": 34.5,
+      "deckOutLoss": 0.4,
+      "draw": 0,
+      "deckOut": 0.4,
+      "avgTurns": 17.94,
+      "playerAttackEvaded": 3.9,
+      "playerAttackDefended": 8.2,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 10.9,
+      "playerGuardsPerGame": 0.65,
+      "opponentGuardsPerGame": 0.8
+     },
+     "booster-3": {
+      "games": 2157,
+      "win": 60.3,
+      "koWin": 60.3,
+      "deckOutWin": 0,
+      "koLoss": 38.9,
+      "deckOutLoss": 0.8,
+      "draw": 0,
+      "deckOut": 0.9,
+      "avgTurns": 18.76,
+      "playerAttackEvaded": 4.3,
+      "playerAttackDefended": 8.5,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 14.5,
+      "playerGuardsPerGame": 0.91,
+      "opponentGuardsPerGame": 0.84
+     }
+    }
+   }
+  },
+  "tournament-s": {
+   "slot": "S",
+   "target": 15,
+   "current": {
+    "scale": 1,
+    "opponents": [
+     {
+      "id": "reg-julius",
+      "name": "ユリウス",
+      "lifeScale": 1.05
+     },
+     {
+      "id": "reg-camilla",
+      "name": "カミラ",
+      "lifeScale": 1.1
+     },
+     {
+      "id": "reg-alvin",
+      "name": "アルヴィン",
+      "lifeScale": 1.2
+     },
+     {
+      "id": "gen-claude",
+      "name": "クロード",
+      "lifeScale": 0.95
+     },
+     {
+      "id": "gen-beatrice",
+      "name": "ベアトリス",
+      "lifeScale": 0.95
+     },
+     {
+      "id": "gen-zara",
+      "name": "ザラ",
+      "lifeScale": 0.95
+     },
+     {
+      "id": "gen-walter",
+      "name": "ウォルター",
+      "lifeScale": 0.95
+     }
+    ],
+    "rate": 15.1,
+    "byBox": {
+     "booster-1": 16.4,
+     "booster-2": 10.1,
+     "booster-3": 18.7
+    },
+    "roundWin": [
+     81.7,
+     71.4,
+     25.8
+    ],
+    "roundPlayed": [
+     3000,
+     2451,
+     1751
+    ],
+    "byOpponent": {
+     "gen-walter": {
+      "name": "ウォルター",
+      "played": 840,
+      "win": 94.4
+     },
+     "gen-beatrice": {
+      "name": "ベアトリス",
+      "played": 892,
+      "win": 92.5
+     },
+     "reg-alvin": {
+      "name": "アルヴィン",
+      "played": 1751,
+      "win": 25.8
+     },
+     "gen-zara": {
+      "name": "ザラ",
+      "played": 615,
+      "win": 95.4
+     },
+     "reg-camilla": {
+      "name": "カミラ",
+      "played": 1281,
+      "win": 39.6
+     },
+     "reg-julius": {
+      "name": "ユリウス",
+      "played": 1062,
+      "win": 75.5
+     },
+     "gen-claude": {
+      "name": "クロード",
+      "played": 761,
+      "win": 90.4
+     }
+    },
+    "summary": {
+     "games": 7202,
+     "win": 64.6,
+     "koWin": 64.6,
+     "deckOutWin": 0,
+     "koLoss": 35.1,
+     "deckOutLoss": 0.3,
+     "draw": 0,
+     "deckOut": 0.3,
+     "avgTurns": 17.55,
+     "playerAttackEvaded": 5.3,
+     "playerAttackDefended": 7.9,
+     "opponentAttackEvaded": 0,
+     "opponentAttackDefended": 6.3,
+     "playerGuardsPerGame": 0.37,
+     "opponentGuardsPerGame": 0.86
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 2442,
+      "win": 65.8,
+      "koWin": 65.7,
+      "deckOutWin": 0,
+      "koLoss": 34.1,
+      "deckOutLoss": 0.1,
+      "draw": 0,
+      "deckOut": 0.2,
+      "avgTurns": 17.45,
+      "playerAttackEvaded": 5,
+      "playerAttackDefended": 7.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 5.5,
+      "playerGuardsPerGame": 0.32,
+      "opponentGuardsPerGame": 0.85
+     },
+     "booster-2": {
+      "games": 2328,
+      "win": 61.4,
+      "koWin": 61.3,
+      "deckOutWin": 0,
+      "koLoss": 38,
+      "deckOutLoss": 0.6,
+      "draw": 0,
+      "deckOut": 0.6,
+      "avgTurns": 18.04,
+      "playerAttackEvaded": 5.4,
+      "playerAttackDefended": 8.2,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 7.8,
+      "playerGuardsPerGame": 0.48,
+      "opponentGuardsPerGame": 0.89
+     },
+     "booster-3": {
+      "games": 2432,
+      "win": 66.6,
+      "koWin": 66.6,
+      "deckOutWin": 0,
+      "koLoss": 33.2,
+      "deckOutLoss": 0.2,
+      "draw": 0,
+      "deckOut": 0.2,
+      "avgTurns": 17.18,
+      "playerAttackEvaded": 5.4,
+      "playerAttackDefended": 7.6,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 5.4,
+      "playerGuardsPerGame": 0.31,
+      "opponentGuardsPerGame": 0.84
+     }
+    }
+   }
+  }
+ }
+}

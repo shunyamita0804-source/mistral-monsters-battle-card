@@ -112,8 +112,18 @@ export interface TournamentDefinition {
 type BracketRank = 'C' | 'B' | 'A' | 'S';
 type RegularId = 'sienna' | 'dolf' | 'leonard' | 'greta' | 'julius' | 'camilla' | 'alvin';
 
-/** ランクごとの強さ（ライフ倍率の目安。C＜B＜A＜S。仮） */
-const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 1.15, B: 1.25, A: 1.35, S: 1.5 };
+/**
+ * ランクごとの強さ（ライフ倍率の目安。仮）。2026-11-02 指示書 AU：その時点の「目安のプレイヤー」が優勝する割合を C 30・B 25・A 20・S 15％ に合わせた
+ * （前は C 1.15・B 1.25・A 1.35・S 1.5。プレイヤーが後のランクほど強くなるので、倍率は C＜B＜A のあと S で少し下がる。docs/balance-au-20261102.md）
+ */
+export const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 0.86, B: 0.9, A: 1.06, S: 1 };
+
+/**
+ * E・D の総当たりの全体の強さ（2026-11-02 指示書 AU）。相手3人の lifeScale（下の rounds の値）に掛ける。
+ * 3人の強さの比はそのままで、全体を上げ下げする（1 なら今までと同じ）
+ */
+// 2026-11-02 指示書 AU：目安のプレイヤーで優勝する割合を E 45％・D 40％ に合わせた（3箱 × 1000回。docs/balance-au-20261102.md）
+export const LEAGUE_SCALE: Readonly<Record<'E' | 'D', number>> = { E: 1.16, D: 0.86 };
 
 /**
  * 常連（人物は src/data/people.ts。相手の ID は reg-〈人物の ID〉）。
@@ -165,8 +175,8 @@ function bracketTournament(
   group: 'cb' | 'as',
   generalCount: number,
   finalist: RegularId | null,
+  scale: number = RANK_SCALE[rank],
 ): TournamentDefinition {
-  const scale = RANK_SCALE[rank];
   const round2 = (v: number): number => Math.round(v * 100) / 100;
   return {
     id: `tournament-${rank.toLowerCase()}`,
@@ -199,8 +209,11 @@ function bracketTournament(
   };
 }
 
-export const TOURNAMENTS: readonly TournamentDefinition[] = [
-  {
+const r2 = (v: number): number => Math.round(v * 100) / 100;
+
+/** E ランク大会（scale：LEAGUE_SCALE.E。相手の lifeScale に掛ける） */
+function leagueE(scale: number = LEAGUE_SCALE.E): TournamentDefinition {
+  return {
     id: 'tournament-e',
     name: 'Eランク大会',
     format: 'league',
@@ -210,12 +223,12 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     // 相手の名前は人物（src/data/people.ts。2026-10-27 決定）。編成・強さは仮のまま
     // 腕前（2026-10-30 指示書 Z）：E の大会の相手は C
     rounds: [
-      { id: 'e-1', name: 'ノエル', monsters: [PUK, SOR, MYU], lifeScale: 0.6, skill: 'C' },
-      { id: 'e-2', name: 'ヴィクトル', monsters: [GAU, LAZ, PUK], lifeScale: 0.65, skill: 'C' },
-      { id: 'e-3', name: 'シエナ', monsters: [SOR, MYU, PUK], lifeScale: 0.7, skill: 'C' },
+      { id: 'e-1', name: 'ノエル', monsters: [PUK, SOR, MYU], lifeScale: r2(0.6 * scale), skill: 'C' },
+      { id: 'e-2', name: 'ヴィクトル', monsters: [GAU, LAZ, PUK], lifeScale: r2(0.65 * scale), skill: 'C' },
+      { id: 'e-3', name: 'シエナ', monsters: [SOR, MYU, PUK], lifeScale: r2(0.7 * scale), skill: 'C' },
     ],
     // シエナがいないあいだは、一般の出場者のマリーが E の強さで出る
-    siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: 0.7, face: 'gen-marie', skill: 'C' } },
+    siennaLeft: { replace: 'e-3', with: { id: 'e-marie', name: 'マリー', monsters: [MYU, SOR, GAU], lifeScale: r2(0.7 * scale), face: 'gen-marie', skill: 'C' } },
     rewards: {
       participationCoins: 20,
       firstWin: {
@@ -229,8 +242,12 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
       repeatWin: { coins: 150 },
     },
     isPlaceholder: true,
-  },
-  {
+  };
+}
+
+/** D ランク大会（scale：LEAGUE_SCALE.D） */
+function leagueD(scale: number = LEAGUE_SCALE.D): TournamentDefinition {
+  return {
     id: 'tournament-d',
     name: 'Dランク大会',
     format: 'league',
@@ -239,9 +256,9 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
     participants: 4,
     // 腕前（2026-10-30 指示書 Z）：D の大会の相手は C〜B（はじめの2人 C・ゴードン B）
     rounds: [
-      { id: 'd-1', name: 'ダリオ', monsters: [MYU, KAL, PUK], lifeScale: 1, skill: 'C' },
-      { id: 'd-2', name: 'イザベラ', monsters: [SOR, MYU, NOB], lifeScale: 1.05, skill: 'C' },
-      { id: 'd-3', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: 1.1, skill: 'B' },
+      { id: 'd-1', name: 'ダリオ', monsters: [MYU, KAL, PUK], lifeScale: r2(1 * scale), skill: 'C' },
+      { id: 'd-2', name: 'イザベラ', monsters: [SOR, MYU, NOB], lifeScale: r2(1.05 * scale), skill: 'C' },
+      { id: 'd-3', name: 'ゴードン', monsters: [GAU, NOB, LAZ], lifeScale: r2(1.1 * scale), skill: 'B' },
     ],
     rewards: {
       participationCoins: 30,
@@ -249,12 +266,28 @@ export const TOURNAMENTS: readonly TournamentDefinition[] = [
       repeatWin: { coins: 200 },
     },
     isPlaceholder: true,
-  },
-  bracketTournament('C', 500, 40, 'B', ['sienna', 'dolf', 'leonard'], 'cb', 4, 'sienna'),
-  bracketTournament('B', 600, 50, 'A', ['dolf', 'leonard', 'greta', 'julius'], 'cb', 3, null),
-  bracketTournament('A', 800, 60, 'S', ['leonard', 'greta', 'julius', 'camilla'], 'as', 3, null),
-  bracketTournament('S', 1000, 80, null, ['julius', 'camilla', 'alvin'], 'as', 4, 'alvin'),
-];
+  };
+}
+
+/**
+ * 大会を、全体の強さ（E・D は LEAGUE_SCALE、C〜S は RANK_SCALE の値）を変えて作る（2026-11-02 指示書 AU：強さを合わせる試遊。tests/balancePlaytest.test.ts）。
+ * scale を渡さなければ今のデータと同じ
+ */
+export function tournamentAtScale(id: string, scale?: number): TournamentDefinition | undefined {
+  switch (id) {
+    case 'tournament-e': return leagueE(scale);
+    case 'tournament-d': return leagueD(scale);
+    case 'tournament-c': return bracketTournament('C', 500, 40, 'B', ['sienna', 'dolf', 'leonard'], 'cb', 4, 'sienna', scale);
+    case 'tournament-b': return bracketTournament('B', 600, 50, 'A', ['dolf', 'leonard', 'greta', 'julius'], 'cb', 3, null, scale);
+    case 'tournament-a': return bracketTournament('A', 800, 60, 'S', ['leonard', 'greta', 'julius', 'camilla'], 'as', 3, null, scale);
+    case 'tournament-s': return bracketTournament('S', 1000, 80, null, ['julius', 'camilla', 'alvin'], 'as', 4, 'alvin', scale);
+    default: return undefined;
+  }
+}
+
+export const TOURNAMENT_IDS = ['tournament-e', 'tournament-d', 'tournament-c', 'tournament-b', 'tournament-a', 'tournament-s'] as const;
+
+export const TOURNAMENTS: readonly TournamentDefinition[] = TOURNAMENT_IDS.map((id) => tournamentAtScale(id) as TournamentDefinition);
 
 /** 大会に出てくる相手すべて（総当たりの3人・トーナメントの常連と一般の組） */
 export function tournamentOpponents(t: TournamentDefinition): readonly OpponentDefinition[] {

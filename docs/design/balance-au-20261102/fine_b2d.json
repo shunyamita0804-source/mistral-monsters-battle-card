@@ -1,0 +1,1855 @@
+{
+ "games": 1000,
+ "playerSkill": "B",
+ "siennaLeft": false,
+ "players": {
+  "first": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 15,
+      "guard": 2,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 16,
+      "guard": 7,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 11,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lilil": 5,
+     "mon-soramo": 2,
+     "mon-nobiton": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 14,
+      "guard": 2,
+      "other": 3
+     },
+     "ラズック": {
+      "attack": 14,
+      "guard": 3,
+      "other": 4
+     },
+     "ツムジ": {
+      "attack": 13,
+      "guard": 3,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-pukarim": 3,
+     "mon-lazuck": 4,
+     "mon-gauul": 1
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 10,
+      "guard": 6,
+      "other": 3
+     },
+     "ミュロル": {
+      "attack": 9,
+      "guard": 4,
+      "other": 3
+     },
+     "フォルン": {
+      "attack": 12,
+      "guard": 6,
+      "other": 3
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 2,
+     "mon-forn": 4,
+     "mon-pukarim": 2
+    }
+   }
+  },
+  "D": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 19,
+      "guard": 3,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 10,
+      "guard": 5,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 10,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-soramo": 9,
+     "mon-uzurio": 4,
+     "mon-nobiton": 8,
+     "mon-pukarim": 3,
+     "mon-lilil": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 17,
+      "guard": 4,
+      "other": 0
+     },
+     "ラズック": {
+      "attack": 13,
+      "guard": 4,
+      "other": 0
+     },
+     "ツムジ": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-uzurio": 4,
+     "mon-gauul": 9,
+     "mon-tsumuji": 5,
+     "mon-lazuck": 5,
+     "mon-pukarim": 2
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 18,
+      "guard": 6,
+      "other": 0
+     },
+     "ミュロル": {
+      "attack": 12,
+      "guard": 7,
+      "other": 0
+     },
+     "フォルン": {
+      "attack": 7,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-myurol": 3,
+     "mon-forn": 6,
+     "mon-kalshell": 8,
+     "mon-pukarim": 5,
+     "mon-uzurio": 3
+    }
+   }
+  },
+  "C": {
+   "booster-1": {
+    "monsters": [
+     "ソラモ",
+     "リリル",
+     "ノビトン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ソラモ": {
+      "attack": 18,
+      "guard": 5,
+      "other": 0
+     },
+     "リリル": {
+      "attack": 9,
+      "guard": 8,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 7,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-serephine": 6,
+     "mon-lilil": 12,
+     "mon-soramo": 9,
+     "mon-uzurio": 5,
+     "mon-pukarim": 2,
+     "mon-nobiton": 11
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ラズック",
+     "ツムジ"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "ガウル": {
+      "attack": 17,
+      "guard": 3,
+      "other": 0
+     },
+     "ツムジ": {
+      "attack": 14,
+      "guard": 4,
+      "other": 0
+     },
+     "ラズック": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lazuck": 11,
+     "mon-uzurio": 5,
+     "mon-gauul": 10,
+     "mon-serephine": 4,
+     "mon-tsumuji": 9,
+     "mon-flune": 3,
+     "mon-pukarim": 3
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "ミュロル",
+     "カルシェル",
+     "フォルン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "カルシェル": {
+      "attack": 13,
+      "guard": 9,
+      "other": 0
+     },
+     "ミュロル": {
+      "attack": 11,
+      "guard": 11,
+      "other": 0
+     },
+     "フォルン": {
+      "attack": 6,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-uzurio": 4,
+     "mon-myurol": 14,
+     "mon-kalshell": 8,
+     "mon-flune": 3,
+     "mon-forn": 9,
+     "mon-serephine": 4,
+     "mon-pukarim": 3
+    }
+   }
+  },
+  "B": {
+   "booster-1": {
+    "monsters": [
+     "ノビトン",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 20,
+      "guard": 3,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 14,
+      "guard": 4,
+      "other": 0
+     },
+     "ノビトン": {
+      "attack": 6,
+      "guard": 9,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-soramo": 4,
+     "mon-nobiton": 15,
+     "mon-shishien": 24,
+     "mon-flune": 2,
+     "mon-lilil": 2,
+     "mon-uzurio": 2,
+     "mon-hyouzuku": 17,
+     "mon-pukarim": 3,
+     "mon-serephine": 1
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "ガウル",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 13,
+      "guard": 5,
+      "other": 0
+     },
+     "ガウル": {
+      "attack": 18,
+      "guard": 3,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 11,
+      "guard": 6,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-gauul": 19,
+     "mon-shishien": 14,
+     "mon-hyouzuku": 16,
+     "mon-tsumuji": 3,
+     "mon-pukarim": 3,
+     "mon-flune": 7,
+     "mon-uzurio": 5,
+     "mon-serephine": 2,
+     "mon-lazuck": 1
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "カルシェル",
+     "ヒョウズク",
+     "シシエン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 19,
+      "guard": 4,
+      "other": 0
+     },
+     "カルシェル": {
+      "attack": 11,
+      "guard": 9,
+      "other": 0
+     },
+     "ヒョウズク": {
+      "attack": 10,
+      "guard": 3,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 14,
+     "mon-myurol": 3,
+     "mon-pukarim": 2,
+     "mon-shishien": 25,
+     "mon-hyouzuku": 14,
+     "mon-uzurio": 3,
+     "mon-serephine": 5,
+     "mon-flune": 4
+    }
+   }
+  },
+  "A": {
+   "booster-1": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 1,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 18,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-hakuran": 24,
+     "mon-lilil": 3,
+     "mon-geol": 30,
+     "mon-shishien": 16,
+     "mon-soramo": 4,
+     "mon-uzurio": 4,
+     "mon-flune": 2,
+     "mon-hyouzuku": 2,
+     "mon-pukarim": 3,
+     "mon-serephine": 4,
+     "mon-nobiton": 3
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 18,
+      "guard": 4,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-geol": 20,
+     "mon-lazuck": 6,
+     "mon-hyouzuku": 8,
+     "mon-tsumuji": 3,
+     "mon-hakuran": 19,
+     "mon-flune": 6,
+     "mon-shishien": 20,
+     "mon-gauul": 3,
+     "mon-serephine": 3,
+     "mon-pukarim": 4,
+     "mon-uzurio": 3
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 16,
+      "guard": 6,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 14,
+      "guard": 3,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-kalshell": 4,
+     "mon-uzurio": 3,
+     "mon-flune": 5,
+     "mon-hakuran": 27,
+     "mon-pukarim": 9,
+     "mon-geol": 15,
+     "mon-forn": 6,
+     "mon-shishien": 17,
+     "mon-myurol": 5,
+     "mon-serephine": 3,
+     "mon-hyouzuku": 1
+    }
+   }
+  },
+  "S": {
+   "booster-1": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 2,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 17,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-nobiton": 2,
+     "mon-lazuck": 6,
+     "mon-shishien": 33,
+     "mon-uzurio": 6,
+     "mon-geol": 27,
+     "mon-pukarim": 5,
+     "mon-hakuran": 28,
+     "mon-hyouzuku": 2,
+     "mon-lilil": 2,
+     "mon-serephine": 2,
+     "mon-flune": 2,
+     "mon-soramo": 5
+    }
+   },
+   "booster-2": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 3,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 16,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-shishien": 37,
+     "mon-hyouzuku": 6,
+     "mon-hakuran": 15,
+     "mon-lazuck": 4,
+     "mon-uzurio": 7,
+     "mon-geol": 30,
+     "mon-gauul": 4,
+     "mon-flune": 5,
+     "mon-serephine": 4,
+     "mon-pukarim": 6,
+     "mon-tsumuji": 2
+    }
+   },
+   "booster-3": {
+    "monsters": [
+     "シシエン",
+     "ジオル",
+     "ハクラン"
+    ],
+    "skills": 60,
+    "supports": 4,
+    "byMonster": {
+     "シシエン": {
+      "attack": 21,
+      "guard": 2,
+      "other": 0
+     },
+     "ジオル": {
+      "attack": 18,
+      "guard": 0,
+      "other": 0
+     },
+     "ハクラン": {
+      "attack": 15,
+      "guard": 0,
+      "other": 0
+     }
+    },
+    "packsBySeries": {
+     "mon-lazuck": 4,
+     "mon-forn": 2,
+     "mon-shishien": 28,
+     "mon-geol": 25,
+     "mon-flune": 8,
+     "mon-hakuran": 23,
+     "mon-pukarim": 9,
+     "mon-serephine": 4,
+     "mon-myurol": 6,
+     "mon-hyouzuku": 4,
+     "mon-uzurio": 3,
+     "mon-kalshell": 4
+    }
+   }
+  }
+ },
+ "guardians": {
+  "enc-holy-boss": {
+   "name": "アウレリオ",
+   "slot": "S",
+   "target": 10,
+   "current": {
+    "lifeScale": 1.08,
+    "rate": 77.3,
+    "byBox": {
+     "booster-1": 78.4,
+     "booster-2": 73.9,
+     "booster-3": 79.6
+    },
+    "summary": {
+     "games": 3000,
+     "win": 77.3,
+     "koWin": 77.2,
+     "deckOutWin": 0.1,
+     "koLoss": 22,
+     "deckOutLoss": 0.7,
+     "draw": 0,
+     "deckOut": 0.8,
+     "avgTurns": 20.44,
+     "playerAttackEvaded": 10.5,
+     "playerAttackDefended": 15.5,
+     "opponentAttackEvaded": 0,
+     "opponentAttackDefended": 6.7,
+     "playerGuardsPerGame": 0.42,
+     "opponentGuardsPerGame": 2.05
+    },
+    "byBoxSummary": {
+     "booster-1": {
+      "games": 1000,
+      "win": 78.4,
+      "koWin": 78.3,
+      "deckOutWin": 0.1,
+      "koLoss": 21,
+      "deckOutLoss": 0.6,
+      "draw": 0,
+      "deckOut": 0.7,
+      "avgTurns": 20.21,
+      "playerAttackEvaded": 10.2,
+      "playerAttackDefended": 15.5,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 5.8,
+      "playerGuardsPerGame": 0.35,
+      "opponentGuardsPerGame": 2.05
+     },
+     "booster-2": {
+      "games": 1000,
+      "win": 73.9,
+      "koWin": 73.9,
+      "deckOutWin": 0,
+      "koLoss": 25.1,
+      "deckOutLoss": 1,
+      "draw": 0,
+      "deckOut": 1,
+      "avgTurns": 21.03,
+      "playerAttackEvaded": 10.6,
+      "playerAttackDefended": 15.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 8.4,
+      "playerGuardsPerGame": 0.54,
+      "opponentGuardsPerGame": 2.09
+     },
+     "booster-3": {
+      "games": 1000,
+      "win": 79.6,
+      "koWin": 79.4,
+      "deckOutWin": 0.2,
+      "koLoss": 19.9,
+      "deckOutLoss": 0.5,
+      "draw": 0,
+      "deckOut": 0.7,
+      "avgTurns": 20.08,
+      "playerAttackEvaded": 10.8,
+      "playerAttackDefended": 15.2,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 5.8,
+      "playerGuardsPerGame": 0.36,
+      "opponentGuardsPerGame": 2.03
+     }
+    }
+   },
+   "scan": {
+    "1.54": {
+     "lifeScale": 1.54,
+     "rate": 26.5,
+     "byBox": {
+      "booster-1": 27.9,
+      "booster-2": 24.9,
+      "booster-3": 26.7
+     },
+     "summary": {
+      "games": 3000,
+      "win": 26.5,
+      "koWin": 26.3,
+      "deckOutWin": 0.2,
+      "koLoss": 69.6,
+      "deckOutLoss": 3.9,
+      "draw": 0,
+      "deckOut": 4.1,
+      "avgTurns": 23.41,
+      "playerAttackEvaded": 10.3,
+      "playerAttackDefended": 14.3,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.9,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.11
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 27.9,
+       "koWin": 27.8,
+       "deckOutWin": 0.1,
+       "koLoss": 68.8,
+       "deckOutLoss": 3.3,
+       "draw": 0,
+       "deckOut": 3.4,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 9.7,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.3,
+       "playerGuardsPerGame": 0.34,
+       "opponentGuardsPerGame": 2.07
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 24.9,
+       "koWin": 24.4,
+       "deckOutWin": 0.5,
+       "koLoss": 70.9,
+       "deckOutLoss": 4.2,
+       "draw": 0,
+       "deckOut": 4.7,
+       "avgTurns": 23.97,
+       "playerAttackEvaded": 10.2,
+       "playerAttackDefended": 14.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6.2,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.13
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 26.7,
+       "koWin": 26.7,
+       "deckOutWin": 0,
+       "koLoss": 69.2,
+       "deckOutLoss": 4.1,
+       "draw": 0,
+       "deckOut": 4.1,
+       "avgTurns": 23.14,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.3,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.14
+      }
+     }
+    },
+    "1.56": {
+     "lifeScale": 1.56,
+     "rate": 26.5,
+     "byBox": {
+      "booster-1": 27.9,
+      "booster-2": 24.9,
+      "booster-3": 26.7
+     },
+     "summary": {
+      "games": 3000,
+      "win": 26.5,
+      "koWin": 26.3,
+      "deckOutWin": 0.2,
+      "koLoss": 69.6,
+      "deckOutLoss": 3.9,
+      "draw": 0,
+      "deckOut": 4.1,
+      "avgTurns": 23.41,
+      "playerAttackEvaded": 10.3,
+      "playerAttackDefended": 14.3,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.9,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.11
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 27.9,
+       "koWin": 27.8,
+       "deckOutWin": 0.1,
+       "koLoss": 68.8,
+       "deckOutLoss": 3.3,
+       "draw": 0,
+       "deckOut": 3.4,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 9.7,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.3,
+       "playerGuardsPerGame": 0.34,
+       "opponentGuardsPerGame": 2.07
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 24.9,
+       "koWin": 24.4,
+       "deckOutWin": 0.5,
+       "koLoss": 70.9,
+       "deckOutLoss": 4.2,
+       "draw": 0,
+       "deckOut": 4.7,
+       "avgTurns": 23.97,
+       "playerAttackEvaded": 10.2,
+       "playerAttackDefended": 14.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6.2,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.13
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 26.7,
+       "koWin": 26.7,
+       "deckOutWin": 0,
+       "koLoss": 69.2,
+       "deckOutLoss": 4.1,
+       "draw": 0,
+       "deckOut": 4.1,
+       "avgTurns": 23.14,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.3,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.14
+      }
+     }
+    },
+    "1.58": {
+     "lifeScale": 1.58,
+     "rate": 23.1,
+     "byBox": {
+      "booster-1": 24.6,
+      "booster-2": 21.3,
+      "booster-3": 23.5
+     },
+     "summary": {
+      "games": 3000,
+      "win": 23.1,
+      "koWin": 23,
+      "deckOutWin": 0.1,
+      "koLoss": 72.5,
+      "deckOutLoss": 4.4,
+      "draw": 0,
+      "deckOut": 4.5,
+      "avgTurns": 23.54,
+      "playerAttackEvaded": 10,
+      "playerAttackDefended": 14.4,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.9,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.1
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 24.6,
+       "koWin": 24.4,
+       "deckOutWin": 0.2,
+       "koLoss": 71.6,
+       "deckOutLoss": 3.8,
+       "draw": 0,
+       "deckOut": 4,
+       "avgTurns": 23.27,
+       "playerAttackEvaded": 9.4,
+       "playerAttackDefended": 14.3,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.2,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.06
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 21.3,
+       "koWin": 21.1,
+       "deckOutWin": 0.2,
+       "koLoss": 73.9,
+       "deckOutLoss": 4.8,
+       "draw": 0,
+       "deckOut": 5,
+       "avgTurns": 24.08,
+       "playerAttackEvaded": 10,
+       "playerAttackDefended": 14.7,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6.2,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.1
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 23.5,
+       "koWin": 23.5,
+       "deckOutWin": 0,
+       "koLoss": 72,
+       "deckOutLoss": 4.5,
+       "draw": 0,
+       "deckOut": 4.5,
+       "avgTurns": 23.28,
+       "playerAttackEvaded": 10.7,
+       "playerAttackDefended": 14.3,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.2,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.13
+      }
+     }
+    },
+    "1.60": {
+     "lifeScale": 1.6,
+     "rate": 18.5,
+     "byBox": {
+      "booster-1": 19.5,
+      "booster-2": 16.5,
+      "booster-3": 19.4
+     },
+     "summary": {
+      "games": 3000,
+      "win": 18.5,
+      "koWin": 18.4,
+      "deckOutWin": 0.1,
+      "koLoss": 77.7,
+      "deckOutLoss": 3.8,
+      "draw": 0,
+      "deckOut": 3.9,
+      "avgTurns": 23.41,
+      "playerAttackEvaded": 10.4,
+      "playerAttackDefended": 13.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.07
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 19.5,
+       "koWin": 19.5,
+       "deckOutWin": 0,
+       "koLoss": 76.9,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.6,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 9.5,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.01
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 16.5,
+       "koWin": 16.3,
+       "deckOutWin": 0.2,
+       "koLoss": 79.2,
+       "deckOutLoss": 4.3,
+       "draw": 0,
+       "deckOut": 4.5,
+       "avgTurns": 23.89,
+       "playerAttackEvaded": 10.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.08
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 19.4,
+       "koWin": 19.3,
+       "deckOutWin": 0.1,
+       "koLoss": 77,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.21,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 13.7,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.11
+      }
+     }
+    },
+    "1.62": {
+     "lifeScale": 1.62,
+     "rate": 18.5,
+     "byBox": {
+      "booster-1": 19.5,
+      "booster-2": 16.5,
+      "booster-3": 19.4
+     },
+     "summary": {
+      "games": 3000,
+      "win": 18.5,
+      "koWin": 18.4,
+      "deckOutWin": 0.1,
+      "koLoss": 77.7,
+      "deckOutLoss": 3.8,
+      "draw": 0,
+      "deckOut": 3.9,
+      "avgTurns": 23.41,
+      "playerAttackEvaded": 10.4,
+      "playerAttackDefended": 13.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.07
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 19.5,
+       "koWin": 19.5,
+       "deckOutWin": 0,
+       "koLoss": 76.9,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.6,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 9.5,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.01
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 16.5,
+       "koWin": 16.3,
+       "deckOutWin": 0.2,
+       "koLoss": 79.2,
+       "deckOutLoss": 4.3,
+       "draw": 0,
+       "deckOut": 4.5,
+       "avgTurns": 23.89,
+       "playerAttackEvaded": 10.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.08
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 19.4,
+       "koWin": 19.3,
+       "deckOutWin": 0.1,
+       "koLoss": 77,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.21,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 13.7,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.11
+      }
+     }
+    },
+    "1.64": {
+     "lifeScale": 1.64,
+     "rate": 18.5,
+     "byBox": {
+      "booster-1": 19.5,
+      "booster-2": 16.5,
+      "booster-3": 19.4
+     },
+     "summary": {
+      "games": 3000,
+      "win": 18.5,
+      "koWin": 18.4,
+      "deckOutWin": 0.1,
+      "koLoss": 77.7,
+      "deckOutLoss": 3.8,
+      "draw": 0,
+      "deckOut": 3.9,
+      "avgTurns": 23.41,
+      "playerAttackEvaded": 10.4,
+      "playerAttackDefended": 13.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.07
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 19.5,
+       "koWin": 19.5,
+       "deckOutWin": 0,
+       "koLoss": 76.9,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.6,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 9.5,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.01
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 16.5,
+       "koWin": 16.3,
+       "deckOutWin": 0.2,
+       "koLoss": 79.2,
+       "deckOutLoss": 4.3,
+       "draw": 0,
+       "deckOut": 4.5,
+       "avgTurns": 23.89,
+       "playerAttackEvaded": 10.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.08
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 19.4,
+       "koWin": 19.3,
+       "deckOutWin": 0.1,
+       "koLoss": 77,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.21,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 13.7,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4.1,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.11
+      }
+     }
+    },
+    "1.66": {
+     "lifeScale": 1.66,
+     "rate": 14.5,
+     "byBox": {
+      "booster-1": 15.2,
+      "booster-2": 12.4,
+      "booster-3": 16
+     },
+     "summary": {
+      "games": 3000,
+      "win": 14.5,
+      "koWin": 14.5,
+      "deckOutWin": 0.1,
+      "koLoss": 81.5,
+      "deckOutLoss": 4,
+      "draw": 0,
+      "deckOut": 4.1,
+      "avgTurns": 23.38,
+      "playerAttackEvaded": 10.5,
+      "playerAttackDefended": 14,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.08
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 15.2,
+       "koWin": 15.2,
+       "deckOutWin": 0,
+       "koLoss": 81.1,
+       "deckOutLoss": 3.7,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.15,
+       "playerAttackEvaded": 9.7,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.04
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 12.4,
+       "koWin": 12.3,
+       "deckOutWin": 0.1,
+       "koLoss": 82.9,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.8,
+       "avgTurns": 23.85,
+       "playerAttackEvaded": 10.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.07
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 16,
+       "koWin": 15.9,
+       "deckOutWin": 0.1,
+       "koLoss": 80.4,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.15,
+       "playerAttackEvaded": 11.2,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.14
+      }
+     }
+    },
+    "1.68": {
+     "lifeScale": 1.68,
+     "rate": 14.5,
+     "byBox": {
+      "booster-1": 15.2,
+      "booster-2": 12.4,
+      "booster-3": 16
+     },
+     "summary": {
+      "games": 3000,
+      "win": 14.5,
+      "koWin": 14.5,
+      "deckOutWin": 0.1,
+      "koLoss": 81.5,
+      "deckOutLoss": 4,
+      "draw": 0,
+      "deckOut": 4.1,
+      "avgTurns": 23.38,
+      "playerAttackEvaded": 10.5,
+      "playerAttackDefended": 14,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.08
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 15.2,
+       "koWin": 15.2,
+       "deckOutWin": 0,
+       "koLoss": 81.1,
+       "deckOutLoss": 3.7,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.15,
+       "playerAttackEvaded": 9.7,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.04
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 12.4,
+       "koWin": 12.3,
+       "deckOutWin": 0.1,
+       "koLoss": 82.9,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.8,
+       "avgTurns": 23.85,
+       "playerAttackEvaded": 10.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.07
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 16,
+       "koWin": 15.9,
+       "deckOutWin": 0.1,
+       "koLoss": 80.4,
+       "deckOutLoss": 3.6,
+       "draw": 0,
+       "deckOut": 3.7,
+       "avgTurns": 23.15,
+       "playerAttackEvaded": 11.2,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.14
+      }
+     }
+    },
+    "1.70": {
+     "lifeScale": 1.7,
+     "rate": 12.6,
+     "byBox": {
+      "booster-1": 13,
+      "booster-2": 10.8,
+      "booster-3": 14
+     },
+     "summary": {
+      "games": 3000,
+      "win": 12.6,
+      "koWin": 12.5,
+      "deckOutWin": 0.1,
+      "koLoss": 82,
+      "deckOutLoss": 5.4,
+      "draw": 0,
+      "deckOut": 5.4,
+      "avgTurns": 23.51,
+      "playerAttackEvaded": 10.3,
+      "playerAttackDefended": 14.1,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.08
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 13,
+       "koWin": 13,
+       "deckOutWin": 0,
+       "koLoss": 81.6,
+       "deckOutLoss": 5.4,
+       "draw": 0,
+       "deckOut": 5.4,
+       "avgTurns": 23.28,
+       "playerAttackEvaded": 9.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.04
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 10.8,
+       "koWin": 10.7,
+       "deckOutWin": 0.1,
+       "koLoss": 83.2,
+       "deckOutLoss": 6,
+       "draw": 0,
+       "deckOut": 6.1,
+       "avgTurns": 24,
+       "playerAttackEvaded": 10.5,
+       "playerAttackDefended": 14.2,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.09
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 14,
+       "koWin": 13.9,
+       "deckOutWin": 0.1,
+       "koLoss": 81.3,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.8,
+       "avgTurns": 23.24,
+       "playerAttackEvaded": 11,
+       "playerAttackDefended": 14,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.12
+      }
+     }
+    },
+    "1.72": {
+     "lifeScale": 1.72,
+     "rate": 12.6,
+     "byBox": {
+      "booster-1": 13,
+      "booster-2": 10.8,
+      "booster-3": 14
+     },
+     "summary": {
+      "games": 3000,
+      "win": 12.6,
+      "koWin": 12.5,
+      "deckOutWin": 0.1,
+      "koLoss": 82,
+      "deckOutLoss": 5.4,
+      "draw": 0,
+      "deckOut": 5.4,
+      "avgTurns": 23.51,
+      "playerAttackEvaded": 10.3,
+      "playerAttackDefended": 14.1,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.08
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 13,
+       "koWin": 13,
+       "deckOutWin": 0,
+       "koLoss": 81.6,
+       "deckOutLoss": 5.4,
+       "draw": 0,
+       "deckOut": 5.4,
+       "avgTurns": 23.28,
+       "playerAttackEvaded": 9.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.04
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 10.8,
+       "koWin": 10.7,
+       "deckOutWin": 0.1,
+       "koLoss": 83.2,
+       "deckOutLoss": 6,
+       "draw": 0,
+       "deckOut": 6.1,
+       "avgTurns": 24,
+       "playerAttackEvaded": 10.5,
+       "playerAttackDefended": 14.2,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.09
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 14,
+       "koWin": 13.9,
+       "deckOutWin": 0.1,
+       "koLoss": 81.3,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.8,
+       "avgTurns": 23.24,
+       "playerAttackEvaded": 11,
+       "playerAttackDefended": 14,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.12
+      }
+     }
+    },
+    "1.74": {
+     "lifeScale": 1.74,
+     "rate": 12.6,
+     "byBox": {
+      "booster-1": 13,
+      "booster-2": 10.8,
+      "booster-3": 14
+     },
+     "summary": {
+      "games": 3000,
+      "win": 12.6,
+      "koWin": 12.5,
+      "deckOutWin": 0.1,
+      "koLoss": 82,
+      "deckOutLoss": 5.4,
+      "draw": 0,
+      "deckOut": 5.4,
+      "avgTurns": 23.51,
+      "playerAttackEvaded": 10.3,
+      "playerAttackDefended": 14.1,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.7,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.08
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 13,
+       "koWin": 13,
+       "deckOutWin": 0,
+       "koLoss": 81.6,
+       "deckOutLoss": 5.4,
+       "draw": 0,
+       "deckOut": 5.4,
+       "avgTurns": 23.28,
+       "playerAttackEvaded": 9.6,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.04
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 10.8,
+       "koWin": 10.7,
+       "deckOutWin": 0.1,
+       "koLoss": 83.2,
+       "deckOutLoss": 6,
+       "draw": 0,
+       "deckOut": 6.1,
+       "avgTurns": 24,
+       "playerAttackEvaded": 10.5,
+       "playerAttackDefended": 14.2,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 6,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.09
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 14,
+       "koWin": 13.9,
+       "deckOutWin": 0.1,
+       "koLoss": 81.3,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.8,
+       "avgTurns": 23.24,
+       "playerAttackEvaded": 11,
+       "playerAttackDefended": 14,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 4,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.12
+      }
+     }
+    },
+    "1.76": {
+     "lifeScale": 1.76,
+     "rate": 9.2,
+     "byBox": {
+      "booster-1": 9.6,
+      "booster-2": 7.8,
+      "booster-3": 10.3
+     },
+     "summary": {
+      "games": 3000,
+      "win": 9.2,
+      "koWin": 9.2,
+      "deckOutWin": 0,
+      "koLoss": 86,
+      "deckOutLoss": 4.8,
+      "draw": 0,
+      "deckOut": 4.8,
+      "avgTurns": 23.3,
+      "playerAttackEvaded": 10.4,
+      "playerAttackDefended": 13.7,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.6,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.03
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 9.6,
+       "koWin": 9.6,
+       "deckOutWin": 0,
+       "koLoss": 85,
+       "deckOutLoss": 5.4,
+       "draw": 0,
+       "deckOut": 5.4,
+       "avgTurns": 23.05,
+       "playerAttackEvaded": 9.5,
+       "playerAttackDefended": 13.6,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 1.97
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 7.8,
+       "koWin": 7.8,
+       "deckOutWin": 0,
+       "koLoss": 87.5,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.7,
+       "avgTurns": 23.73,
+       "playerAttackEvaded": 10.5,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 5.9,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.03
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 10.3,
+       "koWin": 10.3,
+       "deckOutWin": 0,
+       "koLoss": 85.5,
+       "deckOutLoss": 4.2,
+       "draw": 0,
+       "deckOut": 4.2,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 11.3,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.1
+      }
+     }
+    },
+    "1.78": {
+     "lifeScale": 1.78,
+     "rate": 9.2,
+     "byBox": {
+      "booster-1": 9.6,
+      "booster-2": 7.8,
+      "booster-3": 10.3
+     },
+     "summary": {
+      "games": 3000,
+      "win": 9.2,
+      "koWin": 9.2,
+      "deckOutWin": 0,
+      "koLoss": 86,
+      "deckOutLoss": 4.8,
+      "draw": 0,
+      "deckOut": 4.8,
+      "avgTurns": 23.3,
+      "playerAttackEvaded": 10.4,
+      "playerAttackDefended": 13.7,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.6,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.03
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 9.6,
+       "koWin": 9.6,
+       "deckOutWin": 0,
+       "koLoss": 85,
+       "deckOutLoss": 5.4,
+       "draw": 0,
+       "deckOut": 5.4,
+       "avgTurns": 23.05,
+       "playerAttackEvaded": 9.5,
+       "playerAttackDefended": 13.6,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 1.97
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 7.8,
+       "koWin": 7.8,
+       "deckOutWin": 0,
+       "koLoss": 87.5,
+       "deckOutLoss": 4.7,
+       "draw": 0,
+       "deckOut": 4.7,
+       "avgTurns": 23.73,
+       "playerAttackEvaded": 10.5,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 5.9,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.03
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 10.3,
+       "koWin": 10.3,
+       "deckOutWin": 0,
+       "koLoss": 85.5,
+       "deckOutLoss": 4.2,
+       "draw": 0,
+       "deckOut": 4.2,
+       "avgTurns": 23.13,
+       "playerAttackEvaded": 11.3,
+       "playerAttackDefended": 13.9,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.1
+      }
+     }
+    },
+    "1.80": {
+     "lifeScale": 1.8,
+     "rate": 6.3,
+     "byBox": {
+      "booster-1": 5.9,
+      "booster-2": 5.6,
+      "booster-3": 7.5
+     },
+     "summary": {
+      "games": 3000,
+      "win": 6.3,
+      "koWin": 6.3,
+      "deckOutWin": 0,
+      "koLoss": 88.8,
+      "deckOutLoss": 4.9,
+      "draw": 0,
+      "deckOut": 4.9,
+      "avgTurns": 23.16,
+      "playerAttackEvaded": 10.5,
+      "playerAttackDefended": 13.8,
+      "opponentAttackEvaded": 0,
+      "opponentAttackDefended": 4.6,
+      "playerGuardsPerGame": 0.39,
+      "opponentGuardsPerGame": 2.03
+     },
+     "byBoxSummary": {
+      "booster-1": {
+       "games": 1000,
+       "win": 5.9,
+       "koWin": 5.9,
+       "deckOutWin": 0,
+       "koLoss": 89,
+       "deckOutLoss": 5.1,
+       "draw": 0,
+       "deckOut": 5.1,
+       "avgTurns": 22.85,
+       "playerAttackEvaded": 9.6,
+       "playerAttackDefended": 13.6,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.32,
+       "opponentGuardsPerGame": 1.95
+      },
+      "booster-2": {
+       "games": 1000,
+       "win": 5.6,
+       "koWin": 5.6,
+       "deckOutWin": 0,
+       "koLoss": 89.4,
+       "deckOutLoss": 5,
+       "draw": 0,
+       "deckOut": 5,
+       "avgTurns": 23.56,
+       "playerAttackEvaded": 10.7,
+       "playerAttackDefended": 13.8,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 5.9,
+       "playerGuardsPerGame": 0.51,
+       "opponentGuardsPerGame": 2.03
+      },
+      "booster-3": {
+       "games": 1000,
+       "win": 7.5,
+       "koWin": 7.5,
+       "deckOutWin": 0,
+       "koLoss": 88,
+       "deckOutLoss": 4.5,
+       "draw": 0,
+       "deckOut": 4.5,
+       "avgTurns": 23.05,
+       "playerAttackEvaded": 11.1,
+       "playerAttackDefended": 14.1,
+       "opponentAttackEvaded": 0,
+       "opponentAttackDefended": 3.9,
+       "playerGuardsPerGame": 0.33,
+       "opponentGuardsPerGame": 2.1
+      }
+     }
+    }
+   }
+  }
+ }
+}

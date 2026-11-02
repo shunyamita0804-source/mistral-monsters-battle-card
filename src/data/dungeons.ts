@@ -189,6 +189,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // テオだけは、ラズックとガウルのライフの段差が同じ所（1.0833）で、1.07＝31.0％・1.09＝17.3％ と飛ぶので ±3 に入らず、いちばん近い 1.07 にした
   // 2026-10-30 指示書 Y：サポートカードを入れ替え、最初の箱が変わったので、8人とも V の「直す前の勝つ割合」±3 に合わせ直した（3箱 × 1000回。docs/support-y-20261030.md）。
   // ゼフィラだけは、ライフの段差（1.21＝30.1％・1.22＝25.4％・1.25＝14.6％）で ±3 に入らず、いちばん近い 1.22 にした
+  // 2026-11-02 指示書 AU（全体バランス）：守り手9人を、その時点の「目安のプレイヤー」（tests/support/balancePlayer.ts。枠ごとのパック・モンスター）で
+  // 3箱 × 1000回測り、目標（最初 27・D 22・C 19・B 16・A 13・S 10％ ±3）に合わせた。イヴァン 1.05→1.07・グラント 1.06→1.42・ステラ 1→1.36・
+  // テオ 1.07→1.92・アウレリオ 1.08→1.76。ゼフィラ・ルシア・セラ・バルカはそのまま（目標に入っていた）。記録 docs/balance-au-20261102.md
   'enc-b1-a': { id: 'enc-b1-a', name: '野生モンスターの群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },
   'enc-b1-b': { id: 'enc-b1-b', name: '野生モンスターの群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.65 },
   'enc-b2-a': { id: 'enc-b2-a', name: '宝を守る群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.75 },
@@ -198,7 +201,7 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
   // 2026-11-02 指示書 AT：グラントは B の守り手になった。前の B（ステラ 1.0）の勝つ割合 6.4％ ±3 に、今の 1.06（5.5％）で入っているので変えない
-  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], ace: GEOL_MONSTER_ID, lifeScale: 1.06, skill: 'A' },
+  'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], ace: GEOL_MONSTER_ID, lifeScale: 1.42, skill: 'A' },
   // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終）。2026-10-29 夜 ユーザー指示：プカリム・フルーネ・ミュロル（案2）。
   // lifeScale は試遊（最初の手持ち3箱 × 200回）で勝つ割合が 45％ にいちばん近い 0.75（0.85＝35.0％・0.75＝43.2％・0.7＝55.2％。docs/flune-final-20261029.md 6章）。2026-10-30 指示書 V で 0.7 に
   // 2026-11-02 指示書 AT：セラは D の守り手になったので、前の D（ルシア 1.25）の勝つ割合 3.9％ を目ざした（0.93 → 1.26 で 11.6％）。1.3 より上はセラの山札切れでしか負けなくなり 9〜11％ から下がらないので ±3 に入らず、ルシアと同じくらいの段にした（docs/dungeons-at-20261102.md）
@@ -211,7 +214,7 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 氷の洞窟のボス（2026-10-30 指示書 W）：切り札をカルシェルからヒョウズクに（真ん中）。ノビトンは外した（まきつく＋凍らせるで同じモンスターを止め続ける組み合わせになるため）。
   // lifeScale は V で直す前の勝つ割合 21.2％ から ±3 を目ざしたが、1.1 より上はライフを上げても 33〜36％ から下がらない（プレイヤーはほぼボスの山札切れでしか勝たない）。
   // 測った中でいちばん近い 1.3（1000回で 32.7％）にした。±3 には入っていない（docs/hyouzuku-w-20261030.md・npm run playtest:bosses）。指示書 Y で 1.2（20.1％）に
-  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.05, skill: 'A' },
+  'enc-ice-boss': { id: 'enc-ice-boss', name: 'イヴァン', monsters: [MYU, HYOUZUKU_MONSTER_ID, KAL], ace: HYOUZUKU_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
   // 炎の火山のボス（2026-10-31 指示書 AB）：切り札をガウルからシシエンに（真ん中）。ノビトンは外した。
   // lifeScale（2026-10-31 指示書 AC【2】）：ガウル・ラズックはライフ6、シシエンは7なので、ライフは3段に変わる（Math.round）。
   // 1.0＝6・7・6（29.1％）、1.0714〜1.0833＝6・8・6（1.08 で 21.0％）、1.0834〜＝7・8・7（1.09 で 11.0％）。V の目標 18.1％ ±3 に入る 1.08 にした
@@ -221,9 +224,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 雷の高原のボス（2026-11-01 指示書 AH）：ハクランを真ん中に、左右はノビトン・プカリム。腕前 A。
   // lifeScale は試遊でバルカと同じ目標（最初の手持ち3箱・プレイヤー側は腕前 B・1000回で 18.1％ ±3）に合わせた：1.0 でプレイヤーの勝ち 18.3％（0.95〜1.05 は同じ。1.1 で 6.1％）
   // （docs/thunder-plateau-ah-20261101.md・npm run playtest:stella）
-  'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1, skill: 'A' },
-  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.07, skill: 'A' },
-  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
+  'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1.36, skill: 'A' },
+  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.92, skill: 'A' },
+  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.76, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
   // 2026-11-02 指示書 AQ：切り札（真ん中）をツムジからウズリオへ。ほかの2体はそのまま。lifeScale はツムジのときの勝つ割合（いまの最初の3箱・腕前 B・1000回で 2.8％）に

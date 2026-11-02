@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getPlayCard } from '../src/data/cards.ts';
 import { personOfOpponent } from '../src/data/people.ts';
 import { DECK_RULES } from '../src/data/rules.ts';
-import { getTournament, TOURNAMENTS, tournamentOpponents, type TournamentDefinition } from '../src/data/tournaments.ts';
+import { getTournament, RANK_SCALE, TOURNAMENTS, tournamentOpponents, type TournamentDefinition } from '../src/data/tournaments.ts';
 import { simulateBattle } from '../src/game/battle/simulate.ts';
 import { buildOpponentDeck, countCards } from '../src/game/deck/deck.ts';
 import {
@@ -60,11 +60,13 @@ describe('大会のデータ（仮）', () => {
     expect([C, B, A, S].map((t) => t.bracket?.finalist)).toEqual(['reg-sienna', null, null, 'reg-alvin']);
   });
 
-  it('強さは C＜B＜A＜S。勝率は仮の固定値（カミラ 91%・アルヴィン 100%）', () => {
+  // 2026-11-02 指示書 AU：その時点の目安のプレイヤーで優勝する割合に合わせたので、倍率は C＜B＜A のあと S で少し下がる（C 0.86・B 0.9・A 1.06・S 1）
+  it('強さ（RANK_SCALE）は C 0.86・B 0.9・A 1.06・S 1。勝率は仮の固定値（カミラ 91%・アルヴィン 100%）', () => {
     const scale = (t: TournamentDefinition): number => t.bracket?.pool[0]?.lifeScale ?? 0;
+    expect(RANK_SCALE).toEqual({ C: 0.86, B: 0.9, A: 1.06, S: 1 });
     expect(scale(C)).toBeLessThan(scale(B));
     expect(scale(B)).toBeLessThan(scale(A));
-    expect(scale(A)).toBeLessThan(scale(S));
+    expect(scale(S)).toBeLessThan(scale(A));
     const rate = (id: string): number | undefined => S.bracket?.regulars.find((r) => r.id === id)?.winRate;
     expect(rate('reg-camilla')).toBe(91);
     expect(rate('reg-alvin')).toBe(100);
