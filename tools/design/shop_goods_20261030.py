@@ -23,7 +23,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 PACKS = os.path.join(ROOT, 'design-parts/gacha-20261029/shop')
 SKILLS = os.path.join(ROOT, 'assets/images/cards/skills')
 MONSTER_CARDS = os.path.join(ROOT, 'assets/images/cards/monsters')
-MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien']
+# 2026-11-02 指示書 AK2：リリルを足した（14種類。ハクラン・デスオルは手に入れ方が決まっていないので入れていない）
+MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'lilil']
 # 額の台の額4つ（左から）：初期のモンスターのモンスターカード
 FRAME_MONSTERS = ['soramo', 'gauul', 'nobiton', 'lazuck']
 

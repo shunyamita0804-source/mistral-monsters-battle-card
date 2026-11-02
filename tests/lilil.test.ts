@@ -9,7 +9,7 @@ import { PORTRAIT_FOCUS } from '../src/data/monsterPortraits.ts';
 import ak from '../src/data/official/booster_contents_20261102_AK.json';
 import aj from '../src/data/official/booster_contents_20261101_AJ.json';
 import { AJ_SKILLS, MONSTER_HABITAT } from '../src/data/skillRebuildAJ.ts';
-import { chooseAction } from '../src/game/battle/ai.ts';
+import { chooseAction, CPU_SKILL } from '../src/game/battle/ai.ts';
 import { applyAction, createBattle, targetsFor, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { countCards } from '../src/game/deck/deck.ts';
 import { boosterCardCounts, boosterDeck, examLoanDeck } from '../src/game/story/introV2.ts';
@@ -68,7 +68,7 @@ describe('リリルのデータ（届いた JSON のとおり）', () => {
     expect(skills.map((k) => k.art?.file)).toEqual(LILIL_ROWS.map((r) => lililArtFile(r.no)));
   });
 
-  it('効果は今ある効果だけ：4・7 マナ−1・−4、8 おびきよせと同じ、9 すなをほると同じ、10〜12 回避（ちから・かしこさ・両方。マナ1）。防御の技は無い', () => {
+  it('効果は今ある効果だけ：4・7 マナ−1・−4、8 おびきよせと同じ、9 すなをほると同じ、10〜12 回避（ちから・かしこさ・両方）。防御の技は無い', () => {
     const eff = (n: number) => (AJ_SKILLS[LILIL_MONSTER_ID] ?? [])[n - 1]?.effect;
     expect(eff(4)).toEqual({ type: 'attack', manaDrain: 1 });
     expect(eff(7)).toEqual({ type: 'attack', manaDrain: 4 });
@@ -81,6 +81,18 @@ describe('リリルのデータ（届いた JSON のとおり）', () => {
     const text = (n: number) => cardCatalog.get(`skl-lilil-${String(n).padStart(2, '0')}`);
     expect(text(8)?.kind === 'skill' ? text(8) && (text(8) as { effectTextJa?: string }).effectTextJa : null).toBe('相手は次のターン、リリルしか攻撃できない');
     expect((text(9) as { effectTextJa?: string }).effectTextJa).toBe('相手は次のターン、リリルを攻撃できない');
+  });
+
+  it('指示書 AK2：はねでかわす・くるりとかわすはマナ0、よつばねのまいはマナ1のまま。前の版（_v1_20261102）はマナ1で、ほかは同じ', async () => {
+    const cost = (n: number) => (cardCatalog.get(`skl-lilil-${n}`) as { cost: number }).cost;
+    expect([cost(10), cost(11), cost(12)]).toEqual([0, 0, 1]);
+    const v1 = (await import('../src/data/official/lilil12_skills_OFFICIAL_v1_20261102.json')).default;
+    expect(v1.skills.map((k) => k.mana)).toEqual([0, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 1]);
+    expect(LILIL_ROWS.map((k) => k.mana)).toEqual([0, 1, 1, 2, 3, 4, 4, 3, 2, 0, 0, 1]);
+    expect(LILIL_ROWS.map(({ mana: _m, ...rest }) => rest)).toEqual(v1.skills.map(({ mana: _m, ...rest }) => rest));
+    for (const f of ['lilil12_skills_OFFICIAL_v1_20261102.json', 'lilil12_skills_OFFICIAL_v1_20261102.csv']) {
+      expect(readFileSync(`src/data/official/${f}`).equals(readFileSync(`${ORIGINAL}/${f}`)), f).toBe(true);
+    }
   });
 
   it('絵：技12枚（WebP）・正式モンスターカード・バトル用（無改変）・枠（モンスターカード・技カード）がある。原本は無改変で保管', () => {
@@ -245,6 +257,19 @@ describe('リリルの効果（今ある効果のまま）', () => {
     expect(hit(WISDOM, 'skl-lilil-12')).toBe(5);
   });
 
+  it('指示書 AK2：マナが0でも はねでかわす・くるりとかわす で回避できる（よつばねのまいはマナ1が要る）', () => {
+    const evadeWith = (card: string, dodge: string): number => {
+      let s = opponentTurn(scene({ player: [dodge] }, { player: 0 }), [card]);
+      s = applyAction(s, { type: 'useCard', side: 'opponent', cardUid: 'x0', userUid: 'o-m2', targetUid: 'p-m1' });
+      const tried = applyAction(s, { type: 'defend', side: 'player', cardUid: 'p0' });
+      s = tried === s ? applyAction(s, { type: 'defend', side: 'player', cardUid: null }) : tried;
+      return mon(s, 'p-m1').life;
+    };
+    expect(evadeWith(ATTACK, 'skl-lilil-10')).toBe(5);
+    expect(evadeWith(WISDOM, 'skl-lilil-11')).toBe(5);
+    expect(evadeWith(ATTACK, 'skl-lilil-12')).toBeLessThan(5);
+  });
+
   it('CPU もリリルの技を使える（今の思考のまま。手札がうっとりウインクだけでも止まらない）', () => {
     const s = opponentTurn(scene({}), []);
     const cpu: BattleState = {
@@ -256,5 +281,87 @@ describe('リリルの効果（今ある効果のまま）', () => {
     };
     const a = chooseAction(cpu, 'opponent', 'normal', 'A');
     expect(a).not.toBeNull();
+  });
+});
+
+/* ---------- CPU のうっとりウインク・うそなき（指示書 AK2） ---------- */
+
+// CPU（opponent）：リリル・ソラモ・ガウル。プレイヤー：カルシェル・ソラモ・ガウル
+function cpuScene(o: { hand: string[]; mana?: number; foeMana?: number; foeHand?: string[]; lives?: Record<string, number> }): BattleState {
+  const s = createBattle({ name: 'P', deck: oDeck }, { name: 'O', deck: pDeck }, 11, 'opponent');
+  const fix = (k: Side, hand: string[], mana: number) => ({
+    ...s.sides[k],
+    hand: hand.map((cardId, i) => ({ uid: `${k[0]}${i}`, cardId })),
+    manaPile: Array.from({ length: mana }, () => 'skl-soramo14-01'),
+    monsters: s.sides[k].monsters.map((m) => ({ ...m, acted: false, ...(o.lives && m.uid in o.lives ? { life: o.lives[m.uid] } : {}) })),
+  });
+  return { ...s, turn: 5, phase: 'main', active: 'opponent', manaConvertLimit: null, sides: { player: fix('player', o.foeHand ?? [], o.foeMana ?? 6), opponent: fix('opponent', o.hand, o.mana ?? 6) } };
+}
+const used = (s: BattleState, a: ReturnType<typeof chooseAction>): string | null =>
+  a?.type === 'useCard' ? (s.sides.opponent.hand.find((h) => h.uid === a.cardUid)?.cardId ?? null) : null;
+
+describe('CPU のうっとりウインク・うそなき（指示書 AK2）', () => {
+  it('手札にリリルの回避があり、相手のマナが多い（4以上）ときは、攻撃より先にうっとりウインク（狙いはいちばん攻撃の強い相手）', () => {
+    const s = cpuScene({ hand: ['skl-lilil-08', 'skl-lilil-10', 'skl-soramo14-03'], foeMana: 6 });
+    expect(mon(s, 'o-m1').cardId).toBe('mon-lilil');
+    const a = chooseAction(s, 'opponent', 'normal', 'A');
+    expect(used(s, a)).toBe('skl-lilil-08');
+    expect(a?.type === 'useCard' ? a.userUid : null).toBe('o-m1');
+  });
+
+  it('リリルの回避が手札に無ければ、うっとりウインクは使わない（ほかの攻撃を先に）', () => {
+    const s = cpuScene({ hand: ['skl-lilil-08', 'skl-soramo14-03'], foeMana: 6 });
+    expect(used(s, chooseAction(s, 'opponent', 'normal', 'A'))).not.toBe('skl-lilil-08');
+  });
+
+  it('相手の攻撃が弱い（マナが少なく、味方が倒されそうでない）ときは、攻撃を先にして、そのあとウインク', () => {
+    const s = cpuScene({ hand: ['skl-lilil-08', 'skl-lilil-10', 'skl-soramo14-03'], foeMana: 1 });
+    const a = chooseAction(s, 'opponent', 'normal', 'A');
+    expect(used(s, a)).toBe('skl-soramo14-03');
+  });
+
+  it('ウインクを使ったあとのマナ化：リリルの回避はマナにしないで残す（腕前 C でも）', () => {
+    const base = cpuScene({ hand: ['skl-lilil-10', 'skl-lilil-11', 'skl-soramo14-03', 'skl-soramo14-07'], mana: 2 });
+    const winked: BattleState = {
+      ...base,
+      phase: 'mana',
+      sides: { ...base.sides, player: { ...base.sides.player, monsters: base.sides.player.monsters.map((m) => (m.uid === 'p-m1' ? { ...m, taunt: { monsterId: 'mon-lilil', turn: base.turn + 1 } } : m)) } },
+    };
+    for (const skill of ['A', 'B', 'C'] as const) {
+      let s = winked;
+      for (let i = 0; i < 8; i++) {
+        const a = chooseAction(s, 'opponent', 'normal', skill);
+        if (!a || a.type !== 'convertToMana') break;
+        s = applyAction(s, a);
+      }
+      const left = s.sides.opponent.hand.map((h) => h.cardId);
+      expect(left, skill).toContain('skl-lilil-10');
+      expect(left, skill).toContain('skl-lilil-11');
+    }
+  });
+
+  it('ウインクの効いている手番にリリルが狙われたら、1ダメージでも回避する（マナ0の回避）', () => {
+    // プレイヤー側のリリル（p-m1）が狙われる。攻撃する相手 o-m2 はウインクされている
+    const s0 = scene({ player: ['skl-lilil-10'] }, { player: 0 });
+    const s1 = opponentTurn({ ...s0, sides: { ...s0.sides, opponent: { ...s0.sides.opponent, monsters: s0.sides.opponent.monsters.map((m) => (m.uid === 'o-m2' ? { ...m, taunt: { monsterId: 'mon-lilil', turn: s0.turn + 1 } } : m)) } } }, ['skl-soramo14-01']);
+    const s = applyAction(s1, { type: 'useCard', side: 'opponent', cardUid: 'x0', userUid: 'o-m2', targetUid: 'p-m1' });
+    expect(s.phase).toBe('defense');
+    const a = chooseAction(s, 'player', 'normal', 'A');
+    expect(a).toEqual({ type: 'defend', side: 'player', cardUid: 'p0' });
+    // ウインクの無いときの1ダメージは、今までどおり回避しない
+    const plain = applyAction(opponentTurn(s0, ['skl-soramo14-01']), { type: 'useCard', side: 'opponent', cardUid: 'x0', userUid: 'o-m2', targetUid: 'p-m1' });
+    expect(chooseAction(plain, 'player', 'normal', 'A')).toEqual({ type: 'defend', side: 'player', cardUid: null });
+  });
+
+  it('うそなき：リリルのライフが半分以下で、相手の攻撃で倒されそうなら、攻撃より先に使う', () => {
+    const s = cpuScene({ hand: ['skl-lilil-09', 'skl-soramo14-03'], lives: { 'o-m1': 2 } });
+    expect(used(s, chooseAction(s, 'opponent', 'normal', 'A'))).toBe('skl-lilil-09');
+    // ライフが多いときは使わない
+    const full = cpuScene({ hand: ['skl-lilil-09', 'skl-soramo14-03'] });
+    expect(used(full, chooseAction(full, 'opponent', 'normal', 'A'))).not.toBe('skl-lilil-09');
+  });
+
+  it('腕前 C はときどき使いそこねる（forgetTrick 0.3）。B・A は使いそこねない', () => {
+    expect([CPU_SKILL.C.forgetTrick, CPU_SKILL.B.forgetTrick, CPU_SKILL.A.forgetTrick]).toEqual([0.3, 0, 0]);
   });
 });

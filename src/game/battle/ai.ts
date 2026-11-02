@@ -61,6 +61,10 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  * - カラスのめ（デスオル。2026-10-31 指示書 AG）：その手番に相手を倒せる攻撃が無く、相手の手札が3枚以上のときに使う。
  *   捨てさせる1枚は A・B が engine.ts の defaultDiscardChoice（倒せる攻撃 → いちばん強い攻撃 → 条件の無い回避 → 防御）、C はランダム
  * - 構えは腕前より優先（aggressive は A でも守らない・守りを残さない。guard は守りを2枚残す）
+ * - リリルのうっとりウインク・うそなき（2026-11-02 指示書 AK2。リリルだけ。ラズックのおびきよせ・カルシェルのすなをほるは前のまま）：chooseLililTrick。
+ *   ウインクは、手札にリリルの回避があり次の相手の手番に払えるときだけ使う。相手の攻撃が強い（リリル以外の味方が倒されそう・相手のマナが4以上）ときは攻撃より先に、
+ *   そうでなければ攻撃のあとに。ウインクのあとはリリルの回避をマナにしないで残し、ウインクの効いている手番にリリルが狙われたら小さなダメージでも回避する。
+ *   うそなきは、リリルのライフが半分以下で、相手の攻撃で倒されそうなとき（その手番に倒せる攻撃が無ければ攻撃より先に）。腕前 C は 30% で使いそこねる
  */
 
 /** 腕前ごとのふるまい（2026-10-30 指示書 Z。数字は仮。ここでまとめて合わせる） */
@@ -82,12 +86,14 @@ export const CPU_SKILL: Readonly<
       readonly guardFirst: number;
       /** 反動で倒れるのに捨て身の技を使ってしまう割合（2026-10-31 指示書 AB） */
       readonly forgetRecoil: number;
+      /** リリルのうっとりウインク・うそなきを使いそこねる割合（2026-11-02 指示書 AK2） */
+      readonly forgetTrick: number;
     }
   >
 > = {
-  C: { missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3, forgetRecoil: 0.3 },
-  B: { missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0, forgetRecoil: 0 },
-  A: { missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0, forgetRecoil: 0 },
+  C: { missKill: 0.5, hesitate: 0.15, weakSkill: 0.3, misguard: 0.4, guardKeep: 0, guardFirst: 0.3, forgetRecoil: 0.3, forgetTrick: 0.3 },
+  B: { missKill: 0.2, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 1, guardFirst: 0, forgetRecoil: 0, forgetTrick: 0 },
+  A: { missKill: 0, hesitate: 0, weakSkill: 0, misguard: 0, guardKeep: 2, guardFirst: 0, forgetRecoil: 0, forgetTrick: 0 },
 };
 
 /**
@@ -266,9 +272,17 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const crow = chooseCrowEye(state, side, options, skill);
   if (crow) return crow;
 
+  // 2.95 リリル（2026-11-02 指示書 AK2）：相手の攻撃が強いときは、攻撃より先にうっとりウインク・うそなき
+  const trickFirst = chooseLililTrick(state, side, options, enemies, skill, true);
+  if (trickFirst) return trickFirst;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
+
+  // 3.5 リリル（2026-11-02 指示書 AK2）：攻撃のあと、回避を払えるならうっとりウインク
+  const trickAfter = chooseLililTrick(state, side, options, enemies, skill, false);
+  if (trickAfter) return trickAfter;
 
   // 4. 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）
   const special = chooseSpecial(state, side, options, enemies);
@@ -721,10 +735,78 @@ function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[
   return ally ? { type: 'useCard', side, cardUid: wind.card.uid, userUid: user.uid, targetUid: ally.uid } : null;
 }
 
+/** うっとりウインク・うそなきを指示書 AK2 の考え方で使うモンスター（2026-11-02。ほかのモンスターのおびきよせ・すなをほるは前の考え方のまま） */
+const WINK_MONSTERS: readonly string[] = ['mon-lilil'];
+
+/** その手札のカードが、モンスター monsterId の回避か */
+const isEvadeOf = (c: HandCard, monsterId: string): boolean => {
+  const card = getPlayCard(c.cardId);
+  return card.kind === 'skill' && card.effect.type === 'evade' && card.monsterId === monsterId;
+};
+
+/** 次の相手の手番に、相手のだれかが「自分のこのモンスターしか攻撃できない」（うっとりウインクが効く）モンスターの種類 */
+function winkedNextTurn(state: BattleState, side: Side): string[] {
+  return aliveMonsters(state.sides[otherSide(side)])
+    .map((m) => m.taunt)
+    .filter((t): t is { monsterId: string; turn: number } => !!t && t.turn === state.turn + 1 && WINK_MONSTERS.includes(t.monsterId))
+    .map((t) => t.monsterId);
+}
+
+/**
+ * リリルのうっとりウインク・うそなき（2026-11-02 指示書 AK2）。first が true のときは「相手の攻撃が強い」ときだけ（攻撃より先）、false は攻撃のあと。
+ * - うそなき：リリルのライフが半分以下で、相手のいちばん強い攻撃で倒されるほどのとき（first はその手番に倒せる攻撃が無いときだけ）
+ * - うっとりウインク：手札にリリルの回避があり、次の相手の手番に払える（ウインクを払った残り＋この手番にマナにできる手札で足りる）とき。
+ *   相手の攻撃が強い＝リリル以外の味方が相手のいちばん強い攻撃（いまの相手のマナで払えるもの）で倒されそう、または相手のマナが4以上。狙いはいちばん攻撃の強い相手
+ * - 腕前 C は forgetTrick の割合で使いそこねる
+ */
+function chooseLililTrick(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], skill: CpuSkill, first: boolean): BattleAction | null {
+  const tricks = options.filter(isSkillOption).filter((o) => WINK_MONSTERS.includes(o.def.monsterId) && (o.def.effect.type === 'taunt' || o.def.effect.type === 'hide'));
+  if (tricks.length === 0 || enemies.length === 0) return null;
+  if (cpuRoll(state, side, 'lililTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  const mine = state.sides[side];
+  const mana = manaOf(mine);
+  // 相手のいちばん強い攻撃（次の相手の手番に、いまの相手のマナで払える攻撃技の中で）
+  const foeMana = manaOf(state.sides[otherSide(side)]);
+  const strongest = Math.max(
+    0,
+    ...enemies.flatMap((e) =>
+      skillsOf(e.cardId)
+        .filter((k) => k.effect.type === 'attack' && k.stat !== null && k.cost <= foeMana)
+        .map((k) => skillValue(k) + (k.stat ? fieldModifier(state, k.stat.type) : 0)),
+    ),
+  );
+  // うそなき
+  const hide = tricks.find((o) => o.def.effect.type === 'hide');
+  if (hide && (!first || !canKillThisTurn(state, side, options))) {
+    const user = availableUsers(state, side, hide.def).find((m) => m.life <= m.maxLife / 2 && m.life <= strongest && m.hiddenTurn !== state.turn + 1);
+    if (user) return { type: 'useCard', side, cardUid: hide.card.uid, userUid: user.uid };
+  }
+  // うっとりウインク
+  const wink = tricks.find((o) => o.def.effect.type === 'taunt');
+  if (!wink) return null;
+  const user = availableUsers(state, side, wink.def)[0];
+  if (!user) return null;
+  const others = aliveMonsters(mine).filter((m) => m.uid !== user.uid);
+  if (others.length === 0) return null;
+  const evades = mine.hand.filter((c) => c.uid !== wink.card.uid && isEvadeOf(c, user.cardId));
+  if (evades.length === 0) return null;
+  const manaNext = mana - wink.def.cost + Math.max(0, mine.hand.length - 2);
+  if (!evades.some((c) => skillCost(state, getPlayCard(c.cardId) as SkillCard) <= manaNext)) return null;
+  const danger = foeMana >= 4 || others.some((m) => strongest >= m.life);
+  if (first && !danger) return null;
+  const target = targetsFor(state, side, wink.def, user)
+    .filter((e) => e.taunt?.turn !== state.turn + 1)
+    .sort((a, b) => threatOf(state, b) - threatOf(state, a) || b.life - a.life)[0];
+  return target ? { type: 'useCard', side, cardUid: wink.card.uid, userUid: user.uid, targetUid: target.uid } : null;
+}
+
 /** 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）。使えなければ null */
 function chooseSpecial(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], spare = 0): BattleAction | null {
   const mana = manaOf(state.sides[side]);
-  const special = options.filter(isSkillOption).find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && o.def.cost + spare <= mana);
+  // リリルのうっとりウインクは chooseLililTrick だけで考える（2026-11-02 指示書 AK2）
+  const special = options
+    .filter(isSkillOption)
+    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
   const strongestEnemy = [...enemies].sort((a, b) => b.life - a.life)[0];
   return special && strongestEnemy ? attackAction(state, side, special, strongestEnemy.uid) : null;
 }
@@ -771,10 +853,16 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
     const against = guardAgainst(card);
     return against === 'all' ? 2 : (against === 'force' && force >= wisdom) || (against === 'wisdom' && wisdom >= force) ? 1 : 0;
   };
-  const keepGuards = mine.hand
-    .filter((c) => isGuard(c) && cost(c) <= mana)
-    .sort((a, b) => fits(b) - fits(a) || guardValue(b) - guardValue(a))
-    .slice(0, guardKeep);
+  // うっとりウインクを使った（次の相手の手番に効く）モンスターの回避は、マナにしないで残す（2026-11-02 指示書 AK2）
+  const winked = winkedNextTurn(state, side);
+  const winkKeep = mine.hand.filter((c) => winked.some((id) => isEvadeOf(c, id)) && cost(c) <= mana + mine.hand.length - 1);
+  const keepGuards = [
+    ...winkKeep,
+    ...mine.hand
+      .filter((c) => !winkKeep.includes(c) && isGuard(c) && cost(c) <= mana)
+      .sort((a, b) => fits(b) - fits(a) || guardValue(b) - guardValue(a))
+      .slice(0, Math.max(0, guardKeep - winkKeep.length)),
+  ];
   const others = mine.hand.filter((c) => !keepGuards.includes(c) && (!isGuard(c) || guardKeep === 0));
   const manaAfter = mana + mine.hand.length - keepGuards.length - 1;
   let keepSkill = [...others].sort((a, b) => cost(b) - cost(a)).find((c) => cost(c) <= manaAfter);
@@ -813,6 +901,12 @@ function chooseGuard(state: BattleState, side: Side, style: AiStyle): BattleActi
   // 試遊中：ジオルのかばう（2026-10-29 指示書）。味方が倒れそうでジオルは倒れないとき、またはジオルの防御で大きく減らせるとき
   const coverOpt = options.find((o) => o.def.effect.type === 'cover');
   if (coverOpt && target && shouldCover(state, side, coverOpt, damage, lethal, options)) return { type: 'defend', side, cardUid: coverOpt.card.uid };
+  // うっとりウインクの効いている手番に狙われたリリルは、小さなダメージでも回避する（2026-11-02 指示書 AK2）
+  const attacker = findMonster(state, pending.userUid)?.monster;
+  if (target && WINK_MONSTERS.includes(target.cardId) && attacker?.taunt?.turn === state.turn && attacker.taunt.monsterId === target.cardId) {
+    const free = options.filter((o) => o.def.effect.type === 'evade').sort((a, b) => a.def.cost - b.def.cost)[0];
+    if (free) return { type: 'defend', side, cardUid: free.card.uid };
+  }
   // いつも攻撃（aggressive）は、倒されそうなときだけ守る
   if (style === 'aggressive' && !lethal) return end;
   const evade = options.filter((o) => o.def.effect.type === 'evade').sort((a, b) => a.def.cost - b.def.cost)[0];

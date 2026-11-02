@@ -329,8 +329,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-lilil-08', name: 'うっとりウインク', cat: '特', mana: 3, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、リリルしか攻撃できない', box: 2, art: 'lilil_sk_08.webp' },
     // カルシェルの すなをほる と同じ（hide）
     { id: 'skl-lilil-09', name: 'うそなき', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '相手は次のターン、リリルを攻撃できない', rare: true, box: 0, art: 'lilil_sk_09.webp' },
-    { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 2, art: 'lilil_sk_10.webp' },
-    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 1, art: 'lilil_sk_11.webp' },
+    // 2026-11-02 指示書 AK2：はねでかわす・くるりとかわすのマナ 1→0（ユーザー決定）
+    { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 0, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 2, art: 'lilil_sk_10.webp' },
+    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 1, art: 'lilil_sk_11.webp' },
     { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 1, art: 'lilil_sk_12.webp' },
   ],
 };

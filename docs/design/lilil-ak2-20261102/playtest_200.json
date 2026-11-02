@@ -1,0 +1,458 @@
+{
+ "games": 200,
+ "lives": [
+  5
+ ],
+ "sixteen": [
+  {
+   "id": "skl-lilil-01",
+   "copies": 3
+  },
+  {
+   "id": "skl-lilil-02",
+   "copies": 3
+  },
+  {
+   "id": "skl-lilil-03",
+   "copies": 3
+  },
+  {
+   "id": "skl-lilil-04",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-05",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-08",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-10",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-11",
+   "copies": 1
+  }
+ ],
+ "sixteenRare": [
+  {
+   "id": "skl-lilil-01",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-02",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-03",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-04",
+   "copies": 2
+  },
+  {
+   "id": "skl-lilil-05",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-06",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-07",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-08",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-09",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-10",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-11",
+   "copies": 1
+  },
+  {
+   "id": "skl-lilil-12",
+   "copies": 1
+  }
+ ],
+ "life5": {
+  "swap": {
+   "booster-2#0:mon-gauul": {
+    "games": 1200,
+    "win": 31.3,
+    "winKo": 15.7,
+    "winDeck": 15.7,
+    "loseKo": 29.8,
+    "loseDeck": 38.9,
+    "avgTurns": 36.6,
+    "winkPerGame": 0.01,
+    "winkAttacksOnLilil": 14,
+    "winkEvadedPct": 21.4,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.11,
+    "drainedManaPerGame": 0.1,
+    "attacksOnLililPerGame": 2.78,
+    "evadesPerGame": 0.2,
+    "evadedPct": 7
+   },
+   "booster-2#1:mon-lazuck": {
+    "games": 1200,
+    "win": 37.8,
+    "winKo": 18.1,
+    "winDeck": 19.7,
+    "loseKo": 29.3,
+    "loseDeck": 33,
+    "avgTurns": 36.4,
+    "winkPerGame": 0.07,
+    "winkAttacksOnLilil": 52,
+    "winkEvadedPct": 38.5,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.36,
+    "drainedManaPerGame": 0.34,
+    "attacksOnLililPerGame": 2.78,
+    "evadesPerGame": 0.19,
+    "evadedPct": 6.8
+   },
+   "booster-2#2:mon-nobiton": {
+    "games": 1200,
+    "win": 38.3,
+    "winKo": 25.5,
+    "winDeck": 12.8,
+    "loseKo": 50.8,
+    "loseDeck": 10.9,
+    "avgTurns": 32.3,
+    "winkPerGame": 0.08,
+    "winkAttacksOnLilil": 53,
+    "winkEvadedPct": 41.5,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.32,
+    "drainedManaPerGame": 0.3,
+    "attacksOnLililPerGame": 2.93,
+    "evadesPerGame": 0.26,
+    "evadedPct": 8.8
+   },
+   "booster-3#0:mon-myurol": {
+    "games": 1200,
+    "win": 53,
+    "winKo": 27.6,
+    "winDeck": 25.4,
+    "loseKo": 14.8,
+    "loseDeck": 32.2,
+    "avgTurns": 37.2,
+    "winkPerGame": 0.01,
+    "winkAttacksOnLilil": 12,
+    "winkEvadedPct": 50,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.1,
+    "drainedManaPerGame": 0.1,
+    "attacksOnLililPerGame": 2.61,
+    "evadesPerGame": 0.18,
+    "evadedPct": 6.8
+   },
+   "booster-3#1:mon-kalshell": {
+    "games": 1200,
+    "win": 53,
+    "winKo": 25.1,
+    "winDeck": 27.9,
+    "loseKo": 18.5,
+    "loseDeck": 28.5,
+    "avgTurns": 37.5,
+    "winkPerGame": 0.01,
+    "winkAttacksOnLilil": 18,
+    "winkEvadedPct": 44.4,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.07,
+    "drainedManaPerGame": 0.07,
+    "attacksOnLililPerGame": 2.56,
+    "evadesPerGame": 0.15,
+    "evadedPct": 5.9
+   },
+   "booster-3#2:mon-nobiton": {
+    "games": 1200,
+    "win": 63.3,
+    "winKo": 34.3,
+    "winDeck": 28.9,
+    "loseKo": 24.7,
+    "loseDeck": 12.1,
+    "avgTurns": 36.1,
+    "winkPerGame": 0.01,
+    "winkAttacksOnLilil": 10,
+    "winkEvadedPct": 50,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.07,
+    "drainedManaPerGame": 0.07,
+    "attacksOnLililPerGame": 2.57,
+    "evadesPerGame": 0.14,
+    "evadedPct": 5.5
+   },
+   "all": {
+    "games": 7200,
+    "win": 46.1,
+    "winKo": 24.4,
+    "winDeck": 21.7,
+    "loseKo": 28,
+    "loseDeck": 25.9,
+    "avgTurns": 36,
+    "winkPerGame": 0.03,
+    "winkAttacksOnLilil": 159,
+    "winkEvadedPct": 40.3,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.17,
+    "drainedManaPerGame": 0.16,
+    "attacksOnLililPerGame": 2.7,
+    "evadesPerGame": 0.19,
+    "evadedPct": 6.8
+   }
+  },
+  "swapRare": {
+   "booster-2#0:mon-gauul": {
+    "games": 1200,
+    "win": 31.3,
+    "winKo": 13.9,
+    "winDeck": 17.4,
+    "loseKo": 34.6,
+    "loseDeck": 34.1,
+    "avgTurns": 36.5,
+    "winkPerGame": 0.03,
+    "winkAttacksOnLilil": 37,
+    "winkEvadedPct": 24.3,
+    "fakeTearsPerGame": 0.07,
+    "drainUsesPerGame": 0.16,
+    "drainedManaPerGame": 0.21,
+    "attacksOnLililPerGame": 3.06,
+    "evadesPerGame": 0.37,
+    "evadedPct": 12.2
+   },
+   "booster-2#1:mon-lazuck": {
+    "games": 1200,
+    "win": 34.6,
+    "winKo": 14.6,
+    "winDeck": 20,
+    "loseKo": 31.3,
+    "loseDeck": 34.2,
+    "avgTurns": 36.7,
+    "winkPerGame": 0.08,
+    "winkAttacksOnLilil": 57,
+    "winkEvadedPct": 57.9,
+    "fakeTearsPerGame": 0.09,
+    "drainUsesPerGame": 0.52,
+    "drainedManaPerGame": 0.64,
+    "attacksOnLililPerGame": 3.29,
+    "evadesPerGame": 0.44,
+    "evadedPct": 13.4
+   },
+   "booster-2#2:mon-nobiton": {
+    "games": 1200,
+    "win": 37,
+    "winKo": 24.4,
+    "winDeck": 12.6,
+    "loseKo": 49.6,
+    "loseDeck": 13.4,
+    "avgTurns": 33.4,
+    "winkPerGame": 0.11,
+    "winkAttacksOnLilil": 79,
+    "winkEvadedPct": 60.8,
+    "fakeTearsPerGame": 0.09,
+    "drainUsesPerGame": 0.48,
+    "drainedManaPerGame": 0.65,
+    "attacksOnLililPerGame": 3.39,
+    "evadesPerGame": 0.54,
+    "evadedPct": 15.9
+   },
+   "booster-3#0:mon-myurol": {
+    "games": 1200,
+    "win": 51.8,
+    "winKo": 24.7,
+    "winDeck": 27.2,
+    "loseKo": 18.6,
+    "loseDeck": 29.6,
+    "avgTurns": 37.5,
+    "winkPerGame": 0.02,
+    "winkAttacksOnLilil": 24,
+    "winkEvadedPct": 45.8,
+    "fakeTearsPerGame": 0.06,
+    "drainUsesPerGame": 0.13,
+    "drainedManaPerGame": 0.15,
+    "attacksOnLililPerGame": 2.89,
+    "evadesPerGame": 0.35,
+    "evadedPct": 12.1
+   },
+   "booster-3#1:mon-kalshell": {
+    "games": 1200,
+    "win": 48.5,
+    "winKo": 19.3,
+    "winDeck": 29.3,
+    "loseKo": 25.1,
+    "loseDeck": 26.4,
+    "avgTurns": 37.6,
+    "winkPerGame": 0.02,
+    "winkAttacksOnLilil": 19,
+    "winkEvadedPct": 47.4,
+    "fakeTearsPerGame": 0.05,
+    "drainUsesPerGame": 0.09,
+    "drainedManaPerGame": 0.1,
+    "attacksOnLililPerGame": 2.76,
+    "evadesPerGame": 0.28,
+    "evadedPct": 10.3
+   },
+   "booster-3#2:mon-nobiton": {
+    "games": 1200,
+    "win": 62.5,
+    "winKo": 33.8,
+    "winDeck": 28.8,
+    "loseKo": 25.3,
+    "loseDeck": 12.2,
+    "avgTurns": 36.2,
+    "winkPerGame": 0.02,
+    "winkAttacksOnLilil": 23,
+    "winkEvadedPct": 52.2,
+    "fakeTearsPerGame": 0.04,
+    "drainUsesPerGame": 0.1,
+    "drainedManaPerGame": 0.11,
+    "attacksOnLililPerGame": 2.84,
+    "evadesPerGame": 0.32,
+    "evadedPct": 11.2
+   },
+   "all": {
+    "games": 7200,
+    "win": 44.3,
+    "winKo": 21.8,
+    "winDeck": 22.5,
+    "loseKo": 30.7,
+    "loseDeck": 25,
+    "avgTurns": 36.3,
+    "winkPerGame": 0.05,
+    "winkAttacksOnLilil": 239,
+    "winkEvadedPct": 51,
+    "fakeTearsPerGame": 0.07,
+    "drainUsesPerGame": 0.25,
+    "drainedManaPerGame": 0.31,
+    "attacksOnLililPerGame": 3.04,
+    "evadesPerGame": 0.38,
+    "evadedPct": 12.7
+   }
+  },
+  "boxes": {
+   "new>booster-2": {
+    "games": 400,
+    "win": 47.5,
+    "winKo": 23,
+    "winDeck": 24.5,
+    "loseKo": 38,
+    "loseDeck": 14.5,
+    "avgTurns": 34.7,
+    "winkPerGame": 0.32,
+    "winkAttacksOnLilil": 72,
+    "winkEvadedPct": 62.5,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.42,
+    "drainedManaPerGame": 0.4,
+    "attacksOnLililPerGame": 3.63,
+    "evadesPerGame": 0.69,
+    "evadedPct": 18.9
+   },
+   "new>booster-3": {
+    "games": 400,
+    "win": 23.3,
+    "winKo": 7,
+    "winDeck": 16.3,
+    "loseKo": 52.3,
+    "loseDeck": 24.5,
+    "avgTurns": 35.8,
+    "winkPerGame": 0.28,
+    "winkAttacksOnLilil": 59,
+    "winkEvadedPct": 52.5,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.43,
+    "drainedManaPerGame": 0.42,
+    "attacksOnLililPerGame": 3.62,
+    "evadesPerGame": 0.79,
+    "evadedPct": 21.9
+   },
+   "new>all": {
+    "games": 800,
+    "win": 35.4,
+    "winKo": 15,
+    "winDeck": 20.4,
+    "loseKo": 45.1,
+    "loseDeck": 19.5,
+    "avgTurns": 35.3,
+    "winkPerGame": 0.3,
+    "winkAttacksOnLilil": 131,
+    "winkEvadedPct": 58,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0.43,
+    "drainedManaPerGame": 0.41,
+    "attacksOnLililPerGame": 3.62,
+    "evadesPerGame": 0.74,
+    "evadedPct": 20.4
+   },
+   "former>booster-2": {
+    "games": 400,
+    "win": 58,
+    "winKo": 22.3,
+    "winDeck": 35.8,
+    "loseKo": 13.5,
+    "loseDeck": 28.5,
+    "avgTurns": 37.2,
+    "winkPerGame": 0,
+    "winkAttacksOnLilil": 0,
+    "winkEvadedPct": 0,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0,
+    "drainedManaPerGame": 0,
+    "attacksOnLililPerGame": 0,
+    "evadesPerGame": 0,
+    "evadedPct": 0
+   },
+   "former>booster-3": {
+    "games": 400,
+    "win": 13.5,
+    "winKo": 6.5,
+    "winDeck": 7,
+    "loseKo": 30.5,
+    "loseDeck": 56,
+    "avgTurns": 37.7,
+    "winkPerGame": 0,
+    "winkAttacksOnLilil": 0,
+    "winkEvadedPct": 0,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0,
+    "drainedManaPerGame": 0,
+    "attacksOnLililPerGame": 0,
+    "evadesPerGame": 0,
+    "evadedPct": 0
+   },
+   "former>all": {
+    "games": 800,
+    "win": 35.8,
+    "winKo": 14.4,
+    "winDeck": 21.4,
+    "loseKo": 22,
+    "loseDeck": 42.3,
+    "avgTurns": 37.4,
+    "winkPerGame": 0,
+    "winkAttacksOnLilil": 0,
+    "winkEvadedPct": 0,
+    "fakeTearsPerGame": 0,
+    "drainUsesPerGame": 0,
+    "drainedManaPerGame": 0,
+    "attacksOnLililPerGame": 0,
+    "evadesPerGame": 0,
+    "evadedPct": 0
+   }
+  }
+ }
+}
