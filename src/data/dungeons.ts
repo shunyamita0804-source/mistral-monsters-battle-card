@@ -9,7 +9,7 @@ import { NOBITON_MONSTER_ID as NOB } from './nobiton.ts';
 import { PUKARIM_MONSTER_ID as PUK } from './pukarim.ts';
 import { SEREPHINE_MONSTER_ID } from './serephine.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
-import { TSUMUJI_MONSTER_ID } from './tsumuji.ts';
+import { UZURIO_MONSTER_ID } from './uzurio.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { HAKURAN_MONSTER_ID } from './hakuran.ts';
@@ -69,7 +69,11 @@ export const SERA_BEATEN_FLAG = 'sera-beaten';
 export const LUCIA_BEATEN_FLAG = 'lucia-beaten';
 /** 水の神殿の祭壇のセレフィーンをまだ受け取っていない（前に水の神殿をクリアしていたセーブ。DungeonDefinition の altarOwedFlag） */
 export const LUCIA_ALTAR_OWED_FLAG = 'lucia-altar-owed';
-/** 風の渓谷のゼフィラに初めて勝った（2026-10-30 指示書 U：ツムジのガチャのシリーズが並ぶ。SERA_BEATEN_FLAG と同じ形） */
+/**
+ * 風の渓谷のゼフィラに初めて勝った（2026-10-30 指示書 U：ツムジのガチャのシリーズが並ぶ。SERA_BEATEN_FLAG と同じ形）。
+ * 2026-11-02 指示書 AQ で切り札はウズリオに。ウズリオのシリーズは「祭壇でウズリオのモンスターカードを受け取ったら」並ぶ（今の決まり）。
+ * この記録は前のセーブの変換（ツムジのシリーズ）でだけ使うので、そのまま
+ */
 export const ZEPHYRA_BEATEN_FLAG = 'zephyra-beaten';
 /** 氷の洞窟のイヴァンに初めて勝った（2026-10-30 指示書 W：ヒョウズクのガチャのシリーズが並ぶ。ZEPHYRA_BEATEN_FLAG と同じ形） */
 export const IVAN_BEATEN_FLAG = 'ivan-beaten';
@@ -119,13 +123,14 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     isPlaceholder: true,
   },
   // 2026-10-30 指示書 U：D ランクの2つ目のダンジョン（水の神殿と同じ段）。仕掛けは強い風のマス。ボスは守り手ゼフィラ・切り札はツムジ。ダンジョンを選ぶ所では水の神殿の次
+  // 2026-11-02 指示書 AQ：切り札をツムジからウズリオへ（ツムジは最初の箱「烈火の猛攻」にいる）
   {
     id: 'dungeon-08',
     name: '風の渓谷',
     description: '崖とつり橋の渓谷。強い風が吹き、乗ると押し流される。最奥のボスを倒すとクリア。（仮）',
     floors: [],
-    // 初回クリアは最奥の祭壇でツムジのモンスターカード1枚。2回目からはツムジの技カード1枚（水の神殿のセレフィーンと同じ形）
-    firstClearCards: [{ cardId: TSUMUJI_MONSTER_ID, count: 1 }],
+    // 初回クリアは最奥の祭壇でウズリオのモンスターカード1枚（＋技カード。trumpReward）。2回目からはウズリオの技カード1枚（水の神殿のセレフィーンと同じ形。2026-11-02 指示書 AQ でツムジから）
+    firstClearCards: [{ cardId: UZURIO_MONSTER_ID, count: 1 }],
     trumpReward: true,
     bossFlag: ZEPHYRA_BEATEN_FLAG,
     isPlaceholder: true,
@@ -217,7 +222,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
-  'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, TSUMUJI_MONSTER_ID, GAU], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22, skill: 'B' },
+  // 2026-11-02 指示書 AQ：切り札（真ん中）をツムジからウズリオへ。ほかの2体はそのまま。lifeScale はツムジのときの勝つ割合（いまの最初の3箱・腕前 B・1000回で 2.8％）に
+  // いちばん近い 1.28（3.0％。ライフ 9・8・8）にした（1.22 では 4.9％。docs/uzurio-aq-20261102.md・tests/aqPlaytest.test.ts）
+  'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, UZURIO_MONSTER_ID, GAU], ace: UZURIO_MONSTER_ID, lifeScale: 1.28, skill: 'B' },
   // 【仮】ランダム生成のダンジョン（2026-10-26 試作。src/data/dungeonRun.ts）：通常のバトラー・見えない番人。編成とライフは階ごとに src/data/dungeonRun.ts で決める
   'enc-run-npc': { id: 'enc-run-npc', name: 'ダンジョンのバトラー（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
   'enc-run-guardian': { id: 'enc-run-guardian', name: '見えない番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },

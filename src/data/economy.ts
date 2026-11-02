@@ -157,6 +157,10 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // フォルン（2026-11-02 指示書 AL）：並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く。蒼海の守りを選んだ人）。unlockFlag は付けない。
   // レアの枠は JSON の gacha_slot（そうこうげき・そなえのふえ・もりのたより・みがわりのふえ）。パック pack_forn.webp・販売機の窓 panel_forn.webp
   { id: 'forn', monsterId: 'mon-forn', rareSkillNames: ajRareNames('mon-forn') },
+  // ウズリオ（2026-11-02 指示書 AQ）：風の渓谷でウズリオのモンスターカードを受け取ったら並ぶ（今の決まり「モンスターカードを初めて手に入れたら開く」のとおり）。
+  // unlockFlag は付けない（前のセーブの変換で並べない。LATER_GACHA_SERIES_IDS）。ツムジは烈火の箱にいるので、ツムジのシリーズは AM の扱いのまま。
+  // レアの枠は JSON の rare（かぜのうず・おおたつまき・ふきとばし・つむじがくれ）。パック pack_uzurio.webp・販売機の窓 panel_uzurio.webp
+  { id: 'uzurio', monsterId: 'mon-uzurio', rareSkillNames: ajRareNames('mon-uzurio') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -179,7 +183,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'desuoru', monsterId: 'mon-desuoru', rareSkillNames: ajRareNames('mon-desuoru'), unlockFlag: 'desuoru-unlocked' },
   // 道具のパック（仮。2026-10-30 指示書 Y）：サポート11種類。レアの枠は思い出の箱・熱気。最初から並ぶ。値段・確率・枚数はほかと同じ。
   // パックの絵（pack_tools.webp）・販売機の窓（panel_tools.webp）は 2026-10-30 指示書 Z で入れた（袋の色は銀 #B8BCC4。それまでは封をしたパック・店の中のパネル）
-  { id: 'tools', monsterId: '', cardIds: [7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map(supportId), rareSkillNames: ['思い出の箱', '熱気'] },
+  // 2026-11-02 指示書 AQ：まいあがる風・しずまる大地・しずめの祈り（sup-12〜14）を「ふつう」の枠で足した（14種類）
+  { id: 'tools', monsterId: '', cardIds: [7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11, 12, 13, 14].map(supportId), rareSkillNames: ['思い出の箱', '熱気'] },
 ];
 
 /**
@@ -191,10 +196,10 @@ export function legacyAvailableGachaSeries(storyFlags: readonly string[]): reado
 }
 
 /**
- * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン）。
+ * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン・指示書 AQ のウズリオ）。
  * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
  */
-const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn'];
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

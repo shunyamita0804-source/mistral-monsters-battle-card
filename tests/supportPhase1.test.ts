@@ -63,7 +63,7 @@ const giveOpponent = (s: BattleState, cards: string[]): BattleState => ({
 });
 
 describe('カードの中身（ユーザー決定の表）', () => {
-  it('名前・マナ・種類・効果の文・レア（ID は sup-1〜11。前の sup-1〜6 は中身を置きかえた）', () => {
+  it('名前・マナ・種類・効果の文・レア（ID は sup-1〜14。前の sup-1〜6 は中身を置きかえた。sup-12〜14 は 2026-11-02 指示書 AQ）', () => {
     const rows = SUPPORTS.map((c) => [c.code, c.id, c.name, c.duration === 'field' ? '場' : 'すぐ', c.cost, supportShortText(c), c.rarity === 'R' ? 'レア' : 'ふつう']);
     expect(rows).toEqual([
       ['S01', 'sup-7', '投石', 'すぐ', 1, '相手1体に1ダメージ', 'ふつう'],
@@ -77,6 +77,9 @@ describe('カードの中身（ユーザー決定の表）', () => {
       ['F02', 'sup-5', 'ゆらぐ霧', '場', 3, 'かしこさ技のダメージ−1', 'ふつう'],
       ['F03', 'sup-6', '熱気', '場', 3, 'すべての攻撃のダメージ＋1', 'レア'],
       ['F04', 'sup-11', '守りの陣', '場', 3, '防御・回避のカードの消費マナ−1', 'ふつう'],
+      ['F05', 'sup-12', 'まいあがる風', '場', 3, '場にある間、すべてのモンスターを空中として扱う', 'ふつう'],
+      ['F06', 'sup-13', 'しずまる大地', '場', 3, '場にある間、すべてのモンスターを地上として扱う', 'ふつう'],
+      ['S08', 'sup-14', 'しずめの祈り', 'すぐ', 1, '場のカードを1枚取りのぞく（みちしおの水中も消す）', 'ふつう'],
     ]);
   });
 
@@ -268,7 +271,7 @@ describe('入手・デッキ（2026-10-30 指示書 Y）', () => {
     expect(few.skills.filter((id) => id === S('S03'))).toHaveLength(3);
   });
 
-  it('道具のパック（仮）：最初から並ぶ。中身はサポート11種類・レアの枠は思い出の箱・熱気。モンスターカードは出ない', async () => {
+  it('道具のパック（仮）：最初から並ぶ。中身はサポート14種類（2026-11-02 指示書 AQ で3枚足した）・レアの枠は思い出の箱・熱気。モンスターカードは出ない', async () => {
     const { GACHA_SERIES } = await import('../src/data/economy.ts');
     const { availableGachaSeriesFor, drawSeriesPack, seriesLineup } = await import('../src/game/economy/gachaSeries.ts');
     const { createNewSave } = await import('../src/game/save/saveData.ts');

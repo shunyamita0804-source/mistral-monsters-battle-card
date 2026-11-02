@@ -72,6 +72,11 @@ const TEXTS: Readonly<Record<string, string>> = {
   'フォルン以外の味方1体、次のターンの攻撃＋1': "1 ally other than Forn deals +1 with its attack next turn.",
   'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1': '1 ally other than Forn takes 1 less damage during the next enemy turn.',
   '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる': 'Draw until you have 5 cards in hand, then discard 1 card.',
+  // 2026-11-02 指示書 AQ ウズリオ（仮訳）
+  '相手が空中なら +2（ダメージ4）': '+2 if the target is airborne (4 dmg).',
+  '空中にいる相手全員に2ダメージ': '2 dmg to every airborne enemy.',
+  '相手の手札1枚をランダムに山札へもどす': "Return 1 random card from the enemy's hand to their deck.",
+  '条件なしで回避': 'Dodge any attack.',
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(

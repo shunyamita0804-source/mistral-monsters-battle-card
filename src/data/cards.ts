@@ -13,6 +13,7 @@ import { HAKURAN_MONSTER, HAKURAN_SKILLS } from './hakuran.ts';
 import { DESUORU_MONSTER, DESUORU_SKILLS } from './desuoru.ts';
 import { LILIL_MONSTER } from './lilil.ts';
 import { FORN_MONSTER } from './forn.ts';
+import { UZURIO_MONSTER } from './uzurio.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -42,6 +43,7 @@ import { AJ_SKILLS, MONSTER_HABITAT, type AjSkillRow } from './skillRebuildAJ.ts
  * 2026-10-31：デスオルと技14種を足した（src/data/desuoru.ts。指示書 AG。初めての内部ランク A。手に入れ方はまだ無い）
  * 2026-11-02：リリルと技12種を足した（src/data/lilil.ts。指示書 AK。技は初めから AJ の表〔src/data/skillRebuildAJ.ts〕だけに書く。最初の箱「旅立ちのきらめき」に入る）
  * 2026-11-02：フォルンと技12種を足した（src/data/forn.ts。指示書 AL。リリルと同じ作り。最初の箱「蒼海の守り」に入る）
+ * 2026-11-02：ウズリオと技12種を足した（src/data/uzurio.ts。指示書 AQ。フォルンと同じ作り。風の渓谷のゼフィラの切り札。最初の箱には入らない）
  */
 
 interface MonsterSeed {
@@ -161,7 +163,7 @@ export const TMP_GEOL_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no)
 export const TMP_FLUNE_ID = monsterId('tmp-flune');
 export const TMP_FLUNE_SKILL_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map((no) => skillId('tmp-flune', no));
 
-/** 正式の17体（並び＝図鑑・一覧の順）。2026-11-01 指示書 AJ で居場所（habitat）を持たせた。2026-11-02 指示書 AK でリリル・指示書 AL でフォルンを足した */
+/** 正式の18体（並び＝図鑑・一覧の順）。2026-11-01 指示書 AJ で居場所（habitat）を持たせた。2026-11-02 指示書 AK でリリル・指示書 AL でフォルン・指示書 AQ でウズリオを足した */
 const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   SORAMO_MONSTER,
   LAZUCK_MONSTER,
@@ -180,6 +182,7 @@ const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   DESUORU_MONSTER,
   LILIL_MONSTER,
   FORN_MONSTER,
+  UZURIO_MONSTER,
 ].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;
@@ -267,11 +270,11 @@ export const SKILLS: readonly SkillCard[] = [
 export const supportId = (no: number): string => `sup-${no}`;
 
 const BREEDER = { duration: 'instant', limitGroup: 'breeder', limitPerTurn: 1 } as const;
-/** 名前が決まっているサポート（ほかは仮の名前） */
-const FIXED_SUPPORT_NAMES: readonly string[] = ['投石', '薬草', '思い出の箱'];
+/** 名前が決まっているサポート（ほかは仮の名前）。2026-11-02 指示書 AQ の3枚は正本の JSON の名前 */
+const FIXED_SUPPORT_NAMES: readonly string[] = ['投石', '薬草', '思い出の箱', 'まいあがる風', 'しずまる大地', 'しずめの祈り'];
 
 /** 絵のファイルの名前（sup_art_NN_〇〇.webp の〇〇。並びは SUPPORTS と同じ） */
-const SUPPORT_ART_NAMES: readonly string[] = ['toseki', 'techou', 'yakusou', 'omoide', 'kazemakase', 'kirinoka', 'seien', 'omoikuuki', 'yuragukiri', 'nekki', 'mamorinojin'];
+const SUPPORT_ART_NAMES: readonly string[] = ['toseki', 'techou', 'yakusou', 'omoide', 'kazemakase', 'kirinoka', 'seien', 'omoikuuki', 'yuragukiri', 'nekki', 'mamorinojin', 'maiagarukaze', 'shizumarudaichi', 'shizumenoinori'];
 
 /** 並び＝表示の番号の順（S01〜S07・F01〜F04） */
 export const SUPPORTS: readonly SupportCard[] = [
@@ -286,6 +289,11 @@ export const SUPPORTS: readonly SupportCard[] = [
   { no: 5, code: 'F02', name: 'ゆらぐ霧', nameEn: 'Wavering Mist', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'field', stat: 'wisdom', modifier: -1 }, text: 'かしこさ技のダメージ−1', textEn: 'INT skill damage -1' },
   { no: 6, code: 'F03', name: '熱気', nameEn: 'Heat Wave', cost: 3, rarity: 'R', duration: 'field', effect: { type: 'field', stat: 'all', modifier: 1 }, text: 'すべての攻撃のダメージ＋1', textEn: 'All attack damage +1' },
   { no: 11, code: 'F04', name: '守りの陣', nameEn: 'Guard Formation', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'guardDiscount', value: 1 }, text: '防御・回避のカードの消費マナ−1', textEn: 'Guard/dodge cards cost -1 mana' },
+  // 2026-11-02 指示書 AQ（正本 src/data/official/uzurio12_and_support3_OFFICIAL_20261102.json）：居場所を変える場のカード2枚と、場を取りのぞくすぐのカード1枚。
+  // ID は今の決まりの続き（sup-12〜14）。並びは足した順（今のカードの番号・絵の番号を変えないため、しずめの祈り S08 も最後）。名前はデータのとおり（仮ではない）
+  { no: 12, code: 'F05', name: 'まいあがる風', nameEn: 'Rising Wind', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'habitat', habitat: 'air' }, text: '場にある間、すべてのモンスターを空中として扱う', textEn: 'While on the field, all monsters count as airborne' },
+  { no: 13, code: 'F06', name: 'しずまる大地', nameEn: 'Settling Earth', cost: 3, rarity: 'C', duration: 'field', effect: { type: 'habitat', habitat: 'ground' }, text: '場にある間、すべてのモンスターを地上として扱う', textEn: 'While on the field, all monsters count as grounded' },
+  { no: 14, code: 'S08', name: 'しずめの祈り', nameEn: 'Calming Prayer', cost: 1, rarity: 'C', ...BREEDER, effect: { type: 'clearField' }, text: '場のカードを1枚取りのぞく（みちしおの水中も消す）', textEn: 'Remove the field card (also ends High Tide)' },
 ].map(({ no, ...rest }, i) => ({
   ...rest,
   kind: 'support',

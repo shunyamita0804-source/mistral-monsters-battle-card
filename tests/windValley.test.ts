@@ -7,6 +7,7 @@ import { DUNGEON_MONEY } from '../src/data/economy.ts';
 import { getPerson, PEOPLE, personOfOpponent } from '../src/data/people.ts';
 import { getTournament } from '../src/data/tournaments.ts';
 import { TSUMUJI_MONSTER_ID } from '../src/data/tsumuji.ts';
+import { UZURIO_MONSTER_ID } from '../src/data/uzurio.ts';
 import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { DUNGEON_SPOTS } from '../src/data/worldMap.ts';
 import { missingBosses } from '../src/game/calendar/calendar.ts';
@@ -27,12 +28,12 @@ import {
 import { availableGachaSeriesFor } from '../src/game/economy/gachaSeries.ts';
 import { bossRewardCandidates, bossTrumpSkills, descend, move, rollChest, runFloor, startRun, winRunBattle } from '../src/game/dungeon/run.ts';
 import { entryCheck } from '../src/game/progress/tournament.ts';
-import { createNewSave, normalizeSave, SAVE_VERSION, unlockedDungeonsFor, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
+import { addCards, createNewSave, normalizeSave, SAVE_VERSION, unlockedDungeonsFor, type DungeonRun, type SaveData } from '../src/game/save/saveData.ts';
 import { dungeonName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
 
-/** 指示書 AJ の表のツムジの12枚（ゲームの技カード） */
-const TSUMUJI_AJ_IDS = (AJ_SKILLS[TSUMUJI_MONSTER_ID] ?? []).map((r) => r.id);
+/** 指示書 AJ の表のウズリオの12枚（ゲームの技カード。2026-11-02 指示書 AQ で風の渓谷の切り札がツムジからウズリオに） */
+const UZURIO_AJ_IDS = (AJ_SKILLS[UZURIO_MONSTER_ID] ?? []).map((r) => r.id);
 
 /**
  * 風の渓谷（2026-10-30 指示書 U「風の渓谷とツムジ」）：D ランクの2つ目のダンジョン・強い風のマス・守り手ゼフィラ・バトラーのニコ。
@@ -211,9 +212,9 @@ describe('風の渓谷の階（いくつもの階をつくって確かめる）'
 });
 
 describe('人：守り手ゼフィラ・バトラーのニコ', () => {
-  it('ゼフィラの編成：真ん中がツムジ、左右はソラモ・ガウル。lifeScale 1.0（1.2 から試遊して、勝つ割合がルシアと同じくらいになる値）→ 2026-10-30 指示書 V で切り札（ツムジ）の技を2枚ずつにして 1.1 → 指示書 Y で 1.22', () => {
-    expect(ENCOUNTERS['enc-wind-boss']).toEqual({ id: 'enc-wind-boss', name: 'ゼフィラ', monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22, skill: 'B' });
-    expect(runBossOpponent(ID).monsters[1]).toBe(TSUMUJI_MONSTER_ID);
+  it('ゼフィラの編成：真ん中が切り札、左右はソラモ・ガウル。2026-11-02 指示書 AQ で切り札をツムジからウズリオへ（lifeScale は試遊で合わせ直す）', () => {
+    expect(ENCOUNTERS['enc-wind-boss']).toMatchObject({ id: 'enc-wind-boss', name: 'ゼフィラ', monsters: ['mon-soramo', UZURIO_MONSTER_ID, 'mon-gauul'], ace: UZURIO_MONSTER_ID, skill: 'B' });
+    expect(runBossOpponent(ID).monsters[1]).toBe(UZURIO_MONSTER_ID);
     expect(ENCOUNTERS['enc-water-boss']?.lifeScale).toBe(1.25);
   });
 
@@ -250,28 +251,28 @@ function beatZephyra(save: SaveData, seed: number): ReturnType<typeof winRunBatt
   return winRunBattle(s, { kind: 'boss', id: boss.id }, null);
 }
 
-const ZEPHYRA_TEAM = ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'];
+const ZEPHYRA_TEAM = ['mon-soramo', UZURIO_MONSTER_ID, 'mon-gauul'];
 
 describe('入手の流れ', () => {
-  it('初回クリア：祭壇でツムジのモンスターカード1枚。2回目から：ツムジの技カード1枚。宝箱の技カードもツムジの技', () => {
+  it('初回クリア：祭壇でウズリオのモンスターカード1枚。2回目から：ウズリオの技カード1枚。宝箱の技カードもウズリオの技（2026-11-02 指示書 AQ。前はツムジ）', () => {
     const b = base();
     expect(bossRewardCandidates(b, ID, ZEPHYRA_TEAM)).toEqual([]);
     const w = beatZephyra(b, 31);
     expect(w).toMatchObject({ cleared: true, firstClear: true });
-    expect(w.clearCards).toEqual([{ cardId: TSUMUJI_MONSTER_ID, count: 1 }]);
-    expect(w.save.collection[TSUMUJI_MONSTER_ID]).toBe(1);
-    expect(bossRewardCandidates(w.save, ID, ZEPHYRA_TEAM)).toEqual(TSUMUJI_AJ_IDS);
+    expect(w.clearCards).toEqual([{ cardId: UZURIO_MONSTER_ID, count: 1 }]);
+    expect(w.save.collection[UZURIO_MONSTER_ID]).toBe(1);
+    expect(bossRewardCandidates(w.save, ID, ZEPHYRA_TEAM)).toEqual(UZURIO_AJ_IDS);
     const again = beatZephyra(w.save, 32);
     expect(again.firstClear).toBe(false);
     expect(again.clearCards).toEqual([]);
-    expect(bossTrumpSkills(ID)).toEqual(TSUMUJI_AJ_IDS);
+    expect(bossTrumpSkills(ID)).toEqual(UZURIO_AJ_IDS);
     const chestCards = new Set<string>();
     for (let i = 0; i < 3000; i++) {
       const r = rollChest(ID, i, 'f1-chest-1');
       if (r.kind === 'card') chestCards.add(r.card);
     }
     expect(chestCards.size).toBeGreaterThan(0);
-    for (const c of chestCards) expect(c.startsWith('skl-tsumuji-')).toBe(true);
+    for (const c of chestCards) expect(c.startsWith('skl-uzurio-')).toBe(true);
   });
 
   it('ゼフィラに初めて勝つと zephyra-beaten（1つだけ）', () => {
@@ -281,11 +282,24 @@ describe('入手の流れ', () => {
     expect(beatZephyra(w.save, 42).save.storyFlags.filter((f) => f === ZEPHYRA_BEATEN_FLAG)).toHaveLength(1);
   });
 
-  it('ツムジのガチャのシリーズは、ゼフィラに勝つ（ツムジのカードを受け取る）前は並ばず、勝ったあとに並ぶ', () => {
+  it('ウズリオのガチャのシリーズは、ゼフィラに勝つ（ウズリオのカードを受け取る）前は並ばず、勝ったあとに並ぶ（2026-11-02 指示書 AQ。前はツムジ）', () => {
     const b = base();
-    expect(availableGachaSeriesFor(b).map((s) => s.id)).not.toContain('tsumuji');
+    expect(availableGachaSeriesFor(b).map((s) => s.id)).not.toContain('uzurio');
     const w = beatZephyra(b, 51);
-    expect(availableGachaSeriesFor(w.save).map((s) => s.id)).toContain('tsumuji');
+    expect(availableGachaSeriesFor(w.save).map((s) => s.id)).toContain('uzurio');
+  });
+
+  it('前のセーブ：風の渓谷でツムジを受け取っていたセーブでも、ツムジのカードとシリーズは消えない（2026-11-02 指示書 AQ）', () => {
+    const old = addCards(base(), [{ cardId: TSUMUJI_MONSTER_ID, count: 1 }]);
+    const withFlag = { ...old, storyFlags: [...old.storyFlags, ZEPHYRA_BEATEN_FLAG], dungeons: { [ID]: { openedChests: [], bossDefeated: true, clears: 1 } } };
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(withFlag)));
+    if (!loaded) throw new Error('load');
+    expect(loaded.collection[TSUMUJI_MONSTER_ID]).toBe(1);
+    expect(availableGachaSeriesFor(loaded).map((s) => s.id)).toContain('tsumuji');
+    // ツムジを受け取ったあとでも、ゼフィラにもう一度勝つと（2回目のクリア）ウズリオの技カードの候補になる。ウズリオのモンスターカードは祭壇ではもう出ない
+    const again = beatZephyra(loaded, 61);
+    expect(again.firstClear).toBe(false);
+    expect(again.save.collection[TSUMUJI_MONSTER_ID]).toBe(1);
   });
 });
 

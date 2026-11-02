@@ -41,15 +41,16 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-desuoru',
       'mon-lilil',
       'mon-forn',
+      'mon-uzurio',
     ];
     // 2026-11-01 指示書 AJ：技はモンスターの並びの順に、表（src/data/skillRebuildAJ.ts）の12枚ずつ（表の順＝表示の番号）
     const skills = monsters.flatMap((m) => (AJ_SKILLS[m] ?? []).map((r) => r.id));
-    expect(skills).toHaveLength(17 * 12);
+    expect(skills).toHaveLength(18 * 12);
     expect(official).toEqual([
       ...monsters,
       ...skills,
-      // サポート11種類（2026-10-30 指示書 Y。表示の番号 S01〜S07・F01〜F04 の順）
-      ...[7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11].map((n) => `sup-${n}`),
+      // サポート11種類（2026-10-30 指示書 Y。表示の番号 S01〜S07・F01〜F04 の順）＋指示書 AQ の3枚（F05・F06・S08）
+      ...[7, 2, 1, 8, 3, 9, 10, 4, 5, 6, 11, 12, 13, 14].map((n) => `sup-${n}`),
     ]);
   });
 
@@ -97,6 +98,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-desuoru',
       'mon-lilil',
       'mon-forn',
+      'mon-uzurio',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
       // サポート11種類（2026-10-30 指示書 Z で絵が入った）
       ...SUPPORTS.map((s) => s.id),

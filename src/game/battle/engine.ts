@@ -412,6 +412,10 @@ function supportUsability(state: BattleState, side: Side, card: SupportCard): Us
     case 'cheer':
       if (cheerTargets(state, side).length === 0) return NO(t('battle.ng.noCheerTarget'));
       break;
+    case 'clearField':
+      // しずめの祈り（指示書 AQ）：場に何も無いとき（みちしおの期限が過ぎたあとも）は使えない
+      if (!activeField(state)) return NO(t('battle.ng.noField'));
+      break;
     default:
       break;
   }
@@ -503,6 +507,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
   // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
   if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
+  // 「空中の相手だけ」（おおたつまき 指示書 AQ）：いま空中の相手がいなければ使えない（しずまる大地が場にあるときも）
+  if (skill.effect.type === 'attack' && skill.effect.airOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.airOnly'));
   return YES;
 }
 
@@ -573,11 +579,16 @@ export function isTideActive(state: BattleState): boolean {
   return fieldHabitat(state) === 'water';
 }
 
-/** モンスターのいまの居場所（場が水中なら全員水中。居場所の無い仮モンスターは null） */
+/**
+ * モンスターのいまの居場所（いま扱われている居場所。居場所の無い仮モンスターは null）。
+ * 居場所で決まる技（急降下・地ひびき・あらし・みちしお／タイダルクラッシュ・ルナタイド・オーシャンウェーブ・うずまきショット・おおたつまき）は、
+ * すべてここ（と、場の居場所の fieldHabitat）で判定する。生まれつきの居場所（MonsterCard.habitat）を直接見ない（2026-11-02 指示書 AQ で確かめた）。
+ * 場が居場所を変えていれば全員その居場所：みちしお＝水中・まいあがる風＝空中・しずまる大地＝地上（場の枠は1つなので、いちばん新しい場だけが効く）
+ */
 export function habitatOf(state: BattleState, monster: BattleMonster | undefined): Habitat | null {
   if (!monster) return null;
   const base = getMonster(monster.cardId).habitat ?? null;
-  // 場が居場所を変えていれば、全員その居場所（みちしお＝水中）
+  // 場が居場所を変えていれば、全員その居場所（みちしお＝水中・まいあがる風＝空中・しずまる大地＝地上）
   const field = fieldHabitat(state);
   return base && field ? field : base;
 }
@@ -615,9 +626,10 @@ export function requiemVictims(state: BattleState, userUid: string): BattleMonst
 export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?: BattleMonster): BattleMonster[] {
   if (card.kind === 'skill' && targetsEnemy(card)) {
     if (card.effect.type !== 'attack') return aliveMonsters(state.sides[otherSide(side)]);
-    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）
-    const ground = card.effect.groundOnly;
-    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !ground || habitatOf(state, m) === 'ground');
+    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）。
+    // 「空中の相手だけ」（おおたつまき 指示書 AQ）は、いま空中の相手だけ（まいあがる風なら全員・しずまる大地なら選べない）
+    const only: Habitat | null = card.effect.groundOnly ? 'ground' : card.effect.airOnly ? 'air' : null;
+    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !only || habitatOf(state, m) === only);
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -717,15 +729,25 @@ export function weakenTurnOf(state: BattleState, user: BattleMonster | undefined
  * 攻撃の威力（場の増減と、使うモンスターへの「吠える」「ダストキック」「ほっぺにためる」「おいかぜ」「エネルギーをためる」を反映。0未満にはならない）。
  * エネルギーをためるの2倍は「カードのダメージ」にかけ、ほかの＋・−はそのあとに足す（2026-10-29 指示書。防御の軽減はさらにそのあと）
  */
-export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster): number {
+export function attackPower(state: BattleState, skill: SkillCard, user?: BattleMonster, target?: BattleMonster): number {
   if (!skill.stat) return 0;
   // 2倍（エネルギーをためる・場が水中のタイダルクラッシュ）はカードのダメージにかける。両方なら4倍【要確認：指示書 AJ】
   const water = skill.effect.type === 'attack' && skill.effect.doubleInWater && isTideActive(state);
-  const base = skill.stat.value * (energyOf(state, user, skill) ? 2 : 1) * (water ? 2 : 1);
+  // うずまきショット（指示書 AQ）：ねらった相手がいま空中なら、技そのもののダメージに＋（2倍があれば＋込みのダメージにかける）
+  const base = (skill.stat.value + airBonusAgainst(state, skill, target)) * (energyOf(state, user, skill) ? 2 : 1) * (water ? 2 : 1);
   // ししゃのたむけ：倒れている味方1体につき＋（使った瞬間に数える）
   const fallen = skill.effect.type === 'attack' && skill.effect.fallenAllyBonus ? skill.effect.fallenAllyBonus * fallenAllies(state, user) : 0;
   const boost = chargeOf(user) + tailwindOf(state, user) + cheerOf(state, user) + fallen;
   return Math.max(0, base + boost + fieldModifier(state, skill.stat.type) - weakenOf(state, user, skill) - weakenTurnOf(state, user, skill));
+}
+
+/**
+ * うずまきショット（ウズリオ 指示書 AQ）：ねらった相手がいま空中なら、技そのもののダメージに足す量（ほかは 0）。
+ * 相手を渡さなければ 0（相手を決めていない見積もり）。相手が空中かは habitatOf（場のカードで変わった居場所も同じ扱い）
+ */
+export function airBonusAgainst(state: BattleState, skill: SkillCard, target: BattleMonster | undefined): number {
+  const e = skill.effect;
+  return e.type === 'attack' && e.airBonus && target && habitatOf(state, target) === 'air' ? e.airBonus : 0;
 }
 
 /** その攻撃が、使うモンスターの今の状態で「回避されない」か（ぷはーっ：ためているとき） */
@@ -1045,7 +1067,9 @@ function useCard(
   switch (skill.effect.type) {
     case 'attack': {
       if (!target || !skill.stat) return state;
-      const power = attackPower(state, skill, user);
+      // 相手全体への攻撃（地ひびき・おおたつまき）は1つのダメージをみんなに。うずまきショットの＋は、ねらった相手で決める（かばうで代わっても変えない）
+      const power = attackPower(state, skill, user, allTargets ? undefined : target);
+      const airBonus = allTargets ? 0 : airBonusAgainst(state, skill, target);
       const energized = energyOf(state, user, skill);
       const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
@@ -1059,6 +1083,7 @@ function useCard(
       if (energized) next = addLog(updateMonster(next, user.uid, { energy: null }), t('battle.log.energyDouble', { name: nameOf(user.cardId) }));
       if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
       if (allTargets) next = addLog(next, t('battle.log.allTargets', { name: nameOf(user.cardId) }));
+      if (airBonus > 0) next = addLog(next, t('battle.log.airBonus', { n: airBonus }));
       // 防御も回避もできない攻撃は、守備を待たずにダメージ
       if (skill.effect.unblockable && skill.effect.undodgeable) {
         // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
@@ -1227,6 +1252,23 @@ function setField(state: BattleState, field: FieldCard): BattleState {
     if (oldCard?.kind === 'support') next = updateSide(next, state.field.owner, { discard: [...next.sides[state.field.owner].discard, state.field.cardId] });
   }
   return { ...next, field };
+}
+
+/**
+ * しずめの祈り（指示書 AQ）：場を空にする。場のサポートの場のカードは出した人の捨て札へ。みちしおの水中なら、水がすぐ引く（居場所もすぐ戻る）
+ */
+function clearField(state: BattleState): BattleState {
+  const old = activeField(state);
+  if (!old) return state;
+  let next: BattleState = { ...state, field: null };
+  const oldCard = cardCatalog.get(old.cardId);
+  if (oldCard?.kind === 'support') {
+    next = updateSide(next, old.owner, { discard: [...next.sides[old.owner].discard, old.cardId] });
+    next = addLog(next, t('battle.log.fieldCleared', { card: nameOf(old.cardId) }));
+    return addLog(next, t('battle.log.fieldDiscard', { card: nameOf(old.cardId) }));
+  }
+  next = addLog(next, t('battle.log.fieldCleared', { card: nameOf(old.cardId) }));
+  return old.habitat === 'water' ? addLog(next, t('battle.log.tideEnd')) : next;
 }
 
 /**
@@ -1537,6 +1579,12 @@ function useSupport(state: BattleState, side: Side, cardUid: string, card: Suppo
     case 'guardDiscount':
     case 'field':
       return addLog(setField(next, { cardId: card.id, owner: side }), t('battle.log.fieldEnter', { card: cardName(card) }));
+    case 'habitat':
+      // まいあがる風・しずまる大地（指示書 AQ）：場の枠に、居場所を変える場として出す（期限なし。みちしおの水中も上書き）
+      next = addLog(setField(next, { cardId: card.id, owner: side, habitat: e.habitat }), t('battle.log.fieldEnter', { card: cardName(card) }));
+      return addLog(next, t('battle.log.habitatField', { where: t(`habitat.${e.habitat}`) }));
+    case 'clearField':
+      return clearField(next);
   }
 }
 

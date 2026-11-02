@@ -24,6 +24,8 @@ import {
   findMonster,
   requiemVictims,
   activeField,
+  airBonusAgainst,
+  habitatOf,
   fieldSupport,
   tailwindTargets,
   targetsFor,
@@ -178,8 +180,30 @@ function fieldScore(state: BattleState, side: Side, card: SupportCard): number {
   const e = card.effect;
   // 守りの陣（2026-10-30 指示書 Y）：自分の手札に守りのカードが2枚以上あるとき
   if (e.type === 'guardDiscount') return state.sides[side].hand.filter(isGuard).length >= 2 ? 1 : 0;
+  // まいあがる風・しずまる大地（2026-11-02 指示書 AQ）：自分の手札・山札に、その居場所の相手に強くなる技があり（使うモンスターが生きている）、
+  // その居場所でない相手が1体以上生きているとき
+  if (e.type === 'habitat') {
+    const strong = e.habitat === 'air' ? isAirStrong : e.habitat === 'ground' ? isGroundStrong : null;
+    if (!strong || !ownsSkill(state, side, strong)) return 0;
+    return aliveMonsters(state.sides[otherSide(side)]).some((m) => habitatOf(state, m) !== e.habitat) ? 1 : 0;
+  }
   if (e.type !== 'field') return 0;
   return e.modifier * (attackersWith(state, side, e.stat) - attackersWith(state, otherSide(side), e.stat));
+}
+
+/** 空中の相手に強くなる技（うずまきショット・おおたつまき・あらし。2026-11-02 指示書 AQ） */
+const isAirStrong = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.airBonus || k.effect.airOnly || k.effect.undodgeableVsAir);
+/** 地上の相手に強くなる技（地上の相手だけに使える急降下アタック・地ひびき。今の効果で地上の相手に強くなるのはこの2つだけ） */
+const isGroundStrong = (k: SkillCard): boolean => k.effect.type === 'attack' && !!k.effect.groundOnly;
+
+/** 自分の手札・山札に、生きているモンスターの、条件に合う技があるか */
+function ownsSkill(state: BattleState, side: Side, pred: (k: SkillCard) => boolean): boolean {
+  const mine = state.sides[side];
+  const alive = new Set(aliveMonsters(mine).map((m) => m.cardId));
+  return [...mine.hand.map((c) => c.cardId), ...mine.deck].some((id) => {
+    const k = getPlayCard(id);
+    return k.kind === 'skill' && alive.has(k.monsterId) && pred(k);
+  });
 }
 
 /** 山札を動かす効果の枚数（ドロー・山札からマナ） */
@@ -396,6 +420,13 @@ function supportOf(options: Option[], type: SupportCard['effect']['type']): (Opt
 function chooseSupportPlay(state: BattleState, side: Side, options: Option[], style: AiStyle): BattleAction | null {
   const mine = state.sides[side];
   const mana = manaOf(mine);
+  // しずめの祈り（2026-11-02 指示書 AQ）：場のカードが相手に有利なとき（相手が出した場、または自分に損になる場のカード）
+  const calm = supportOf(options, 'clearField');
+  const field = activeField(state);
+  if (calm && field) {
+    const support = fieldSupport(state);
+    if (field.owner !== side || (support && fieldScore(state, side, support) < 0)) return { type: 'useCard', side, cardUid: calm.card.uid };
+  }
   const stone = supportOf(options, 'stone');
   if (stone && stone.def.effect.type === 'stone') {
     const power = Math.max(0, stone.def.effect.value + fieldModifier(state, 'force'));
@@ -580,7 +611,9 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   if (attacks.length === 0 || enemies.length === 0) return null;
   const drained = chooseDrain(state, side, attacks, style, skill);
   if (drained) return drained;
-  const power = (o: SkillOption): number => attackPower(state, o.def, availableUsers(state, side, o.def)[0]);
+  // うずまきショット（2026-11-02 指示書 AQ）：相手しだいでダメージが変わるので、相手ごとの威力（powerOn）で倒せるかを見る。技の強さは当てられる相手のうちいちばん大きい値
+  const powerOn = (o: SkillOption, e: BattleMonster): number => attackPower(state, o.def, availableUsers(state, side, o.def)[0], e);
+  const power = (o: SkillOption): number => Math.max(attackPower(state, o.def, availableUsers(state, side, o.def)[0]), ...targetsFor(state, side, o.def).map((e) => powerOn(o, e)));
   // ためているときのぷはーっ（回避されない）は、少し強いものとして先に考える（試遊中：プカリム）
   const rank = (o: SkillOption): number => power(o) + (undodgeableNow(o.def, availableUsers(state, side, o.def)[0]) ? 1.5 : 0);
   // 大技を先に（flashy）は必要マナの多い順、ほかは強い順
@@ -592,13 +625,13 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   if (style !== 'flashy' && !missKill) {
     if (skill === 'A') {
       const kills = byPower
-        .flatMap((o) => reachable(o).filter((e) => e.life <= power(o)).map((e) => ({ o, e, over: power(o) - e.life })))
+        .flatMap((o) => reachable(o).filter((e) => e.life <= powerOn(o, e)).map((e) => ({ o, e, over: powerOn(o, e) - e.life })))
         .sort((a, b) => a.over - b.over || a.o.def.cost - b.o.def.cost || dangerOf(state, b.e) - dangerOf(state, a.e));
       const best = kills[0];
       if (best) return attackAction(state, side, best.o, best.e.uid);
     } else {
       for (const option of byPower) {
-        const killable = reachable(option).filter((e) => e.life <= power(option));
+        const killable = reachable(option).filter((e) => e.life <= powerOn(option, e));
         // hunter は最大ライフの少ないモンスターから。ほかはライフの多い相手（倒せるうちの大物）から
         const kill = killable.sort((a, b) => (style === 'hunter' ? a.maxLife - b.maxLife : 0) || b.life - a.life)[0];
         if (kill) return attackAction(state, side, option, kill.uid);
@@ -615,15 +648,19 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   // 試遊中：ジオルの地ひびき（相手全体）。倒せる相手がいなければ、相手が2体以上生きているときに使う（2026-10-29 指示書）
   const quake = byPower.find((o) => o.def.effect.type === 'attack' && o.def.effect.allTargets);
   if (quake && reachable(quake).length >= 2) return attackAction(state, side, quake, reachable(quake)[0]?.uid ?? '');
-  // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える
-  const candidates = byPower.filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && reachable(o).length >= 2));
+  // 相手全体への攻撃は、相手が1体のときはふつうの攻撃と同じに考える。
+  // おおたつまき（空中の相手全員。2026-11-02 指示書 AQ）は、空中の相手が2体以上のとき（上の地ひびきと同じ）か、1体でも倒せるとき（上の倒す所）だけ
+  const candidates = byPower.filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.allTargets && (reachable(o).length >= 2 || o.def.effect.airOnly)));
   // 腕前 C：一部の手番で、強くない技（使える技からばらばら）を選ぶ
   const weak = cpuRoll(state, side, 'weak') < CPU_SKILL[skill].weakSkill;
   const strongest = weak ? candidates[Math.min(candidates.length - 1, Math.floor(cpuRoll(state, side, 'weakPick') * candidates.length))] : candidates[0];
   if (!strongest) return null;
   // 腕前 A：倒せないときは、次の手番に大技を払えるようマナを残すことがある
   if (skill === 'A' && style !== 'aggressive' && saveManaForBig(state, side, strongest, power(strongest))) return null;
-  const target = pickTarget(state, side, reachable(strongest), style, skill, 'attack');
+  // うずまきショット（2026-11-02 指示書 AQ）：空中の相手がいればそちらをねらう
+  const reach = reachable(strongest);
+  const air = reach.filter((e) => airBonusAgainst(state, strongest.def, e) > 0);
+  const target = pickTarget(state, side, air.length > 0 ? air : reach, style, skill, 'attack');
   return target ? attackAction(state, side, strongest, target.uid) : null;
 }
 

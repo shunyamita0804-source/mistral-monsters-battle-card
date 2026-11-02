@@ -189,7 +189,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     'enc-b3-boss': 'mon-geol',
     'enc-forest-boss': 'mon-flune',
     'enc-water-boss': 'mon-serephine',
-    'enc-wind-boss': 'mon-tsumuji',
+    'enc-wind-boss': 'mon-uzurio', // 2026-11-02 指示書 AQ：ツムジからウズリオへ
     'enc-ice-boss': 'mon-hyouzuku', // 2026-10-30 指示書 W：カルシェルからヒョウズクに
     'enc-fire-boss': 'mon-shishien', // 2026-10-31 指示書 AB：ガウルからシシエンに
     'enc-thunder-boss': 'mon-hakuran', // 2026-11-01 指示書 AH：雷の高原のステラ
@@ -215,7 +215,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       'enc-b3-boss': 1.06,
       'enc-forest-boss': 0.93,
       'enc-water-boss': 1.25,
-      'enc-wind-boss': 1.22,
+      'enc-wind-boss': 1.28, // 2026-11-02 指示書 AQ：切り札がウズリオになり、ツムジのときの勝つ割合（2.8％）に合わせ直した（3.0％）
       'enc-ice-boss': 1.05,
       'enc-fire-boss': 1.08, // 2026-10-31 指示書 AC【2】：1.09 → 1.08（21.0％。V の目標 18.1％ ±3 に入った）
       'enc-thunder-boss': 1, // 2026-11-01 指示書 AH：試遊で 1.0（18.3％。バルカと同じ目標 18.1％ ±3 に入った）

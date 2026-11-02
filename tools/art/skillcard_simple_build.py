@@ -51,6 +51,7 @@ MONSTER_COLORS = {
     'desuoru': '#1E2B58',  # 2026-10-31 デスオル（紺。指示書 AG）
     'lilil': '#EE8FB6',  # 2026-11-02 リリル（やわらかいローズピンク。指示書 AK）
     'forn': '#7A8B3C',  # 2026-11-02 フォルン（濃いオリーブ。指示書 AL）
+    'uzurio': '#3D8FD6',  # 2026-11-02 ウズリオ（はっきりした空色。指示書 AQ）
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

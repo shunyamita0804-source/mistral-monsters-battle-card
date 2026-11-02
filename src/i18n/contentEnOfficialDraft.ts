@@ -351,6 +351,22 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-forn-11:name': 'Crown Ward',
   'card:skl-forn-12:name': 'Stand-in Flute',
 
+  // ウズリオ（2026-11-02 指示書 AQ。仮訳）
+  'card:mon-uzurio:name': 'Uzurio',
+  'card:mon-uzurio:description': 'A fluffy beast wrapped in swirling wind.',
+  'card:skl-uzurio-01:name': 'Tail Sweep',
+  'card:skl-uzurio-02:name': 'Rolling Attack',
+  'card:skl-uzurio-03:name': 'Breeze Orb',
+  'card:skl-uzurio-04:name': 'Swirl Shot',
+  'card:skl-uzurio-05:name': 'Wind Vortex',
+  'card:skl-uzurio-06:name': 'Great Tornado',
+  'card:skl-uzurio-07:name': 'Sand Cloud',
+  'card:skl-uzurio-08:name': 'Blow Away',
+  'card:skl-uzurio-09:name': 'Whistle Dodge',
+  'card:skl-uzurio-10:name': 'Float Dodge',
+  'card:skl-uzurio-11:name': 'Updraft Kick',
+  'card:skl-uzurio-12:name': 'Whirlwind Veil',
+
   // 指示書 AJ（2026-11-01）：名前を変えた技・新しい技の名前と、効果の文（src/i18n/contentEnAJ.ts。同じキーはこちらが勝つ）
   ...AJ_EN,
 };

@@ -42,6 +42,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-lilil': { x: 0.51, y: 0.19, zoom: 2.2 },
   // フォルン（2026-11-02 指示書 AL）：顔は絵の上のほうの真ん中（体が少し左を向く）。長い角2本が入りすぎて顔が小さくならないくらいに寄せる
   'mon-forn': { x: 0.5, y: 0.24, zoom: 1.8 },
+  // ウズリオ（2026-11-02 指示書 AQ）：顔は頭の大きな渦の毛の下（絵の真ん中より少し右・上から半分くらい）。渦の毛だけが写らないよう顔に合わせる
+  'mon-uzurio': { x: 0.6, y: 0.45, zoom: 2.2 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

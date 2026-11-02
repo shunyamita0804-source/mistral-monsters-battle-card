@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { getPlayCard } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
-import { TSUMUJI_MONSTER_ID } from '../src/data/tsumuji.ts';
+import { UZURIO_MONSTER_ID } from '../src/data/uzurio.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { actingSide, applyAction, createBattle, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { buildOpponentDeck, type Deck } from '../src/game/deck/deck.ts';
@@ -65,8 +65,8 @@ const ZEPHYRA = ENCOUNTERS['enc-wind-boss'];
 const LUCIA = ENCOUNTERS['enc-water-boss'];
 
 describe('ゼフィラの試遊（自動の対戦）', () => {
-  it('ゼフィラ：ソラモ・ツムジ・ガウル。ルシアと同じ 1.2 から試遊し、勝つ割合がルシアといちばん近い 1.0 にした（2026-10-30 指示書 V で切り札の技を2枚ずつにして 1.1）', () => {
-    expect(ZEPHYRA).toMatchObject({ monsters: ['mon-soramo', TSUMUJI_MONSTER_ID, 'mon-gauul'], ace: TSUMUJI_MONSTER_ID, lifeScale: 1.22 });
+  it('ゼフィラ：ソラモ・（切り札）・ガウル。2026-11-02 指示書 AQ で切り札はツムジからウズリオへ（lifeScale は tests/aqPlaytest.test.ts で合わせ直す）', () => {
+    expect(ZEPHYRA).toMatchObject({ monsters: ['mon-soramo', UZURIO_MONSTER_ID, 'mon-gauul'], ace: UZURIO_MONSTER_ID });
     expect(LUCIA?.lifeScale).toBe(1.25);
   });
 

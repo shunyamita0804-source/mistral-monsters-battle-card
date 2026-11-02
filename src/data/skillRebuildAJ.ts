@@ -29,6 +29,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-desuoru': 'air',
   'mon-lilil': 'air', // 2026-11-02 指示書 AK
   'mon-forn': 'ground', // 2026-11-02 指示書 AL
+  'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -358,6 +359,26 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-forn-11', name: 'かんむりのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 1, art: 'forn_sk_11.webp' },
     // ジオルの かばう と同じ（cover）
     { id: 'skl-forn-12', name: 'みがわりのふえ', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける', rare: true, box: 0, art: 'forn_sk_12.webp' },
+  ],
+  // ウズリオ（地上・LIFE 6・C。2026-11-02 指示書 AQ。正本は src/data/official/uzurio12_and_support3_OFFICIAL_20261102.json）
+  // 最初の箱には入れない（box なし）。絵は uzurio_sk_NN.webp（番号＝技番号）。新しい効果は 04 うずまきショット（airBonus）・06 おおたつまき（allTargets＋airOnly）
+  'mon-uzurio': [
+    { id: 'skl-uzurio-01', name: 'しっぽはらい', cat: 'ち', mana: 0, damage: 1, text: null, art: 'uzurio_sk_01.webp' },
+    { id: 'skl-uzurio-02', name: 'ころがりアタック', cat: 'ち', mana: 2, damage: 2, text: null, art: 'uzurio_sk_02.webp' },
+    { id: 'skl-uzurio-03', name: 'そよかぜだま', cat: 'か', mana: 1, damage: 1, text: null, art: 'uzurio_sk_03.webp' },
+    // 新しい効果（airBonus）：ねらった相手がいま空中なら技のダメージ＋2
+    { id: 'skl-uzurio-04', name: 'うずまきショット', cat: 'か', mana: 2, damage: 2, effect: atk({ airBonus: 2 }), text: '相手が空中なら +2（ダメージ4）', art: 'uzurio_sk_04.webp' },
+    { id: 'skl-uzurio-05', name: 'かぜのうず', cat: 'か', mana: 3, damage: 4, text: null, rare: true, art: 'uzurio_sk_05.webp' },
+    // 新しい効果（airOnly）：ジオルの 地ひびき（allTargets）と同じ当て方で、いま空中の相手全員に。守りは1体ずつ
+    { id: 'skl-uzurio-06', name: 'おおたつまき', cat: 'か', mana: 4, damage: 2, effect: atk({ allTargets: true, airOnly: true }), text: '空中にいる相手全員に2ダメージ', rare: true, art: 'uzurio_sk_06.webp' },
+    // ソラモの すなかけ と同じ（seal）
+    { id: 'skl-uzurio-07', name: 'すなけむり', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, art: 'uzurio_sk_07.webp' },
+    // ラズックの いたずら と同じ（handToDeck）
+    { id: 'skl-uzurio-08', name: 'ふきとばし', cat: '特', mana: 2, damage: null, effect: { type: 'handToDeck' }, text: '相手の手札1枚をランダムに山札へもどす', rare: true, art: 'uzurio_sk_08.webp' },
+    { id: 'skl-uzurio-09', name: 'ひゅるりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, art: 'uzurio_sk_09.webp' },
+    { id: 'skl-uzurio-10', name: 'ふわりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', art: 'uzurio_sk_10.webp' },
+    { id: 'skl-uzurio-11', name: 'まきあげキック', cat: 'ち', mana: 3, damage: 3, text: null, art: 'uzurio_sk_11.webp' },
+    { id: 'skl-uzurio-12', name: 'つむじがくれ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'uzurio_sk_12.webp' },
   ],
 };
 

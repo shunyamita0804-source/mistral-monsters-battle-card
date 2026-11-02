@@ -16,6 +16,8 @@ export interface BattleCardOptions {
   readonly size: BattleCardSize;
   /** マナの数字（かぜのりで下がったとき。skillCard.ts の SkillCardOptions.mana） */
   readonly mana?: number;
+  /** ダメージの数字（うずまきショットで相手が空中のとき。skillCard.ts の SkillCardOptions.damage） */
+  readonly damage?: number;
 }
 
 export function battleCardHeight(width: number, size: BattleCardSize): number {
@@ -23,7 +25,7 @@ export function battleCardHeight(width: number, size: BattleCardSize): number {
 }
 
 export function createBattleCard(card: PlayCard, options: BattleCardOptions): HTMLElement {
-  const mana = options.mana !== undefined ? { mana: options.mana } : {};
+  const mana = { ...(options.mana !== undefined ? { mana: options.mana } : {}), ...(options.damage !== undefined ? { damage: options.damage } : {}) };
   if (options.size !== 'focus') return createPlayCard(card, { width: options.width, size: 'hand', showText: false, ...mana });
   return createPlayCard(card, { width: options.width, size: 'normal', showText: true, ...mana });
 }

@@ -109,6 +109,16 @@ export type SkillEffect =
       readonly chain?: boolean;
       /** 地上の相手にしか使えない（指示書 AJ：ガウルの急降下アタック。allTargets と一緒なら「地上の相手全員」＝ジオルの地ひびき） */
       readonly groundOnly?: boolean;
+      /**
+       * 空中の相手にしか使えない（指示書 AQ：ウズリオのおおたつまき。allTargets と一緒で「空中の相手全員」）。
+       * 空中かどうかは「いま扱われている居場所」（場のカード まいあがる風・しずまる大地・みちしお で変わる。src/game/battle/engine.ts の habitatOf）
+       */
+      readonly airOnly?: boolean;
+      /**
+       * ねらった相手がいま空中なら、技そのもののダメージに＋この値（指示書 AQ：ウズリオのうずまきショット ＋2）。
+       * 「技のダメージ（＋込み）→ 今ある増減（場・声援など）→ 防御」の順（engine.ts の attackPower）
+       */
+      readonly airBonus?: number;
       /** 水中の相手には防御されない（指示書 AJ：セレフィーンのルナタイド） */
       readonly unblockableVsWater?: boolean;
       /** 水中の相手は回避できない（指示書 AJ：セレフィーンのオーシャンウェーブ） */
@@ -334,7 +344,11 @@ export type SupportEffect =
   | { readonly type: 'swap' }
   | { readonly type: 'manaDrain'; readonly value: number }
   | { readonly type: 'cheer'; readonly value: number }
-  | { readonly type: 'guardDiscount'; readonly value: number };
+  | { readonly type: 'guardDiscount'; readonly value: number }
+  /** 場（指示書 AQ：まいあがる風＝空中・しずまる大地＝地上）：場にある間、すべてのモンスター（双方）をその居場所として扱う。期限なし */
+  | { readonly type: 'habitat'; readonly habitat: Habitat }
+  /** すぐ（指示書 AQ：しずめの祈り）：場のカードを1枚取りのぞく（みちしおの水中も消す）。場に何も無いときは使えない */
+  | { readonly type: 'clearField' };
 
 export interface SupportCard extends CardBase {
   readonly kind: 'support';
@@ -398,6 +412,10 @@ export function describeSupport(card: SupportCard): string {
       return t('card.support.field', { stat: statOrAll(e.stat), sign: signed(e.modifier) });
     case 'guardDiscount':
       return t('card.support.guardDiscount', { v: e.value });
+    case 'habitat':
+      return t('card.support.habitat', { where: t(`habitat.${e.habitat}`) });
+    case 'clearField':
+      return t('card.support.clearField');
   }
 }
 
@@ -420,6 +438,10 @@ export function supportShortText(card: SupportCard): string {
       return t(`card.short.${e.type}`);
     case 'field':
       return t('card.short.field', { stat: statOrAll(e.stat), sign: signed(e.modifier) });
+    case 'habitat':
+      return t('card.short.habitat', { where: t(`habitat.${e.habitat}`) });
+    case 'clearField':
+      return t('card.short.clearField');
   }
 }
 

@@ -12,6 +12,8 @@ import {
   findMonster,
   guardCost,
   activeField,
+  airBonusAgainst,
+  attackableMonsters,
   fieldSupport,
   habitatOf,
   isTideActive,
@@ -778,6 +780,16 @@ export const battleScreen: ScreenDefinition = {
       if (card.effect.type !== 'attack' || s.active !== 'player') return {};
       const cost = handSkillCost(s, 'player', card);
       return cost < card.cost ? { mana: cost } : {};
+    };
+
+    /**
+     * 手札・大きなカードのダメージの数字（うずまきショット 2026-11-02 指示書 AQ）：攻撃できる相手に、いま空中の相手がいれば、その相手に当てたときのダメージ（2→4）。
+     * 空中の相手がいなければ何も渡さない（印字のまま）。ほかの増減（場・声援など）は今までどおり数字に入れない
+     */
+    const handDamage = (s: BattleState, card: PlayCard): { damage?: number } => {
+      if (card.kind !== 'skill' || card.effect.type !== 'attack' || !card.effect.airBonus || !card.stat) return {};
+      const air = attackableMonsters(s, 'opponent').some((m) => airBonusAgainst(s, card, m) > 0);
+      return air ? { damage: card.stat.value + card.effect.airBonus } : {};
     };
 
     /** 演出をタップで飛ばす：大きく見せるのをやめ、待たせていた操作・相手の行動をすぐ進める */
@@ -1901,7 +1913,7 @@ export const battleScreen: ScreenDefinition = {
         h(
           'div',
           { class: 'battle-detail__card' },
-          card ? createBattleCard(card, { width: detailW, size: 'focus' }) : last ? lastCardView(last) : h('div', { class: 'battle-card-slot' }),
+          card ? createBattleCard(card, { width: detailW, size: 'focus', ...(s.phase === 'main' && s.active === 'player' ? handDamage(s, card) : {}) }) : last ? lastCardView(last) : h('div', { class: 'battle-card-slot' }),
         ),
       );
     };
@@ -1971,8 +1983,8 @@ export const battleScreen: ScreenDefinition = {
               },
             },
             isNew
-              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card) }), h('span', { class: 'battle__hand-cover' }))
-              : createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card) }),
+              ? h('span', { class: 'battle__hand-face' }, createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card), ...handDamage(s, card) }), h('span', { class: 'battle__hand-cover' }))
+              : createBattleCard(card, { width: cardW, size: 'tall', ...handMana(s, card), ...handDamage(s, card) }),
             picked ? h('span', { class: 'battle__hand-mana' }, h('span', { class: 'battle__hand-mana-text', text: t('card.detail.mana') })) : null,
           );
           if (deal && isNew) {
@@ -2290,7 +2302,8 @@ export const battleScreen: ScreenDefinition = {
           on: { click: () => openCardDetail(element, card, { extra: [t(`battle.field.by.${s.field?.owner ?? 'player'}`)] }) },
         },
         h('span', { class: 'battle-turn__field-label', text: t('battle.field.label') }),
-        h('span', { class: 'battle-turn__field-text' }, phraseText(withoutFieldPrefix(supportShortText(card)))),
+        // まいあがる風・しずまる大地（2026-11-02 指示書 AQ）：カードの文は長いので、場の札は短く「全員が空中」（みちしおの「場が水中」と同じ考え方）
+        h('span', { class: 'battle-turn__field-text' }, phraseText(card.effect.type === 'habitat' ? t('battle.field.habitat', { where: t(`habitat.${card.effect.habitat}`) }) : withoutFieldPrefix(supportShortText(card)))),
       );
     };
 

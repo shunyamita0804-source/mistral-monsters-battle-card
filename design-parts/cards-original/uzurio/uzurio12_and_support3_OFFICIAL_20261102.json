@@ -1,0 +1,188 @@
+{
+  "monster": {
+    "id": "mon-uzurio",
+    "name_ja": "ウズリオ",
+    "name_en_tmp": "Uzurio",
+    "life": 6,
+    "rank_internal": "C",
+    "habitat": "ground",
+    "frame_color": "#3D8FD6",
+    "body": "砂のベージュに砂岩の赤茶のしま・頭の大きな渦の毛・ほっぺ／脚／しっぽの先に空色の渦。手足とも指3本・爪3本（焦げ茶）、目2（空色）、しっぽ1、耳なし、羽なし、服なし",
+    "role": "風の渓谷（最初のダンジョン）の守り手ゼフィラの切り札。最初の箱には入れない",
+    "skills": [
+      {
+        "no": 1,
+        "id": "skl-uzurio-01",
+        "name_ja": "しっぽはらい",
+        "class": "power",
+        "mana": 0,
+        "damage": 1,
+        "effect_key": null,
+        "effect_ja": null,
+        "rare": false,
+        "art": "uzurio_sk_01.png"
+      },
+      {
+        "no": 2,
+        "id": "skl-uzurio-02",
+        "name_ja": "ころがりアタック",
+        "class": "power",
+        "mana": 2,
+        "damage": 2,
+        "effect_key": null,
+        "effect_ja": null,
+        "rare": false,
+        "art": "uzurio_sk_02.png"
+      },
+      {
+        "no": 3,
+        "id": "skl-uzurio-03",
+        "name_ja": "そよかぜだま",
+        "class": "wisdom",
+        "mana": 1,
+        "damage": 1,
+        "effect_key": null,
+        "effect_ja": null,
+        "rare": false,
+        "art": "uzurio_sk_03.png"
+      },
+      {
+        "no": 4,
+        "id": "skl-uzurio-04",
+        "name_ja": "うずまきショット",
+        "class": "wisdom",
+        "mana": 2,
+        "damage": 2,
+        "effect_key": "air_bonus_2",
+        "effect_ja": "相手が空中なら +2（ダメージ4）",
+        "rare": false,
+        "art": "uzurio_sk_04.png"
+      },
+      {
+        "no": 5,
+        "id": "skl-uzurio-05",
+        "name_ja": "かぜのうず",
+        "class": "wisdom",
+        "mana": 3,
+        "damage": 4,
+        "effect_key": null,
+        "effect_ja": null,
+        "rare": true,
+        "art": "uzurio_sk_05.png"
+      },
+      {
+        "no": 6,
+        "id": "skl-uzurio-06",
+        "name_ja": "おおたつまき",
+        "class": "wisdom",
+        "mana": 4,
+        "damage": 2,
+        "effect_key": "hit_all_air_enemies",
+        "effect_ja": "空中にいる相手全員に2ダメージ",
+        "rare": true,
+        "art": "uzurio_sk_06.png"
+      },
+      {
+        "no": 7,
+        "id": "skl-uzurio-07",
+        "name_ja": "すなけむり",
+        "class": "special",
+        "mana": 2,
+        "damage": null,
+        "effect_key": "same_as_sunakake",
+        "effect_ja": "相手1体は次の攻撃を行えない（ソラモの すなかけ と同じ）",
+        "rare": false,
+        "art": "uzurio_sk_07.png"
+      },
+      {
+        "no": 8,
+        "id": "skl-uzurio-08",
+        "name_ja": "ふきとばし",
+        "class": "special",
+        "mana": 2,
+        "damage": null,
+        "effect_key": "same_as_itazura",
+        "effect_ja": "相手の手札1枚をランダムに山札へもどす（いたずら と同じ）",
+        "rare": true,
+        "art": "uzurio_sk_08.png"
+      },
+      {
+        "no": 9,
+        "id": "skl-uzurio-09",
+        "name_ja": "ひゅるりとかわす",
+        "class": "evade",
+        "mana": 1,
+        "damage": null,
+        "effect_key": "evade_power",
+        "effect_ja": "ちから技を回避",
+        "rare": false,
+        "art": "uzurio_sk_09.png"
+      },
+      {
+        "no": 10,
+        "id": "skl-uzurio-10",
+        "name_ja": "ふわりとかわす",
+        "class": "evade",
+        "mana": 1,
+        "damage": null,
+        "effect_key": "evade_wisdom",
+        "effect_ja": "かしこさ技を回避",
+        "rare": false,
+        "art": "uzurio_sk_10.png"
+      },
+      {
+        "no": 11,
+        "id": "skl-uzurio-11",
+        "name_ja": "まきあげキック",
+        "class": "power",
+        "mana": 3,
+        "damage": 3,
+        "effect_key": null,
+        "effect_ja": null,
+        "rare": false,
+        "art": "uzurio_sk_11.png"
+      },
+      {
+        "no": 12,
+        "id": "skl-uzurio-12",
+        "name_ja": "つむじがくれ",
+        "class": "evade",
+        "mana": 2,
+        "damage": null,
+        "effect_key": "evade_any",
+        "effect_ja": "条件なしで回避",
+        "rare": true,
+        "art": "uzurio_sk_12.png"
+      }
+    ]
+  },
+  "support_cards": [
+    {
+      "id": "(既存の決まりで)",
+      "name_ja": "まいあがる風",
+      "kind": "field",
+      "mana": 3,
+      "effect_ja": "場にある間、すべてのモンスター（双方）を空中として扱う。期限なし（上書き・しずめの祈りで消えるまで）",
+      "art": "sup_art_12_maiagarukaze.png",
+      "rare": false
+    },
+    {
+      "id": "(既存の決まりで)",
+      "name_ja": "しずまる大地",
+      "kind": "field",
+      "mana": 3,
+      "effect_ja": "場にある間、すべてのモンスター（双方）を地上として扱う。期限なし",
+      "art": "sup_art_13_shizumarudaichi.png",
+      "rare": false
+    },
+    {
+      "id": "(既存の決まりで)",
+      "name_ja": "しずめの祈り",
+      "kind": "instant",
+      "mana": 1,
+      "effect_ja": "場のカードを1枚取りのぞく（みちしおの水中も消す）。場に何も無いときは使えない",
+      "art": "sup_art_14_shizumenoinori.png",
+      "rare": false
+    }
+  ]
+}

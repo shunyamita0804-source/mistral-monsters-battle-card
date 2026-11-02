@@ -101,6 +101,15 @@ export const CARDS = {
     ja: '場に残る。防御・回避のカードの消費マナ−{v}（双方。0より下にならない）。場のカードは1枚だけで、新しく出すと入れ替わる。',
     en: 'Stays on the field. Guard and dodge cards cost {v} less mana (both players, not below 0). Only 1 field card at a time; a new one replaces it.',
   },
+  // 2026-11-02 指示書 AQ：まいあがる風・しずまる大地（場）・しずめの祈り（すぐ）。カード面は text（データの文）を出す
+  'card.support.habitat': {
+    ja: '場に残る。すべてのモンスター（双方）を{where}として扱う。場のカードは1枚だけで、新しく出すと入れ替わる。',
+    en: 'Stays on the field. All monsters (both players) count as {where}. Only 1 field card at a time; a new one replaces it.',
+  },
+  'card.support.clearField': {
+    ja: '場のカードを1枚取りのぞく（みちしおの水中も消す）。場に何も無いときは使えない。',
+    en: 'Remove the field card (also ends High Tide). Unusable when the field is empty.',
+  },
   'card.support.field': {
     ja: '場に残る。{stat}攻撃のダメージを{sign}する（双方）。場のカードは1枚だけで、新しく出すと入れ替わる。',
     en: 'Stays on the field. {stat}attack damage {sign} (both players). Only 1 field card at a time; a new one replaces it.',
@@ -122,6 +131,8 @@ export const CARDS = {
   'card.short.cheer': { ja: 'このターン、味方1体が次に使う攻撃のダメージ＋{v}', en: "This turn: 1 ally's next attack +{v}" },
   'card.short.guardDiscount': { ja: '防御・回避のカードの消費マナ−{v}', en: 'Guard/dodge cards cost -{v}' },
   'card.short.fieldPrefix': { ja: '場：', en: 'Field: ' },
+  'card.short.habitat': { ja: '場にある間、すべてのモンスターを{where}として扱う', en: 'While on the field, all monsters count as {where}' },
+  'card.short.clearField': { ja: '場のカードを1枚取りのぞく', en: 'Remove the field card' },
 
   // カード面の絵の代わりの文字・読み上げ
   'card.art.skill': { ja: '技', en: 'SK' },

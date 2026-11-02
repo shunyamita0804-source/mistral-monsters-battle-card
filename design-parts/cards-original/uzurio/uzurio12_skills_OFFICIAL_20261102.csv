@@ -1,0 +1,13 @@
+﻿no,id,name_ja,class,mana,damage,effect_ja,rare,art
+1,skl-uzurio-01,しっぽはらい,power,0,1,,,uzurio_sk_01.png
+2,skl-uzurio-02,ころがりアタック,power,2,2,,,uzurio_sk_02.png
+3,skl-uzurio-03,そよかぜだま,wisdom,1,1,,,uzurio_sk_03.png
+4,skl-uzurio-04,うずまきショット,wisdom,2,2,相手が空中なら +2（ダメージ4）,,uzurio_sk_04.png
+5,skl-uzurio-05,かぜのうず,wisdom,3,4,,★,uzurio_sk_05.png
+6,skl-uzurio-06,おおたつまき,wisdom,4,2,空中にいる相手全員に2ダメージ,★,uzurio_sk_06.png
+7,skl-uzurio-07,すなけむり,special,2,,相手1体は次の攻撃を行えない（ソラモの すなかけ と同じ）,,uzurio_sk_07.png
+8,skl-uzurio-08,ふきとばし,special,2,,相手の手札1枚をランダムに山札へもどす（いたずら と同じ）,★,uzurio_sk_08.png
+9,skl-uzurio-09,ひゅるりとかわす,evade,1,,ちから技を回避,,uzurio_sk_09.png
+10,skl-uzurio-10,ふわりとかわす,evade,1,,かしこさ技を回避,,uzurio_sk_10.png
+11,skl-uzurio-11,まきあげキック,power,3,3,,,uzurio_sk_11.png
+12,skl-uzurio-12,つむじがくれ,evade,2,,条件なしで回避,★,uzurio_sk_12.png

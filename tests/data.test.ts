@@ -26,24 +26,24 @@ describe('カードデータ（仮）', () => {
   it('仮データであることが明示されている（正式カードはソラモ・ラズック・ガウルだけ）', () => {
     for (const c of [...MONSTERS, ...SKILLS, ...SUPPORTS]) {
       const official =
-        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran', 'mon-desuoru', 'mon-lilil', 'mon-forn'].includes(c.id) ||
-        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-', 'skl-shishien-', 'skl-hakuran-', 'skl-desuoru-', 'skl-lilil-', 'skl-forn-'].some((p) => c.id.startsWith(p)) ||
+        ['mon-soramo', 'mon-lazuck', 'mon-gauul', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine', 'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran', 'mon-desuoru', 'mon-lilil', 'mon-forn', 'mon-uzurio'].includes(c.id) ||
+        ['skl-soramo14-', 'skl-lazuck-', 'skl-gauul14-', 'skl-nobiton-', 'skl-myurol-', 'skl-kalshell-', 'skl-pukarim-', 'skl-geol-', 'skl-flune-', 'skl-serephine-', 'skl-tsumuji-', 'skl-hyouzuku-', 'skl-shishien-', 'skl-hakuran-', 'skl-desuoru-', 'skl-lilil-', 'skl-forn-', 'skl-uzurio-'].some((p) => c.id.startsWith(p)) ||
         // サポート11種類（2026-10-30 指示書 Y）
         c.kind === 'support';
       expect(c.isPlaceholder).toBe(!official);
     }
   });
 
-  it('サポートカードは正式の11種類（2026-10-30 指示書 Y）。すぐ効くカードは全部まとめて1ターン1回、場に残るカードは回数制限なし', () => {
-    expect(SUPPORTS).toHaveLength(11);
-    expect(SUPPORTS.map((c) => c.code)).toEqual(['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'F01', 'F02', 'F03', 'F04']);
+  it('サポートカードは正式の14種類（2026-10-30 指示書 Y の11種類＋指示書 AQ の3枚）。すぐ効くカードは全部まとめて1ターン1回、場に残るカードは回数制限なし', () => {
+    expect(SUPPORTS).toHaveLength(14);
+    expect(SUPPORTS.map((c) => c.code)).toEqual(['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'S08']);
     for (const c of SUPPORTS) {
       expect(c.kind).toBe('support');
       expect(c.isPlaceholder).toBe(false);
       expect(c.name.startsWith('仮')).toBe(false);
     }
     for (const c of SUPPORTS.filter((x) => x.duration === 'instant')) expect(c).toMatchObject({ limitGroup: 'breeder', limitPerTurn: 1 });
-    for (const c of SUPPORTS.filter((x) => x.duration === 'field')) expect(['field', 'guardDiscount']).toContain(c.effect.type);
+    for (const c of SUPPORTS.filter((x) => x.duration === 'field')) expect(['field', 'guardDiscount', 'habitat']).toContain(c.effect.type);
     // 古いパック（第1〜2弾・仮）は同じ ID のまま新しい中身で出る
     expect(PACKS.some((p) => p.cardIds.includes('sup-1'))).toBe(true);
   });

@@ -32,12 +32,13 @@ const CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 
 
 describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリルを足して16体）', () => {
   it('どのモンスターも技は12枚・レアは4つ。名前・分類・マナ・ダメージ・効果の文・表示の番号は表のとおり。LIFE は変えない（ミュロル・カルシェルは 2026-11-02 に 6・7 にしたが、指示書 AO で 7・8 に戻した）', () => {
-    expect(AJ_MONSTER_IDS).toHaveLength(17);
+    expect(AJ_MONSTER_IDS).toHaveLength(18);
     const life: Record<string, number> = {
       'mon-soramo': 7, 'mon-gauul': 6, 'mon-myurol': 7, 'mon-kalshell': 8, 'mon-lazuck': 6, 'mon-nobiton': 8, 'mon-pukarim': 6, 'mon-flune': 10,
       'mon-serephine': 6, 'mon-tsumuji': 6, 'mon-geol': 9, 'mon-hyouzuku': 7, 'mon-shishien': 7, 'mon-hakuran': 7, 'mon-desuoru': 7,
       'mon-lilil': 5,
       'mon-forn': 7,
+      'mon-uzurio': 6, // 2026-11-02 指示書 AQ
     };
     for (const id of AJ_MONSTER_IDS) {
       const rows = AJ_SKILLS[id] ?? [];
@@ -111,10 +112,11 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     expect(REMOVED_SKILL_IDS).toContain('skl-kalshell-14');
   });
 
-  it('居場所：地上9体（フォルンは指示書 AL）・空中5体（リリルは指示書 AK）・水中3体', () => {
+  it('居場所：地上10体（フォルンは指示書 AL・ウズリオは指示書 AQ）・空中5体（リリルは指示書 AK）・水中3体', () => {
     const by = (h: string): string[] => Object.entries(MONSTER_HABITAT).filter(([, v]) => v === h).map(([k]) => k);
-    expect(by('ground')).toHaveLength(9);
+    expect(by('ground')).toHaveLength(10);
     expect(by('ground')).toContain('mon-forn');
+    expect(by('ground')).toContain('mon-uzurio');
     expect(by('air').sort()).toEqual(['mon-desuoru', 'mon-gauul', 'mon-hyouzuku', 'mon-lilil', 'mon-pukarim']);
     expect(by('water').sort()).toEqual(['mon-kalshell', 'mon-myurol', 'mon-serephine']);
     expect(getMonster('mon-gauul').habitat).toBe('air');
@@ -135,6 +137,8 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     expect(entries.find((e) => e.card.id === 'mon-lilil')?.no).toBe(15 * 13 + 1);
     // 2026-11-02 指示書 AL：フォルンはリリルのあと（No.209〜221）
     expect(entries.find((e) => e.card.id === 'mon-forn')?.no).toBe(16 * 13 + 1);
+    // 2026-11-02 指示書 AQ：ウズリオはフォルンのあと（No.222〜234）
+    expect(entries.find((e) => e.card.id === 'mon-uzurio')?.no).toBe(17 * 13 + 1);
   });
 
   it('ガチャのシリーズ：○/13（技12＋モンスター1）。レアの枠は★の4つ', () => {

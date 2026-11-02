@@ -167,6 +167,11 @@ img.skill-card__art {
   font-size: 22cqw;
 }
 
+/* うずまきショット（2026-11-02 指示書 AQ）：相手が空中でダメージが上がっているとき（マナが下がったときの緑と同じ考え方で、上がった数字は黄色） */
+.skill-card__value.is-boosted .skill-card__value-num {
+  color: #ffd84a;
+}
+
 .skill-card__value-word {
   /* 大きさは skillCard.ts の VALUE_FONT（8.5cqw・手札用 9.5cqw。「サポート」など長い語は四角に収まる大きさまで下げる） */
   font-size: 8.5cqw;

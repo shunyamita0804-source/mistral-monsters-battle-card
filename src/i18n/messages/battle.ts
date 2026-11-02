@@ -61,6 +61,11 @@ export const BATTLE = {
   'battle.log.tide': { ja: '{name}のみちしお！ 場が水中になった（次の自分のターンの終わりまで、全員が水中）。', en: "{name}'s High Tide! The field is underwater (everyone counts as underwater until the end of its side's next turn)." },
   'battle.tide.chip': { ja: '場が水中 あと{n}手番', en: 'Underwater: {n} more {n|turn|turns}' },
   'battle.log.tideEnd': { ja: '場の水が引いた。', en: 'The water receded from the field.' },
+  // 2026-11-02 指示書 AQ
+  'battle.log.airBonus': { ja: '相手は空中！ ダメージ＋{n}。', en: 'The target is airborne! Damage +{n}.' },
+  'battle.field.habitat': { ja: '全員が{where}', en: 'All {where}' },
+  'battle.log.fieldCleared': { ja: '場の「{card}」が取りのぞかれた。', en: '{card} was removed from the field.' },
+  'battle.log.habitatField': { ja: '場にある間、すべてのモンスターが{where}になる。', en: 'While it stays on the field, all monsters count as {where}.' },
   'battle.log.requiem': { ja: '死のレクイエム：{n}体が倒れた（{names}）。', en: 'Requiem of Death: {n} {n|monster|monsters} fell ({names}).' },
   'battle.log.requiemNone': { ja: '死のレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
@@ -177,6 +182,9 @@ export const BATTLE = {
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
   'battle.ng.groundOnly': { ja: '地上の相手がいません（地上の相手だけに使える技）', en: 'No ground enemies (this skill can only target ground enemies)' },
+  // 2026-11-02 指示書 AQ：おおたつまき・しずめの祈り
+  'battle.ng.airOnly': { ja: '空中の相手がいません（空中にいる相手だけに当たる技）', en: 'No airborne enemies (this skill only hits airborne enemies)' },
+  'battle.ng.noField': { ja: '場にカードがありません', en: 'There is no field card' },
   'battle.ng.allHidden': { ja: '相手はもぐっていて攻撃できません', en: 'All enemies are hidden' },
   'battle.defense.cover': { ja: 'かばう', en: 'Cover' },
   'battle.defense.nullify': { ja: '0に', en: 'To 0' },

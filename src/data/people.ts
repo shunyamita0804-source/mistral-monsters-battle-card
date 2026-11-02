@@ -3,7 +3,7 @@ import type { OpponentDefinition } from './tournaments.ts';
 
 /**
  * 登場人物44人（28人は 2026-10-27 ユーザー承認の指示書「人物の名前・名刺図鑑・カード図鑑」、29〜40 は 2026-10-28 指示書「ダンジョンの人物12人」、
- * 41・42 は 2026-10-30 指示書 U「風の渓谷とツムジ」の守り手ゼフィラ・バトラーのニコ。せりふは Claude の案。
+ * 41・42 は 2026-10-30 指示書 U「風の渓谷とツムジ」の守り手ゼフィラ・バトラーのニコ。せりふは Claude の案。2026-11-02 指示書 AQ で切り札がウズリオになり、ゼフィラの祭壇へのせりふの「ツムジ」を「ウズリオ」に
  * 43・44 は 2026-11-01 指示書 AH「雷の高原」の守り手ステラ・バトラーのルカ。せりふは進行の案〔試遊でユーザーが直す〕）。
  * 名前・二つ名・肩書き・ひとことは指示書のとおり（言い回しを変えない）。英語は Claude の仮訳。
  * No. は名刺図鑑の番号。顔の絵は src/ui/components/personFace.ts（絵が無い人は人影）。
@@ -256,8 +256,8 @@ export const PEOPLE: readonly Person[] = [
       ['やったー！ でも惜しかったよ！ 風を読めば、次はきっといけるって！', "Yay! But that was close! Read the wind and you'll get me next time!"],
       ['うそっ、負けちゃった！ すごいね、風よりも速かったかも！', 'No way, I lost! Wow, you might be faster than the wind!'],
       [
-        '祭壇はこの先だよ！ ツムジもきっと喜ぶ！ ほかの聖地のみんなにも教えてあげなきゃ……あっ、今のなし！ 聞かなかったことにして！',
-        "The altar's just ahead! Tsumuji will be so happy! I've gotta tell everyone at the other sacred sites too... Oops, forget I said that!",
+        '祭壇はこの先だよ！ ウズリオもきっと喜ぶ！ ほかの聖地のみんなにも教えてあげなきゃ……あっ、今のなし！ 聞かなかったことにして！',
+        "The altar's just ahead! Uzurio will be so happy! I've gotta tell everyone at the other sacred sites too... Oops, forget I said that!",
       ],
     ),
   }),

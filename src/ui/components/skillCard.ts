@@ -34,6 +34,8 @@ export interface SkillCardOptions {
   readonly size?: SkillCardSize;
   /** マナの数字をカードの値の代わりに出す（対戦の手札：ツムジのかぜのりで攻撃技のマナ−1 のとき。2026-10-30 指示書 U） */
   readonly mana?: number;
+  /** ダメージの数字をカードの値の代わりに出す（対戦の手札・大きなカード：うずまきショットで相手が空中のとき 4。2026-11-02 指示書 AQ。かぜのりの見せ方と同じ考え方） */
+  readonly damage?: number;
 }
 
 type Rect = readonly [number, number, number, number];
@@ -197,7 +199,7 @@ function wordFontOf(): string {
 }
 
 /** ダメージの四角（窓の左下の角）：攻撃＝大きな数字だけ、防御＝軽減値の数字だけ（-3。2026-10-29 ユーザー「盾のアイコン不要」）、回避＝「回避」、特殊＝「効果」。サポートは区分の文字 */
-function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, supportLabel: string): HTMLElement {
+function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, supportLabel: string, damage?: number): HTMLElement {
   const box = place(h('div', { class: 'skill-card__value' }), l, l.value);
   // 文字を収める幅：欄の幅から金のふち（CSS の .skill-card__value の border 4.6cqw）を左右とも引く
   const boxW = ((l.value[2] - l.value[0]) / l.w) * 100 - 2 * VALUE_BORDER;
@@ -212,7 +214,10 @@ function valueBox(l: FrameLayout, size: SkillCardSize, skill: SkillCard | null, 
     box.append(word(supportLabel));
     return box;
   }
-  const badge = skillValueBadge(skill);
+  const printed = skillValueBadge(skill);
+  // うずまきショット（指示書 AQ）：相手が空中なら上がったダメージを出す（色を変えて、上がっていると分かるように）
+  const badge = printed.kind === 'damage' && damage !== undefined && damage !== printed.value ? { kind: 'damage' as const, value: damage } : printed;
+  if (badge !== printed) box.classList.add('is-boosted');
   if (badge.kind === 'damage' || badge.kind === 'guard') {
     // 攻撃＝ダメージ、防御＝軽減値（-3）。どちらも数字だけ（はみ出すときは収まる大きさまで下げる）
     const text = skillValueBadgeText(badge);
@@ -320,7 +325,7 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
     { class: `skill-card skill-card--${size}${f.skill ? '' : ' skill-card--support'}`, dataset: { category: f.category }, attrs: { role: 'img', 'aria-label': f.aria } },
     artLayer(l, f.art, f.mark, !f.skill, f.artKey),
     frame ? h('img', { class: 'skill-card__frame', attrs: { src: frame, alt: '', draggable: 'false' } }) : null,
-    valueBox(l, size, f.skill, f.supportLabel),
+    valueBox(l, size, f.skill, f.supportLabel, options.damage),
     band,
     name,
     manaOrb(l, options.mana ?? f.mana, options.mana !== undefined && options.mana < f.mana),

@@ -115,7 +115,7 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
     guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, NOB], bossId: 'enc-water-boss',
   },
   // 風の渓谷（D ランク・2026-10-30 指示書 U。水の神殿の次に並べる）：強い風のマス。強さは水の神殿と同じ段（地下4階・floorLife 0.8〜1.1・見える範囲 1・負けられる回数 3）。
-  // バトラー・見えない番人の編成は Claude の仮（空を飛ぶ・身軽なモンスター：ソラモ・ガウル・プカリム。ツムジは使わない〔ボスの切り札〕）
+  // バトラー・見えない番人の編成は Claude の仮（空を飛ぶ・身軽なモンスター：ソラモ・ガウル・プカリム。ツムジは使わない〔前のボスの切り札〕。2026-11-02 指示書 AQ で切り札はウズリオ）
   'dungeon-08': {
     floors: 4, gimmick: 'wind', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: 0, npcTeams: [[SOR, PUK, GAU], [GAU, SOR, MYU]], guardianTeam: [GAU, SOR, PUK], bossId: 'enc-wind-boss',
