@@ -5,6 +5,7 @@ import { FLUNE_MONSTER_ID } from '../../data/flune.ts';
 import { SEREPHINE_MONSTER_ID } from '../../data/serephine.ts';
 import { GEOL_MONSTER_ID } from '../../data/geol.ts';
 import { CURRENCY, GACHA_SERIES, gachaSeenFlag, legacyAvailableGachaSeries, PACKS, RANK_ORDER, rankAtLeast, type RankId } from '../../data/economy.ts';
+import { seedGachaShelf } from '../economy/gachaSeries.ts';
 import { ITEM_IDS, ITEM_RULES, ITEMS, isItemId, type ItemId } from '../../data/items.ts';
 import { getTournament, TOURNAMENTS, tournamentOpponents } from '../../data/tournaments.ts';
 import { RUN_DUNGEONS } from '../../data/dungeonRun.ts';
@@ -45,7 +46,7 @@ import { RANK_BOSS_DUNGEONS, RANK_BOSS_DUNGEONS_BEFORE_AT, reorderWaivedFlag, ST
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 34;
+export const SAVE_VERSION = 35;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -239,6 +240,12 @@ export interface SaveData {
   readonly peopleBook: PeopleBook;
   /** カード図鑑の詳しい画面で見たカード（持っていてここに無いカードに NEW の印） */
   readonly cardsSeen: readonly string[];
+  /**
+   * ガチャのシリーズが並んだ順と、パックを開けたシリーズ（2026-11-02 指示書 AV：店の販売機の「新入荷」の札。src/game/economy/gachaSeries.ts）。
+   * order：最初から並ぶシリーズ（箱の3体）と道具のパックを除いた、あとから並んだシリーズ（並んだ順。最後が「いちばん新しい」）。
+   * opened：パックを1回でも開けたシリーズ（いちばん新しいシリーズがここに無いあいだ「NEW」）
+   */
+  readonly gachaShelf: GachaShelf;
   /** 物語の記録（一度立てたら消えない。FLAG_SIENNA_LEFT など） */
   readonly storyFlags: readonly string[];
   /** 物語の進み具合（序盤イベント。src/game/story/intro.ts） */
@@ -247,6 +254,11 @@ export interface SaveData {
     /** 導入イベントV2「プロのカードバトラーになる試験」（2026-10-27。src/game/story/introV2.ts） */
     readonly introV2: IntroV2;
   };
+}
+
+export interface GachaShelf {
+  readonly order: readonly string[];
+  readonly opened: readonly string[];
 }
 
 export const TRANSACTION_LOG_SIZE = 100;
@@ -292,6 +304,7 @@ export function createNewSave(now: Date = new Date(), starter: StarterDeckKey | 
     processedTransactions: [],
     stats: { battlesWon: 0, battlesLost: 0, packsOpened: 0 },
     peopleBook: EMPTY_PEOPLE_BOOK,
+    gachaShelf: { order: [], opened: [] },
     storyFlags: [],
     // 初めから持っているカードは NEW にしない
     cardsSeen: ownedCardIds(createStarterCollection(deck)),
@@ -837,6 +850,8 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   31: migrateThunderBossWaiverV32,
   32: migrateSkillRebuildV33,
   33: migrateDungeonOrderV34,
+  // 2026-11-02 指示書 AV：ガチャのシリーズが並んだ順（gachaShelf）。前のセーブには無いので、読みこむときに今並んでいるシリーズで作る（NEW は付けない。normalize の seedGachaShelf）
+  34: (raw) => raw,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -1103,12 +1118,17 @@ export function normalizeSave(raw: unknown): SaveData | null {
     },
     peopleBook: normalizePeopleBook(migrated.peopleBook),
     cardsSeen: unique(asStringArray(migrated.cardsSeen)),
+    gachaShelf: isObject(migrated.gachaShelf)
+      ? { order: unique(asStringArray(migrated.gachaShelf.order)), opened: unique(asStringArray(migrated.gachaShelf.opened)) }
+      : { order: [], opened: [] },
     storyFlags: withBossFlags(unique(asStringArray(migrated.storyFlags)), normalizeDungeons(migrated.dungeons)),
     // 読めない値は「あとで」と同じ扱い（導入を突然始めない）。練習試合の最中に閉じたなら練習場に着いた状態へ
     story: { intro: isIntroState(story.intro) ? recoverIntro(story.intro) : 'deferred', introV2: normalizeIntroV2(story.introV2) },
   };
   // 中身が決まる前に管理局で箱を選んだセーブには、中身を1回だけ配る（2026-10-28）
-  return grantPendingBooster(normalized);
+  const granted = grantPendingBooster(normalized);
+  // ガチャのシリーズが並んだ順の記録が無い前のセーブ（v34 まで）は、今並んでいるシリーズで作る（NEW は付けない。2026-11-02 指示書 AV）
+  return isObject(migrated.gachaShelf) ? granted : seedGachaShelf(granted);
 }
 
 /* ---------- よく使う変更 ---------- */

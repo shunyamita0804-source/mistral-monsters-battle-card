@@ -10,7 +10,8 @@
 
 出力（assets/images/ui/gacha/）
 - panel_{シリーズID}.webp   ガチャの画面：選んだシリーズのパックの絵を1枚、大きく（PANEL_BOX の大きさ）
-- panel_shop.webp           店の中の販売機：3×2（上 ソラモ・ガウル・カルシェル／下 ラズック・ノビトン・ミュロル）
+- panel_shop_group.webp     店の中の販売機：10体の集合の絵1枚（2026-11-02 指示書 AV。原本 design-parts/av-shop-machine-20261102/panel_shop_group.png）
+- panel_fallback.webp       絵が無いシリーズの代わり：3×2（上 ソラモ・ガウル・カルシェル／下 ラズック・ノビトン・ミュロル。前は panel_shop の名前で店の中の販売機にも使っていた）
 - machine_stars.webp        四すみの星（900×1300。機械の絵と同じ位置）
 """
 from __future__ import annotations
@@ -98,6 +99,28 @@ def panel(names: list[list[str]]) -> Image.Image:
     return im
 
 
+# 店の中の販売機の窓の絵（2026-11-02 指示書 AV。ユーザーと進行が合格にした10体の集合の絵。原本は手を加えずに保管）
+SHOP_GROUP_ART = os.path.join(ROOT, 'design-parts/av-shop-machine-20261102/panel_shop_group.png')
+
+
+def group_panel() -> Image.Image:
+    """集合の絵1枚を、パネル（PANEL_BOX の大きさ）に。まわりの金のふち・紺は1枚のパネルと同じ。絵は縦横の比を保って真ん中を切り取る（顔は四すみの星にかからない）"""
+    pw, ph = PANEL_BOX[2] - PANEL_BOX[0], PANEL_BOX[3] - PANEL_BOX[1]
+    im = Image.new('RGBA', (pw, ph), GOLD + (255,))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, pw - 1, ph - 1], outline=GOLD_DARK, width=2)
+    d.rectangle([4, 4, pw - 5, ph - 5], outline=GOLD_LIGHT, width=1)
+    x1, y1, x2, y2 = FRAME, FRAME, pw - FRAME, ph - FRAME
+    d.rectangle([x1 - 1, y1 - 1, x2, y2], fill=GOLD_DARK)
+    d.rectangle([x1, y1, x2 - 1, y2 - 1], fill=NAVY)
+    bw, bh = x2 - x1 - 2 * INSET, y2 - y1 - 2 * INSET
+    art = Image.open(SHOP_GROUP_ART).convert('RGB')
+    pic = crop_face(art, (0.5, 0.45), bw / bh, 1.0).resize((bw, bh), Image.LANCZOS)
+    im.paste(pic, (x1 + INSET, y1 + INSET))
+    d.rectangle([x1 + INSET - 2, y1 + INSET - 2, x1 + INSET + bw + 1, y1 + INSET + bh + 1], outline=GOLD, width=2)
+    return im
+
+
 def stars() -> Image.Image:
     """窓の四すみの金の星を、機械の絵から切り出す（金色の大きなかたまりだけ。窓の内側の小さな飾りは入れない）"""
     front = Image.open(os.path.join(GACHA_UI, 'machine_front.webp')).convert('RGBA')
@@ -126,7 +149,8 @@ def stars() -> Image.Image:
 
 
 def main() -> None:
-    panel(SHOP_GRID).save(os.path.join(GACHA_UI, 'panel_shop.webp'), quality=90, method=6)
+    group_panel().save(os.path.join(GACHA_UI, 'panel_shop_group.webp'), quality=90, method=6)
+    panel(SHOP_GRID).save(os.path.join(GACHA_UI, 'panel_fallback.webp'), quality=90, method=6)
     for name in FACE:
         panel([[name]]).save(os.path.join(GACHA_UI, f'panel_{name}.webp'), quality=90, method=6)
     stars().save(os.path.join(GACHA_UI, 'machine_stars.webp'), quality=92, method=6)

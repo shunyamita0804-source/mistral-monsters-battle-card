@@ -1,10 +1,19 @@
-# 引き継ぎメモ（2026-11-02：指示書 AW〔画面の直し6つ〕まで main に入れて公開した）
+# 引き継ぎメモ（2026-11-02：指示書 AV〔ショップの販売機〕まで main に入れて公開した）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：いまの状態（2026-11-02 指示書 AW のあと）
+### まず読む：いまの状態（2026-11-02 指示書 AV のあと）
+
+- **指示書 AV（ブランチ `av-shop-machine`）を main に取り込み、公開した**（AV の依頼「終わり次第公開してください」）。記録 `docs/av-shop-machine-20261102.md`
+- **セーブ version 35**（`gachaShelf`：シリーズが並んだ順・パックを開けたシリーズ。前のセーブは読みこむときに作る〔NEW なし〕）。テスト 1381件
+- 店の販売機を7割・窓は10体の集合の絵（`panel_shop_group.webp`。3×2 は `panel_fallback.webp`）・「新入荷」の札（部屋のデータの `slots.NEW_PLATE`）
+- 大会会場の当たり判定（AV の 2）は前に済んでいた（確かめだけ）
+- 部屋のデータを作り直すとき：`python3 tools/design/seimon_world_build.py design-parts/seimon-world` は matplotlib が要る（この環境に無ければ、作業用フォルダに `pip install --no-deps --target … matplotlib contourpy cycler fonttools kiwisolver pyparsing` して PYTHONPATH で渡す。Pillow・numpy は入れ直さない＝絵のバイト列が変わらない）
+- **ユーザーの返事待ち**：AV の要確認（機械のわきの床・札の小ささ）・iPhone 実機での確認
+
+### その前：いまの状態（2026-11-02 指示書 AW のあと）
 
 - **指示書 AW（ブランチ `aw-screen-fixes`）を main に取り込み、AU・大会会場の当たり判定と一緒に公開した**（ユーザー「終わり次第公開してください」）。**公開中：main `ef12d89`（公開ページは `static/index-DqvIQjP2.js`。公開ページに名札の層・7割の機械が届いていることを確かめた）**。記録 `docs/aw-screen-fixes-20261102.md`
 - AW：技カードを選ぶの枚数の欄・大きなカード（`stand_tall.webp`）・デッキ編集の表の数字・ガチャの機械を7割・名札の層（`.world__labels`）・名刺の横線を消した

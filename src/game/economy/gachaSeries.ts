@@ -163,6 +163,8 @@ export function purchaseSeriesPack(save: SaveData, seriesId: string, transaction
   );
   next = markProcessed(next, transactionId);
   next = { ...next, stats: { ...next.stats, packsOpened: next.stats.packsOpened + 1 } };
+  // 店の販売機の「新入荷」：並んだ順の記録を最新にしてから、開けたシリーズを記録（NEW を消す。2026-11-02 指示書 AV）
+  next = markGachaShelfOpened(syncGachaShelf(next), series.id);
   return { status: 'ok', save: next, cards };
 }
 
@@ -171,6 +173,48 @@ export function purchaseSeriesPack(save: SaveData, seriesId: string, transaction
  */
 export function canReselectSeries(paid: boolean): boolean {
   return !paid;
+}
+
+/* ---------- 店の販売機の「新入荷」の札（2026-11-02 指示書 AV） ---------- */
+
+/** 札に出すシリーズの候補：今並んでいるシリーズのうち、最初から並ぶシリーズ（箱の3体など）と道具のパックを除いたもの（GACHA_SERIES の並び） */
+function shelfCandidates(save: SaveData): string[] {
+  const start = startingGachaMonsters(save);
+  return availableGachaSeriesFor(save)
+    .filter((s) => !s.cardIds && !start.includes(s.monsterId))
+    .map((s) => s.id);
+}
+
+/** 新しく並んだシリーズを、並んだ順の記録（gachaShelf.order）の最後に足す。変わらなければ同じ save を返す */
+export function syncGachaShelf(save: SaveData): SaveData {
+  const add = shelfCandidates(save).filter((id) => !save.gachaShelf.order.includes(id));
+  return add.length === 0 ? save : { ...save, gachaShelf: { ...save.gachaShelf, order: [...save.gachaShelf.order, ...add] } };
+}
+
+/** 記録の無い前のセーブ：今並んでいるシリーズを GACHA_SERIES の並びで記録し、どれも「開けた」ことにする（NEW は付けない） */
+export function seedGachaShelf(save: SaveData): SaveData {
+  const order = shelfCandidates(save);
+  return { ...save, gachaShelf: { order, opened: [...new Set([...save.gachaShelf.opened, ...order])] } };
+}
+
+/** 最初から並ぶシリーズしか無いときに札に出すパック：旅立ちの主役（ソラモ） */
+export const NEW_ARRIVAL_FALLBACK = 'soramo';
+
+/**
+ * 「新入荷」の札：いちばん新しく並んだシリーズ（記録の最後）と、まだそのパックを開けていないか（NEW）。
+ * 記録が無い（最初から並ぶシリーズしか無い）ときはソラモのパックを NEW なしで
+ */
+export function newArrival(save: SaveData): { readonly series: GachaSeries; readonly isNew: boolean } {
+  const order = syncGachaShelf(save).gachaShelf.order;
+  const last = order.length > 0 ? getGachaSeries(order[order.length - 1] as string) : undefined;
+  if (!last) return { series: getGachaSeries(NEW_ARRIVAL_FALLBACK) as GachaSeries, isNew: false };
+  return { series: last, isNew: !save.gachaShelf.opened.includes(last.id) };
+}
+
+/** パックを開けたシリーズを記録する（「新入荷」の NEW を消す） */
+export function markGachaShelfOpened(save: SaveData, seriesId: string): SaveData {
+  if (save.gachaShelf.opened.includes(seriesId)) return save;
+  return { ...save, gachaShelf: { ...save.gachaShelf, opened: [...save.gachaShelf.opened, seriesId] } };
 }
 
 /** シリーズを一度選んだ記録を付ける（NEW の印を消す）。NEW でなければそのまま返す */

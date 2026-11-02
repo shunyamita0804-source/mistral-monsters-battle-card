@@ -1,3 +1,5 @@
+import { newArrival, syncGachaShelf } from '../../game/economy/gachaSeries.ts';
+import { seriesPackUrl } from '../components/gachaArt.ts';
 import { getDungeon, ENCOUNTERS } from '../../data/dungeons.ts';
 import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
@@ -1027,6 +1029,9 @@ export class WorldView {
         const z = img.z ? 10 + Math.round(img.z * this.#scale) : 1;
         this.#mapLayer.append(this.#artImage(img.file, img, 'world__furniture', z));
       }
+      // 店の販売機の「新入荷」の札（2026-11-02 指示書 AV）：機械の下の左の板に、いちばん新しく並んだシリーズのパックと NEW
+      const plate = map.art.slots?.['NEW_PLATE'];
+      if (plate) this.#mapLayer.append(this.#newArrivalPlate(plate));
       this.#buildDoors(map.art.doorAnims ?? []);
       for (const loop of map.art.loops ?? []) {
         const el = this.#artImage(loop.frames[0] ?? '', loop, 'world__furniture world__loop', 10 + Math.round(loop.z * this.#scale)) as HTMLImageElement;
@@ -1218,6 +1223,30 @@ export class WorldView {
       door.t = target > door.t ? Math.min(1, door.t + step) : Math.max(0, door.t - step);
       this.#placeDoor(door);
     }
+  }
+
+  /**
+   * 「新入荷」の札（2026-11-02 指示書 AV）。並んだ順の記録を最新にしてから（新しく並んだシリーズを足す）、いちばん新しいシリーズのパックの絵を板に出す。
+   * そのシリーズのパックをまだ開けていなければ「NEW」（金の小さな札と、ゆっくりした光）。札の絵に文字は焼きこまない（NEW はゲームの文字）
+   */
+  #newArrivalPlate(slot: { x: number; y: number; w: number; h: number; z: number }): HTMLElement {
+    const synced = syncGachaShelf(this.#store.save);
+    if (synced !== this.#store.save) this.#store.update(syncGachaShelf);
+    const { series, isNew } = newArrival(this.#store.save);
+    const el = h(
+      'div',
+      { class: `world__new-plate${isNew ? ' is-new' : ''}`, dataset: { series: series.id }, attrs: { 'aria-hidden': 'true' } },
+      h('img', { class: 'world__new-plate-pack', attrs: { src: seriesPackUrl(series), alt: '', draggable: 'false' } }),
+      isNew ? h('span', { class: 'world__new-plate-tag', text: t('world.newArrival') }) : null,
+    );
+    Object.assign(el.style, {
+      left: `${slot.x * this.#scale}px`,
+      top: `${slot.y * this.#scale}px`,
+      width: `${slot.w * this.#scale}px`,
+      height: `${slot.h * this.#scale}px`,
+      zIndex: String(10 + Math.round(slot.z * this.#scale)),
+    });
+    return el;
   }
 
   #artImage(src: string, r: { x: number; y: number; w: number; h: number }, cls: string, z: number): HTMLElement {
