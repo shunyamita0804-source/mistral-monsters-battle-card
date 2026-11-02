@@ -68,6 +68,10 @@ const TEXTS: Readonly<Record<string, string>> = {
   // 2026-11-02 指示書 AK リリル（仮訳）
   '相手は次のターン、リリルしか攻撃できない': 'Next turn, the enemy can only attack Lilil.',
   '相手は次のターン、リリルを攻撃できない': "Next turn, the enemy can't attack Lilil.",
+  // 2026-11-02 指示書 AL フォルン（仮訳）
+  'フォルン以外の味方1体、次のターンの攻撃＋1': "1 ally other than Forn deals +1 with its attack next turn.",
+  'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1': '1 ally other than Forn takes 1 less damage during the next enemy turn.',
+  '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる': 'Draw until you have 5 cards in hand, then discard 1 card.',
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(

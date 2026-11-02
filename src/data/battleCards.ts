@@ -11,6 +11,7 @@ import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { HAKURAN_MONSTER_ID } from './hakuran.ts';
 import { DESUORU_MONSTER_ID } from './desuoru.ts';
 import { LILIL_MONSTER_ID } from './lilil.ts';
+import { FORN_MONSTER_ID } from './forn.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -75,6 +76,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // リリル（2026-11-02 指示書 AK）：枠はやわらかいローズピンク（#EE8FB6）。絵は届いた lilil_battleart.png（1170×1344 透過。800:920 と同じ縦横比）を無改変。
   // 4枚の羽が絵の幅いっぱいまで広がるので、羽の先が枠に切られず、体が小さくなりすぎない大きさ
   [LILIL_MONSTER_ID]: { art: 'lilil_battlecard.png', frame: 'lilil', scale: 0.8, offsetY: -0.01 },
+  // フォルン（2026-11-02 指示書 AL）：枠は濃いオリーブ（#7A8B3C）。絵は届いた forn_battleart.png（800×920 透過）を無改変。角の先と笛が切れない大きさ
+  [FORN_MONSTER_ID]: { art: 'forn_battlecard.png', frame: 'forn', scale: 0.9, offsetY: 0.01 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

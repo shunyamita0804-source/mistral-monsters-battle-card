@@ -2,6 +2,7 @@ import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
+import { FORN_MONSTER_ID } from './forn.ts';
 import { LILIL_MONSTER_ID } from './lilil.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -58,7 +59,7 @@ export interface BoosterDefinition {
   readonly monsters: readonly [string, string, string];
   /**
    * 前の版の箱のモンスター（中身が変わった箱だけ。前のセーブでもう箱を開けた人のガチャのシリーズを変えないため。src/game/economy/gachaSeries.ts の startingGachaMonsters）。
-   * 2026-11-02 指示書 AK：旅立ちは前はソラモ・ノビトン・ラズック
+   * 2026-11-02 指示書 AK：旅立ちは前はソラモ・ノビトン・ラズック。指示書 AL：蒼海は前はミュロル・カルシェル・ノビトン
    */
   readonly formerMonsters?: readonly string[];
 }
@@ -66,18 +67,26 @@ export interface BoosterDefinition {
 /**
  * 管理局で選ぶブースターパック3種（2026-10-27 ユーザー承認の箱デザイン「BoosterPack_Claude_Request」）。並び・名前・種類・箱のモンスターは確定。
  * 中身は 2026-10-28 に決定：その種類の初期デッキ（src/game/deck/deck.ts の createStarterDeckFor。モンスター3＋山札60）。
- * 技とサポートの枚数の出典は src/data/official/booster_contents_20261102_AK.json（2026-11-02 指示書 AK：旅立ちのノビトンをリリルに。技48枚＋サポート12枚〔仮〕。
- * 前の版 _20261101_AJ（指示書 AJ）・_20261030（指示書 Y：技56枚＋旅の手帳×2・投石×2）・_20261029・_20261028 は残す。
+ * 技とサポートの枚数の出典は src/data/official/booster_contents_20261102_AL.json（2026-11-02 指示書 AK：旅立ちのノビトンをリリルに・指示書 AL：蒼海のノビトンをフォルンに。技48枚＋サポート12枚〔仮〕。
+ * 前の版 _20261102_AK（指示書 AK）・_20261101_AJ（指示書 AJ）・_20261030（指示書 Y：技56枚＋旅の手帳×2・投石×2）・_20261029・_20261028 は残す。
  * src/game/story/introV2.ts の boosterDeck が資料から作る。tests/boosterCounter.test.ts で照合）
  */
 export const BOOSTERS: readonly BoosterDefinition[] = [
   // 2026-11-01 指示書 AJ【5】（ユーザー決定・一部は仮）：箱の主＋ C 2体。C 2体はまだ作っていないので【仮】の中身
   // （旅立ち＝ソラモ・ノビトン・ラズック、烈火＝ガウル・ラズック・ノビトン、蒼海＝ミュロル・カルシェル・ノビトン〔牧神の代わり〕）。
   // 2026-11-02 指示書 AK：旅立ち＝ソラモ・リリル・ラズック（仮のノビトンをリリルに。ラズックは仮のまま。残りの1体は新しい C ができたら決める）。
-  // 箱の絵（booster_tabidachi）は変えていない。技とサポートの枚数は src/data/official/booster_contents_20261102_AK.json
+  // 箱の絵（booster_tabidachi）は変えていない。技とサポートの枚数は src/data/official/booster_contents_20261102_AL.json
   { key: 'booster-1', name: '旅立ちのきらめき', art: 'booster_tabidachi', category: 'balance', monsters: [SORAMO_MONSTER_ID, LILIL_MONSTER_ID, LAZUCK_MONSTER_ID], formerMonsters: [SORAMO_MONSTER_ID, NOBITON_MONSTER_ID, LAZUCK_MONSTER_ID] },
   { key: 'booster-2', name: '烈火の猛攻', art: 'booster_rekka', category: 'attack', monsters: [GAUUL_MONSTER_ID, LAZUCK_MONSTER_ID, NOBITON_MONSTER_ID] },
-  { key: 'booster-3', name: '蒼海の守り', art: 'booster_soukai', category: 'defense', monsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID] },
+  // 2026-11-02 指示書 AL：蒼海＝ミュロル・カルシェル・フォルン（仮のノビトンをフォルンに）。箱の絵（booster_soukai）は変えていない。烈火にはノビトンが残る
+  {
+    key: 'booster-3',
+    name: '蒼海の守り',
+    art: 'booster_soukai',
+    category: 'defense',
+    monsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, FORN_MONSTER_ID],
+    formerMonsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID],
+  },
 ];
 
 /** ショップのカウンターでの値段（2026-10-28 ユーザー決定。1箱 1,500G・各箱1回まで） */

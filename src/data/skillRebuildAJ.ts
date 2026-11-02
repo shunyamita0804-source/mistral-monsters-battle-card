@@ -9,7 +9,7 @@ export type { Habitat };
  * - 名前を変えた技は、カードの ID と絵はそのまま（名前と数字・効果だけ変える）。新しい技（skl-kalshell-15・skl-desuoru-15・16）の絵は仮（art）
  * - 居場所（地上・空中・水中）：MONSTER_HABITAT。場が水中（みちしお）のあいだは全員を水中として扱う（src/game/battle/engine.ts）
  * - box：最初の箱（ブースター）に入れる枚数（箱が決まっている子だけ。ラズック・ノビトンは仮の箱の枚数。src/data/introV2.ts）
- * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリルを足して16体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
+ * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリル、指示書 AL でフォルンを足して17体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
  * 決まりの細かい所は docs/battle-rules.md「指示書 AJ」
  */
 /** モンスターの居場所（指示書 AJ【2】） */
@@ -27,6 +27,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-hyouzuku': 'air',
   'mon-desuoru': 'air',
   'mon-lilil': 'air', // 2026-11-02 指示書 AK
+  'mon-forn': 'ground', // 2026-11-02 指示書 AL
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -73,7 +74,7 @@ const T_DODGE_2 = 'マナ2以上のちから技・かしこさ技を回避';
 const T_DODGE_FORCE = 'ちから技を回避';
 const T_TIDE = '次の自分のターンの終わりまで、全モンスターを水中にする';
 
-/** 16体の12枚（並び＝表示の番号 1〜12。リリルは 2026-11-02 指示書 AK） */
+/** 17体の12枚（並び＝表示の番号 1〜12。リリルは 2026-11-02 指示書 AK・フォルンは指示書 AL） */
 export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   // ソラモ（地上・LIFE 7）［箱：旅立ちのきらめき 16枚］
   'mon-soramo': [
@@ -334,9 +335,30 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 1, art: 'lilil_sk_11.webp' },
     { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 1, art: 'lilil_sk_12.webp' },
   ],
+  // フォルン（地上・LIFE 7・C。2026-11-02 指示書 AL。正本は src/data/official/forn12_skills_OFFICIAL_20261102.json）
+  // ［箱：蒼海の守り 16枚（box は JSON の box_copies）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
+  'mon-forn': [
+    { id: 'skl-forn-01', name: 'ひづめキック', cat: 'ち', mana: 0, damage: 1, text: null, box: 2, art: 'forn_sk_01.webp' },
+    { id: 'skl-forn-02', name: 'つのでつく', cat: 'ち', mana: 2, damage: 2, text: null, box: 2, art: 'forn_sk_02.webp' },
+    { id: 'skl-forn-03', name: 'ねいろだま', cat: 'か', mana: 1, damage: 1, text: null, box: 2, art: 'forn_sk_03.webp' },
+    { id: 'skl-forn-04', name: 'ふえのしらべ', cat: 'か', mana: 2, damage: 2, text: null, box: 2, art: 'forn_sk_04.webp' },
+    { id: 'skl-forn-05', name: 'そうこうげき', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 0, art: 'forn_sk_05.webp' },
+    // プカリムの おいかぜ と同じ（tailwind）
+    { id: 'skl-forn-06', name: 'はげましのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'tailwind', amount: 1 }, text: 'フォルン以外の味方1体、次のターンの攻撃＋1', box: 2, art: 'forn_sk_06.webp' },
+    // 新しい効果（ward）
+    { id: 'skl-forn-07', name: 'そなえのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'ward', reduce: 1 }, text: 'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1', rare: true, box: 1, art: 'forn_sk_07.webp' },
+    // ソラモの すなかけ と同じ（seal）
+    { id: 'skl-forn-08', name: 'こもりうた', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2, art: 'forn_sk_08.webp' },
+    // 新しい効果（drawTo）
+    { id: 'skl-forn-09', name: 'もりのたより', cat: '特', mana: 1, damage: null, effect: { type: 'drawTo', hand: 5 }, text: '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる', rare: true, box: 0, art: 'forn_sk_09.webp' },
+    { id: 'skl-forn-10', name: 'もこもこガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2, art: 'forn_sk_10.webp' },
+    { id: 'skl-forn-11', name: 'かんむりのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 1, art: 'forn_sk_11.webp' },
+    // ジオルの かばう と同じ（cover）
+    { id: 'skl-forn-12', name: 'みがわりのふえ', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける', rare: true, box: 0, art: 'forn_sk_12.webp' },
+  ],
 };
 
-/** 指示書 AJ の形の技を持つモンスター（AJ で作り直した15体＋指示書 AK のリリル。並び＝今までのモンスターの並び） */
+/** 指示書 AJ の形の技を持つモンスター（AJ で作り直した15体＋指示書 AK のリリル・指示書 AL のフォルン。並び＝今までのモンスターの並び） */
 export const AJ_MONSTER_IDS: readonly string[] = Object.keys(AJ_SKILLS);
 
 /** レアの枠の技の名前（ガチャのシリーズの rareSkillNames） */

@@ -40,10 +40,11 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-hakuran',
       'mon-desuoru',
       'mon-lilil',
+      'mon-forn',
     ];
     // 2026-11-01 指示書 AJ：技はモンスターの並びの順に、表（src/data/skillRebuildAJ.ts）の12枚ずつ（表の順＝表示の番号）
     const skills = monsters.flatMap((m) => (AJ_SKILLS[m] ?? []).map((r) => r.id));
-    expect(skills).toHaveLength(16 * 12);
+    expect(skills).toHaveLength(17 * 12);
     expect(official).toEqual([
       ...monsters,
       ...skills,
@@ -95,6 +96,7 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-hakuran',
       'mon-desuoru',
       'mon-lilil',
+      'mon-forn',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
       // サポート11種類（2026-10-30 指示書 Z で絵が入った）
       ...SUPPORTS.map((s) => s.id),

@@ -72,6 +72,8 @@ export interface BattleMonster {
    * その手番にそのモンスターが攻撃技を1回使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える
    */
   readonly tailwind?: { readonly amount: number; readonly turn: number } | null;
+  /** そなえのふえ（フォルン 2026-11-02 指示書 AL）：untilTurn の手番が終わるまで、受ける攻撃のダメージ−reduce（ちから技・かしこさ技どちらも）。倒れたら消える */
+  readonly ward?: { readonly reduce: number; readonly untilTurn: number } | null;
   /** この手番（turn）に受ける次の攻撃1回を回避できない（試遊中：ジオルのじならし 2026-10-29）。攻撃を1回受けたら・倒れたら消える */
   readonly pinTurn?: number | null;
   /**
@@ -481,6 +483,10 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
+  // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
+  if (skill.effect.type === 'ward' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noWardTarget'));
+  // もりのたより（フォルン 指示書 AL）：使ったあとの手札がすでに hand 枚以上なら使えない
+  if (skill.effect.type === 'drawTo' && state.sides[side].hand.length - 1 >= skill.effect.hand) return NO(t('battle.ng.handEnough', { n: skill.effect.hand }));
   // かぜのり（ツムジ）が効いていれば、攻撃技の消費マナ−1
   if (manaOf(state.sides[side]) < handSkillCost(state, side, skill)) return NO(t('battle.ng.noMana'));
   if (availableUsers(state, side, skill).length === 0) {
@@ -625,11 +631,11 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
   // 投石（2026-10-30 指示書 Y）：すなをほるで隠れていない相手（ちょうはつの制限は受けない）。声援：まだ動いていない味方
   if (card.kind === 'support' && card.effect.type === 'stone') return attackableMonsters(state, otherSide(side));
   if (card.kind === 'support' && card.effect.type === 'cheer') return cheerTargets(state, side);
-  if (card.kind === 'skill' && card.effect.type === 'tailwind') return tailwindTargets(state, side, card);
+  if (card.kind === 'skill' && (card.effect.type === 'tailwind' || card.effect.type === 'ward')) return tailwindTargets(state, side, card);
   return [];
 }
 
-/** おいかぜをかけられる味方（生きていて、使ったモンスターと同じ種類〔プカリム〕でない） */
+/** おいかぜ・そなえのふえをかけられる味方（生きていて、使ったモンスターと同じ種類〔プカリム・フォルン〕でない） */
 export function tailwindTargets(state: BattleState, side: Side, skill: SkillCard): BattleMonster[] {
   return aliveMonsters(state.sides[side]).filter((m) => m.cardId !== skill.monsterId);
 }
@@ -804,7 +810,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -825,11 +831,17 @@ export function pendingDamage(pending: PendingAttack): number {
   return Math.max(0, pending.power - reduction);
 }
 
-/** monster にかかっている「受ける stat の技のダメージ−」の量（正式：ミュロルのしめったはだ。期限が過ぎていれば 0） */
+/** monster にかかっている「受ける stat の技のダメージ−」の量（正式：ミュロルのしめったはだ。期限が過ぎていれば 0。2026-11-02 指示書 AL からフォルンのそなえのふえも足す） */
 export function shieldOf(state: BattleState, monster: BattleMonster | undefined, stat: StatType): number {
   const sh = monster?.shield;
-  if (!sh || state.turn > sh.untilTurn) return 0;
-  return sh.against === 'all' || sh.against === stat ? sh.reduce : 0;
+  const own = !sh || state.turn > sh.untilTurn ? 0 : sh.against === 'all' || sh.against === stat ? sh.reduce : 0;
+  return own + wardOf(state, monster);
+}
+
+/** そなえのふえ（フォルン 2026-11-02 指示書 AL）で、monster が受ける攻撃のダメージを減らす量（期限が過ぎていれば・倒れていれば 0）。しめったはだと同じ順で引く */
+export function wardOf(state: BattleState, monster: BattleMonster | undefined): number {
+  const w = monster?.ward;
+  return w && monster.life > 0 && state.turn <= w.untilTurn ? w.reduce : 0;
 }
 
 /**
@@ -1015,7 +1027,7 @@ function useCard(
   if (allTargets) {
     target = targets[0];
     if (!target) return state;
-  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'healAlly' || skill.effect.type === 'tailwind') {
+  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'healAlly' || skill.effect.type === 'tailwind' || skill.effect.type === 'ward') {
     target = targetUid ? targets.find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
@@ -1174,6 +1186,14 @@ function useCard(
       return discardRandom(next, otherSide(side));
     case 'discardChoice':
       return discardChoice(next, side, choice);
+    case 'ward': {
+      // そなえのふえ（フォルン 指示書 AL）：選んだ味方が、次の相手の手番（turn + 1）が終わるまで受ける攻撃のダメージ−reduce。重ねない（かけ直すと期限だけ新しく）
+      if (!target) return state;
+      next = updateMonster(next, target.uid, { ward: { reduce: skill.effect.reduce, untilTurn: state.turn + 1 } });
+      return addLog(next, t('battle.log.ward', { name: nameOf(target.cardId), n: skill.effect.reduce }));
+    }
+    case 'drawTo':
+      return drawToHand(next, side, skill.effect.hand, choice);
     case 'redrawHand':
       return redrawHand(next, side);
     case 'revealHand':
@@ -1217,7 +1237,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);
@@ -1305,6 +1325,44 @@ function discardChoice(state: BattleState, side: Side, choice: string | undefine
     crowEye: { seq: (state.crowEye?.seq ?? 0) + 1, chooser: side, cardId: card.cardId },
   };
   return addLog(next, t('battle.log.discardChoice', { player: s.name, card: nameOf(card.cardId) }));
+}
+
+/**
+ * もりのたより（フォルン 2026-11-02 指示書 AL）で、使ったあとに手札がどうなるか（このカードを除いた手札＋山札から引く札。引いたときに付く uid のまま）。
+ * 画面はこれを並べて捨てる1枚を選ばせ、CPU（ai.ts）はこれでいちばん要らない札を選ぶ。山札が足りなければ引けるだけ
+ */
+export function drawToPreview(state: BattleState, side: Side, cardUid: string): HandCard[] {
+  const card = findHandCard(state, side, cardUid);
+  const effect = card ? getPlayCard(card.cardId).effect : null;
+  const size = effect?.type === 'drawTo' ? effect.hand : 0;
+  const s = state.sides[side];
+  const hand = s.hand.filter((c) => c.uid !== cardUid);
+  const n = Math.max(0, Math.min(size - hand.length, s.deck.length));
+  return [...hand, ...s.deck.slice(0, n).map((cardId, i) => ({ uid: `c${state.nextUid + i}`, cardId }))];
+}
+
+/**
+ * もりのたより（フォルン 2026-11-02 指示書 AL）：手札が size 枚になるまで山札から引く（山札が足りなければ引けるだけ。山札切れの負けにはしない。
+ * 手札の上限〔9〕を超えることは無い）。そのあと手札から1枚（choice＝uid）を捨て札へ。指定が無い・手札に無いときは defaultSelfDiscard
+ */
+function drawToHand(state: BattleState, side: Side, size: number, choice: string | undefined): BattleState {
+  const s = state.sides[side];
+  const room = Math.max(0, Math.min(size, BATTLE_RULES.maxHand) - s.hand.length);
+  const drawn = drawCards(s, room, state.nextUid);
+  let next = updateSide({ ...state, nextUid: drawn.nextUid }, side, drawn.side);
+  next = addLog(next, t('battle.log.drawTo', { side: sideLabel(side), n: drawn.drawn }));
+  const hand = next.sides[side].hand;
+  const out = hand.find((c) => c.uid === choice) ?? defaultSelfDiscard(next, side);
+  if (!out) return next;
+  const s2 = next.sides[side];
+  next = updateSide(next, side, { hand: s2.hand.filter((c) => c.uid !== out.uid), discard: [...s2.discard, out.cardId] });
+  return addLog(next, t('battle.log.drawToDiscard', { side: sideLabel(side), card: nameOf(out.cardId) }));
+}
+
+/** もりのたよりで捨てる1枚の決まった選び方（指定が無いとき：試遊・テスト）。必要マナのいちばん多い札（同じなら右はし）。CPU は ai.ts の pickDrawToDiscard で選ぶ */
+export function defaultSelfDiscard(state: BattleState, side: Side): HandCard | undefined {
+  const cost = (c: HandCard): number => getPlayCard(c.cardId).cost;
+  return [...state.sides[side].hand].reverse().sort((a, b) => cost(b) - cost(a))[0];
 }
 
 /**

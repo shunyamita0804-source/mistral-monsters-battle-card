@@ -335,6 +335,22 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-lilil-11:name': 'Twirl Away',
   'card:skl-lilil-12:name': 'Four-Wing Dance',
 
+  // フォルン（2026-11-02 指示書 AL。仮訳）
+  'card:mon-forn:name': 'Forn',
+  'card:mon-forn:description': 'A little forest god who plays the flute.',
+  'card:skl-forn-01:name': 'Hoof Kick',
+  'card:skl-forn-02:name': 'Horn Thrust',
+  'card:skl-forn-03:name': 'Tone Orb',
+  'card:skl-forn-04:name': 'Flute Melody',
+  'card:skl-forn-05:name': 'Grassland Blast',
+  'card:skl-forn-06:name': 'Rallying Flute',
+  'card:skl-forn-07:name': 'Guarding Flute',
+  'card:skl-forn-08:name': 'Lullaby',
+  'card:skl-forn-09:name': 'Forest Tidings',
+  'card:skl-forn-10:name': 'Fluffy Guard',
+  'card:skl-forn-11:name': 'Crown Ward',
+  'card:skl-forn-12:name': 'Stand-in Flute',
+
   // 指示書 AJ（2026-11-01）：名前を変えた技・新しい技の名前と、効果の文（src/i18n/contentEnAJ.ts。同じキーはこちらが勝つ）
   ...AJ_EN,
 };

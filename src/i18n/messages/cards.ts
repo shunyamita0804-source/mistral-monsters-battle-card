@@ -47,6 +47,8 @@ export const CARDS = {
   'habitat.water': { ja: '水中', en: 'Water' },
   'card.effect.tide': { ja: '特殊', en: 'Special' },
   'card.effect.requiem': { ja: '特殊', en: 'Special' },
+  'card.effect.ward': { ja: '特殊', en: 'Special' },
+  'card.effect.drawTo': { ja: '特殊', en: 'Special' },
   'card.effect.charge': { ja: '特殊', en: 'Special' },
   'card.effect.tailwind': { ja: '特殊', en: 'Special' },
   'card.effect.pin': { ja: '特殊', en: 'Special' },

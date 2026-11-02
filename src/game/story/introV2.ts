@@ -1,6 +1,6 @@
 import { cardCatalog, skillsOf } from '../../data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, isBoosterKey, isStarterDeckKey, type BoosterKey, type StarterDeckKey } from '../../data/introV2.ts';
-import boosterContents from '../../data/official/booster_contents_20261102_AK.json';
+import boosterContents from '../../data/official/booster_contents_20261102_AL.json';
 import { t } from '../../i18n/i18n.ts';
 import { countCards, createStarterDeckFor, isDeckValid, type Deck } from '../deck/deck.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
@@ -132,8 +132,8 @@ export function finishExam(save: SaveData, won: boolean): SaveData {
 
 /**
  * 箱の中身のデッキ（モンスター3体＋技56枚＋サポート4枚＝60枚。2026-10-30 指示書 Y・ユーザー決定）。
- * 技とサポートは資料 src/data/official/booster_contents_20261102_AK.json の行（モンスター名・技名・枚数。ID は今のデータから名前で引く。2026-11-02 指示書 AK：旅立ちのノビトンをリリルに。前の版 _20261101_AJ・_20261030 は残す）。
- * 箱の中身は、箱を受け取る・買うときだけ所持カードに足す。前のセーブの所持カード・デッキは変えない（もう旅立ちを選んだ人にリリルは配らない）。
+ * 技とサポートは資料 src/data/official/booster_contents_20261102_AL.json の行（モンスター名・技名・枚数。ID は今のデータから名前で引く。2026-11-02 指示書 AK：旅立ちのノビトンをリリルに・指示書 AL：蒼海のノビトンをフォルンに。前の版 _20261102_AK・_20261101_AJ・_20261030 は残す）。
+ * 箱の中身は、箱を受け取る・買うときだけ所持カードに足す。前のセーブの所持カード・デッキは変えない（もう旅立ちを選んだ人にリリルは配らない。蒼海を選んだ人にフォルンも配らない）。
  * 前の版（技48枚＋仮サポート12枚）は booster_contents_20261029.json（2026-10-29 夜に烈火の猛攻だけ案3に入れかえた版）。
  * 同じモンスターでも箱によって技がちがうので、モンスターごとの初期配布（createStarterDeckFor）ではなく箱の資料から作る
  */

@@ -10,6 +10,7 @@ import {
   cheerTargets,
   coverUser,
   defaultDiscardChoice,
+  drawToPreview,
   fieldModifier,
   guardCost,
   isPinned,
@@ -65,6 +66,10 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  *   ウインクは、手札にリリルの回避があり次の相手の手番に払えるときだけ使う。相手の攻撃が強い（リリル以外の味方が倒されそう・相手のマナが4以上）ときは攻撃より先に、
  *   そうでなければ攻撃のあとに。ウインクのあとはリリルの回避をマナにしないで残し、ウインクの効いている手番にリリルが狙われたら小さなダメージでも回避する。
  *   うそなきは、リリルのライフが半分以下で、相手の攻撃で倒されそうなとき（その手番に倒せる攻撃が無ければ攻撃より先に）。腕前 C は 30% で使いそこねる
+ * - フォルン（2026-11-02 指示書 AL。フォルンだけ）：chooseFornTrick。はげましのふえは今のおいかぜの考え方（次の手番に攻撃できそうな味方）。
+ *   そなえのふえは狙われそうな味方（相手がいまのマナで払える攻撃で倒されそうな味方。そなえで助かるなら攻撃より先に）。こもりうたはいちばん強い攻撃を持つ相手へ。
+ *   もりのたよりは手札が2枚以下で山札が10枚以上あるとき（攻撃より先に。捨てる1枚は pickDrawToDiscard＝マナにする順）。みがわりのふえは狙われた味方のライフが半分以下でフォルンが倒れないとき。
+ *   腕前 C は forgetTrick の割合で使いそこねる
  */
 
 /** 腕前ごとのふるまい（2026-10-30 指示書 Z。数字は仮。ここでまとめて合わせる） */
@@ -275,6 +280,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.95 リリル（2026-11-02 指示書 AK2）：相手の攻撃が強いときは、攻撃より先にうっとりウインク・うそなき
   const trickFirst = chooseLililTrick(state, side, options, enemies, skill, true);
   if (trickFirst) return trickFirst;
+  // 2.96 フォルン（2026-11-02 指示書 AL）：もりのたより・倒されそうな味方へのそなえのふえは、攻撃より先に
+  const fornFirst = chooseFornTrick(state, side, options, enemies, style, skill, true);
+  if (fornFirst) return fornFirst;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
@@ -283,6 +291,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 3.5 リリル（2026-11-02 指示書 AK2）：攻撃のあと、回避を払えるならうっとりウインク
   const trickAfter = chooseLililTrick(state, side, options, enemies, skill, false);
   if (trickAfter) return trickAfter;
+  // 3.6 フォルン（2026-11-02 指示書 AL）：攻撃のあと、こもりうた・そなえのふえ
+  const fornAfter = chooseFornTrick(state, side, options, enemies, style, skill, false);
+  if (fornAfter) return fornAfter;
 
   // 4. 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）
   const special = chooseSpecial(state, side, options, enemies);
@@ -800,13 +811,91 @@ function chooseLililTrick(state: BattleState, side: Side, options: Option[], ene
   return target ? { type: 'useCard', side, cardUid: wink.card.uid, userUid: user.uid, targetUid: target.uid } : null;
 }
 
+/** 指示書 AL の考え方で、そなえのふえ・こもりうた・もりのたより・みがわりのふえを使うモンスター（2026-11-02。ほかのモンスターのすなかけ・かばうは前の考え方のまま） */
+const FORN_MONSTERS: readonly string[] = ['mon-forn'];
+/** もりのたよりを使う手札・山札の枚数（指示書 AL：手札が2枚以下・山札が10枚以上） */
+const DRAW_TO_MAX_HAND = 2;
+const DRAW_TO_MIN_DECK = 10;
+
+/** 相手が、いまの相手のマナで払える攻撃技の中でいちばん大きいダメージ（場の増減を入れる） */
+function affordableThreat(state: BattleState, side: Side): number {
+  const foe = otherSide(side);
+  const foeMana = manaOf(state.sides[foe]);
+  return Math.max(
+    0,
+    ...aliveMonsters(state.sides[foe]).flatMap((e) =>
+      skillsOf(e.cardId)
+        .filter((k) => k.effect.type === 'attack' && k.stat !== null && k.cost <= foeMana)
+        .map((k) => skillValue(k) + (k.stat ? fieldModifier(state, k.stat.type) : 0)),
+    ),
+  );
+}
+
+/**
+ * フォルン（2026-11-02 指示書 AL）。first が true のときは攻撃より先（もりのたより・そなえで助かる味方へのそなえのふえ）、false は攻撃のあと（こもりうた・そなえのふえ）。
+ * はげましのふえは今のおいかぜの考え方（chooseChargeOrTailwind）。腕前 C は forgetTrick の割合で使いそこねる
+ */
+function chooseFornTrick(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], style: AiStyle, skill: CpuSkill, first: boolean): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => FORN_MONSTERS.includes(o.def.monsterId));
+  if (mine.length === 0 || enemies.length === 0) return null;
+  if (cpuRoll(state, side, 'fornTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  const me = state.sides[side];
+  // もりのたより：手札が2枚以下で、山札が10枚以上
+  const tidings = mine.find((o) => o.def.effect.type === 'drawTo');
+  if (first && tidings && me.hand.length <= DRAW_TO_MAX_HAND && me.deck.length >= DRAW_TO_MIN_DECK) {
+    const choice = pickDrawToDiscard(state, side, tidings.card.uid, style, skill);
+    return { type: 'useCard', side, cardUid: tidings.card.uid, ...(choice ? { choice } : {}) };
+  }
+  const threat = affordableThreat(state, side);
+  // そなえのふえ：狙われそうな味方（相手の攻撃で倒されそうな味方。first はそなえの −1 で助かるときだけ）。いなければ、攻撃のあとに残りライフのいちばん少ない味方
+  const ward = mine.find((o) => o.def.effect.type === 'ward');
+  if (ward && ward.def.effect.type === 'ward') {
+    const reduce = ward.def.effect.reduce;
+    const user = availableUsers(state, side, ward.def)[0];
+    const allies = user ? tailwindTargets(state, side, ward.def).filter((m) => m.ward?.untilTurn !== state.turn + 1) : [];
+    const atRisk = allies.filter((m) => threat >= m.life).sort((a, b) => a.life - b.life);
+    const saved = atRisk.find((m) => threat - reduce < m.life);
+    const pick = first ? saved : (saved ?? atRisk[0] ?? (threat > 0 ? [...allies].sort((a, b) => a.life - b.life)[0] : undefined));
+    if (user && pick && (!first || !canKillThisTurn(state, side, options))) return { type: 'useCard', side, cardUid: ward.card.uid, userUid: user.uid, targetUid: pick.uid };
+  }
+  if (first) return null;
+  // こもりうた：いちばん強い攻撃を持つ相手（まだ封じられていない）へ
+  const lull = mine.find((o) => o.def.effect.type === 'seal');
+  if (lull) {
+    const target = targetsFor(state, side, lull.def)
+      .filter((e) => e.sealedTurn !== state.turn + 1)
+      .sort((a, b) => threatOf(state, b) - threatOf(state, a) || b.life - a.life)[0];
+    if (target) return attackAction(state, side, lull, target.uid);
+  }
+  return null;
+}
+
+/**
+ * もりのたより（フォルン 2026-11-02 指示書 AL）で捨てる1枚：引いたあとの手札で、マナ化のときにいちばん先にマナにする札（chooseManaAction と同じ考え方）。
+ * 払ったあとのマナ・引いたあとの手札で考える
+ */
+export function pickDrawToDiscard(state: BattleState, side: Side, cardUid: string, style: AiStyle = 'normal', skill: CpuSkill = 'B'): string | null {
+  const card = state.sides[side].hand.find((c) => c.uid === cardUid);
+  if (!card) return null;
+  const s = state.sides[side];
+  const hand = drawToPreview(state, side, cardUid);
+  const drawn = hand.length - (s.hand.length - 1);
+  const cost = getPlayCard(card.cardId).cost;
+  const after: BattleState = {
+    ...state,
+    phase: 'mana',
+    sides: { ...state.sides, [side]: { ...s, hand, deck: s.deck.slice(drawn), manaPile: s.manaPile.slice(cost) } },
+  };
+  return manaPick(after, side, style, skill)?.uid ?? hand[hand.length - 1]?.uid ?? null;
+}
+
 /** 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）。使えなければ null */
 function chooseSpecial(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], spare = 0): BattleAction | null {
   const mana = manaOf(state.sides[side]);
-  // リリルのうっとりウインクは chooseLililTrick だけで考える（2026-11-02 指示書 AK2）
+  // リリルのうっとりウインクは chooseLililTrick、フォルンのこもりうたは chooseFornTrick だけで考える（2026-11-02 指示書 AK2・AL）
   const special = options
     .filter(isSkillOption)
-    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
+    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && !FORN_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
   const strongestEnemy = [...enemies].sort((a, b) => b.life - a.life)[0];
   return special && strongestEnemy ? attackAction(state, side, special, strongestEnemy.uid) : null;
 }
@@ -831,6 +920,13 @@ const guardValue = (c: HandCard): number => {
  * マナ化するたびにマナ+1・手札-1 なので「マナ化し終えたあとのマナ」は途中で変わらず、残す札が安定する。
  */
 function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction {
+  const convert = manaPick(state, side, style, skill);
+  if (convert && canConvertToMana(state, side)) return { type: 'convertToMana', side, cardUid: convert.uid };
+  return { type: 'endTurn', side };
+}
+
+/** マナ化で次にマナにする手札（chooseManaAction の考え方。もりのたよりで捨てる1枚にも使う。2026-11-02 指示書 AL で関数に分けた） */
+function manaPick(state: BattleState, side: Side, style: AiStyle, skill: CpuSkill): HandCard | undefined {
   const mine = state.sides[side];
   const mana = manaOf(mine);
   const cost = (c: HandCard): number => {
@@ -870,9 +966,7 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
   if (skill === 'A' && keepSkill && keepGuards.length > 0 && manaAfter < Math.max(...keepGuards.map(cost))) keepSkill = undefined;
   const rest = mine.hand.filter((c) => !keepGuards.includes(c) && c !== keepSkill);
   const guardFirst = cpuRoll(state, side, 'guardFirst', false) < CPU_SKILL[skill].guardFirst;
-  const convert = guardFirst ? (rest.find(isGuard) ?? rest[0]) : (rest.find((c) => !isGuard(c)) ?? rest[0]);
-  if (convert && canConvertToMana(state, side)) return { type: 'convertToMana', side, cardUid: convert.uid };
-  return { type: 'endTurn', side };
+  return guardFirst ? (rest.find(isGuard) ?? rest[0]) : (rest.find((c) => !isGuard(c)) ?? rest[0]);
 }
 
 /**
@@ -941,6 +1035,9 @@ function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage:
   const geolSurvives = toGeol < geol.life;
   const allyCanEvade = options.some((o) => o.def.effect.type === 'evade');
   if (lethal && !allyCanEvade && geolSurvives) return true;
+  // フォルンのみがわりのふえ（2026-11-02 指示書 AL）：狙われた味方のライフが半分以下で、フォルンは倒れないとき
+  const target = findMonster(state, pending.targetUid)?.monster;
+  if (FORN_MONSTERS.includes(geol.cardId) && target && target.life <= target.maxLife / 2 && geolSurvives && damage > 0) return true;
   return geolSurvives && damage >= 3 && Math.min(bestGuard, pending.power) >= 3;
 }
 
