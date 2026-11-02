@@ -280,7 +280,7 @@ export const deckScreen: ScreenDefinition = {
       const preview = h(
         'div',
         { class: 'deck-preview' },
-        monster ? createMonsterCard(monster, { width: 88 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        monster ? createMonsterCard(monster, { width: 104 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
         monster ? info(monster) : h('div', { class: 'deck-preview__info' }, h('p', { class: 'deck-preview__text', text: t('deck.previewEmpty') })),
       );
       const slots = h(
@@ -360,7 +360,7 @@ export const deckScreen: ScreenDefinition = {
       const preview = h(
         'div',
         { class: 'deck-preview' },
-        card && known ? createPlayCard(card, { width: 92 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
+        card && known ? createPlayCard(card, { width: 110 }) : h('img', { class: 'deck-preview__back', attrs: { src: cardBackUrl, alt: '', draggable: 'false' } }),
         card && known
           ? h(
               'div',

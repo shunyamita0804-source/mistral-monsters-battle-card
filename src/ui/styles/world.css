@@ -322,6 +322,19 @@
   content: '';
 }
 
+/*
+ * 名札の層（2026-11-02 指示書 AW【5】）：家具・出口の名前・街の建物の名前・ダンジョンの案内板は、すべてこの層に入れる。
+ * 地図の中でいちばん最後・いちばん上に置き、人・主人公・家具・手前の壁より必ず手前に描く（名札の描く順番はここ1か所）。
+ * iPhone（Safari）は動く人の絵を別の層で描くので、名札の層も translateZ で別の層にして、重なり順をはっきりさせる
+ */
+.world__labels {
+  position: absolute;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
 .world__label {
   position: absolute;
   z-index: 9000;

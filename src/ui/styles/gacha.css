@@ -295,9 +295,13 @@
   container-type: size;
 }
 
+/*
+ * 2026-11-02 指示書 AW【4】「シリーズを選んだあとの機械が大きすぎる」：前の約7割（330px → 231px・置き場の 70%）にして、
+ * 上の一覧・説明の文・下の「自動でまわす」とのあいだに余白をあける。つまみのつかめる所は下の .gacha-machine__knob::before で広げた
+ */
 .gacha-machine__stage {
   position: relative;
-  width: min(330px, 100cqw, calc(100cqh * 900 / 1300));
+  width: min(231px, 70cqw, calc(70cqh * 900 / 1300));
   aspect-ratio: 900 / 1300;
   overflow: hidden;
   border-radius: 12px;
@@ -402,10 +406,11 @@
   touch-action: none;
 }
 
+/* つまみのつかめる所（見えない輪）。機械を7割にしたので、指で触れる大きさは前と同じくらいに広げた（2026-11-02 指示書 AW【4】。前は -30%） */
 .gacha-machine__knob::before {
   content: '';
   position: absolute;
-  inset: -30%;
+  inset: -65%;
   border-radius: 50%;
 }
 
