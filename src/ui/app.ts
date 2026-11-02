@@ -10,13 +10,22 @@ import { installButtonSound } from './buttonSound.ts';
 import { sound } from './sound.ts';
 import { mountStage } from './stage.ts';
 
-/** セーブがなくても開ける画面（歩きの確認画面は自分用の仮セーブで動く） */
-const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'prologue', 'newGame', 'options', 'walkLab'];
+/** セーブがなくても開ける画面（歩きの確認画面は自分用の仮セーブで動く。蒼海を試す画面は借りた山札で遊ぶ。2026-11-02 指示書 AP） */
+const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'prologue', 'newGame', 'options', 'walkLab', 'soukaiLab'];
 
-/** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）・?lab=soukai で蒼海（みちしおあり）を試す画面（2026-11-02 指示書 AP）を直接開ける */
+/** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）・?lab=soukai で蒼海（みちしおあり）を試す画面（2026-11-02 指示書 AP。セーブがなくても開ける）を直接開ける */
 export function initialScreen(qa: boolean, search: string): ScreenId {
   const lab = qa ? new URLSearchParams(search).get('lab') : null;
   return lab === 'walk' ? 'walkLab' : lab === 'pukarim' ? 'pukarimLab' : lab === 'geol' ? 'geolLab' : lab === 'event' ? 'eventDungeonLab' : lab === 'soukai' ? 'soukaiLab' : INITIAL_SCREEN;
+}
+
+/**
+ * セーブがない状態で遊ぶ画面に来たらタイトルへ（設定はセーブがなくても開ける）。
+ * 対戦は、借りた山札で遊ぶもの（確かめ用の入口）だけセーブがなくても開ける（2026-11-02 指示書 AP）
+ */
+export function screenWithoutSave(id: ScreenId, hasSave: boolean, borrowedDeck: boolean): ScreenId {
+  if (hasSave || NO_SAVE_SCREENS.includes(id)) return id;
+  return id === 'battle' && borrowedDeck ? id : 'title';
 }
 
 /** アプリ全体の組み立て：ステージを用意し、ルーターの変化に合わせて画面を差し替える */
@@ -45,8 +54,7 @@ export function startApp(root: HTMLElement, store: GameStore = GameStore.fromBro
 
   const show = (id: ScreenId): void => {
     current?.destroy?.();
-    // セーブがない状態で遊ぶ画面に来たらタイトルへ（設定はセーブがなくても開ける）
-    let target: ScreenId = !store.hasSave && !NO_SAVE_SCREENS.includes(id) ? 'title' : id;
+    let target: ScreenId = screenWithoutSave(id, store.hasSave, !!store.pendingBattle?.playerDeck);
     // ランダム生成のダンジョンの挑戦中（中断して再開したときも）は、歩行画面の代わりにダンジョンの画面（同じ階・同じ位置から）
     if (target === 'world' && store.hasSave && store.save.dungeonRun) target = 'dungeonRun';
     // 挑戦が終わっていれば（クリア・戻された）歩行画面へ

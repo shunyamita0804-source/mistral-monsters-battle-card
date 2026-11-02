@@ -321,7 +321,8 @@ export const battleScreen: ScreenDefinition = {
   create(ctx) {
     const request = ctx.store.pendingBattle;
     const element = h('main', { class: 'screen battle' });
-    if (!request) {
+    // セーブが無いときは、借りた山札（playerDeck）のある対戦だけ遊べる（確かめ用の入口。2026-11-02 指示書 AP）
+    if (!request || (!ctx.store.hasSave && !request.playerDeck)) {
       element.append(
         h('p', { class: 'battle__missing', text: t('battle.missing') }),
         button(t('common.back'), () => ctx.reset('world'), 'btn btn--primary'),
@@ -346,7 +347,9 @@ export const battleScreen: ScreenDefinition = {
     element.style.setProperty('--hand-card-h', `${battleCardHeight(HAND_CARD_W, 'tall').toFixed(2)}px`);
     // 相手の手札（裏向き）も自分の手札と同じ大きさ（2026-10-31 指示書 AB【3】。10/24 の改訂R2 の考え方に戻した）
     element.style.setProperty('--opp-card-h', `${battleCardHeight(HAND_CARD_W, 'tall').toFixed(2)}px`);
-    const save = ctx.store.save;
+    // セーブが無いとき（確かめ用の入口）は、主人公の名前・絵はふつうのもの。セーブには何も書かない
+    const save = ctx.store.hasSave ? ctx.store.save : null;
+    const heroProfile = save?.player ?? { gender: null, name: null };
     const seed = randomSeed();
 
     // 先攻・後攻のカード（並び順はランダム）
@@ -556,7 +559,7 @@ export const battleScreen: ScreenDefinition = {
     let swipeRaf = 0;
     const finish = once((winner: BattleState['winner']) => {
       // 名刺図鑑：相手が人物なら登録して勝ち負けを数える（2026-10-27）
-      ctx.store.update((s) => recordPersonBattle(s, req.opponent, winner ?? 'draw'));
+      if (ctx.store.hasSave) ctx.store.update((s) => recordPersonBattle(s, req.opponent, winner ?? 'draw'));
       req.onFinish(winner ?? 'draw', state ? summarizeBattle(state) : undefined);
     });
     /** 最初の練習試合のヒント（出したものは2度出さない。出ている間は相手も待つ） */
@@ -985,7 +988,7 @@ export const battleScreen: ScreenDefinition = {
       setTimeout(() => {
         if (destroyed) return;
         state = createBattle(
-          { name: heroName(save.player.name), deck: req.playerDeck ?? save.deck },
+          { name: heroName(heroProfile.name), deck: req.playerDeck ?? ctx.store.save.deck },
           { name: opponentName(req.opponent), deck: req.opponentDeck ?? buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
           seed,
           first,
@@ -1031,7 +1034,7 @@ export const battleScreen: ScreenDefinition = {
       const lead = req.opponent.monsters[0];
       const opponentFaceEl = opponentUrl ? faceImg(opponentUrl) : lead ? createMonsterPortrait(getMonster(lead), 44) : h('span');
       return versusBanner(
-        { name: heroName(save.player.name), face: faceImg(heroFaceUrl(save.player.gender)) },
+        { name: heroName(heroProfile.name), face: faceImg(heroFaceUrl(heroProfile.gender)) },
         { name: opponentName(req.opponent), face: opponentFaceEl },
       );
     };
@@ -2117,7 +2120,7 @@ export const battleScreen: ScreenDefinition = {
       // 勝ち・負けの主人公の姿（2026-10-27 デザイン第13弾。引き分けは出さない）。結果の窓の上に、窓が足元に重なるように
       const hero =
         w === 'player' || w === 'opponent'
-          ? h('img', { class: 'battle__result-hero', attrs: { src: heroResultUrl(save.player.gender, w === 'player'), alt: '', draggable: 'false' } })
+          ? h('img', { class: 'battle__result-hero', attrs: { src: heroResultUrl(heroProfile.gender, w === 'player'), alt: '', draggable: 'false' } })
           : null;
       return h(
         'div',
