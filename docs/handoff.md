@@ -6,7 +6,7 @@
 
 ### まず読む：いまの状態（2026-11-02 指示書 AV のあと）
 
-- **指示書 AV（ブランチ `av-shop-machine`）を main に取り込み、公開した**（AV の依頼「終わり次第公開してください」）。記録 `docs/av-shop-machine-20261102.md`
+- **指示書 AV（ブランチ `av-shop-machine`）を main に取り込み、公開した**（AV の依頼「終わり次第公開してください」）。**公開中：main `3998c02`（公開ページは `static/index-CYc_WomN.js`。公開ページに新しい窓の絵・新入荷の札が届いていることを確かめた）**。記録 `docs/av-shop-machine-20261102.md`
 - **セーブ version 35**（`gachaShelf`：シリーズが並んだ順・パックを開けたシリーズ。前のセーブは読みこむときに作る〔NEW なし〕）。テスト 1381件
 - 店の販売機を7割・窓は10体の集合の絵（`panel_shop_group.webp`。3×2 は `panel_fallback.webp`）・「新入荷」の札（部屋のデータの `slots.NEW_PLATE`）
 - 大会会場の当たり判定（AV の 2）は前に済んでいた（確かめだけ）
