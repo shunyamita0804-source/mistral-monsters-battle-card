@@ -146,25 +146,27 @@ describe('最初の箱「旅立ちのきらめき」（指示書 AK：ソラモ�
     }
   });
 
-  it('リリルの16枚（2026-11-02 の正式配布）：しっぽはたき1・つめでひっかく2・こあくまだま2・マナをくすねる2・まどわしのひかり2・デビーム1・うっとりウインク2・はねでかわす2・くるりとかわす2', () => {
+  it('リリルの16枚（2026-11-02 の正式配布のまま）：しっぽはたき1・つめでひっかく2・こあくまだま2・マナをくすねる2・まどわしのひかり2・デビーム1・うっとりウインク2・はねでかわす2・くるりとかわす2', () => {
     const c = countCards(boosterDeck('booster-1').skills);
     expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[`skl-lilil-${String(n).padStart(2, '0')}`] ?? 0)).toEqual([1, 2, 2, 2, 2, 1, 0, 2, 0, 2, 2, 0]);
-    expect(Object.keys(c).some((id) => id.startsWith('skl-nobiton-'))).toBe(false);
-    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-forn']);
+    // 指示書 AM：旅立ちにノビトンが入った
+    expect(Object.keys(c).some((id) => id.startsWith('skl-nobiton-'))).toBe(true);
+    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-nobiton']);
     expect(boosterCardCounts('booster-1')['mon-lilil']).toBe(1);
   });
 
-  it('試験で先生が貸すデッキも同じ（2026-11-02 から ソラモ・リリル・フォルン）', () => {
+  it('試験で先生が貸すデッキも同じ（指示書 AM から ソラモ・リリル・ノビトン）', () => {
     expect(examLoanDeck()).toEqual(boosterDeck('booster-1'));
     expect(examLoanDeck().monsters).toContain(LILIL_MONSTER_ID);
   });
 
-  it('箱の絵（booster_tabidachi）は変えていない。前の中身（formerMonsters・版ごと）はソラモ・ノビトン・ラズック（AJ）とソラモ・リリル・ラズック（AK・AL）', () => {
+  it('箱の絵（booster_tabidachi）は変えていない。前の中身（formerMonsters・版ごと）は AJ・AK と AL・正式配布', () => {
     const b = BOOSTERS.find((x) => x.key === 'booster-1');
     expect(b?.art).toBe('booster_tabidachi');
     expect(b?.formerMonsters).toEqual([
       ['mon-soramo', 'mon-nobiton', 'mon-lazuck'],
       ['mon-soramo', 'mon-lilil', 'mon-lazuck'],
+      ['mon-soramo', 'mon-lilil', 'mon-forn'],
     ]);
   });
 });

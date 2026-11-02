@@ -156,12 +156,12 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
   });
 });
 
-describe('AJ：最初の箱（2026-11-02 ユーザー決定の正式配布）', () => {
-  it('旅立ち＝ソラモ・リリル・フォルン／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン。どれも山札60枚', () => {
+describe('AJ：最初の箱（2026-11-02 指示書 AM）', () => {
+  it('旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン。どれも山札60枚', () => {
     expect(BOOSTERS.map((b) => b.monsters)).toEqual([
-      ['mon-soramo', 'mon-lilil', 'mon-forn'],
-      ['mon-gauul', 'mon-lazuck', 'mon-nobiton'],
-      ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
+      ['mon-soramo', 'mon-lilil', 'mon-nobiton'],
+      ['mon-gauul', 'mon-lazuck', 'mon-tsumuji'],
+      ['mon-myurol', 'mon-kalshell', 'mon-forn'],
     ]);
     for (const b of BOOSTERS) {
       const deck = boosterDeck(b.key);

@@ -53,7 +53,8 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
   });
 
   it('技カードの名前の帯は紺に寄せる（AG2。skillcard_simple_build.py の LIGHT_MIX）', () => {
-    expect(readFileSync('tools/art/skillcard_simple_build.py', 'utf8')).toContain("LIGHT_MIX = {'desuoru': 0.22}");
+    // 2026-11-02 指示書 AM でフォルン（0.3）も足した
+    expect(readFileSync('tools/art/skillcard_simple_build.py', 'utf8')).toContain("LIGHT_MIX = {'desuoru': 0.22, 'forn': 0.3}");
   });
 
   it('CSV の14行・JSON・ゲームのカードで、番号・名前・分類・マナ・ダメージ・効果がすべて一致する', () => {

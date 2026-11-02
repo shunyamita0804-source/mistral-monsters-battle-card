@@ -2347,6 +2347,8 @@ export class WorldView {
       tutorial: true,
       hintSet: 'introV2',
       eventBattleId: 'introV2-exam',
+      // 2026-11-02 指示書 AN：練習場（教習所）の対戦はやわらかい曲（チュートリアル / いまたく）
+      bgm: 'tutorialBattle',
       // 2026-10-28：先生が貸すデッキ（「旅立ちのきらめき」と同じ中身）。試験のあいだだけ使い、所持カードには入れない
       playerDeck: examLoanDeck(),
       // 勝ったら、結果の窓が出た時点で合格を記録する（「続ける」の前にアプリを閉じても、次は試験のあとから。2026-10-30 指示書 O3）
@@ -2566,6 +2568,8 @@ export class WorldView {
       background: practiceBattleBg,
       backgroundVivid: true,
       tutorial: tutorial && store.save.story.intro !== 'completed',
+      // 2026-11-02 指示書 AN：練習場（教習所）の中で始めた練習試合は、やわらかい曲（チュートリアル / いまたく）。ほかの所（となりの家など）は今までの対戦の曲
+      ...(this.#map.id === 'practice' ? { bgm: 'tutorialBattle' as const } : {}),
       onFinish: (winner) => {
         store.practiceResult = { winner, tutorial, withGuide };
         ctx.reset('world');

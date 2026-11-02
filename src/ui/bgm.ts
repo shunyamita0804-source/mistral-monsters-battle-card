@@ -23,6 +23,7 @@ import neighborMp3 from '@assets/audio/bgm/bgm_neighbor.mp3';
 import bureauMp3 from '@assets/audio/bgm/bgm_bureau.mp3';
 import prologueMp3 from '@assets/audio/bgm/bgm_prologue.mp3';
 import departureMp3 from '@assets/audio/bgm/bgm_departure.mp3';
+import tutorialBattleMp3 from '@assets/audio/bgm/bgm_tutorial_battle.mp3';
 import { sound } from './sound.ts';
 
 /**
@@ -61,7 +62,8 @@ export type BgmId =
   | 'prologue'
   | 'departure'
   | 'battle'
-  | 'bossBattle';
+  | 'bossBattle'
+  | 'tutorialBattle';
 
 interface BgmEntry {
   readonly src: string;
@@ -128,6 +130,10 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   battle: { src: battleMp3, gain: 0.36 },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   bossBattle: { src: bossBattleMp3, gain: 0.31 },
+  // カード練習場（教習所）の対戦：チュートリアル / いまたく（imataku。OpenTracks〔旧 DOVA-SYNDROME〕 https://opentracks.com/bgm/detail/9057。2026-11-02 ユーザー提供・指示書 AN）。
+  // 「神獣の試練」はバトルっぽすぎたので、教わりながら戦う場面に合うやわらかい曲に。ガレス先生との試験・練習場で始めた練習試合だけ（ダンジョン・大会・街の人は今の曲）。
+  // 1.45〜124.18 秒を切り出したループ（tools/audio/make_bgm_loops_bgmer.py）。測った音量 -13.6 LUFS → 約 -18.5 LUFS になる 0.57
+  tutorialBattle: { src: tutorialBattleMp3, gain: 0.57 },
 };
 
 /** 曲を替えるときの、小さくする／大きくする時間（秒） */

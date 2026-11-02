@@ -8,8 +8,8 @@ export type { Habitat };
  * - 数字はモンファーBC（PS 版・LIFE は同じ 6〜10）を物差しに上げ直した（LIFE はどのモンスターも変えない）
  * - 名前を変えた技は、カードの ID と絵はそのまま（名前と数字・効果だけ変える）。新しい技（skl-kalshell-15・skl-desuoru-15・16）の絵は仮（art）
  * - 居場所（地上・空中・水中）：MONSTER_HABITAT。場が水中（みちしお）のあいだは全員を水中として扱う（src/game/battle/engine.ts）
- * - box：最初の箱（ブースター）に入れる枚数（箱に入る8体だけ。src/data/introV2.ts）。2026-11-02 ユーザー決定の正式配布 src/data/official/booster_contents_20261102_final.json と同じ
- *   （ノビトンは烈火と蒼海に同じ16枚。tests/starterBoxesFinal.test.ts で照らし合わせる）
+ * - box：最初の箱（ブースター）に入れる枚数（箱に入る9体だけ。src/data/introV2.ts）。2026-11-02 指示書 AM の src/data/official/booster_contents_20261102_AM.json と同じ
+ *   （ツムジのほかは正式配布 _20261102_final の16枚のまま。tests/starterBoxesAM.test.ts で照らし合わせる）
  * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリル、指示書 AL でフォルンを足して17体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
  * 決まりの細かい所は docs/battle-rules.md「指示書 AJ」
  */
@@ -221,19 +221,19 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-serephine-13', name: 'ゆらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避' },
     { id: 'skl-serephine-14', name: 'ウェーブダンス', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
-  // ツムジ（地上・LIFE 6）
+  // ツムジ（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 指示書 AM。Wひっかきは2枚続けて使えるよう2枚）］
   'mon-tsumuji': [
-    { id: 'skl-tsumuji-01', name: 'ひっかく', cat: 'ち', mana: 0, damage: 1, text: null },
-    { id: 'skl-tsumuji-02', name: 'Wひっかき', cat: 'ち', mana: 1, damage: 1, effect: atk({ chain: true }), text: '同じターンにもう1枚続けて使える' },
-    { id: 'skl-tsumuji-05', name: 'とびかかる', cat: 'ち', mana: 2, damage: 2, text: null },
-    { id: 'skl-tsumuji-07', name: 'みだれぎり', cat: 'ち', mana: 3, damage: 3, text: null },
+    { id: 'skl-tsumuji-01', name: 'ひっかく', cat: 'ち', mana: 0, damage: 1, text: null, box: 1 },
+    { id: 'skl-tsumuji-02', name: 'Wひっかき', cat: 'ち', mana: 1, damage: 1, effect: atk({ chain: true }), text: '同じターンにもう1枚続けて使える', box: 2 },
+    { id: 'skl-tsumuji-05', name: 'とびかかる', cat: 'ち', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-tsumuji-07', name: 'みだれぎり', cat: 'ち', mana: 3, damage: 3, text: null, box: 2 },
     { id: 'skl-tsumuji-10', name: 'ストームブレイド', cat: 'ち', mana: 5, damage: 6, text: null, rare: true },
-    { id: 'skl-tsumuji-03', name: 'かまいたち', cat: 'か', mana: 1, damage: 2, text: null, rare: true },
-    { id: 'skl-tsumuji-04', name: 'つむじかぜ', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE },
-    { id: 'skl-tsumuji-06', name: 'かぜのやいば', cat: 'か', mana: 2, damage: 2, text: null },
-    { id: 'skl-tsumuji-09', name: 'あらし', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeableVsAir: true }), text: '空中の相手は回避できない' },
+    { id: 'skl-tsumuji-03', name: 'かまいたち', cat: 'か', mana: 1, damage: 2, text: null, rare: true, box: 1 },
+    { id: 'skl-tsumuji-04', name: 'つむじかぜ', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 2 },
+    { id: 'skl-tsumuji-06', name: 'かぜのやいば', cat: 'か', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-tsumuji-09', name: 'あらし', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeableVsAir: true }), text: '空中の相手は回避できない', box: 1 },
     { id: 'skl-tsumuji-08', name: 'かぜのり', cat: '特', mana: 0, damage: null, effect: { type: 'windRide', discount: 1 }, text: '次のターン、ツムジの攻撃のマナ−1', rare: true },
-    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE },
+    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 3 },
     { id: 'skl-tsumuji-14', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
   // ジオル（地上・LIFE 9）
@@ -339,7 +339,7 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0, art: 'lilil_sk_12.webp' },
   ],
   // フォルン（地上・LIFE 7・C。2026-11-02 指示書 AL。正本は src/data/official/forn12_skills_OFFICIAL_20261102.json）
-  // ［箱：旅立ちのきらめき 16枚（2026-11-02 正式配布。前は蒼海の守り・JSON の box_copies）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
+  // ［箱：蒼海の守り 16枚（2026-11-02 指示書 AM。正式配布で旅立ちに入っていた16枚のまま）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
   'mon-forn': [
     { id: 'skl-forn-01', name: 'ひづめキック', cat: 'ち', mana: 0, damage: 1, text: null, box: 0, art: 'forn_sk_01.webp' },
     { id: 'skl-forn-02', name: 'つのでつく', cat: 'ち', mana: 2, damage: 2, text: null, box: 2, art: 'forn_sk_02.webp' },

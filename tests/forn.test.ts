@@ -126,16 +126,16 @@ describe('最初の箱「蒼海の守り」（指示書 AL：ミュロル・カ�
     }
   });
 
-  // 2026-11-02 ユーザー決定の正式配布：フォルンは「旅立ちのきらめき」へ。蒼海はミュロル・カルシェル・ノビトンに戻った
-  it('フォルンの16枚（2026-11-02 の正式配布・旅立ちのきらめき）：つのでつく2・ねいろだま2・ふえのしらべ2・そうこうげき1・はげましのふえ2・そなえのふえ2・こもりうた2・もこもこガード2・かんむりのまもり1', () => {
-    const c = countCards(boosterDeck('booster-1').skills);
+  // 2026-11-02 正式配布（PR #1）でフォルンは旅立ちへ。指示書 AM で蒼海（ミュロル・カルシェル・フォルン）に戻った（16枚は正式配布のまま）
+  it('フォルンの16枚（指示書 AM・蒼海の守り）：つのでつく2・ねいろだま2・ふえのしらべ2・そうこうげき1・はげましのふえ2・そなえのふえ2・こもりうた2・もこもこガード2・かんむりのまもり1', () => {
+    const c = countCards(boosterDeck('booster-3').skills);
     expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[fo(n)] ?? 0)).toEqual([0, 2, 2, 2, 1, 2, 2, 2, 0, 2, 1, 0]);
-    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-forn']);
-    expect(boosterDeck('booster-3').monsters).toEqual(['mon-myurol', 'mon-kalshell', 'mon-nobiton']);
-    expect(Object.keys(countCards(boosterDeck('booster-3').skills)).some((id) => id.startsWith('skl-forn-'))).toBe(false);
+    expect(boosterDeck('booster-3').monsters).toEqual(['mon-myurol', 'mon-kalshell', 'mon-forn']);
+    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-nobiton']);
+    expect(Object.keys(countCards(boosterDeck('booster-1').skills)).some((id) => id.startsWith('skl-forn-'))).toBe(false);
     const b = BOOSTERS.find((x) => x.key === 'booster-3');
     expect(b?.art).toBe('booster_soukai');
-    // 前の中身（版ごと）：指示書 AJ・AK の蒼海、指示書 AL の蒼海
+    // 前の中身（版ごと）：指示書 AJ・AK・正式配布の蒼海、指示書 AL の蒼海
     expect(b?.formerMonsters).toEqual([
       ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
       ['mon-myurol', 'mon-kalshell', 'mon-forn'],
@@ -296,7 +296,7 @@ const used = (s: BattleState, a: ReturnType<typeof chooseAction>): string | null
   a?.type === 'useCard' ? (s.sides.opponent.hand.find((h) => h.uid === a.cardUid)?.cardId ?? null) : null;
 
 describe('CPU のフォルン（指示書 AL）', () => {
-  it('もりのたより：手札が2枚以下で山札が10枚以上なら、攻撃より先に使う（捨てる1枚も選ぶ）。山札が少なければ使わない', () => {
+  it('もりのたより：手札が3枚以下（指示書 AM。前は2枚以下）で山札が10枚以上なら、攻撃より先に使う（捨てる1枚も選ぶ）。山札が少なければ使わない', () => {
     const s = cpuScene({ hand: [fo(9), 'skl-soramo14-03'] });
     const a = chooseAction(s, 'opponent', 'normal', 'A');
     expect(used(s, a)).toBe(fo(9));
@@ -304,6 +304,11 @@ describe('CPU のフォルン（指示書 AL）', () => {
     expect(drawToPreview(s, 'opponent', 'o0').map((c) => c.uid)).toContain(a?.type === 'useCard' ? a.choice : '');
     const thin = cpuScene({ hand: [fo(9), 'skl-soramo14-03'], deck: 5 });
     expect(used(thin, chooseAction(thin, 'opponent', 'normal', 'A'))).not.toBe(fo(9));
+    // 手札3枚でも使う・4枚なら使わない（指示書 AM）
+    const three = cpuScene({ hand: [fo(9), 'skl-soramo14-03', 'skl-soramo14-04'] });
+    expect(used(three, chooseAction(three, 'opponent', 'normal', 'A'))).toBe(fo(9));
+    const four = cpuScene({ hand: [fo(9), 'skl-soramo14-03', 'skl-soramo14-04', 'skl-soramo14-05'] });
+    expect(used(four, chooseAction(four, 'opponent', 'normal', 'A'))).not.toBe(fo(9));
   });
 
   it('そなえのふえ：相手の攻撃で倒されそうで、−1 で助かる味方がいれば攻撃より先にかける', () => {

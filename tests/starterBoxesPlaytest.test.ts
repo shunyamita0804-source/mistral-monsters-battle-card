@@ -9,17 +9,20 @@ import { actingSide, applyAction, cardUsability, createBattle, type BattleState,
 import { boosterDeck } from '../src/game/story/introV2.ts';
 
 /**
- * 2026-11-02 の正式配布（3箱・技144枚・4技の性能・ミュロル LIFE 6・カルシェル LIFE 7）での、3箱の総当たり（実際の対戦の決まりと CPU の思考で最後まで）。
+ * 3箱の総当たり（実際の対戦の決まりと CPU の思考で最後まで）。2026-11-02 の正式配布（PR #1）で作り、指示書 AM の箱（旅立ち＝ソラモ・リリル・ノビトン／
+ * 烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン）でも同じ作り方で測る。
  * - 組み合わせ3つ（旅立ち×烈火・旅立ち×蒼海・烈火×蒼海）× 席の入れ替え2方向 × GAMES 回。1方向の中で先攻・後攻は半分ずつ（偶数回目は player が先攻）
  * - 種（seed）は組み合わせ・方向・回数から決まる（同じ回数なら同じ結果）
  * - 両方とも同じ腕前の CPU（PLAYTEST_SKILL。ふだんは B）。人の遊び方を測ったものではない
  * - 数えること：勝ち・引き分け・決着の理由（倒した／山札切れ）・先攻と後攻の勝ち・カードを使った回数（箱ごと）・
  *   おかしな動き（使えないカードを選んだ・選んでも何も変わらなかった・手数の上限で終わらない・ライフが 0 未満や最大より上）
- * ふだん（npm run check）は少ない回数で動くことだけ確かめる。npm run playtest:starter-final（PLAYTEST=200）で 1,200 戦（PLAYTEST_OUT に JSON）
+ * - ツムジの Wひっかき：2枚目まで続けて使えた回数（chain。同じ手番に、Wひっかきを使ったツムジがもう1枚 Wひっかきを使った）
+ * ふだん（npm run check）は少ない回数で動くことだけ確かめる。npm run playtest:starter-am-a・starter-am-b（PLAYTEST=200）で腕前ごとに 1,200 戦（PLAYTEST_OUT に JSON）
  */
 const GAMES = Number(process.env.PLAYTEST ?? 2);
 const SKILL = (process.env.PLAYTEST_SKILL ?? 'B') as CpuSkill;
 const MAX_STEPS = 6000;
+const W_SCRATCH = 'skl-tsumuji-02';
 const PAIRS: readonly (readonly [BoosterKey, BoosterKey])[] = [
   ['booster-1', 'booster-2'],
   ['booster-1', 'booster-3'],
@@ -55,7 +58,7 @@ interface Oddities {
 }
 
 /** 1対戦：a（player）と b（opponent） */
-function playOne(a: BoosterKey, b: BoosterKey, seed: number, first: Side, use: Record<BoosterKey, Record<string, number>>, odd: Oddities): BattleState {
+function playOne(a: BoosterKey, b: BoosterKey, seed: number, first: Side, use: Record<BoosterKey, Record<string, number>>, odd: Oddities, chained: Record<BoosterKey, number>): BattleState {
   const box: Record<Side, BoosterKey> = { player: a, opponent: b };
   let state = createBattle({ name: 'A', deck: boosterDeck(a) }, { name: 'B', deck: boosterDeck(b) }, seed, first);
   let steps = 0;
@@ -71,6 +74,10 @@ function playOne(a: BoosterKey, b: BoosterKey, seed: number, first: Side, use: R
       if (card) {
         const counts = use[box[side]];
         counts[card.cardId] = (counts[card.cardId] ?? 0) + 1;
+        // Wひっかきの2枚目（この手番に Wひっかきを1回使ったツムジが、もう1枚使う）
+        if (action.type === 'useCard' && card.cardId === W_SCRATCH && state.sides[side].monsters.some((m) => m.acted && m.chain?.turn === state.turn && m.chain.cardId === W_SCRATCH)) {
+          chained[box[side]] += 1;
+        }
       }
     }
     const next = applyAction(state, action);
@@ -121,6 +128,7 @@ describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', (
     const boxes: Record<BoosterKey, Tally> = { 'booster-1': tally(), 'booster-2': tally(), 'booster-3': tally() };
     const use: Record<BoosterKey, Record<string, number>> = { 'booster-1': {}, 'booster-2': {}, 'booster-3': {} };
     const odd: Oddities = { unusablePick: 0, noProgress: 0, timeout: 0, lifeOutOfRange: 0 };
+    const chained: Record<BoosterKey, number> = { 'booster-1': 0, 'booster-2': 0, 'booster-3': 0 };
     const matchups: Record<string, unknown> = {};
     const firstSide = tally();
     let total = 0;
@@ -133,7 +141,7 @@ describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', (
         for (let g = 0; g < GAMES; g++) {
           const first: Side = g % 2 === 0 ? 'player' : 'opponent';
           const seed = 20261102 + p * 100000 + d * 10000 + g;
-          const end = playOne(a, b, seed, first, use, odd);
+          const end = playOne(a, b, seed, first, use, odd, chained);
           record(dir, end, 'player', first);
           record(pair, end, a === x ? 'player' : 'opponent', first);
           record(boxes[a], end, 'player', first);
@@ -156,6 +164,7 @@ describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', (
     };
     const out = {
       date: '2026-11-02',
+      boxes: Object.fromEntries(PAIRS.flat().filter((k, i, all) => all.indexOf(k) === i).map((k) => [k, boosterDeck(k).monsters])),
       cpuSkill: SKILL,
       gamesPerDirection: GAMES,
       totalGames: total,
@@ -165,6 +174,8 @@ describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', (
       matchups,
       oddities: odd,
       cardUse: Object.fromEntries((Object.keys(boxes) as BoosterKey[]).map((k) => [k, perGame(k)])),
+      // Wひっかきの2枚目を続けて使えた回数（1対戦あたり。箱ごと）
+      chainSecondPerGame: Object.fromEntries((Object.keys(boxes) as BoosterKey[]).map((k) => [k, Math.round((chained[k] / Math.max(1, boxes[k].games)) * 100) / 100])),
     };
     // おかしな動きは無い
     expect(odd).toEqual({ unusablePick: 0, noProgress: 0, timeout: 0, lifeOutOfRange: 0 });

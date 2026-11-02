@@ -77,6 +77,8 @@ describe('入れ替えの試遊（腕前 A どうし・レア抜きの16枚）',
   it('入れ替えたデッキは、山札60枚で、ルールに合う', () => {
     for (const id of SUBJECTS) {
       for (const key of KEYS) {
+        // その箱にもういるモンスターは入れ替えない（2026-11-02 指示書 AM でツムジは烈火に入った）
+        if (boosterDeck(key).monsters.includes(id)) continue;
         for (let slot = 0; slot < 3; slot++) {
           const d = swapDeck(key, slot, id, playtest16(id));
           expect(d.skills).toHaveLength(60);
@@ -99,6 +101,7 @@ describe('入れ替えの試遊（腕前 A どうし・レア抜きの16枚）',
       const all = emptyCount();
       const rows: Record<string, unknown> = {};
       KEYS.forEach((a, i) => {
+        if (boosterDeck(a).monsters.includes(id)) return;
         for (let slot = 0; slot < 3; slot++) {
           const deck = swapDeck(a, slot, id, cards);
           const row = emptyCount();

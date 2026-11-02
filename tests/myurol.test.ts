@@ -258,6 +258,9 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(MYUROL_MONSTER.art).toEqual({ category: 'monsterCards', file: 'myurol_official.webp', layout: 'full' });
     expect(existsSync('assets/images/cards/monsters/myurol_official.webp')).toBe(true);
     expect(existsSync(`${NEW_ORIGINAL_DIR}/myurol_official_monstercard_LIFE7.png`)).toBe(true);
+    // 指示書 AM【2】：LIFE 6 の絵（線を消した版）。届いた版も残す
+    expect(existsSync(`${NEW_ORIGINAL_DIR}/myurol_official_monstercard_LIFE6.png`)).toBe(true);
+    expect(existsSync(`${NEW_ORIGINAL_DIR}/myurol_official_monstercard_LIFE6_delivered_20261102.png`)).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-myurol')).toHaveLength(1);
     expect(SKILLS.filter((s) => s.monsterId === 'mon-myurol')).toHaveLength(12); // 指示書 AJ から12枚
     expect(BATTLE_CARDS['mon-myurol']).toMatchObject({ art: 'myurol_battlecard.png', frame: 'myurol' });

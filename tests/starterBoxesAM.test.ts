@@ -3,6 +3,7 @@ import { cardCatalog, getMonster, getSkill, skillsOf } from '../src/data/cards.t
 import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, type BoosterKey } from '../src/data/introV2.ts';
 import { KALSHELL_MONSTER } from '../src/data/kalshell.ts';
 import { MYUROL_MONSTER } from '../src/data/myurol.ts';
+import amContents from '../src/data/official/booster_contents_20261102_AM.json';
 import finalContents from '../src/data/official/booster_contents_20261102_final.json';
 import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { guardReduction } from '../src/game/cards/cardTypes.ts';
@@ -14,33 +15,56 @@ import { createNewGameSave, normalizeSave, type SaveData } from '../src/game/sav
 import { boosterDeck, boosterShelf, buyBooster, examLoanDeck } from '../src/game/story/introV2.ts';
 
 /**
- * 2026-11-02 ユーザー決定：初期3箱・技144枚の正式配布＋4技の性能＋ミュロル／カルシェルの LIFE（検収チェックの機械で見られるところ）。
- * 正本は src/data/official/booster_contents_20261102_final.json（届いた JSON を無改変）。記録は docs/starter-boxes-final-20261102.md
+ * 2026-11-02 指示書 AM（ユーザー決定）：最初の3箱の作り直し（旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン）。
+ * 正本は src/data/official/booster_contents_20261102_AM.json。各モンスターの16枚は PR #1 の正式配布（booster_contents_20261102_final.json）のまま、ツムジだけ新しい（進行の案）。
+ * あわせて PR #1 の4技の性能・ミュロル／カルシェルの LIFE。記録は docs/starter-boxes-am-20261102.md
  */
 
 const CATEGORY: Record<string, string> = { ちから: 'ち', かしこさ: 'か', 特殊: '特', 防御: '防', 回避: '避' };
 const SUPPORTS = { 'sup-2': 3, 'sup-7': 3, 'sup-1': 2, 'sup-3': 2, 'sup-10': 2 };
 const group = (key: BoosterKey) => {
-  const g = finalContents.booster_groups.find((x) => x.booster_key === key);
+  const g = amContents.booster_groups.find((x) => x.booster_key === key);
   if (!g) throw new Error(key);
   return g;
 };
+/** PR #1 の正式配布の、そのモンスターの12行（どの箱でも同じ） */
+const finalRows = (monsterId: string) => {
+  const g = finalContents.booster_groups.find((x) => x.monster_ids.includes(monsterId));
+  return g ? g.card_rows.filter((r) => r.monster_id === monsterId) : [];
+};
 
-describe('3箱・9枠（正式配布）', () => {
-  it('旅立ち＝ソラモ・リリル・フォルン／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン。箱の中で同じモンスターは無い。箱は3つだけ', () => {
-    expect(BOOSTERS.map((b) => [b.key, b.name])).toEqual(finalContents.booster_groups.map((g) => [g.booster_key, g.booster_name]));
+describe('3箱・9枠（指示書 AM）', () => {
+  it('旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン。箱の中で同じモンスターは無い。箱は3つだけ・9体', () => {
+    expect(BOOSTERS.map((b) => [b.key, b.name])).toEqual(amContents.booster_groups.map((g) => [g.booster_key, g.booster_name]));
     expect(BOOSTERS.map((b) => b.monsters)).toEqual([
-      ['mon-soramo', 'mon-lilil', 'mon-forn'],
-      ['mon-gauul', 'mon-lazuck', 'mon-nobiton'],
-      ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
+      ['mon-soramo', 'mon-lilil', 'mon-nobiton'],
+      ['mon-gauul', 'mon-lazuck', 'mon-tsumuji'],
+      ['mon-myurol', 'mon-kalshell', 'mon-forn'],
     ]);
     for (const b of BOOSTERS) {
       expect(b.monsters, b.key).toEqual(group(b.key).monster_ids);
       expect(b.monsters.map((m) => getMonster(m).name), b.key).toEqual(group(b.key).monsters);
       expect(new Set(b.monsters).size, b.key).toBe(3);
     }
-    // 種類は8体
-    expect(new Set(BOOSTERS.flatMap((b) => b.monsters)).size).toBe(8);
+    expect(new Set(BOOSTERS.flatMap((b) => b.monsters)).size).toBe(9);
+  });
+
+  it('ツムジのほかは、PR #1 の正式配布の16枚のまま（ノビトンは前の烈火・蒼海の16枚、フォルンは前の旅立ちの16枚）', () => {
+    for (const g of amContents.booster_groups) {
+      for (const m of g.monster_ids) {
+        if (m === 'mon-tsumuji') continue;
+        const rows = g.card_rows.filter((r) => r.monster_id === m).map(({ monster: _m, ...r }) => r);
+        expect(rows, `${g.booster_key} ${m}`).toEqual(finalRows(m).map(({ monster: _m, ...r }) => r));
+      }
+    }
+  });
+
+  it('ツムジの16枚：ひっかく1・Wひっかき2・とびかかる2・みだれぎり2・つむじかぜ2・かぜのやいば2・あらし1・ひらりとかわす3・★かまいたち1', () => {
+    const c = countCards(boosterDeck('booster-2').skills);
+    const by = Object.fromEntries(skillsOf('mon-tsumuji').map((k) => [k.name, c[k.id] ?? 0]));
+    expect(by).toEqual({
+      ひっかく: 1, Wひっかき: 2, とびかかる: 2, みだれぎり: 2, ストームブレイド: 0, かまいたち: 1, つむじかぜ: 2, かぜのやいば: 2, あらし: 1, かぜのり: 0, ひらりとかわす: 3, かぜよみ: 0,
+    });
   });
 
   it('9枠それぞれ技16枚。箱ごとに技48枚＋サポート12枚＝山札60枚。同じカードは3枚まで。技 ID はどれもある', () => {
@@ -70,7 +94,7 @@ describe('3箱・9枠（正式配布）', () => {
     expect(total).toBe(144);
   });
 
-  it('8体それぞれ12技（0枚の技も）を JSON と照らし合わせる：ID・名前・分類・マナ・ダメージ・レア・箱の枚数。名前で引くと1枚だけ', () => {
+  it('9体それぞれ12技（0枚の技も）を JSON と照らし合わせる：ID・名前・分類・マナ・ダメージ・レア・箱の枚数。名前で引くと1枚だけ', () => {
     for (const b of BOOSTERS) {
       const g = group(b.key);
       const deckCounts = countCards(boosterDeck(b.key).skills);
@@ -96,20 +120,13 @@ describe('3箱・9枠（正式配布）', () => {
     }
   });
 
-  it('ノビトンの16枚は烈火と蒼海でまったく同じ', () => {
-    const nob = (key: BoosterKey) => group(key).card_rows.filter((r) => r.monster_id === 'mon-nobiton');
-    expect(nob('booster-2')).toEqual(nob('booster-3'));
-    const inDeck = (key: BoosterKey) => Object.fromEntries(Object.entries(countCards(boosterDeck(key).skills)).filter(([id]) => id.startsWith('skl-nobiton-')));
-    expect(inDeck('booster-2')).toEqual(inDeck('booster-3'));
-  });
-
-  it('レアの枚数：ソラモ1・リリル1・フォルン3／ガウル1・ラズック0・ノビトン0／ミュロル0・カルシェル2', () => {
+  it('レアの枚数：ソラモ1・リリル1・ノビトン0／ガウル1・ラズック0・ツムジ1／ミュロル0・カルシェル2・フォルン3', () => {
     const rare: Record<string, number> = {};
-    for (const g of finalContents.booster_groups) for (const r of g.card_rows) if (r.rare) rare[`${g.booster_key} ${r.monster}`] = (rare[`${g.booster_key} ${r.monster}`] ?? 0) + r.copies;
+    for (const g of amContents.booster_groups) for (const r of g.card_rows) if (r.rare) rare[`${g.booster_key} ${r.monster}`] = (rare[`${g.booster_key} ${r.monster}`] ?? 0) + r.copies;
     expect(rare).toEqual({
-      'booster-1 ソラモ': 1, 'booster-1 リリル': 1, 'booster-1 フォルン': 3,
-      'booster-2 ガウル': 1, 'booster-2 ラズック': 0, 'booster-2 ノビトン': 0,
-      'booster-3 ミュロル': 0, 'booster-3 カルシェル': 2, 'booster-3 ノビトン': 0,
+      'booster-1 ソラモ': 1, 'booster-1 リリル': 1, 'booster-1 ノビトン': 0,
+      'booster-2 ガウル': 1, 'booster-2 ラズック': 0, 'booster-2 ツムジ': 1,
+      'booster-3 ミュロル': 0, 'booster-3 カルシェル': 2, 'booster-3 フォルン': 3,
     });
   });
 
@@ -180,6 +197,10 @@ describe('前のセーブ（箱を開けたあと）を変えない', () => {
     ['booster-1', ['mon-soramo', 'mon-lilil', 'mon-lazuck']], // 指示書 AK・AL
     ['booster-3', ['mon-myurol', 'mon-kalshell', 'mon-nobiton']], // 指示書 AJ・AK
     ['booster-3', ['mon-myurol', 'mon-kalshell', 'mon-forn']], // 指示書 AL
+    ['booster-1', ['mon-soramo', 'mon-lilil', 'mon-forn']], // 初期3箱の正式配布（PR #1）
+    ['booster-2', ['mon-gauul', 'mon-lazuck', 'mon-nobiton']], // 指示書 AJ〜正式配布
+    ['booster-1', ['mon-soramo', 'mon-lilil', 'mon-nobiton']], // 指示書 AM
+    ['booster-2', ['mon-gauul', 'mon-lazuck', 'mon-tsumuji']], // 指示書 AM
   ] as const)('%s %j：読み込み直しても、所持カード・選んだ箱・買った箱は同じ。最初から並ぶガチャはその版の3体', (key, monsters) => {
     const s = opened(key, [...monsters]);
     const loaded = normalizeSave(JSON.parse(JSON.stringify(s)));

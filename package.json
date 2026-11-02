@@ -35,6 +35,8 @@
     "playtest:lilil-ak2": "PLAYTEST=200 PLAYTEST_LIVES=5 PLAYTEST_OUT=docs/design/lilil-ak2-20261102/playtest_200.json vitest run tests/akPlaytest.test.ts",
     "playtest:forn": "PLAYTEST=200 PLAYTEST_OUT=docs/design/forn-al-20261102/playtest_200.json vitest run tests/alPlaytest.test.ts",
     "playtest:starter-final": "PLAYTEST=200 PLAYTEST_OUT=docs/design/starter-boxes-final-20261102/playtest_200_B.json vitest run tests/starterBoxesPlaytest.test.ts",
+    "playtest:starter-am-a": "PLAYTEST=200 PLAYTEST_SKILL=A PLAYTEST_OUT=docs/design/starter-boxes-am-20261102/playtest_200_A.json vitest run tests/starterBoxesPlaytest.test.ts",
+    "playtest:starter-am-b": "PLAYTEST=200 PLAYTEST_SKILL=B PLAYTEST_OUT=docs/design/starter-boxes-am-20261102/playtest_200_B.json vitest run tests/starterBoxesPlaytest.test.ts",
     "playtest:stella": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-thunder-boss PLAYTEST_SCALES=0.8:1.4:0.05 PLAYTEST_OUT=docs/design/thunder-plateau-ah-20261101/stella_scan_1000.json vitest run tests/bossPlaytest.test.ts",
     "playtest:thunder": "PLAYTEST=150 PLAYTEST_OUT=docs/design/thunder-plateau-ah-20261101/thunder_walk_150.json vitest run tests/thunderPlateau.test.ts",
     "playtest:barca": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-fire-boss PLAYTEST_SCALES=1.0:1.09:0.01 PLAYTEST_OUT=docs/design/barca-ac-20261031/barca_scan_1000.json vitest run tests/bossPlaytest.test.ts",
