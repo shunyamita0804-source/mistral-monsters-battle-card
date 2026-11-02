@@ -348,6 +348,8 @@ def to_ts(town: dict, rooms: list[dict]) -> str:
         '  /** 自動ドア */\n  readonly doorAnims?: readonly ArtDoorAnim[];\n'
         '  /** くり返す絵 */\n  readonly loops?: readonly ArtLoop[];\n'
         '  /** 部屋を画面の高さに合わせるときの基準の高さ（無ければ絵の高さ） */\n  readonly fitHeight?: number;\n'
+        '  /** 絵の上に、遊びの進み具合で変わる物を重ねる所（設計図の単位。z は人と前後を比べる高さ。2026-11-02 指示書 AV：販売機の「新入荷」の札 NEW_PLATE） */\n'
+        '  readonly slots?: Readonly<Record<string, { readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z: number }>>;\n'
         '}\n\n'
         f'export const WORLD_ART: Readonly<Record<string, ArtMap>> = {body};\n'
     )

@@ -16,12 +16,12 @@ export function seriesPackUrl(series: GachaSeries): string {
 
 /**
  * 販売機の窓のパネル（2026-10-30 指示書 J）：assets/images/ui/gacha/panel_{シリーズID}.webp（tools/design/gacha_panel_build.py）。
- * 絵が無いシリーズは、店の中の販売機と同じ 3×2 のパネル（panel_shop）
+ * 絵が無いシリーズは 3×2 のパネル（panel_fallback。2026-11-02 指示書 AV までは panel_shop の名前で店の中の販売機にも使っていた。店の販売機は今は panel_shop_group）
  */
 const PANEL_URLS = import.meta.glob<string>('/assets/images/ui/gacha/panel_*.webp', { eager: true, query: '?url', import: 'default' });
 
 export function seriesPanelUrl(series: GachaSeries): string {
-  return PANEL_URLS[`/assets/images/ui/gacha/panel_${series.id}.webp`] ?? PANEL_URLS['/assets/images/ui/gacha/panel_shop.webp']!;
+  return PANEL_URLS[`/assets/images/ui/gacha/panel_${series.id}.webp`] ?? PANEL_URLS['/assets/images/ui/gacha/panel_fallback.webp']!;
 }
 
 /** ラインナップの小さな枠に出す絵（技はイラスト、モンスターはバトル用カードの絵） */

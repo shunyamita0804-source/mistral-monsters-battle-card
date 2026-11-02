@@ -61,10 +61,16 @@ GACHA_FORWARD = 30
 GACHA_UI = os.path.join(ROOT, 'assets/images/ui/gacha')
 # 2026-10-30（指示書 J。ユーザー「ガラスじゃないのがいい。現実世界のカードダスみたいに」）：窓（ガラスと奥行きのある内側の壁）をやめ、
 # モンスターの絵を印刷した平らなパネル（panel_shop。tools/design/gacha_panel_build.py が作る）でおおう。窓の四すみの星（machine_stars）はパネルの上
-GACHA_LAYERS = ['machine_front', 'panel_shop', 'machine_stars', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
+# 2026-11-02 指示書 AV：窓の絵を 3×2 のパネル（今は panel_fallback）から、10体の集合の絵1枚（panel_shop_group）に。四すみの星は今のまま上に重ねる
+GACHA_LAYERS = ['machine_front', 'panel_shop_group', 'machine_stars', 'knob_base', 'outlet_closed', 'outlet_front', 'knob_dial']
 GACHA_PANEL_AT = (212, 268)              # パネルの左上（900×1300 の px。gacha_panel_build.PANEL_BOX と同じ）
-GACHA_BOX = (1156, 85, 520)              # 店の中の機械の真ん中の x・上のはし・下のはし（絵の px）
-GLOW = dict(rx=190, ry=58, color=(255, 214, 120))
+# 2026-11-02 指示書 AV（ユーザーの iPhone「機械が大きすぎて部屋から浮いて見える」）：前（上のはし y 85・高さ 435）の約7割。
+# 足元（下のはし y 520）と真ん中の x はそのまま。主人公の背の約1.75倍
+GACHA_SHRINK = 0.7
+GACHA_BOX = (1156, 520 - round(435 * GACHA_SHRINK), 520)   # 店の中の機械の真ん中の x・上のはし・下のはし（絵の px）
+GLOW = dict(rx=round(190 * GACHA_SHRINK), ry=round(58 * GACHA_SHRINK), color=(255, 214, 120))
+# 「新入荷」の札（2026-11-02 指示書 AV）：機械の下の左の四角い板（星の羅針盤の飾り）の内がわ（900×1300 の px）。ゲームがこの上にパックの絵と NEW を重ねる
+NEW_PLATE_IN_MACHINE = (220, 1024, 430, 1156)
 
 # 入口の戸（素材の「内側の自動ドア E」）：開口・戸1枚の幅・戸の足元
 DOOR_OPENING = (600, 680, 352, 141)
@@ -100,7 +106,8 @@ BLOCKS = [
 # 調べる物（絵の px の範囲）。maps.ts の ID と同じ
 ITEMS = {
     'COUNTER': (445, 250, 1008, 400),
-    'PACK_MACHINE': (1014, 420, 1298, 522),
+    # 2026-11-02 指示書 AV：機械を7割にしたので、調べる範囲も機械の幅（x 1057〜1255）に
+    'PACK_MACHINE': (1057, 420, 1255, 522),
     'SHELF_WALL': (36, 185, 224, 562),
     'CASE_L': (245, 340, 406, 529),
     'CASE_R': (415, 380, 523, 553),
@@ -147,19 +154,39 @@ def _cells(box: tuple[float, float, float, float]) -> dict:
     return dict(x=cx1, y=cy1, w=cx2 - cx1, h=cy2 - cy1)
 
 
-def _gacha_machine() -> dict:
-    """店の中の販売機：ガチャの画面の機械の絵（GACHA_LAYERS）を重ねて、GACHA_BOX の高さ・足元に縮めて置く"""
+def _gacha_machine_layout() -> tuple[Image.Image, tuple[int, int, int, int], float, int]:
+    """機械の絵（900×1300 を重ねて余白を切ったもの）・切った範囲・縮める割合・置く左のはし（絵の px）"""
     full = Image.new('RGBA', (900, 1300))
     for name in GACHA_LAYERS:
         im = Image.open(os.path.join(GACHA_UI, f'{name}.webp')).convert('RGBA')
         full.alpha_composite(im, GACHA_PANEL_AT if name.startswith('panel_') else (0, 0))
-    full = full.crop(full.getbbox())
+    box = full.getbbox()
+    full = full.crop(box)
     cx, top, bottom = GACHA_BOX
     k = (bottom - top) / full.height
+    left = round(cx - round(full.width * k) / 2)
+    return full, box, k, left
+
+
+def _gacha_machine() -> dict:
+    """店の中の販売機：ガチャの画面の機械の絵（GACHA_LAYERS）を重ねて、GACHA_BOX の高さ・足元に縮めて置く"""
+    full, _box, k, left = _gacha_machine_layout()
+    _cx, top, bottom = GACHA_BOX
     small = full.resize((round(full.width * k), bottom - top), Image.LANCZOS)
     canvas = Image.new('RGBA', (1536, 1024))
-    canvas.alpha_composite(small, (round(cx - small.width / 2), top))
+    canvas.alpha_composite(small, (left, top))
     return _save_cropped(canvas, 'cardshop_gacha_machine.webp')
+
+
+def _new_plate_slot() -> dict:
+    """「新入荷」の札を重ねる所（設計図の単位）：機械の下の左の板の内がわ。z は機械より少し手前（機械の上に描く・前に立つ人よりは奥）"""
+    _full, box, k, left = _gacha_machine_layout()
+    top = GACHA_BOX[1]
+    x1, y1, x2, y2 = NEW_PLATE_IN_MACHINE
+    u = ROOM_UNIT
+    rx1, ry1 = left + (x1 - box[0]) * k, top + (y1 - box[1]) * k
+    rx2, ry2 = left + (x2 - box[0]) * k, top + (y2 - box[1]) * k
+    return dict(x=round(rx1 * u), y=round(ry1 * u), w=round((rx2 - rx1) * u), h=round((ry2 - ry1) * u), z=round((GACHA_FOOT + GACHA_FORWARD) * u) + 1)
 
 
 def _gacha_glow() -> dict:
@@ -248,4 +275,6 @@ def build_shop_room() -> dict:
         exit=dict(x=exit_cols[0], y=exit_row, w=len(exit_cols), h=1),
         spawn=dict(x=door_cx, y=spawn_row),
         doorAnims=[door],
+        # 遊びの進み具合で変わる物を重ねる所（2026-11-02 指示書 AV：販売機の「新入荷」の札）
+        slots=dict(NEW_PLATE=_new_plate_slot()),
     )

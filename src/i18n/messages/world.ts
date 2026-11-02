@@ -26,6 +26,8 @@ export const WORLD = {
     en: 'Slide to walk\nTap nearby people or\nfurniture, or the button,\nto talk or check',
   },
   'world.examine': { ja: '調べる', en: 'Check' },
+  // 店の販売機の「新入荷」の札（2026-11-02 指示書 AV。いちばん新しく並んだシリーズのパックをまだ開けていないとき）
+  'world.newArrival': { ja: 'NEW', en: 'NEW' },
   'world.researcher.title': { ja: 'カード研究所', en: 'Card Laboratory' },
   'world.researcher.text': { ja: '図鑑を見ますか？ 欠片がそろっていれば、解析台で特別復元もできますよ。', en: 'Would you like to see the album? If you have all the shards, we can also do a special restoration at the analysis table.' },
   'world.researcher.collection': { ja: '図鑑を見る', en: 'View Album' },

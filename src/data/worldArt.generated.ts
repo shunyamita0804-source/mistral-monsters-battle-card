@@ -162,6 +162,8 @@ export interface ArtMap {
   readonly loops?: readonly ArtLoop[];
   /** 部屋を画面の高さに合わせるときの基準の高さ（無ければ絵の高さ） */
   readonly fitHeight?: number;
+  /** 絵の上に、遊びの進み具合で変わる物を重ねる所（設計図の単位。z は人と前後を比べる高さ。2026-11-02 指示書 AV：販売機の「新入荷」の札 NEW_PLATE） */
+  readonly slots?: Readonly<Record<string, { readonly x: number; readonly y: number; readonly w: number; readonly h: number; readonly z: number }>>;
 }
 
 export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
@@ -3627,18 +3629,18 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
    },
    {
     "file": img106,
-    "x": 1134,
-    "y": 491,
-    "w": 624,
-    "h": 304,
+    "x": 1206,
+    "y": 512,
+    "w": 479,
+    "h": 261,
     "z": 412
    },
    {
     "file": img107,
-    "x": 1268,
-    "y": 106,
-    "w": 354,
-    "h": 544,
+    "x": 1321,
+    "y": 270,
+    "w": 248,
+    "h": 380,
     "z": 650
    },
    {
@@ -3682,9 +3684,9 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
     "h": 7
    },
    "PACK_MACHINE": {
-    "x": 39,
+    "x": 41,
     "y": 16,
-    "w": 12,
+    "w": 9,
     "h": 5
    },
    "SHELF_WALL": {
@@ -3754,6 +3756,15 @@ export const WORLD_ART: Readonly<Record<string, ArtMap>> = {
      "h": 12
     }
    }
-  ]
+  ],
+  "slots": {
+   "NEW_PLATE": {
+    "x": 1374,
+    "y": 577,
+    "w": 65,
+    "h": 41,
+    "z": 651
+   }
+  }
  }
 };
