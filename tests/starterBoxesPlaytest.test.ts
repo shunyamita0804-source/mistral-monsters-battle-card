@@ -7,6 +7,7 @@ import type { CpuSkill } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import { actingSide, applyAction, cardUsability, createBattle, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { boosterDeck } from '../src/game/story/introV2.ts';
+import { countCards, isDeckValid, type Deck } from '../src/game/deck/deck.ts';
 
 /**
  * 3箱の総当たり（実際の対戦の決まりと CPU の思考で最後まで）。2026-11-02 の正式配布（PR #1）で作り、指示書 AM の箱（旅立ち＝ソラモ・リリル・ノビトン／
@@ -21,6 +22,29 @@ import { boosterDeck } from '../src/game/story/introV2.ts';
  */
 const GAMES = Number(process.env.PLAYTEST ?? 2);
 const SKILL = (process.env.PLAYTEST_SKILL ?? 'B') as CpuSkill;
+/**
+ * 2026-11-02 指示書 AO：試遊用の中身（ゲームの箱は変えない）。PLAYTEST_VARIANT=V0（いまの箱）・V1・V2
+ * - V1：烈火のラズック とびかかり 3→2・みだれづめ 2→1、空いた2枚を おびきよせ 1→2・ダストキック 1→2
+ * - V2：V1 ＋ 烈火のガウル 連続つつき 3→2、空いた1枚を 威嚇 2→3
+ */
+const VARIANT = (process.env.PLAYTEST_VARIANT ?? 'V0') as 'V0' | 'V1' | 'V2';
+const VARIANT_CHANGES: Record<'V0' | 'V1' | 'V2', Partial<Record<BoosterKey, Record<string, number>>>> = {
+  V0: {},
+  V1: { 'booster-2': { 'skl-lazuck-03': -1, 'skl-lazuck-04': -1, 'skl-lazuck-07': 1, 'skl-lazuck-08': 1 } },
+  V2: { 'booster-2': { 'skl-lazuck-03': -1, 'skl-lazuck-04': -1, 'skl-lazuck-07': 1, 'skl-lazuck-08': 1, 'skl-gauul14-02': -1, 'skl-gauul14-10': 1 } },
+};
+/** 試遊の箱の中身（VARIANT の足し引きをした山札。枚数は60のまま） */
+export function playtestDeck(key: BoosterKey, variant: 'V0' | 'V1' | 'V2' = VARIANT): Deck {
+  const deck = boosterDeck(key);
+  const change = VARIANT_CHANGES[variant][key];
+  if (!change) return deck;
+  const skills = [...deck.skills];
+  for (const [id, n] of Object.entries(change)) {
+    if (n > 0) for (let i = 0; i < n; i++) skills.push(id);
+    else for (let i = 0; i < -n; i++) skills.splice(skills.indexOf(id), 1);
+  }
+  return { ...deck, skills };
+}
 const MAX_STEPS = 6000;
 const W_SCRATCH = 'skl-tsumuji-02';
 const PAIRS: readonly (readonly [BoosterKey, BoosterKey])[] = [
@@ -60,7 +84,7 @@ interface Oddities {
 /** 1対戦：a（player）と b（opponent） */
 function playOne(a: BoosterKey, b: BoosterKey, seed: number, first: Side, use: Record<BoosterKey, Record<string, number>>, odd: Oddities, chained: Record<BoosterKey, number>): BattleState {
   const box: Record<Side, BoosterKey> = { player: a, opponent: b };
-  let state = createBattle({ name: 'A', deck: boosterDeck(a) }, { name: 'B', deck: boosterDeck(b) }, seed, first);
+  let state = createBattle({ name: 'A', deck: playtestDeck(a) }, { name: 'B', deck: playtestDeck(b) }, seed, first);
   let steps = 0;
   for (; steps < MAX_STEPS && state.phase !== 'ended'; steps++) {
     const side = actingSide(state);
@@ -124,6 +148,20 @@ const summary = (t: Tally) => ({
 });
 
 describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', () => {
+  it('試遊用の中身（V0・V1・V2）は山札60枚・同じカード3枚まで・ルールに合う。V0 はゲームの箱と同じ', () => {
+    for (const v of ['V0', 'V1', 'V2'] as const) {
+      for (const key of ['booster-1', 'booster-2', 'booster-3'] as const) {
+        const d = playtestDeck(key, v);
+        expect(d.skills, `${v} ${key}`).toHaveLength(60);
+        expect(Math.max(...Object.values(countCards(d.skills))), `${v} ${key}`).toBeLessThanOrEqual(3);
+        expect(isDeckValid(d, countCards([...d.monsters, ...d.skills])), `${v} ${key}`).toBe(true);
+      }
+    }
+    expect(playtestDeck('booster-2', 'V0')).toEqual(boosterDeck('booster-2'));
+    const v2 = countCards(playtestDeck('booster-2', 'V2').skills);
+    expect([v2['skl-lazuck-03'], v2['skl-lazuck-04'], v2['skl-lazuck-07'], v2['skl-lazuck-08'], v2['skl-gauul14-02'], v2['skl-gauul14-10']]).toEqual([2, 1, 2, 2, 2, 3]);
+  });
+
   it(`3組み合わせ × 2方向 × ${GAMES} 回（腕前 ${SKILL} どうし）`, () => {
     const boxes: Record<BoosterKey, Tally> = { 'booster-1': tally(), 'booster-2': tally(), 'booster-3': tally() };
     const use: Record<BoosterKey, Record<string, number>> = { 'booster-1': {}, 'booster-2': {}, 'booster-3': {} };
@@ -164,6 +202,7 @@ describe('2026-11-02 正式配布の3箱の総当たり（自動の対戦）', (
     };
     const out = {
       date: '2026-11-02',
+      variant: VARIANT,
       boxes: Object.fromEntries(PAIRS.flat().filter((k, i, all) => all.indexOf(k) === i).map((k) => [k, boosterDeck(k).monsters])),
       cpuSkill: SKILL,
       gamesPerDirection: GAMES,

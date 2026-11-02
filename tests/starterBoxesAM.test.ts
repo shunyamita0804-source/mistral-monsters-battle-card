@@ -144,7 +144,7 @@ describe('3箱・9枠（指示書 AM）', () => {
   });
 });
 
-describe('4技の性能（ユーザー承認）とミュロル・カルシェルの LIFE', () => {
+describe('4技の性能（ユーザー承認）とミュロル・カルシェルの LIFE（指示書 AO で 7・8 に戻した）', () => {
   const guardOf = (id: string) => {
     const k = getSkill(id);
     return { mana: k.cost, reduce: guardReduction(k), against: k.effect.type === 'defense' ? k.effect.against : null };
@@ -161,21 +161,21 @@ describe('4技の性能（ユーザー承認）とミュロル・カルシェル
     expect(guardOf('skl-kalshell-12')).toEqual({ mana: 2, reduce: 5, against: 'wisdom' });
   });
 
-  it('LIFE：ミュロル 6・カルシェル 7。対戦の最大ライフも同じで、回復しても超えない', () => {
-    expect(MYUROL_MONSTER.life).toBe(6);
-    expect(KALSHELL_MONSTER.life).toBe(7);
+  it('LIFE：ミュロル 7・カルシェル 8（指示書 AO で戻した）。対戦の最大ライフも同じで、回復しても超えない', () => {
+    expect(MYUROL_MONSTER.life).toBe(7);
+    expect(KALSHELL_MONSTER.life).toBe(8);
     const deck = { monsters: ['mon-myurol', 'mon-kalshell', 'mon-soramo'], skills: Array.from({ length: 60 }, () => 'skl-soramo14-03') };
     let s: BattleState = createBattle({ name: 'P', deck }, { name: 'O', deck }, 3, 'player');
-    expect(s.sides.player.monsters.map((m) => [m.maxLife, m.life])).toEqual([[6, 6], [7, 7], [7, 7]]);
-    // 薬草（ライフ+1）：ライフ5のミュロル → 6、満タンのカルシェルは 7 のまま
+    expect(s.sides.player.monsters.map((m) => [m.maxLife, m.life])).toEqual([[7, 7], [8, 8], [7, 7]]);
+    // 薬草（ライフ+1）：ライフ6のミュロル → 7、満タンのカルシェルは 8 のまま
     const hand = (cards: string[]) => cards.map((cardId, i) => ({ uid: `p${i}`, cardId }));
     const side = (k: Side, patch: Partial<BattleState['sides']['player']>) => ({ ...s, sides: { ...s.sides, [k]: { ...s.sides[k], ...patch } } });
     s = { ...side('player', { hand: hand(['sup-1', 'sup-1']), manaPile: Array.from({ length: 10 }, () => 'x') }), phase: 'main', manaConvertLimit: null };
-    s = { ...s, sides: { ...s.sides, player: { ...s.sides.player, monsters: s.sides.player.monsters.map((m) => (m.uid === 'p-m1' ? { ...m, life: 5 } : m)) } } };
+    s = { ...s, sides: { ...s.sides, player: { ...s.sides.player, monsters: s.sides.player.monsters.map((m) => (m.uid === 'p-m1' ? { ...m, life: 6 } : m)) } } };
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'p-m1' });
-    expect(s.sides.player.monsters[0]?.life).toBe(6);
+    expect(s.sides.player.monsters[0]?.life).toBe(7);
     if (cardUsability(s, 'player', 'p1').usable) s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p1', targetUid: 'p-m2' });
-    expect(s.sides.player.monsters[1]?.life).toBe(7);
+    expect(s.sides.player.monsters[1]?.life).toBe(8);
   });
 });
 

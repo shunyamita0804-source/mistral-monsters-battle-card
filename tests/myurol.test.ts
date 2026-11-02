@@ -250,8 +250,8 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
     expect(deck.skills).toContain(myu(1));
   });
 
-  it('モンスター：ライフ6（2026-11-02 ユーザー決定で 7→6）・水色。正式モンスターカード（2026-10-31 指示書 AC【3】）。バトル用カードは届いた透過 PNG（無改変）と水色の枠。技カードの枠も水色', () => {
-    expect(MYUROL_MONSTER.life).toBe(6);
+  it('モンスター：ライフ7（2026-11-02 に 6 にしたが、指示書 AO で 7 に戻した）・水色。正式モンスターカード（2026-10-31 指示書 AC【3】）。バトル用カードは届いた透過 PNG（無改変）と水色の枠。技カードの枠も水色', () => {
+    expect(MYUROL_MONSTER.life).toBe(7);
     expect(MYUROL_MONSTER.name).toBe('ミュロル');
     expect(MYUROL_MONSTER.themeColor).toBe(MYUROL_COLOR);
     expect(MYUROL_COLOR).toBe('#84E5FA');
@@ -293,7 +293,7 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
 
 // 自分：ミュロル（m1）・ソラモ（m2）・ラズック（m3）。相手も同じ
 const deck = { monsters: ['mon-myurol', 'mon-soramo', 'mon-lazuck'], skills: Array.from({ length: 60 }, () => sor(1)) };
-/** ミュロルの最大ライフ（2026-11-02 ユーザー決定で 7→6。下の数字は「最大ライフ − 受けたダメージ」で書く） */
+/** ミュロルの最大ライフ（7。下の数字は「最大ライフ − 受けたダメージ」で書く） */
 const LIFE = MYUROL_MONSTER.life;
 
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, active: Side = 'player'): BattleState {
@@ -409,16 +409,16 @@ describe('ミュロルの技：効果（指示書 AJ。細かい裁定は docs/b
     expect(shielded.pending && incomingDamage(shielded, shielded.pending)).toBe(2);
   });
 
-  it('09 みずあび：使ったミュロルのライフ+2（指示書 AJ。マナ2）。最大ライフ（2026-11-02 から 6）を超えない', () => {
-    let s = withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 3 });
+  it('09 みずあび：使ったミュロルのライフ+2（指示書 AJ。マナ2）。最大ライフ（7）を超えない', () => {
+    let s = withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 4 });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0' });
-    expect(monster(s, 'p-m1').life).toBe(5);
+    expect(monster(s, 'p-m1').life).toBe(6);
     expect(manaOf(s.sides.player)).toBe(8);
     expect(s.log.at(-1)?.text).toBe('ミュロルのライフが2回復。');
     const full = applyAction(scene({ player: [myu(9)] }), { type: 'useCard', side: 'player', cardUid: 'p0' });
-    expect(monster(full, 'p-m1').life).toBe(6);
-    const almost = applyAction(withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 5 }), { type: 'useCard', side: 'player', cardUid: 'p0' });
-    expect(monster(almost, 'p-m1').life).toBe(6);
+    expect(monster(full, 'p-m1').life).toBe(7);
+    const almost = applyAction(withMonster(scene({ player: [myu(9)] }), 'p-m1', { life: 6 }), { type: 'useCard', side: 'player', cardUid: 'p0' });
+    expect(monster(almost, 'p-m1').life).toBe(7);
   });
 
   it('10 しっぽガード・11 みずのまく：ちから−3／かしこさ−3（2026-11-02 ユーザー決定でマナ 0→1）。0未満にならない。種類が違えば使えない。マナ0では使えない', () => {
