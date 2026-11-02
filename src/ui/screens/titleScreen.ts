@@ -68,6 +68,8 @@ export const titleScreen: ScreenDefinition = {
         button(t('title.settings'), () => ctx.navigate('options'), 'btn title__btn title__btn--settings'),
         // 開発用（?qa=1 のときだけ）：歩きの確認画面
         store.qa ? button(t('walkLab.title'), () => ctx.navigate('walkLab'), 'btn btn--small') : null,
+        // 確かめ用（?qa=1 のときだけ）：蒼海（みちしおあり）を試す。セーブがなくても遊べる（2026-11-02 指示書 AP）
+        store.qa ? button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small') : null,
       ),
       h('p', { class: 'title__footer', text: t('title.footer', { version: APP_INFO.version }) }),
     );
