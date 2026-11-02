@@ -13,10 +13,10 @@ import { mountStage } from './stage.ts';
 /** セーブがなくても開ける画面（歩きの確認画面は自分用の仮セーブで動く） */
 const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'prologue', 'newGame', 'options', 'walkLab'];
 
-/** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）を直接開ける */
+/** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）・?lab=soukai で蒼海（みちしおあり）を試す画面（2026-11-02 指示書 AP）を直接開ける */
 export function initialScreen(qa: boolean, search: string): ScreenId {
   const lab = qa ? new URLSearchParams(search).get('lab') : null;
-  return lab === 'walk' ? 'walkLab' : lab === 'pukarim' ? 'pukarimLab' : lab === 'geol' ? 'geolLab' : lab === 'event' ? 'eventDungeonLab' : INITIAL_SCREEN;
+  return lab === 'walk' ? 'walkLab' : lab === 'pukarim' ? 'pukarimLab' : lab === 'geol' ? 'geolLab' : lab === 'event' ? 'eventDungeonLab' : lab === 'soukai' ? 'soukaiLab' : INITIAL_SCREEN;
 }
 
 /** アプリ全体の組み立て：ステージを用意し、ルーターの変化に合わせて画面を差し替える */

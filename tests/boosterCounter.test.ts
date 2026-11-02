@@ -3,7 +3,7 @@ import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import contents from '../src/data/official/booster_contents_20261030.json';
 import before from '../src/data/official/booster_contents_20261029.json';
-import ajContents from '../src/data/official/booster_contents_20261102_AM.json';
+import ajContents from '../src/data/official/booster_contents_20261102_AO.json';
 import { ajBoxRows } from '../src/data/skillRebuildAJ.ts';
 import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
@@ -29,7 +29,7 @@ const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginE
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
 describe('ブースターの箱＝初期配布', () => {
-  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（2026-11-02 指示書 AM〔booster_contents_20261102_AM.json〕。サポートは指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
+  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（2026-11-02 指示書 AP〔booster_contents_20261102_AO.json。AM の版に烈火のラズックの V1〕。サポートは指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
     expect(ajContents.booster_groups.map((g) => g.booster_key)).toEqual(BOOSTERS.map((b) => b.key));
     for (const group of ajContents.booster_groups) {
       const key = group.booster_key as BoosterKey;
@@ -91,10 +91,10 @@ describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとか
     }
   });
 
-  it('烈火の猛攻（2026-11-02 正式配布・指示書 AM）：ラズック ひっかき2・かみつき2・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ3（レアのトリックショット・シャドウバーストは入らない）、ノビトンは旅立ちへ（くしゃみ2・ミラージュノーズ2）', () => {
+  it('烈火の猛攻（2026-11-02 指示書 AP の V1）：ラズック ひっかき2・かみつき2・とびかかり2・みだれづめ1・しっぷうタックル2・おびきよせ2・ダストキック2・シャドウスリップ3（レアのトリックショット・シャドウバーストは入らない）、ノビトンは旅立ちへ（くしゃみ2・ミラージュノーズ2）', () => {
     const c = ids('booster-2');
     const laz = (n: string): number => c[n] ?? 0;
-    expect([1, 2, 3, 4, 6, 7, 8, 15, 9, 10].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([2, 2, 3, 2, 2, 1, 1, 3, 0, 0]);
+    expect([1, 2, 3, 4, 6, 7, 8, 15, 9, 10].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([2, 2, 2, 1, 2, 2, 2, 3, 0, 0]);
     expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([0, 0]);
     expect([5, 6].map((n) => ids('booster-1')[`skl-nobiton-0${n}`] ?? 0)).toEqual([2, 2]);
   });

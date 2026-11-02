@@ -8,7 +8,7 @@ export type { Habitat };
  * - 数字はモンファーBC（PS 版・LIFE は同じ 6〜10）を物差しに上げ直した（LIFE はどのモンスターも変えない）
  * - 名前を変えた技は、カードの ID と絵はそのまま（名前と数字・効果だけ変える）。新しい技（skl-kalshell-15・skl-desuoru-15・16）の絵は仮（art）
  * - 居場所（地上・空中・水中）：MONSTER_HABITAT。場が水中（みちしお）のあいだは全員を水中として扱う（src/game/battle/engine.ts）
- * - box：最初の箱（ブースター）に入れる枚数（箱に入る9体だけ。src/data/introV2.ts）。2026-11-02 指示書 AM の src/data/official/booster_contents_20261102_AM.json と同じ
+ * - box：最初の箱（ブースター）に入れる枚数（箱に入る9体だけ。src/data/introV2.ts）。2026-11-02 指示書 AP の src/data/official/booster_contents_20261102_AO.json と同じ（AM の版に烈火のラズックの V1 の直し）
  *   （ツムジのほかは正式配布 _20261102_final の16枚のまま。tests/starterBoxesAM.test.ts で照らし合わせる）
  * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリル、指示書 AL でフォルンを足して17体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
  * 決まりの細かい所は docs/battle-rules.md「指示書 AJ」
@@ -143,19 +143,19 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: T_WISDOM, box: 2 },
     { id: 'skl-kalshell-13', name: 'てっぺきシェル', cat: '防', mana: 3, damage: null, effect: { type: 'defense', against: 'all', nullify: true }, text: T_BOTH, rare: true, box: 0 },
   ],
-  // ラズック（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 正式配布）］
+  // ラズック（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 正式配布。指示書 AP で V1：とびかかり 3→2・みだれづめ 2→1・おびきよせ 1→2・ダストキック 1→2）］
   'mon-lazuck': [
     { id: 'skl-lazuck-01', name: 'ひっかき', cat: 'ち', mana: 0, damage: 1, text: null, box: 2 },
     { id: 'skl-lazuck-02', name: 'かみつき', cat: 'ち', mana: 1, damage: 1, text: null, box: 2 },
-    { id: 'skl-lazuck-03', name: 'とびかかり', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
-    { id: 'skl-lazuck-04', name: 'みだれづめ', cat: 'ち', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 2 },
+    { id: 'skl-lazuck-03', name: 'とびかかり', cat: 'ち', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-lazuck-04', name: 'みだれづめ', cat: 'ち', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 1 },
     { id: 'skl-lazuck-06', name: 'しっぷうタックル', cat: 'ち', mana: 4, damage: 4, text: null, box: 2 },
     { id: 'skl-lazuck-09', name: 'トリックショット', cat: 'か', mana: 2, damage: 3, text: null, rare: true },
     { id: 'skl-lazuck-10', name: 'シャドウバースト', cat: 'か', mana: 4, damage: 4, text: null, rare: true },
-    { id: 'skl-lazuck-07', name: 'おびきよせ', cat: '特', mana: 2, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、ラズックしか攻撃できない', box: 1 },
+    { id: 'skl-lazuck-07', name: 'おびきよせ', cat: '特', mana: 2, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、ラズックしか攻撃できない', box: 2 },
     {
       id: 'skl-lazuck-08', name: 'ダストキック', cat: '特', mana: 0, damage: null,
-      effect: { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' }, text: '相手の次のターンのちから技−1', box: 1,
+      effect: { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' }, text: '相手の次のターンのちから技−1', box: 2,
     },
     { id: 'skl-lazuck-itazura', name: 'いたずら', cat: '特', mana: 2, damage: null, effect: { type: 'handToDeck' }, text: '相手の手札1枚をランダムに山札へ（補充なし）', rare: true },
     { id: 'skl-lazuck-15', name: 'シャドウスリップ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 3 },

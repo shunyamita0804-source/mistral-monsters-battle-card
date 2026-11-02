@@ -138,3 +138,30 @@ export function playMatch(a: Deck, b: Deck, seed: number, first: Side): MatchRes
   }
   return { winner: state.winner, turns: state.turn, stats };
 }
+
+/**
+ * 蒼海の守り「みちしおあり」（2026-11-02 指示書 AP の T1。試遊・確かめ用の入口だけで使う。ゲームの箱は変えない）：
+ * カルシェルの はさむ 3→2・すなをほる 2→1・みちしお 0→1・タイダルクラッシュ 0→1
+ */
+export const SOUKAI_TIDE_T1: Readonly<Record<string, number>> = { 'skl-kalshell-01': -1, 'skl-kalshell-10': -1, 'skl-kalshell-15': 1, 'skl-kalshell-08': 1 };
+
+/** 箱の山札に足し引きした山札（枚数は60のまま）。同じカードは3枚まで（足し引きの側で守る） */
+export function adjustedBoxDeck(key: BoosterKey, change: Readonly<Record<string, number>>): Deck {
+  const deck = boosterDeck(key);
+  const skills = [...deck.skills];
+  for (const [id, n] of Object.entries(change)) {
+    if (n > 0) for (let i = 0; i < n; i++) skills.push(id);
+    else
+      for (let i = 0; i < -n; i++) {
+        const at = skills.indexOf(id);
+        if (at < 0) throw new Error(`山札に ${id} がありません`);
+        skills.splice(at, 1);
+      }
+  }
+  return { ...deck, skills };
+}
+
+/** 蒼海の守り「みちしおあり」（T1）の山札 */
+export function soukaiTideDeck(): Deck {
+  return adjustedBoxDeck('booster-3', SOUKAI_TIDE_T1);
+}
