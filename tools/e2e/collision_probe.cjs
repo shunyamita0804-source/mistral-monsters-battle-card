@@ -3,7 +3,7 @@
 //   台本.json：[{ "name": "bureau_board", "at": { "mapId": "bureau", "x": 30, "y": 20, "dir": "left" },
 //                "steps": ["L3", "shot", "E", "shot:after"] }, ...]
 //   L・R・U・D＋回数＝その向きへ1マスずつ進む（進めなければそこで止まる。向きは変わる）。E＝調べる（Enter）。W＋ミリ秒＝待つ。
-//   shot・shot:名前＝写真。ESC＝窓を閉じる。どの手も、そのあとの位置（地図・x・y）と、出ている窓の文字を記録する（出力フォルダ/log.json）
+//   shot・shot:名前＝写真。ESC＝窓を閉じる。CLICK:文字＝画面のその文字を押す。どの手も、そのあとの位置（地図・x・y）と、出ている窓の文字を記録する（出力フォルダ/log.json）
 //   HIT=0 で当たりの網目（?qa=1&hit=1）を出さない。導入は終わったセーブ（すべての建物に入れる）。
 //   "intro": { "state": "escortToSchool", ... } で導入の進み具合を、"fresh": true で新しく始めたセーブ（カード無し）を使う
 const { chromium } = require('playwright');
@@ -26,7 +26,10 @@ async function open(browser, at, intro, fresh) {
   await page.waitForTimeout(800);
   await page.evaluate(async ([at, intro, fresh]) => {
     const { createNewSave, createNewGameSave } = await import('/src/game/save/saveData.ts');
-    const s = fresh ? createNewGameSave(new Date(2026, 10, 2)) : createNewSave(new Date(2026, 10, 2));
+    // 2026-11-02 指示書 AT のイベント（ミレイユの話など）が歩く前に出ないよう、イベントはすべて見たことにする
+    const { STORY_EVENTS, storyEventFlag } = await import('/src/data/storyEvents.ts');
+    const s0 = fresh ? createNewGameSave(new Date(2026, 10, 2)) : createNewSave(new Date(2026, 10, 2));
+    const s = { ...s0, storyFlags: [...s0.storyFlags, ...STORY_EVENTS.map((e) => storyEventFlag(e.id))] };
     const done = { state: 'completed', selectedBoosterKey: 'booster-1', boosterClaimed: true, boosterGranted: true, examPassed: true };
     const story = { ...s.story, introV2: { ...s.story.introV2, ...(intro ? intro : done) } };
     localStorage.setItem('mistria-battle-card/save', JSON.stringify({ ...s, player: { gender: 'male', name: 'テスト' }, coins: 5000, story, location: at }));
@@ -78,6 +81,10 @@ async function step(page, key) {
       if (s === 'E') {
         await page.keyboard.press('Enter');
         await page.waitForTimeout(900);
+      } else if (s.startsWith('CLICK:')) {
+        // 画面の文字を押す（大会受付の「戻る」など。2026-11-02）
+        await page.locator(`text=${s.slice(6)}`).first().click();
+        await page.waitForTimeout(1200);
       } else if (s === 'ESC') {
         await page.keyboard.press('Escape');
         await page.waitForTimeout(400);

@@ -43,12 +43,13 @@ const npcOf = (map: MapDefinition, id: string): NpcObject => {
 };
 
 describe('カウンターの奥に見える人のまわり（P0-4 研究所・P0-6 大会会場）', () => {
-  it('ルーカス・エレノア・花屋・仕立て屋（2.5マス以上奥に見える人）は本人のマスだけ。セリア・ショップの店員は今までどおり', () => {
+  // 2026-11-02 iPhone 試遊（2回目）「カウンターの左のはしで動けなくなる」：セリアも本人のマスだけに（受付の前の行を、セリアの真ん前まで歩ける）
+  it('ルーカス・エレノア・花屋・仕立て屋（2.5マス以上奥に見える人）とセリアは本人のマスだけ。ショップの店員は今までどおり', () => {
     expect(npcOf(LAB, 'lab-researcher').space).toEqual({ x: 0, y: 0 });
     expect(npcOf(BUREAU, 'bureau-clerk').space).toEqual({ x: 0, y: 0 });
     expect(npcOf(FLORIST, 'florist-keeper').space).toEqual({ x: 0, y: 0 });
     expect(npcOf(TAILOR, 'tailor-keeper').space).toEqual({ x: 0, y: 0 });
-    expect(npcOf(HALL, 'hall-receptionist').space).toBeUndefined();
+    expect(npcOf(HALL, 'hall-receptionist').space).toEqual({ x: 0, y: 0 });
     expect(npcOf(SHOP, 'shop-clerk').space).toBeUndefined();
   });
 
@@ -67,10 +68,11 @@ describe('カウンターの奥に見える人のまわり（P0-4 研究所・P0
     expect(analysis).toBeDefined();
   });
 
-  it('大会会場：受付の前の行（セリアの前はふさがる）と、その1つ手前の行で、入口から受付の右はしまで行ける。セリアに話せる', () => {
+  it('大会会場：受付の前の行（セリアの真ん前も）と、その1つ手前の行で、入口から受付の右はしまで行ける。セリアに話せる', () => {
     const { blocked, area } = walker(HALL);
     const celia = npcOf(HALL, 'hall-receptionist');
-    expect(blocked(celia.x, celia.y + 1)).toBe(true);
+    expect(blocked(celia.x, celia.y + 1)).toBe(false);
+    expect(nearestNpc(HALL, { x: celia.x, y: celia.y + 1 }, () => true, TALK)?.id).toBe('hall-receptionist');
     for (let x = 40; x <= 56; x++) expect(blocked(x, celia.y + 2), `${x}`).toBe(false);
     expect(at(area, 56, celia.y + 1)).toBe(true);
     expect(nearestNpc(HALL, { x: celia.x, y: celia.y + 2 }, () => true, TALK)?.id).toBe('hall-receptionist');
