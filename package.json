@@ -58,7 +58,8 @@
     "playtest:stella": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-thunder-boss PLAYTEST_SCALES=0.8:1.4:0.05 PLAYTEST_OUT=docs/design/thunder-plateau-ah-20261101/stella_scan_1000.json vitest run tests/bossPlaytest.test.ts",
     "playtest:thunder": "PLAYTEST=150 PLAYTEST_OUT=docs/design/thunder-plateau-ah-20261101/thunder_walk_150.json vitest run tests/thunderPlateau.test.ts",
     "playtest:barca": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-fire-boss PLAYTEST_SCALES=1.0:1.09:0.01 PLAYTEST_OUT=docs/design/barca-ac-20261031/barca_scan_1000.json vitest run tests/bossPlaytest.test.ts",
-    "playtest:regulars": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/regulars_200.json vitest run tests/regularsPlaytest.test.ts"
+    "playtest:regulars": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/regulars_200.json vitest run tests/regularsPlaytest.test.ts",
+    "playtest:balance": "PLAYTEST=1000 PLAYTEST_OUT=docs/design/balance-au-20261102/balance_1000.json vitest run tests/balancePlaytest.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

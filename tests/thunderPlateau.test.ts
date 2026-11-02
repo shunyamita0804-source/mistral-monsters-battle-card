@@ -116,7 +116,7 @@ describe('人：守り手ステラ・バトラーのルカ', () => {
   });
 
   it('ボス ステラ：ノビトン・ハクラン（真ん中・切り札）・プカリム・腕前 A', () => {
-    expect(ENCOUNTERS['enc-thunder-boss']).toMatchObject({ name: 'ステラ', monsters: ['mon-nobiton', HAKURAN_MONSTER_ID, 'mon-pukarim'], ace: HAKURAN_MONSTER_ID, skill: 'A', lifeScale: 1 });
+    expect(ENCOUNTERS['enc-thunder-boss']).toMatchObject({ name: 'ステラ', monsters: ['mon-nobiton', HAKURAN_MONSTER_ID, 'mon-pukarim'], ace: HAKURAN_MONSTER_ID, skill: 'A', lifeScale: 1.36 });
     expect(runBossOpponent(ID).monsters[1]).toBe(HAKURAN_MONSTER_ID);
   });
 
