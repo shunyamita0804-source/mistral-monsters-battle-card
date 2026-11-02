@@ -1,0 +1,275 @@
+/* ===== 序盤〜C大会後のイベント（2026-11-02 指示書 AT。src/ui/components/storyEventPlayer.ts） ===== */
+
+/* せりふの窓：顔の絵と名前・文 */
+.story-event .story-event__who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.story-event .story-event__who .person-face {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 8px;
+}
+
+.story-event__name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.story-event__text {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.story-event--narration .story-event__text {
+  font-style: normal;
+  color: var(--color-sub, #d9d4c6);
+}
+
+.story-event .modal__actions .btn {
+  min-height: 44px;
+}
+
+/* カードを大きく見せる窓（owned／preview_only／reward）。カードの絵・枠・名前・LIFE は加工しない。光はカードの外に */
+.story-card .modal__panel,
+.modal__panel.story-card {
+  max-height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
+  overflow-y: auto;
+}
+
+.story-card__label {
+  margin: 0 0 8px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.story-card__view {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.story-card--reward .story-card__view {
+  filter: drop-shadow(0 0 10px rgb(255 214 120 / 0.85));
+}
+
+/* 見せるだけのカードは「手に入れた」に見えないよう、金の光を付けない・札の色を落ち着かせる */
+.story-card--preview_only .story-card__label {
+  color: #b9c3d6;
+}
+
+.story-card__count {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* 小さな地図：ダンジョンの印を光らせる */
+.story-map {
+  position: relative;
+  width: 100%;
+}
+
+.story-map__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.story-map__pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.story-map__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffe08a;
+  box-shadow: 0 0 0 3px rgb(255 224 138 / 0.5), 0 0 14px 4px rgb(255 214 120 / 0.9);
+  animation: story-map-pulse 1.2s ease-in-out infinite;
+}
+
+.story-map__label {
+  margin-top: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgb(10 16 40 / 0.75);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@keyframes story-map-pulse {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+/* 世界地図の画面の印を光らせる（M15・M23） */
+.world-map__pin.is-story-glow .world-map__dot {
+  box-shadow: 0 0 0 3px rgb(255 224 138 / 0.6), 0 0 16px 6px rgb(255 214 120 / 0.95);
+  animation: story-map-pulse 1.2s ease-in-out infinite;
+}
+
+/* 物語の挿絵：画面いっぱい・上の3分の1に白い字（プロローグと同じ見た目） */
+.story-still {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  background: #000;
+  opacity: 0;
+  transition: opacity 700ms ease;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.story-still.is-active {
+  opacity: 1;
+}
+
+.story-still.is-leaving {
+  opacity: 0;
+  transition-duration: 500ms;
+}
+
+.story-still__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  transform-origin: 50% 60%;
+}
+
+.story-still.is-active .story-still__art {
+  transform: scale(1.04);
+  transition: transform 7000ms linear;
+}
+
+.story-still__text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 11%;
+  padding: 0 16px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  text-shadow:
+    0 1px 3px rgb(0 0 0 / 0.75),
+    0 0 14px rgb(0 0 0 / 0.55),
+    0 0 28px rgb(0 20 60 / 0.45);
+}
+
+/* story_02：セラの顔が上の3分の1の下の方にかかるので、字を上に寄せる */
+.story-still--top .story-still__text {
+  top: calc(env(safe-area-inset-top, 0px) + 56px);
+}
+
+.story-still--top .story-still__line {
+  margin-bottom: 0.6em;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.story-still__line {
+  margin: 0 0 1.2em;
+  font-size: 17px;
+  line-height: 1.75;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 1200ms ease,
+    transform 1200ms ease;
+}
+
+.story-still__line.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+.story-still__skip {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: 12px;
+  z-index: 2;
+  min-height: 40px;
+  padding: 0 16px;
+  background: rgb(10 16 40 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.5);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-still.is-active .story-still__art,
+  .story-map__dot,
+  .world-map__pin.is-story-glow .world-map__dot {
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+}
+
+/* 確かめ用の入口（?qa=1&lab=events） */
+.story-event-lab {
+  overflow-y: auto;
+}
+
+.story-event-lab__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px 24px;
+}
+
+.story-event-lab__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.story-event-lab__id {
+  min-width: 40px;
+  font-weight: 700;
+}
+
+.story-event-lab__title {
+  flex: 1;
+  min-width: 140px;
+  font-size: 14px;
+}
+
+.story-event-lab__note {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* 選択肢：ボタンを縦に並べる（長い選択肢でも画面からはみ出さない） */
+.story-event--choice .modal__actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.story-event--choice .modal__actions .btn {
+  width: 100%;
+  white-space: normal;
+}

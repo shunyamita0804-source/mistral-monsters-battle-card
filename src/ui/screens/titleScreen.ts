@@ -70,6 +70,7 @@ export const titleScreen: ScreenDefinition = {
         store.qa ? button(t('walkLab.title'), () => ctx.navigate('walkLab'), 'btn btn--small') : null,
         // 確かめ用（?qa=1 のときだけ）：蒼海（みちしおあり）を試す。セーブがなくても遊べる（2026-11-02 指示書 AP）
         store.qa ? button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small') : null,
+        store.qa ? button(t('storyEvent.lab.title'), () => ctx.navigate('storyEventLab'), 'btn btn--small') : null,
       ),
       h('p', { class: 'title__footer', text: t('title.footer', { version: APP_INFO.version }) }),
     );

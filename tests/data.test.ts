@@ -163,7 +163,8 @@ describe('マップ（仮）', () => {
   });
 
   it('ダンジョンは地下3階で、最下層にボスがいる', () => {
-    const dungeon = DUNGEONS[0];
+    // 固定のマップを持つ前の形のダンジョン（太古の遺跡。2026-11-02 指示書 AT で並びが変わったので ID で引く）
+    const dungeon = DUNGEONS.find((d) => d.id === 'dungeon-01');
     expect(dungeon?.floors).toHaveLength(3);
     const last = getMap(dungeon?.floors[2] ?? '');
     expect(last?.objects.some((o) => o.type === 'enemy' && o.boss)).toBe(true);

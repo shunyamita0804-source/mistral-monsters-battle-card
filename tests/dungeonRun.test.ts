@@ -162,7 +162,7 @@ describe('ダンジョンの挑戦', () => {
     }
   });
 
-  it('下りると次の階のスタート。上り階段はなく、最後の階より下へは行かない（太古の遺跡は 2026-10-29 から地下4階）', () => {
+  it('下りると次の階のスタート。上り階段はなく、最後の階より下へは行かない（太古の遺跡は 2026-11-02 指示書 AT から地下5階）', () => {
     const run = runOf(started(1));
     const r1 = descend(run);
     expect(r1.floor).toBe(1);
@@ -171,7 +171,9 @@ describe('ダンジョンの挑戦', () => {
     expect(r2.floor).toBe(2);
     const r3 = descend(r2);
     expect(r3.floor).toBe(3);
-    expect(descend(r3)).toBe(r3);
+    const r4 = descend(r3);
+    expect(r4.floor).toBe(4);
+    expect(descend(r4)).toBe(r4);
   });
 
   it('宝箱は1度だけ開く（2回目は中身なし）', () => {
@@ -236,9 +238,9 @@ describe('ダンジョンの挑戦', () => {
     expect(last.save.location).toEqual(save.location);
   });
 
-  it('ボスを倒すとクリア：挑戦が終わり、ボスのお金（遺跡は初回 600G・2回目から 180G）と初めてのときのカード（ジオルのモンスターカード）', () => {
+  it('ボスを倒すとクリア：挑戦が終わり、ボスのお金（遺跡は 2026-11-02 指示書 AT から B の段：初回 700G・2回目から 210G）と初めてのときのカード（ジオルのモンスターカード）', () => {
     let s = started(5);
-    s = { ...s, dungeonRun: descend(descend(descend(runOf(s)))) };
+    s = { ...s, dungeonRun: descend(descend(descend(descend(runOf(s))))) };
     const boss = runFloor(runOf(s)).entities.find((e) => e.kind === 'boss');
     if (!boss) throw new Error('ボスがいない');
     expect(runBossOpponent().monsters).toEqual(['mon-gauul', GEOL_MONSTER_ID, 'mon-lazuck']);
@@ -249,18 +251,18 @@ describe('ダンジョンの挑戦', () => {
     expect(w.cleared).toBe(true);
     expect(w.firstClear).toBe(true);
     expect(w.save.dungeonRun).toBeNull();
-    expect(w.save.coins).toBe(coins + 600);
+    expect(w.save.coins).toBe(coins + 700);
     expect(w.clearCards).toEqual([{ cardId: GEOL_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[GEOL_MONSTER_ID]).toBe((s.collection[GEOL_MONSTER_ID] ?? 0) + 1);
     expect(w.save.dungeons['dungeon-01']?.bossDefeated).toBe(true);
     // 2回目は初めてのカードなし。技カードはジオルの技から1枚
     expect(bossRewardCandidates(w.save, 'dungeon-01', runBossOpponent().monsters)).toEqual(skillsOf(GEOL_MONSTER_ID).map((k) => k.id));
-    const again = winRunBattle({ ...startRun(w.save, 'dungeon-01', 6), dungeonRun: { ...runOf(startRun(w.save, 'dungeon-01', 6)), floor: 3 } }, { kind: 'boss', id: boss.id }, 'skl-geol-03');
+    const again = winRunBattle({ ...startRun(w.save, 'dungeon-01', 6), dungeonRun: { ...runOf(startRun(w.save, 'dungeon-01', 6)), floor: 4 } }, { kind: 'boss', id: boss.id }, 'skl-geol-03');
     expect(again.firstClear).toBe(false);
-    expect(again.coins).toBe(180);
+    expect(again.coins).toBe(210);
     expect(again.clearCards).toEqual([]);
     expect(again.save.collection['skl-geol-03']).toBe((w.save.collection['skl-geol-03'] ?? 0) + 1);
-    expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 600, bossRepeat: 180 });
+    expect(DUNGEON_MONEY['dungeon-01']).toMatchObject({ bossFirst: 700, bossRepeat: 210 });
     // 精霊の森・水の神殿・氷の洞窟（2026-10-30 指示書 W）も切り札の報酬（2026-10-29 フルーネ・セレフィーンの最終）：初めてのクリアの前は技カードなし。ほかのダンジョンはいままでどおり（相手の3体の技から）
     expect(bossRewardCandidates(w.save, 'dungeon-02', ['mon-soramo'])).toEqual([]);
     expect(bossRewardCandidates(w.save, 'dungeon-03', ['mon-soramo'])).toEqual([]);

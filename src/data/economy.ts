@@ -229,18 +229,17 @@ export interface DungeonMoney {
 }
 
 export const DUNGEON_MONEY: Readonly<Record<string, DungeonMoney>> = {
-  // 太古の遺跡：2026-10-29 ジオルの最終で氷の洞窟と同じ段に（C ランクで開く・地下4階）
-  'dungeon-01': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
-  'dungeon-02': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
-  'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
-  'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
-  'dungeon-05': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
-  'dungeon-06': { win: 35, chest: [35, 70], bossFirst: 850, bossRepeat: 250 },
-  'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
-  // 風の渓谷（2026-10-30 指示書 U）：水の神殿と同じ段
-  'dungeon-08': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
-  // 雷の高原（2026-11-01 指示書 AH）：炎の火山と同じ段
-  'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
+  // 2026-11-02 指示書 AT：ダンジョンの並び直しにあわせて、そのランクの段の今の値にした（新しい決まりは作らない）。
+  // 最初＝15・D＝20・C＝25・B＝30・A＝35・S＝40（前は 森＝15・水と風＝20・氷と遺跡＝25・火と雷＝30）
+  'dungeon-08': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 }, // 風の渓谷（最初）
+  'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 }, // 水の神殿（D）
+  'dungeon-02': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 }, // 精霊の森（D）
+  'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 }, // 氷の洞窟（C）
+  'dungeon-05': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 }, // 炎の火山（C）
+  'dungeon-01': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 }, // 太古の遺跡（B）
+  'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 }, // 雷の高原（B）
+  'dungeon-06': { win: 35, chest: [35, 70], bossFirst: 850, bossRepeat: 250 }, // 機械の塔（A）
+  'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 }, // 天の聖域（S）
 };
 
 /** そのダンジョンのお金（表に無いダンジョンは太古の遺跡と同じ） */

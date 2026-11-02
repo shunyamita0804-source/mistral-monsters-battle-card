@@ -219,10 +219,10 @@ describe('腕前の割り当て（2026-10-30 指示書 Z・ユーザー OK の�
     }
   });
 
-  it('ダンジョン：森 C・水と風 C と B を半分ずつ・遺跡と氷と火 B・機械と聖域 A。ボスは1つ上', () => {
-    expect([1, 2, 3].map((i) => runNpcOpponent(1, i, 'dungeon-02').skill)).toEqual(['C', 'C', 'C']);
+  it('ダンジョン：最初の風 C・D の水と森 C と B を半分ずつ（2026-11-02 指示書 AT で並べ直し）・遺跡と氷と火 B・機械と聖域 A。ボスは1つ上', () => {
+    expect([1, 2, 3].map((i) => runNpcOpponent(1, i, 'dungeon-08').skill)).toEqual(['C', 'C', 'C']);
     expect([1, 2, 3, 4].map((i) => runNpcOpponent(1, i, 'dungeon-03').skill)).toEqual(['C', 'B', 'C', 'B']);
-    expect([1, 2].map((f) => runGuardianOpponent(f, 'dungeon-08').skill)).toEqual(['C', 'B']);
+    expect([1, 2].map((f) => runGuardianOpponent(f, 'dungeon-02').skill)).toEqual(['C', 'B']);
     for (const id of ['dungeon-01', 'dungeon-04', 'dungeon-05']) expect(runCpuSkill(id, 1)).toBe('B');
     for (const id of ['dungeon-06', 'dungeon-07']) expect(runGuardianOpponent(2, id).skill).toBe('A');
     const boss = (id: string): string | undefined => runBossOpponent(id).skill;

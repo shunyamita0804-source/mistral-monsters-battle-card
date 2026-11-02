@@ -15,6 +15,7 @@ import { EVENT_LAB } from './eventLab.ts';
 import { WORLD } from './world.ts';
 import { NAME_MESSAGES } from './name.ts';
 import { CALENDAR } from './calendar.ts';
+import { STORY_EVENT_MESSAGES } from './storyEvents.ts';
 
 /**
  * 画面の文字の辞書（固定キー → ja/en）。分野ごとのファイルに分け、ここでまとめる。
@@ -38,6 +39,7 @@ export const MESSAGE_GROUPS = {
   eventLab: EVENT_LAB,
   name: NAME_MESSAGES,
   calendar: CALENDAR,
+  storyEvents: STORY_EVENT_MESSAGES,
 } as const;
 
 export const MESSAGES = {
@@ -58,6 +60,7 @@ export const MESSAGES = {
   ...EVENT_LAB,
   ...NAME_MESSAGES,
   ...CALENDAR,
+  ...STORY_EVENT_MESSAGES,
 };
 
 export type MessageKey = keyof typeof MESSAGES;

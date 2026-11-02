@@ -80,7 +80,7 @@ describe('年と月', () => {
 
 describe('1か月進むとき・進まないとき', () => {
   it('ダンジョンのボスを倒して街に戻ると進む（途中のバトラーに勝っても進まない）', () => {
-    const { save, bossId } = atBoss(base(), 'dungeon-02');
+    const { save, bossId } = atBoss(base(), 'dungeon-08');
     const npc = runFloor(runOf(save)).entities.find((e) => e.kind === 'npc');
     if (npc) expect(winRunBattle(save, { kind: 'npc', id: npc.id }, null).save.calendar).toEqual({ year: 1, month: 4 });
     const w = winRunBattle(save, { kind: 'boss', id: bossId }, null);
@@ -89,8 +89,8 @@ describe('1か月進むとき・進まないとき', () => {
   });
 
   it('負けて街に戻されると進む（まだ負けられるあいだは進まない）', () => {
-    let s = startRun(base(), 'dungeon-02', 3);
-    for (let i = 1; i < maxLossesOf('dungeon-02'); i++) {
+    let s = startRun(base(), 'dungeon-08', 3);
+    for (let i = 1; i < maxLossesOf('dungeon-08'); i++) {
       const l = loseRunBattle(s, { kind: 'npc', id: 'f0-npc-1' });
       expect(l.expelled).toBe(false);
       expect(l.save.calendar.month).toBe(4);
@@ -102,7 +102,7 @@ describe('1か月進むとき・進まないとき', () => {
   });
 
   it('帰還の羽根で街に戻ると進む（ほかの道具では進まない）', () => {
-    const s = startRun({ ...base(), items: { returnFeather: 1, torch: 1 } }, 'dungeon-02', 3);
+    const s = startRun({ ...base(), items: { returnFeather: 1, torch: 1 } }, 'dungeon-08', 3);
     expect(useDungeonItem(s, 'torch').save.calendar.month).toBe(4);
     const r = useDungeonItem(s, 'returnFeather');
     expect(r.status).toBe('ok');
@@ -111,7 +111,7 @@ describe('1か月進むとき・進まないとき', () => {
   });
 
   it('大会が終わって景品を受け取ると進む（優勝でも負けでも・棄権でも）。参加しただけ・試合の途中では進まない', () => {
-    const ready = { ...at(base(), 6), dungeons: { 'dungeon-02': { openedChests: [], bossDefeated: true, clears: 1 } } };
+    const ready = { ...at(base(), 6), dungeons: { 'dungeon-08': { openedChests: [], bossDefeated: true, clears: 1 } } };
     let s = enterTournament(ready, 'tournament-e', 'e-1', 1);
     expect(s.activeTournament).not.toBeNull();
     expect(s.calendar.month).toBe(6);
@@ -134,7 +134,7 @@ describe('大会は 3・6・9月だけ・出場の条件', () => {
   const E = getTournament('tournament-e');
   const C = getTournament('tournament-c');
   if (!E || !C) throw new Error('大会がない');
-  const forest = { 'dungeon-02': { openedChests: [], bossDefeated: true, clears: 1 } };
+  const forest = { 'dungeon-08': { openedChests: [], bossDefeated: true, clears: 1 } };
 
   it('次の公式戦の月・次の行事の月', () => {
     expect([3, 6, 9].every(isOfficialMonth)).toBe(true);
@@ -158,22 +158,22 @@ describe('大会は 3・6・9月だけ・出場の条件', () => {
     expect(dec.reasons).toEqual(['12月はチーム戦の月です']);
   });
 
-  it('ボスを倒していないと受け付けない（「○○のボスをまだ倒していません」）。C は氷の洞窟と太古の遺跡の両方', () => {
+  it('ボスを倒していないと受け付けない（「○○のボスをまだ倒していません」）。C は氷の洞窟と炎の火山の両方（2026-11-02 指示書 AT）', () => {
     const june = entryCheck(at(base(), 6), E);
     expect(june.ok).toBe(false);
-    expect(june.reasons).toEqual(['精霊の森のボスをまだ倒していません']);
+    expect(june.reasons).toEqual(['風の渓谷のボスをまだ倒していません']);
     expect(entryCheck({ ...at(base(), 6), dungeons: forest }, E).ok).toBe(true);
-    expect(RANK_BOSS_DUNGEONS.C).toEqual(['dungeon-04', 'dungeon-01']);
+    expect(RANK_BOSS_DUNGEONS.C).toEqual(['dungeon-04', 'dungeon-05']);
     const c = { ...at(base(), 9), rank: 'C' as const, dungeons: { 'dungeon-04': { openedChests: [], bossDefeated: true, clears: 1 } } };
-    expect(missingBosses(c, 'C')).toEqual(['dungeon-01']);
-    expect(entryCheck(c, C).reasons).toEqual(['太古の遺跡のボスをまだ倒していません']);
+    expect(missingBosses(c, 'C')).toEqual(['dungeon-05']);
+    expect(entryCheck(c, C).reasons).toEqual(['炎の火山のボスをまだ倒していません']);
   });
 
-  it('通し：4月 → 精霊の森のボスを倒して戻る（5月）→ 寝る（6月・夏の挿絵）→ E の大会に出られる', () => {
+  it('通し：4月 → 風の渓谷のボスを倒して戻る（5月）→ 寝る（6月・夏の挿絵）→ E の大会に出られる', () => {
     const start = createNewGameSave();
     const deckOk = { ...start, deck: base().deck, collection: base().collection };
     expect(deckOk.calendar).toEqual({ year: 1, month: 4 });
-    const { save, bossId } = atBoss(deckOk, 'dungeon-02');
+    const { save, bossId } = atBoss(deckOk, 'dungeon-08');
     const may = winRunBattle(save, { kind: 'boss', id: bossId }, null).save;
     expect(may.calendar).toEqual({ year: 1, month: 5 });
     expect(entryCheck(may, E).reasons).toEqual(['次の公式戦は 6月です']);
@@ -185,6 +185,6 @@ describe('大会は 3・6・9月だけ・出場の条件', () => {
     // ボスを倒さずに6月にしたときは断られる
     const skip = advanceMonth(advanceMonth(deckOk));
     expect(skip.calendar.month).toBe(6);
-    expect(entryCheck(skip, E).reasons).toEqual(['精霊の森のボスをまだ倒していません']);
+    expect(entryCheck(skip, E).reasons).toEqual(['風の渓谷のボスをまだ倒していません']);
   });
 });

@@ -1,4 +1,7 @@
 import { cardCatalog, getMonster, skillsOf } from '../../data/cards.ts';
+import { playStoryEvent } from '../components/storyEventPlayer.ts';
+import { markStoryEventSeen, pendingStoryEvent, type EventContext } from '../../game/story/storyEvents.ts';
+import type { EventTrigger } from '../../data/storyEvents.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { recordPersonCard } from '../../game/people/peopleBook.ts';
 import { DUNGEON_RUN, runBattlerFace, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
@@ -340,8 +343,11 @@ class DungeonRunView {
     if (intro && dungeon) {
       this.#busy = true;
       showDungeonIntro(this.#root, dungeon, () => {
-        this.#busy = false;
-        this.#floorBanner();
+        // 2026-11-02 指示書 AT（M09・M16・M18・M24・M25）：初めて入ったとき、入場の絵のあとに案内
+        this.#storyEvent('dungeonEnter', { dungeon: dungeon.id }, () => {
+          this.#busy = false;
+          this.#floorBanner();
+        });
       });
     } else if (run.rewardChoice) {
       // 幸運のコイン：勝ったあと、もらう技カードを選ぶ（選ぶ前に閉じても、次に開いたときにまた選ぶ）
@@ -892,6 +898,15 @@ class DungeonRunView {
     this.#world.append(el);
   }
 
+  /** 序盤〜C大会後のイベント（2026-11-02 指示書 AT）：あれば出してから after（一度だけの印は出す前に付ける） */
+  #storyEvent(trigger: EventTrigger, ctx: EventContext, after: () => void): void {
+    const ev = pendingStoryEvent(this.#store.save, trigger, ctx);
+    if (!ev) return after();
+    this.#store.update((s) => markStoryEventSeen(s, ev.id));
+    this.#busy = true;
+    playStoryEvent(this.#root, this.#store.save, ev, { ctx, onDone: after });
+  }
+
   #startBattle(kind: BattleTargetKind, id: string, opponent: OpponentDefinition, key: 'dungeonRun.bossTalk' | 'dungeonRun.npcTalk' | 'dungeonRun.guardianAppear' | 'dungeonRun.thunderGuardian'): void {
     const store = this.#store;
     if (!isDeckValid(store.save.deck, store.save.collection)) {
@@ -915,17 +930,26 @@ class DungeonRunView {
       },
     };
     // ダンジョンの人（守り手・バトラー。2026-10-28）は顔の絵とその人のせりふ
-    const meet = personOfOpponent(opponent)?.lines?.meet;
-    const text = meet && kind !== 'guardian'
-      ? t('dungeonRun.personTalk', { name: opponentName(opponent), line: localText(meet), monsters: names })
-      : t(key, { name: opponentName(opponent), monsters: names });
+    const person = personOfOpponent(opponent);
+    const meet = person?.lines?.meet;
+    // 2026-11-02 指示書 AT：守り手（ボス）の戦う前には、モンスター（切り札）の名前も出さない（切り札は対戦で初めて見る）。せりふは今のまま
+    const text = meet && kind === 'boss'
+      ? t('dungeonRun.keeperAfter', { name: opponentName(opponent), line: localText(meet) })
+      : meet && kind !== 'guardian'
+        ? t('dungeonRun.personTalk', { name: opponentName(opponent), line: localText(meet), monsters: names })
+        : t(key, { name: opponentName(opponent), monsters: kind === 'boss' ? '？？？' : names });
     const fight = (): void => {
       this.#busy = true;
       this.#encounterFlash(() => ctx.navigate('battle'));
     };
     const smoke = itemCount(store.save, 'smokeBall');
     if (kind !== 'guardian' || smoke <= 0) {
-      this.#message(text, fight, meet ? talkFaceVisual(faceKeyOf(opponent)) : undefined);
+      const talk = (): void => {
+        this.#message(text, fight, meet ? talkFaceVisual(faceKeyOf(opponent)) : undefined);
+      };
+      // 2026-11-02 指示書 AT（M18F）：精霊の森でフローラに初めて会ったとき（任意）。守り手の前では何も足さない
+      if (kind === 'npc' && person) this.#storyEvent('battler', { npc: person.id, dungeon: this.#run.dungeonId }, talk);
+      else talk();
       return;
     }
     // 見えない番人で煙玉を持っている：相手の顔ぶれを見てから「戦う」か「煙玉を使う」（2026-10-27 道具）

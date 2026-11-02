@@ -27,14 +27,33 @@ export const TEAM_REQUIREMENT = { rank: 'C' as RankId } as const;
  * B の大会の条件からはずす（読み込むときに1回だけこの記録を付ける。src/game/save/saveData.ts の v32。風の渓谷の D と同じく、今いるランクの大会に出られなくならないように）
  */
 export const THUNDER_BOSS_WAIVED_FLAG = 'thunder-boss-waived';
+/**
+ * 2026-11-02 指示書 AT：ダンジョンの並び直しで、そのランクの大会の条件に新しく入ったダンジョン（E＝風の渓谷・D＝精霊の森・C＝炎の火山・B＝太古の遺跡）。
+ * 前のセーブ（v33 まで）で、いまのランクの条件に新しく入ったボスをまだ倒していなければ、読み込むときにこの記録を付けて条件からはずす
+ * （src/game/save/saveData.ts の v34。雷の高原のときと同じく、今いるランクの大会に出られなくならないように。次のランクからはふつうの条件）
+ */
+export const reorderWaivedFlag = (dungeonId: string): string => `boss-waived-${dungeonId}`;
+/** 並び直しの前の、ランクごとの大会の条件（前のセーブの変換でだけ使う） */
+export const RANK_BOSS_DUNGEONS_BEFORE_AT: Readonly<Record<RankId, readonly string[]>> = {
+  E: ['dungeon-02'],
+  D: ['dungeon-03', 'dungeon-08'],
+  C: ['dungeon-04', 'dungeon-01'],
+  B: ['dungeon-05', 'dungeon-09'],
+  A: ['dungeon-06'],
+  S: ['dungeon-07'],
+};
 /** 上の記録があるとき、条件からはずすダンジョン */
-export const WAIVED_BOSS_DUNGEONS: Readonly<Record<string, readonly string[]>> = { [THUNDER_BOSS_WAIVED_FLAG]: ['dungeon-09'] };
+export const WAIVED_BOSS_DUNGEONS: Readonly<Record<string, readonly string[]>> = {
+  [THUNDER_BOSS_WAIVED_FLAG]: ['dungeon-09'],
+  ...Object.fromEntries(['dungeon-08', 'dungeon-02', 'dungeon-05', 'dungeon-01'].map((id) => [reorderWaivedFlag(id), [id]])),
+};
 
+/** 2026-11-02 指示書 AT（2026-11-01 ユーザー決定）で並べ直した。前は E＝精霊の森／D＝水の神殿・風の渓谷／C＝氷の洞窟・太古の遺跡／B＝炎の火山・雷の高原 */
 export const RANK_BOSS_DUNGEONS: Readonly<Record<RankId, readonly string[]>> = {
-  E: ['dungeon-02'], // 精霊の森
-  D: ['dungeon-03', 'dungeon-08'], // 水の神殿・風の渓谷（2026-10-30 指示書 U）
-  C: ['dungeon-04', 'dungeon-01'], // 氷の洞窟・太古の遺跡
-  B: ['dungeon-05', 'dungeon-09'], // 炎の火山・雷の高原（2026-11-01 指示書 AH）
+  E: ['dungeon-08'], // 風の渓谷
+  D: ['dungeon-03', 'dungeon-02'], // 水の神殿・精霊の森
+  C: ['dungeon-04', 'dungeon-05'], // 氷の洞窟・炎の火山
+  B: ['dungeon-01', 'dungeon-09'], // 太古の遺跡・雷の高原
   A: ['dungeon-06'], // 機械の塔
   S: ['dungeon-07'], // 天の聖域
 };

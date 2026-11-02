@@ -347,7 +347,8 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
   it('ルシアに初めて勝つと lucia-beaten（1つだけ）', () => {
     const w = beatLucia(createNewSave(), 41);
     // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く
-    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
+    // v34（2026-11-02 指示書 AT）で付く「大会の条件からはずす」記録（boss-waived-*）も数えない
+    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-') && !f.startsWith('boss-waived-'))).toEqual([LUCIA_BEATEN_FLAG]);
     expect(beatLucia(w.save, 42).save.storyFlags).toEqual([LUCIA_BEATEN_FLAG]);
   });
 
@@ -364,8 +365,8 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
     expect(w.firstClear).toBe(false);
     expect(w.clearCards).toEqual([{ cardId: SEREPHINE_MONSTER_ID, count: 1 }]);
     expect(w.save.collection[SEREPHINE_MONSTER_ID]).toBe(1);
-    // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く
-    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
+    // v27 から、もう並んでいるガチャのシリーズは「選んだ」記録（gacha-seen-*）も付く。v34（指示書 AT）の「大会の条件からはずす」記録も数えない
+    expect(w.save.storyFlags.filter((f) => !f.startsWith('gacha-seen-') && !f.startsWith('boss-waived-'))).toEqual([LUCIA_BEATEN_FLAG]);
     // その次からはふつうの2回目と同じ（セレフィーンの技カード）
     expect(bossRewardCandidates(w.save, 'dungeon-03', LUCIA_TEAM)).toEqual(AJ_IDS);
     expect(beatLucia(w.save, 52).clearCards).toEqual([]);
@@ -382,7 +383,7 @@ describe('水の神殿のボス（ルシア）・入手の流れ', () => {
       collection: { ...base.collection, [SEREPHINE_MONSTER_ID]: 1 },
       dungeons: { 'dungeon-03': { openedChests: [], bossDefeated: true, clears: 1 } },
     };
-    expect(normalizeSave(JSON.parse(JSON.stringify(has)))?.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([LUCIA_BEATEN_FLAG]);
+    expect(normalizeSave(JSON.parse(JSON.stringify(has)))?.storyFlags.filter((f) => !f.startsWith('gacha-seen-') && !f.startsWith('boss-waived-'))).toEqual([LUCIA_BEATEN_FLAG]);
   });
 });
 

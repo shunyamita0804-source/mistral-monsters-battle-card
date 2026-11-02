@@ -36,7 +36,7 @@ import { isIntroState, recoverIntro } from '../story/intro.ts';
 import { EMPTY_PEOPLE_BOOK, normalizePeopleBook, ownedCardIds, rescuePeopleBook, type PeopleBook } from '../people/peopleBook.ts';
 import { grantPendingBooster, LEGACY_INTRO_V2, newIntroV2, normalizeIntroV2, type IntroV2 } from '../story/introV2.ts';
 import type { StarterDeckKey } from '../../data/introV2.ts';
-import { START_DATE, THUNDER_BOSS_WAIVED_FLAG } from '../../data/calendar.ts';
+import { RANK_BOSS_DUNGEONS, RANK_BOSS_DUNGEONS_BEFORE_AT, reorderWaivedFlag, START_DATE, THUNDER_BOSS_WAIVED_FLAG } from '../../data/calendar.ts';
 
 /**
  * セーブデータ（カード所持・通貨・パック解放・欠片・大会実績・ダンジョン進捗・デッキを一元管理）。
@@ -45,7 +45,7 @@ import { START_DATE, THUNDER_BOSS_WAIVED_FLAG } from '../../data/calendar.ts';
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 33;
+export const SAVE_VERSION = 34;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -764,6 +764,24 @@ function migrateThunderBossWaiverV32(raw: RawObject): RawObject {
 }
 
 /**
+ * v33 → v34（2026-11-02 指示書 AT）：ダンジョンを並べ直し、公式戦の条件が変わった（E＝風の渓谷／D＝水の神殿・精霊の森／C＝氷の洞窟・炎の火山／B＝太古の遺跡・雷の高原）。
+ * いまのランクとそれより下のランクの条件に新しく入ったダンジョンのボスをまだ倒していなければ、条件からはずす記録（reorderWaivedFlag）を付ける（出られていた大会に出られなくならないように）。
+ * 開いていたダンジョンは unlockedDungeonsFor が記録を残すので閉じない。倒した記録・カード・お金・ランクは変えない
+ */
+function migrateDungeonOrderV34(raw: RawObject): RawObject {
+  const rank = typeof raw.rank === 'string' && (RANK_ORDER as readonly string[]).includes(raw.rank) ? (raw.rank as RankId) : null;
+  if (!rank) return raw;
+  const dungeons = isObject(raw.dungeons) ? raw.dungeons : {};
+  const beaten = (id: string): boolean => isObject(dungeons[id]) && (dungeons[id] as RawObject).bossDefeated === true;
+  const flags = Array.isArray(raw.storyFlags) ? (raw.storyFlags as unknown[]) : [];
+  // いまのランクと、それより下のランク（下のランクの大会にも今までどおり出られるように。雷の高原の B 以上と同じ考え方）
+  const ranks = RANK_ORDER.filter((r) => rankAtLeast(rank, r));
+  const newly = [...new Set(ranks.flatMap((r) => RANK_BOSS_DUNGEONS[r].filter((id) => !RANK_BOSS_DUNGEONS_BEFORE_AT[r].includes(id))))];
+  const add = newly.filter((id) => !beaten(id)).map(reorderWaivedFlag).filter((f) => !flags.includes(f));
+  return add.length > 0 ? { ...raw, storyFlags: [...flags, ...add] } : raw;
+}
+
+/**
  * v32 → v33（2026-11-01 指示書 AJ）：どのモンスターも技を12枚にした。外した技（REMOVED_SKILL_IDS・33枚）は、ユーザー決定で
  * 持っているカードから消し、デッキに入っていたら抜く。デッキの抜けた分は、持っているカードで埋める（v8 のクロスガードと同じ。topUpDeck）。
  * それでも60枚に足りなければ足りないまま（デッキ編集の「おまかせ」で直せる）【要確認：足りないデッキの扱い】。
@@ -818,6 +836,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   30: migrateShishienAltarV31,
   31: migrateThunderBossWaiverV32,
   32: migrateSkillRebuildV33,
+  33: migrateDungeonOrderV34,
 };
 
 export function migrate(raw: RawObject): RawObject | null {

@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { RANK_BOSS_DUNGEONS } from '../src/data/calendar.ts';
 import { DUNGEONS, ENCOUNTERS, ZEPHYRA_BEATEN_FLAG } from '../src/data/dungeons.ts';
-import { RUN_DUNGEONS, runBattlerFace, runBossOpponent, runConfig } from '../src/data/dungeonRun.ts';
+import { RUN_DUNGEONS, runBattlerFace, runBossOpponent, runConfig, runCpuSkill } from '../src/data/dungeonRun.ts';
 import { DUNGEON_MONEY } from '../src/data/economy.ts';
 import { getPerson, PEOPLE, personOfOpponent } from '../src/data/people.ts';
 import { getTournament } from '../src/data/tournaments.ts';
@@ -21,7 +21,9 @@ import {
   slide,
   WIND_DIRS,
   WIND_PUSH,
+  WIND_EARLY_FLOORS,
   WIND_TILES,
+  WIND_TILES_EARLY,
   windLoops,
   type DungeonFloor,
 } from '../src/game/dungeon/generate.ts';
@@ -47,23 +49,22 @@ const runOf = (s: SaveData): DungeonRun => {
 };
 
 describe('風の渓谷：ダンジョンの値', () => {
-  it('D ランクで開く・地下4階・強さは水の神殿と同じ段・水の神殿の次に並ぶ', () => {
+  it('2026-11-02 指示書 AT：最初のダンジョン（最初から開く）・地下3階・強さは最初の段（前の精霊の森の値）・ダンジョンの一覧のいちばん上', () => {
     expect(DUNGEONS.find((d) => d.id === ID)).toMatchObject({ name: '風の渓谷', trumpReward: true, bossFlag: ZEPHYRA_BEATEN_FLAG });
-    expect(runConfig(ID)).toMatchObject({ floors: 4, gimmick: 'wind', unlockRank: 'D', viewRadius: 1, maxLosses: 3, bossId: 'enc-wind-boss' });
-    expect(runConfig(ID).floorLife).toEqual(runConfig('dungeon-03').floorLife);
-    expect(runConfig(ID).floorLife).toEqual([0.8, 0.9, 1, 1.1]);
-    expect(DUNGEON_MONEY[ID]).toEqual(DUNGEON_MONEY['dungeon-03']);
-    const ids = DUNGEONS.map((d) => d.id);
-    expect(ids.indexOf(ID)).toBe(ids.indexOf('dungeon-03') + 1);
-    expect(Object.keys(RUN_DUNGEONS).indexOf(ID)).toBe(Object.keys(RUN_DUNGEONS).indexOf('dungeon-03') + 1);
+    expect(runConfig(ID)).toMatchObject({ floors: 3, gimmick: 'wind', unlockRank: null, viewRadius: 1, maxLosses: 3, bossId: 'enc-wind-boss' });
+    expect(runConfig(ID).floorLife).toEqual([0.6, 0.75, 0.85]);
+    expect(DUNGEON_MONEY[ID]).toEqual({ win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 });
+    expect(runCpuSkill(ID, 1)).toBe('C');
+    expect(DUNGEONS[0]?.id).toBe(ID);
+    expect(Object.keys(RUN_DUNGEONS)[0]).toBe(ID);
     expect(DUNGEON_SPOTS[ID]).toBeDefined();
   });
 
-  it('E ランクでは開かず、D ランクに上がると開く（前のセーブも読み込むと D なら開く）', () => {
-    expect(unlockedDungeonsFor('E', [])).not.toContain(ID);
-    expect(unlockedDungeonsFor('D', [])).toContain(ID);
-    const old = normalizeSave(JSON.parse(JSON.stringify({ ...base(), rank: 'C', unlockedDungeons: ['dungeon-02', 'dungeon-03', 'dungeon-04', 'dungeon-01'] })));
-    expect(old?.unlockedDungeons).toContain(ID);
+  it('新しく始めたセーブ（E ランク）で開いている。前のセーブも読み込むと開く（開いていたダンジョンは閉じない）', () => {
+    expect(unlockedDungeonsFor('E', [])).toEqual([ID]);
+    expect(base().unlockedDungeons).toEqual([ID]);
+    const old = normalizeSave(JSON.parse(JSON.stringify({ ...base(), version: 33, rank: 'E', unlockedDungeons: ['dungeon-02'] })));
+    expect(old?.unlockedDungeons).toEqual([ID, 'dungeon-02']);
   });
 
   it('英語の名前（仮訳）・絵（入るときの絵・題字・重ねる絵・ボスの印・ボス戦の背景・床と壁・階段・飾り5つ）・曲', () => {
@@ -145,11 +146,12 @@ describe('風の渓谷の階（いくつもの階をつくって確かめる）'
     for (let floor = 0; floor < 4; floor++) floors.push(generateFloor(seed * 7919, floor, floor === 3, undefined, 'wind'));
   }
 
-  it('1階に4〜8か所。階段・宝箱・人・スタートの上には置かない', () => {
+  it('1階に4〜8か所（2026-11-02 指示書 AT：1〜2階は少なめに 2〜4か所）。階段・宝箱・人・スタートの上には置かない', () => {
     for (const f of floors) {
       const n = windCount(f);
-      expect(n, `${f.index}`).toBeGreaterThanOrEqual(WIND_TILES.min);
-      expect(n).toBeLessThanOrEqual(WIND_TILES.max);
+      const want = f.index < WIND_EARLY_FLOORS ? WIND_TILES_EARLY : WIND_TILES;
+      expect(n, `${f.index}`).toBeGreaterThanOrEqual(want.min);
+      expect(n).toBeLessThanOrEqual(want.max);
       for (const e of f.entities) expect(isWindTile(f.tiles[e.y]?.[e.x])).toBe(false);
       if (f.stairs) expect(isWindTile(f.tiles[f.stairs.y]?.[f.stairs.x])).toBe(false);
       expect(isWindTile(f.tiles[f.start.y]?.[f.start.x])).toBe(false);
@@ -303,23 +305,49 @@ describe('入手の流れ', () => {
   });
 });
 
-describe('D の大会の出場条件・セーブ', () => {
-  it('D の条件に風の渓谷を足した（水の神殿・風の渓谷）。受付の理由に出る', () => {
-    expect(RANK_BOSS_DUNGEONS.D).toEqual(['dungeon-03', ID]);
-    const water = { 'dungeon-03': { openedChests: [], bossDefeated: true, clears: 1 } };
-    const s = { ...base(), rank: 'D' as const, calendar: { year: 1, month: 9 }, dungeons: water };
-    expect(missingBosses(s, 'D')).toEqual([ID]);
-    const d = getTournament('tournament-d');
-    if (!d) throw new Error('tournament-d');
-    expect(entryCheck(s, d).reasons).toEqual(['風の渓谷のボスをまだ倒していません']);
+describe('通し（2026-11-02 指示書 AT）：新しく始めた状態で風の渓谷 → ゼフィラ → 祭壇 → E 大会に出られる', () => {
+  it('新しいセーブで風の渓谷だけが開いていて、最後の階のゼフィラに勝つと祭壇でウズリオ・E 大会の条件を満たす', () => {
+    let s: SaveData = base();
+    expect(s.unlockedDungeons).toEqual([ID]);
+    const e = getTournament('tournament-e');
+    if (!e) throw new Error('tournament-e');
+    expect(entryCheck({ ...s, calendar: { year: 1, month: 6 } }, e).reasons).toContain('風の渓谷のボスをまだ倒していません');
+    s = startRun(s, ID, 2026);
+    expect(runOf(s).dungeonId).toBe(ID);
+    // 地下3階：1階・2階と下りて、最後の階にボス
+    s = { ...s, dungeonRun: descend(descend(runOf(s))) };
+    expect(runOf(s).floor).toBe(2);
+    const boss = runFloor(runOf(s)).entities.find((x) => x.kind === 'boss');
+    if (!boss) throw new Error('boss');
+    const w = winRunBattle(s, { kind: 'boss', id: boss.id }, null);
+    expect(w).toMatchObject({ cleared: true, firstClear: true });
+    expect(w.clearCards).toEqual([{ cardId: UZURIO_MONSTER_ID, count: 1 }]);
+    expect(w.save.coins).toBe(s.coins + 300);
+    const june = { ...w.save, calendar: { year: 1, month: 6 } };
+    expect(entryCheck(june, e).reasons).toEqual([]);
+  });
+});
+
+describe('E の大会の出場条件・セーブ（2026-11-02 指示書 AT）', () => {
+  it('E の条件は風の渓谷（前は精霊の森）。D は水の神殿・精霊の森。受付の理由に出る', () => {
+    expect(RANK_BOSS_DUNGEONS.E).toEqual([ID]);
+    expect(RANK_BOSS_DUNGEONS.D).toEqual(['dungeon-03', 'dungeon-02']);
+    const s = { ...base(), calendar: { year: 1, month: 6 } };
+    expect(missingBosses(s, 'E')).toEqual([ID]);
+    const e = getTournament('tournament-e');
+    if (!e) throw new Error('tournament-e');
+    expect(entryCheck(s, e).reasons).toEqual(['風の渓谷のボスをまだ倒していません']);
+    const beaten = { ...s, dungeons: { [ID]: { openedChests: [], bossDefeated: true, clears: 1 } } };
+    expect(missingBosses(beaten, 'E')).toEqual([]);
   });
 
-  it('すでに D より上のセーブ：風の渓谷のボスを倒していなくても、今のランクの大会の条件には関係しない', () => {
-    for (const rank of ['C', 'B', 'A', 'S'] as const) expect(RANK_BOSS_DUNGEONS[rank]).not.toContain(ID);
+  it('前のセーブ（v33）：いまのランクと下のランクの条件に新しく入ったボスをまだ倒していなければ、条件からはずす（出られていた大会に出られなくならない）', () => {
+    // C ランク：前は氷の洞窟・太古の遺跡。いまは氷の洞窟・炎の火山。E（風の渓谷）・D（精霊の森）も新しく入った
     const old = normalizeSave(
       JSON.parse(
         JSON.stringify({
           ...base(),
+          version: 33,
           rank: 'C',
           calendar: { year: 1, month: 9 },
           dungeons: {
@@ -332,13 +360,21 @@ describe('D の大会の出場条件・セーブ', () => {
       ),
     );
     if (!old) throw new Error('load');
+    expect(old.storyFlags).toEqual(expect.arrayContaining(['boss-waived-dungeon-05', 'boss-waived-dungeon-08']));
+    // 精霊の森は倒しているので、はずす記録は付かない
+    expect(old.storyFlags).not.toContain('boss-waived-dungeon-02');
+    for (const r of ['E', 'D', 'C'] as const) expect(missingBosses(old, r), r).toEqual([]);
     const c = getTournament('tournament-c');
     if (!c) throw new Error('tournament-c');
-    expect(missingBosses(old, 'C')).toEqual([]);
-    expect(entryCheck(old, c).reasons.some((r) => r.includes('風の渓谷'))).toBe(false);
+    expect(entryCheck(old, c).reasons.some((r) => r.includes('ボス'))).toBe(false);
+    // 開いていたダンジョン・倒した記録・ランクはそのまま
+    expect(old.rank).toBe('C');
+    expect(old.dungeons['dungeon-01']?.bossDefeated).toBe(true);
+    // 新しいセーブには付かない
+    expect(base().storyFlags.some((f) => f.startsWith('boss-waived-'))).toBe(false);
   });
 
   it('セーブの version は上げていない（ダンジョン・人・モンスターを足しただけ。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(33); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に
+    expect(SAVE_VERSION).toBe(34); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に。指示書 AT でダンジョンの並び直しの大会の条件のために 34 に
   });
 });

@@ -33,6 +33,8 @@ export const SCREEN_IDS = [
   /** ジオルの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-29） */
   'geolLab',
   'soukaiLab',
+  // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
+  'storyEventLab',
   /** イベントのダンジョン3つの絵の確認用の画面（?qa=1 のときだけ設定から入れる。2026-10-29） */
   'eventDungeonLab',
 ] as const;

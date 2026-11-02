@@ -24,6 +24,10 @@ import { createScreenHeader } from '../components/screenHeader.ts';
 import { button, h } from '../dom.ts';
 import { newId, once } from '../gameStore.ts';
 import type { ScreenDefinition } from './types.ts';
+import { personOfOpponent } from '../../data/people.ts';
+import type { EventTrigger } from '../../data/storyEvents.ts';
+import { markStoryEventSeen, pendingStoryEvent, type EventContext } from '../../game/story/storyEvents.ts';
+import { playStoryEvent } from '../components/storyEventPlayer.ts';
 import { bracketView, leagueTable, openEntrant, playerPlace, standingsTable } from '../components/tournamentBoards.ts';
 import { rewardGlow } from '../components/rewardGlow.ts';
 import { celebrationBanner, dungeonFoundBanner } from '../components/celebrationBanner.ts';
@@ -104,10 +108,31 @@ export const tournamentScreen: ScreenDefinition = {
     const element = h('main', { class: 'screen tournament' });
     bgm.play('tournament');
 
+    /** 序盤〜C大会後のイベント（2026-11-02 指示書 AT）：あれば出してから after（一度だけの印は出す前に付ける） */
+    const storyEvent = (trigger: EventTrigger, ectx: EventContext, after: () => void): void => {
+      const ev = pendingStoryEvent(store.save, trigger, ectx);
+      if (!ev) return after();
+      store.update((s) => markStoryEventSeen(s, ev.id));
+      playStoryEvent(element, store.save, ev, { ctx: ectx, onDone: after });
+    };
+    const rankOf = (t: TournamentDefinition): 'E' | 'D' | 'C' | undefined => (['E', 'D', 'C'].includes(t.requiredRank) ? (t.requiredRank as 'E' | 'D' | 'C') : undefined);
+
     const startMatch = once((t: TournamentDefinition, round: number) => {
       const active = store.save.activeTournament;
       const opponent = active ? nextOpponent(t, active) : undefined;
       if (!opponent) return;
+      // 2026-11-02 指示書 AT：試合の前のひと言（E のノエル・ヴィクトル〔O09・O10〕）・C 大会の決勝でシエナと戦うとき（M27・挿絵 story_04）
+      const who = personOfOpponent(opponent)?.id;
+      const rank = rankOf(t);
+      const final = t.id === 'tournament-c' && TOURNAMENT_ROUNDS - round === 1;
+      if (final) store.storyCtx = { ...store.storyCtx, reachedFinal: true };
+      const go = (): void => startMatchNow(t, round, opponent, final && who === 'sienna');
+      storyEvent('match', { ...(rank ? { rank } : {}), ...(who ? { opponent: who } : {}) }, () =>
+        final && who === 'sienna' ? storyEvent('final', { rank: 'C', opponent: 'sienna' }, go) : go(),
+      );
+    });
+
+    const startMatchNow = (t: TournamentDefinition, round: number, opponent: NonNullable<ReturnType<typeof nextOpponent>>, finalSienna: boolean): void => {
       store.pendingBattle = {
         title: tr('tournament.battleTitle', { name: tournamentName(t), round: roundLabel(t, round) }),
         opponent,
@@ -121,13 +146,15 @@ export const tournamentScreen: ScreenDefinition = {
             ...recordMatch(s, round, { won, ...summary }),
             stats: { ...s.stats, battlesWon: s.stats.battlesWon + (won ? 1 : 0), battlesLost: s.stats.battlesLost + (won ? 0 : 1) },
           }));
+          if (finalSienna) store.storyCtx = { ...store.storyCtx, finalSienna: { won } };
           ctx.back('tournament');
         },
       };
       ctx.navigate('battle');
-    });
+    };
 
     const claim = once(() => {
+      const claimedTour = store.save.activeTournament ? getTournament(store.save.activeTournament.tournamentId) : undefined;
       const r = claimTournamentRewards(store.save);
       if (r.status !== 'ok') {
         render();
@@ -160,13 +187,25 @@ export const tournamentScreen: ScreenDefinition = {
         actions: [{ label: tr('common.ok'), primary: true, onTap: () => handle.close() }],
         onClose: () => {
           render();
+          // 2026-11-02 指示書 AT：大会が初めて終わったとき（E＝M14 は勝ち負けで分ける）・C 大会の決勝の相手がシエナだったとき（M27E）。月が変わる演出のあと
+          const rank = claimedTour ? rankOf(claimedTour) : undefined;
+          const finalSienna = store.storyCtx.finalSienna;
+          const afterClaim = (): void => {
+            if (rank === 'C') {
+              // M28 の「早く負けたとき」の行は、街に戻ったときに使う（決勝まで行ったかどうか）
+              store.storyCtx = { reachedFinal: store.storyCtx.reachedFinal ?? false };
+              if (finalSienna) storyEvent('finalEnd', { rank: 'C', opponent: 'sienna', won: finalSienna.won }, () => undefined);
+              return;
+            }
+            if (rank) storyEvent('tournamentEnd', { rank, won: s.won }, () => undefined);
+          };
           // 大会が終わったので月が進んだ（2026-10-30 指示書 R2）：景品のお知らせのあとに月が変わる演出
           const change = store.pendingMonthChange();
           if (change) {
             // 先に「出した」にしておく（演出の途中で会場に戻っても、もう一度は出さない）
             store.markMonthShown();
-            playMonthChange(element, change.to, () => {}, { yearChanged: change.from.year !== change.to.year });
-          }
+            playMonthChange(element, change.to, afterClaim, { yearChanged: change.from.year !== change.to.year });
+          } else afterClaim();
         },
       });
     });
@@ -185,7 +224,11 @@ export const tournamentScreen: ScreenDefinition = {
           ],
           () => {
             store.update((s) => enterTournament(s, t.id, newId('entry'), randomSeed()));
+            store.storyCtx = {};
             render();
+            // 2026-11-02 指示書 AT：大会に初めてエントリーしたとき（E＝シエナとの出会い M13・D＝M22・C＝シエナとの再会 M26）
+            const rank = rankOf(t);
+            if (rank) storyEvent('tournamentEntry', { rank }, () => undefined);
           },
         );
       }, 'btn btn--primary');

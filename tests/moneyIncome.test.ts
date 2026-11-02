@@ -30,19 +30,17 @@ function inRun(dungeonId: string, seed = 777): SaveData {
 
 describe('ダンジョンごとのお金の表（src/data/economy.ts の DUNGEON_MONEY）', () => {
   it('指示書の表のとおり', () => {
+    // 2026-11-02 指示書 AT：ダンジョンの並び直しで、そのランクの段の値（最初 15・D 20・C 25・B 30・A 35・S 40）
     expect(DUNGEON_MONEY).toEqual({
-      // 太古の遺跡：2026-10-29 ジオルの最終で氷の洞窟と同じ段
-      'dungeon-01': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
-      'dungeon-02': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
+      'dungeon-08': { win: 15, chest: [15, 30], bossFirst: 300, bossRepeat: 90 },
       'dungeon-03': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
+      'dungeon-02': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
       'dungeon-04': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
-      'dungeon-05': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
+      'dungeon-05': { win: 25, chest: [25, 50], bossFirst: 600, bossRepeat: 180 },
+      'dungeon-01': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
+      'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
       'dungeon-06': { win: 35, chest: [35, 70], bossFirst: 850, bossRepeat: 250 },
       'dungeon-07': { win: 40, chest: [40, 80], bossFirst: 1000, bossRepeat: 300 },
-      // 風の渓谷（2026-10-30 指示書 U）：水の神殿と同じ段
-      'dungeon-08': { win: 20, chest: [20, 40], bossFirst: 500, bossRepeat: 150 },
-      // 雷の高原（2026-11-01 指示書 AH）：炎の火山と同じ段
-      'dungeon-09': { win: 30, chest: [30, 60], bossFirst: 700, bossRepeat: 210 },
     });
     expect(CHEST_RULES.rates).toEqual({ coins: 70, item: 25, card: 5 });
     expect(CHEST_RULES.items).toEqual(['torch', 'incense', 'smokeBall', 'returnFeather']);

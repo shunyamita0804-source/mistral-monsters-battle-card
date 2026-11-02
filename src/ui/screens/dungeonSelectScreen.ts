@@ -9,6 +9,8 @@ import { startRun } from '../../game/dungeon/run.ts';
 import { dungeonRecord, startDungeon } from '../../game/progress/dungeon.ts';
 import { randomSeed } from '../../game/rng.ts';
 import { messageModal } from '../components/modal.ts';
+import { playStoryEvent } from '../components/storyEventPlayer.ts';
+import { markStoryEventSeen, pendingStoryEvent } from '../../game/story/storyEvents.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { h } from '../dom.ts';
 import { once } from '../gameStore.ts';
@@ -91,7 +93,9 @@ export const dungeonSelectScreen: ScreenDefinition = {
       }
       const record = dungeonRecord(store.save, d.id);
       const kind = record.clears > 0 ? 'cleared' : 'dungeon';
-      map.append(pinAt(spot, dungeonName(d), kind, () => go(d.id), record.bossDefeated));
+      const pin = pinAt(spot, dungeonName(d), kind, () => go(d.id), record.bossDefeated);
+      pin.dataset.dungeon = d.id;
+      map.append(pin);
     }
 
     element.append(
@@ -99,6 +103,20 @@ export const dungeonSelectScreen: ScreenDefinition = {
       map,
       h('p', { class: 'notice', text: t(viewOnly ? 'world.dungeonSelect.viewNotice' : 'world.dungeonSelect.notice') }),
     );
+    // 2026-11-02 指示書 AT（M15・M23）：D・C に上がって初めて地図を開いたとき、新しいダンジョンの印を光らせてミレイユの案内（1回だけ）
+    requestAnimationFrame(() => {
+      const ev = pendingStoryEvent(store.save, 'mapOpen');
+      if (!ev) return;
+      store.update((s) => markStoryEventSeen(s, ev.id));
+      playStoryEvent(element, store.save, ev, {
+        onMap: (highlight, next) => {
+          for (const id of highlight) map.querySelector(`[data-dungeon="${id}"]`)?.classList.add('is-story-glow');
+          next();
+          return true;
+        },
+        onDone: () => undefined,
+      });
+    });
     return { element };
   },
 };

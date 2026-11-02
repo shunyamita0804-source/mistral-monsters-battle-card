@@ -121,6 +121,7 @@ export const settingsScreen: ScreenDefinition = {
                 button(t('geolLab.title'), () => ctx.navigate('geolLab'), 'btn btn--small'),
                 // 2026-11-02 指示書 AP：蒼海（みちしおあり）を試す
                 button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small'),
+                button(t('storyEvent.lab.title'), () => ctx.navigate('storyEventLab'), 'btn btn--small'),
                 // イベントのダンジョン3つの絵（2026-10-29）：まだダンジョンとしては足していない
                 button(t('eventLab.title'), () => ctx.navigate('eventDungeonLab'), 'btn btn--small'),
               )
