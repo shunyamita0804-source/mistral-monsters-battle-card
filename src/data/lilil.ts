@@ -17,7 +17,8 @@ import liliData from './official/lilil12_skills_OFFICIAL_20261102.json';
  * - 技 lilil_sk_01〜12.webp（届いた lilil_sk_NN.png〔827×937〕を tools/art/card_art_webp.py で WebP に。番号＝技番号）
  * - 正式モンスターカード lilil_official.webp（届いた lilil_official_monstercard_LIFE5.png〔970×1622〕を tools/art/official_card_webp.py で 508×849 に）
  * - バトル用 lilil_battlecard.png（届いた lilil_battleart.png を無改変。1170×1344 透過）
- * - パックの窓の絵はまだ無い（届くまで封をしたパックの絵）
+ * - パックの窓の絵 pack_art_lilil.png（2026-11-02 指示書 AK2。パック pack_lilil.webp・販売機の窓 panel_lilil.webp・ショップの棚の商品）
+ * 2026-11-02 指示書 AK2：はねでかわす・くるりとかわすのマナ 1→0（JSON・CSV を直し、前の版は *_v1_20261102.* に残す）。CPU のうっとりウインク・うそなき（src/game/battle/ai.ts）
  * 色：やわらかいローズピンク #EE8FB6（モンスターカード枠・技カード枠・パックの色の表）
  */
 export const LILIL_MONSTER_ID = 'mon-lilil';

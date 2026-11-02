@@ -78,6 +78,7 @@
 - ゲーム内 ID：`mon-lilil`（ライフ5）・`skl-lilil-01〜12`（JSON の id・no のまま。新しいモンスターなので引き継ぐ ID は無い）。「1. 固定 ID」「新しい ID で足す」の決まりに合う（直しは無し）
 - 正本 `src/data/official/lilil12_skills_OFFICIAL_20261102.json`（CSV も）を無改変で置き、技12枚は AJ の表（`src/data/skillRebuildAJ.ts`）に書く。表と JSON が合うかは `tests/lilil.test.ts`
 - 図鑑はデスオルのあと（No.196〜208）。セーブの version は上げていない（33 のまま。前のセーブの所持カード・デッキは変えない）
+- 2026-11-02 指示書 AK2：はねでかわす・くるりとかわすのマナ 1→0。ID は同じ（セーブの変換は無し）。前の JSON・CSV は `lilil12_skills_OFFICIAL_v1_20261102.*`
 
 ### 2026-10-25 ミュロル（Mistral_Myurol_16Skills_Claude_Approved_20261025）
 

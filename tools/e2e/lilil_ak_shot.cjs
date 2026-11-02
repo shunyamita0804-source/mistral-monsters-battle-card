@@ -11,7 +11,10 @@
 //   evade   リリルが回避する所（はねでかわす）
 //   moncard 対戦のアイコンの切り抜き・バトル用の大きなカード（対戦でモンスターを押したとき）・アイコンの並び
 //   box     箱を選ぶ画面・旅立ちのきらめきを開けた一覧・試験の貸しデッキ
-//   gacha   ガチャ（リリルを持っているセーブ：シリーズ選び・封をしたパック）
+//   gacha   ガチャ（リリルを持っているセーブ：シリーズ選び・機械の窓・パック〔AK2 から窓の絵〕・開ける所）
+//   ak2hand 指示書 AK2：マナ0になった回避2枚（手札・押して大きく出したカード）
+//   ak2wink 指示書 AK2：CPU がうっとりウインクを使い、次の手番にリリルが回避する所
+//   shelf   ショップの棚（左・右）と店の中の販売機
 // 撮影のときだけ、ブラウザの中でセーブを作る。対戦の始まりは page.route で包んで置きかえる（ゲームのファイルは変えない）
 // 使い方: node tools/e2e/lilil_ak_shot.cjs http://127.0.0.1:5173/ 出力フォルダ（ONLY=book,hand,... でしぼれる）
 const { chromium } = require('playwright');
@@ -416,5 +419,69 @@ const lil = (n) => `skl-lilil-${String(n).padStart(2, '0')}`;
       await shot('gacha_open_last');
     } else log('no gacha landing');
   }
+  if (want('ak2hand')) {
+    // マナ0：自分のマナが0でも、はねでかわす・くるりとかわすは使える（よつばねのまいはマナ1）
+    await start({ monsters: ['mon-lilil', 'mon-soramo', 'mon-myurol'], mana: 0, hand: [lil(10), lil(11), lil(12), lil(1)] });
+    await page.evaluate(() => { const h = document.querySelector('.battle__hand'); if (h) h.scrollLeft = 0; });
+    await shot('ak2_hand');
+    for (const n of [10, 11, 12]) {
+      await openCard(lil(n));
+      await shot(`ak2_hand_big_${n}`);
+      await cancel();
+    }
+  }
+
+  if (want('ak2wink')) {
+    // CPU（相手のリリル o-m1）が うっとりウインク → 自分の手番にソラモ（ウインクされた・ほかの2体は倒れている）で攻撃 → リリルが はねでかわす（マナ0）で回避
+    await start({
+      first: 'opponent', skill: 'A', wait: 300,
+      monsters: ['mon-soramo', 'mon-gauul', 'mon-myurol'], mana: 6, hand: ['skl-soramo14-03'], lives: { 'p-m2': 0, 'p-m3': 0 },
+      oppMonsters: ['mon-lilil', 'mon-soramo', 'mon-myurol'], oppMana: 3, oppHand: [lil(8), lil(10)],
+    });
+    if (await waitFor(() => !!document.querySelector('.battle-spot--opponent:not(.is-idle) .battle-spot__card'))) {
+      await page.waitForTimeout(1200);
+      await shot('ak2_wink_cpu_card');
+    } else log('no opponent card');
+    // 自分の手番になるまで待つ
+    let mine = false;
+    for (let i = 0; i < 40 && !mine; i++) {
+      await page.waitForTimeout(1000);
+      await closeTalk();
+      mine = await page.evaluate(() => ![...document.querySelectorAll('*')].some((e) => e.children.length === 0 && e.textContent.trim() === '相手の番'));
+    }
+    log('my turn', mine);
+    await page.waitForTimeout(1500);
+    for (let i = 0; i < 3; i++) await closeTalk();
+    await shot('ak2_wink_my_turn');
+    if (mine) {
+      await useCard('skl-soramo14-03');
+      await page.waitForTimeout(500);
+      const t = page.locator('.battle__monster--opponent.is-target').first();
+      if (await t.count()) await t.click({ force: true }).catch(() => {});
+      for (let i = 0; i < 6; i++) {
+        await page.waitForTimeout(700);
+        await shot(`ak2_wink_evade_${i}`);
+      }
+    }
+  }
+
+  if (want('shelf')) {
+    for (const [name, loc] of [['shop_shelf_left', { mapId: 'shop', x: 30, y: 26, dir: 'left' }], ['shop_shelf_right', { mapId: 'shop', x: 58, y: 26, dir: 'right' }], ['shop_machine', { mapId: 'shop', x: 45, y: 20, dir: 'up' }]]) {
+      await page.goto(base);
+      await page.waitForTimeout(800);
+      const json = await seedSave({ location: loc });
+      await page.close();
+      page = await ctx.newPage();
+      page.on('pageerror', (e) => log('PAGEERROR', e.message));
+      await page.addInitScript((s) => localStorage.setItem('mistria-battle-card/save', s), json);
+      await page.goto(base);
+      await page.waitForTimeout(1000);
+      const c = page.locator('button:has-text("続きから"):not([disabled])').first();
+      if (await c.count()) await c.click();
+      await page.waitForTimeout(3000);
+      await shot(name);
+    }
+  }
+
   await browser.close();
 })();
