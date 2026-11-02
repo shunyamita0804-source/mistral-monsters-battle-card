@@ -139,13 +139,13 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
     expect(readFileSync('assets/images/cards/monsters/lazuck_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/08_BATTLE_MONSTER_CARD_ASSETS/02_Razuk_Battle_800x920_RGBA.png`))).toBe(true);
   });
 
-  // AJ の表の box（2026-11-02 ユーザー決定の正式配布のラズック16枚）
-  it('初期デッキのラズックは16枚（ひっかき2・かみつき2・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ3）', () => {
+  // AJ の表の box（2026-11-02 指示書 AP の V1：正式配布のラズック16枚から とびかかり 3→2・みだれづめ 2→1・おびきよせ 1→2・ダストキック 1→2）
+  it('初期デッキのラズックは16枚（ひっかき2・かみつき2・とびかかり2・みだれづめ1・しっぷうタックル2・おびきよせ2・ダストキック2・シャドウスリップ3）', () => {
     const lazuck = createStarterDeck().skills.filter((id) => id.startsWith('skl-lazuck-'));
     expect(lazuck).toHaveLength(16);
     const counts: Record<string, number> = {};
     for (const id of lazuck) counts[id] = (counts[id] ?? 0) + 1;
-    expect(counts).toEqual({ [laz(1)]: 2, [laz(2)]: 2, [laz(3)]: 3, [laz(4)]: 2, [laz(6)]: 2, [laz(7)]: 1, [laz(8)]: 1, [laz(15)]: 3 });
+    expect(counts).toEqual({ [laz(1)]: 2, [laz(2)]: 2, [laz(3)]: 2, [laz(4)]: 1, [laz(6)]: 2, [laz(7)]: 2, [laz(8)]: 2, [laz(15)]: 3 });
   });
 
   it('パックには入れていない（入手方法・排出率は未定）', () => {

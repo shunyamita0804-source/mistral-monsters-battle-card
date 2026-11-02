@@ -32,6 +32,7 @@ export const SCREEN_IDS = [
   'pukarimLab',
   /** ジオルの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-29） */
   'geolLab',
+  'soukaiLab',
   /** イベントのダンジョン3つの絵の確認用の画面（?qa=1 のときだけ設定から入れる。2026-10-29） */
   'eventDungeonLab',
 ] as const;

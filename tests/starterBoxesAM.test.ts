@@ -3,7 +3,8 @@ import { cardCatalog, getMonster, getSkill, skillsOf } from '../src/data/cards.t
 import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, type BoosterKey } from '../src/data/introV2.ts';
 import { KALSHELL_MONSTER } from '../src/data/kalshell.ts';
 import { MYUROL_MONSTER } from '../src/data/myurol.ts';
-import amContents from '../src/data/official/booster_contents_20261102_AM.json';
+import amContents from '../src/data/official/booster_contents_20261102_AO.json';
+import amOnly from '../src/data/official/booster_contents_20261102_AM.json';
 import finalContents from '../src/data/official/booster_contents_20261102_final.json';
 import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import { guardReduction } from '../src/game/cards/cardTypes.ts';
@@ -16,7 +17,8 @@ import { boosterDeck, boosterShelf, buyBooster, examLoanDeck } from '../src/game
 
 /**
  * 2026-11-02 指示書 AM（ユーザー決定）：最初の3箱の作り直し（旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン）。
- * 正本は src/data/official/booster_contents_20261102_AM.json。各モンスターの16枚は PR #1 の正式配布（booster_contents_20261102_final.json）のまま、ツムジだけ新しい（進行の案）。
+ * 正本は src/data/official/booster_contents_20261102_AO.json（指示書 AP：AM の版〔booster_contents_20261102_AM.json〕に烈火のラズックの V1 の直し）。
+ * AM の版の各モンスターの16枚は PR #1 の正式配布（booster_contents_20261102_final.json）のまま、ツムジだけ新しい（進行の案）。
  * あわせて PR #1 の4技の性能・ミュロル／カルシェルの LIFE。記録は docs/starter-boxes-am-20261102.md
  */
 
@@ -49,14 +51,31 @@ describe('3箱・9枠（指示書 AM）', () => {
     expect(new Set(BOOSTERS.flatMap((b) => b.monsters)).size).toBe(9);
   });
 
-  it('ツムジのほかは、PR #1 の正式配布の16枚のまま（ノビトンは前の烈火・蒼海の16枚、フォルンは前の旅立ちの16枚）', () => {
-    for (const g of amContents.booster_groups) {
+  it('AM の版：ツムジのほかは、PR #1 の正式配布の16枚のまま（ノビトンは前の烈火・蒼海の16枚、フォルンは前の旅立ちの16枚）', () => {
+    for (const g of amOnly.booster_groups) {
       for (const m of g.monster_ids) {
         if (m === 'mon-tsumuji') continue;
         const rows = g.card_rows.filter((r) => r.monster_id === m).map(({ monster: _m, ...r }) => r);
         expect(rows, `${g.booster_key} ${m}`).toEqual(finalRows(m).map(({ monster: _m, ...r }) => r));
       }
     }
+  });
+
+  it('指示書 AP の版（V1）：AM の版とちがうのは烈火のラズック4行だけ（とびかかり 3→2・みだれづめ 2→1・おびきよせ 1→2・ダストキック 1→2）', () => {
+    const diff: [string, number, number][] = [];
+    amContents.booster_groups.forEach((g, i) => {
+      g.card_rows.forEach((r, j) => {
+        const before = amOnly.booster_groups[i]?.card_rows[j];
+        expect(before?.skill_id).toBe(r.skill_id);
+        if (before && before.copies !== r.copies) diff.push([r.skill_id, before.copies, r.copies]);
+      });
+    });
+    expect(diff).toEqual([
+      ['skl-lazuck-03', 3, 2],
+      ['skl-lazuck-04', 2, 1],
+      ['skl-lazuck-07', 1, 2],
+      ['skl-lazuck-08', 1, 2],
+    ]);
   });
 
   it('ツムジの16枚：ひっかく1・Wひっかき2・とびかかる2・みだれぎり2・つむじかぜ2・かぜのやいば2・あらし1・ひらりとかわす3・★かまいたち1', () => {
