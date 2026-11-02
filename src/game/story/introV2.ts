@@ -1,6 +1,6 @@
 import { cardCatalog, skillsOf } from '../../data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, EXAM_LOAN_BOOSTER, isBoosterKey, isStarterDeckKey, type BoosterKey, type StarterDeckKey } from '../../data/introV2.ts';
-import boosterContents from '../../data/official/booster_contents_20261102_AL.json';
+import boosterContents from '../../data/official/booster_contents_20261102_AM.json';
 import { t } from '../../i18n/i18n.ts';
 import { countCards, createStarterDeckFor, isDeckValid, type Deck } from '../deck/deck.ts';
 import { addCards, hasProcessed, markProcessed, type SaveData } from '../save/saveData.ts';
@@ -132,8 +132,9 @@ export function finishExam(save: SaveData, won: boolean): SaveData {
 
 /**
  * 箱の中身のデッキ（モンスター3体＋技56枚＋サポート4枚＝60枚。2026-10-30 指示書 Y・ユーザー決定）。
- * 技とサポートは資料 src/data/official/booster_contents_20261102_AL.json の行（モンスター名・技名・枚数。ID は今のデータから名前で引く。2026-11-02 指示書 AK：旅立ちのノビトンをリリルに・指示書 AL：蒼海のノビトンをフォルンに。前の版 _20261102_AK・_20261101_AJ・_20261030 は残す）。
- * 箱の中身は、箱を受け取る・買うときだけ所持カードに足す。前のセーブの所持カード・デッキは変えない（もう旅立ちを選んだ人にリリルは配らない。蒼海を選んだ人にフォルンも配らない）。
+ * 技とサポートは資料 src/data/official/booster_contents_20261102_AM.json の行（2026-11-02 指示書 AM。各モンスターの16枚は正式配布 _20261102_final のまま。モンスター名・技名・枚数。0枚の技の行もある。ID は今のデータから名前で引き、資料の skill_id と同じかも確かめる。
+ * 前の版 _20261102_final・_20261102_AL・_20261102_AK・_20261101_AJ・_20261030 は残す）。
+ * 箱の中身は、箱を受け取る・買うときだけ所持カードに足す。前のセーブの所持カード・デッキは変えない（前の中身で箱を開けた人に、新しく入ったモンスター・技を配らない）。
  * 前の版（技48枚＋仮サポート12枚）は booster_contents_20261029.json（2026-10-29 夜に烈火の猛攻だけ案3に入れかえた版）。
  * 同じモンスターでも箱によって技がちがうので、モンスターごとの初期配布（createStarterDeckFor）ではなく箱の資料から作る
  */
@@ -145,7 +146,7 @@ export function boosterDeck(key: BoosterKey): Deck {
   const skills = group.card_rows.flatMap((row) => {
     const monster = def.monsters.find((m) => cardCatalog.get(m)?.name === row.monster);
     const hit = monster ? skillsOf(monster).filter((s) => s.name === row.skill_name) : [];
-    if (hit.length !== 1 || !hit[0]) throw new Error(`箱の技が見つかりません: ${def.key} ${row.monster} ${row.skill_name}`);
+    if (hit.length !== 1 || !hit[0] || hit[0].id !== row.skill_id) throw new Error(`箱の技が見つかりません: ${def.key} ${row.monster} ${row.skill_name}`);
     return Array<string>(row.copies).fill(hit[0].id);
   });
   const supports = group.support_cards.flatMap((row) => {

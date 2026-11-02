@@ -113,10 +113,10 @@ describe('ノビトン正式14技（2026-10-26。届いた CSV を無改変で�
     expect(NOBITON_SKILLS.filter((s) => s.availability === 'initial').map((s) => s.displayNo)).toEqual([1, 2, 3, 5, 8, 10, 13]);
   });
 
-  it('指示書 AJ の初期配布16枚（仮の箱）：はなビンタ3・ずつき3・くしゃみ2・ミラージュノーズ2・考える1・鼻でまもる2・のびのびガード2・必死によける1', () => {
+  it('初期配布16枚（2026-11-02 ユーザー決定の正式配布。烈火・蒼海とも同じ）：はなビンタ3・ずつき3・くしゃみ2・ミラージュノーズ2・考える2・鼻でまもる2・のびのびガード2', () => {
     const cards = INITIAL_DISTRIBUTION.find((d) => d.monsterId === 'mon-nobiton')?.cards ?? [];
     expect(Object.fromEntries(cards.map((c) => [c.id, c.copies]))).toEqual({
-      [nob(1)]: 3, [nob(2)]: 3, [nob(5)]: 2, [nob(6)]: 2, [nob(8)]: 1, [nob(10)]: 2, [nob(12)]: 2, [nob(16)]: 1,
+      [nob(1)]: 3, [nob(2)]: 3, [nob(5)]: 2, [nob(6)]: 2, [nob(8)]: 2, [nob(10)]: 2, [nob(12)]: 2,
     });
     expect(cards.reduce((n, c) => n + c.copies, 0)).toBe(16);
   });
@@ -329,7 +329,7 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
     expect(cardUsability(f, 'opponent', 'o0').usable).toBe(true);
     let evaded = applyAction(f, { type: 'defend', side: 'opponent', cardUid: 'o0' });
     if (evaded.phase === 'defense') evaded = applyAction(evaded, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(monster(evaded, 'o-m2').life).toBe(7); // よけたのでミュロルのライフ 7 のまま
+    expect(monster(evaded, 'o-m2').life).toBe(6); // よけたのでミュロルのライフ 6（2026-11-02）のまま
     expect(cardUsability(run(nob(5)), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
   });
 

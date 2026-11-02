@@ -31,10 +31,10 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 const CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 避: 'evade' } as const;
 
 describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリルを足して16体）', () => {
-  it('どのモンスターも技は12枚・レアは4つ。名前・分類・マナ・ダメージ・効果の文・表示の番号は表のとおり。LIFE は変えない', () => {
+  it('どのモンスターも技は12枚・レアは4つ。名前・分類・マナ・ダメージ・効果の文・表示の番号は表のとおり。LIFE は AJ で変えない（ミュロル・カルシェルは 2026-11-02 のユーザー決定で 7→6・8→7）', () => {
     expect(AJ_MONSTER_IDS).toHaveLength(17);
     const life: Record<string, number> = {
-      'mon-soramo': 7, 'mon-gauul': 6, 'mon-myurol': 7, 'mon-kalshell': 8, 'mon-lazuck': 6, 'mon-nobiton': 8, 'mon-pukarim': 6, 'mon-flune': 10,
+      'mon-soramo': 7, 'mon-gauul': 6, 'mon-myurol': 6, 'mon-kalshell': 7, 'mon-lazuck': 6, 'mon-nobiton': 8, 'mon-pukarim': 6, 'mon-flune': 10,
       'mon-serephine': 6, 'mon-tsumuji': 6, 'mon-geol': 9, 'mon-hyouzuku': 7, 'mon-shishien': 7, 'mon-hakuran': 7, 'mon-desuoru': 7,
       'mon-lilil': 5,
       'mon-forn': 7,
@@ -156,11 +156,11 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
   });
 });
 
-describe('AJ：最初の箱（仮の中身）', () => {
-  it('旅立ち＝ソラモ・リリル・ラズック（2026-11-02 指示書 AK）／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・フォルン（2026-11-02 指示書 AL）。どれも山札60枚', () => {
+describe('AJ：最初の箱（2026-11-02 指示書 AM）', () => {
+  it('旅立ち＝ソラモ・リリル・ノビトン／烈火＝ガウル・ラズック・ツムジ／蒼海＝ミュロル・カルシェル・フォルン。どれも山札60枚', () => {
     expect(BOOSTERS.map((b) => b.monsters)).toEqual([
-      ['mon-soramo', 'mon-lilil', 'mon-lazuck'],
-      ['mon-gauul', 'mon-lazuck', 'mon-nobiton'],
+      ['mon-soramo', 'mon-lilil', 'mon-nobiton'],
+      ['mon-gauul', 'mon-lazuck', 'mon-tsumuji'],
       ['mon-myurol', 'mon-kalshell', 'mon-forn'],
     ]);
     for (const b of BOOSTERS) {
@@ -360,9 +360,9 @@ describe('AJ：新しい効果', () => {
     const d = { monsters: ['mon-myurol', 'mon-soramo', 'mon-gauul'], skills: Array.from({ length: 60 }, () => 'skl-soramo14-01') };
     let s = createBattle({ name: 'P', deck: d }, { name: 'O', deck: oDeck }, 5, 'player');
     s = { ...s, phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player: { ...s.sides.player, hand: [{ uid: 'p0', cardId: 'skl-myurol-09' }], manaPile: Array.from({ length: 10 }, () => 'x') } } };
-    s = patch(s, 'p-m1', { life: 6 });
+    s = patch(s, 'p-m1', { life: 5 });
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', userUid: 'p-m1' });
-    expect(mon(s, 'p-m1').life).toBe(7);
+    expect(mon(s, 'p-m1').life).toBe(6); // ミュロルの LIFE 6（2026-11-02）まで
   });
 
   it('れんごくのとっしん：当たると自分のライフ−3。うけとめる：ちから技−5（0にはしない）', () => {

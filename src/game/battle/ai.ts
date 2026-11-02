@@ -68,7 +68,7 @@ import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
  *   うそなきは、リリルのライフが半分以下で、相手の攻撃で倒されそうなとき（その手番に倒せる攻撃が無ければ攻撃より先に）。腕前 C は 30% で使いそこねる
  * - フォルン（2026-11-02 指示書 AL。フォルンだけ）：chooseFornTrick。はげましのふえは今のおいかぜの考え方（次の手番に攻撃できそうな味方）。
  *   そなえのふえは狙われそうな味方（相手がいまのマナで払える攻撃で倒されそうな味方。そなえで助かるなら攻撃より先に）。こもりうたはいちばん強い攻撃を持つ相手へ。
- *   もりのたよりは手札が2枚以下で山札が10枚以上あるとき（攻撃より先に。捨てる1枚は pickDrawToDiscard＝マナにする順）。みがわりのふえは狙われた味方のライフが半分以下でフォルンが倒れないとき。
+ *   もりのたよりは手札が3枚以下（指示書 AM。前は2枚以下）で山札が10枚以上あるとき（攻撃より先に。捨てる1枚は pickDrawToDiscard＝マナにする順）。みがわりのふえは狙われた味方のライフが半分以下でフォルンが倒れないとき。
  *   腕前 C は forgetTrick の割合で使いそこねる
  */
 
@@ -813,8 +813,8 @@ function chooseLililTrick(state: BattleState, side: Side, options: Option[], ene
 
 /** 指示書 AL の考え方で、そなえのふえ・こもりうた・もりのたより・みがわりのふえを使うモンスター（2026-11-02。ほかのモンスターのすなかけ・かばうは前の考え方のまま） */
 const FORN_MONSTERS: readonly string[] = ['mon-forn'];
-/** もりのたよりを使う手札・山札の枚数（指示書 AL：手札が2枚以下・山札が10枚以上） */
-const DRAW_TO_MAX_HAND = 2;
+/** もりのたよりを使う手札・山札の枚数（指示書 AL：手札が2枚以下・山札が10枚以上。2026-11-02 指示書 AM で手札3枚以下に広げた） */
+const DRAW_TO_MAX_HAND = 3;
 const DRAW_TO_MIN_DECK = 10;
 
 /** 相手が、いまの相手のマナで払える攻撃技の中でいちばん大きいダメージ（場の増減を入れる） */
@@ -840,7 +840,7 @@ function chooseFornTrick(state: BattleState, side: Side, options: Option[], enem
   if (mine.length === 0 || enemies.length === 0) return null;
   if (cpuRoll(state, side, 'fornTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
   const me = state.sides[side];
-  // もりのたより：手札が2枚以下で、山札が10枚以上
+  // もりのたより：手札が3枚以下（指示書 AM）で、山札が10枚以上
   const tidings = mine.find((o) => o.def.effect.type === 'drawTo');
   if (first && tidings && me.hand.length <= DRAW_TO_MAX_HAND && me.deck.length >= DRAW_TO_MIN_DECK) {
     const choice = pickDrawToDiscard(state, side, tidings.card.uid, style, skill);

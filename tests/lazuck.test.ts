@@ -139,13 +139,13 @@ describe('ラズック正式14技（2026-10-26。正本 JSON を無改変で導�
     expect(readFileSync('assets/images/cards/monsters/lazuck_battlecard.png').equals(readFileSync(`${ORIGINAL_DIR}/08_BATTLE_MONSTER_CARD_ASSETS/02_Razuk_Battle_800x920_RGBA.png`))).toBe(true);
   });
 
-  // 2026-11-01 指示書 AJ：AJ の表の box（仮のラズック16枚）
-  it('初期デッキのラズックは16枚（ひっかき2・かみつき3・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ2）', () => {
+  // AJ の表の box（2026-11-02 ユーザー決定の正式配布のラズック16枚）
+  it('初期デッキのラズックは16枚（ひっかき2・かみつき2・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ3）', () => {
     const lazuck = createStarterDeck().skills.filter((id) => id.startsWith('skl-lazuck-'));
     expect(lazuck).toHaveLength(16);
     const counts: Record<string, number> = {};
     for (const id of lazuck) counts[id] = (counts[id] ?? 0) + 1;
-    expect(counts).toEqual({ [laz(1)]: 2, [laz(2)]: 3, [laz(3)]: 3, [laz(4)]: 2, [laz(6)]: 2, [laz(7)]: 1, [laz(8)]: 1, [laz(15)]: 2 });
+    expect(counts).toEqual({ [laz(1)]: 2, [laz(2)]: 2, [laz(3)]: 3, [laz(4)]: 2, [laz(6)]: 2, [laz(7)]: 1, [laz(8)]: 1, [laz(15)]: 3 });
   });
 
   it('パックには入れていない（入手方法・排出率は未定）', () => {
@@ -244,17 +244,18 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
   });
 
   // 指示書 AJ でしっぽいなし（ちから技だけ−3）・シャドウガード（かしこさ技だけ−3）を外したので、同じ守りのミュロルの技（しっぽガード・みずのまく）で見る
-  it('ちから技だけ−3（ミュロルのしっぽガード）・かしこさ技だけ−3（みずのまく）。どちらもマナ0。0 未満にならない', () => {
+  it('ちから技だけ−3（ミュロルのしっぽガード）・かしこさ技だけ−3（みずのまく）。どちらもマナ1（2026-11-02 に 0→1）。0 未満にならない', () => {
     const myurolDeck = { ...createStarterDeck(), monsters: ['mon-soramo', 'mon-myurol', 'mon-soramo'] };
     const [force, wisdom] = ['skl-myurol-10', 'skl-myurol-11'];
-    expect([getSkill(force).cost, getSkill(wisdom).cost]).toEqual([0, 0]);
+    expect([getSkill(force).cost, getSkill(wisdom).cost]).toEqual([1, 1]);
     expect(getSkill(force).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
     expect(getSkill(wisdom).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
     // しっぽうち：ちから3 → 0、たいあたり：ちから2 → 0（0 未満にならない）、スターダストレイ：かしこさ4 → 1、ソラモビーム：かしこさ3 → 0
-    expect(lifeOf(attackAndGuard('skl-soramo14-04', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
-    expect(lifeOf(attackAndGuard('skl-soramo14-03', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
-    expect(lifeOf(attackAndGuard('skl-soramo14-07', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(6);
-    expect(lifeOf(attackAndGuard('skl-soramo14-06', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(7);
+    // ミュロルの LIFE は 6（2026-11-02 ユーザー決定）
+    expect(lifeOf(attackAndGuard('skl-soramo14-04', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(6);
+    expect(lifeOf(attackAndGuard('skl-soramo14-03', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(6);
+    expect(lifeOf(attackAndGuard('skl-soramo14-07', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(5);
+    expect(lifeOf(attackAndGuard('skl-soramo14-06', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(6);
     // 効かない種類の攻撃には使えない
     let s = scene({ player: ['skl-soramo14-07'], opponent: [force] }, {}, myurolDeck);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });

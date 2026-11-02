@@ -8,6 +8,7 @@ import { LILIL_COLOR, LILIL_MONSTER_ID, LILIL_ROWS, lililArtFile } from '../src/
 import { PORTRAIT_FOCUS } from '../src/data/monsterPortraits.ts';
 import ak from '../src/data/official/booster_contents_20261102_AK.json';
 import aj from '../src/data/official/booster_contents_20261101_AJ.json';
+import finalContents from '../src/data/official/booster_contents_20261102_final.json';
 import { AJ_SKILLS, MONSTER_HABITAT } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction, CPU_SKILL } from '../src/game/battle/ai.ts';
 import { applyAction, createBattle, targetsFor, type BattleMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
@@ -15,6 +16,9 @@ import { countCards } from '../src/game/deck/deck.ts';
 import { boosterCardCounts, boosterDeck, examLoanDeck } from '../src/game/story/introV2.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+
+/** 2026-11-02 ユーザー決定の正式配布（技 ID → 箱の枚数。0枚の行もある） */
+const FINAL_BOX: Record<string, number> = Object.fromEntries(finalContents.booster_groups.flatMap((g) => g.card_rows.map((r) => [r.skill_id, r.copies])));
 
 /** 指示書 AK（2026-11-02）：リリル。正本は src/data/official/lilil12_skills_OFFICIAL_20261102.json、カードは src/data/skillRebuildAJ.ts の表 */
 
@@ -59,10 +63,12 @@ describe('リリルのデータ（届いた JSON のとおり）', () => {
       expect(r.mana).toBe(j.mana);
       expect(r.damage).toBe(j.damage === '―' ? null : Number(j.damage));
       expect(!!r.rare).toBe(j.gacha_slot === 'レア');
-      expect(r.box ?? 0).toBe(j.box_copies);
+      // 箱の枚数は 2026-11-02 の正式配布（JSON の box_copies は指示書 AK の版。書き換えずに残す）
+      expect(r.box ?? 0).toBe(FINAL_BOX[r.id]);
       expect(r.art).toBe(lililArtFile(j.no));
     });
     expect(rows.reduce((n, r) => n + (r.box ?? 0), 0)).toBe(16);
+    expect(LILIL_ROWS.reduce((n, j) => n + j.box_copies, 0)).toBe(16);
     const skills = skillsOf(LILIL_MONSTER_ID);
     expect(skills.map((k) => k.displayNo)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(skills.map((k) => k.art?.file)).toEqual(LILIL_ROWS.map((r) => lililArtFile(r.no)));
@@ -140,23 +146,28 @@ describe('最初の箱「旅立ちのきらめき」（指示書 AK：ソラモ�
     }
   });
 
-  it('リリルの16枚：しっぽはたき2・つめでひっかく2・こあくまだま2・マナをくすねる2・まどわしのひかり2・うっとりウインク2・はねでかわす2・くるりとかわす1・よつばねのまい1', () => {
+  it('リリルの16枚（2026-11-02 の正式配布のまま）：しっぽはたき1・つめでひっかく2・こあくまだま2・マナをくすねる2・まどわしのひかり2・デビーム1・うっとりウインク2・はねでかわす2・くるりとかわす2', () => {
     const c = countCards(boosterDeck('booster-1').skills);
-    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[`skl-lilil-${String(n).padStart(2, '0')}`] ?? 0)).toEqual([2, 2, 2, 2, 2, 0, 0, 2, 0, 2, 1, 1]);
-    expect(Object.keys(c).some((id) => id.startsWith('skl-nobiton-'))).toBe(false);
-    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-lazuck']);
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[`skl-lilil-${String(n).padStart(2, '0')}`] ?? 0)).toEqual([1, 2, 2, 2, 2, 1, 0, 2, 0, 2, 2, 0]);
+    // 指示書 AM：旅立ちにノビトンが入った
+    expect(Object.keys(c).some((id) => id.startsWith('skl-nobiton-'))).toBe(true);
+    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-nobiton']);
     expect(boosterCardCounts('booster-1')['mon-lilil']).toBe(1);
   });
 
-  it('試験で先生が貸すデッキも同じ（ソラモ・リリル・ラズック）', () => {
+  it('試験で先生が貸すデッキも同じ（指示書 AM から ソラモ・リリル・ノビトン）', () => {
     expect(examLoanDeck()).toEqual(boosterDeck('booster-1'));
     expect(examLoanDeck().monsters).toContain(LILIL_MONSTER_ID);
   });
 
-  it('箱の絵（booster_tabidachi）は変えていない。前の中身（formerMonsters）はソラモ・ノビトン・ラズック', () => {
+  it('箱の絵（booster_tabidachi）は変えていない。前の中身（formerMonsters・版ごと）は AJ・AK と AL・正式配布', () => {
     const b = BOOSTERS.find((x) => x.key === 'booster-1');
     expect(b?.art).toBe('booster_tabidachi');
-    expect(b?.formerMonsters).toEqual(['mon-soramo', 'mon-nobiton', 'mon-lazuck']);
+    expect(b?.formerMonsters).toEqual([
+      ['mon-soramo', 'mon-nobiton', 'mon-lazuck'],
+      ['mon-soramo', 'mon-lilil', 'mon-lazuck'],
+      ['mon-soramo', 'mon-lilil', 'mon-forn'],
+    ]);
   });
 });
 

@@ -148,6 +148,7 @@ describe('AL の試遊（フォルン）', () => {
     const cards = playtest16(FORN_MONSTER_ID);
     expect(cards).toHaveLength(8);
     expect(cards.reduce((n, x) => n + x.copies, 0)).toBe(16);
+    // フォルンのいない箱の3体と入れ替える（指示書 AM でフォルンは蒼海に戻ったので旅立ち・烈火。指示書 AL の記録の数字は、旅立ち・烈火で測った当時のもの）
     expect(SLOTS.map((x) => x.key)).toEqual(['booster-1', 'booster-1', 'booster-1', 'booster-2', 'booster-2', 'booster-2']);
     for (const { key, slot } of SLOTS) {
       const d = swapDeck(key, slot, FORN_MONSTER_ID, cards);

@@ -8,7 +8,8 @@ export type { Habitat };
  * - 数字はモンファーBC（PS 版・LIFE は同じ 6〜10）を物差しに上げ直した（LIFE はどのモンスターも変えない）
  * - 名前を変えた技は、カードの ID と絵はそのまま（名前と数字・効果だけ変える）。新しい技（skl-kalshell-15・skl-desuoru-15・16）の絵は仮（art）
  * - 居場所（地上・空中・水中）：MONSTER_HABITAT。場が水中（みちしお）のあいだは全員を水中として扱う（src/game/battle/engine.ts）
- * - box：最初の箱（ブースター）に入れる枚数（箱が決まっている子だけ。ラズック・ノビトンは仮の箱の枚数。src/data/introV2.ts）
+ * - box：最初の箱（ブースター）に入れる枚数（箱に入る9体だけ。src/data/introV2.ts）。2026-11-02 指示書 AM の src/data/official/booster_contents_20261102_AM.json と同じ
+ *   （ツムジのほかは正式配布 _20261102_final の16枚のまま。tests/starterBoxesAM.test.ts で照らし合わせる）
  * この表がカードの正本。src/data/cards.ts がこの表で 15体の技を組み立てる（2026-11-02 指示書 AK でリリル、指示書 AL でフォルンを足して17体）（各モンスターのファイルの14技は、絵と前のデータを引くためだけに使う）。
  * 決まりの細かい所は docs/battle-rules.md「指示書 AJ」
  */
@@ -96,54 +97,56 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-gauul14-01', name: 'つつく', cat: 'ち', mana: 0, damage: 1, text: null, box: 0 },
     { id: 'skl-gauul14-02', name: '連続つつき', cat: 'ち', mana: 1, damage: 1, text: null, box: 3 },
     { id: 'skl-gauul14-03', name: 'かぎ爪', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
-    { id: 'skl-gauul14-04', name: '急降下アタック', cat: 'ち', mana: 3, damage: 4, effect: atk({ groundOnly: true }), text: '地上の相手だけに使える', box: 0 },
-    { id: 'skl-gauul14-05', name: 'スパイラルダイブ', cat: 'ち', mana: 4, damage: 5, text: null, box: 2 },
+    { id: 'skl-gauul14-04', name: '急降下アタック', cat: 'ち', mana: 3, damage: 4, effect: atk({ groundOnly: true }), text: '地上の相手だけに使える', box: 2 },
+    { id: 'skl-gauul14-05', name: 'スパイラルダイブ', cat: 'ち', mana: 4, damage: 5, text: null, box: 1 },
     { id: 'skl-gauul14-06', name: '火の粉', cat: 'か', mana: 1, damage: 2, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, box: 0 },
-    { id: 'skl-gauul14-07', name: 'ファイアボール', cat: 'か', mana: 3, damage: 4, text: null, box: 3 },
+    { id: 'skl-gauul14-07', name: 'ファイアボール', cat: 'か', mana: 3, damage: 4, text: null, box: 2 },
     { id: 'skl-gauul14-09', name: '聖なる炎', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, box: 0 },
     { id: 'skl-gauul14-08', name: 'フレアレイ', cat: 'か', mana: 4, damage: 6, text: null, rare: true, box: 1 },
     { id: 'skl-gauul14-10', name: '威嚇', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2 },
     { id: 'skl-gauul14-13', name: '上に飛ぶ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 2 },
     { id: 'skl-gauul14-14', name: '高速飛行', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0 },
   ],
-  // ミュロル（水中・LIFE 7）［箱：蒼海の守り 16枚］
+  // ミュロル（水中・LIFE 6〔2026-11-02 ユーザー決定 7→6〕）［箱：蒼海の守り 16枚］
   'mon-myurol': [
-    { id: 'skl-myurol-01', name: 'たいあたり', cat: 'ち', mana: 1, damage: 1, text: null, box: 0 },
+    { id: 'skl-myurol-01', name: 'たいあたり', cat: 'ち', mana: 1, damage: 1, text: null, box: 2 },
     { id: 'skl-myurol-02', name: 'しっぽたたき', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
     { id: 'skl-myurol-03', name: 'しっぽまわし', cat: 'ち', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, box: 0 },
-    { id: 'skl-myurol-04', name: 'アクアテール', cat: 'ち', mana: 4, damage: 5, text: null, rare: true, box: 1 },
-    { id: 'skl-myurol-05', name: 'みずでっぽう', cat: 'か', mana: 2, damage: 2, text: null, box: 3 },
-    { id: 'skl-myurol-07', name: 'アクアボール', cat: 'か', mana: 3, damage: 4, text: null, box: 3 },
+    { id: 'skl-myurol-04', name: 'アクアテール', cat: 'ち', mana: 4, damage: 5, text: null, rare: true, box: 0 },
+    { id: 'skl-myurol-05', name: 'みずでっぽう', cat: 'か', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-myurol-07', name: 'アクアボール', cat: 'か', mana: 3, damage: 4, text: null, box: 2 },
     {
       id: 'skl-myurol-08', name: 'しめったはだ', cat: '特', mana: 1, damage: null,
-      effect: { type: 'shield', against: 'force', reduce: 3, turns: 2 }, text: '次の相手のターン、受けるちから技すべて−3', box: 2,
+      effect: { type: 'shield', against: 'force', reduce: 3, turns: 2 }, text: '次の相手のターン、受けるちから技すべて−3', box: 3,
     },
     { id: 'skl-myurol-09', name: 'みずあび', cat: '特', mana: 2, damage: null, effect: { type: 'healSelf', amount: 2 }, text: '自分のライフ＋2（もとのLIFEまで）', rare: true, box: 0 },
-    { id: 'skl-myurol-10', name: 'しっぽガード', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2 },
-    { id: 'skl-myurol-11', name: 'みずのまく', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 2 },
+    // 2026-11-02 ユーザー決定：しっぽガード・みずのまくのマナ 0→1（軽減 −3 はそのまま）
+    { id: 'skl-myurol-10', name: 'しっぽガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2 },
+    { id: 'skl-myurol-11', name: 'みずのまく', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 2 },
     { id: 'skl-myurol-14', name: 'スリップガード', cat: '防', mana: 2, damage: null, effect: guard(5, 'all'), text: T_BOTH, rare: true, box: 0 },
     { id: 'skl-myurol-16', name: 'すべってよける', cat: '避', mana: 2, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 0 },
   ],
-  // カルシェル（水中・LIFE 8）［箱：蒼海の守り 16枚］
+  // カルシェル（水中・LIFE 7〔2026-11-02 ユーザー決定 8→7〕）［箱：蒼海の守り 16枚］
   'mon-kalshell': [
-    { id: 'skl-kalshell-01', name: 'はさむ', cat: 'ち', mana: 1, damage: 1, text: null, box: 2 },
+    { id: 'skl-kalshell-01', name: 'はさむ', cat: 'ち', mana: 1, damage: 1, text: null, box: 3 },
     { id: 'skl-kalshell-02', name: 'シェルタックル', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
     { id: 'skl-kalshell-04', name: 'コーラルスピア', cat: 'ち', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 0 },
-    { id: 'skl-kalshell-03', name: 'クラッシュクロー', cat: 'ち', mana: 3, damage: 4, text: null, box: 3 },
+    { id: 'skl-kalshell-03', name: 'クラッシュクロー', cat: 'ち', mana: 3, damage: 4, text: null, box: 2 },
     { id: 'skl-kalshell-05', name: 'シェルブレイカー', cat: 'ち', mana: 5, damage: 6, text: null, rare: true, box: 1 },
     { id: 'skl-kalshell-06', name: 'あわだま', cat: 'か', mana: 1, damage: 2, text: null, rare: true, box: 1 },
     { id: 'skl-kalshell-08', name: 'タイダルクラッシュ', cat: 'か', mana: 4, damage: 5, effect: atk({ doubleInWater: true }), text: '場が水中なら2倍', rare: true, box: 0 },
     { id: 'skl-kalshell-10', name: 'すなをほる', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '次のターン攻撃の的にならない', box: 2 },
     // 新しい技（絵はデザイン担当に依頼中。届くまでタイダルクラッシュの絵）
     { id: 'skl-kalshell-15', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, box: 0, art: 'kal_sk_15.png' },
-    { id: 'skl-kalshell-11', name: 'からにこもる', cat: '防', mana: 1, damage: null, effect: guard(5, 'force'), text: T_FORCE, box: 2 },
-    { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 2 },
+    // 2026-11-02 ユーザー決定：からにこもるのマナ 1→2（ちから −5 はそのまま）・あわのまくのマナ 1→2・かしこさ −3→−5
+    { id: 'skl-kalshell-11', name: 'からにこもる', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: T_FORCE, box: 2 },
+    { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: T_WISDOM, box: 2 },
     { id: 'skl-kalshell-13', name: 'てっぺきシェル', cat: '防', mana: 3, damage: null, effect: { type: 'defense', against: 'all', nullify: true }, text: T_BOTH, rare: true, box: 0 },
   ],
-  // ラズック（地上・LIFE 6）［箱：仮。box は仮のラズック16枚］
+  // ラズック（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 正式配布）］
   'mon-lazuck': [
     { id: 'skl-lazuck-01', name: 'ひっかき', cat: 'ち', mana: 0, damage: 1, text: null, box: 2 },
-    { id: 'skl-lazuck-02', name: 'かみつき', cat: 'ち', mana: 1, damage: 1, text: null, box: 3 },
+    { id: 'skl-lazuck-02', name: 'かみつき', cat: 'ち', mana: 1, damage: 1, text: null, box: 2 },
     { id: 'skl-lazuck-03', name: 'とびかかり', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
     { id: 'skl-lazuck-04', name: 'みだれづめ', cat: 'ち', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 2 },
     { id: 'skl-lazuck-06', name: 'しっぷうタックル', cat: 'ち', mana: 4, damage: 4, text: null, box: 2 },
@@ -155,10 +158,10 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
       effect: { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' }, text: '相手の次のターンのちから技−1', box: 1,
     },
     { id: 'skl-lazuck-itazura', name: 'いたずら', cat: '特', mana: 2, damage: null, effect: { type: 'handToDeck' }, text: '相手の手札1枚をランダムに山札へ（補充なし）', rare: true },
-    { id: 'skl-lazuck-15', name: 'シャドウスリップ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 2 },
+    { id: 'skl-lazuck-15', name: 'シャドウスリップ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 3 },
     { id: 'skl-lazuck-14', name: 'フェイントステップ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
-  // ノビトン（地上・LIFE 8）［箱：仮。box は仮のノビトン16枚］
+  // ノビトン（地上・LIFE 8）［箱：烈火の猛攻・蒼海の守り 同じ16枚（2026-11-02 正式配布）］
   'mon-nobiton': [
     { id: 'skl-nobiton-01', name: 'はなビンタ', cat: 'ち', mana: 1, damage: 1, text: null, box: 3 },
     { id: 'skl-nobiton-02', name: 'ずつき', cat: 'ち', mana: 2, damage: 2, text: null, box: 3 },
@@ -167,11 +170,11 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-nobiton-05', name: 'くしゃみ', cat: 'か', mana: 2, damage: 1, effect: atk({ manaDrain: 1 }), text: '相手のマナ−1', box: 2 },
     { id: 'skl-nobiton-06', name: 'ミラージュノーズ', cat: 'か', mana: 2, damage: 2, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 2 },
     { id: 'skl-nobiton-07', name: 'ダウナーミスト', cat: 'か', mana: 4, damage: 2, effect: atk({ manaDrain: 3 }), text: '相手のマナ−3', rare: true },
-    { id: 'skl-nobiton-08', name: '考える', cat: '特', mana: 1, damage: null, effect: { type: 'redrawHand' }, text: '手札をすべて交換', box: 1 },
+    { id: 'skl-nobiton-08', name: '考える', cat: '特', mana: 1, damage: null, effect: { type: 'redrawHand' }, text: '手札をすべて交換', box: 2 },
     { id: 'skl-nobiton-09', name: '不思議な嗅覚', cat: '特', mana: 2, damage: null, effect: { type: 'revealHand' }, text: '相手の手札をすべて見る', rare: true },
     { id: 'skl-nobiton-10', name: '鼻でまもる', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2 },
     { id: 'skl-nobiton-12', name: 'のびのびガード', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: T_BOTH, box: 2 },
-    { id: 'skl-nobiton-16', name: '必死によける', cat: '避', mana: 3, damage: null, effect: dodge('all'), text: T_DODGE_ALL, box: 1 },
+    { id: 'skl-nobiton-16', name: '必死によける', cat: '避', mana: 3, damage: null, effect: dodge('all'), text: T_DODGE_ALL, box: 0 },
   ],
   // プカリム（空中・LIFE 6）
   'mon-pukarim': [
@@ -218,19 +221,19 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-serephine-13', name: 'ゆらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避' },
     { id: 'skl-serephine-14', name: 'ウェーブダンス', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
-  // ツムジ（地上・LIFE 6）
+  // ツムジ（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 指示書 AM。Wひっかきは2枚続けて使えるよう2枚）］
   'mon-tsumuji': [
-    { id: 'skl-tsumuji-01', name: 'ひっかく', cat: 'ち', mana: 0, damage: 1, text: null },
-    { id: 'skl-tsumuji-02', name: 'Wひっかき', cat: 'ち', mana: 1, damage: 1, effect: atk({ chain: true }), text: '同じターンにもう1枚続けて使える' },
-    { id: 'skl-tsumuji-05', name: 'とびかかる', cat: 'ち', mana: 2, damage: 2, text: null },
-    { id: 'skl-tsumuji-07', name: 'みだれぎり', cat: 'ち', mana: 3, damage: 3, text: null },
+    { id: 'skl-tsumuji-01', name: 'ひっかく', cat: 'ち', mana: 0, damage: 1, text: null, box: 1 },
+    { id: 'skl-tsumuji-02', name: 'Wひっかき', cat: 'ち', mana: 1, damage: 1, effect: atk({ chain: true }), text: '同じターンにもう1枚続けて使える', box: 2 },
+    { id: 'skl-tsumuji-05', name: 'とびかかる', cat: 'ち', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-tsumuji-07', name: 'みだれぎり', cat: 'ち', mana: 3, damage: 3, text: null, box: 2 },
     { id: 'skl-tsumuji-10', name: 'ストームブレイド', cat: 'ち', mana: 5, damage: 6, text: null, rare: true },
-    { id: 'skl-tsumuji-03', name: 'かまいたち', cat: 'か', mana: 1, damage: 2, text: null, rare: true },
-    { id: 'skl-tsumuji-04', name: 'つむじかぜ', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE },
-    { id: 'skl-tsumuji-06', name: 'かぜのやいば', cat: 'か', mana: 2, damage: 2, text: null },
-    { id: 'skl-tsumuji-09', name: 'あらし', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeableVsAir: true }), text: '空中の相手は回避できない' },
+    { id: 'skl-tsumuji-03', name: 'かまいたち', cat: 'か', mana: 1, damage: 2, text: null, rare: true, box: 1 },
+    { id: 'skl-tsumuji-04', name: 'つむじかぜ', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE, box: 2 },
+    { id: 'skl-tsumuji-06', name: 'かぜのやいば', cat: 'か', mana: 2, damage: 2, text: null, box: 2 },
+    { id: 'skl-tsumuji-09', name: 'あらし', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeableVsAir: true }), text: '空中の相手は回避できない', box: 1 },
     { id: 'skl-tsumuji-08', name: 'かぜのり', cat: '特', mana: 0, damage: null, effect: { type: 'windRide', discount: 1 }, text: '次のターン、ツムジの攻撃のマナ−1', rare: true },
-    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE },
+    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 3 },
     { id: 'skl-tsumuji-14', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
   // ジオル（地上・LIFE 9）
@@ -317,14 +320,14 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-desuoru-14', name: 'やみにまぎれる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
   ],
   // リリル（空中・LIFE 5・C。2026-11-02 指示書 AK。正本は src/data/official/lilil12_skills_OFFICIAL_20261102.json。新しい効果は無い）
-  // ［箱：旅立ちのきらめき 16枚（box は JSON の box_copies）］。絵は lilil_sk_NN.webp（番号＝技番号）
+  // ［箱：旅立ちのきらめき 16枚（2026-11-02 正式配布。前の box は JSON の box_copies）］。絵は lilil_sk_NN.webp（番号＝技番号）
   'mon-lilil': [
-    { id: 'skl-lilil-01', name: 'しっぽはたき', cat: 'ち', mana: 0, damage: 1, text: null, box: 2, art: 'lilil_sk_01.webp' },
+    { id: 'skl-lilil-01', name: 'しっぽはたき', cat: 'ち', mana: 0, damage: 1, text: null, box: 1, art: 'lilil_sk_01.webp' },
     { id: 'skl-lilil-02', name: 'つめでひっかく', cat: 'ち', mana: 1, damage: 1, text: null, box: 2, art: 'lilil_sk_02.webp' },
     { id: 'skl-lilil-03', name: 'こあくまだま', cat: 'か', mana: 1, damage: 1, text: null, box: 2, art: 'lilil_sk_03.webp' },
     { id: 'skl-lilil-04', name: 'マナをくすねる', cat: 'か', mana: 2, damage: 1, effect: atk({ manaDrain: 1 }), text: '相手のマナ−1', box: 2, art: 'lilil_sk_04.webp' },
     { id: 'skl-lilil-05', name: 'まどわしのひかり', cat: 'か', mana: 3, damage: 3, text: null, box: 2, art: 'lilil_sk_05.webp' },
-    { id: 'skl-lilil-06', name: 'デビーム', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 0, art: 'lilil_sk_06.webp' },
+    { id: 'skl-lilil-06', name: 'デビーム', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 1, art: 'lilil_sk_06.webp' },
     { id: 'skl-lilil-07', name: 'あまいかおり', cat: 'か', mana: 4, damage: 1, effect: atk({ manaDrain: 4 }), text: '相手のマナ−4', rare: true, box: 0, art: 'lilil_sk_07.webp' },
     // ラズックの おびきよせ と同じ（taunt）
     { id: 'skl-lilil-08', name: 'うっとりウインク', cat: '特', mana: 3, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、リリルしか攻撃できない', box: 2, art: 'lilil_sk_08.webp' },
@@ -332,21 +335,21 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-lilil-09', name: 'うそなき', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '相手は次のターン、リリルを攻撃できない', rare: true, box: 0, art: 'lilil_sk_09.webp' },
     // 2026-11-02 指示書 AK2：はねでかわす・くるりとかわすのマナ 1→0（ユーザー決定）
     { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 0, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 2, art: 'lilil_sk_10.webp' },
-    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 1, art: 'lilil_sk_11.webp' },
-    { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 1, art: 'lilil_sk_12.webp' },
+    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 2, art: 'lilil_sk_11.webp' },
+    { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0, art: 'lilil_sk_12.webp' },
   ],
   // フォルン（地上・LIFE 7・C。2026-11-02 指示書 AL。正本は src/data/official/forn12_skills_OFFICIAL_20261102.json）
-  // ［箱：蒼海の守り 16枚（box は JSON の box_copies）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
+  // ［箱：蒼海の守り 16枚（2026-11-02 指示書 AM。正式配布で旅立ちに入っていた16枚のまま）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
   'mon-forn': [
-    { id: 'skl-forn-01', name: 'ひづめキック', cat: 'ち', mana: 0, damage: 1, text: null, box: 2, art: 'forn_sk_01.webp' },
+    { id: 'skl-forn-01', name: 'ひづめキック', cat: 'ち', mana: 0, damage: 1, text: null, box: 0, art: 'forn_sk_01.webp' },
     { id: 'skl-forn-02', name: 'つのでつく', cat: 'ち', mana: 2, damage: 2, text: null, box: 2, art: 'forn_sk_02.webp' },
     { id: 'skl-forn-03', name: 'ねいろだま', cat: 'か', mana: 1, damage: 1, text: null, box: 2, art: 'forn_sk_03.webp' },
     { id: 'skl-forn-04', name: 'ふえのしらべ', cat: 'か', mana: 2, damage: 2, text: null, box: 2, art: 'forn_sk_04.webp' },
-    { id: 'skl-forn-05', name: 'そうこうげき', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 0, art: 'forn_sk_05.webp' },
+    { id: 'skl-forn-05', name: 'そうこうげき', cat: 'か', mana: 4, damage: 4, text: null, rare: true, box: 1, art: 'forn_sk_05.webp' },
     // プカリムの おいかぜ と同じ（tailwind）
     { id: 'skl-forn-06', name: 'はげましのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'tailwind', amount: 1 }, text: 'フォルン以外の味方1体、次のターンの攻撃＋1', box: 2, art: 'forn_sk_06.webp' },
     // 新しい効果（ward）
-    { id: 'skl-forn-07', name: 'そなえのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'ward', reduce: 1 }, text: 'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1', rare: true, box: 1, art: 'forn_sk_07.webp' },
+    { id: 'skl-forn-07', name: 'そなえのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'ward', reduce: 1 }, text: 'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1', rare: true, box: 2, art: 'forn_sk_07.webp' },
     // ソラモの すなかけ と同じ（seal）
     { id: 'skl-forn-08', name: 'こもりうた', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2, art: 'forn_sk_08.webp' },
     // 新しい効果（drawTo）
