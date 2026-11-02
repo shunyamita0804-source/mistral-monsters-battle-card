@@ -755,6 +755,15 @@
   filter: brightness(0.9) saturate(0.86) sepia(0.1) drop-shadow(0 0 1px rgb(30 18 8 / 0.55));
 }
 
+/*
+ * 案内役のミレイユだけ、落ち着かせる調整を弱く（2026-11-02 iPhone 試遊「ミレイユが背景にくらべて暗く沈んで見える」）。
+ * 白い服が上の調整（明るさ 0.9・セピア）で灰色っぽくなり、いつもとなりに立つ主人公（調整なし）より暗く見えていた。
+ * 絵・大きさ・コマ・縁の線はそのまま。ほかの人・背景は変えない（街で一緒に歩く .world__follower も同じ）
+ */
+.world__npc[data-npc='neighbor_guide'] {
+  filter: brightness(0.97) saturate(0.95) sepia(0.04) drop-shadow(0 0 1px rgb(30 18 8 / 0.55));
+}
+
 .world__shadow--npc {
   background:
     radial-gradient(closest-side, rgb(12 8 4 / 0.92), rgb(12 8 4 / 0.62) 55%, rgb(12 8 4 / 0)) center / 66% 66% no-repeat,

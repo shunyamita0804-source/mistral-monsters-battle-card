@@ -152,6 +152,17 @@ export interface NpcObject extends Rect {
   readonly drawDy?: number;
   /** 絵だけを横にずらすマスの数（負＝左へ）。大会会場の受付のように、カウンターの横から話しかけるとき（2026-10-28） */
   readonly drawDx?: number;
+  /**
+   * この人のまわりの通れない範囲（マス。無ければ worldScreen の NPC_SPACE）。
+   * 2026-11-02 当たり判定の点検：カウンターの奥に見える人（研究所のルーカスなど）は、話しかけるマスがカウンターの前のふちにあるので、
+   * まわりを NPC_SPACE でふさぐとカウンターの前の通り道が切れていた（研究所でカウンターの前から右へ進めない）。カウンターが人と主人公を離すので、本人のマスだけにする
+   */
+  readonly space?: { readonly x: number; readonly y: number };
+  /**
+   * この人と話せる範囲（マス。無ければ worldScreen の NPC_TALK_RANGE）。
+   * 2026-11-02 練習場のガレス：主人公と上下に向かい合う立ち位置（TEACHER_FRONT_DY マス手前）からも話せるように
+   */
+  readonly talkReach?: { readonly x: number; readonly y: number };
 }
 
 export type MapObject = InteractObject | WarpObject | EnemyObject | ChestObject | NpcObject;
@@ -380,6 +391,14 @@ export const NEIGHBOR: MapDefinition = artMap('neighbor', 'となりの家', 'in
   roomExit('neighbor-exit', NEIGHBOR_ART, 'GUIDE_HOME'),
 ], entryOf(NEIGHBOR_ART));
 
+/** カウンターの奥に見える人のまわりの通れない範囲：本人のマスだけ（NpcObject.space） */
+const COUNTER_NPC_SPACE = { x: 0, y: 0 } as const;
+/**
+ * 何マス奥に見える人なら、まわりをふさがないか。カウンターのすぐ前に立ったとき、主人公の頭が人の体に重ならない深さ。
+ * 研究所のルーカス（約3マス）・管理局のエレノア（約3.6）・花屋（約3）・仕立て屋（約2.8）はふさがない。
+ * 大会会場のセリア（約2）・カードショップの店員（1）は浅く、真ん前に立つと頭が体に重なるので、今までどおり NPC_SPACE（その1つ手前の行を通れる）
+ */
+const COUNTER_NPC_DEPTH = 2.5;
 const SHOP_ART = artOf('shop');
 /**
  * 店員は、話しかけるマス（カウンターの前の床の隣）より少し奥に見せる。
@@ -407,7 +426,9 @@ const LAB_ART = ROOMS4_ART.lab;
 /** カウンターの奥などに立つ人（話しかけるマスは家具の手前。見た目だけ奥にずらす） */
 const spotNpc = (id: string, art: ArtMap, spot: string, offset: { readonly dx: number; readonly dy: number } | undefined, npcId: NpcId, action?: InteractAction): NpcObject => {
   const p = spotOf(art, spot);
-  return npc(id, p.x, p.y, npcId, action, offset?.dy, offset?.dx);
+  // 見た目がカウンターの奥（COUNTER_NPC_DEPTH マス以上奥）の人は、まわりをふさがない（カウンターの前を歩ける。2026-11-02）
+  const behindCounter = (offset?.dy ?? 0) <= -COUNTER_NPC_DEPTH;
+  return { ...npc(id, p.x, p.y, npcId, action, offset?.dy, offset?.dx), ...(behindCounter ? { space: COUNTER_NPC_SPACE } : {}) };
 };
 /**
  * カード研究所（2026-10-28 新しい絵。tools/design/rooms4_build.py）。奥の壁の本棚＝図鑑、左奥のガラスの飾り棚＝標本棚、中央の机（研究員ルーカスはその奥）、
@@ -459,6 +480,11 @@ export const CAMERA_LEANS: readonly { readonly mapId: string; readonly npcId: st
   { mapId: 'hall', npcId: 'hall-receptionist', target: itemOf(HALL_ART, 'COUNTER') },
 ];
 
+/**
+ * 練習場：主人公が先生と上下に向かい合って立つときの、先生からの手前のマス数（2026-11-02 iPhone 試遊「ガレスの横に来て横向きで話す」）。
+ * 主人公の絵は約4マスの高さで、4マスより近いと主人公の頭が先生の体に重なる。5マスで帽子の先が先生の足もとに届くくらい（顔・体は重ならない）
+ */
+export const TEACHER_FRONT_DY = 5;
 const PRACTICE_ART = ROOMS4_ART.practice;
 /**
  * カード練習場（2026-10-30 指示書 X で正面向きの新しい絵に。tools/design/rooms4_build.py）。初心者がカードを学ぶ場所。対戦机3つで練習試合ができる。
@@ -472,7 +498,11 @@ export const PRACTICE: MapDefinition = artMap('practice', 'カード練習場', 
   interactAt('practice-table-3', itemOf(PRACTICE_ART, 'TABLE_3'), '練習テーブル', 'practiceTable'),
   // ガレス先生は真ん中の机の右の辺の横（手前を向く）。案内役は最初の練習試合が終わるまで、先生の右（3マス右・2マス手前）にいる。
   // 2026-11-01 指示書 AI【1】：机を奥へ動かし、先生を机の右へ。ミレイユは先生と、先生の左前に立つ主人公のどちらにも重ならない所
-  npc('practice-teacher', spotOf(PRACTICE_ART, 'TEACHER_SPOT').x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y, 'teacher', 'practiceTable'),
+  // 2026-11-02 iPhone 試遊：主人公は先生の真ん前（TEACHER_FRONT_DY マス手前）で上下に向かい合う。そこからも話せる（talkReach）
+  {
+    ...npc('practice-teacher', spotOf(PRACTICE_ART, 'TEACHER_SPOT').x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y, 'teacher', 'practiceTable'),
+    talkReach: { x: 3, y: TEACHER_FRONT_DY },
+  },
   npc('guide-practice', spotOf(PRACTICE_ART, 'TEACHER_SPOT', 3).x, spotOf(PRACTICE_ART, 'TEACHER_SPOT').y + 2, 'neighbor_guide'),
   roomExit('practice-exit', PRACTICE_ART, 'TRAINING'),
 ], entryOf(PRACTICE_ART));
