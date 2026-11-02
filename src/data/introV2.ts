@@ -58,34 +58,48 @@ export interface BoosterDefinition {
   readonly category: StarterDeckKey;
   readonly monsters: readonly [string, string, string];
   /**
-   * 前の版の箱のモンスター（中身が変わった箱だけ。前のセーブでもう箱を開けた人のガチャのシリーズを変えないため。src/game/economy/gachaSeries.ts の startingGachaMonsters）。
-   * 2026-11-02 指示書 AK：旅立ちは前はソラモ・ノビトン・ラズック。指示書 AL：蒼海は前はミュロル・カルシェル・ノビトン
+   * 前の版の箱のモンスター（中身が変わった箱だけ。版ごとに1つの並び。前のセーブでもう箱を開けた人のガチャのシリーズを変えないため。src/game/economy/gachaSeries.ts の startingGachaMonsters）。
+   * 2026-11-02 指示書 AK：旅立ちは前はソラモ・ノビトン・ラズック。指示書 AL：蒼海は前はミュロル・カルシェル・ノビトン。
+   * 2026-11-02 初期3箱の正式配布：旅立ち・蒼海の中身がまた変わったので、1つの並びから「版ごとの並び」にした（AK・AL の版も足す）
    */
-  readonly formerMonsters?: readonly string[];
+  readonly formerMonsters?: readonly (readonly string[])[];
 }
 
 /**
  * 管理局で選ぶブースターパック3種（2026-10-27 ユーザー承認の箱デザイン「BoosterPack_Claude_Request」）。並び・名前・種類・箱のモンスターは確定。
  * 中身は 2026-10-28 に決定：その種類の初期デッキ（src/game/deck/deck.ts の createStarterDeckFor。モンスター3＋山札60）。
- * 技とサポートの枚数の出典は src/data/official/booster_contents_20261102_AL.json（2026-11-02 指示書 AK：旅立ちのノビトンをリリルに・指示書 AL：蒼海のノビトンをフォルンに。技48枚＋サポート12枚〔仮〕。
- * 前の版 _20261102_AK（指示書 AK）・_20261101_AJ（指示書 AJ）・_20261030（指示書 Y：技56枚＋旅の手帳×2・投石×2）・_20261029・_20261028 は残す。
+ * 技とサポートの枚数の出典は src/data/official/booster_contents_20261102_final.json（2026-11-02 ユーザー決定の正式配布：3箱9枠×技16枚＝144枚。届いた JSON を無改変。同じ内容の CSV も並べて置く。
+ * 技48枚＋サポート12枚〔サポートは仮のまま〕）。
+ * 前の版 _20261102_AL（指示書 AL）・_20261102_AK（指示書 AK）・_20261101_AJ（指示書 AJ）・_20261030（指示書 Y：技56枚＋旅の手帳×2・投石×2）・_20261029・_20261028 は残す。
  * src/game/story/introV2.ts の boosterDeck が資料から作る。tests/boosterCounter.test.ts で照合）
  */
 export const BOOSTERS: readonly BoosterDefinition[] = [
-  // 2026-11-01 指示書 AJ【5】（ユーザー決定・一部は仮）：箱の主＋ C 2体。C 2体はまだ作っていないので【仮】の中身
-  // （旅立ち＝ソラモ・ノビトン・ラズック、烈火＝ガウル・ラズック・ノビトン、蒼海＝ミュロル・カルシェル・ノビトン〔牧神の代わり〕）。
-  // 2026-11-02 指示書 AK：旅立ち＝ソラモ・リリル・ラズック（仮のノビトンをリリルに。ラズックは仮のまま。残りの1体は新しい C ができたら決める）。
-  // 箱の絵（booster_tabidachi）は変えていない。技とサポートの枚数は src/data/official/booster_contents_20261102_AL.json
-  { key: 'booster-1', name: '旅立ちのきらめき', art: 'booster_tabidachi', category: 'balance', monsters: [SORAMO_MONSTER_ID, LILIL_MONSTER_ID, LAZUCK_MONSTER_ID], formerMonsters: [SORAMO_MONSTER_ID, NOBITON_MONSTER_ID, LAZUCK_MONSTER_ID] },
+  // 2026-11-01 指示書 AJ【5】：箱の主＋ C 2体（旅立ち＝ソラモ・ノビトン・ラズック、烈火＝ガウル・ラズック・ノビトン、蒼海＝ミュロル・カルシェル・ノビトン）。
+  // 2026-11-02 指示書 AK：旅立ち＝ソラモ・リリル・ラズック。指示書 AL：蒼海＝ミュロル・カルシェル・フォルン。
+  // 2026-11-02 初期3箱の正式配布（ユーザー決定）：旅立ち＝ソラモ・リリル・フォルン、烈火＝ガウル・ラズック・ノビトン（変わらない）、蒼海＝ミュロル・カルシェル・ノビトン。
+  // ノビトンは烈火と蒼海に同じ16枚。箱の絵は変えていない。技とサポートの枚数は src/data/official/booster_contents_20261102_final.json
+  {
+    key: 'booster-1',
+    name: '旅立ちのきらめき',
+    art: 'booster_tabidachi',
+    category: 'balance',
+    monsters: [SORAMO_MONSTER_ID, LILIL_MONSTER_ID, FORN_MONSTER_ID],
+    formerMonsters: [
+      [SORAMO_MONSTER_ID, NOBITON_MONSTER_ID, LAZUCK_MONSTER_ID], // 指示書 AJ（公開済み）
+      [SORAMO_MONSTER_ID, LILIL_MONSTER_ID, LAZUCK_MONSTER_ID], // 指示書 AK・AL
+    ],
+  },
   { key: 'booster-2', name: '烈火の猛攻', art: 'booster_rekka', category: 'attack', monsters: [GAUUL_MONSTER_ID, LAZUCK_MONSTER_ID, NOBITON_MONSTER_ID] },
-  // 2026-11-02 指示書 AL：蒼海＝ミュロル・カルシェル・フォルン（仮のノビトンをフォルンに）。箱の絵（booster_soukai）は変えていない。烈火にはノビトンが残る
   {
     key: 'booster-3',
     name: '蒼海の守り',
     art: 'booster_soukai',
     category: 'defense',
-    monsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, FORN_MONSTER_ID],
-    formerMonsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID],
+    monsters: [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID],
+    formerMonsters: [
+      [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, NOBITON_MONSTER_ID], // 指示書 AJ・AK（公開済みの AJ と同じ顔ぶれ）
+      [MYUROL_MONSTER_ID, KALSHELL_MONSTER_ID, FORN_MONSTER_ID], // 指示書 AL
+    ],
   },
 ];
 

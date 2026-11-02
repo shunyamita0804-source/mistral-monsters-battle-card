@@ -176,10 +176,10 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
 
   it('新しく始めたときの所持カードにだけ入る（初期デッキ60枚・モンスターカード本体・パック・相手の編成には入れない）', () => {
     const save = createNewSave();
-    // 2026-11-01 指示書 AJ：最初の箱（烈火の猛攻）の枚数。02・03・07 が3枚、05・10・13 が2枚、08 が1枚（16枚）
-    expect(ajBoxRows('mon-gauul')).toEqual([[gau(2), 3], [gau(3), 3], [gau(5), 2], [gau(7), 3], [gau(8), 1], [gau(10), 2], [gau(13), 2]]);
+    // 最初の箱（烈火の猛攻）の枚数。2026-11-02 ユーザー決定の正式配布：02・03 が3枚、04・07・10・13 が2枚、05・08 が1枚（16枚）
+    expect(ajBoxRows('mon-gauul')).toEqual([[gau(2), 3], [gau(3), 3], [gau(4), 2], [gau(5), 1], [gau(7), 2], [gau(8), 1], [gau(10), 2], [gau(13), 2]]);
     for (const [id, copies] of ajBoxRows('mon-gauul')) expect(save.collection[id]).toBe(copies);
-    for (const n of [1, 4, 6, 9, 14]) expect(save.collection[gau(n)]).toBeUndefined();
+    for (const n of [1, 6, 9, 14]) expect(save.collection[gau(n)]).toBeUndefined();
     expect(save.collection['mon-gauul']).toBeUndefined();
     for (const p of PACKS) expect(p.cardIds.some((id) => id.includes('gauul'))).toBe(false);
     const starter = createStarterDeck();
@@ -422,7 +422,8 @@ describe('クロスガードの削除と旧セーブ（version 8）', () => {
     const save = createNewSave();
     let swapped = 0;
     const deckSkills = save.deck.skills.map((id) => (id === laz(2) && swapped < 2 ? (swapped++, LAZUCK_CROSS_GUARD_ID) : id));
-    const collection: Record<string, number> = { ...save.collection, [laz(2)]: 1, [LAZUCK_CROSS_GUARD_ID]: 2 };
+    // かみつきは、デッキに残った枚数だけ持っている（予備なし。2026-11-02 の正式配布でデッキのかみつきは2枚になり、2枚とも替わる）
+    const collection: Record<string, number> = { ...save.collection, [laz(2)]: deckSkills.filter((id) => id === laz(2)).length, [LAZUCK_CROSS_GUARD_ID]: 2 };
     return { ...save, version: 7, deck: { ...save.deck, skills: deckSkills }, collection };
   };
 

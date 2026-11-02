@@ -3,7 +3,7 @@ import { cardCatalog, skillsOf } from '../src/data/cards.ts';
 import { BOOSTER_SHOP_PRICE, BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import contents from '../src/data/official/booster_contents_20261030.json';
 import before from '../src/data/official/booster_contents_20261029.json';
-import ajContents from '../src/data/official/booster_contents_20261102_AL.json';
+import ajContents from '../src/data/official/booster_contents_20261102_final.json';
 import { ajBoxRows } from '../src/data/skillRebuildAJ.ts';
 import { countCards, createStarterDeckFor, isDeckValid } from '../src/game/deck/deck.ts';
 import { createNewGameSave, createNewSave, normalizeSave, type SaveData } from '../src/game/save/saveData.ts';
@@ -29,13 +29,14 @@ const throughExam = (s: SaveData): SaveData => setIntroV2State(finishExam(beginE
 const name = (id: string): string => cardCatalog.get(id)?.name ?? id;
 
 describe('ブースターの箱＝初期配布', () => {
-  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（指示書 AL の版〔旅立ちのノビトンをリリルに・蒼海のノビトンをフォルンに〕。サポートは指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
+  it('箱の中身はモンスター3枚＋技48枚＋サポート12枚（2026-11-02 ユーザー決定の正式配布〔booster_contents_20261102_final.json〕。サポートは指示書 AJ・仮：旅の手帳×3・投石×3・薬草×2・風まかせ×2・声援×2）。資料の技名・枚数どおり', () => {
     expect(ajContents.booster_groups.map((g) => g.booster_key)).toEqual(BOOSTERS.map((b) => b.key));
     for (const group of ajContents.booster_groups) {
       const key = group.booster_key as BoosterKey;
       const deck = boosterDeck(key);
       const def = BOOSTERS.find((b) => b.key === key);
       expect(deck.monsters).toEqual(def?.monsters);
+      expect(deck.monsters).toEqual(group.monster_ids);
       expect(deck.skills).toHaveLength(60);
       const skills = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'skill');
       const supports = deck.skills.filter((id) => cardCatalog.get(id)?.kind === 'support');
@@ -52,7 +53,7 @@ describe('ブースターの箱＝初期配布', () => {
         expect(hit, `${row.monster} ${row.skill_name}`).toHaveLength(1);
         const id = hit[0]?.id ?? '';
         expect(id).toBe(row.skill_id);
-        want[id] = (want[id] ?? 0) + row.copies;
+        if (row.copies > 0) want[id] = (want[id] ?? 0) + row.copies; // 0枚の行（収集用の技）は箱に入らない
       }
       expect(countCards(skills)).toEqual(want);
       expect(isDeckValid(deck, boosterCardCounts(key))).toBe(true);
@@ -78,7 +79,7 @@ describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとか
     }
   });
 
-  it('指示書 AJ の箱：どの箱も、3体それぞれの技は表の box の枚数（16枚ずつ。ラズック・ノビトンは仮の枚数。リリルは指示書 AK の box_copies）', () => {
+  it('どの箱も、3体それぞれの技は表の box の枚数（16枚ずつ。2026-11-02 の正式配布と同じ。ノビトンは烈火・蒼海とも同じ16枚）', () => {
     for (const b of BOOSTERS) {
       const c = ids(b.key);
       for (const m of b.monsters) {
@@ -90,10 +91,10 @@ describe('箱の中身（2026-10-30 指示書 Y：前の版に、箱にもとか
     }
   });
 
-  it('烈火の猛攻（指示書 AJ・仮）：ラズック ひっかき2・かみつき3・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ2（レアのトリックショット・シャドウバーストは入らない）、ノビトン くしゃみ2・ミラージュノーズ2', () => {
+  it('烈火の猛攻（2026-11-02 正式配布）：ラズック ひっかき2・かみつき2・とびかかり3・みだれづめ2・しっぷうタックル2・おびきよせ1・ダストキック1・シャドウスリップ3（レアのトリックショット・シャドウバーストは入らない）、ノビトン くしゃみ2・ミラージュノーズ2', () => {
     const c = ids('booster-2');
     const laz = (n: string): number => c[n] ?? 0;
-    expect([1, 2, 3, 4, 6, 7, 8, 15, 9, 10].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([2, 3, 3, 2, 2, 1, 1, 2, 0, 0]);
+    expect([1, 2, 3, 4, 6, 7, 8, 15, 9, 10].map((n) => laz(`skl-lazuck-${String(n).padStart(2, '0')}`))).toEqual([2, 2, 3, 2, 2, 1, 1, 3, 0, 0]);
     expect([5, 6].map((n) => c[`skl-nobiton-0${n}`] ?? 0)).toEqual([2, 2]);
   });
 
@@ -152,10 +153,10 @@ describe('カウンターで残りの2箱を買う', () => {
     s = r.save;
     // 中身は所持カードに足すだけ（デッキは変えない。同じカードが重なってもそのまま持つ）
     expect(s.deck).toEqual(boosterDeck('booster-1'));
-    // ラズックは旅立ちのきらめき・烈火の猛攻の両方に入る（指示書 AJ の箱）
-    const lazuck = 'mon-lazuck';
-    expect(s.collection[lazuck]).toBe(2);
+    // 2026-11-02 の正式配布：旅立ち（ソラモ・リリル・フォルン）と烈火（ガウル・ラズック・ノビトン）は同じモンスターがいない
+    expect(s.collection['mon-lazuck']).toBe(1);
     expect(s.collection['mon-gauul']).toBe(1);
+    expect(s.collection['mon-soramo']).toBe(1);
     expect(boosterShelf(s)).toEqual([
       { key: 'booster-2', bought: true },
       { key: 'booster-3', bought: false },
@@ -172,6 +173,9 @@ describe('カウンターで残りの2箱を買う', () => {
     if (r3.status !== 'ok') throw new Error(r3.status);
     expect(r3.save.coins).toBe(5000 - 2 * BOOSTER_SHOP_PRICE);
     expect(ownedBoosters(r3.save)).toEqual(['booster-1', 'booster-2', 'booster-3']);
+    // ノビトンは烈火と蒼海の両方に入る（同じ16枚。重なってもそのまま持つ）
+    expect(r3.save.collection['mon-nobiton']).toBe(2);
+    expect(r3.save.collection['skl-nobiton-01']).toBe(6);
     // 開き直しても「購入済み」のまま
     const reloaded = normalizeSave(JSON.parse(JSON.stringify(r3.save)));
     if (!reloaded) throw new Error('load');

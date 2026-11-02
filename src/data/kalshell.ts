@@ -27,18 +27,25 @@ export const kalshellSkillId = (no: number): string => `skl-kalshell-${twoDigits
 /** カルシェルの色（資料の推奨基準色。JSON の frame_color_hex） */
 export const KALSHELL_COLOR: string = kalshellData.frame_color_hex;
 
-/** カルシェルのモンスターカード。ライフは JSON の life（8）・内部ランクは未定（画面に出さない） */
+/**
+ * カルシェルのモンスターカード。ライフ 7（2026-11-02 ユーザー決定で 8→7。JSON の life 8 は前の14技の原本なので書き換えず、ここで 7 にする）・
+ * 内部ランクは未定（画面に出さない）
+ */
+export const KALSHELL_LIFE = 7;
+
 export const KALSHELL_MONSTER: MonsterCard = {
   kind: 'monster',
   id: KALSHELL_MONSTER_ID,
   name: kalshellData.monster,
   rarity: null,
-  life: kalshellData.life,
+  life: KALSHELL_LIFE,
   themeColor: KALSHELL_COLOR,
   description: 'カルシェル（水系）。',
   isPlaceholder: false,
   // 図鑑・箱を受け取る窓・取得カード・祭壇などのカード：名前と LIFE 入りの正式モンスターカード（2026-10-30 指示書 P。
-  // 届いた design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png を幅 508 に縮めただけ。ソラモ・プカリムと同じ使い方）
+  // 届いた design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png を幅 508 に縮めただけ。ソラモ・プカリムと同じ使い方）。
+  // 2026-11-02 ユーザー決定（LIFE 8→7）：数字だけ直した kalshell_official_monstercard_LIFE7.png（970×1622。原本と比べて数字の枠の外は1画素も変わっていない）から
+  // tools/art/official_card_webp.py で作り直した（LIFE8 の原本も残す）
   art: { category: 'monsterCards', file: 'kalshell_official.webp', layout: 'full' },
   // 対戦画面のアイコンの切り抜き：正式のバトル用の絵（src/data/battleCards.ts と同じファイル）
   battleArt: { category: 'monsterCards', file: 'kalshell_battlecard.png', layout: 'full' },

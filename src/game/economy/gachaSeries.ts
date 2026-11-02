@@ -50,15 +50,18 @@ export function seriesLineup(series: GachaSeries): SeriesLineup & { readonly err
  * 2026-11-02 指示書 AK：箱の中身が変わった箱（旅立ち：ノビトン → リリル）は、前の中身と今の中身の両方にいるモンスターはそのまま。
  * 片方にだけいるモンスター（ノビトン・リリル）は、そのモンスターカードを持っているときだけ（前のセーブでもう箱を開けた人に
  * リリルのシリーズを出さない・ノビトンに NEW を出さない。新しく箱を開けた人はリリルを持っているのでリリルが並ぶ）
+ * 2026-11-02 初期3箱の正式配布：前の中身を版ごとに持つようにした。今の中身と前のすべての版にいるモンスターはそのまま並ぶ。
+ * どれかの版にしかいないモンスターは、そのモンスターカードを持っているときだけ（版が1つのときは AK と同じ動き）
  */
 export function startingGachaMonsters(save: SaveData): readonly string[] {
   const box = BOOSTERS.find((b) => b.key === save.story.introV2.selectedBoosterKey);
   if (box) {
     const former = box.formerMonsters;
-    if (!former) return box.monsters;
-    const both = box.monsters.filter((m) => former.includes(m));
-    const changed = [...box.monsters, ...former].filter((m) => !both.includes(m));
-    return [...both, ...changed.filter((m) => (save.collection[m] ?? 0) > 0)];
+    if (!former || former.length === 0) return box.monsters;
+    const versions = [box.monsters, ...former];
+    const always = box.monsters.filter((m) => versions.every((v) => v.includes(m)));
+    const changed = [...new Set(versions.flat())].filter((m) => !always.includes(m));
+    return [...always, ...changed.filter((m) => (save.collection[m] ?? 0) > 0)];
   }
   return GACHA_SERIES.filter((s) => SKIP_GACHA_SERIES_IDS.includes(s.id)).map((s) => s.monsterId);
 }

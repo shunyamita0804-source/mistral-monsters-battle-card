@@ -134,23 +134,25 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
 });
 
 describe('カルシェル：モンスター・初期配布16枚', () => {
-  it('モンスター：ライフ8・淡い氷色 #DFF2F6。名前・LIFE 入りの正式モンスターカード（2026-10-30 指示書 P）', () => {
+  it('モンスター：ライフ7（2026-11-02 ユーザー決定で 8→7）・淡い氷色 #DFF2F6。名前・LIFE 入りの正式モンスターカード（2026-10-30 指示書 P。LIFE 7 の絵に差し替え）', () => {
     expect(KALSHELL_MONSTER.name).toBe('カルシェル');
-    expect(KALSHELL_MONSTER.life).toBe(8);
+    expect(KALSHELL_MONSTER.life).toBe(7);
+    expect(kalshellJson.life).toBe(8); // 前の14技の原本は書き換えない
     expect(KALSHELL_COLOR).toBe('#DFF2F6');
     expect(KALSHELL_MONSTER.themeColor).toBe('#DFF2F6');
     expect(KALSHELL_MONSTER.art).toEqual({ category: 'monsterCards', file: 'kalshell_official.webp', layout: 'full' });
     expect(existsSync('assets/images/cards/monsters/kalshell_official.webp')).toBe(true);
     expect(existsSync('design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE8.png')).toBe(true);
+    expect(existsSync('design-parts/cards-original/kalshell-official-20261030/kalshell_official_monstercard_LIFE7.png')).toBe(true);
     expect(MONSTERS.filter((m) => m.id === 'mon-kalshell')).toHaveLength(1);
     // 指示書 AJ：技カードは12枚
     expect(SKILLS.filter((s) => s.monsterId === 'mon-kalshell')).toHaveLength(12);
   });
 
-  it('初期配布16枚（指示書 AJ の箱の枚数）：はさむ2・シェルタックル3・クラッシュクロー3・シェルブレイカー1・あわだま1・すなをほる2・からにこもる2・あわのまく2', () => {
+  it('初期配布16枚（2026-11-02 ユーザー決定の正式配布）：はさむ3・シェルタックル3・クラッシュクロー2・シェルブレイカー1・あわだま1・すなをほる2・からにこもる2・あわのまく2', () => {
     const cards = INITIAL_DISTRIBUTION.find((d) => d.monsterId === 'mon-kalshell')?.cards ?? [];
     const byNo = Object.fromEntries(cards.map((s) => [getSkill(s.id).displayNo, s.copies]));
-    expect(byNo).toEqual({ 1: 2, 2: 3, 4: 3, 5: 1, 6: 1, 8: 2, 10: 2, 11: 2 });
+    expect(byNo).toEqual({ 1: 3, 2: 3, 4: 2, 5: 1, 6: 1, 8: 2, 10: 2, 11: 2 });
     expect(cards.reduce((n, s) => n + s.copies, 0)).toBe(16);
     expect(cards).toEqual(AJ.filter((r) => (r.box ?? 0) > 0).map((r) => ({ id: r.id, copies: r.box })));
     // 前の配布（JSON の initial_distribution）は保管のまま：01・02・03・06・07・09・10 が2枚、11・12 が1枚
@@ -189,6 +191,8 @@ describe('カルシェル：モンスター・初期配布16枚', () => {
 
 // 自分：カルシェル（m1）・ソラモ（m2）・ラズック（m3）。相手も同じ
 const deck = { monsters: ['mon-kalshell', 'mon-soramo', 'mon-lazuck'], skills: Array.from({ length: 60 }, () => sor(1)) };
+/** カルシェルの最大ライフ（2026-11-02 ユーザー決定で 8→7。下の数字は「最大ライフ − 受けたダメージ」で書く） */
+const LIFE = KALSHELL_MONSTER.life;
 
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, active: Side = 'player'): BattleState {
   const s = createBattle({ name: 'P', deck }, { name: 'O', deck }, 11, 'player');
@@ -244,7 +248,7 @@ describe('カルシェル正式14技：効果（細かい裁定は docs/battle-r
     ]);
     for (const r of attacks) {
       const s = attackWith(r.id, []);
-      expect(monster(s, 'o-m1').life).toBe(8 - (r.damage ?? 0));
+      expect(monster(s, 'o-m1').life).toBe(LIFE - (r.damage ?? 0));
       expect(manaOf(s.sides.player)).toBe(10 - r.mana);
     }
   });
@@ -254,7 +258,7 @@ describe('カルシェル正式14技：効果（細かい裁定は docs/battle-r
     const s = underAttack(kal(4), [sor(14), sor(12)], 'o-m2');
     expect(cardUsability(s, 'opponent', 'o0').usable).toBe(false);
     expect(cardUsability(s, 'opponent', 'o1').usable).toBe(true);
-    expect(monster(attackWith(kal(4), [kal(11)]), 'o-m1').life).toBe(8);
+    expect(monster(attackWith(kal(4), [kal(11)]), 'o-m1').life).toBe(LIFE);
   });
 
   // 指示書 AJ で外した技（skl-kalshell-09 いかくのハサミ）と同じ封じ：ソラモのすなかけ（skl-soramo14-09）で確かめる
@@ -298,14 +302,23 @@ describe('カルシェル正式14技：効果（細かい裁定は docs/battle-r
     expect(cardUsability(s, 'opponent', 'o0')).toMatchObject({ usable: false, reason: '相手はもぐっていて攻撃できません' });
   });
 
-  it('防御（指示書 AJ）：からにこもる ちから−5／あわのまく かしこさ−3／てっぺきシェル 両方0に。0未満にならない', () => {
-    expect(monster(attackWith(kal(5), [kal(11)]), 'o-m1').life).toBe(7);
-    expect(monster(attackWith(kal(8), [kal(12)]), 'o-m1').life).toBe(6);
-    expect(monster(attackWith(kal(5), [kal(13)]), 'o-m1').life).toBe(8);
-    expect(monster(attackWith(kal(8), [kal(13)]), 'o-m1').life).toBe(8);
-    expect(monster(attackWith(kal(1), [kal(11)]), 'o-m1').life).toBe(8);
+  it('防御（2026-11-02 ユーザー決定）：からにこもる マナ2・ちから−5／あわのまく マナ2・かしこさ−5／てっぺきシェル 両方0に。0未満にならない。マナが足りなければ使えない', () => {
+    expect([getSkill(kal(11)).cost, getSkill(kal(12)).cost]).toEqual([2, 2]);
+    expect(monster(attackWith(kal(5), [kal(11)]), 'o-m1').life).toBe(LIFE - 1); // 6 − 5 → 1
+    expect(monster(attackWith(kal(8), [kal(12)]), 'o-m1').life).toBe(LIFE); // 5 − 5 → 0
+    expect(monster(attackWith(kal(6), [kal(12)]), 'o-m1').life).toBe(LIFE); // 2 − 5 → 0
+    expect(monster(attackWith(kal(5), [kal(13)]), 'o-m1').life).toBe(LIFE);
+    expect(monster(attackWith(kal(8), [kal(13)]), 'o-m1').life).toBe(LIFE);
+    expect(monster(attackWith(kal(1), [kal(11)]), 'o-m1').life).toBe(LIFE);
     // てっぺきシェルは回避ではないので「回避されない」攻撃にも使える
-    expect(monster(attackWith(kal(4), [kal(13)]), 'o-m1').life).toBe(8);
+    expect(monster(attackWith(kal(4), [kal(13)]), 'o-m1').life).toBe(LIFE);
+    // マナ1では使えない・マナ2なら使える
+    for (const [attack, guard] of [[kal(5), kal(11)], [kal(8), kal(12)]] as const) {
+      const at = (mana: number): BattleState =>
+        applyAction(scene({ player: [attack], opponent: [guard] }, { opponent: mana }), { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m1' });
+      expect(cardUsability(at(1), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'マナが足りません' });
+      expect(cardUsability(at(2), 'opponent', 'o0').usable).toBe(true);
+    }
     expect(cardUsability(underAttack(kal(6), [kal(11)]), 'opponent', 'o0').usable).toBe(false);
     expect(cardUsability(underAttack(kal(1), [kal(12)]), 'opponent', 'o0').usable).toBe(false);
   });

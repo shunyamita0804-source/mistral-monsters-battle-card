@@ -109,7 +109,8 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
     expect(getSkill(des(10)).effect).toEqual({ type: 'discardChoice' });
     expect(getSkill(des(15)).effect).toEqual({ type: 'attack', fallenAllyBonus: 2 });
     expect(getSkill(des(16)).effect).toEqual({ type: 'requiem' });
-    expect(getSkill(des(12)).effect).toEqual(getSkill('skl-kalshell-12').effect);
+    // ルーンのまもり＝かしこさ技 −3（前はカルシェルのあわのまくと同じ。あわのまくは 2026-11-02 に −5 になったが、デスオルは変えない）
+    expect(getSkill(des(12)).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
     expect(getSkill(des(14)).effect).toEqual(getSkill('skl-serephine-14').effect); // ウェーブダンス
     for (const n of [1, 2, 3, 4, 8]) expect(getSkill(des(n)).effect, String(n)).toEqual({ type: 'attack' });
     // 外した技：めいかいのかぜ・にらみつける・やみのころも・マントでそらす

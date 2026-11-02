@@ -8,6 +8,7 @@ import { BOOSTERS } from '../src/data/introV2.ts';
 import { PORTRAIT_FOCUS } from '../src/data/monsterPortraits.ts';
 import ak from '../src/data/official/booster_contents_20261102_AK.json';
 import al from '../src/data/official/booster_contents_20261102_AL.json';
+import finalContents from '../src/data/official/booster_contents_20261102_final.json';
 import { AJ_SKILLS, MONSTER_HABITAT } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction, pickDrawToDiscard } from '../src/game/battle/ai.ts';
 import {
@@ -26,6 +27,9 @@ import { countCards } from '../src/game/deck/deck.ts';
 import { boosterDeck } from '../src/game/story/introV2.ts';
 import { cardName } from '../src/i18n/content.ts';
 import { setLanguage } from '../src/i18n/i18n.ts';
+
+/** 2026-11-02 ユーザー決定の正式配布（技 ID → 箱の枚数。0枚の行もある） */
+const FINAL_BOX: Record<string, number> = Object.fromEntries(finalContents.booster_groups.flatMap((g) => g.card_rows.map((r) => [r.skill_id, r.copies])));
 
 /** 指示書 AL（2026-11-02）：フォルン。正本は src/data/official/forn12_skills_OFFICIAL_20261102.json、カードは src/data/skillRebuildAJ.ts の表 */
 
@@ -66,10 +70,12 @@ describe('フォルンのデータ（届いた JSON のとおり）', () => {
       const attack = r.cat === 'ち' || r.cat === 'か';
       expect(r.damage).toBe(attack ? Number(j.damage_or_value) : null);
       expect(!!r.rare).toBe(j.gacha_slot === 'レア');
-      expect(r.box ?? 0).toBe(j.box_copies);
+      // 箱の枚数は 2026-11-02 の正式配布（JSON の box_copies は指示書 AL の蒼海の版。書き換えずに残す）
+      expect(r.box ?? 0).toBe(FINAL_BOX[r.id]);
       expect(r.art).toBe(fornArtFile(j.no));
     });
     expect(rows.reduce((n, r) => n + (r.box ?? 0), 0)).toBe(16);
+    expect(FORN_ROWS.reduce((n, j) => n + j.box_copies, 0)).toBe(16);
     expect(skillsOf(FORN_MONSTER_ID).map((k) => k.displayNo)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
 
@@ -120,16 +126,20 @@ describe('最初の箱「蒼海の守り」（指示書 AL：ミュロル・カ�
     }
   });
 
-  it('フォルンの16枚：ひづめキック2・つのでつく2・ねいろだま2・ふえのしらべ2・はげましのふえ2・そなえのふえ1・こもりうた2・もこもこガード2・かんむりのまもり1', () => {
-    const c = countCards(boosterDeck('booster-3').skills);
-    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[fo(n)] ?? 0)).toEqual([2, 2, 2, 2, 0, 2, 1, 2, 0, 2, 1, 0]);
-    expect(Object.keys(c).some((id) => id.startsWith('skl-nobiton-'))).toBe(false);
-    expect(boosterDeck('booster-3').monsters).toEqual(['mon-myurol', 'mon-kalshell', 'mon-forn']);
+  // 2026-11-02 ユーザー決定の正式配布：フォルンは「旅立ちのきらめき」へ。蒼海はミュロル・カルシェル・ノビトンに戻った
+  it('フォルンの16枚（2026-11-02 の正式配布・旅立ちのきらめき）：つのでつく2・ねいろだま2・ふえのしらべ2・そうこうげき1・はげましのふえ2・そなえのふえ2・こもりうた2・もこもこガード2・かんむりのまもり1', () => {
+    const c = countCards(boosterDeck('booster-1').skills);
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => c[fo(n)] ?? 0)).toEqual([0, 2, 2, 2, 1, 2, 2, 2, 0, 2, 1, 0]);
+    expect(boosterDeck('booster-1').monsters).toEqual(['mon-soramo', 'mon-lilil', 'mon-forn']);
+    expect(boosterDeck('booster-3').monsters).toEqual(['mon-myurol', 'mon-kalshell', 'mon-nobiton']);
+    expect(Object.keys(countCards(boosterDeck('booster-3').skills)).some((id) => id.startsWith('skl-forn-'))).toBe(false);
     const b = BOOSTERS.find((x) => x.key === 'booster-3');
     expect(b?.art).toBe('booster_soukai');
-    expect(b?.formerMonsters).toEqual(['mon-myurol', 'mon-kalshell', 'mon-nobiton']);
-    // 烈火にはノビトンが残る（指示書は「どの最初の箱にもいなくなる」と書いているが、烈火の中身は変えていない）
-    expect(BOOSTERS.find((x) => x.key === 'booster-2')?.monsters).toContain('mon-nobiton');
+    // 前の中身（版ごと）：指示書 AJ・AK の蒼海、指示書 AL の蒼海
+    expect(b?.formerMonsters).toEqual([
+      ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
+      ['mon-myurol', 'mon-kalshell', 'mon-forn'],
+    ]);
   });
 });
 

@@ -294,7 +294,7 @@ describe('守り（指示書 AJ：まいあがる・おとなきはばたき）'
     expect(attackWith(hyo(3), 'skl-myurol-10', 'o-m2', start(hyo(3))).usable).toBe(false); // こなゆき（かしこさ）
     const f = attackWith(hyo(2), 'skl-myurol-10', 'o-m2', start(hyo(2))); // かぎづめ（ちから2）
     expect(f.usable).toBe(true);
-    expect(monster(f.after, 'o-m2').life).toBe(7);
+    expect(monster(f.after, 'o-m2').life).toBe(6); // ミュロルの LIFE 6（2026-11-02）のまま
   });
 });
 
