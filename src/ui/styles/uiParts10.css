@@ -425,12 +425,29 @@
   overflow: visible;
 }
 
-/* 行の板（x 1.5〜11.5% に丸い窓、x 65〜74.5・76〜85.5・87〜97% に数字のくぼみ） */
+/*
+ * 行の板（x 1.5〜11.5% に丸い窓、x 65〜74.5・76〜85.5・87〜97% に数字のくぼみ）。
+ * 2026-11-02 指示書 AW【3】：数字の欄を板のくぼみにぴったり合わせた（前は欄が左にずれ、数字がくぼみの左に寄り、「60/60」が「守り」にはみ出していた）。
+ * 欄の割合は行の幅に対して：名前 0〜63.5%・すき間 1.5%・攻撃 65〜74.5%・守り 76〜85.5%・計 87〜97%（右の 3% はあまり）
+ */
 .deck-table__head,
 .deck-table__row {
-  grid-template-columns: 64% 11% 11% 11%;
-  gap: 0;
-  padding: 0 3% 0 1.5%;
+  grid-template-columns: 63.5% 9.5% 9.5% 10%;
+  column-gap: 1.5%;
+  row-gap: 0;
+  padding: 0;
+}
+
+/* 丸い窓は行の 1.5% から（名前の欄の幅 63.5% に対して 2.4%） */
+.deck-table__name {
+  padding-left: 2.4%;
+}
+
+.deck-table__head > span,
+.deck-table__num {
+  justify-self: stretch;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .deck-table__head {
@@ -473,20 +490,26 @@ button.deck-table__row:active {
   object-fit: contain;
 }
 
+/* 「60/60」は「計」のくぼみ（行の幅の 10%）に収まる大きさ */
 .deck-table__row--team .deck-table__num:last-child {
-  font-size: 12px;
+  font-size: 11px;
+  letter-spacing: -0.02em;
 }
 
-/* 大きなカードの台（左の 5〜31% にカード、右の 34〜96% の紙に説明） */
+/*
+ * 大きなカードの台。2026-11-02 指示書 AW【2】「タップしたカードが小さい」：左の枠を広く・台を少し高くした絵（stand_tall.webp。
+ * tools/art/deck_stand_tall.py。720×400・枠の窓 x 43〜267・y 33〜367）にして、カードを窓の高さいっぱいに近く出す。
+ * カードの大きさは台の幅の割合で決める（画面の大きさ・ブラウザによらず同じ見え方。iPhone で小さく出ていた）
+ */
 .deck-preview {
   position: relative;
   display: block;
   min-height: 0;
-  aspect-ratio: 720 / 351;
+  aspect-ratio: 720 / 400;
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: url('@assets/images/ui/deck/stand.webp') center / 100% 100% no-repeat;
+  background: url('@assets/images/ui/deck/stand_tall.webp') center / 100% 100% no-repeat;
 }
 
 .deck-preview > .monster-card,
@@ -495,22 +518,29 @@ button.deck-table__row:active {
 .deck-preview > .deck-preview__back,
 .deck-preview > :first-child {
   position: absolute;
-  left: 18%;
-  top: 51%;
+  left: 21.5%;
+  top: 50%;
   transform: translate(-50%, -50%);
 }
 
+/* 技・サポートのカード：窓の高さの約96%（中の文字・絵は幅の割合で決まるので、幅だけ変えればよい） */
+.deck-preview > .skill-card {
+  width: 29.6% !important;
+  height: auto !important;
+  aspect-ratio: 253 / 382;
+}
+
 .deck-preview__back {
-  width: 84px;
+  width: 29.6%;
   opacity: 0.85;
 }
 
 .deck-preview__info {
   position: absolute;
-  left: 36%;
-  right: 6%;
-  top: 11%;
-  bottom: 11%;
+  left: 43%;
+  right: 5.5%;
+  top: 10%;
+  bottom: 10%;
   max-height: none;
   color: #3a2a18;
 }

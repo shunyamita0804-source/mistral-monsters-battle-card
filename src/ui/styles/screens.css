@@ -443,8 +443,24 @@ button.deck-table__row:active {
   text-align: center;
 }
 
+/*
+ * 技カードを選ぶの行（2026-11-02 指示書 AW【1】）：「−」「枚数」「＋」「残り」を同じ幅の欄に横一列。
+ * −・＋は押しやすい大きさ（tapSize.css の 44px。小さい画面では 44px × --tap-inv）なので、欄の幅も同じ値（--deck-step）から決める
+ * （前は欄が 36px で、44px のボタンと枚数の枠がはみ出して重なっていた）
+ */
+.deck__list-head--card,
+.deck__item--card {
+  --deck-step: 44px;
+}
+
+.stage[data-small] .deck__list-head--card,
+.stage[data-small] .deck__item--card {
+  --deck-step: calc(44px * var(--tap-inv, 1));
+}
+
 .deck__list-head--card {
-  grid-template-columns: 1fr 116px 40px;
+  grid-template-columns: 1fr calc(var(--deck-step) * 3 + 8px) 32px;
+  gap: 4px;
 }
 
 .deck__list-head--card > span:nth-child(2) {
@@ -469,7 +485,7 @@ button.deck-table__row:active {
 }
 
 .deck__item--card {
-  grid-template-columns: 1fr 36px 36px 36px 40px;
+  grid-template-columns: 1fr var(--deck-step) var(--deck-step) var(--deck-step) 32px;
   gap: 4px;
   cursor: default;
 }
@@ -531,12 +547,18 @@ span.deck__item-name {
 }
 
 .deck__item--card .deck__step {
-  width: 36px;
-  height: 40px;
+  width: var(--deck-step);
+  min-width: 0;
+  height: var(--deck-step);
+  min-height: 0;
 }
 
+/* 枚数の窓：欄の幅いっぱい（枠も幅に入れる）。−・＋とすき間をそろえる */
 .deck__item--card .deck__row-count {
+  box-sizing: border-box;
+  width: var(--deck-step);
   min-width: 0;
+  justify-self: center;
 }
 
 .deck__group-count {

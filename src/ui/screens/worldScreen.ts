@@ -593,6 +593,11 @@ export class WorldView {
   #playerLook = '';
   #destroyed = false;
   #mapLayer!: HTMLElement;
+  /**
+   * 名札（家具・出口の名前・街の建物の名前・ダンジョンの案内板）だけを入れる層（2026-11-02 指示書 AW【5】）。
+   * 名札の描く順番はここ1か所で決める：地図のいちばん最後に置き、人・主人公・家具・手前の壁より必ず手前（world.css の .world__labels）
+   */
+  #labelLayer!: HTMLElement;
   #viewport!: HTMLElement;
   #player!: HTMLElement;
   #objectEls = new Map<string, HTMLElement>();
@@ -1049,6 +1054,7 @@ export class WorldView {
       });
       this.#mapLayer.append(tiles);
     }
+    this.#labelLayer = h('div', { class: 'world__labels', attrs: { 'aria-hidden': 'true' } });
     this.#addLabels();
     this.#addLeagueBoard();
     this.#objectEls.clear();
@@ -1080,6 +1086,8 @@ export class WorldView {
     this.#mapLayer.append(this.#player);
     this.#marker = h('div', { class: 'world__marker', attrs: { 'aria-hidden': 'true' } });
     this.#mapLayer.append(this.#marker);
+    // 名札の層はいちばん最後（人・主人公より手前）
+    this.#mapLayer.append(this.#labelLayer);
 
     this.#viewport = h('div', { class: 'world__viewport' }, this.#mapLayer);
 
@@ -1241,7 +1249,7 @@ export class WorldView {
         const top = sign.y * this.#scale;
         const maxShift = door ? Math.max(0, door.y * cell - 3 * this.#figureH * 0.5 - top) : 0;
         this.#signs.push({ el, top, maxShift, shift: 0 });
-        this.#mapLayer.append(el);
+        this.#labelLayer.append(el);
       }
       return;
     }
@@ -1265,7 +1273,7 @@ export class WorldView {
       // 人が立つ家具（カウンターの奥の店員など）：名札は人の顔・体にかからない、人のとなりへ（人を優先して見せる。2026-10-30 指示書 S1）
       const center = map.art && obj.type === 'interact' ? labelCenterAwayFromPeople(obj, map.objects, labelDy) : null;
       if (center !== null) Object.assign(el.style, { left: `${(center - 3) * cell}px`, width: `${6 * cell}px` });
-      this.#mapLayer.append(el);
+      this.#labelLayer.append(el);
     }
   }
 
