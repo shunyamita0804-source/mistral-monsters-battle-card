@@ -329,7 +329,7 @@ describe('ノビトン：効果（2026-10-25 から同じ動き。2026-10-26 正
     expect(cardUsability(f, 'opponent', 'o0').usable).toBe(true);
     let evaded = applyAction(f, { type: 'defend', side: 'opponent', cardUid: 'o0' });
     if (evaded.phase === 'defense') evaded = applyAction(evaded, { type: 'defend', side: 'opponent', cardUid: null });
-    expect(monster(evaded, 'o-m2').life).toBe(6); // よけたのでミュロルのライフ 6（2026-11-02）のまま
+    expect(monster(evaded, 'o-m2').life).toBe(7); // よけたのでミュロルのライフ 7 のまま
     expect(cardUsability(run(nob(5)), 'opponent', 'o0')).toMatchObject({ usable: false, reason: 'かしこさ攻撃には使えません' });
   });
 

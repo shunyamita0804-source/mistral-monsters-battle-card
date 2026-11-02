@@ -19,13 +19,13 @@ export const myurolSkillId = (no: number): string => `skl-myurol-${twoDigits(no)
  */
 export const MYUROL_COLOR = '#84E5FA';
 
-/** ミュロルのモンスターカード。ライフ 6（2026-10-27 は 7。2026-11-02 ユーザー決定で 7→6）・内部ランク C（画面に出さない） */
+/** ミュロルのモンスターカード。ライフ 7（2026-10-27 ユーザー確定。2026-11-02 PR #1 で 6 にしたが、指示書 AO で 7 に戻した）・内部ランク C（画面に出さない） */
 export const MYUROL_MONSTER: MonsterCard = {
   kind: 'monster',
   id: MYUROL_MONSTER_ID,
   name: myurol14Data.monster,
   rarity: null,
-  life: 6,
+  life: 7,
   themeColor: MYUROL_COLOR,
   description: 'ミュロル（水系）。',
   isPlaceholder: false,
@@ -34,7 +34,8 @@ export const MYUROL_MONSTER: MonsterCard = {
   // ゆがめずに幅 508 に縮め、上下に白い余白を 3・4 足してほかと同じ 508×849 にした（tools/art/official_card_webp.py）。
   // 2026-11-02（PR #1）：届いた LIFE 6 の絵は「LIFE」の字の下に前の数字の上の縁が細い線で残っていたので保留。
   // 指示書 AM【2】：線（y 97〜99）を上下の画素の色から埋めて消し（tools/art/myurol_life6_line_fix.py。届いた絵は *_LIFE6_delivered_20261102.png に残す）、
-  // 数字の枠の外は1画素も変わっていないことを確かめて myurol_official_monstercard_LIFE6.png から作り直した（LIFE 7 の原本も残す）
+  // 数字の枠の外は1画素も変わっていないことを確かめて myurol_official_monstercard_LIFE6.png から作り直した（LIFE 7 の原本も残す）。
+  // 2026-11-02 指示書 AO：LIFE 7 に戻したので、絵も myurol_official_monstercard_LIFE7.png から作り直した（LIFE 6 の版は消さずに残す）
   art: { category: 'monsterCards', file: 'myurol_official.webp', layout: 'full' },
   // 対戦画面のアイコンの切り抜きに使う絵：正式のバトル用の絵（透明つき 800×920。src/data/battleCards.ts と同じファイル。2026-10-31 指示書 AC【3】で足4本・えら片側3本の版に）
   battleArt: { category: 'monsterCards', file: 'myurol_battlecard.png', layout: 'full' },

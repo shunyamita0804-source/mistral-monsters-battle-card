@@ -119,13 +119,16 @@ const fo = (n) => `skl-forn-${String(n).padStart(2, '0')}`;
   if (want('book')) {
     await mount('collection');
     await page.waitForTimeout(800);
-    await center('mon-myurol');
-    await page.waitForTimeout(700);
-    await shot('book_myurol');
-    await page.locator('.card-book__item[data-id="mon-myurol"]').first().click();
-    await page.waitForTimeout(1200);
-    await shot('big_myurol');
-    await closeModal();
+    // 2026-11-02 指示書 AO：カルシェルも（LIFE 8 に戻した絵）
+    for (const id of ['mon-myurol', 'mon-kalshell']) {
+      await center(id);
+      await page.waitForTimeout(700);
+      await shot(`book_${id.slice(4)}`);
+      await page.locator(`.card-book__item[data-id="${id}"]`).first().click();
+      await page.waitForTimeout(1200);
+      await shot(`big_${id.slice(4)}`);
+      await closeModal();
+    }
   }
 
   if (want('frames')) {

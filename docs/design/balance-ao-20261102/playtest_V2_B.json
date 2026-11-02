@@ -1,0 +1,661 @@
+{
+ "date": "2026-11-02",
+ "variant": "V2",
+ "boxes": {
+  "booster-1": [
+   "mon-soramo",
+   "mon-lilil",
+   "mon-nobiton"
+  ],
+  "booster-2": [
+   "mon-gauul",
+   "mon-lazuck",
+   "mon-tsumuji"
+  ],
+  "booster-3": [
+   "mon-myurol",
+   "mon-kalshell",
+   "mon-forn"
+  ]
+ },
+ "cpuSkill": "B",
+ "gamesPerDirection": 200,
+ "totalGames": 1200,
+ "note": "CPU どうしの対戦（両方とも同じ腕前・ふつうの構え）。人の遊び方を測ったものではない",
+ "byBox": {
+  "booster-1": {
+   "games": 800,
+   "win": 45.1,
+   "lose": 54.9,
+   "draws": 0,
+   "winKo": 30.9,
+   "winDeckOut": 14.3,
+   "loseKo": 36,
+   "loseDeckOut": 18.9,
+   "winWhenFirst": 43.8,
+   "winWhenSecond": 46.5,
+   "avgTurns": 29.3
+  },
+  "booster-2": {
+   "games": 800,
+   "win": 49.6,
+   "lose": 50.4,
+   "draws": 0,
+   "winKo": 37.9,
+   "winDeckOut": 11.8,
+   "loseKo": 42.3,
+   "loseDeckOut": 8.1,
+   "winWhenFirst": 49.8,
+   "winWhenSecond": 49.5,
+   "avgTurns": 28.1
+  },
+  "booster-3": {
+   "games": 800,
+   "win": 55.3,
+   "lose": 44.8,
+   "draws": 0,
+   "winKo": 37.8,
+   "winDeckOut": 17.5,
+   "loseKo": 28.3,
+   "loseDeckOut": 16.5,
+   "winWhenFirst": 54.3,
+   "winWhenSecond": 56.3,
+   "avgTurns": 29.8
+  }
+ },
+ "firstPlayer": {
+  "win": 49.3,
+  "lose": 50.7,
+  "draws": 0
+ },
+ "matchups": {
+  "booster-1 vs booster-2": {
+   "fromFirstBox": {
+    "games": 400,
+    "win": 46.3,
+    "lose": 53.8,
+    "draws": 0,
+    "winKo": 38.8,
+    "winDeckOut": 7.5,
+    "loseKo": 42.3,
+    "loseDeckOut": 11.5,
+    "winWhenFirst": 46,
+    "winWhenSecond": 46.5,
+    "avgTurns": 27.6
+   },
+   "directions": {
+    "booster-1(player) vs booster-2(opponent)": {
+     "games": 200,
+     "win": 47.5,
+     "lose": 52.5,
+     "draws": 0,
+     "winKo": 42,
+     "winDeckOut": 5.5,
+     "loseKo": 38.5,
+     "loseDeckOut": 14,
+     "winWhenFirst": 49,
+     "winWhenSecond": 46,
+     "avgTurns": 27.6
+    },
+    "booster-2(player) vs booster-1(opponent)": {
+     "games": 200,
+     "win": 55,
+     "lose": 45,
+     "draws": 0,
+     "winKo": 46,
+     "winDeckOut": 9,
+     "loseKo": 35.5,
+     "loseDeckOut": 9.5,
+     "winWhenFirst": 53,
+     "winWhenSecond": 57,
+     "avgTurns": 27.6
+    }
+   }
+  },
+  "booster-1 vs booster-3": {
+   "fromFirstBox": {
+    "games": 400,
+    "win": 44,
+    "lose": 56,
+    "draws": 0,
+    "winKo": 23,
+    "winDeckOut": 21,
+    "loseKo": 29.8,
+    "loseDeckOut": 26.3,
+    "winWhenFirst": 41.5,
+    "winWhenSecond": 46.5,
+    "avgTurns": 31.1
+   },
+   "directions": {
+    "booster-1(player) vs booster-3(opponent)": {
+     "games": 200,
+     "win": 43,
+     "lose": 57,
+     "draws": 0,
+     "winKo": 20.5,
+     "winDeckOut": 22.5,
+     "loseKo": 30.5,
+     "loseDeckOut": 26.5,
+     "winWhenFirst": 44,
+     "winWhenSecond": 42,
+     "avgTurns": 31.3
+    },
+    "booster-3(player) vs booster-1(opponent)": {
+     "games": 200,
+     "win": 55,
+     "lose": 45,
+     "draws": 0,
+     "winKo": 29,
+     "winDeckOut": 26,
+     "loseKo": 25.5,
+     "loseDeckOut": 19.5,
+     "winWhenFirst": 49,
+     "winWhenSecond": 61,
+     "avgTurns": 30.9
+    }
+   }
+  },
+  "booster-2 vs booster-3": {
+   "fromFirstBox": {
+    "games": 400,
+    "win": 45.5,
+    "lose": 54.5,
+    "draws": 0,
+    "winKo": 33.5,
+    "winDeckOut": 12,
+    "loseKo": 45.8,
+    "loseDeckOut": 8.8,
+    "winWhenFirst": 46,
+    "winWhenSecond": 45,
+    "avgTurns": 28.5
+   },
+   "directions": {
+    "booster-2(player) vs booster-3(opponent)": {
+     "games": 200,
+     "win": 44,
+     "lose": 56,
+     "draws": 0,
+     "winKo": 32,
+     "winDeckOut": 12,
+     "loseKo": 47,
+     "loseDeckOut": 9,
+     "winWhenFirst": 47,
+     "winWhenSecond": 41,
+     "avgTurns": 28.7
+    },
+    "booster-3(player) vs booster-2(opponent)": {
+     "games": 200,
+     "win": 53,
+     "lose": 47,
+     "draws": 0,
+     "winKo": 44.5,
+     "winDeckOut": 8.5,
+     "loseKo": 35,
+     "loseDeckOut": 12,
+     "winWhenFirst": 51,
+     "winWhenSecond": 55,
+     "avgTurns": 28.4
+    }
+   }
+  }
+ },
+ "oddities": {
+  "unusablePick": 0,
+  "noProgress": 0,
+  "timeout": 0,
+  "lifeOutOfRange": 0
+ },
+ "cardUse": {
+  "booster-1": [
+   {
+    "id": "skl-nobiton-02",
+    "name": "ずつき",
+    "perGame": 1.51
+   },
+   {
+    "id": "skl-soramo14-03",
+    "name": "たいあたり",
+    "perGame": 1.21
+   },
+   {
+    "id": "skl-nobiton-06",
+    "name": "ミラージュノーズ",
+    "perGame": 1.2
+   },
+   {
+    "id": "skl-nobiton-01",
+    "name": "はなビンタ",
+    "perGame": 1.18
+   },
+   {
+    "id": "sup-3",
+    "name": "風まかせ",
+    "perGame": 1.01
+   },
+   {
+    "id": "skl-soramo14-04",
+    "name": "しっぽうち",
+    "perGame": 0.86
+   },
+   {
+    "id": "sup-2",
+    "name": "旅の手帳",
+    "perGame": 0.82
+   },
+   {
+    "id": "skl-nobiton-10",
+    "name": "鼻でまもる",
+    "perGame": 0.8
+   },
+   {
+    "id": "skl-nobiton-05",
+    "name": "くしゃみ",
+    "perGame": 0.76
+   },
+   {
+    "id": "sup-1",
+    "name": "薬草",
+    "perGame": 0.73
+   },
+   {
+    "id": "sup-7",
+    "name": "投石",
+    "perGame": 0.62
+   },
+   {
+    "id": "skl-soramo14-12",
+    "name": "星のまもり",
+    "perGame": 0.61
+   },
+   {
+    "id": "skl-nobiton-08",
+    "name": "考える",
+    "perGame": 0.57
+   },
+   {
+    "id": "skl-soramo14-09",
+    "name": "すなかけ",
+    "perGame": 0.5
+   },
+   {
+    "id": "skl-lilil-02",
+    "name": "つめでひっかく",
+    "perGame": 0.44
+   },
+   {
+    "id": "skl-lilil-04",
+    "name": "マナをくすねる",
+    "perGame": 0.43
+   },
+   {
+    "id": "skl-lilil-03",
+    "name": "こあくまだま",
+    "perGame": 0.42
+   },
+   {
+    "id": "skl-lilil-05",
+    "name": "まどわしのひかり",
+    "perGame": 0.41
+   },
+   {
+    "id": "skl-soramo14-05",
+    "name": "スターダイブ",
+    "perGame": 0.4
+   },
+   {
+    "id": "skl-nobiton-12",
+    "name": "のびのびガード",
+    "perGame": 0.39
+   },
+   {
+    "id": "skl-lilil-01",
+    "name": "しっぽはたき",
+    "perGame": 0.38
+   },
+   {
+    "id": "skl-soramo14-07",
+    "name": "スターダストレイ",
+    "perGame": 0.36
+   },
+   {
+    "id": "skl-soramo14-10",
+    "name": "吠える",
+    "perGame": 0.29
+   },
+   {
+    "id": "skl-soramo14-08",
+    "name": "スターフォール",
+    "perGame": 0.22
+   },
+   {
+    "id": "skl-lilil-08",
+    "name": "うっとりウインク",
+    "perGame": 0.12
+   },
+   {
+    "id": "skl-lilil-06",
+    "name": "デビーム",
+    "perGame": 0.11
+   },
+   {
+    "id": "skl-lilil-10",
+    "name": "はねでかわす",
+    "perGame": 0.09
+   },
+   {
+    "id": "sup-10",
+    "name": "声援",
+    "perGame": 0.09
+   },
+   {
+    "id": "skl-lilil-11",
+    "name": "くるりとかわす",
+    "perGame": 0.06
+   }
+  ],
+  "booster-2": [
+   {
+    "id": "skl-lazuck-01",
+    "name": "ひっかき",
+    "perGame": 1.01
+   },
+   {
+    "id": "skl-gauul14-03",
+    "name": "かぎ爪",
+    "perGame": 0.97
+   },
+   {
+    "id": "skl-lazuck-08",
+    "name": "ダストキック",
+    "perGame": 0.9
+   },
+   {
+    "id": "sup-2",
+    "name": "旅の手帳",
+    "perGame": 0.88
+   },
+   {
+    "id": "sup-3",
+    "name": "風まかせ",
+    "perGame": 0.85
+   },
+   {
+    "id": "skl-tsumuji-04",
+    "name": "つむじかぜ",
+    "perGame": 0.85
+   },
+   {
+    "id": "sup-1",
+    "name": "薬草",
+    "perGame": 0.81
+   },
+   {
+    "id": "skl-lazuck-03",
+    "name": "とびかかり",
+    "perGame": 0.76
+   },
+   {
+    "id": "skl-lazuck-02",
+    "name": "かみつき",
+    "perGame": 0.71
+   },
+   {
+    "id": "skl-tsumuji-05",
+    "name": "とびかかる",
+    "perGame": 0.68
+   },
+   {
+    "id": "skl-tsumuji-06",
+    "name": "かぜのやいば",
+    "perGame": 0.66
+   },
+   {
+    "id": "skl-gauul14-02",
+    "name": "連続つつき",
+    "perGame": 0.63
+   },
+   {
+    "id": "skl-tsumuji-02",
+    "name": "Wひっかき",
+    "perGame": 0.6
+   },
+   {
+    "id": "skl-gauul14-10",
+    "name": "威嚇",
+    "perGame": 0.57
+   },
+   {
+    "id": "skl-gauul14-07",
+    "name": "ファイアボール",
+    "perGame": 0.56
+   },
+   {
+    "id": "sup-7",
+    "name": "投石",
+    "perGame": 0.55
+   },
+   {
+    "id": "skl-tsumuji-07",
+    "name": "みだれぎり",
+    "perGame": 0.53
+   },
+   {
+    "id": "skl-gauul14-04",
+    "name": "急降下アタック",
+    "perGame": 0.5
+   },
+   {
+    "id": "skl-tsumuji-01",
+    "name": "ひっかく",
+    "perGame": 0.43
+   },
+   {
+    "id": "skl-lazuck-07",
+    "name": "おびきよせ",
+    "perGame": 0.43
+   },
+   {
+    "id": "skl-lazuck-15",
+    "name": "シャドウスリップ",
+    "perGame": 0.4
+   },
+   {
+    "id": "skl-tsumuji-03",
+    "name": "かまいたち",
+    "perGame": 0.36
+   },
+   {
+    "id": "skl-lazuck-04",
+    "name": "みだれづめ",
+    "perGame": 0.35
+   },
+   {
+    "id": "skl-lazuck-06",
+    "name": "しっぷうタックル",
+    "perGame": 0.34
+   },
+   {
+    "id": "skl-tsumuji-12",
+    "name": "ひらりとかわす",
+    "perGame": 0.31
+   },
+   {
+    "id": "skl-gauul14-13",
+    "name": "上に飛ぶ",
+    "perGame": 0.25
+   },
+   {
+    "id": "skl-gauul14-08",
+    "name": "フレアレイ",
+    "perGame": 0.2
+   },
+   {
+    "id": "skl-tsumuji-09",
+    "name": "あらし",
+    "perGame": 0.19
+   },
+   {
+    "id": "skl-gauul14-05",
+    "name": "スパイラルダイブ",
+    "perGame": 0.17
+   },
+   {
+    "id": "sup-10",
+    "name": "声援",
+    "perGame": 0.09
+   }
+  ],
+  "booster-3": [
+   {
+    "id": "skl-kalshell-02",
+    "name": "シェルタックル",
+    "perGame": 1.32
+   },
+   {
+    "id": "skl-myurol-02",
+    "name": "しっぽたたき",
+    "perGame": 1.11
+   },
+   {
+    "id": "skl-kalshell-01",
+    "name": "はさむ",
+    "perGame": 1.09
+   },
+   {
+    "id": "skl-kalshell-03",
+    "name": "クラッシュクロー",
+    "perGame": 0.88
+   },
+   {
+    "id": "sup-3",
+    "name": "風まかせ",
+    "perGame": 0.85
+   },
+   {
+    "id": "sup-1",
+    "name": "薬草",
+    "perGame": 0.8
+   },
+   {
+    "id": "sup-2",
+    "name": "旅の手帳",
+    "perGame": 0.76
+   },
+   {
+    "id": "skl-myurol-08",
+    "name": "しめったはだ",
+    "perGame": 0.75
+   },
+   {
+    "id": "skl-myurol-07",
+    "name": "アクアボール",
+    "perGame": 0.74
+   },
+   {
+    "id": "skl-myurol-05",
+    "name": "みずでっぽう",
+    "perGame": 0.74
+   },
+   {
+    "id": "skl-forn-02",
+    "name": "つのでつく",
+    "perGame": 0.74
+   },
+   {
+    "id": "skl-forn-04",
+    "name": "ふえのしらべ",
+    "perGame": 0.73
+   },
+   {
+    "id": "skl-forn-06",
+    "name": "はげましのふえ",
+    "perGame": 0.7
+   },
+   {
+    "id": "skl-myurol-01",
+    "name": "たいあたり",
+    "perGame": 0.61
+   },
+   {
+    "id": "skl-forn-03",
+    "name": "ねいろだま",
+    "perGame": 0.6
+   },
+   {
+    "id": "sup-7",
+    "name": "投石",
+    "perGame": 0.56
+   },
+   {
+    "id": "skl-forn-07",
+    "name": "そなえのふえ",
+    "perGame": 0.48
+   },
+   {
+    "id": "skl-kalshell-06",
+    "name": "あわだま",
+    "perGame": 0.43
+   },
+   {
+    "id": "skl-forn-08",
+    "name": "こもりうた",
+    "perGame": 0.41
+   },
+   {
+    "id": "skl-kalshell-11",
+    "name": "からにこもる",
+    "perGame": 0.39
+   },
+   {
+    "id": "skl-forn-10",
+    "name": "もこもこガード",
+    "perGame": 0.33
+   },
+   {
+    "id": "skl-myurol-10",
+    "name": "しっぽガード",
+    "perGame": 0.3
+   },
+   {
+    "id": "skl-kalshell-12",
+    "name": "あわのまく",
+    "perGame": 0.23
+   },
+   {
+    "id": "skl-forn-05",
+    "name": "そうこうげき",
+    "perGame": 0.17
+   },
+   {
+    "id": "skl-myurol-11",
+    "name": "みずのまく",
+    "perGame": 0.17
+   },
+   {
+    "id": "skl-kalshell-10",
+    "name": "すなをほる",
+    "perGame": 0.15
+   },
+   {
+    "id": "skl-kalshell-05",
+    "name": "シェルブレイカー",
+    "perGame": 0.15
+   },
+   {
+    "id": "sup-10",
+    "name": "声援",
+    "perGame": 0.11
+   },
+   {
+    "id": "skl-forn-11",
+    "name": "かんむりのまもり",
+    "perGame": 0.08
+   }
+  ]
+ },
+ "chainSecondPerGame": {
+  "booster-1": 0,
+  "booster-2": 0.03,
+  "booster-3": 0
+ }
+}

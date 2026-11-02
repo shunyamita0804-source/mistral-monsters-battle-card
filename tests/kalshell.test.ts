@@ -134,10 +134,10 @@ describe('カルシェル：画像（届いた PNG を無改変）', () => {
 });
 
 describe('カルシェル：モンスター・初期配布16枚', () => {
-  it('モンスター：ライフ7（2026-11-02 ユーザー決定で 8→7）・淡い氷色 #DFF2F6。名前・LIFE 入りの正式モンスターカード（2026-10-30 指示書 P。LIFE 7 の絵に差し替え）', () => {
+  it('モンスター：ライフ8（2026-11-02 に 7 にしたが、指示書 AO で 8 に戻した）・淡い氷色 #DFF2F6。名前・LIFE 入りの正式モンスターカード（2026-10-30 指示書 P。LIFE 8 の絵）', () => {
     expect(KALSHELL_MONSTER.name).toBe('カルシェル');
-    expect(KALSHELL_MONSTER.life).toBe(7);
-    expect(kalshellJson.life).toBe(8); // 前の14技の原本は書き換えない
+    expect(KALSHELL_MONSTER.life).toBe(8);
+    expect(kalshellJson.life).toBe(8);
     expect(KALSHELL_COLOR).toBe('#DFF2F6');
     expect(KALSHELL_MONSTER.themeColor).toBe('#DFF2F6');
     expect(KALSHELL_MONSTER.art).toEqual({ category: 'monsterCards', file: 'kalshell_official.webp', layout: 'full' });
@@ -191,7 +191,7 @@ describe('カルシェル：モンスター・初期配布16枚', () => {
 
 // 自分：カルシェル（m1）・ソラモ（m2）・ラズック（m3）。相手も同じ
 const deck = { monsters: ['mon-kalshell', 'mon-soramo', 'mon-lazuck'], skills: Array.from({ length: 60 }, () => sor(1)) };
-/** カルシェルの最大ライフ（2026-11-02 ユーザー決定で 8→7。下の数字は「最大ライフ − 受けたダメージ」で書く） */
+/** カルシェルの最大ライフ（8。下の数字は「最大ライフ − 受けたダメージ」で書く） */
 const LIFE = KALSHELL_MONSTER.life;
 
 function scene(hand: Partial<Record<Side, string[]>>, mana: Partial<Record<Side, number>> = {}, active: Side = 'player'): BattleState {

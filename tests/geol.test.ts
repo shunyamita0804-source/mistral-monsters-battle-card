@@ -250,7 +250,7 @@ describe('05 地ひびき：地上の相手全体に3ダメージ（指示書 AJ
     expect(s.pending?.queue ?? []).toEqual([]);
     s = endDefense(s);
     expect(s.phase).toBe('main');
-    expect([monster(s, 'o-m1').life, monster(s, 'o-m2').life, monster(s, 'o-m3').life]).toEqual([6, 6, 6]); // ミュロルは LIFE 6（2026-11-02）のまま
+    expect([monster(s, 'o-m1').life, monster(s, 'o-m2').life, monster(s, 'o-m3').life]).toEqual([6, 6, 7]); // ミュロルは LIFE 7 のまま
   });
 
   it('倒れている相手は飛ばす。最後の1体を倒したら勝負がつく', () => {

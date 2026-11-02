@@ -251,11 +251,11 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
     expect(getSkill(force).effect).toEqual({ type: 'defense', reduce: 3, against: 'force' });
     expect(getSkill(wisdom).effect).toEqual({ type: 'defense', reduce: 3, against: 'wisdom' });
     // しっぽうち：ちから3 → 0、たいあたり：ちから2 → 0（0 未満にならない）、スターダストレイ：かしこさ4 → 1、ソラモビーム：かしこさ3 → 0
-    // ミュロルの LIFE は 6（2026-11-02 ユーザー決定）
-    expect(lifeOf(attackAndGuard('skl-soramo14-04', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(6);
-    expect(lifeOf(attackAndGuard('skl-soramo14-03', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(6);
-    expect(lifeOf(attackAndGuard('skl-soramo14-07', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(5);
-    expect(lifeOf(attackAndGuard('skl-soramo14-06', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(6);
+    // ミュロルの LIFE は 7（2026-11-02 指示書 AO で戻した）
+    expect(lifeOf(attackAndGuard('skl-soramo14-04', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
+    expect(lifeOf(attackAndGuard('skl-soramo14-03', 'o-m2', [force], myurolDeck), 'o-m2')).toBe(7);
+    expect(lifeOf(attackAndGuard('skl-soramo14-07', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(6);
+    expect(lifeOf(attackAndGuard('skl-soramo14-06', 'o-m2', [wisdom], myurolDeck), 'o-m2')).toBe(7);
     // 効かない種類の攻撃には使えない
     let s = scene({ player: ['skl-soramo14-07'], opponent: [force] }, {}, myurolDeck);
     s = applyAction(s, { type: 'useCard', side: 'player', cardUid: 'p0', targetUid: 'o-m2' });
