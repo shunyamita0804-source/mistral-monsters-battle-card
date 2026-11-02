@@ -1,3 +1,4 @@
+import { runConfig } from '../src/data/dungeonRun.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
@@ -430,7 +431,7 @@ describe('ジオルのガチャのシリーズ（2026-10-29 夜）', () => {
     const s = startRun(base, 'dungeon-01', 77);
     const run = s.dungeonRun;
     if (!run) throw new Error('run');
-    const last = { ...run, floor: 3 };
+    const last = { ...run, floor: runConfig('dungeon-01').floors - 1 }; // 2026-11-02 指示書 AT で地下5階
     const boss = runFloor(last).entities.find((e) => e.kind === 'boss');
     if (!boss) throw new Error('boss');
     const w = winRunBattle({ ...s, dungeonRun: last }, { kind: 'boss', id: boss.id }, null);

@@ -62,6 +62,10 @@ const WATER_ROOM_RATE = 0.7;
 const ICE_ROOM_RATE = 0.6;
 /** 【仮】風のマスの数（1階に min〜max か所）・押し流すマスの数（2026-10-30 指示書 U） */
 export const WIND_TILES = { min: 4, max: 8 } as const;
+/** 1〜2階の風のマスの数（2026-11-02 指示書 AT：風の渓谷が最初のダンジョンになったので、初めての人が迷わないよう少なめ） */
+export const WIND_TILES_EARLY = { min: 2, max: 4 } as const;
+/** 風のマスを少なめにする階の数（0＝1階・1＝2階） */
+export const WIND_EARLY_FLOORS = 2;
 export const WIND_PUSH = 2;
 
 /** 風のマスの向き（文字 → 1マスの動き） */
@@ -370,7 +374,8 @@ export function generateFloor(runSeed: number, floor: number, isLast: boolean, p
   // 強い風のマス（風の渓谷）：床のマス（スタート・階段〔ボス〕のマスは除く）に、決まった向きの風を置く。
   // 押し流す先が1マス以上あり、置いたあとも全部の床へ行けて（押し流されても止まれる所として）、輪にならないものだけ残す
   if (gimmick === 'wind') {
-    const want = rng.range(WIND_TILES.min, WIND_TILES.max);
+    const count = floor < WIND_EARLY_FLOORS ? WIND_TILES_EARLY : WIND_TILES;
+    const want = rng.range(count.min, count.max);
     const kinds = Object.keys(WIND_DIRS);
     const candidates: Point[] = [];
     for (let y = 0; y < height; y++) {

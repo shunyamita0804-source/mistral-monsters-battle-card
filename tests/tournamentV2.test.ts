@@ -331,8 +331,9 @@ describe('報酬・記録・セーブ', () => {
     const migrated = normalizeSave(old);
     expect(migrated?.version).toBe(SAVE_VERSION);
     expect(SAVE_VERSION).toBeGreaterThanOrEqual(18);
-    // v28 の変換（2026-10-30 ガチャのシリーズ）で付く「選んだ」記録のほかは、記録は増えない
-    expect(migrated?.storyFlags.filter((f) => !f.startsWith('gacha-seen-'))).toEqual([]);
+    // v28 の変換（2026-10-30 ガチャのシリーズ）で付く「選んだ」記録と、v34 の変換（2026-11-02 指示書 AT のダンジョンの並び直し）で付く
+    // 「大会の条件からはずす」記録のほかは、記録は増えない
+    expect(migrated?.storyFlags.filter((f) => !f.startsWith('gacha-seen-') && !f.startsWith('boss-waived-'))).toEqual([]);
     expect(migrated?.activeTournament).toMatchObject({ tournamentId: 'tournament-e', entryId: 'old-1', round: 0, status: 'inProgress', entrants: ['player', 'e-1', 'e-2', 'e-3'], matches: [] });
     expect(migrated?.tournaments['tournament-e']?.entries).toBe(2);
   });

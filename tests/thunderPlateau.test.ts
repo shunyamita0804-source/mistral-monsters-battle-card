@@ -45,7 +45,8 @@ describe('雷の高原：ダンジョンの値', () => {
     expect(STELLA_BEATEN_FLAG).toBe('thunder-boss-beaten');
     expect(runConfig(ID)).toMatchObject({ floors: 5, gimmick: 'thunder', unlockRank: 'B', viewRadius: 1, guardianRate: 0.3, maxLosses: 3, guardianLifeBonus: -0.2, bossId: 'enc-thunder-boss' });
     expect(runConfig(ID).floorLife).toEqual([1, 1.1, 1.2, 1.3, 1.4]);
-    expect(runConfig(ID).floorLife).toEqual(runConfig('dungeon-05').floorLife);
+    // 2026-11-02 指示書 AT：炎の火山は C に移ったので、同じ B の段は太古の遺跡
+    expect(runConfig(ID).floorLife).toEqual(runConfig('dungeon-01').floorLife);
     expect(runConfig(ID).npcTeams).toEqual([
       ['mon-nobiton', 'mon-pukarim', 'mon-kalshell'],
       ['mon-pukarim', 'mon-nobiton', 'mon-myurol'],
@@ -53,10 +54,10 @@ describe('雷の高原：ダンジョンの値', () => {
     expect(runConfig(ID).guardianTeam).toEqual(['mon-nobiton', 'mon-kalshell', 'mon-pukarim']);
     expect(JSON.stringify(RUN_DUNGEONS[ID])).not.toContain('hakuran');
     expect(runCpuSkill(ID, 1)).toBe('B');
-    expect(DUNGEON_MONEY[ID]).toEqual(DUNGEON_MONEY['dungeon-05']);
+    expect(DUNGEON_MONEY[ID]).toEqual(DUNGEON_MONEY['dungeon-01']);
     const ids = DUNGEONS.map((d) => d.id);
-    expect(ids.indexOf(ID)).toBe(ids.indexOf('dungeon-05') + 1);
-    expect(Object.keys(RUN_DUNGEONS).indexOf(ID)).toBe(Object.keys(RUN_DUNGEONS).indexOf('dungeon-05') + 1);
+    expect(ids.indexOf(ID)).toBe(ids.indexOf('dungeon-01') + 1);
+    expect(Object.keys(RUN_DUNGEONS).indexOf(ID)).toBe(Object.keys(RUN_DUNGEONS).indexOf('dungeon-01') + 1);
     expect(DUNGEON_SPOTS[ID]).toBeDefined();
   });
 
@@ -148,9 +149,9 @@ describe('入手の流れ', () => {
 });
 
 describe('B の大会の出場条件・セーブ', () => {
-  it('B の条件に雷の高原を足した（炎の火山・雷の高原）。受付の理由に出る', () => {
-    expect(RANK_BOSS_DUNGEONS.B).toEqual(['dungeon-05', ID]);
-    const fire = { 'dungeon-05': { openedChests: [], bossDefeated: true, clears: 1 } };
+  it('B の条件は太古の遺跡・雷の高原（2026-11-02 指示書 AT。前は炎の火山・雷の高原）。受付の理由に出る', () => {
+    expect(RANK_BOSS_DUNGEONS.B).toEqual(['dungeon-01', ID]);
+    const fire = { 'dungeon-01': { openedChests: [], bossDefeated: true, clears: 1 } };
     const s = { ...base(), rank: 'B' as const, calendar: { year: 1, month: 9 }, dungeons: fire };
     expect(missingBosses(s, 'B')).toEqual([ID]);
     const b = getTournament('tournament-b');
@@ -182,7 +183,7 @@ describe('B の大会の出場条件・セーブ', () => {
   });
 
   it('セーブの version は 33（B の大会の条件のため 32。指示書 AJ で外した技を消すために 33 に）', () => {
-    expect(SAVE_VERSION).toBe(33);
+    expect(SAVE_VERSION).toBe(34); // 2026-11-02 指示書 AT で 34 に
   });
 });
 

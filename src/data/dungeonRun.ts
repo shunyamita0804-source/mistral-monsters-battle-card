@@ -96,39 +96,45 @@ export interface RunDungeonConfig {
  * 3体ともちがうと番人が強くなったので（最後の階で、最初の手持ち3箱 × 200回）、番人のライフ（guardianLifeBonus）で前の勝つ割合に近づけた：
  * 遺跡・氷 −0.2（36.8％ → 22.3％ → 31.8％。±3 に入る値はなく、いちばん近い値）、火 −0.2（24.7％ → 18.5％ → 26.0％）、機械 −0.3（22.8％ → 17.3％ → 23.2％）。水は 26.2％ → 24.2％ でそのまま
  */
-/** 2026-10-27 指示書：ふつうのダンジョンは最大5階。強さは 森 ＜ 水 ＜ 氷・遺跡 ＜ 火 ＜ 機械 ＜ 聖域（すべて仮。遺跡は 2026-10-29 に氷の洞窟と同じ段へ） */
+/**
+ * 2026-10-27 指示書：ふつうのダンジョンは最大5階。
+ * 2026-11-02 指示書 AT（2026-11-01 ユーザー決定）の並び：最初＝風の渓谷（3階）／D＝水の神殿（3階）・精霊の森（4階）／C＝氷の洞窟・炎の火山（4階）／
+ * B＝太古の遺跡・雷の高原（5階）／A＝機械の塔／S＝天の聖域。強さ（floorLife）・お金・CPU の腕前は、そのランクの段の今の値（新しい決まりは作らない）。
+ * 並び＝ダンジョンを選ぶ所の順
+ */
 export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
-  // 太古の遺跡（C ランク。2026-10-29 ジオルの最終で初期のダンジョンから外した）：地下4階・仕掛けなし。
-  // 強さ・バトラーと見えない番人の編成は氷の洞窟と同じ段（プカリムを使うのは精霊の森のバトラーだけ）
-  'dungeon-01': {
-    floors: 4, gimmick: 'none', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: -0.2, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, MYU], bossId: 'enc-b3-boss',
-  },
-  // 精霊の森（最初から。2026-10-29 から初期のダンジョンはここだけ）：固定のマップをやめて、ランダム生成（2026-10-27）
-  'dungeon-02': {
-    floors: 3, gimmick: 'none', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, SOR], bossId: 'enc-forest-boss',
-  },
-  // 水の神殿（D ランク）：水路
-  'dungeon-03': {
-    floors: 4, gimmick: 'water', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, NOB], bossId: 'enc-water-boss',
-  },
-  // 風の渓谷（D ランク・2026-10-30 指示書 U。水の神殿の次に並べる）：強い風のマス。強さは水の神殿と同じ段（地下4階・floorLife 0.8〜1.1・見える範囲 1・負けられる回数 3）。
+  // 風の渓谷（2026-11-02 指示書 AT で最初のダンジョン・地下3階。前は D ランク・地下4階）：強い風のマス（1〜2階は少なめ。src/game/dungeon/generate.ts）。
+  // 強さは最初の段（前の精霊の森と同じ floorLife 0.6〜0.85）。
   // バトラー・見えない番人の編成は Claude の仮（空を飛ぶ・身軽なモンスター：ソラモ・ガウル・プカリム。ツムジは使わない〔前のボスの切り札〕。2026-11-02 指示書 AQ で切り札はウズリオ）
   'dungeon-08': {
-    floors: 4, gimmick: 'wind', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    floors: 3, gimmick: 'wind', unlockRank: null, floorLife: [0.6, 0.75, 0.85], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: 0, npcTeams: [[SOR, PUK, GAU], [GAU, SOR, MYU]], guardianTeam: [GAU, SOR, PUK], bossId: 'enc-wind-boss',
+  },
+  // 水の神殿（D ランク）：水路。2026-11-02 指示書 AT で地下3階（D の段の始まり 0.8 から1階ごとに +0.1。今の決まりのまま階を減らした）
+  'dungeon-03': {
+    floors: 3, gimmick: 'water', unlockRank: 'D', floorLife: [0.8, 0.9, 1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[MYU, KAL, SOR], [KAL, MYU, NOB]], guardianTeam: [KAL, MYU, NOB], bossId: 'enc-water-boss',
+  },
+  // 精霊の森（2026-11-02 指示書 AT で D ランク・地下4階。前は最初から・地下3階）：仕掛けなし。強さは D の段（前の水の神殿・風の渓谷と同じ floorLife）
+  'dungeon-02': {
+    floors: 4, gimmick: 'none', unlockRank: 'D', floorLife: [0.8, 0.9, 1, 1.1], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: 0, npcTeams: [[PUK, MYU, NOB], [NOB, PUK, SOR]], guardianTeam: [PUK, LAZ, SOR], bossId: 'enc-forest-boss',
   },
   // 氷の洞窟（C ランク）：すべる床
   'dungeon-04': {
     floors: 4, gimmick: 'ice', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: -0.2, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, MYU], bossId: 'enc-ice-boss',
   },
-  // 炎の火山（B ランク）：見える範囲が1マス広い（2マス）・見えない番人が出やすい（1.5倍）
+  // 炎の火山（2026-11-02 指示書 AT で C ランク・地下4階。前は B ランク・地下5階）：見える範囲が1マス広い（2マス）・見えない番人が出やすい（1.5倍）。強さは C の段（氷の洞窟と同じ floorLife）
   'dungeon-05': {
-    floors: 5, gimmick: 'lava', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 2, guardianRate: 0.45, maxLosses: 3,
+    floors: 4, gimmick: 'lava', unlockRank: 'C', floorLife: [0.9, 1, 1.1, 1.2], viewRadius: 2, guardianRate: 0.45, maxLosses: 3,
     guardianLifeBonus: -0.2, npcTeams: [[GAU, LAZ, NOB], [LAZ, GAU, SOR]], guardianTeam: [GAU, LAZ, NOB], bossId: 'enc-fire-boss',
+  },
+  // 太古の遺跡（2026-11-02 指示書 AT で B ランク・地下5階。前は C ランク・地下4階）：仕掛けなし。
+  // 強さは B の段（雷の高原と同じ floorLife）。バトラーと見えない番人の編成は前のまま
+  'dungeon-01': {
+    floors: 5, gimmick: 'none', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: -0.2, npcTeams: [[KAL, NOB, MYU], [NOB, KAL, SOR]], guardianTeam: [KAL, NOB, MYU], bossId: 'enc-b3-boss',
   },
   // 雷の高原（B ランク・2026-11-01 指示書 AH。炎の火山の次に並べる）：落雷のマス。強さは炎の火山と同じ段（地下5階・floorLife 1〜1.4・負けられる回数 3）。
   // 見える範囲 1。落雷で番人が出るので、ふだんの番人は火山より少なめ（0.3）。バトラー・見えない番人の編成は指示書の仮（ハクランは使わない〔ボスの切り札〕）
@@ -205,9 +211,10 @@ export function runBattlerFace(index: number, dungeonId?: string): string {
  * 太古の遺跡・氷の洞窟・炎の火山（C・B）＝B・機械の塔・天の聖域（A・S）＝A。ボスは1つ上（src/data/dungeons.ts の ENCOUNTERS）
  */
 const RUN_CPU_SKILL: Readonly<Record<string, CpuSkill | 'CB'>> = {
-  'dungeon-02': 'C',
+  // 2026-11-02 指示書 AT：最初の段（C）は風の渓谷、D の段（C と B を半分ずつ）は水の神殿・精霊の森
+  'dungeon-08': 'C',
   'dungeon-03': 'CB',
-  'dungeon-08': 'CB',
+  'dungeon-02': 'CB',
   'dungeon-01': 'B',
   'dungeon-04': 'B',
   'dungeon-05': 'B',

@@ -17,6 +17,7 @@ import { walkLabScreen } from './walkLabScreen.ts';
 import { pukarimLabScreen } from './pukarimLabScreen.ts';
 import { geolLabScreen } from './geolLabScreen.ts';
 import { soukaiLabScreen } from './soukaiLabScreen.ts';
+import { storyEventLabScreen } from './storyEventLabScreen.ts';
 import { eventDungeonLabScreen } from './eventDungeonLabScreen.ts';
 import type { ScreenDefinition } from './types.ts';
 import { worldScreen } from './worldScreen.ts';
@@ -47,5 +48,6 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   pukarimLab: pukarimLabScreen,
   geolLab: geolLabScreen,
   soukaiLab: soukaiLabScreen,
+  storyEventLab: storyEventLabScreen,
   eventDungeonLab: eventDungeonLabScreen,
 };

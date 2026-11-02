@@ -87,29 +87,21 @@ export const BARCA_ALTAR_OWED_FLAG = 'barca-altar-owed';
 export const STELLA_BEATEN_FLAG = 'thunder-boss-beaten';
 
 export const DUNGEONS: readonly DungeonDefinition[] = [
+  // 2026-11-02 指示書 AT（2026-11-01 ユーザー決定）：並び＝ダンジョンを選ぶ所の順。最初＝風の渓谷／D＝水の神殿・精霊の森／C＝氷の洞窟・炎の火山／B＝太古の遺跡・雷の高原／A＝機械の塔／S＝天の聖域
+  // （開くランク・階は src/data/dungeonRun.ts の RUN_DUNGEONS。公式戦の条件は src/data/calendar.ts の RANK_BOSS_DUNGEONS）
+  // 2026-10-30 指示書 U：仕掛けは強い風のマス。ボスは守り手ゼフィラ（2026-11-02 指示書 AT で最初のダンジョン。前は D ランクの2つ目）
+  // 2026-11-02 指示書 AQ：切り札をツムジからウズリオへ（ツムジは最初の箱「烈火の猛攻」にいる）
   {
-    id: 'dungeon-01',
-    name: '太古の遺跡',
-    description: '草や木に覆われ、壊れた建物が残る遺跡。最奥のボスを倒すとクリア。（敵編成・マップは仮）',
-    floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
-    // 2026-10-29 ジオルの最終：初回クリアは最奥の祭壇でジオルのモンスターカード1枚（仮ジオルはもう使わない）
-    firstClearCards: [{ cardId: GEOL_MONSTER_ID, count: 1 }],
+    id: 'dungeon-08',
+    name: '風の渓谷',
+    description: '崖とつり橋の渓谷。強い風が吹き、乗ると押し流される。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    // 初回クリアは最奥の祭壇でウズリオのモンスターカード1枚（＋技カード。trumpReward）。2回目からはウズリオの技カード1枚（水の神殿のセレフィーンと同じ形。2026-11-02 指示書 AQ でツムジから）
+    firstClearCards: [{ cardId: UZURIO_MONSTER_ID, count: 1 }],
     trumpReward: true,
-    bossFlag: GRANT_BEATEN_FLAG,
+    bossFlag: ZEPHYRA_BEATEN_FLAG,
     isPlaceholder: true,
   },
-  {
-    id: 'dungeon-02',
-    name: '精霊の森',
-    description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成は仮）',
-    floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
-    // 2026-10-29 フルーネの最終：初回クリアは最奥の祭壇でフルーネのモンスターカード1枚。2回目からはフルーネの技カード1枚（遺跡のジオルと同じ形）
-    firstClearCards: [{ cardId: FLUNE_MONSTER_ID, count: 1 }],
-    trumpReward: true,
-    bossFlag: SERA_BEATEN_FLAG,
-    isPlaceholder: true,
-  },
-  // 2026-10-27 指示書「ダンジョン7つ」：ランクで開放する5つ。名前・ボス・編成はすべて仮（仕掛け・階・開放は src/data/dungeonRun.ts の RUN_DUNGEONS）
   {
     id: 'dungeon-03',
     name: '水の神殿',
@@ -122,17 +114,15 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     altarOwedFlag: LUCIA_ALTAR_OWED_FLAG,
     isPlaceholder: true,
   },
-  // 2026-10-30 指示書 U：D ランクの2つ目のダンジョン（水の神殿と同じ段）。仕掛けは強い風のマス。ボスは守り手ゼフィラ・切り札はツムジ。ダンジョンを選ぶ所では水の神殿の次
-  // 2026-11-02 指示書 AQ：切り札をツムジからウズリオへ（ツムジは最初の箱「烈火の猛攻」にいる）
   {
-    id: 'dungeon-08',
-    name: '風の渓谷',
-    description: '崖とつり橋の渓谷。強い風が吹き、乗ると押し流される。最奥のボスを倒すとクリア。（仮）',
-    floors: [],
-    // 初回クリアは最奥の祭壇でウズリオのモンスターカード1枚（＋技カード。trumpReward）。2回目からはウズリオの技カード1枚（水の神殿のセレフィーンと同じ形。2026-11-02 指示書 AQ でツムジから）
-    firstClearCards: [{ cardId: UZURIO_MONSTER_ID, count: 1 }],
+    id: 'dungeon-02',
+    name: '精霊の森',
+    description: 'ピンクの花が咲き、蝶が舞う森。最奥のボスを倒すとクリア。（敵編成は仮）',
+    floors: ['dungeon-02-b1', 'dungeon-02-b2', 'dungeon-02-b3'],
+    // 2026-10-29 フルーネの最終：初回クリアは最奥の祭壇でフルーネのモンスターカード1枚。2回目からはフルーネの技カード1枚（遺跡のジオルと同じ形）
+    firstClearCards: [{ cardId: FLUNE_MONSTER_ID, count: 1 }],
     trumpReward: true,
-    bossFlag: ZEPHYRA_BEATEN_FLAG,
+    bossFlag: SERA_BEATEN_FLAG,
     isPlaceholder: true,
   },
   {
@@ -159,7 +149,18 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     altarOwedFlag: BARCA_ALTAR_OWED_FLAG,
     isPlaceholder: true,
   },
-  // 2026-11-01 指示書 AH：B ランクの2つ目のダンジョン（炎の火山と同じ段）。仕掛けは落雷のマス。ボスは守り手ステラ・切り札はハクラン。ダンジョンを選ぶ所では炎の火山の次
+  {
+    id: 'dungeon-01',
+    name: '太古の遺跡',
+    description: '草や木に覆われ、壊れた建物が残る遺跡。最奥のボスを倒すとクリア。（敵編成・マップは仮）',
+    floors: ['dungeon-01-b1', 'dungeon-01-b2', 'dungeon-01-b3'],
+    // 2026-10-29 ジオルの最終：初回クリアは最奥の祭壇でジオルのモンスターカード1枚（仮ジオルはもう使わない）
+    firstClearCards: [{ cardId: GEOL_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    bossFlag: GRANT_BEATEN_FLAG,
+    isPlaceholder: true,
+  },
+  // 2026-11-01 指示書 AH：B ランクのダンジョン。仕掛けは落雷のマス。ボスは守り手ステラ・切り札はハクラン（2026-11-02 指示書 AT で太古の遺跡の次）
   {
     id: 'dungeon-09',
     name: '雷の高原',
@@ -196,10 +197,12 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-b3-a': { id: 'enc-b3-a', name: '深層の群れ（仮）', monsters: TEST_TEAM, lifeScale: 0.85 },
   'enc-b3-b': { id: 'enc-b3-b', name: '深層の群れ（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.85 },
   // 遺跡のボス：ジオルを真ん中に（2026-10-29 ジオルの最終。遺跡は氷の洞窟と同じ段になったので、強さもそれに合わせる）
+  // 2026-11-02 指示書 AT：グラントは B の守り手になった。前の B（ステラ 1.0）の勝つ割合 6.4％ ±3 に、今の 1.06（5.5％）で入っているので変えない
   'enc-b3-boss': { id: 'enc-b3-boss', name: 'グラント', monsters: [GAU, GEOL_MONSTER_ID, LAZUCK_MONSTER_ID], ace: GEOL_MONSTER_ID, lifeScale: 1.06, skill: 'A' },
   // 森のボス：フルーネを真ん中に（2026-10-29 フルーネの最終）。2026-10-29 夜 ユーザー指示：プカリム・フルーネ・ミュロル（案2）。
   // lifeScale は試遊（最初の手持ち3箱 × 200回）で勝つ割合が 45％ にいちばん近い 0.75（0.85＝35.0％・0.75＝43.2％・0.7＝55.2％。docs/flune-final-20261029.md 6章）。2026-10-30 指示書 V で 0.7 に
-  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], ace: FLUNE_MONSTER_ID, lifeScale: 0.93, skill: 'B' },
+  // 2026-11-02 指示書 AT：セラは D の守り手になったので、前の D（ルシア 1.25）の勝つ割合 3.9％ を目ざした（0.93 → 1.26 で 11.6％）。1.3 より上はセラの山札切れでしか負けなくなり 9〜11％ から下がらないので ±3 に入らず、ルシアと同じくらいの段にした（docs/dungeons-at-20261102.md）
+  'enc-forest-boss': { id: 'enc-forest-boss', name: 'セラ', monsters: [PUK, FLUNE_MONSTER_ID, MYU], ace: FLUNE_MONSTER_ID, lifeScale: 1.26, skill: 'B' },
   // 2026-10-27 指示書「ダンジョン7つ」のボス（仮。真ん中のモンスターがボスのモンスター。強さは最後の階より少し上）
   // 2026-10-30 指示書 V：どのボスも切り札（ace）＝祭壇でもらえるモンスター（真ん中）。デッキに切り札の技14種を2枚ずつ（deck.ts の buildAceDeck）。
   // 後ろの4人（イヴァン・バルカ・テオ・アウレリオ）の切り札は仮（あとで新しいモンスターに替える）
@@ -213,7 +216,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale（2026-10-31 指示書 AC【2】）：ガウル・ラズックはライフ6、シシエンは7なので、ライフは3段に変わる（Math.round）。
   // 1.0＝6・7・6（29.1％）、1.0714〜1.0833＝6・8・6（1.08 で 21.0％）、1.0834〜＝7・8・7（1.09 で 11.0％）。V の目標 18.1％ ±3 に入る 1.08 にした
   // （最初の手持ち3箱 × 1000回・プレイヤー側は腕前 B・バルカは腕前 A。docs/design/barca-ac-20261031/・npm run playtest:barca。AB では「3体ともライフ7」と測り違えて 1.09 にしていた）
-  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.08, skill: 'A' },
+  // 2026-11-02 指示書 AT：バルカは C の守り手になったので、前の C（イヴァン 1.05）の勝つ割合 2.6％ に合わせ直した（1.08 → 1.10 で 2.3％）
+  'enc-fire-boss': { id: 'enc-fire-boss', name: 'バルカ', monsters: [GAU, SHISHIEN_MONSTER_ID, LAZUCK_MONSTER_ID], ace: SHISHIEN_MONSTER_ID, lifeScale: 1.10, skill: 'A' },
   // 雷の高原のボス（2026-11-01 指示書 AH）：ハクランを真ん中に、左右はノビトン・プカリム。腕前 A。
   // lifeScale は試遊でバルカと同じ目標（最初の手持ち3箱・プレイヤー側は腕前 B・1000回で 18.1％ ±3）に合わせた：1.0 でプレイヤーの勝ち 18.3％（0.95〜1.05 は同じ。1.1 で 6.1％）
   // （docs/thunder-plateau-ah-20261101.md・npm run playtest:stella）
@@ -224,7 +228,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
   // 2026-11-02 指示書 AQ：切り札（真ん中）をツムジからウズリオへ。ほかの2体はそのまま。lifeScale はツムジのときの勝つ割合（いまの最初の3箱・腕前 B・1000回で 2.8％）に
   // いちばん近い 1.28（3.0％。ライフ 9・8・8）にした（1.22 では 4.9％。docs/uzurio-aq-20261102.md・tests/aqPlaytest.test.ts）
-  'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, UZURIO_MONSTER_ID, GAU], ace: UZURIO_MONSTER_ID, lifeScale: 1.28, skill: 'B' },
+  // 2026-11-02 指示書 AT：ゼフィラは最初の守り手になったので、前の最初の守り手（セラ 0.93）の勝つ割合 22.4％ に合わせ直した（1.28 → 0.92。最初の3箱・腕前 B・1000回で 26.9％。ライフの段差〔0.92＝6・6・6、0.94＝7・6・6 で 17.7％〕で ±3 には入らず、いちばん近い値）
+  'enc-wind-boss': { id: 'enc-wind-boss', name: 'ゼフィラ', monsters: [SORAMO_MONSTER_ID, UZURIO_MONSTER_ID, GAU], ace: UZURIO_MONSTER_ID, lifeScale: 0.92, skill: 'B' },
   // 【仮】ランダム生成のダンジョン（2026-10-26 試作。src/data/dungeonRun.ts）：通常のバトラー・見えない番人。編成とライフは階ごとに src/data/dungeonRun.ts で決める
   'enc-run-npc': { id: 'enc-run-npc', name: 'ダンジョンのバトラー（仮）', monsters: TEST_TEAM, lifeScale: 0.6 },
   'enc-run-guardian': { id: 'enc-run-guardian', name: '見えない番人（仮）', monsters: TEST_TEAM_ALT, lifeScale: 0.6 },

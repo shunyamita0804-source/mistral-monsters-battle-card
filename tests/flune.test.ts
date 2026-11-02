@@ -1,3 +1,4 @@
+import { runConfig } from '../src/data/dungeonRun.ts';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BATTLE_CARDS } from '../src/data/battleCards.ts';
@@ -328,7 +329,7 @@ function beatSera(save: SaveData, seed: number): ReturnType<typeof winRunBattle>
   const s = startRun(save, 'dungeon-02', seed);
   const run = s.dungeonRun;
   if (!run) throw new Error('run');
-  const last = { ...run, floor: 2 };
+  const last = { ...run, floor: runConfig('dungeon-02').floors - 1 }; // 2026-11-02 指示書 AT で地下4階
   const boss = runFloor(last).entities.find((e) => e.kind === 'boss');
   if (!boss) throw new Error('boss');
   return winRunBattle({ ...s, dungeonRun: last }, { kind: 'boss', id: boss.id }, null);
@@ -336,7 +337,7 @@ function beatSera(save: SaveData, seed: number): ReturnType<typeof winRunBattle>
 
 describe('精霊の森のボス（セラ）・入手の流れ', () => {
   it('セラのデッキはプカリム・フルーネ・ミュロル（2026-10-29 夜 ユーザー指示）。lifeScale は試遊で 0.75、2026-10-30 指示書 V（切り札の技を2枚ずつ）で 0.7、指示書 Y（サポートの入れ替え）で 0.75', () => {
-    expect(ENCOUNTERS['enc-forest-boss']).toMatchObject({ name: 'セラ', monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], ace: FLUNE_MONSTER_ID, lifeScale: 0.93, skill: 'B' });
+    expect(ENCOUNTERS['enc-forest-boss']).toMatchObject({ name: 'セラ', monsters: ['mon-pukarim', FLUNE_MONSTER_ID, 'mon-myurol'], ace: FLUNE_MONSTER_ID, lifeScale: 1.26, skill: 'B' }); // 2026-11-02 指示書 AT で 1.26
     expect(DUNGEONS.find((d) => d.id === 'dungeon-02')).toMatchObject({ trumpReward: true, bossFlag: SERA_BEATEN_FLAG, firstClearCards: [{ cardId: FLUNE_MONSTER_ID, count: 1 }] });
     expect(SERA_BEATEN_FLAG).toBe('sera-beaten');
   });

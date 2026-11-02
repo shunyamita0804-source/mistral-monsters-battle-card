@@ -7,7 +7,8 @@ import { getPerson, PEOPLE, personOfOpponent } from '../src/data/people.ts';
 const KEEPERS = ['grant', 'sera', 'lucia', 'ivan', 'balka', 'teo', 'aurelio'];
 const BATTLERS = ['pia', 'hans', 'zack', 'otto', 'mina'];
 /** RUN_DUNGEON_IDS の並び（風の渓谷〔2026-10-30 指示書 U〕は水の神殿の次）の守り手 */
-const KEEPERS_IN_RUN_ORDER = ['grant', 'sera', 'lucia', 'zephyra', 'ivan', 'balka', 'stella', 'teo', 'aurelio'];
+// 2026-11-02 指示書 AT：ダンジョンの並び直し（風・水・森・氷・火・遺跡・雷・機械・聖域）
+const KEEPERS_IN_RUN_ORDER = ['zephyra', 'lucia', 'sera', 'ivan', 'balka', 'grant', 'stella', 'teo', 'aurelio'];
 
 describe('ダンジョンの人物12人（2026-10-28）', () => {
   it('名刺図鑑の No. は 29〜40（今の 1〜28 は変えない）。どの人もせりふが日本語と英語の両方', () => {

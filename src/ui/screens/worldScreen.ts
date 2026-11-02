@@ -3,6 +3,12 @@ import { FRAGMENT_TOTAL } from '../../data/fragments.ts';
 import type { ArtDoorAnim, ArtLoop } from '../../data/worldArt.generated.ts';
 import { BUREAU_DESK_FRONT, CAMERA_LEANS, getMap, HALL_BOARD, isResidentId, TEACHER_FRONT_DY, TOWN_SIGNS, type ChestObject, type EnemyObject, type MapDefinition, type MapObject, type NpcId, type NpcObject, type WarpTarget } from '../../data/maps.ts';
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
+import { DUNGEONS } from '../../data/dungeons.ts';
+import type { EventTrigger, StoryEventDefinition } from '../../data/storyEvents.ts';
+import { changedSeason, chainedStoryEvent, markStoryEventSeen, pendingStoryEvent, storyEventGoal, type EventContext } from '../../game/story/storyEvents.ts';
+import { seasonOf, type Season } from '../../game/calendar/calendar.ts';
+import { playStoryEvent } from '../components/storyEventPlayer.ts';
+import { getLanguage } from '../../i18n/i18n.ts';
 import { BOOSTERS, EXAM_OPPONENT, examLifeScale, type BoosterKey } from '../../data/introV2.ts';
 import { boosterArtUrl } from '../components/boosterArt.ts';
 import { INITIAL_BOOSTER_SELECT, tapBooster } from '../../game/story/boosterSelect.ts';
@@ -806,14 +812,16 @@ export class WorldView {
       this.#afterLoadScene = null;
       const sceneNext = v2Run ?? (scene ? () => this.#playScene(scene, afterScene) : undefined);
       // ダンジョンから戻った・大会が終わったあとに月が変わっていたら、お知らせのあとに月が変わる演出（2026-10-30 指示書 R2）
-      const next = dev ? sceneNext : () => this.#monthChange(() => sceneNext?.());
+      // 2026-11-02 指示書 AT：ほかの場面が無ければ、街に入ったときのイベント（月が変わる演出のあと。戦闘・報酬・月の途中には割り込まない）
+      const next = dev ? sceneNext : () => this.#monthChange(() => (sceneNext ? sceneNext() : this.#townStoryEvents()));
       if (flash) {
         this.#store.flashMessage = null;
         const stage = clear ? this.#clearScene(clear) : null;
         const reward = (): void =>
           this.#message(flash, () => {
             stage?.remove();
-            next?.();
+            // 2026-11-02 指示書 AT（M11 など）：今の報酬の処理が全部終わったあとで、受け取った切り札のカードを大きく見せる
+            this.#rewardStoryEvent(clear, () => next?.());
           });
         if (keeper) this.#message(keeper.text, reward, talkFaceVisual(keeper.face));
         else reward();
@@ -912,7 +920,8 @@ export class WorldView {
     if (pete) {
       store.peteResult = null;
       if (pete === 'lost') return 'peteLose';
-      if (pete.cardId) this.#afterLoadScene = () => openCardList(this.#root, { cardIds: [pete.cardId], onClose: () => {} });
+      // 2026-11-02 指示書 AT（M05W）：初めて勝ったとき、取得カードの画面のあとにピートのひと言
+      if (pete.cardId) this.#afterLoadScene = () => openCardList(this.#root, { cardIds: [pete.cardId], onClose: () => (pete.first ? this.#storyEvent('chain', { after: 'M05' }, () => {}) : undefined) });
       return pete.first ? 'peteFirstWin' : 'peteWinAgain';
     }
     const result = store.practiceResult;
@@ -1112,11 +1121,15 @@ export class WorldView {
     const hint = WorldView.#stickUsed || this.#eventLock ? null : h('div', { class: 'world__hint', text: t('world.hint') });
 
     const v2Goal = this.#dev ? null : this.#introV2Goal(save.story.introV2, map.id);
+    // 2026-11-02 指示書 AT（M03）：目標「風の渓谷を探検しよう」（街と部屋だけ。目標の表示だけ）
+    const storyGoal = this.#dev || map.area === 'dungeon' ? null : storyEventGoal(save);
     const goal = v2Goal
       ? h('div', { class: 'world__goal', text: t(v2Goal) })
       : showsPracticeGoal(save, map.id)
         ? h('div', { class: 'world__goal', text: t('story.goal.practice') })
-        : null;
+        : storyGoal
+          ? h('div', { class: 'world__goal', text: getLanguage() === 'en' ? storyGoal.en : storyGoal.ja })
+          : null;
     // 暗転の幕：場所に入ったときは閉じた状態から、絵を読み込み終えたら開ける
     const keepClosed = !fade && this.#fade?.classList.contains('is-on');
     this.#fade = h('div', { class: `world__fade${fade || keepClosed ? ' is-on' : ''}`, attrs: { 'aria-hidden': 'true' } });
@@ -2012,6 +2025,20 @@ export class WorldView {
       const dy = this.#tile.y - npc.y;
       this.#faceNpc(el, Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up');
     }
+    // 2026-11-02 指示書 AT：その人に初めて話しかけたときのイベント（ニーナ・ピート・ルーカス・セリア・マルタ・ロザリー・ハロルド・ガレス）。終わったら今までの会話・画面へ
+    const person = personOfSpeaker(npc.npcId)?.id;
+    if (person && !this.#eventLock) {
+      const ev = pendingStoryEvent(this.#store.save, 'talk', { npc: person });
+      if (ev) {
+        this.#playStory(ev, { npc: person }, () => this.#talkDispatch(npc));
+        return;
+      }
+    }
+    this.#talkDispatch(npc);
+  }
+
+  /** 今までの会話・画面（#talk の続き） */
+  #talkDispatch(npc: NpcObject): void {
     if (npc.npcId === 'neighbor_guide') this.#playScene(sceneOnTalk(this.#store.save));
     else if (npc.action && STAFF_GREETING[npc.npcId]) {
       // 店員・受付・研究員：顔の絵つきでひと言しゃべってから、その画面を開く（2026-10-23）
@@ -2146,6 +2173,8 @@ export class WorldView {
               // 幼馴染は家に帰る（となりの家にいる）
               this.#follower = null;
               this.#build();
+              // 2026-11-02 指示書 AT（M03）：導入が終わった直後のミレイユの案内（風の渓谷へ）
+              this.#storyEvent('introDone', {}, () => this.#build());
             });
         }
         break;
@@ -2445,7 +2474,8 @@ export class WorldView {
         messageModal(
           this.#root,
           t('introV2.pack.got', { name: boosterName(key) }),
-          () => openCardList(this.#root, { cardIds: [...deck.monsters, ...deck.skills], onClose: () => this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit')) }),
+          // 2026-11-02 指示書 AT（M02）：3体のモンスターカードを1枚ずつ大きく見せてから（もう持っているカード。二重に渡さない）、取得カードの画面
+          () => this.#storyEvent('chain', {}, () => openCardList(this.#root, { cardIds: [...deck.monsters, ...deck.skills], onClose: () => this.#playScene('v2Thanks', () => this.#walkOut('bureau-exit')) })),
           undefined,
           got,
           'ok',
@@ -2480,6 +2510,8 @@ export class WorldView {
         this.#walkTalk = null;
         this.#build();
         this.#busy = false;
+        // 2026-11-02 指示書 AT（M03）：導入を飛ばしたときも、ミレイユの案内を1回
+        this.#storyEvent('introDone', {}, () => this.#build());
       },
       () => {
         if (isIntroV2Done(this.#v2)) return;
@@ -2652,6 +2684,76 @@ export class WorldView {
   }
 
   /** まだ出していない月の変わり目があれば、月が変わる演出（そのあいだは歩けない）。終わったら日付の札を描き直して done */
+  /** 月が変わる演出で季節が変わったとき（O11 に使う。1回使ったら消す） */
+  #seasonChange: Season | null = null;
+
+  /**
+   * 序盤〜C大会後のイベント（2026-11-02 指示書 AT）：そのきっかけで起きるイベントがあれば出してから after。無ければすぐ after。
+   * 一度だけの印は出す前に付ける（早送り・スキップ・アプリを閉じても、もう一度は出ない）
+   */
+  #storyEvent(trigger: EventTrigger, ctx: EventContext, after: () => void): void {
+    if (this.#dev || this.#destroyed) return after();
+    const ev = pendingStoryEvent(this.#store.save, trigger, ctx);
+    if (!ev) return after();
+    this.#playStory(ev, ctx, after);
+  }
+
+  #playStory(ev: StoryEventDefinition, ctx: EventContext, after: () => void): void {
+    this.#store.update((s) => markStoryEventSeen(s, ev.id));
+    const wasBusy = this.#busy;
+    this.#busy = true;
+    this.#held = null;
+    this.#path = [];
+    playStoryEvent(this.#root, this.#store.save, ev, {
+      ctx,
+      onAction: (action, next) => {
+        if (action === 'openBook') {
+          this.#busy = false;
+          this.#ctx.navigate('collection');
+          return;
+        }
+        next();
+      },
+      onObjective: () => undefined,
+      onDone: () => {
+        this.#busy = wasBusy;
+        // 続けて起きるイベント（M29 → M30）
+        const chained = chainedStoryEvent(this.#store.save, ev.id, ctx);
+        if (chained) {
+          this.#playStory(chained, ctx, after);
+          return;
+        }
+        // 目標の帯などを描き直す
+        if (!this.#destroyed && ev.steps.some((st) => st.kind === 'objective')) this.#build();
+        after();
+      },
+    });
+  }
+
+  /**
+   * 街・部屋に入って落ち着いたときのイベント（1回の入場で1つだけ。重なったら M28 → M21 → M11T の順に、残りは次に入ったとき）。
+   * 導入の最中・ダンジョンの中では出さない
+   */
+  #townStoryEvents(): void {
+    if (this.#dev || this.#map.area === 'dungeon' || this.#eventLock) return;
+    const save = this.#store.save;
+    // C 大会で決勝まで行かなかったとき（M28 の「早く負けたとき」の行。大会の画面で覚えた、その場かぎりの記録）
+    const ctx: EventContext = this.#store.storyCtx.reachedFinal === false ? { earlyLoss: true } : {};
+    const ev = pendingStoryEvent(save, 'introDone') ?? pendingStoryEvent(save, 'townEnter', ctx);
+    if (ev) return this.#playStory(ev, ctx, () => undefined);
+    const season = this.#seasonChange;
+    this.#seasonChange = null;
+    if (season) this.#storyEvent('season', { season }, () => undefined);
+  }
+
+  /** 守り手に初めて勝ったときの、切り札のカードを大きく見せる場面（今の報酬の処理のあと。M11・M17R・M19R・M24R・M25R） */
+  #rewardStoryEvent(clear: { readonly cards: readonly string[]; readonly firstClear: boolean } | null, after: () => void): void {
+    if (!clear?.firstClear) return after();
+    const dungeon = DUNGEONS.find((d) => d.firstClearCards?.some((c) => clear.cards.includes(c.cardId)));
+    if (!dungeon) return after();
+    this.#storyEvent('reward', { dungeon: dungeon.id, firstClear: true }, after);
+  }
+
   #monthChange(done: () => void): void {
     const change = this.#store.pendingMonthChange();
     if (!change) {
@@ -2661,6 +2763,8 @@ export class WorldView {
     this.#busy = true;
     this.#held = null;
     this.#path = [];
+    // 2026-11-02 指示書 AT（O11）：季節が変わったら、街の人のひと言（街に入ったときのイベントで1回だけ）
+    this.#seasonChange = changedSeason(change.from.month, change.to.month, seasonOf) ?? this.#seasonChange;
     playMonthChange(this.#root, change.to, () => {
       this.#store.markMonthShown();
       this.#busy = false;
@@ -2716,7 +2820,8 @@ export class WorldView {
     playSleep(this.#root, to, before.year !== to.year, () => {
       this.#store.markMonthShown();
       this.#refreshDatePlate();
-      this.#message(t('calendar.bed.morning', { date: dateLabel(to) }));
+      const season = changedSeason(before.month, to.month, seasonOf);
+      this.#message(t('calendar.bed.morning', { date: dateLabel(to) }), () => (season ? this.#storyEvent('season', { season }, () => {}) : undefined));
     });
   }
 
@@ -2726,6 +2831,8 @@ export class WorldView {
     this.#held = null;
     openNoticeBoard(this.#root, this.#store.save, () => {
       this.#busy = false;
+      // 2026-11-02 指示書 AT（M12）：風の渓谷を越えたあと、初めて掲示板を見たとき
+      this.#storyEvent('board', {}, () => {});
     });
   }
 
@@ -2778,13 +2885,14 @@ export class WorldView {
   #action(action: string, message?: string): void {
     const nav = this.#ctx.navigate;
     switch (action) {
-      case 'deck': return nav('deck');
+      // 2026-11-02 指示書 AT：家の机（M08）・販売機（O04）は、初めてのときイベントを出してから
+      case 'deck': return this.#storyEvent('desk', {}, () => nav('deck'));
       case 'dungeonSelect': return nav('dungeonSelect');
       case 'collection': return nav('collection');
       case 'peopleBook': return nav('peopleBook');
       case 'settings': return nav('settings');
       case 'shopClerk': return nav('shopMenu');
-      case 'gacha': return nav('gacha');
+      case 'gacha': return this.#storyEvent('gacha', {}, () => nav('gacha'));
       case 'tournamentDesk': return nav('tournament');
       case 'practiceTable': return this.#playScene(sceneOnTable(this.#store.save));
       case 'bureauDesk': return this.#playScene('v2BureauAfter');

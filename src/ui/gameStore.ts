@@ -65,6 +65,11 @@ export class GameStore {
   flashKeeper: { readonly face: string; readonly text: string } | null = null;
   /** ダンジョンに入った直後に出す、挿絵とダンジョン名の札（ダンジョンの ID。2026-10-26 ユーザー指示） */
   dungeonIntro: string | null = null;
+  /**
+   * イベントのための、その場かぎりの記録（2026-11-02 指示書 AT。セーブには入れない）：
+   * C 大会で決勝まで行ったか（M28 の「早く負けたとき」の行）・決勝の相手がシエナだったときの勝ち負け（M27E）
+   */
+  storyCtx: { reachedFinal?: boolean; finalSienna?: { readonly won: boolean } } = {};
   /** 新しく始めた直後に、物語の始まりの挿絵を出す（2026-10-27 ユーザー指示。主人公を選んだあとに1回だけ） */
   openingIntro = false;
   /** 練習試合の結果（歩行画面に戻ったとき、対戦後の会話に使う） */
