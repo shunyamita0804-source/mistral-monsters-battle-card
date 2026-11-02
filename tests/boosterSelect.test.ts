@@ -17,12 +17,12 @@ describe('ブースターパック3種（2026-10-27 正式の箱）', () => {
       ['booster-3', '蒼海の守り', 'booster_soukai', 'defense'],
     ]);
     // 2026-11-01 指示書 AJ の箱：旅立ち＝ソラモ・ノビトン・ラズック／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン
-    // 2026-11-02 指示書 AK：旅立ちのノビトンをリリルに（ソラモ・リリル・ラズック）
+    // 2026-11-02 指示書 AK：旅立ちのノビトンをリリルに（ソラモ・リリル・ラズック）。指示書 AL：蒼海のノビトンをフォルンに（ミュロル・カルシェル・フォルン）
     // （前の初期デッキ STARTER_DECKS の3体とは、旅立ち・蒼海が違う）
     expect(BOOSTERS.map((b) => b.monsters)).toEqual([
       ['mon-soramo', 'mon-lilil', 'mon-lazuck'],
       ['mon-gauul', 'mon-lazuck', 'mon-nobiton'],
-      ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
+      ['mon-myurol', 'mon-kalshell', 'mon-forn'],
     ]);
     expect(BOOSTERS.map((b) => b.category)).toEqual(STARTER_DECKS.map((d) => d.key));
     // 2026-10-28 ユーザー決定：1箱 1,500G

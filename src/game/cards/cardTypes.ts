@@ -224,6 +224,16 @@ export type SkillEffect =
   | { readonly type: 'tide' }
   /** 特殊（指示書 AJ：デスオルの死のレクイエム）：ライフ1以下の、使ったモンスター以外のモンスター（味方も相手も）をすべて倒す。守れない */
   | { readonly type: 'requiem' }
+  /**
+   * 特殊（指示書 AL：フォルンのそなえのふえ 2026-11-02）：使ったモンスター以外の生きている味方1体（選ぶ）が、次の相手の手番が終わるまで受ける攻撃のダメージを reduce 減らす
+   * （ちから技・かしこさ技どちらも。しめったはだと同じ順で、防御で減らしたあとに引く。0 より下にしない）。重ねない（かけ直すと期限だけ新しく）。倒れたら消える
+   */
+  | { readonly type: 'ward'; readonly reduce: number }
+  /**
+   * 特殊（指示書 AL：フォルンのもりのたより 2026-11-02）：使ったあとの手札が hand 枚より少なければ、hand 枚になるまで山札から引き（山札が足りなければ引けるだけ。
+   * このカードで山札切れの負けにはしない）、そのあと手札から1枚選んで捨てる。使ったあとの手札がすでに hand 枚以上なら使えない
+   */
+  | { readonly type: 'drawTo'; readonly hand: number }
   | { readonly type: 'draw' };
 
 export type SkillEffectType = SkillEffect['type'];
@@ -429,8 +439,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover' | 'tide' | 'requiem';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover', 'tide', 'requiem'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

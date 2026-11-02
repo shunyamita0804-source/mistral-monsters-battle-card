@@ -32,11 +32,12 @@ const CATEGORY = { ち: 'force', か: 'wisdom', 特: 'special', 防: 'defense', 
 
 describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリルを足して16体）', () => {
   it('どのモンスターも技は12枚・レアは4つ。名前・分類・マナ・ダメージ・効果の文・表示の番号は表のとおり。LIFE は変えない', () => {
-    expect(AJ_MONSTER_IDS).toHaveLength(16);
+    expect(AJ_MONSTER_IDS).toHaveLength(17);
     const life: Record<string, number> = {
       'mon-soramo': 7, 'mon-gauul': 6, 'mon-myurol': 7, 'mon-kalshell': 8, 'mon-lazuck': 6, 'mon-nobiton': 8, 'mon-pukarim': 6, 'mon-flune': 10,
       'mon-serephine': 6, 'mon-tsumuji': 6, 'mon-geol': 9, 'mon-hyouzuku': 7, 'mon-shishien': 7, 'mon-hakuran': 7, 'mon-desuoru': 7,
       'mon-lilil': 5,
+      'mon-forn': 7,
     };
     for (const id of AJ_MONSTER_IDS) {
       const rows = AJ_SKILLS[id] ?? [];
@@ -110,9 +111,10 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     expect(REMOVED_SKILL_IDS).toContain('skl-kalshell-14');
   });
 
-  it('居場所：地上8体・空中5体（リリルは指示書 AK）・水中3体', () => {
+  it('居場所：地上9体（フォルンは指示書 AL）・空中5体（リリルは指示書 AK）・水中3体', () => {
     const by = (h: string): string[] => Object.entries(MONSTER_HABITAT).filter(([, v]) => v === h).map(([k]) => k);
-    expect(by('ground')).toHaveLength(8);
+    expect(by('ground')).toHaveLength(9);
+    expect(by('ground')).toContain('mon-forn');
     expect(by('air').sort()).toEqual(['mon-desuoru', 'mon-gauul', 'mon-hyouzuku', 'mon-lilil', 'mon-pukarim']);
     expect(by('water').sort()).toEqual(['mon-kalshell', 'mon-myurol', 'mon-serephine']);
     expect(getMonster('mon-gauul').habitat).toBe('air');
@@ -131,6 +133,8 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     expect(entries.find((e) => e.card.id === 'mon-desuoru')?.no).toBe(14 * 13 + 1);
     // 2026-11-02 指示書 AK：リリルはデスオルのあと（No.196〜208）
     expect(entries.find((e) => e.card.id === 'mon-lilil')?.no).toBe(15 * 13 + 1);
+    // 2026-11-02 指示書 AL：フォルンはリリルのあと（No.209〜221）
+    expect(entries.find((e) => e.card.id === 'mon-forn')?.no).toBe(16 * 13 + 1);
   });
 
   it('ガチャのシリーズ：○/13（技12＋モンスター1）。レアの枠は★の4つ', () => {
@@ -153,11 +157,11 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
 });
 
 describe('AJ：最初の箱（仮の中身）', () => {
-  it('旅立ち＝ソラモ・リリル・ラズック（2026-11-02 指示書 AK）／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・ノビトン。どれも山札60枚', () => {
+  it('旅立ち＝ソラモ・リリル・ラズック（2026-11-02 指示書 AK）／烈火＝ガウル・ラズック・ノビトン／蒼海＝ミュロル・カルシェル・フォルン（2026-11-02 指示書 AL）。どれも山札60枚', () => {
     expect(BOOSTERS.map((b) => b.monsters)).toEqual([
       ['mon-soramo', 'mon-lilil', 'mon-lazuck'],
       ['mon-gauul', 'mon-lazuck', 'mon-nobiton'],
-      ['mon-myurol', 'mon-kalshell', 'mon-nobiton'],
+      ['mon-myurol', 'mon-kalshell', 'mon-forn'],
     ]);
     for (const b of BOOSTERS) {
       const deck = boosterDeck(b.key);

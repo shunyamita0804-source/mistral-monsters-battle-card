@@ -1,0 +1,413 @@
+{
+ "games": 200,
+ "sixteen": [
+  {
+   "id": "skl-forn-01",
+   "copies": 3
+  },
+  {
+   "id": "skl-forn-02",
+   "copies": 3
+  },
+  {
+   "id": "skl-forn-03",
+   "copies": 3
+  },
+  {
+   "id": "skl-forn-04",
+   "copies": 3
+  },
+  {
+   "id": "skl-forn-06",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-08",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-10",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-11",
+   "copies": 1
+  }
+ ],
+ "sixteenRare": [
+  {
+   "id": "skl-forn-01",
+   "copies": 2
+  },
+  {
+   "id": "skl-forn-02",
+   "copies": 2
+  },
+  {
+   "id": "skl-forn-03",
+   "copies": 2
+  },
+  {
+   "id": "skl-forn-04",
+   "copies": 2
+  },
+  {
+   "id": "skl-forn-05",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-06",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-07",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-08",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-09",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-10",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-11",
+   "copies": 1
+  },
+  {
+   "id": "skl-forn-12",
+   "copies": 1
+  }
+ ],
+ "swap": {
+  "booster-1#0:mon-soramo": {
+   "games": 1200,
+   "win": 40.6,
+   "winKo": 24.8,
+   "winDeck": 15.8,
+   "loseKo": 42.6,
+   "loseDeck": 16.8,
+   "avgTurns": 34.6,
+   "rallyPerGame": 0.31,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.38,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "booster-1#1:mon-lilil": {
+   "games": 1200,
+   "win": 51,
+   "winKo": 36.1,
+   "winDeck": 14.9,
+   "loseKo": 25,
+   "loseDeck": 24,
+   "avgTurns": 34.2,
+   "rallyPerGame": 0.36,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "booster-1#2:mon-lazuck": {
+   "games": 1200,
+   "win": 43.3,
+   "winKo": 22.6,
+   "winDeck": 20.8,
+   "loseKo": 37.4,
+   "loseDeck": 19.3,
+   "avgTurns": 35.4,
+   "rallyPerGame": 0.31,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "booster-2#0:mon-gauul": {
+   "games": 1200,
+   "win": 49.2,
+   "winKo": 34.8,
+   "winDeck": 14.3,
+   "loseKo": 20.3,
+   "loseDeck": 30.6,
+   "avgTurns": 35.1,
+   "rallyPerGame": 0.37,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "booster-2#1:mon-lazuck": {
+   "games": 1200,
+   "win": 53.4,
+   "winKo": 37.8,
+   "winDeck": 15.7,
+   "loseKo": 17.2,
+   "loseDeck": 29.4,
+   "avgTurns": 35.1,
+   "rallyPerGame": 0.39,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.38,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "booster-2#2:mon-nobiton": {
+   "games": 1200,
+   "win": 48.3,
+   "winKo": 34.8,
+   "winDeck": 13.6,
+   "loseKo": 33.3,
+   "loseDeck": 18.4,
+   "avgTurns": 33.5,
+   "rallyPerGame": 0.36,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.39,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "all": {
+   "games": 7200,
+   "win": 47.6,
+   "winKo": 31.8,
+   "winDeck": 15.8,
+   "loseKo": 29.3,
+   "loseDeck": 23.1,
+   "avgTurns": 34.7,
+   "rallyPerGame": 0.35,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0.39,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  }
+ },
+ "swapRare": {
+  "booster-1#0:mon-soramo": {
+   "games": 1200,
+   "win": 31.2,
+   "winKo": 16.3,
+   "winDeck": 14.9,
+   "loseKo": 48.8,
+   "loseDeck": 20.1,
+   "avgTurns": 34.6,
+   "rallyPerGame": 0.31,
+   "wardPerGame": 0.29,
+   "wardSavedPerGame": 0.15,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.5
+  },
+  "booster-1#1:mon-lilil": {
+   "games": 1200,
+   "win": 41.1,
+   "winKo": 28.2,
+   "winDeck": 12.9,
+   "loseKo": 28.8,
+   "loseDeck": 30.2,
+   "avgTurns": 35,
+   "rallyPerGame": 0.38,
+   "wardPerGame": 0.34,
+   "wardSavedPerGame": 0.14,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.59
+  },
+  "booster-1#2:mon-lazuck": {
+   "games": 1200,
+   "win": 34.7,
+   "winKo": 15.3,
+   "winDeck": 19.4,
+   "loseKo": 41.8,
+   "loseDeck": 23.6,
+   "avgTurns": 35.4,
+   "rallyPerGame": 0.32,
+   "wardPerGame": 0.31,
+   "wardSavedPerGame": 0.17,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.52
+  },
+  "booster-2#0:mon-gauul": {
+   "games": 1200,
+   "win": 34.8,
+   "winKo": 18.8,
+   "winDeck": 16.1,
+   "loseKo": 21,
+   "loseDeck": 44.2,
+   "avgTurns": 36.7,
+   "rallyPerGame": 0.39,
+   "wardPerGame": 0.38,
+   "wardSavedPerGame": 0.22,
+   "lullabyPerGame": 0.41,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.56
+  },
+  "booster-2#1:mon-lazuck": {
+   "games": 1200,
+   "win": 41.2,
+   "winKo": 25.2,
+   "winDeck": 16,
+   "loseKo": 19.9,
+   "loseDeck": 38.9,
+   "avgTurns": 36.4,
+   "rallyPerGame": 0.35,
+   "wardPerGame": 0.37,
+   "wardSavedPerGame": 0.22,
+   "lullabyPerGame": 0.39,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.56
+  },
+  "booster-2#2:mon-nobiton": {
+   "games": 1200,
+   "win": 41.3,
+   "winKo": 26.9,
+   "winDeck": 14.3,
+   "loseKo": 35.3,
+   "loseDeck": 23.4,
+   "avgTurns": 34.4,
+   "rallyPerGame": 0.34,
+   "wardPerGame": 0.33,
+   "wardSavedPerGame": 0.2,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.57
+  },
+  "all": {
+   "games": 7200,
+   "win": 37.4,
+   "winKo": 21.8,
+   "winDeck": 15.6,
+   "loseKo": 32.6,
+   "loseDeck": 30.1,
+   "avgTurns": 35.4,
+   "rallyPerGame": 0.35,
+   "wardPerGame": 0.34,
+   "wardSavedPerGame": 0.18,
+   "lullabyPerGame": 0.4,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0.55
+  }
+ },
+ "boxes": {
+  "new>booster-1": {
+   "games": 400,
+   "win": 64.5,
+   "winKo": 38.3,
+   "winDeck": 26.3,
+   "loseKo": 22.5,
+   "loseDeck": 13,
+   "avgTurns": 36.5,
+   "rallyPerGame": 0.68,
+   "wardPerGame": 0.27,
+   "wardSavedPerGame": 0.16,
+   "lullabyPerGame": 0.81,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "new>booster-2": {
+   "games": 400,
+   "win": 63.3,
+   "winKo": 23.3,
+   "winDeck": 40,
+   "loseKo": 23.3,
+   "loseDeck": 13.5,
+   "avgTurns": 37.5,
+   "rallyPerGame": 0.7,
+   "wardPerGame": 0.38,
+   "wardSavedPerGame": 0.21,
+   "lullabyPerGame": 0.72,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "new>all": {
+   "games": 800,
+   "win": 63.9,
+   "winKo": 30.8,
+   "winDeck": 33.1,
+   "loseKo": 22.9,
+   "loseDeck": 13.3,
+   "avgTurns": 37,
+   "rallyPerGame": 0.69,
+   "wardPerGame": 0.32,
+   "wardSavedPerGame": 0.18,
+   "lullabyPerGame": 0.76,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "former>booster-1": {
+   "games": 400,
+   "win": 75.3,
+   "winKo": 46.5,
+   "winDeck": 28.8,
+   "loseKo": 9,
+   "loseDeck": 15.8,
+   "avgTurns": 36.1,
+   "rallyPerGame": 0,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "former>booster-2": {
+   "games": 400,
+   "win": 83.8,
+   "winKo": 39.5,
+   "winDeck": 44.3,
+   "loseKo": 4.5,
+   "loseDeck": 11.8,
+   "avgTurns": 37.2,
+   "rallyPerGame": 0,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  },
+  "former>all": {
+   "games": 800,
+   "win": 79.5,
+   "winKo": 43,
+   "winDeck": 36.5,
+   "loseKo": 6.8,
+   "loseDeck": 13.8,
+   "avgTurns": 36.7,
+   "rallyPerGame": 0,
+   "wardPerGame": 0,
+   "wardSavedPerGame": 0,
+   "lullabyPerGame": 0,
+   "tidingsPerGame": 0,
+   "tidingsDrawnPerUse": 0,
+   "coverPerGame": 0
+  }
+ }
+}

@@ -33,7 +33,7 @@ if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
   it('16シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン・ハクラン・デスオル。2026-11-02 にリリル〔カルシェルのあと〕）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'forn', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -74,6 +74,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       hakuran: ['てんをかける', 'らいうん', 'せいなるいかずち', 'かすみのあゆみ'],
       desuoru: ['しのゆびさし', 'ヘルのもん', 'カラスのめ', 'やみにまぎれる'],
       lilil: ['デビーム', 'あまいかおり', 'うそなき', 'よつばねのまい'],
+      forn: ['そうこうげき', 'そなえのふえ', 'もりのたより', 'みがわりのふえ'],
     };
     for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) {
       expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
@@ -153,7 +154,7 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
   });
 
   it('プカリム・ジオル・フルーネ以外は最初から選べる（新しいセーブでも買える。リリル〔2026-11-02〕は旅立ちのきらめきを開けてから）', () => {
-    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag && s.id !== 'lilil')) {
+    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag && s.id !== 'lilil' && s.id !== 'forn')) {
       const r = purchaseSeriesPack({ ...createNewSave(), coins: 150 }, series.id, `tx-${series.id}`, 3);
       expect(r.status).toBe('ok');
     }
@@ -208,7 +209,8 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
     // 2026-11-02 指示書 AK：旅立ち＝ソラモ・リリル・ラズック
     expect(ids(boxSave('booster-1'))).toEqual(['soramo', 'lazuck', 'lilil', 'tools']);
     expect(ids(boxSave('booster-2'))).toEqual(['gauul', 'lazuck', 'nobiton', 'tools']);
-    expect(ids(boxSave('booster-3'))).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
+    // 2026-11-02 指示書 AL：蒼海＝ミュロル・カルシェル・フォルン
+    expect(ids(boxSave('booster-3'))).toEqual(['myurol', 'kalshell', 'forn', 'tools']);
     // 箱の3体には NEW を出さない
     const s = boxSave('booster-1');
     for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
@@ -259,6 +261,13 @@ describe('シリーズの開く条件（2026-10-30 指示書 K。ユーザー決
     expect(s.version).toBe(SAVE_VERSION);
     expect(SAVE_VERSION).toBeGreaterThanOrEqual(28);
     expect(ids(s)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'pukarim', 'tools']);
+    // フォルン（2026-11-02 指示書 AL）は、この変換では開かない（カードを持っていない）。リリルは箱のカードを持っているので並ぶ
+    // 前の中身の旅立ち（リリルのカードなし）の v27 のセーブでは、リリルもフォルンも開かない
+    const oldBox = addCards(createNewGameSave(), ['mon-soramo', 'mon-nobiton', 'mon-lazuck'].map((cardId) => ({ cardId, count: 1 })));
+    const v27 = normalizeSave(JSON.parse(JSON.stringify({ ...oldBox, version: 27, story: { ...oldBox.story, introV2: { ...oldBox.story.introV2, state: 'completed', selectedBoosterKey: 'booster-1', boosterClaimed: true, boosterGranted: true } } })));
+    if (!v27) throw new Error('load');
+    expect(ids(v27)).not.toContain('lilil');
+    expect(ids(v27)).not.toContain('forn');
     for (const g of GACHA_SERIES) expect(isNewGachaSeries(s, g)).toBe(false);
   });
 });
@@ -298,6 +307,39 @@ describe('リリルを入れた旅立ちのきらめき（2026-11-02 指示書 A
     const got = addCards(boxSave('booster-2'), [{ cardId: 'mon-lilil', count: 1 }]);
     expect(ids(got)).toContain('lilil');
     expect(isNewGachaSeries(got, series('lilil'))).toBe(true);
+  });
+});
+
+describe('フォルンを入れた蒼海の守り（2026-11-02 指示書 AL）', () => {
+  const oldSoukai = (): SaveData => {
+    const base = createNewGameSave();
+    const withCards = addCards(base, ['mon-myurol', 'mon-kalshell', 'mon-nobiton'].map((cardId) => ({ cardId, count: 1 })));
+    return { ...withCards, coins: 1000, story: { ...withCards.story, introV2: { ...withCards.story.introV2, state: 'completed', selectedBoosterKey: 'booster-3', boosterClaimed: true, boosterGranted: true } } };
+  };
+
+  it('前のセーブ（前の中身で蒼海を開けた）は今までと同じ：ノビトン・ミュロル・カルシェル。フォルンは並ばず、NEW も出さない', () => {
+    const s = oldSoukai();
+    expect(ids(s)).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
+    for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
+    expect(purchaseSeriesPack(s, 'forn', 'tx-f', 1).status).toBe('error');
+    const loaded = normalizeSave(JSON.parse(JSON.stringify(s)));
+    if (!loaded) throw new Error('load');
+    expect(loaded.collection['mon-forn'] ?? 0).toBe(0);
+    expect(ids(loaded)).toEqual(['nobiton', 'myurol', 'kalshell', 'tools']);
+  });
+
+  it('新しく蒼海を開けた人：ミュロル・カルシェル・フォルンが最初から並び（NEW なし）、フォルンのパックが買える', () => {
+    const s = boxSave('booster-3');
+    expect(ids(s)).not.toContain('nobiton');
+    for (const g of availableGachaSeriesFor(s)) expect(isNewGachaSeries(s, g)).toBe(false);
+    expect(purchaseSeriesPack(s, 'forn', 'tx-f', 1).status).toBe('ok');
+  });
+
+  it('ほかの箱を選んだ人は、フォルンのモンスターカードを手に入れるまで並ばない', () => {
+    expect(ids(boxSave('booster-1'))).not.toContain('forn');
+    expect(ids(boxSave('booster-2'))).not.toContain('forn');
+    const got = addCards(boxSave('booster-1'), [{ cardId: 'mon-forn', count: 1 }]);
+    expect(isNewGachaSeries(got, series('forn'))).toBe(true);
   });
 });
 

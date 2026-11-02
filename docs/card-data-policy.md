@@ -73,6 +73,12 @@
 - 英語は仮訳（`src/i18n/contentEnOfficialDraft.ts` に分けて管理）
 - 登録だけのモンスターは、いまはいない（ガウルは 2026-10-24 に正式へ）
 
+### 2026-11-02 フォルン（指示書 AL「Mistral_CC_AL_Forn_20261102」）
+
+- ゲーム内 ID：`mon-forn`（ライフ7）・`skl-forn-01〜12`（JSON の id・no のまま。新しいモンスターなので引き継ぐ ID は無い）。決まりに合う（直しは無し）
+- 正本 `src/data/official/forn12_skills_OFFICIAL_20261102.json`（CSV も）を無改変で置き、技12枚は AJ の表に書く。表と JSON が合うかは `tests/forn.test.ts`
+- 図鑑はリリルのあと（No.209〜221）。セーブの version は上げていない（33 のまま）
+
 ### 2026-11-02 リリル（指示書 AK「Mistral_CC_AK_Lilil_20261102」）
 
 - ゲーム内 ID：`mon-lilil`（ライフ5）・`skl-lilil-01〜12`（JSON の id・no のまま。新しいモンスターなので引き継ぐ ID は無い）。「1. 固定 ID」「新しい ID で足す」の決まりに合う（直しは無し）

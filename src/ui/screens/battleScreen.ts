@@ -8,6 +8,7 @@ import {
   canConvertToMana,
   cardUsability,
   createBattle,
+  drawToPreview,
   findMonster,
   guardCost,
   activeField,
@@ -1053,12 +1054,17 @@ export const battleScreen: ScreenDefinition = {
         pickCrowEye(cardUid);
         return;
       }
+      // もりのたより（フォルン 2026-11-02 指示書 AL）：引いたあとの手札を見せて、捨てる1枚を選ぶ（やめる無し）
+      if (card.kind === 'skill' && card.effect.type === 'drawTo') {
+        pickDrawToDiscard(cardUid, card.effect.hand);
+        return;
+      }
       // 相手全体への攻撃（試遊中：ジオルの地ひびき）は相手を選ばない
       const allTargets = card.kind === 'skill' && card.effect.type === 'attack' && !!card.effect.allTargets;
       // 投石（サポート）も相手1体を選ぶ
       const stone = card.kind === 'support' && card.effect.type === 'stone';
       const enemyTarget = (card.kind === 'skill' && targetsEnemy(card) && !allTargets) || stone;
-      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind' || card.effect.type === 'cheer') {
+      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind' || card.effect.type === 'ward' || card.effect.type === 'cheer') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
           return;
@@ -1073,6 +1079,8 @@ export const battleScreen: ScreenDefinition = {
                 ? 'battle.prompt.specialTarget'
                 : card.effect.type === 'tailwind'
                   ? 'battle.prompt.tailwindTarget'
+                  : card.effect.type === 'ward'
+                    ? 'battle.prompt.wardTarget'
                   : card.effect.type === 'cheer'
                     ? 'battle.prompt.cheerTarget'
                     : 'battle.prompt.healTarget',
@@ -1164,6 +1172,62 @@ export const battleScreen: ScreenDefinition = {
         actions: [
           {
             label: t('battle.crow.confirm'),
+            primary: true,
+            disabled: true,
+            onTap: () => {
+              if (picked === null) return;
+              handle.close();
+              dispatch({ type: 'useCard', side: 'player', cardUid, choice: picked });
+            },
+          },
+        ],
+      });
+    };
+
+    /**
+     * もりのたより（フォルン 2026-11-02 指示書 AL）：手札が size 枚になるまで引いたあとの手札（engine の drawToPreview。引く札も山札の順のまま）を
+     * カラスのめと同じ窓に並べ、捨てる1枚をタップ →「これを捨てる」で決める。「使う」を押したら使ったことになるので、やめるボタンは無い
+     */
+    const pickDrawToDiscard = (cardUid: string, size: number): void => {
+      if (!state) return;
+      const hand = drawToPreview(state, 'player', cardUid);
+      if (hand.length === 0) {
+        dispatch({ type: 'useCard', side: 'player', cardUid });
+        return;
+      }
+      let picked: string | null = null;
+      const items = hand.map((c) =>
+        h(
+          'button',
+          {
+            class: 'battle-pick__item battle-crow__item',
+            attrs: { type: 'button', 'aria-label': cardName(c.cardId), 'aria-pressed': 'false' },
+            dataset: { uid: c.uid },
+            on: {
+              click: () => {
+                picked = c.uid;
+                for (const el of items) {
+                  const on = el.dataset.uid === c.uid;
+                  el.classList.toggle('is-picked', on);
+                  el.setAttribute('aria-pressed', on ? 'true' : 'false');
+                }
+                const ok = handle.element.querySelector<HTMLButtonElement>('.modal__actions .btn');
+                if (ok) ok.disabled = false;
+              },
+            },
+          },
+          createBattleCard(getPlayCard(c.cardId), { width: 74, size: 'hand' }),
+          h('span', { class: 'battle-pick__name', text: cardName(c.cardId) }),
+        ),
+      );
+      const handle = openModal(element, {
+        title: t('battle.forest.title'),
+        className: 'battle-pick battle-crow battle-forest',
+        closeOnBackdrop: false,
+        body: [h('p', { class: 'modal__text', text: t('battle.forest.lead', { n: size }) }), h('div', { class: 'battle-pick__grid' }, ...items)],
+        actions: [
+          {
+            label: t('battle.forest.confirm'),
             primary: true,
             disabled: true,
             onTap: () => {
@@ -1610,6 +1674,8 @@ export const battleScreen: ScreenDefinition = {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
         items.push(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
       }
+      // そなえのふえ（フォルン 2026-11-02 指示書 AL）：受けるダメージ−（かけた手番と相手の次の手番の間だけ出す。相手からも見える。しめったはだと同じ盾の印）
+      if (m.ward && m.life > 0 && m.ward.untilTurn >= s.turn) items.push(textBadge(statusShieldArt, t('battle.status.ward', { n: m.ward.reduce })));
       if (items.length === 0) return null;
       return h('span', { class: 'battle__status' }, ...items);
     };

@@ -154,6 +154,9 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // リリル（2026-11-02 指示書 AK）：並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く。旅立ちのきらめきを選んだ人）。unlockFlag は付けない。
   // パックの窓の絵は 2026-11-02 指示書 AK2 で届いた（pack_lilil.webp・panel_lilil.webp）。レアの枠は JSON の gacha_slot（デビーム・あまいかおり・うそなき・よつばねのまい）
   { id: 'lilil', monsterId: 'mon-lilil', rareSkillNames: ajRareNames('mon-lilil') },
+  // フォルン（2026-11-02 指示書 AL）：並ぶ条件は今のとおり（モンスターカードを初めて手に入れたら開く。蒼海の守りを選んだ人）。unlockFlag は付けない。
+  // レアの枠は JSON の gacha_slot（そうこうげき・そなえのふえ・もりのたより・みがわりのふえ）。パック pack_forn.webp・販売機の窓 panel_forn.webp
+  { id: 'forn', monsterId: 'mon-forn', rareSkillNames: ajRareNames('mon-forn') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -184,8 +187,14 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
  * 今の並ぶ条件は src/game/economy/gachaSeries.ts の availableGachaSeriesFor
  */
 export function legacyAvailableGachaSeries(storyFlags: readonly string[]): readonly GachaSeries[] {
-  return GACHA_SERIES.filter((s) => !s.unlockFlag || storyFlags.includes(s.unlockFlag));
+  return GACHA_SERIES.filter((s) => !LATER_GACHA_SERIES_IDS.includes(s.id) && (!s.unlockFlag || storyFlags.includes(s.unlockFlag)));
 }
+
+/**
+ * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン）。
+ * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
+ */
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

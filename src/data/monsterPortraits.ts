@@ -40,6 +40,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-desuoru': { x: 0.58, y: 0.19, zoom: 2.6 },
   // リリル（2026-11-02 指示書 AK）：顔は絵の上のほうの真ん中。羽が横に広く体が絵の中で小さいので寄せる（巻き角2本が切れすぎないように）
   'mon-lilil': { x: 0.51, y: 0.19, zoom: 2.2 },
+  // フォルン（2026-11-02 指示書 AL）：顔は絵の上のほうの真ん中（体が少し左を向く）。長い角2本が入りすぎて顔が小さくならないくらいに寄せる
+  'mon-forn': { x: 0.5, y: 0.24, zoom: 1.8 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

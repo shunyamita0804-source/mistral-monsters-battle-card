@@ -66,6 +66,9 @@ export const BATTLE = {
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
+  'battle.log.ward': { ja: '{name}にそなえのふえ。次の相手のターン、受けるダメージ−{n}。', en: '{name} is warded. It takes {n} less damage during the next enemy turn.' },
+  'battle.log.drawTo': { ja: '{side}はもりのたよりで{n}枚引いた。', en: '{side} drew {n} {n|card|cards} with Forest Tidings.' },
+  'battle.log.drawToDiscard': { ja: '{side}は「{card}」を捨てた。', en: '{side} discarded {card}.' },
   'battle.log.tailwind': { ja: '{name}においかぜ。次のターンの攻撃技のダメージ＋{n}。', en: 'A tailwind for {name}. Its attack next turn deals +{n}.' },
   // 試遊中：ジオル（2026-10-29）
   'battle.log.allTargets': { ja: '{name}の攻撃は相手全体へ！ 1体ずつ守りを選ぶ。', en: "{name}'s attack hits all enemies! Each one guards separately." },
@@ -100,6 +103,9 @@ export const BATTLE = {
   'battle.crow.title': { ja: 'カラスのめ', en: "Raven's Eye" },
   'battle.crow.lead': { ja: '相手の手札をすべて見た。捨てさせる1枚をタップして選んでください。', en: "You see every card in the opponent's hand. Tap one card to make them discard it." },
   'battle.crow.confirm': { ja: 'これを捨てさせる', en: 'Discard this' },
+  'battle.forest.title': { ja: 'もりのたより', en: 'Forest Tidings' },
+  'battle.forest.lead': { ja: '手札が{n}枚になるまで引いた。捨てる1枚をタップして選んでください。', en: 'You drew up to {n} cards. Tap one card to discard.' },
+  'battle.forest.confirm': { ja: 'これを捨てる', en: 'Discard this' },
   'battle.talk.crowEye': { ja: 'カラスのめ：「{card}」を捨てさせた', en: "Raven's Eye: I made you discard {card}." },
   'battle.reveal.lead': { ja: '不思議な嗅覚で、相手の手札をすべて確認した。', en: 'Curious Sniff revealed every card in the opponent’s hand.' },
 
@@ -152,6 +158,7 @@ export const BATTLE = {
   'battle.status.noEvade': { ja: '回避できない', en: "Can't dodge" },
   'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
   'battle.status.charged': { ja: 'ためている', en: 'Charged' },
+  'battle.status.ward': { ja: 'ダメージ−{n}', en: 'Damage -{n}' },
   'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },
   'battle.status.cheer': { ja: '声援＋{n}', en: 'Cheer +{n}' },
   'battle.status.windRide': { ja: 'かぜのり マナ−{n}', en: 'Wind Ride: mana −{n}' },
@@ -178,6 +185,8 @@ export const BATTLE = {
   'battle.ng.coverOnce': { ja: 'もうかばっています', en: 'Already covering' },
   'battle.ng.coverFirst': { ja: 'ほかの守りを使ったあとは、かばえません', en: "Can't cover after another guard was used" },
   'battle.ng.coverSelf': { ja: 'かばえるのはほかの味方だけです', en: 'Can only cover another ally' },
+  'battle.ng.noWardTarget': { ja: 'そなえのふえをかけられる味方がいません', en: 'No ally can be warded' },
+  'battle.ng.handEnough': { ja: '手札がもう{n}枚以上あるので使えません', en: 'You already have {n} or more cards in hand' },
   'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },
 
   // 先攻・後攻を決める
@@ -245,6 +254,7 @@ export const BATTLE = {
   // 説明欄
   'battle.prompt.attackTarget': { ja: '攻撃する相手モンスターをタップしてください', en: 'Tap an enemy monster to attack' },
   'battle.prompt.healTarget': { ja: '回復する味方モンスターをタップしてください', en: 'Tap an ally monster to heal' },
+  'battle.prompt.wardTarget': { ja: 'そなえのふえをかける味方モンスターをタップしてください', en: 'Tap an ally monster to ward' },
   'battle.prompt.tailwindTarget': { ja: 'おいかぜをかける味方モンスターをタップしてください', en: 'Tap an ally monster to give a tailwind' },
   'battle.prompt.cheerTarget': { ja: '声援をかける味方モンスターをタップしてください（まだ動いていない味方）', en: 'Tap an ally monster to cheer (one that has not acted)' },
   'battle.pick.recall': { ja: '手札に戻す技カードを選んでください（思い出の箱）', en: 'Choose a skill card to return to your hand (Memory Box)' },

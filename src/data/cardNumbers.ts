@@ -9,6 +9,7 @@ import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { HAKURAN_MONSTER_ID } from './hakuran.ts';
 import { DESUORU_MONSTER_ID } from './desuoru.ts';
 import { LILIL_MONSTER_ID } from './lilil.ts';
+import { FORN_MONSTER_ID } from './forn.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -49,6 +50,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   DESUORU_MONSTER_ID,
   // 2026-11-02 指示書 AK：デスオルのあと（AJ からは本体＋技12枚の13番ずつ。No.196〜208）
   LILIL_MONSTER_ID,
+  // 2026-11-02 指示書 AL：リリルのあと（No.209〜221）
+  FORN_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */
