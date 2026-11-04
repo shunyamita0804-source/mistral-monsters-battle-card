@@ -32,6 +32,8 @@ export const MONSTER_RANK: Readonly<Record<string, 'C' | 'B' | 'A'>> = {
   'mon-lilil': 'C', 'mon-forn': 'C', 'mon-tsumuji': 'C', 'mon-uzurio': 'C', 'mon-pukarim': 'C', 'mon-flune': 'C', 'mon-serephine': 'C',
   'mon-hyouzuku': 'B', 'mon-shishien': 'B', 'mon-geol': 'B', 'mon-hakuran': 'B',
   'mon-desuoru': 'A',
+  // 2026-11-05 指示書 AX：ギアロス（機械の塔の切り札）は A
+  'mon-gearos': 'A',
 };
 
 const RANK_ORDER: Readonly<Record<'C' | 'B' | 'A', number>> = { C: 0, B: 1, A: 2 };
@@ -46,8 +48,8 @@ export interface BalanceSlot {
   readonly extra: readonly string[];
 }
 
-/** 機械の塔の切り札（今の仮のまま。テオの ace） */
-const MACHINE_ACE = ENCOUNTERS['enc-machine-boss']?.ace ?? 'mon-lazuck';
+/** 機械の塔の切り札（テオの ace。2026-11-05 指示書 AX からギアロス） */
+const MACHINE_ACE = ENCOUNTERS['enc-machine-boss']?.ace ?? 'mon-gearos';
 
 /** 枠ごとの目安（指示書 AU の表。モンスターは前の枠の分も持っている） */
 export const BALANCE_SLOTS: readonly BalanceSlot[] = (() => {
@@ -56,8 +58,9 @@ export const BALANCE_SLOTS: readonly BalanceSlot[] = (() => {
     ['D', 25, ['mon-uzurio']],
     ['C', 45, ['mon-serephine', 'mon-flune']],
     ['B', 70, ['mon-hyouzuku', 'mon-shishien']],
-    ['A', 95, ['mon-geol', 'mon-hakuran']],
-    ['S', 120, [MACHINE_ACE]],
+    // 2026-11-05 指示書 AX：A・S の目安のプレイヤーは機械の塔の切り札（ギアロス）を持っている（前は S だけ）
+    ['A', 95, ['mon-geol', 'mon-hakuran', MACHINE_ACE]],
+    ['S', 120, []],
   ];
   const owned: string[] = [];
   return steps.map(([id, packs, add]) => {

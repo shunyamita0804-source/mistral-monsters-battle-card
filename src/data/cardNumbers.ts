@@ -11,6 +11,7 @@ import { DESUORU_MONSTER_ID } from './desuoru.ts';
 import { LILIL_MONSTER_ID } from './lilil.ts';
 import { FORN_MONSTER_ID } from './forn.ts';
 import { UZURIO_MONSTER_ID } from './uzurio.ts';
+import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { KALSHELL_MONSTER_ID } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -55,6 +56,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   FORN_MONSTER_ID,
   // 2026-11-02 指示書 AQ：フォルンのあと（No.222〜234）
   UZURIO_MONSTER_ID,
+  // 2026-11-05 指示書 AX：ウズリオのあと（No.235〜247。サポート・隠しモンスターの番号は13ずつ後ろへ）
+  GEAROS_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */

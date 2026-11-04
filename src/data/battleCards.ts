@@ -14,6 +14,7 @@ import { LILIL_MONSTER_ID } from './lilil.ts';
 import { FORN_MONSTER_ID } from './forn.ts';
 import { UZURIO_MONSTER_ID } from './uzurio.ts';
 import { TYRANT_MONSTER_ID } from './tyrant.ts';
+import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -86,6 +87,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // タイラント（2026-11-05 指示書 AX）：枠は真っ赤（#A31523）。絵は届いた tyrant_battle_transparent.png（800×920）の透明度を 0／255 にそろえたもの。
   // 翼と角が枠の飾りに隠れない大きさ
   [TYRANT_MONSTER_ID]: { art: 'tyrant_battlecard.png', frame: 'tyrant', scale: 0.86, offsetY: 0.01 },
+  // ギアロス（2026-11-05 指示書 AX）：枠は赤銅（#945247。今の絵の枠のまま）。絵は届いた gearos_battle_transparent.png（800×920）の透明度を 0／255 にそろえたもの
+  [GEAROS_MONSTER_ID]: { art: 'gearos_battlecard.png', frame: 'gearos', scale: 0.86, offsetY: 0 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

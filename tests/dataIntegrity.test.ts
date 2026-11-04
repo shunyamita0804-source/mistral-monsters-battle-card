@@ -42,10 +42,11 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-lilil',
       'mon-forn',
       'mon-uzurio',
+      'mon-gearos',
     ];
     // 2026-11-01 指示書 AJ：技はモンスターの並びの順に、表（src/data/skillRebuildAJ.ts）の12枚ずつ（表の順＝表示の番号）
     const skills = monsters.flatMap((m) => (AJ_SKILLS[m] ?? []).map((r) => r.id));
-    expect(skills).toHaveLength(18 * 12);
+    expect(skills).toHaveLength(19 * 12);
     expect(official).toEqual([
       ...monsters,
       ...skills,
@@ -99,12 +100,15 @@ describe('カードデータの点検（正式データを入れる前の土台�
       'mon-lilil',
       'mon-forn',
       'mon-uzurio',
+      'mon-gearos',
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
       // サポート11種類（2026-10-30 指示書 Z で絵が入った）
       ...SUPPORTS.map((s) => s.id),
       // 確かめ用だけのタイラント（2026-11-05 指示書 AX）
       ...QA_MONSTERS.map((m) => m.id),
       ...QA_SKILLS.map((s) => s.id),
+      // ギアロスの3枚コンボの攻撃を表すカード（台帳だけ。2026-11-05 指示書 AX）
+      'skl-gearos-od',
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);
   });

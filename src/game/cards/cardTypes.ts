@@ -214,6 +214,13 @@ export type SkillEffect =
   /** 特殊（2026-11-05 指示書 AX：タイラントの竜のちから）：竜のまなざしと同じ形で、最初に使う攻撃1回は防御されない（かばうも使えない） */
   | { readonly type: 'dragonMight' }
   /**
+   * 特殊（2026-11-05 指示書 AX：ギアロスのシステムチェンジ）：自分の手札から1枚選んで自分の山札のいちばん下に戻す → 山札の上から1枚引く → 山札をシャッフル。
+   * このカードのほかに手札が無ければ使えない
+   */
+  | { readonly type: 'systemChange' }
+  /** 特殊（2026-11-05 指示書 AX：ギアロスのシステムチェック）：自分の山札の上から count 枚まで、使った人だけが見る（並べ替え・引くはしない）。山札が0枚なら使えない */
+  | { readonly type: 'systemCheck'; readonly count: number }
+  /**
    * 特殊（正式：ツムジのかぜのり 2026-10-30）：次の自分のターンの間、使ったモンスターの攻撃技（ちから技・かしこさ技）の消費マナを discount 減らす。
    * 0より下にはならない。重ねない（もう一度使っても discount のまま、効くターンだけ新しく）。次の自分のターンが終わったら消える。倒れたら消える
    */
@@ -463,8 +470,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

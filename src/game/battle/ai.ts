@@ -10,6 +10,9 @@ import {
   cheerTargets,
   coverUser,
   defaultDiscardChoice,
+  defaultSystemChange,
+  overdriveHandCards,
+  overdriveUsability,
   drawToPreview,
   fieldModifier,
   guardCost,
@@ -38,6 +41,7 @@ import {
   type Side,
 } from './engine.ts';
 import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
+import { OVERDRIVE_CHOICE } from '../../data/gearos.ts';
 
 /**
  * 対戦相手（およびQA用のオート操作）の思考。
@@ -232,6 +236,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // ツムジ（2026-10-30 指示書 U）：Wひっかきを2回続けて使う（2回目が使えるなら必ず続ける）
   const scratch = chooseDoubleScratch(state, side, options, enemies, style, skill);
   if (scratch) return scratch;
+  // ギアロス（2026-11-05 指示書 AX）：オーバードライブの3枚コンボは使えるときは使う（腕前 C は forgetTrick の割合で見落とす）
+  const overdrive = chooseOverdrive(state, side, skill);
+  if (overdrive) return overdrive;
 
   // 癖：攻撃・妨害を先に使う人
   if (style === 'aggressive' || style === 'flashy' || style === 'hunter') {
@@ -322,6 +329,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const fornAfter = chooseFornTrick(state, side, options, enemies, style, skill, false);
   if (fornAfter) return fornAfter;
 
+  // 3.7 ギアロス（2026-11-05 指示書 AX）：攻撃のあと、使えない手札があればシステムチェンジ
+  const sysChange = chooseSystemChange(state, side, options);
+  if (sysChange) return sysChange;
+
   // 4. 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）
   const special = chooseSpecial(state, side, options, enemies);
   if (special) return special;
@@ -376,8 +387,41 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   });
   if (support) return { type: 'useCard', side, cardUid: support.card.uid };
 
+  // 5.5 ギアロス（2026-11-05 指示書 AX）：システムチェックは、ほかに使うカードが無いときだけ
+  const check = options.filter(isSkillOption).find((o) => o.def.effect.type === 'systemCheck');
+  if (check) return { type: 'useCard', side, cardUid: check.card.uid };
+
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
+}
+
+/** オーバードライブの3枚コンボ（ギアロス 指示書 AX）：使えるときは使う。腕前 C は forgetTrick の割合で見落とす */
+function chooseOverdrive(state: BattleState, side: Side, skill: CpuSkill): BattleAction | null {
+  if (!overdriveUsability(state, side).usable) return null;
+  if (cpuRoll(state, side, 'overdrive-forget') < CPU_SKILL[skill].forgetTrick) return null;
+  const first = overdriveHandCards(state, side)[0];
+  return first ? { type: 'useCard', side, cardUid: first.uid, choice: OVERDRIVE_CHOICE } : null;
+}
+
+/**
+ * システムチェンジ（ギアロス 指示書 AX）：手札に「いま使えない札」（守りの札を除く。このあとのマナで払えない・届く相手がいない）があり、
+ * 山札に余裕（10枚以上）があるときに使う。戻す札は engine の defaultSystemChange（使えない札のうち必要マナのいちばん多いもの）
+ */
+function chooseSystemChange(state: BattleState, side: Side, options: Option[]): BattleAction | null {
+  const change = options.filter(isSkillOption).find((o) => o.def.effect.type === 'systemChange');
+  if (!change) return null;
+  const mine = state.sides[side];
+  if (mine.deck.length < 10) return null;
+  const manaAfter = manaOf(mine) - change.def.cost;
+  const stuck = mine.hand.some((c) => {
+    if (c.uid === change.card.uid) return false;
+    const k = getPlayCard(c.cardId);
+    if (k.kind === 'skill' && (k.effect.type === 'defense' || k.effect.type === 'evade' || k.effect.type === 'cover')) return false;
+    return k.cost > manaAfter || !cardUsability(state, side, c.uid).usable;
+  });
+  if (!stuck) return null;
+  const out = defaultSystemChange({ ...state, sides: { ...state.sides, [side]: { ...mine, hand: mine.hand.filter((c) => c.uid !== change.card.uid) } } }, side);
+  return out ? { type: 'useCard', side, cardUid: change.card.uid, choice: out.uid } : null;
 }
 
 /** カラスのめを使う、相手の手札の枚数の下限（2026-10-31 指示書 AG） */

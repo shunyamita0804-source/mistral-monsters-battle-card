@@ -1,4 +1,5 @@
 import { cardCatalog, getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
+import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_ID, OVERDRIVE_IDS } from '../../data/gearos.ts';
 import { BATTLE_RULES } from '../../data/rules.ts';
 import { cardName } from '../../i18n/content.ts';
 import { t } from '../../i18n/i18n.ts';
@@ -230,6 +231,11 @@ export interface BattleState {
   readonly reveal?: { readonly seq: number; readonly viewer: Side; readonly cardIds: readonly string[] } | null;
   /** カラスのめ（2026-10-31 指示書 AG）で最後に捨てさせたカード（画面が CPU のふきだしで知らせる。seq で同じものを2度出さない） */
   readonly crowEye?: { readonly seq: number; readonly chooser: Side; readonly cardId: string } | null;
+  /**
+   * システムチェック（2026-11-05 指示書 AX：ギアロス）。viewer が自分の山札の上（cardIds。上から順）を見た。使った人の画面だけが表を見せる
+   * （相手の画面には「山札の上を確かめた」の記録だけ）。山札は動かさない
+   */
+  readonly deckPeek?: { readonly seq: number; readonly viewer: Side; readonly cardIds: readonly string[] } | null;
 }
 
 export type BattleAction =
@@ -501,6 +507,9 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'mana' && skill.effect.amount !== undefined && state.sides[side].deck.length < skill.effect.amount) return NO(t('battle.ng.noDeck'));
   // 考える：このカードのほかに戻す手札がないときは使えない
   if (skill.effect.type === 'redrawHand' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
+  // システムチェンジ（ギアロス 指示書 AX）：このカードのほかに手札がないときは使えない。システムチェック：山札が0枚なら使えない
+  if (skill.effect.type === 'systemChange' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
+  if (skill.effect.type === 'systemCheck' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
@@ -524,6 +533,28 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
   if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
   return YES;
+}
+
+/**
+ * オーバードライブの3枚コンボ（ギアロス 2026-11-05 指示書 AX）をいま使えるか：攻撃の手番で、α・β・γ の3枚がそろって手札にあり、
+ * ギアロスがこのターンまだ技を使っていなくて（まきつく・すなかけで止められていない）、マナ5を払え、攻撃できる相手がいるとき
+ */
+export function overdriveUsability(state: BattleState, side: Side): Usability {
+  if (state.phase !== 'main' || state.active !== side) return NO(t('battle.ng.opponentTurn'));
+  const hand = state.sides[side].hand;
+  if (!OVERDRIVE_IDS.every((id) => hand.some((c) => c.cardId === id))) return NO(t('battle.ng.overdriveCards'));
+  const combo = getSkill(OVERDRIVE_COMBO_ID);
+  const users = availableUsers(state, side, combo);
+  if (users.length === 0) return NO(t('battle.ng.acted'));
+  if (manaOf(state.sides[side]) < Math.min(...users.map((u) => skillCost(state, combo, u)))) return NO(t('battle.ng.noMana'));
+  if (attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
+  return YES;
+}
+
+/** 手札の α・β・γ（3枚コンボで捨てる3枚。それぞれ手札の左から最初の1枚） */
+export function overdriveHandCards(state: BattleState, side: Side): HandCard[] {
+  const hand = state.sides[side].hand;
+  return OVERDRIVE_IDS.map((id) => hand.find((c) => c.cardId === id)).filter((c): c is HandCard => !!c);
 }
 
 /** じならしの回数を数える turnUsage のキー（1ターンに1回） */
@@ -1053,7 +1084,11 @@ function useCard(
   if (!cardUsability(state, side, cardUid).usable) return state;
   const hand = findHandCard(state, side, cardUid);
   if (!hand) return state;
-  const card = getPlayCard(hand.cardId);
+  const handCard = getPlayCard(hand.cardId);
+  // オーバードライブの3枚コンボ（ギアロス 指示書 AX）：α・β・γ のどれかを choice 'overdrive' で使うと、3枚まとめてコンボの攻撃1回
+  const combo = choice === OVERDRIVE_CHOICE && OVERDRIVE_IDS.includes(handCard.id);
+  if (combo && !overdriveUsability(state, side).usable) return state;
+  const card = combo ? getSkill(OVERDRIVE_COMBO_ID) : handCard;
   if (card.kind === 'support') return useSupport(state, side, cardUid, card, targetUid, choice);
   const skill = card;
   const users = availableUsers(state, side, skill);
@@ -1081,13 +1116,13 @@ function useCard(
     if (!target) return state;
   }
 
-  let next = removeFromHand(state, side, cardUid);
+  let next = combo ? overdriveHandCards(state, side).reduce((x, c) => removeFromHand(x, side, c.uid), state) : removeFromHand(state, side, cardUid);
   next = payMana(next, side, cost);
   // Wひっかき：その手番の最初の技なら、もう1回続けて使える印を付ける。2回目を使ったら印を消す（3回目は使えない）
   const chained = user.acted;
   const chain = !chained && skill.effect.type === 'attack' && skill.effect.chain ? { turn: state.turn, cardId: skill.id } : null;
   next = updateMonster(next, user.uid, { acted: true, chain });
-  next = addLog(next, t('battle.log.skill', { name: nameOf(user.cardId), skill: cardName(skill) }));
+  next = addLog(next, combo ? t('battle.log.overdrive', { name: nameOf(user.cardId) }) : t('battle.log.skill', { name: nameOf(user.cardId), skill: cardName(skill) }));
   if (chained) next = addLog(next, t('battle.log.chain', { name: nameOf(user.cardId), skill: cardName(skill) }));
   if (cost < skill.cost) next = addLog(next, t('battle.log.windRideCost', { name: nameOf(user.cardId), n: cost }));
 
@@ -1269,6 +1304,14 @@ function useCard(
       return drawToHand(next, side, skill.effect.hand, choice);
     case 'redrawHand':
       return redrawHand(next, side);
+    case 'systemChange':
+      return systemChange(next, side, choice);
+    case 'systemCheck': {
+      // システムチェック（指示書 AX）：山札の上から count 枚まで、使った人だけが見る（山札は動かさない）
+      const cardIds = next.sides[side].deck.slice(0, skill.effect.count);
+      next = { ...next, deckPeek: { seq: (next.deckPeek?.seq ?? 0) + 1, viewer: side, cardIds } };
+      return addLog(next, t('battle.log.systemCheck', { side: sideLabel(side), n: cardIds.length }));
+    }
     case 'revealHand':
       return revealHand(next, side);
     case 'defense':
@@ -1344,6 +1387,40 @@ function redrawHand(state: BattleState, side: Side): BattleState {
   const mixed = shuffle([...s.deck, ...s.hand.map((c) => c.cardId)], state.seed);
   const emptied = updateSide({ ...state, seed: mixed.seed }, side, { hand: [], deck: mixed.items });
   return drawUpToMax(emptied, side, n, (drawn) => t('battle.log.redrawHand', { side: sideLabel(side), n: drawn }));
+}
+
+/**
+ * システムチェンジ（ギアロス 2026-11-05 指示書 AX）：自分の手札から1枚（choice＝uid）を自分の山札のいちばん下に戻す → 山札の上から1枚引く → 山札をシャッフル。
+ * 戻した札をすぐ引き直さないように「いちばん下」に入れる【要確認】。指定が無い・手札に無いときは defaultSystemChange（CPU・試遊）。
+ * 引く札は必ずある（戻した札が山札に入るので、山札切れの負けにはならない）
+ */
+function systemChange(state: BattleState, side: Side, choice: string | undefined): BattleState {
+  const s = state.sides[side];
+  const card = s.hand.find((c) => c.uid === choice) ?? defaultSystemChange(state, side);
+  if (!card) return state;
+  let next = updateSide(state, side, { hand: s.hand.filter((c) => c.uid !== card.uid), deck: [...s.deck, card.cardId] });
+  const drawn = drawCards(next.sides[side], 1, next.nextUid);
+  next = updateSide({ ...next, nextUid: drawn.nextUid }, side, drawn.side);
+  const mixed = shuffle([...next.sides[side].deck], next.seed);
+  next = updateSide({ ...next, seed: mixed.seed }, side, { deck: mixed.items });
+  return addLog(next, t('battle.log.systemChange', { side: sideLabel(side) }));
+}
+
+/**
+ * システムチェンジで戻す1枚の決まった選び方（指定が無いとき：CPU・試遊）：いま使えない札（守りの札を除く。マナが足りない・届く相手がいない）のうち必要マナのいちばん多いもの。
+ * 無ければ必要マナのいちばん多い札（守りの札は後回し）
+ */
+export function defaultSystemChange(state: BattleState, side: Side): HandCard | undefined {
+  const hand = state.sides[side].hand.filter((c) => getPlayCard(c.cardId).effect.type !== 'systemChange');
+  const guard = (c: HandCard): boolean => {
+    const k = getPlayCard(c.cardId);
+    return k.kind === 'skill' && (k.effect.type === 'defense' || k.effect.type === 'evade' || k.effect.type === 'cover');
+  };
+  const cost = (c: HandCard): number => getPlayCard(c.cardId).cost;
+  const mana = manaOf(state.sides[side]);
+  const stuck = hand.filter((c) => !guard(c) && (cost(c) > mana || !cardUsability(state, side, c.uid).usable));
+  const pool = stuck.length > 0 ? stuck : hand.filter((c) => !guard(c)).length > 0 ? hand.filter((c) => !guard(c)) : hand;
+  return [...pool].sort((a, b) => cost(b) - cost(a))[0];
 }
 
 /**

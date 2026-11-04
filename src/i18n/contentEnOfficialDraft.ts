@@ -383,6 +383,24 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-tyrant-11:name': 'Scale Guard',
   'card:skl-tyrant-12:name': 'Soar Skyward',
 
+  // ギアロス（2026-11-05 指示書 AX。仮訳）
+  'card:mon-gearos:name': 'Gearos',
+  'card:mon-gearos:description': 'A floating machine guardian with a will of its own.',
+  'card:skl-gearos-01:name': 'Lock-On Beam',
+  'card:skl-gearos-02:name': 'Energy Cutter',
+  'card:skl-gearos-03:name': 'Rotor Slash',
+  'card:skl-gearos-04:name': 'Spark Shot',
+  'card:skl-gearos-05:name': 'Overdrive α',
+  'card:skl-gearos-06:name': 'Overdrive β',
+  'card:skl-gearos-07:name': 'Overdrive γ',
+  'card:skl-gearos-08:name': 'System Change',
+  'card:skl-gearos-09:name': 'System Check',
+  'card:skl-gearos-10:name': 'Energy Shield',
+  'card:skl-gearos-11:name': 'High-Speed Maneuver',
+  'card:skl-gearos-12:name': 'Gear Claw',
+  'card:skl-gearos-od:name': 'Overdrive (3-card combo)',
+  'card:skl-gearos-od:effect': 'α, β, γ 3-card combo. 8 dmg to every enemy.',
+
   // 指示書 AJ（2026-11-01）：名前を変えた技・新しい技の名前と、効果の文（src/i18n/contentEnAJ.ts。同じキーはこちらが勝つ）
   ...AJ_EN,
 };

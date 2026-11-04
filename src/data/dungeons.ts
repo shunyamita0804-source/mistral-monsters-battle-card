@@ -13,6 +13,7 @@ import { UZURIO_MONSTER_ID } from './uzurio.ts';
 import { HYOUZUKU_MONSTER_ID } from './hyouzuku.ts';
 import { SHISHIEN_MONSTER_ID } from './shishien.ts';
 import { HAKURAN_MONSTER_ID } from './hakuran.ts';
+import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { TEST_TEAM, TEST_TEAM_ALT } from './testTeams.ts';
 import type { CardReward, OpponentDefinition } from './tournaments.ts';
 
@@ -172,7 +173,17 @@ export const DUNGEONS: readonly DungeonDefinition[] = [
     bossFlag: STELLA_BEATEN_FLAG,
     isPlaceholder: true,
   },
-  { id: 'dungeon-06', name: '機械の塔', description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(LAZUCK_MONSTER_ID), isPlaceholder: true },
+  // 2026-11-05 指示書 AX【3】：切り札をラズックからギアロスへ。初回クリアは最奥の祭壇でギアロスのモンスターカード1枚。2回目からはギアロスの技カード1枚（雷の高原と同じ形）。
+  // 機械の塔の中身（仕掛け・階）は今回は作らない（仮のまま）。前のセーブで機械の塔をもうクリアしていた人への祭壇の受け取り直し（altarOwedFlag）は付けていない【要確認】
+  {
+    id: 'dungeon-06',
+    name: '機械の塔',
+    description: 'スイッチで開く扉のある塔。最奥のボスを倒すとクリア。（仮）',
+    floors: [],
+    firstClearCards: [{ cardId: GEAROS_MONSTER_ID, count: 1 }],
+    trumpReward: true,
+    isPlaceholder: true,
+  },
   { id: 'dungeon-07', name: '天の聖域', description: '強い番人が守る最後の試練。2回負けると戻される。最奥のボスを倒すとクリア。（仮）', floors: [], firstClearCards: officialBossCards(SORAMO_MONSTER_ID), isPlaceholder: true },
 ];
 
@@ -225,7 +236,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale は試遊でバルカと同じ目標（最初の手持ち3箱・プレイヤー側は腕前 B・1000回で 18.1％ ±3）に合わせた：1.0 でプレイヤーの勝ち 18.3％（0.95〜1.05 は同じ。1.1 で 6.1％）
   // （docs/thunder-plateau-ah-20261101.md・npm run playtest:stella）
   'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1.36, skill: 'A' },
-  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, LAZUCK_MONSTER_ID, GAU], ace: LAZUCK_MONSTER_ID, lifeScale: 1.92, skill: 'A' },
+  // 2026-11-05 指示書 AX【3】：切り札（真ん中）をラズックからギアロスへ。ほかの2体はそのまま。lifeScale は 指示書 AU の「目安のプレイヤー」で目標 13％（±3）に合わせ直す（docs/ax-tyrant-gearos-20261105.md）
+  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, GEAROS_MONSTER_ID, GAU], ace: GEAROS_MONSTER_ID, lifeScale: 1.92, skill: 'A' },
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.76, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に

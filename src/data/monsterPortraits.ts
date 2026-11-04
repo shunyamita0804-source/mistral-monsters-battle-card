@@ -46,6 +46,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-uzurio': { x: 0.6, y: 0.45, zoom: 2.2 },
   // タイラント（2026-11-05 指示書 AX）：顔は絵の右上（角と口が入るように）
   'mon-tyrant': { x: 0.66, y: 0.2, zoom: 2.2 },
+  // ギアロス（2026-11-05 指示書 AX）：顔は真ん中の単眼（絵の真ん中より少し上）
+  'mon-gearos': { x: 0.5, y: 0.36, zoom: 1.9 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

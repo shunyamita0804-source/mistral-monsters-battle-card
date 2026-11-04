@@ -27,6 +27,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-pukarim': 'air',
   'mon-hyouzuku': 'air',
   'mon-desuoru': 'air',
+  'mon-gearos': 'air', // 2026-11-05 指示書 AX（浮いている）
   'mon-lilil': 'air', // 2026-11-02 指示書 AK
   'mon-forn': 'ground', // 2026-11-02 指示書 AL
   'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
@@ -380,6 +381,25 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-uzurio-10', name: 'ふわりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', art: 'uzurio_sk_10.webp' },
     { id: 'skl-uzurio-11', name: 'まきあげキック', cat: 'ち', mana: 3, damage: 3, text: null, art: 'uzurio_sk_11.webp' },
     { id: 'skl-uzurio-12', name: 'つむじがくれ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'uzurio_sk_12.webp' },
+  ],
+  // ギアロス（空中・LIFE 8・A。2026-11-05 指示書 AX【3】。正本は src/data/official/gearos_skills_20261105.csv）。機械の塔の守り手テオの切り札。
+  // 最初の箱には入れない（box なし）。絵は gearos_sk_NN.webp。レア＝01・06・07・11（進行の案。CSV の ○ と同じ）。
+  // 新しい効果は オーバードライブ α・β・γ の3枚コンボ（engine.ts の overdriveUsability）・08 システムチェンジ・09 システムチェック
+  'mon-gearos': [
+    { id: 'skl-gearos-01', name: 'ロックオンビーム', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'gearos_sk_01.webp' },
+    { id: 'skl-gearos-02', name: 'エネルギーカッター', cat: 'か', mana: 3, damage: 4, text: null, art: 'gearos_sk_02.webp' },
+    { id: 'skl-gearos-03', name: 'ロータースラッシュ', cat: 'ち', mana: 2, damage: 3, text: null, art: 'gearos_sk_03.webp' },
+    { id: 'skl-gearos-04', name: 'スパークショット', cat: 'か', mana: 1, damage: 2, text: null, art: 'gearos_sk_04.webp' },
+    // オーバードライブ α・β・γ：1枚で使うときはカードのとおり。3枚そろえば「3枚コンボ」（相手全員に8。α・β・γ の効果は付かない）
+    { id: 'skl-gearos-05', name: 'オーバードライブα', cat: 'か', mana: 2, damage: 2, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'gearos_sk_05.webp' },
+    { id: 'skl-gearos-06', name: 'オーバードライブβ', cat: 'か', mana: 3, damage: 3, effect: atk({ unblockable: true }), text: T_UNBLOCK, rare: true, art: 'gearos_sk_06.webp' },
+    { id: 'skl-gearos-07', name: 'オーバードライブγ', cat: 'か', mana: 4, damage: 6, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, art: 'gearos_sk_07.webp' },
+    { id: 'skl-gearos-08', name: 'システムチェンジ', cat: '特', mana: 1, damage: null, effect: { type: 'systemChange' }, text: '手札から1枚山札に戻し、1枚引いて、そのあと山札をシャッフル', art: 'gearos_sk_08.webp' },
+    { id: 'skl-gearos-09', name: 'システムチェック', cat: '特', mana: 2, damage: null, effect: { type: 'systemCheck', count: 3 }, text: '山札の上から3枚まで確かめる', art: 'gearos_sk_09.webp' },
+    // 効果の文：CSV は「かしこさ技のダメージを3軽減」。防御の文は「どの技に効くか」だけにそろえる決まりなので T_WISDOM（タイラントの 11 と同じ）
+    { id: 'skl-gearos-10', name: 'エネルギーシールド', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, art: 'gearos_sk_10.webp' },
+    { id: 'skl-gearos-11', name: '高速機動', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: '消費マナ2以上のちから技・かしこさ技を回避', rare: true, art: 'gearos_sk_11.webp' },
+    { id: 'skl-gearos-12', name: 'ギアクロー', cat: 'ち', mana: 0, damage: 1, text: null, art: 'gearos_sk_12.webp' },
   ],
 };
 

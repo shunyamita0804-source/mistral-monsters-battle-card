@@ -38,3 +38,13 @@ export const gearosSkillId = (no: number): string => `skl-gearos-${String(no).pa
 
 /** オーバードライブ α・β・γ（3枚そろうとコンボ）の ID */
 export const OVERDRIVE_IDS: readonly string[] = [gearosSkillId(5), gearosSkillId(6), gearosSkillId(7)];
+
+/**
+ * 3枚コンボの攻撃を表すカード（台帳 cardCatalog にだけ入れる。一覧・図鑑・デッキ・ガチャには出ない。持てない）。
+ * 使った記録・大きく見せる絵・守りの判定（攻撃の印・必要マナ）に使う。マナ5・かしこさ・相手全員に8。α・β・γ の「回避されない」などは付かない
+ */
+export const OVERDRIVE_COMBO_ID = 'skl-gearos-od';
+/** 3枚コンボを選んだときの useCard の choice（α・β・γ のどれかの uid と一緒に送る） */
+export const OVERDRIVE_CHOICE = 'overdrive';
+export const OVERDRIVE_COMBO_COST = 5;
+export const OVERDRIVE_COMBO_DAMAGE = 8;

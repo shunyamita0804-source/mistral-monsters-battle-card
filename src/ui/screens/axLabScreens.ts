@@ -2,6 +2,7 @@ import { ENCOUNTERS } from '../../data/dungeons.ts';
 import { getMonster, skillsOf } from '../../data/cards.ts';
 import { BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
 import { TYRANT_MONSTER_ID, tyrantSkillId } from '../../data/tyrant.ts';
+import { GEAROS_MONSTER_ID, gearosSkillId } from '../../data/gearos.ts';
 import { swapDeck } from '../../game/battle/playtest.ts';
 import type { Deck } from '../../game/deck/deck.ts';
 import { boosterDeck } from '../../game/story/introV2.ts';
@@ -43,7 +44,7 @@ function lab16(monsterId: string): Pick {
 }
 
 interface LabSpec {
-  readonly id: 'tyrantLab';
+  readonly id: 'tyrantLab' | 'gearosLab';
   readonly monsterId: string;
   /** 新しい効果を目で確かめる用の16枚（新しい効果のカードを多めに） */
   readonly check16: Pick;
@@ -149,4 +150,14 @@ export const tyrantLabScreen: ScreenDefinition = makeLab({
   check16: [
     [9, 3], [10, 3], [7, 2], [1, 2], [5, 2], [3, 1], [11, 1], [12, 2],
   ].map(([no, copies]) => ({ id: tyrantSkillId(no as number), copies: copies as number })),
+});
+
+/** ギアロス：オーバードライブ α・β・γ・システムチェンジ・システムチェックを多めに。相手は機械の塔の守り手テオ（切り札がギアロス）も選べる */
+export const gearosLabScreen: ScreenDefinition = makeLab({
+  id: 'gearosLab',
+  monsterId: GEAROS_MONSTER_ID,
+  bossId: 'enc-machine-boss',
+  check16: [
+    [5, 3], [6, 3], [7, 3], [8, 2], [9, 2], [4, 1], [11, 1], [12, 1],
+  ].map(([no, copies]) => ({ id: gearosSkillId(no as number), copies: copies as number })),
 });

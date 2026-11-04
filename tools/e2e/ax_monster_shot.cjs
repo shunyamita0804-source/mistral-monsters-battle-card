@@ -82,6 +82,26 @@ const [kind, who] = mode.split(':');
     await page.locator('.battle__monster--player').first().click();
     await page.waitForTimeout(900);
     await page.screenshot({ path: `${out}/${who}_battle_detail${suffix}.png` });
+    if (who === 'gearos') {
+      // オーバードライブ：α を押す（説明の欄）→「使う」→ 選ぶ窓 →「3枚コンボ」→ 演出と記録
+      await page.locator('button:has-text("閉じる")').first().click({ timeout: 3000 });
+      await page.waitForTimeout(500);
+      const b = await page.locator('.battle__hand-card[data-uid="x0"]').boundingBox();
+      if (b) await page.mouse.click(b.x + 12, b.y + b.height / 2);
+      await page.waitForTimeout(800);
+      await page.screenshot({ path: `${out}/${who}_combo_select${suffix}.png` });
+      await page.locator('button:has-text("使う")').first().click({ timeout: 3000 });
+      await page.waitForTimeout(700);
+      await page.screenshot({ path: `${out}/${who}_combo_choice${suffix}.png` });
+      await page.locator('button:has-text("3枚コンボ")').first().click({ timeout: 3000 });
+      await page.waitForTimeout(1300);
+      await page.screenshot({ path: `${out}/${who}_combo_play${suffix}.png` });
+      await page.waitForTimeout(3500);
+      await page.screenshot({ path: `${out}/${who}_combo_defense${suffix}.png` });
+      // 記録（ルールの本の横の記録の帯を開かずに、state の記録の最後を出す）
+      const logText = await page.evaluate(() => [...document.querySelectorAll('.battle-mid, .battle-log, .battle__log')].map((e) => e.textContent).join(' | '));
+      console.log('log', logText.slice(0, 200));
+    }
     console.log('battle', who);
   }
   await browser.close();

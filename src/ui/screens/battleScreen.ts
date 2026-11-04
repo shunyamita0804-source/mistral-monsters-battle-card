@@ -1,9 +1,11 @@
 import { getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
+import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_ID, OVERDRIVE_IDS } from '../../data/gearos.ts';
 import { provisionalRuleNotes } from '../../data/rules.ts';
 import { chooseAction, cpuRoll } from '../../game/battle/ai.ts';
 import { pickCpuLine } from '../../data/cpuLines.ts';
 import {
   actingSide,
+  overdriveUsability,
   applyAction,
   canConvertToMana,
   cardUsability,
@@ -570,6 +572,8 @@ export const battleScreen: ScreenDefinition = {
       const uid = action.type === 'useCard' ? action.cardUid : action.type === 'defend' ? action.cardUid : null;
       if (!uid) return null;
       const hand = s.sides[action.side].hand.find((c) => c.uid === uid);
+      // オーバードライブの3枚コンボ（ギアロス 指示書 AX）は、コンボのカード（OVERDRIVE_COMBO_ID）を大きく見せる
+      if (hand && action.type === 'useCard' && action.choice === OVERDRIVE_CHOICE) return { cardId: OVERDRIVE_COMBO_ID, side: action.side };
       return hand ? { cardId: hand.cardId, side: action.side } : null;
     };
 
@@ -655,6 +659,25 @@ export const battleScreen: ScreenDefinition = {
       });
     };
 
+    /** 見せ終えたシステムチェック（engine の deckPeek の seq） */
+    let shownPeekSeq = 0;
+    /** システムチェック（ギアロス 2026-11-05 指示書 AX）：自分の山札の上（上から順）を表で見せる窓。山札は動かさない */
+    const showDeckPeek = (cardIds: readonly string[]): void => {
+      const handle = openModal(element, {
+        title: t('battle.peek.title'),
+        body: [
+          h('p', { class: 'modal__text', text: t('battle.peek.lead', { n: cardIds.length }) }),
+          h(
+            'div',
+            { class: 'battle-reveal' },
+            ...cardIds.map((id) => h('div', { class: 'battle-reveal__card' }, createBattleCard(getPlayCard(id), { width: 70, size: 'hand' }))),
+          ),
+          h('ol', { class: 'battle-reveal__names' }, ...cardIds.map((id) => h('li', { text: cardName(getPlayCard(id)) }))),
+        ],
+        actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
+      });
+    };
+
     const dispatch = (action: BattleAction): void => {
       if (!state) return;
       const played = playedCard(state, action);
@@ -677,6 +700,12 @@ export const battleScreen: ScreenDefinition = {
         shownRevealSeq = reveal.seq;
         const ids = reveal.cardIds;
         setTimeout(() => !destroyed && showReveal(ids), SHOWCASE_MS);
+      }
+      const peek = state.deckPeek;
+      if (peek && peek.viewer === 'player' && peek.seq !== shownPeekSeq) {
+        shownPeekSeq = peek.seq;
+        const ids = peek.cardIds;
+        setTimeout(() => !destroyed && showDeckPeek(ids), SHOWCASE_MS);
       }
       if (selectedUid && !state.sides.player.hand.some((c) => c.uid === selectedUid)) selectedUid = null;
       // 相手のカードは、裏向きのまま手札からフォーカスエリアへ大きくなりながら動き、着いたら表に返す（返し終えるまでの時間）
@@ -1053,10 +1082,21 @@ export const battleScreen: ScreenDefinition = {
       const hand = state.sides.player.hand.find((c) => c.uid === cardUid);
       if (!hand || !cardUsability(state, 'player', cardUid).usable) return;
       const card = getPlayCard(hand.cardId);
+      // オーバードライブ α・β・γ（ギアロス 2026-11-05 指示書 AX）：3枚そろっていてコンボを使えるなら「1枚で使う／3枚コンボ」を選ぶ
+      if (!skipOverdriveChoice && OVERDRIVE_IDS.includes(card.id) && overdriveUsability(state, 'player').usable) {
+        chooseOverdrive(cardUid);
+        return;
+      }
+      skipOverdriveChoice = false;
       const targets = targetsFor(state, 'player', card);
       // 思い出の箱・風まかせ（2026-10-30 指示書 Y）：選ぶ画面
       if (card.kind === 'support' && (card.effect.type === 'recall' || card.effect.type === 'swap')) {
         pickSupportCard(cardUid, card.effect.type);
+        return;
+      }
+      // システムチェンジ（ギアロス 指示書 AX）：風まかせと同じ窓で、山札に戻す手札を選ぶ
+      if (card.kind === 'skill' && card.effect.type === 'systemChange') {
+        pickSupportCard(cardUid, 'systemChange');
         return;
       }
       // カラスのめ（デスオル 2026-10-31 指示書 AG）：相手の手札を見せて1枚選ぶ（相手は選ばない）
@@ -1102,18 +1142,51 @@ export const battleScreen: ScreenDefinition = {
       dispatch({ type: 'useCard', side: 'player', cardUid });
     };
 
+    /** 「1枚で使う」を選んだあと、もう一度 useCard を通すとき（選ぶ窓を2回出さない） */
+    let skipOverdriveChoice = false;
+    /**
+     * オーバードライブ α・β・γ（ギアロス 2026-11-05 指示書 AX）：3枚そろっていてコンボを使えるとき、「1枚で使う／3枚コンボ」を選ぶ窓。
+     * 1枚で使う＝今までどおり（相手を選ぶ）。3枚コンボ＝相手を選ばずに、相手全員へ（守りは1体ずつ）。「やめる」で使わずに閉じる
+     */
+    const chooseOverdrive = (cardUid: string): void => {
+      const handle = openModal(element, {
+        title: t('battle.overdrive.title'),
+        className: 'battle-overdrive',
+        body: [h('p', { class: 'modal__text', text: t('battle.overdrive.lead') }), h('p', { class: 'modal__text battle-overdrive__note', text: t('battle.overdrive.note') })],
+        actions: [
+          {
+            label: t('battle.overdrive.combo'),
+            primary: true,
+            onTap: () => {
+              handle.close();
+              dispatch({ type: 'useCard', side: 'player', cardUid, choice: OVERDRIVE_CHOICE });
+            },
+          },
+          {
+            label: t('battle.overdrive.single'),
+            onTap: () => {
+              handle.close();
+              skipOverdriveChoice = true;
+              useCard(cardUid);
+            },
+          },
+          { label: t('battle.pick.cancel'), onTap: () => handle.close() },
+        ],
+      });
+    };
+
     /**
      * 思い出の箱（捨て札の技カードから）・風まかせ（このカードのほかの手札から）で1枚を選ぶ窓（2026-10-30 指示書 Y）。
-     * 押したカードを選んで使う。「やめる」で使わずに閉じる
+     * 押したカードを選んで使う。「やめる」で使わずに閉じる。システムチェンジ（ギアロス 指示書 AX）も風まかせと同じ窓
      */
-    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap'): void => {
+    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap' | 'systemChange'): void => {
       if (!state) return;
       const choices: { readonly choice: string; readonly cardId: string }[] =
         kind === 'recall'
           ? recallChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
           : state.sides.player.hand.filter((c) => c.uid !== cardUid).map((c) => ({ choice: c.uid, cardId: c.cardId }));
       const handle = openModal(element, {
-        title: t(kind === 'recall' ? 'battle.pick.recall' : 'battle.pick.swap'),
+        title: t(kind === 'recall' ? 'battle.pick.recall' : kind === 'systemChange' ? 'battle.pick.systemChange' : 'battle.pick.swap'),
         className: 'battle-pick',
         body: [
           h(
@@ -1901,6 +1974,8 @@ export const battleScreen: ScreenDefinition = {
           h('p', { class: 'battle-text__name', text: cardName(card) }),
           h('p', { class: 'battle-text__owner', text: owner }),
           h('p', { class: 'battle-text__desc' }, phraseText(describePlayCard(card))),
+          // ギアロスのオーバードライブ α・β・γ（指示書 AX）：3枚そろっているときは、コンボを使えることを書く
+          OVERDRIVE_IDS.includes(card.id) && overdriveUsability(s, 'player').usable ? h('p', { class: 'battle-text__ok battle-text__combo', text: t('battle.overdrive.ready') }) : null,
           usability.usable
             ? h('p', { class: 'battle-text__ok', text: t('battle.prompt.usable') })
             : h('p', { class: 'battle-text__ng', text: usability.reason ?? t('battle.prompt.unusable') }),
@@ -1937,6 +2012,8 @@ export const battleScreen: ScreenDefinition = {
 
     const handRow = (s: BattleState): HTMLElement => {
       const myTurnMain = s.phase === 'main' && s.active === 'player';
+      // オーバードライブ（ギアロス 指示書 AX）：3枚コンボを使えるとき、手札の α・β・γ を光らせる
+      const overdriveGlow = myTurnMain && overdriveUsability(s, 'player').usable;
       const myMana = s.phase === 'mana' && s.active === 'player' && !auto;
       // カードの大きさはいつも HAND_CARD_W（2026-10-28：枚数が多くても小さくしない。入りきらない分は下で重ねる）
       const room = (element.offsetWidth || 390) - HAND_ROW_PAD * 2;
@@ -1977,7 +2054,7 @@ export const battleScreen: ScreenDefinition = {
           const el = h(
             'button',
             {
-              class: `battle__hand-card${usable ? ' is-usable' : ''}${!usable && myTurnMain ? ' is-unusable' : ''}${selectedUid === c.uid ? ' is-selected' : ''}${picked ? ' is-picked' : ''}${isNew ? ' is-dealt' : ''}${touching}${leaving}`,
+              class: `battle__hand-card${usable ? ' is-usable' : ''}${!usable && myTurnMain ? ' is-unusable' : ''}${selectedUid === c.uid ? ' is-selected' : ''}${picked ? ' is-picked' : ''}${isNew ? ' is-dealt' : ''}${touching}${leaving}${overdriveGlow && OVERDRIVE_IDS.includes(c.cardId) ? ' is-overdrive' : ''}`,
               attrs: {
                 type: 'button',
                 'aria-label': picked

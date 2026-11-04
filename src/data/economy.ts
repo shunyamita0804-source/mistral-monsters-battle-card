@@ -161,6 +161,9 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // unlockFlag は付けない（前のセーブの変換で並べない。LATER_GACHA_SERIES_IDS）。ツムジは烈火の箱にいるので、ツムジのシリーズは AM の扱いのまま。
   // レアの枠は JSON の rare（かぜのうず・おおたつまき・ふきとばし・つむじがくれ）。パック pack_uzurio.webp・販売機の窓 panel_uzurio.webp
   { id: 'uzurio', monsterId: 'mon-uzurio', rareSkillNames: ajRareNames('mon-uzurio') },
+  // ギアロス（2026-11-05 指示書 AX）：機械の塔でギアロスのモンスターカードを受け取ったら並ぶ（ウズリオと同じ「モンスターカードを初めて手に入れたら開く」）。unlockFlag は付けない。
+  // レアの枠は ロックオンビーム・オーバードライブβ・オーバードライブγ・高速機動（進行の案）。パック pack_gearos.webp・販売機の窓 panel_gearos.webp
+  { id: 'gearos', monsterId: 'mon-gearos', rareSkillNames: ajRareNames('mon-gearos') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -199,7 +202,7 @@ export function legacyAvailableGachaSeries(storyFlags: readonly string[]): reado
  * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン・指示書 AQ のウズリオ）。
  * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
  */
-const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio'];
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

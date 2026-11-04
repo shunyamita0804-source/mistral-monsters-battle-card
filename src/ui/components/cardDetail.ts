@@ -1,4 +1,5 @@
 import { getMonster } from '../../data/cards.ts';
+import { OVERDRIVE_IDS } from '../../data/gearos.ts';
 import { GACHA_SERIES } from '../../data/economy.ts';
 import { BOOSTERS } from '../../data/introV2.ts';
 import { seriesLineup } from '../../game/economy/gachaSeries.ts';
@@ -70,6 +71,8 @@ export function openCardDetail(parent: HTMLElement, card: CardDefinition, option
       h('h2', { class: 'card-detail__name', text: cardName(card) }),
       ...(options.extra ?? []).map((t) => h('p', { class: 'card-detail__extra', text: t })),
       h('p', { class: 'card-detail__description' }, phraseText(description)),
+      // ギアロスのオーバードライブ α・β・γ（2026-11-05 指示書 AX）：カードの文は短いままにして、3枚コンボの説明をここに足す
+      OVERDRIVE_IDS.includes(card.id) ? h('p', { class: 'card-detail__extra card-detail__combo', text: t('battle.overdrive.note') }) : null,
       h(
         'dl',
         { class: 'card-detail__rows' },

@@ -34,6 +34,8 @@ export const SCREEN_IDS = [
   'geolLab',
   /** 2026-11-05 指示書 AX：タイラントの確認用の画面（?qa=1&lab=tyrant） */
   'tyrantLab',
+  /** 2026-11-05 指示書 AX：ギアロスの確認用の画面（?qa=1&lab=gearos。テオとの対戦も） */
+  'gearosLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

@@ -193,7 +193,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
     'enc-ice-boss': 'mon-hyouzuku', // 2026-10-30 指示書 W：カルシェルからヒョウズクに
     'enc-fire-boss': 'mon-shishien', // 2026-10-31 指示書 AB：ガウルからシシエンに
     'enc-thunder-boss': 'mon-hakuran', // 2026-11-01 指示書 AH：雷の高原のステラ
-    'enc-machine-boss': 'mon-lazuck',
+    'enc-machine-boss': 'mon-gearos', // 2026-11-05 指示書 AX：ラズックからギアロスへ
     'enc-holy-boss': 'mon-soramo',
   };
 

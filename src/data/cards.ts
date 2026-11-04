@@ -15,6 +15,7 @@ import { LILIL_MONSTER } from './lilil.ts';
 import { FORN_MONSTER } from './forn.ts';
 import { UZURIO_MONSTER } from './uzurio.ts';
 import { TYRANT_MONSTER } from './tyrant.ts';
+import { GEAROS_MONSTER, GEAROS_MONSTER_ID, OVERDRIVE_COMBO_COST, OVERDRIVE_COMBO_DAMAGE, OVERDRIVE_COMBO_ID } from './gearos.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
@@ -184,6 +185,8 @@ const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   LILIL_MONSTER,
   FORN_MONSTER,
   UZURIO_MONSTER,
+  // 2026-11-05 指示書 AX【3】：機械の塔の切り札
+  GEAROS_MONSTER,
 ].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;
@@ -324,7 +327,28 @@ export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER].map((m): Mon
 });
 export const QA_SKILLS: readonly SkillCard[] = QA_MONSTERS.flatMap((m) => (AJ_QA_SKILLS[m.id] ?? []).map((row, i) => ajSkill(m.id, row, i)));
 
-export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
+/**
+ * ギアロスのオーバードライブ3枚コンボ（2026-11-05 指示書 AX【3】）の攻撃を表すカード。台帳にだけ入れる（一覧・図鑑・デッキ・ガチャ・持っているカードには出ない）。
+ * マナ5・かしこさ・相手全員に8（守りは1体ずつ）。α・β・γ それぞれの「回避されない」「防御されない」「回避されても半分」は付かない。
+ * 絵は【仮】でオーバードライブγ の絵（13枚目の絵は作らない。指示書のとおり）
+ */
+export const OVERDRIVE_COMBO_CARD: SkillCard = {
+  kind: 'skill',
+  id: OVERDRIVE_COMBO_ID,
+  name: 'オーバードライブ（3枚コンボ）',
+  monsterId: GEAROS_MONSTER_ID,
+  rarity: null,
+  cost: OVERDRIVE_COMBO_COST,
+  stat: { type: 'wisdom', value: OVERDRIVE_COMBO_DAMAGE },
+  category: 'wisdom',
+  effectTextJa: 'α・β・γ の3枚コンボ。相手全員に8ダメージ',
+  effect: { type: 'attack', allTargets: true },
+  isPlaceholder: false,
+  art: { category: 'skillCards', file: 'gearos_sk_07.webp', layout: 'frame' },
+  pendingSpec: ['rarity', 'art'],
+};
+
+export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS, OVERDRIVE_COMBO_CARD]);
 
 export function getMonster(id: string): MonsterCard {
   const card = cardCatalog.get(id);
