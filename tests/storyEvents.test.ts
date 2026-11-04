@@ -89,7 +89,9 @@ describe('いつ起きるか', () => {
     expect(ev?.id).toBe('M04');
     const seen = markStoryEventSeen(s, 'M04');
     expect(seen.storyFlags).toContain(storyEventFlag('M04'));
-    expect(pendingStoryEvent(seen, 'talk', { npc: 'nina' })).toBeNull();
+    // M04 は二度出ない（2026-11-05 指示書 AX【4】から、次に話しかけたときはイベント第2弾の N02）
+    expect(pendingStoryEvent(seen, 'talk', { npc: 'nina' })?.id).toBe('EV2_N02');
+    expect(pendingStoryEvent(markStoryEventSeen(seen, 'EV2_N02'), 'talk', { npc: 'nina' })).toBeNull();
     expect(seen.collection).toEqual(s.collection);
     expect(seen.coins).toBe(s.coins);
     expect(seen.calendar).toEqual(s.calendar);

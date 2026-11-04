@@ -31,6 +31,10 @@ export const WORLD = {
   'world.researcher.title': { ja: 'カード研究所', en: 'Card Laboratory' },
   'world.researcher.text': { ja: '図鑑を見ますか？ 欠片がそろっていれば、解析台で特別復元もできますよ。', en: 'Would you like to see the album? If you have all the shards, we can also do a special restoration at the analysis table.' },
   'world.researcher.collection': { ja: '図鑑を見る', en: 'View Album' },
+  // 2026-11-05 指示書 AX【4】：研究所の「記録をふり返る」（見たイベント第2弾をもう一度見る）
+  'world.researcher.textReview': { ja: '図鑑を見ますか？ これまでの出来事の記録も、ふり返れますよ。', en: 'Would you like to see the album? You can also look back on records of past events.' },
+  'world.researcher.review': { ja: '記録をふり返る', en: 'Look Back on Records' },
+  'world.researcher.reviewText': { ja: 'どの記録を見ますか？（見直しても、なにも変わりません）', en: 'Which record would you like to see? (Nothing changes when you look back.)' },
   'world.leagueBoard.title': { ja: '大会の対戦表', en: 'Cup Match Board' },
   'world.leagueBoard.empty': { ja: '大会の対戦表を貼る板。まだ何も貼られていない。', en: 'A board for cup match tables. Nothing is posted yet.' },
   // 話せる人のそばでは、右下のボタンの文字を「話す」に（2026-10-24 改訂R2 フェーズ1）

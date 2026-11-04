@@ -2,10 +2,26 @@ import worldMapArt from '@assets/images/ui/worldmap/world_map.webp';
 import story01 from '@assets/images/backgrounds/story_01_meet_sienna.webp';
 import story02 from '@assets/images/backgrounds/story_02_silver_clasp.webp';
 import story04 from '@assets/images/backgrounds/story_04_final_sienna.webp';
+import ev2S01 from '@assets/images/backgrounds/event_ev2_s01_last_card.webp';
+import ev2S02 from '@assets/images/backgrounds/event_ev2_s02_travel_notebook.webp';
+import ev2S04 from '@assets/images/backgrounds/event_ev2_s04_promise.webp';
+import ev2N02 from '@assets/images/backgrounds/event_ev2_n02_shop_keepsake.webp';
+import ev2N03 from '@assets/images/backgrounds/event_ev2_n03_pete_sorting.webp';
+import ev2N07 from '@assets/images/backgrounds/event_ev2_n07_florist.webp';
+import ev2N08 from '@assets/images/backgrounds/event_ev2_n08_card_case.webp';
+import tutShop from '@assets/images/backgrounds/tutorial_shop_and_packs.webp';
+import tutDungeon from '@assets/images/backgrounds/tutorial_dungeon_overview.webp';
+import tutTournament from '@assets/images/backgrounds/tutorial_tournament_overview.webp';
+import tutBoard from '@assets/images/backgrounds/tutorial_bureau_board.webp';
+import siennaSmile from '@assets/images/characters/talk_sienna_smile.webp';
+import siennaHappy from '@assets/images/characters/talk_sienna_happy.webp';
+import siennaNormal from '@assets/images/characters/talk_sienna_normal.webp';
+import siennaWorried from '@assets/images/characters/talk_sienna_worried.webp';
+import guideSmile from '@assets/images/characters/neighbor_guide_talk_smile.webp';
 import { cardCatalog } from '../../data/cards.ts';
 import { DUNGEONS } from '../../data/dungeons.ts';
 import { getPerson } from '../../data/people.ts';
-import type { CardShow, EventChoice, EventLine, EventStep, StillId, StoryEventDefinition } from '../../data/storyEvents.ts';
+import { SQUARE_PICTURES, type CardShow, type EventChoice, type EventLine, type EventStep, type PictureId, type StillId, type StoryEventDefinition, type TalkFace } from '../../data/storyEvents.ts';
 import { DUNGEON_SPOTS } from '../../data/worldMap.ts';
 import { eventText, lineVisible, resolveCards, type EventContext } from '../../game/story/storyEvents.ts';
 import type { SaveData } from '../../game/save/saveData.ts';
@@ -49,21 +65,74 @@ const STILLS: Readonly<Record<StillId, string>> = {
   story_04_final_sienna: story04,
 };
 
+/** 会話の窓の上の額の絵（2026-11-05 指示書 AX：小挿絵7枚・説明の絵4枚） */
+const PICTURES: Readonly<Record<PictureId, string>> = {
+  ev2_s01_last_card: ev2S01,
+  ev2_s02_travel_notebook: ev2S02,
+  ev2_s04_promise: ev2S04,
+  ev2_n02_shop_keepsake: ev2N02,
+  ev2_n03_pete_sorting: ev2N03,
+  ev2_n07_florist: ev2N07,
+  ev2_n08_card_case: ev2N08,
+  tutorial_shop_and_packs: tutShop,
+  tutorial_dungeon_overview: tutDungeon,
+  tutorial_tournament_overview: tutTournament,
+  tutorial_bureau_board: tutBoard,
+};
+
+/** 話し手の顔の代わりの会話の絵（2026-11-05 指示書 AX【4】）と、その絵の人 */
+const TALK_FACES: Readonly<Record<TalkFace, { readonly person: string; readonly url: string }>> = {
+  sienna_smile: { person: 'sienna', url: siennaSmile },
+  sienna_happy: { person: 'sienna', url: siennaHappy },
+  sienna_normal: { person: 'sienna', url: siennaNormal },
+  sienna_worried: { person: 'sienna', url: siennaWorried },
+  mireille_smile: { person: 'mireille', url: guideSmile },
+};
+
+/** 金の細い縁の額に入れた絵（会話の窓の中のいちばん上。顔と文字には重ねない） */
+function pictureFrame(picture: PictureId): HTMLElement {
+  const square = SQUARE_PICTURES.includes(picture);
+  const img = h('img', { class: 'story-picture__art', attrs: { src: PICTURES[picture], alt: '', draggable: 'false', decoding: 'async' } }) as HTMLImageElement;
+  const frame = h('div', { class: `story-picture${square ? ' story-picture--square' : ''}`, dataset: { picture } }, img);
+  // 絵が読めなくても会話は止めない（額ごと消す）
+  img.addEventListener('error', () => frame.remove());
+  return frame;
+}
+
 const speakerName = (line: EventLine): string | null => {
   if (line.speaker === 'system') return null;
   const p = getPerson(line.speaker);
   return p ? (getLanguage() === 'en' ? p.name.en : p.name.ja) : null;
 };
 
+/** 窓の見た目（イベントの小挿絵・会話の絵） */
+interface LineLook {
+  readonly picture?: PictureId;
+  readonly face?: TalkFace;
+}
+
+/** 話し手の顔：イベントの会話の絵（その人の行だけ）か、今の顔の絵 */
+function faceOf(line: EventLine, look: LineLook): HTMLElement | null {
+  const person = line.speaker === 'system' ? null : getPerson(line.speaker) ?? null;
+  if (!person) return null;
+  const talk = look.face ? TALK_FACES[look.face] : undefined;
+  if (talk && talk.person === line.speaker) {
+    return h('span', { class: 'person-face person-face--portrait', attrs: { 'aria-hidden': 'true' } }, h('img', { class: 'person-face__img', attrs: { src: talk.url, alt: '', draggable: 'false', decoding: 'async' } }));
+  }
+  return personFace(person);
+}
+
 /** せりふ1つの窓 */
-function lineModal(root: HTMLElement, save: SaveData, line: EventLine, next: () => void, skip: () => void): void {
+function lineModal(root: HTMLElement, save: SaveData, line: EventLine, next: () => void, skip: () => void, look: LineLook = {}): void {
   const name = speakerName(line);
   const person = line.speaker === 'system' ? null : getPerson(line.speaker) ?? null;
   const go = once(next);
+  const picture = line.picture ?? look.picture;
   const handle = openModal(root, {
-    className: `story-event${person ? '' : ' story-event--narration'}`,
+    className: `story-event${person ? '' : ' story-event--narration'}${picture ? ' story-event--picture' : ''}`,
     body: [
-      person ? h('div', { class: 'story-event__who' }, personFace(person), name ? h('span', { class: 'story-event__name', text: name }) : null) : null,
+      picture ? pictureFrame(picture) : null,
+      person ? h('div', { class: 'story-event__who' }, faceOf(line, look), name ? h('span', { class: 'story-event__name', text: name }) : null) : null,
       ...eventText(line.text, save).split('\n').map((s) => h('p', { class: 'story-event__text', text: s })),
     ],
     actions: [
@@ -157,6 +226,20 @@ function showCards(root: HTMLElement, save: SaveData, show: CardShow, next: () =
   one(0);
 }
 
+/** 絵だけの窓（M07 の大会の説明の絵） */
+function figureModal(root: HTMLElement, picture: PictureId, next: () => void, skip: () => void): void {
+  const go = once(next);
+  const handle = openModal(root, {
+    className: 'story-event story-event--picture story-event--figure',
+    body: [pictureFrame(picture)],
+    actions: [
+      { label: t('storyEvent.skip'), onTap: () => { handle.close(); skip(); } },
+      { label: t('storyEvent.next'), primary: true, onTap: () => { handle.close(); go(); } },
+    ],
+    onClose: go,
+  });
+}
+
 /** 小さな地図の窓：ダンジョンの印を光らせる */
 function showMiniMap(root: HTMLElement, highlight: readonly string[], next: () => void): void {
   const map = h('div', { class: 'story-map' }, h('img', { class: 'story-map__art', attrs: { src: worldMapArt, alt: '', draggable: 'false' } }));
@@ -179,10 +262,10 @@ function showMiniMap(root: HTMLElement, highlight: readonly string[], next: () =
 }
 
 /** 選択肢の窓 */
-function choiceModal(root: HTMLElement, choices: readonly EventChoice[], pick: (c: EventChoice) => void): void {
+function choiceModal(root: HTMLElement, choices: readonly EventChoice[], pick: (c: EventChoice) => void, picture?: PictureId): void {
   const handle = openModal(root, {
-    className: 'story-event story-event--choice',
-    body: [],
+    className: `story-event story-event--choice${picture ? ' story-event--picture' : ''}`,
+    body: picture ? [pictureFrame(picture)] : [],
     actions: choices.map((c, i) => ({ label: getLanguage() === 'en' ? c.label.en : c.label.ja, primary: i === 0, onTap: () => { handle.close(); pick(c); } })),
     closeOnBackdrop: false,
   });
@@ -195,6 +278,7 @@ export function playStoryEvent(screen: HTMLElement, save: SaveData, ev: StoryEve
   const ctx = options.ctx ?? {};
   const done = once(options.onDone);
   const steps = ev.steps;
+  const look: LineLook = { ...(ev.picture ? { picture: ev.picture } : {}), ...(ev.face ? { face: ev.face } : {}) };
   const run = (i: number): void => {
     if (i >= steps.length) {
       done();
@@ -205,7 +289,7 @@ export function playStoryEvent(screen: HTMLElement, save: SaveData, ev: StoryEve
     switch (step.kind) {
       case 'line':
         if (!lineVisible(step.line, ctx, save)) return next();
-        return lineModal(root, save, step.line, next, done);
+        return lineModal(root, save, step.line, next, done, look);
       case 'still':
         return showStill(root, save, step, ctx, next);
       case 'cards':
@@ -218,6 +302,8 @@ export function playStoryEvent(screen: HTMLElement, save: SaveData, ev: StoryEve
       case 'objective':
         options.onObjective?.(eventText(step.text, save));
         return next();
+      case 'figure':
+        return figureModal(root, step.picture, next, done);
       case 'choice':
         return choiceModal(root, step.choices, (c) => {
           const after = (): void => {
@@ -232,9 +318,9 @@ export function playStoryEvent(screen: HTMLElement, save: SaveData, ev: StoryEve
             next();
           };
           const replies = (c.reply ?? []).filter((l) => lineVisible(l, ctx, save));
-          const reply = (k: number): void => (k >= replies.length ? after() : lineModal(root, save, replies[k] as EventLine, () => reply(k + 1), done));
+          const reply = (k: number): void => (k >= replies.length ? after() : lineModal(root, save, replies[k] as EventLine, () => reply(k + 1), done, look));
           reply(0);
-        });
+        }, look.picture);
     }
   };
   run(0);

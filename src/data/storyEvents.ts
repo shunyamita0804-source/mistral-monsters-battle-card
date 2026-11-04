@@ -18,7 +18,10 @@ export type StoryEventId =
   | 'M02' | 'M03' | 'M04' | 'M05' | 'M05W' | 'M06' | 'M07' | 'M08' | 'M09' | 'M10' | 'M11' | 'M11T' | 'M12'
   | 'M13' | 'M14' | 'M15' | 'M16' | 'M17' | 'M17R' | 'M18' | 'M18F' | 'M19' | 'M19R' | 'M21' | 'M22'
   | 'M23' | 'M24' | 'M24I' | 'M24R' | 'M25' | 'M25B' | 'M25R' | 'M26' | 'M27' | 'M27E' | 'M28' | 'M29' | 'M30'
-  | 'O01' | 'O02' | 'O03' | 'O04' | 'O05' | 'O06' | 'O09' | 'O10' | 'O11S' | 'O11A' | 'O11W' | 'O11P';
+  | 'O01' | 'O02' | 'O03' | 'O04' | 'O05' | 'O06' | 'O09' | 'O10' | 'O11S' | 'O11A' | 'O11W' | 'O11P'
+  // イベント第2弾（2026-11-05 指示書 AX【4】）：シエナの4本（大会会場に入ったとき）・町の人の8本（その人に次に話しかけたとき）
+  | 'EV2_S01' | 'EV2_S02' | 'EV2_S03' | 'EV2_S04'
+  | 'EV2_N01' | 'EV2_N02' | 'EV2_N03' | 'EV2_N04' | 'EV2_N05' | 'EV2_N06' | 'EV2_N07' | 'EV2_N08';
 
 /** 話し手：人の ID（src/data/people.ts）か地の文 */
 export type EventSpeaker = 'system' | 'mireille' | 'nina' | 'lucas' | 'celia' | 'gareth' | 'martha' | 'pete' | 'rosalie' | 'harold' | 'noel' | 'viktor' | 'sienna' | 'dario' | 'isabella' | 'gordon' | 'flora';
@@ -30,7 +33,27 @@ export interface EventLine {
   readonly speaker: EventSpeaker;
   readonly text: MessageEntry;
   readonly when?: LineWhen;
+  /** この行の窓の上に出す絵（2026-11-05 指示書 AX【5】の説明の絵。金の細い縁の額） */
+  readonly picture?: PictureId;
 }
+
+/**
+ * 会話の窓の上に、金の細い縁の額に入れて出す絵（2026-11-05 指示書 AX）。
+ * 小挿絵（横長 1200×700。原本 design-parts/ax-events-20261105/small/）と、説明の絵（正方形 1024×1024。原本 …/tutorial/）
+ */
+export type PictureId =
+  | 'ev2_s01_last_card' | 'ev2_s02_travel_notebook' | 'ev2_s04_promise'
+  | 'ev2_n02_shop_keepsake' | 'ev2_n03_pete_sorting' | 'ev2_n07_florist' | 'ev2_n08_card_case'
+  | 'tutorial_shop_and_packs' | 'tutorial_dungeon_overview' | 'tutorial_tournament_overview' | 'tutorial_bureau_board';
+
+/** 正方形の絵（説明の絵）。ほかは横長の小挿絵 */
+export const SQUARE_PICTURES: readonly PictureId[] = ['tutorial_shop_and_packs', 'tutorial_dungeon_overview', 'tutorial_tournament_overview', 'tutorial_bureau_board'];
+
+/**
+ * 会話の顔の絵を今の顔の絵の代わりに使うもの（2026-11-05 指示書 AX【4】）：シエナの会話の絵（design-parts/talk-portraits-20261030/ の承認済み）と、
+ * ミレイユの会話の絵（今のもの）。新しいアップ絵は使わない
+ */
+export type TalkFace = 'sienna_smile' | 'sienna_happy' | 'sienna_normal' | 'sienna_worried' | 'mireille_smile';
 
 /** 選択肢（選んだあとの返事。action は選んだあとに画面ですること） */
 export interface EventChoice {
@@ -62,7 +85,9 @@ export type EventStep =
   /** 世界地図でダンジョンを順に光らせる（地図を開いて印を光らせる） */
   | { readonly kind: 'map'; readonly highlight: readonly string[] }
   /** 目標の表示だけ（ゲームの決まりは変えない） */
-  | { readonly kind: 'objective'; readonly text: MessageEntry };
+  | { readonly kind: 'objective'; readonly text: MessageEntry }
+  /** 絵だけの窓（2026-11-05 指示書 AX【5】：M07 の大会の説明の絵。せりふは無し） */
+  | { readonly kind: 'figure'; readonly picture: PictureId };
 
 /** イベントが起きるきっかけ（src/game/story/storyEvents.ts の pendingStoryEvent に渡す） */
 export type EventTrigger =
@@ -78,6 +103,7 @@ export type EventTrigger =
   | 'guardian' // 守り手に話しかけたとき（今のせりふだけ。ここでは何も足さない）
   | 'reward' // 守り手に初めて勝ち、今の報酬の処理が終わったあと（dungeon にダンジョンの ID）
   | 'tournamentEntry' // 大会に初めてエントリーしたとき（rank）
+  | 'hallEnter' // 大会会場に入って落ち着いたとき（2026-11-05 指示書 AX のシエナの4本。1回の入場で1つ）
   | 'match' // 大会の試合の前（opponent に相手の人の ID）
   | 'final' // C 大会の決勝の前（相手がシエナのとき）
   | 'finalEnd' // C 大会の決勝が終わったとき（相手がシエナのとき）
@@ -111,10 +137,27 @@ export interface StoryEventDefinition {
   readonly guardianFront?: boolean;
   /** 挿絵の場面（自動の表示は1回だけ） */
   readonly steps: readonly EventStep[];
+  /** すべての行の窓の上に出す小挿絵（2026-11-05 指示書 AX【4】） */
+  readonly picture?: PictureId;
+  /** 話し手の顔の代わりに使う会話の絵（2026-11-05 指示書 AX【4】） */
+  readonly face?: TalkFace;
+  /** イベント第2弾（研究所の「記録をふり返る」で見直せる） */
+  readonly batch?: 2;
 }
 
 const L = (speaker: EventSpeaker, ja: string, en: string, when?: LineWhen): EventStep => ({ kind: 'line', line: { speaker, text: { ja, en }, ...(when ? { when } : {}) } });
 const line = (speaker: EventSpeaker, ja: string, en: string, when?: LineWhen): EventLine => ({ speaker, text: { ja, en }, ...(when ? { when } : {}) });
+/** 説明の絵つきの1行（2026-11-05 指示書 AX【5】） */
+const P = (speaker: EventSpeaker, picture: PictureId, ja: string, en: string): EventStep => ({ kind: 'line', line: { speaker, text: { ja, en }, picture } });
+/** 3行＋選択肢2つ（返事は1行ずつ。どちらも同じ進行へ）。イベント第2弾の形 */
+const talk3 = (
+  speaker: EventSpeaker,
+  lines: readonly (readonly [string, string])[],
+  choices: readonly (readonly [string, string, string, string])[],
+): EventStep[] => [
+  ...lines.map(([ja, en]) => L(speaker, ja, en)),
+  { kind: 'choice', choices: choices.map(([lj, le, rj, re]) => ({ label: { ja: lj, en: le }, reply: [line(speaker, rj, re)] })) },
+];
 
 export const STORY_EVENTS: readonly StoryEventDefinition[] = [
   // ---------- 第0章 街とカード ----------
@@ -190,6 +233,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
       L('celia', 'ようこそ、公式大会へ。初めての方ですね。', "Welcome to the official cups. This is your first time, isn't it?"),
       L('celia', 'EランクとDランクは4人の総当たり。3人と戦って、1位を目指します。', 'Ranks E and D are 4-player round robins. Battle 3 opponents and aim for first place.'),
       L('celia', 'Cランクからは8人のトーナメントです。', 'From Rank C, it is an 8-player tournament.'),
+      // 2026-11-05 指示書 AX【5】：説明の絵（大会会場）。せりふは足さない
+      { kind: 'figure', picture: 'tutorial_tournament_overview' },
       L('celia', '出場するには、いまのランクの試練を越えていることが必要です。', "To enter, you must have cleared your current rank's trial."),
       L('celia', '次の公式戦は{nextMonth}。{missingLine}', 'The next official cup is in {nextMonth}. {missingLine}'),
     ],
@@ -208,6 +253,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
     steps: [
       L('system', '風の渓谷。つり橋の下を、強い風が吹き抜けていく。', 'The Wind Valley. A strong wind blows beneath the rope bridges.'),
       L('system', 'ダンジョンでは、奥へ続く階段を探して進みます。宝箱やカードバトラーに出会うこともあります。', 'In a dungeon, look for stairs leading deeper. You may find chests or meet card battlers.'),
+      // 2026-11-05 指示書 AX【5】：説明の絵（ダンジョンの入口）
+      P('system', 'tutorial_dungeon_overview', '新しいダンジョンは、進むにつれて開きます。どこが開いているかは、世界地図で確かめましょう。', 'New dungeons open up as you progress. Check the world map to see which ones are open.'),
       L('system', '風の吹くマスに乗ると、体が押し流されます。進む向きに気をつけましょう。', 'Step on a windy tile and you will be pushed along. Watch which way you go.'),
       L('system', 'いちばん奥には守り手がいます。負けても、準備してまた挑めます。', 'A keeper waits at the very end. Even if you lose, you can prepare and try again.'),
       {
@@ -239,6 +286,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
     id: 'M12', chapter: 2, order: 12, kind: 'optional', trigger: 'board', title: { ja: '管理局の掲示板', en: 'The Notice Board' },
     steps: [
       L('system', '公式大会は決まった月にだけ開かれる。次は{nextMonth}。', 'Official cups are held only in certain months. The next is in {nextMonth}.'),
+      // 2026-11-05 指示書 AX【5】：説明の絵（管理局の掲示板）
+      P('system', 'tutorial_bureau_board', 'どこへ行くか迷ったときは、まず掲示板を見てみましょう。', "When you're not sure where to go, check the notice board first."),
       L('system', '家のベッドで休むと、月が進みます。ダンジョンから戻ったときや、大会が終わったときにも月が進みます。', 'Resting in your bed at home moves time forward a month. Returning from a dungeon or finishing a cup does too.'),
     ],
   },
@@ -486,6 +535,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
     // 広告の話の行は入れない（広告はまだ無い）
     steps: [
       L('nina', '気になるモンスターが決まっているなら、そのシリーズを選ぶと分かりやすいですよ。1回{gachaPrice}です。', 'If you already have a favorite monster, picking its series makes things easy. One pull is {gachaPrice}.'),
+      // 2026-11-05 指示書 AX【5】：説明の絵（カードショップとパック）
+      P('nina', 'tutorial_shop_and_packs', 'パックを開けると、新しいモンスターや技のカードが手に入りますよ。', 'Open a pack and you will get new monster and skill cards.'),
       L('nina', 'ただ、最初は今のデッキを遊びながら、どんな技が欲しいか見つけるのがおすすめです。', 'But at first I suggest playing your current deck to find out which skills you want.'),
     ],
   },
@@ -526,7 +577,204 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
   { id: 'O11A', chapter: 1, order: 112, kind: 'optional', trigger: 'season', season: 'autumn', title: { ja: '秋の街', en: 'Autumn in Town' }, steps: [L('harold', '今年の大会の話も、ずいぶん増えたのう。', "There's been a lot more talk about this year's cups.")] },
   { id: 'O11W', chapter: 1, order: 113, kind: 'optional', trigger: 'season', season: 'winter', title: { ja: '冬の街', en: 'Winter in Town' }, steps: [L('rosalie', '寒いときこそ、温かい服で出かけなさいね。', 'When it is cold, be sure to go out in warm clothes.')] },
   { id: 'O11P', chapter: 1, order: 114, kind: 'optional', trigger: 'season', season: 'spring', title: { ja: '春の街', en: 'Spring in Town' }, steps: [L('mireille', 'また新しい春だね。今年はどんなカードに出会えるかな。', "Another new spring. I wonder what cards we'll meet this year.")] },
+  // ---------- イベント第2弾（2026-11-05 指示書 AX【4】。台本 design-parts/ax-events-20261105/event_batch02_scripts.md。S01・S02 は指示書の直しを優先） ----------
+  // どれも任意・1回だけ。カード・お金は渡さない。選択肢は返事だけ（どちらも同じ進行へ）。英語は仮訳
+  // シエナの4本：大会会場に入ったとき（条件は src/game/story/storyEvents.ts。シエナがいなくなったあとは、どの方法でも出さない）
+  {
+    id: 'EV2_S01', chapter: 3, order: 201, kind: 'optional', trigger: 'hallEnter', batch: 2, picture: 'ev2_s01_last_card', face: 'sienna_smile',
+    title: { ja: 'あの一手を覚えてる', en: 'I Remember That Move' },
+    steps: talk3(
+      'sienna',
+      [
+        ['この前の大会、最後まで見ていたよ。', 'I watched the last cup all the way to the end.'],
+        ['勝ったか負けたかより、私は迷ったときの一手を見るのが好き。', "More than who won or lost, I like watching the move someone makes when they're unsure."],
+        ['どのカードを使って、どのカードを残すか。そこに、その人らしさが出ると思うんだ。', 'Which card you play and which you keep. I think that shows who you are.'],
+      ],
+      [
+        ['見てたの？', 'You were watching?', 'ふふ。私も同じ場面なら迷っていたと思う。', "Heh. I'd have hesitated in the same spot, too."],
+        ['考えたこともなかった', 'I never thought about it', 'そういう所から、好きな戦い方が見つかることもあるよ。', 'Sometimes that is where you find the way you like to battle.'],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_S02', chapter: 4, order: 202, kind: 'optional', trigger: 'hallEnter', batch: 2, picture: 'ev2_s02_travel_notebook', face: 'sienna_happy',
+    title: { ja: '旅のノート', en: 'The Travel Notebook' },
+    steps: talk3(
+      'sienna',
+      [
+        ['旅をしていると、街ごとにカードの飾り方が違って面白いんだ。', 'When you travel, every town decorates its cards differently. It is fun.'],
+        ['港町と山の町じゃ、好きなモンスターも、大会の空気も、ぜんぜん違うの。', 'A port town and a mountain town love different monsters, and their cups feel completely different.'],
+        ['だから私は、勝負の記録と一緒に、旅先で見たものもノートに残してるの。', 'So along with my match records, I write down what I see on my travels.'],
+      ],
+      [
+        ['ノートを見せて', 'Show me the notebook', 'いいよ。字はちょっと雑だけど、景色だけはよく描けたと思う。', "Sure. My writing's a bit messy, but I think I drew the scenery well."],
+        ['ずいぶん旅してるんだね', "You've traveled a lot", 'うん。まだ知らない景色が、いくらでもありそうだから。', "Yes. There seem to be so many sights I haven't seen yet."],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_S03', chapter: 5, order: 203, kind: 'optional', trigger: 'hallEnter', batch: 2, face: 'sienna_normal',
+    title: { ja: '好きな一枚の話', en: 'A Favorite Card' },
+    steps: talk3(
+      'sienna',
+      [
+        ['強いカードを見ると、つい欲しくなることがあるでしょう？', 'When you see a strong card, you just want it, right?'],
+        ['でもね、旅先で出会った人に言われたの。「好きな一枚を、誰かの強さと比べなくていい」って。', 'But someone I met on my travels told me, "You don\'t have to compare your favorite card to someone else\'s strength."'],
+        ['それからは、相手のデッキを見るのがもっと楽しくなった。きみの組み合わせも、きみらしいと思う。', "Since then, looking at other people's decks has become more fun. Your combinations feel like you, too."],
+      ],
+      [
+        ['自分らしさって何だろう', 'What does "like me" even mean?', 'まだ決めなくていいんじゃない？ 選び続けているうちに、見つかるよ。', "You don't have to decide yet. You'll find it as you keep choosing."],
+        ['シエナの好きなカードは？', "What's your favorite card, Sienna?", '一枚に決めるのは難しいな。思い出が増えるたびに変わっちゃう。', 'It is hard to pick just one. It changes every time I make new memories.'],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_S04', chapter: 5, order: 204, kind: 'optional', trigger: 'hallEnter', batch: 2, picture: 'ev2_s04_promise', face: 'sienna_worried',
+    title: { ja: '今度、聞いてほしい話', en: 'Something to Tell You Next Time' },
+    steps: talk3(
+      'sienna',
+      [
+        ['大会が終わったら、また少し旅をするつもりなんだ。', "After the cup, I'm planning to travel for a while again."],
+        ['勝負のことも、景色のことも……話したいことが、まだたくさんあるから。', "About battles, about scenery... there's still so much I want to talk about."],
+        ['次に会ったとき、少し時間をもらえる？', 'Next time we meet, could you spare me a little time?'],
+      ],
+      [
+        ['もちろん', 'Of course', 'ありがとう。じゃあ、ひとつ約束ができたね。', "Thanks. Then that's a promise."],
+        ['まず大会で勝とう', "Let's win the cup first", 'ふふ、そうだね。話の続きは、いい試合のあとで。', "Heh, you're right. We'll continue after a good match."],
+      ],
+    ),
+  },
+  // 町の人の8本：前のイベントのあと、その人に次に話しかけたとき（1回だけ）
+  {
+    id: 'EV2_N01', chapter: 2, order: 211, kind: 'optional', trigger: 'talk', npc: 'mireille', batch: 2, face: 'mireille_smile',
+    title: { ja: 'いつもの帰り道', en: 'The Usual Way Home' },
+    steps: talk3(
+      'mireille',
+      [
+        ['この道、昔から何度も歩いているのに、最近ちょっと違って見えるんだ。', "I've walked this road so many times, but lately it looks a little different."],
+        ['カードの話をしながら歩くと、いつもの街にも面白いものが見つかるからかな。', "Maybe it's because when we walk and talk about cards, I find fun things even in our usual town."],
+        ['きみは、この街のどんなところが好き？', 'What do you like about this town?'],
+      ],
+      [
+        ['にぎやかな広場', 'The lively square', '私も好き！ だれかが新しいカードを見せると、すぐ人が集まるんだよね。', 'Me too! Whenever someone shows off a new card, a crowd gathers right away.'],
+        ['静かな通り', 'The quiet streets', 'わかるなあ。帰り道にほっとできる場所って、大事だよね。', 'I get it. Having a place to relax on the way home is important.'],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N02', chapter: 1, order: 212, kind: 'optional', trigger: 'talk', npc: 'nina', batch: 2, picture: 'ev2_n02_shop_keepsake',
+    title: { ja: 'ニーナの手放せない一枚', en: "Nina's Keepsake Card" },
+    steps: talk3(
+      'nina',
+      [
+        ['実は、お店でいちばん大切にしているカードは、いちばん高いカードじゃないんです。', "Actually, the card I treasure most in the shop isn't the most expensive one."],
+        ['この店で初めて仕事を教えてもらった日に、見本として渡された一枚で。', 'It was handed to me as a sample on my first day learning the job here.'],
+        ['端がちょっと傷んでいるけれど、見ると初心を思い出すんです。', 'Its edges are a bit worn, but looking at it reminds me how I started.'],
+      ],
+      [
+        ['見せてほしい', "I'd like to see it", 'ふふ、いいですよ。これは売り物じゃないので、眺めるだけですよ。', "Heh, sure. It's not for sale, so just looking, okay?"],
+        ['大切にしてるんだね', 'You really treasure it', 'はい。大事なカードって、値段だけでは決まりませんから。', "Yes. A card's worth isn't decided by price alone."],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N03', chapter: 1, order: 213, kind: 'optional', trigger: 'talk', npc: 'pete', batch: 2, picture: 'ev2_n03_pete_sorting',
+    title: { ja: 'ピートの整理術', en: "Pete's Sorting Trick" },
+    steps: talk3(
+      'pete',
+      [
+        ['見てくれよ、このカードの並べ方！ 技ごとに分けたら、探すのが速くなったんだ。', 'Check out how I arrange my cards! Sorting by skill made them so much faster to find.'],
+        ['前は好きな絵を上に重ねてばかりでさ。勝負の前に、欲しいカードが見つからなくて大慌てだった。', 'I used to just pile my favorite art on top. Before battles I could never find the card I wanted.'],
+        ['集めるのも楽しいけど、どう使うか考えるともっと楽しいよな。', 'Collecting is fun, but thinking about how to use them is even more fun.'],
+      ],
+      [
+        ['すごく整理されてる', "That's really organized", 'だろ？ でも昨日また新しいカードが増えて、もう場所が足りない！', "Right? But I got more new cards yesterday and I'm already out of room!"],
+        ['自分も整理しようかな', 'Maybe I should sort mine too', 'おすすめ！ 並べてるうちに、新しい組み合わせも浮かぶぜ。', "Do it! While you're sorting, new combos will pop into your head."],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N04', chapter: 4, order: 214, kind: 'optional', trigger: 'talk', npc: 'lucas', batch: 2,
+    title: { ja: 'カードの絵の余白', en: 'The Space in Card Art' },
+    steps: talk3(
+      'lucas',
+      [
+        ['カードの絵って、描かれていないところにも意味があると思わないかい？', "Don't you think the parts of card art that aren't drawn have meaning too?"],
+        ['空の広さや、草の揺れだけで、その聖獣が暮らす場所を想像できる。', 'From the size of the sky or the sway of the grass, you can imagine where that sacred beast lives.'],
+        ['研究って数字を集めることだけじゃない。見つめ直すことから、始まるんだ。', "Research isn't just collecting numbers. It starts with looking again."],
+      ],
+      [
+        ['お気に入りの絵がある', 'I have a favorite picture', 'それはいいね。次は背景に何が描かれているかも、見てみよう。', "That's great. Next time, look at what's drawn in the background too."],
+        ['難しそうだね', 'Sounds difficult', '大丈夫。一枚を好きになる、その気持ちが入口さ。', "Don't worry. Liking a single card is where it begins."],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N05', chapter: 1, order: 215, kind: 'optional', trigger: 'talk', npc: 'gareth', batch: 2,
+    title: { ja: 'ガレス先生の三つの問い', en: "Gareth's Three Questions" },
+    steps: talk3(
+      'gareth',
+      [
+        ['負けた試合を振り返るとき、俺は三つだけ考える。', 'When I look back on a lost match, I think about just three things.'],
+        ['何を守ろうとしたか。どの技を先に使ったか。そして、何を手札に残したか。', 'What I tried to protect. Which skill I used first. And what I kept in my hand.'],
+        ['答えがひとつじゃないから、カードバトルは飽きないんだ。', "There's never just one answer. That's why card battles never get old."],
+      ],
+      [
+        ['もう一度対戦してみる', "I'll try battling again", 'いい心がけだ。準備ができたら、いつもの練習試合で試せ。', 'Good attitude. When you are ready, try it in the usual practice match.'],
+        ['自分のデッキを見直す', "I'll review my deck", 'うむ。たった一枚の入れ替えで、動きが変わることもある。', 'Mm. Swapping just one card can change how a deck plays.'],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N06', chapter: 3, order: 216, kind: 'optional', trigger: 'talk', npc: 'celia', batch: 2,
+    title: { ja: '受付の向こう側', en: 'Behind the Desk' },
+    steps: talk3(
+      'celia',
+      [
+        ['大会が終わると、みなさんいろいろな顔で受付を通られるんです。', 'After a cup, everyone passes the desk with all sorts of expressions.'],
+        ['笑っている方も、悔しそうな方も。でも、次の大会の予定を聞いて帰る方が多いんですよ。', 'Some smiling, some frustrated. But most ask about the next cup before they leave.'],
+        ['何度でも挑戦したくなる場所であれば、私も嬉しいです。', 'If this is a place people want to challenge again and again, that makes me happy.'],
+      ],
+      [
+        ['次も出たい', 'I want to enter the next one', 'ぜひ。出場条件や日程は、いつでも受付でご確認ください。', 'Please do. You can check entry conditions and dates at the desk anytime.'],
+        ['少し休もうかな', 'Maybe I will rest a bit', 'それも大切です。次の大会で、またお会いしましょう。', "That's important too. I'll see you at the next cup."],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N07', chapter: 1, order: 217, kind: 'optional', trigger: 'talk', npc: 'martha', batch: 2, picture: 'ev2_n07_florist',
+    title: { ja: 'マルタの花とカード', en: "Martha's Flowers and Cards" },
+    steps: talk3(
+      'martha',
+      [
+        ['最近ね、カードに描かれた花を見て、同じ花を探しに来るお客さんがいるの。', 'Lately, some customers come looking for the same flowers they saw drawn on cards.'],
+        ['絵をきっかけに、足もとの季節に気づくなんて素敵でしょう？', "Isn't it lovely to notice the season at your feet because of a picture?"],
+        ['カードが好きな人と、花が好きな人。話してみると、意外と気が合うものよ。', 'People who love cards and people who love flowers. When they talk, they get along surprisingly well.'],
+      ],
+      [
+        ['どんな花が人気？', 'Which flowers are popular?', 'みんな好みが違うわ。今日は、きみが気に入った色を探してみて。', 'Everyone has different tastes. Today, look for a color you like.'],
+        ['カードにも花が多いね', 'Cards have lots of flowers, too', 'そうね。描く人が大切にした景色が、絵にも残るのかしら。', 'They do. Maybe the scenery the artist cherished stays in the picture.'],
+      ],
+    ),
+  },
+  {
+    id: 'EV2_N08', chapter: 1, order: 218, kind: 'optional', trigger: 'talk', npc: 'rosalie', batch: 2, picture: 'ev2_n08_card_case',
+    title: { ja: 'ロザリーの小さなケース', en: "Rosalie's Little Case" },
+    steps: talk3(
+      'rosalie',
+      [
+        ['このところ、カードをしまう小さな布のケースを作ってほしいって頼まれるの。', 'Lately people have been asking me to make little cloth cases for their cards.'],
+        ['大切な一枚を持ち歩くのに、気持ちが落ち着くんですって。', 'They say carrying a precious card in one puts them at ease.'],
+        ['戦い方も、好きな色も、人によって違うもの。そういう違いを仕立てるのが、私は好きよ。', 'Battle styles and favorite colors differ from person to person. I love tailoring those differences.'],
+      ],
+      [
+        ['きれいな布だね', "That's beautiful cloth", 'ありがとう。派手すぎず、カードが主役になる色を選んだの。', 'Thank you. I chose colors that are not too flashy, so the card stays the star.'],
+        ['自分にも似合うかな', 'Would one suit me?', 'もちろん。まずは好きな色から考えてみましょうか。', "Of course. Let's start by thinking about your favorite color."],
+      ],
+    ),
+  },
 ];
+
 
 /** 一度だけの印（storyFlags） */
 export const storyEventFlag = (id: StoryEventId): string => `storyevt:${id.toLowerCase()}`;

@@ -137,3 +137,11 @@ import monsterUrl from '@assets/images/cards/monsters/monster_001.png';
 | --- | --- | --- |
 | `images/maps/rooms/room4_lab_*.webp`・`room_florist_*.webp`・`room_tailor_*.webp` | 研究所・花屋・仕立て屋の正面向きの新しい絵（床と壁・家具・手前の層） | 原本 `design-parts/rooms-frontfacing-20261031/` を `rooms4_build.py`・`rooms_shop_build.py` で切り抜いた（描き直していない） |
 | `images/maps/rooms/{player,guide,house}_shell.webp` | 家3つの床と壁（左右の壁をまっすぐ縦の細い壁に） | 原本 `design-parts/seimon-world/room_shell_*_frontwall_20261031.png`（書き出しと同じ大きさ・無改変） |
+
+## 2026-11-05 指示書 AX（イベント第2弾・説明の絵）
+
+| パス | 内容 | 状態 |
+| --- | --- | --- |
+| `images/backgrounds/event_ev2_*.webp` | イベント第2弾の小挿絵7枚（会話の窓の上の額） | 原本 `design-parts/ax-events-20261105/small/`（1200×700）を 780×455 に縮小して WebP（`tools/art/ax_event_pictures.py`。描き換えなし） |
+| `images/backgrounds/tutorial_*.webp` | 説明の絵4枚（O04・M09・M07・M12） | 原本 `design-parts/ax-events-20261105/tutorial/`（1024×1024）を 600×600 に縮小して WebP（同上） |
+| `images/characters/talk_sienna_{smile,happy,normal,worried}.webp` | シエナの会話の絵（イベント第2弾のシエナの4本） | 原本 `design-parts/talk-portraits-20261030/`（561×701・承認済み）を WebP にしただけ（同上） |

@@ -1,7 +1,7 @@
 import { RANK_BOSS_DUNGEONS } from '../../data/calendar.ts';
 import { getMonster, skillsOf } from '../../data/cards.ts';
 import { DUNGEONS, LUCIA_BEATEN_FLAG, SERA_BEATEN_FLAG } from '../../data/dungeons.ts';
-import { GACHA, type RankId } from '../../data/economy.ts';
+import { GACHA, rankAtLeast, type RankId } from '../../data/economy.ts';
 import { BOOSTERS } from '../../data/introV2.ts';
 import { personOfOpponent } from '../../data/people.ts';
 import { ENCOUNTERS } from '../../data/dungeons.ts';
@@ -56,9 +56,18 @@ export function markStoryEventSeen(save: SaveData, id: StoryEventId): SaveData {
   return save.storyFlags.includes(flag) ? save : { ...save, storyFlags: [...save.storyFlags, flag] };
 }
 
+const seen = (save: SaveData, id: StoryEventId): boolean => hasSeenStoryEvent(save, id);
 const beaten = (save: SaveData, dungeonId: string): boolean => save.dungeons[dungeonId]?.bossDefeated === true;
 const introDone = (save: SaveData): boolean => isIntroV2Done(save.story.introV2);
 const ownsSkill = (save: SaveData): boolean => Object.entries(save.collection).some(([id, n]) => n > 0 && id.startsWith('skl-') && !id.startsWith('skl-tmp'));
+
+/**
+ * シエナがまだこの街にいるか（2026-11-05 指示書 AX【4】のシエナの4本）。siennaLeft が付いた・M28 を見た・C 大会の決着がついた（記録がある）なら、いない。
+ * 前のセーブで見ていない分も、いなくなったあとは出さない
+ */
+export function siennaPresent(save: SaveData): boolean {
+  return !save.storyFlags.includes(FLAG_SIENNA_LEFT) && !hasSeenStoryEvent(save, 'M28') && save.tournaments['tournament-c'] === undefined;
+}
 
 /** 街に入ったときの順番（2026-11-02 指示書 AT「10. 重なったときの順番」） */
 const TOWN_ORDER: readonly StoryEventId[] = ['M28', 'M21', 'M11T'];
@@ -121,6 +130,33 @@ function conditionMet(save: SaveData, ev: StoryEventDefinition, ctx: EventContex
     case 'O06':
       // 導入の練習のあとで、ふつうの対戦（ダンジョン・大会・ピート）に1回以上負けた（save.stats.battlesLost。練習試合は数えない）
       return introDone(save) && save.stats.battlesLost > 0;
+    // ---------- イベント第2弾（2026-11-05 指示書 AX【4】）。台本の条件（M/O の見た印・ランク）は、どれも今のセーブで取れる ----------
+    // シエナの4本：大会会場に入ったとき。大会の途中（受付から決着まで）は出さない。シエナがいなくなったあとは、どの方法でも出さない
+    case 'EV2_S01':
+      return siennaPresent(save) && save.activeTournament === null && seen(save, 'M13') && seen(save, 'M14');
+    case 'EV2_S02':
+      return siennaPresent(save) && save.activeTournament === null && seen(save, 'M15') && !seen(save, 'M22');
+    case 'EV2_S03':
+      return siennaPresent(save) && save.activeTournament === null && seen(save, 'M22') && rankAtLeast(save.rank, 'C') && !seen(save, 'M26');
+    case 'EV2_S04':
+      return siennaPresent(save) && save.activeTournament === null && seen(save, 'M23') && !seen(save, 'M26');
+    // 町の人の8本：前のイベントを見たあと、その人に次に話しかけたとき（1回の話しかけで1つなので、前のイベントと同じ回には出ない）
+    case 'EV2_N01':
+      return seen(save, 'M03') && !seen(save, 'M11T');
+    case 'EV2_N02':
+      return seen(save, 'M04');
+    case 'EV2_N03':
+      return seen(save, 'M05W');
+    case 'EV2_N04':
+      return seen(save, 'M06') && seen(save, 'O05') && rankAtLeast(save.rank, 'D');
+    case 'EV2_N05':
+      return seen(save, 'O06');
+    case 'EV2_N06':
+      return seen(save, 'M07') && seen(save, 'M14');
+    case 'EV2_N07':
+      return seen(save, 'O01');
+    case 'EV2_N08':
+      return seen(save, 'O02');
     default:
       return true;
   }
@@ -236,6 +272,11 @@ export function resolveCards(save: SaveData, show: CardShow): string[] {
     }
   });
   return show.mode === 'preview_only' ? ids : ids.filter(owned);
+}
+
+/** 研究所の「記録をふり返る」で見直せるイベント（2026-11-05 指示書 AX【4】：第2弾のうち見たもの。見直しても印・報酬は動かさない） */
+export function reviewableStoryEvents(save: SaveData): StoryEventDefinition[] {
+  return STORY_EVENTS.filter((ev) => ev.batch === 2 && hasSeenStoryEvent(save, ev.id)).sort((a, b) => a.order - b.order);
 }
 
 /** 確かめ用の入口（?qa=1&lab=events）の並び：章と順番 */
