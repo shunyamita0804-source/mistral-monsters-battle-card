@@ -7,7 +7,7 @@ import { BUREAU_DESK_FRONT, CAMERA_LEANS, getMap, HALL_BOARD, isResidentId, TEAC
 import { residentScene, type SceneId } from '../../data/storyScenes.ts';
 import { DUNGEONS } from '../../data/dungeons.ts';
 import type { EventTrigger, StoryEventDefinition } from '../../data/storyEvents.ts';
-import { changedSeason, chainedStoryEvent, markStoryEventSeen, pendingStoryEvent, storyEventGoal, type EventContext } from '../../game/story/storyEvents.ts';
+import { changedSeason, chainedStoryEvent, markStoryEventSeen, pendingStoryEvent, reviewableStoryEvents, storyEventGoal, type EventContext } from '../../game/story/storyEvents.ts';
 import { seasonOf, type Season } from '../../game/calendar/calendar.ts';
 import { playStoryEvent } from '../components/storyEventPlayer.ts';
 import { getLanguage } from '../../i18n/i18n.ts';
@@ -2700,7 +2700,10 @@ export class WorldView {
   /** 研究員ルーカス：欠片を持っていれば（または復元したあとは）図鑑と特別復元を選べる。なければ図鑑 */
   #researcherMenu(): void {
     const save = this.#store.save;
-    if (fragmentCount(save) === 0 && !save.hiddenRestored) {
+    const restore = fragmentCount(save) > 0 || save.hiddenRestored;
+    // 2026-11-05 指示書 AX【4】：イベント第2弾を見ていれば「記録をふり返る」
+    const review = reviewableStoryEvents(save).length > 0;
+    if (!restore && !review) {
       this.#ctx.navigate('collection');
       return;
     }
@@ -2708,10 +2711,43 @@ export class WorldView {
     let next: (() => void) | null = null;
     const handle = openModal(this.#root, {
       title: t('world.researcher.title'),
-      body: [h('p', { class: 'modal__text', text: t('world.researcher.text') })],
+      body: [h('p', { class: 'modal__text', text: t(restore ? 'world.researcher.text' : 'world.researcher.textReview') })],
       actions: [
-        { label: t('world.researcher.collection'), onTap: () => ((next = () => this.#ctx.navigate('collection')), handle.close()) },
-        { label: t('shop.restore', { n: fragmentCount(save), total: FRAGMENT_TOTAL }), primary: true, onTap: () => ((next = () => this.#openRestore()), handle.close()) },
+        { label: t('world.researcher.collection'), primary: !restore, onTap: () => ((next = () => this.#ctx.navigate('collection')), handle.close()) },
+        ...(review ? [{ label: t('world.researcher.review'), onTap: () => ((next = () => this.#reviewMenu()), handle.close()) }] : []),
+        ...(restore ? [{ label: t('shop.restore', { n: fragmentCount(save), total: FRAGMENT_TOTAL }), primary: true, onTap: () => ((next = () => this.#openRestore()), handle.close()) }] : []),
+      ],
+      onClose: () => {
+        this.#busy = false;
+        next?.();
+      },
+    });
+  }
+
+  /**
+   * 研究所の「記録をふり返る」（2026-11-05 指示書 AX【4】）：見たことのあるイベント第2弾を選んで、もう一度見る。
+   * 見直しでは印・報酬・フラグを動かさない（セーブには触らない）
+   */
+  #reviewMenu(): void {
+    const list = reviewableStoryEvents(this.#store.save);
+    this.#busy = true;
+    let next: (() => void) | null = null;
+    const handle = openModal(this.#root, {
+      className: 'story-review',
+      title: t('world.researcher.review'),
+      body: [h('p', { class: 'modal__text', text: t('world.researcher.reviewText') })],
+      actions: [
+        ...list.map((ev) => ({
+          label: getLanguage() === 'en' ? ev.title.en : ev.title.ja,
+          onTap: () => (
+            (next = () => {
+              this.#busy = true;
+              playStoryEvent(this.#root, this.#store.save, ev, { onDone: () => (this.#busy = false) });
+            }),
+            handle.close()
+          ),
+        })),
+        { label: t('common.close'), primary: true, onTap: () => handle.close() },
       ],
       onClose: () => {
         this.#busy = false;
@@ -2778,6 +2814,9 @@ export class WorldView {
     const ctx: EventContext = this.#store.storyCtx.reachedFinal === false ? { earlyLoss: true } : {};
     const ev = pendingStoryEvent(save, 'introDone') ?? pendingStoryEvent(save, 'townEnter', ctx);
     if (ev) return this.#playStory(ev, ctx, () => undefined);
+    // 2026-11-05 指示書 AX【4】：大会会場に入ったときのシエナ（1回の入場で1つ。街に入ったときのイベントが先）
+    const hall = this.#map.id === 'hall' ? pendingStoryEvent(save, 'hallEnter') : null;
+    if (hall) return this.#playStory(hall, {}, () => undefined);
     const season = this.#seasonChange;
     this.#seasonChange = null;
     if (season) this.#storyEvent('season', { season }, () => undefined);
