@@ -28,6 +28,7 @@ import './ui/styles/calendar.css';
 import './ui/styles/tapSize.css';
 import './ui/styles/habitat.css';
 import './ui/styles/storyEvents.css';
+import './ui/styles/ax.css';
 import { startApp } from './ui/app.ts';
 
 const root = document.querySelector<HTMLElement>('#app');

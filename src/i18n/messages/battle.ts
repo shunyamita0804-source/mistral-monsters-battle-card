@@ -254,6 +254,7 @@ export const BATTLE = {
   'battle.monster.acted': { ja: '行動済', en: 'Acted' },
   'battle.monster.owner.player': { ja: 'あなたのモンスター', en: 'Your monster' },
   'battle.monster.owner.opponent': { ja: '相手のモンスター', en: "Opponent's monster" },
+  'battle.monster.statusLine': { ja: '状態：{text}', en: 'Status: {text}' },
   'battle.monster.life': { ja: 'ライフ {life}/{max}', en: 'Life {life}/{max}' },
   'battle.monster.lifeActed': { ja: 'ライフ {life}/{max}（このターンは行動済み）', en: 'Life {life}/{max} (already acted this turn)' },
 

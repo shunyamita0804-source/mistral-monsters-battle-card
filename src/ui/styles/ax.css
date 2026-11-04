@@ -1,0 +1,73 @@
+/* ===== 2026-11-05 指示書 AX ===== */
+
+/* 【1】状態の印：場のモンスターカードの上（カードの外・すぐ上）に横一列。モンスターの絵には重ねない。
+ * 1つのときは「アイコン＋文字」、2つ以上のときはアイコンだけ（文はカードを押したときの説明に出す）。
+ * 高さ 15px：相手3体と自分3体のあいだ（FIELD_GAP 16）・相手の手札の段とのすき間に入る大きさ */
+.battle__monster .battle__status {
+  top: auto;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  z-index: 4;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 15px;
+  transform: translateX(-50%);
+}
+
+.battle__monster .battle__status .battle__status-art {
+  width: 14px;
+  height: 14px;
+}
+
+.battle__monster .battle__status .battle__status-text {
+  height: 15px;
+  box-sizing: border-box;
+  padding: 0 4px 0 0;
+  gap: 1px;
+  border-radius: 8px;
+  font-size: 9px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.battle__monster .battle__status .battle__status-label {
+  display: block;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle__monster .battle__status.is-many .battle__status-text {
+  padding: 0;
+}
+
+.battle__monster .battle__status.is-many .battle__status-label {
+  display: none;
+}
+
+.battle__monster .battle__status .battle__status-stat {
+  height: 15px;
+  padding: 0 2px 0 0;
+  border-radius: 8px;
+  background: rgb(10 14 24 / 0.85);
+  border: 1px solid rgb(201 162 74 / 0.6);
+  box-sizing: border-box;
+  filter: none;
+}
+
+.battle__monster .battle__status .battle__status-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.battle__monster .battle__status .battle__status-num {
+  height: 11px;
+}
+
+/* 印があるモンスターを技の対象にするときは、矢印を印の上へ */
+.battle__monster.has-status .battle__pointer {
+  top: -30px;
+}
