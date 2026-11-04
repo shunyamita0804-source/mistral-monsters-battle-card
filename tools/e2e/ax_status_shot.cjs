@@ -28,8 +28,16 @@ fs.mkdirSync(out, { recursive: true });
   await page.goto(base);
   await page.waitForTimeout(1500);
   await page.addStyleTag({ content: '.stage-diag{display:none!important}' });
+  // 案B（写真で比べるだけ。ゲームには入れていない）：相手側の印は文字を残して縦に積み、相手の手札の段の下のはしに重ねる
+  if (PLAN === 'b') {
+    await page.addStyleTag({
+      content:
+        '.battle__monster--opponent .battle__status{flex-direction:column-reverse!important;height:auto!important;gap:1px!important}' +
+        '.battle__monster--opponent .battle__status.is-many .battle__status-label{display:block!important}' +
+        '.battle__monster--opponent .battle__status.is-many .battle__status-text{padding:0 4px 0 0!important}',
+    });
+  }
   await page.evaluate(async ([plan]) => {
-    if (plan) document.documentElement.dataset.statusPlan = plan;
     globalThis.__battlePatch = (s) => {
       const t = s.turn;
       // 自分：1体目に3つ・2体目に1つ（＋右上の角の印）・3体目は0

@@ -236,9 +236,11 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // lifeScale は試遊でバルカと同じ目標（最初の手持ち3箱・プレイヤー側は腕前 B・1000回で 18.1％ ±3）に合わせた：1.0 でプレイヤーの勝ち 18.3％（0.95〜1.05 は同じ。1.1 で 6.1％）
   // （docs/thunder-plateau-ah-20261101.md・npm run playtest:stella）
   'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1.36, skill: 'A' },
-  // 2026-11-05 指示書 AX【3】：切り札（真ん中）をラズックからギアロスへ。ほかの2体はそのまま。lifeScale は 指示書 AU の「目安のプレイヤー」で目標 13％（±3）に合わせ直す（docs/ax-tyrant-gearos-20261105.md）
-  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, GEAROS_MONSTER_ID, GAU], ace: GEAROS_MONSTER_ID, lifeScale: 1.92, skill: 'A' },
-  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.76, skill: 'A' },
+  // 2026-11-05 指示書 AX【3】【6】：切り札（真ん中）をラズックからギアロスへ。ほかの2体はそのまま。指示書 AU の「目安のプレイヤー」（A の枠。ギアロスを持っている）で
+  // 目標 13％（±3）に合わせ直した：1.92＝2.1％ → 1.60＝15.6％（ライフ 13・13・10。1.69＝8.7％ は外れる）。記録 docs/ax-tyrant-gearos-20261105.md
+  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, GEAROS_MONSTER_ID, GAU], ace: GEAROS_MONSTER_ID, lifeScale: 1.6, skill: 'A' },
+  // 2026-11-05 指示書 AX【6】：S の目安のプレイヤーがギアロスを持つようになり、1.76＝5.7％ と目標 10％（±3）から外れたので 1.66（ライフ 10・12・13）に
+  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.66, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
   // 2026-11-02 指示書 AQ：切り札（真ん中）をツムジからウズリオへ。ほかの2体はそのまま。lifeScale はツムジのときの勝つ割合（いまの最初の3箱・腕前 B・1000回で 2.8％）に

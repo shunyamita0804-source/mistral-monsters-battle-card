@@ -98,9 +98,10 @@ const [kind, who] = mode.split(':');
       await page.screenshot({ path: `${out}/${who}_combo_play${suffix}.png` });
       await page.waitForTimeout(3500);
       await page.screenshot({ path: `${out}/${who}_combo_defense${suffix}.png` });
-      // 記録（ルールの本の横の記録の帯を開かずに、state の記録の最後を出す）
-      const logText = await page.evaluate(() => [...document.querySelectorAll('.battle-mid, .battle-log, .battle__log')].map((e) => e.textContent).join(' | '));
-      console.log('log', logText.slice(0, 200));
+      // 記録（経過の1行を押すと開く記録の窓）
+      await page.locator('.battle__ticker-hit').first().click({ timeout: 3000 }).catch(() => console.log('no ticker'));
+      await page.waitForTimeout(700);
+      await page.screenshot({ path: `${out}/${who}_combo_log${suffix}.png` });
     }
     console.log('battle', who);
   }

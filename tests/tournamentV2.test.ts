@@ -61,9 +61,10 @@ describe('大会のデータ（仮）', () => {
   });
 
   // 2026-11-02 指示書 AU：その時点の目安のプレイヤーで優勝する割合に合わせたので、倍率は C＜B＜A のあと S で少し下がる（C 0.86・B 0.9・A 1.06・S 1）
-  it('強さ（RANK_SCALE）は C 0.86・B 0.9・A 1.06・S 1。勝率は仮の固定値（カミラ 91%・アルヴィン 100%）', () => {
+  // 2026-11-05 指示書 AX：A・S の目安のプレイヤーがギアロスを持つようになり、A 1.13・S 1.05 に合わせ直した
+  it('強さ（RANK_SCALE）は C 0.86・B 0.9・A 1.13・S 1.05。勝率は仮の固定値（カミラ 91%・アルヴィン 100%）', () => {
     const scale = (t: TournamentDefinition): number => t.bracket?.pool[0]?.lifeScale ?? 0;
-    expect(RANK_SCALE).toEqual({ C: 0.86, B: 0.9, A: 1.06, S: 1 });
+    expect(RANK_SCALE).toEqual({ C: 0.86, B: 0.9, A: 1.13, S: 1.05 });
     expect(scale(C)).toBeLessThan(scale(B));
     expect(scale(B)).toBeLessThan(scale(A));
     expect(scale(S)).toBeLessThan(scale(A));

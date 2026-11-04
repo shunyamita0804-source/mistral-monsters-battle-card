@@ -116,7 +116,9 @@ type RegularId = 'sienna' | 'dolf' | 'leonard' | 'greta' | 'julius' | 'camilla' 
  * ランクごとの強さ（ライフ倍率の目安。仮）。2026-11-02 指示書 AU：その時点の「目安のプレイヤー」が優勝する割合を C 30・B 25・A 20・S 15％ に合わせた
  * （前は C 1.15・B 1.25・A 1.35・S 1.5。プレイヤーが後のランクほど強くなるので、倍率は C＜B＜A のあと S で少し下がる。docs/balance-au-20261102.md）
  */
-export const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 0.86, B: 0.9, A: 1.06, S: 1 };
+// 2026-11-05 指示書 AX【6】：A・S の目安のプレイヤーがギアロス（機械の塔の切り札）を持つようになったので、目標から外れた A・S だけ合わせ直した
+// （A 1.06＝30.7％ → 1.13＝20.4％、S 1.00＝25.8％ → 1.05＝15.6％。docs/ax-tyrant-gearos-20261105.md）
+export const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 0.86, B: 0.9, A: 1.13, S: 1.05 };
 
 /**
  * E・D の総当たりの全体の強さ（2026-11-02 指示書 AU）。相手3人の lifeScale（下の rounds の値）に掛ける。
