@@ -286,6 +286,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.6 試遊中：ジオル（2026-10-29）。エネルギーをためる・じならし
   const geol = chooseEnergyOrPin(state, side, options, enemies, style, skill);
   if (geol) return geol;
+  // 2.65 タイラント（2026-11-05 指示書 AX）。竜のまなざし・竜のちから
+  const dragon = chooseDragonFocus(state, side, options, enemies, skill);
+  if (dragon) return dragon;
 
   // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルの死のレクイエム
   const tide = chooseTide(state, side, options);
@@ -749,6 +752,59 @@ function chooseEnergyOrPin(state: BattleState, side: Side, options: Option[], en
   const victim = reach.filter((e) => e.life <= follow.power).sort((a, b) => b.life - a.life)[0] ?? pickTarget(state, side, reach, style, skill, 'pin');
   if (!victim || isPinned(state, victim)) return null;
   return { type: 'useCard', side, cardUid: pin.card.uid, userUid: user.uid, targetUid: victim.uid };
+}
+
+/** 竜のまなざし・竜のちからを考える「大きな攻撃」のダメージ（指示書 AX：5以上） */
+const DRAGON_BIG_POWER = 5;
+
+/**
+ * 相手が回避（kind＝'evade'）・防御（'defense'）のカードを持っていそうか（指示書 AX。CPU は相手の手札を見ない。腕前で見積もりの細かさを変える）。
+ * - A：相手の生きているモンスターにその種類の技があり、相手の手札が2枚以上で、相手のマナでいちばん安いその種類の技を払える
+ * - B：相手の生きているモンスターにその種類の技がある（手札・マナは見ない）
+ * - C：B と同じ見方を、半分の割合で見落とす
+ */
+function guardLikely(state: BattleState, side: Side, kind: 'evade' | 'defense', skill: CpuSkill): boolean {
+  const foe = state.sides[otherSide(side)];
+  const guards = aliveMonsters(foe).flatMap((m) => skillsOf(m.cardId).filter((k) => k.effect.type === kind));
+  if (guards.length === 0) return false;
+  if (skill === 'C') return cpuRoll(state, side, `dragon-${kind}`) >= 0.5;
+  if (skill === 'B') return true;
+  return foe.hand.length >= 2 && manaOf(foe) >= Math.min(...guards.map((k) => k.cost));
+}
+
+/**
+ * タイラント（2026-11-05 指示書 AX）：竜のまなざし（次のターン最初の攻撃は回避されない）・竜のちから（防御されない）。
+ * そのモンスターがこの手番に相手を倒せず、次の手番に大きな攻撃（ダメージ5以上）を払えそうで、相手が回避（防御）のカードを持っていそうなとき。
+ * 両方使えるときは回避の方を先に見る（回避されると0になるため）。もうかかっていれば使わない。腕前 C は forgetTrick の割合で使いそこねる
+ */
+function chooseDragonFocus(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], skill: CpuSkill): BattleAction | null {
+  const skills = options.filter(isSkillOption);
+  const focus = skills.filter((o) => o.def.effect.type === 'dragonGaze' || o.def.effect.type === 'dragonMight');
+  if (focus.length === 0 || enemies.length === 0) return null;
+  if (cpuRoll(state, side, 'dragon-forget') < CPU_SKILL[skill].forgetTrick) return null;
+  const mine = state.sides[side];
+  const attacks = skills.filter((o) => o.def.effect.type === 'attack');
+  const nextTurn = state.turn + 2;
+  for (const kind of ['evade', 'defense'] as const) {
+    const type = kind === 'evade' ? 'dragonGaze' : 'dragonMight';
+    const o = focus.find((f) => f.def.effect.type === type);
+    if (!o) continue;
+    const user = availableUsers(state, side, o.def).find((m) => {
+      const already = kind === 'evade' ? m.dragonGaze?.turn === nextTurn : m.dragonMight?.turn === nextTurn;
+      const canKill = attacks.some((a) => availableUsers(state, side, a.def).some((u) => u.uid === m.uid) && targetsFor(state, side, a.def, m).some((e) => e.life <= attackPower(state, a.def, m)));
+      return !already && !canKill;
+    });
+    if (!user) continue;
+    // 次の手番に払えるマナの見積もり（エネルギーをためると同じ：いまのマナ − このカード ＋ 手札からマナにできそうな枚数）
+    const manaNext = manaOf(mine) - o.def.cost + Math.max(0, mine.hand.length - 2);
+    const bigNext = mine.hand.some((c) => {
+      if (c.uid === o.card.uid) return false;
+      const card = getPlayCard(c.cardId);
+      return card.kind === 'skill' && card.effect.type === 'attack' && card.monsterId === user.cardId && skillValue(card) >= DRAGON_BIG_POWER && card.cost <= manaNext;
+    });
+    if (bigNext && guardLikely(state, side, kind, skill)) return { type: 'useCard', side, cardUid: o.card.uid, userUid: user.uid };
+  }
+  return null;
 }
 
 /**

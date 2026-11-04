@@ -1,4 +1,4 @@
-import { AJ_SKILLS } from '../data/skillRebuildAJ.ts';
+import { AJ_QA_SKILLS, AJ_SKILLS } from '../data/skillRebuildAJ.ts';
 
 /**
  * 指示書 AJ（2026-11-01）の技カードの英語【仮訳】。名前を変えた技・新しい技の名前と、効果の文（表の日本語の文ごとの訳）。
@@ -77,10 +77,20 @@ const TEXTS: Readonly<Record<string, string>> = {
   '相手全員に1ダメージ。空中の相手には2ダメージ': '1 dmg to every enemy, 2 dmg to airborne enemies.',
   '相手の手札1枚をランダムに山札へもどす': "Return 1 random card from the enemy's hand to their deck.",
   '条件なしで回避': 'Dodge any attack.',
+  // 2026-11-05 指示書 AX タイラント・ギアロス（仮訳）
+  相手全員にダメージ: 'Damages every enemy.',
+  次のターン回避されない: "Next turn, your first attack can't be dodged.",
+  次のターン防御されない: "Next turn, your first attack can't be guarded.",
+  ちから技のダメージを3軽減: 'Reduce POW skill damage by 3.',
+  かしこさ技のダメージを3軽減: 'Reduce INT skill damage by 3.',
+  'ちから技・かしこさ技を回避': 'Dodge POW and INT skills.',
+  '消費マナ2以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 2+ mana.',
+  '手札から1枚山札に戻し、1枚引いて、そのあと山札をシャッフル': 'Return 1 card from your hand to your deck, draw 1, then shuffle your deck.',
+  山札の上から3枚まで確かめる: 'Look at up to 3 cards from the top of your deck.',
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(
-  Object.values(AJ_SKILLS).flatMap((rows) =>
+  [...Object.values(AJ_SKILLS), ...Object.values(AJ_QA_SKILLS)].flatMap((rows) =>
     rows.flatMap((r) => [
       ...(NAMES[r.id] ? [[`card:${r.id}:name`, NAMES[r.id] as string]] : []),
       [`card:${r.id}:effect`, r.text ? (TEXTS[r.text] ?? r.text) : ''],
@@ -89,4 +99,4 @@ export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(
 );
 
 /** 英語の仮訳が無い効果の文（テストで 0 件を確かめる） */
-export const AJ_EN_MISSING: readonly string[] = Object.values(AJ_SKILLS).flatMap((rows) => rows.filter((r) => r.text && !TEXTS[r.text]).map((r) => r.id));
+export const AJ_EN_MISSING: readonly string[] = [...Object.values(AJ_SKILLS), ...Object.values(AJ_QA_SKILLS)].flatMap((rows) => rows.filter((r) => r.text && !TEXTS[r.text]).map((r) => r.id));

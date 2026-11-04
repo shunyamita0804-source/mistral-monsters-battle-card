@@ -367,6 +367,22 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-uzurio-11:name': 'Updraft Kick',
   'card:skl-uzurio-12:name': 'Whirlwind Veil',
 
+  // タイラント（2026-11-05 指示書 AX。確かめ用だけ。仮訳）
+  'card:mon-tyrant:name': 'Tyrant',
+  'card:mon-tyrant:description': 'A crimson dragon that rules the burning sky.',
+  'card:skl-tyrant-01:name': 'Tail',
+  'card:skl-tyrant-02:name': 'Wing Attack',
+  'card:skl-tyrant-03:name': 'Bite',
+  'card:skl-tyrant-04:name': 'Dragon Dive',
+  'card:skl-tyrant-05:name': 'Flame',
+  'card:skl-tyrant-06:name': 'Wing Cutter',
+  'card:skl-tyrant-07:name': 'Dragon Breath',
+  'card:skl-tyrant-08:name': 'Crimson Inferno',
+  'card:skl-tyrant-09:name': 'Dragon Gaze',
+  'card:skl-tyrant-10:name': 'Dragon Might',
+  'card:skl-tyrant-11:name': 'Scale Guard',
+  'card:skl-tyrant-12:name': 'Soar Skyward',
+
   // 指示書 AJ（2026-11-01）：名前を変えた技・新しい技の名前と、効果の文（src/i18n/contentEnAJ.ts。同じキーはこちらが勝つ）
   ...AJ_EN,
 };

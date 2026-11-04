@@ -3,6 +3,7 @@ import { MONSTERS, SKILLS, SUPPORTS } from '../../data/cards.ts';
 import { PACKS } from '../../data/economy.ts';
 import { addCards, addCoins, unlockPacks } from '../../game/save/saveData.ts';
 import { getLanguage, localeOf, t } from '../../i18n/i18n.ts';
+import { cardName } from '../../i18n/content.ts';
 import { confirmModal, messageModal } from '../components/modal.ts';
 import { createScreenHeader } from '../components/screenHeader.ts';
 import { button, h } from '../dom.ts';
@@ -119,6 +120,8 @@ export const settingsScreen: ScreenDefinition = {
                 button(t('pukarimLab.title'), () => ctx.navigate('pukarimLab'), 'btn btn--small'),
                 // 試遊中のジオル（2026-10-29）：ふつうに遊んでいる人には出さない
                 button(t('geolLab.title'), () => ctx.navigate('geolLab'), 'btn btn--small'),
+                // 2026-11-05 指示書 AX：タイラント（置き場所が決まるまで、ここからだけ）
+                button(t('axLab.titleOf', { name: cardName('mon-tyrant') }), () => ctx.navigate('tyrantLab'), 'btn btn--small'),
                 // 2026-11-02 指示書 AP：蒼海（みちしおあり）を試す
                 button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small'),
                 button(t('storyEvent.lab.title'), () => ctx.navigate('storyEventLab'), 'btn btn--small'),

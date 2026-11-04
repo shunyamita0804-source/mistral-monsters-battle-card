@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cardCatalog, MONSTERS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
+import { cardCatalog, MONSTERS, QA_MONSTERS, QA_SKILLS, SKILLS, SUPPORTS } from '../src/data/cards.ts';
 import { ENCOUNTERS } from '../src/data/dungeons.ts';
 import { MAPS } from '../src/data/maps.ts';
 import { TOURNAMENTS, tournamentOpponents } from '../src/data/tournaments.ts';
@@ -102,6 +102,9 @@ describe('カードデータの点検（正式データを入れる前の土台�
       ...SKILLS.filter((s) => !s.isPlaceholder).map((s) => s.id),
       // サポート11種類（2026-10-30 指示書 Z で絵が入った）
       ...SUPPORTS.map((s) => s.id),
+      // 確かめ用だけのタイラント（2026-11-05 指示書 AX）
+      ...QA_MONSTERS.map((m) => m.id),
+      ...QA_SKILLS.map((s) => s.id),
     ]);
     expect(checkCardData(cardCatalog.all(), options).filter((i) => i.code === 'officialWithoutArt')).toEqual([]);
   });

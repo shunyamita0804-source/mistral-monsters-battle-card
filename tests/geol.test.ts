@@ -132,8 +132,9 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
     expect(INITIAL_DISTRIBUTION.some((d) => d.monsterId === GEOL_MONSTER_ID)).toBe(false);
     for (const b of BOOSTERS) expect(b.monsters).not.toContain(GEOL_MONSTER_ID);
     expect(Object.keys(createNewGameSave().collection).some((id) => id.includes('geol'))).toBe(false);
-    expect(QA_MONSTERS).toEqual([]);
-    expect(QA_SKILLS).toEqual([]);
+    // 確認用の一覧（QA）にジオルはいない（2026-11-05 指示書 AX からタイラントだけがいる）
+    expect(QA_MONSTERS.some((m) => m.id === GEOL_MONSTER_ID)).toBe(false);
+    expect(QA_SKILLS.some((s) => s.monsterId === GEOL_MONSTER_ID)).toBe(false);
     expect(skillsOf(GEOL_MONSTER_ID).map((s) => s.id)).toEqual(ajIds);
   });
 

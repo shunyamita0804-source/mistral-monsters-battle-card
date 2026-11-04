@@ -1,0 +1,152 @@
+import { ENCOUNTERS } from '../../data/dungeons.ts';
+import { getMonster, skillsOf } from '../../data/cards.ts';
+import { BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
+import { TYRANT_MONSTER_ID, tyrantSkillId } from '../../data/tyrant.ts';
+import { swapDeck } from '../../game/battle/playtest.ts';
+import type { Deck } from '../../game/deck/deck.ts';
+import { boosterDeck } from '../../game/story/introV2.ts';
+import { cardName } from '../../i18n/content.ts';
+import { t } from '../../i18n/i18n.ts';
+import type { MessageKey } from '../../i18n/messages/index.ts';
+import { createBattleMonsterCard } from '../components/battleMonsterCard.ts';
+import { createScreenHeader } from '../components/screenHeader.ts';
+import { createSkillCard } from '../components/skillCard.ts';
+import { button, h } from '../dom.ts';
+import type { ScreenDefinition } from './types.ts';
+
+/**
+ * 2026-11-05 指示書 AX の確かめ用の画面（?qa=1 のときだけ。設定の「QA用」の欄・?qa=1&lab=tyrant／gearos）。作りはジオルの試遊の画面と同じ。
+ * - モンスターのバトル用カードと技カード12枚
+ * - そのモンスター入りのデッキで対戦（箱の3体目と入れ替え。どちらのデッキも借り物で、持っているカード・セーブのデッキは変えない）
+ * - ギアロスは、機械の塔の守り手テオ（enc-machine-boss。切り札がギアロス）とも対戦できる
+ */
+
+/** 入れ替える位置（箱の3体目） */
+const LAB_SLOT = 2;
+
+type Pick = readonly { readonly id: string; readonly copies: number }[];
+
+/** 入れ替えの16枚：技12枚を1枚ずつ、足りない分は安い攻撃からもう1枚ずつ（試遊の「レアあり」と同じ） */
+function lab16(monsterId: string): Pick {
+  const cards = skillsOf(monsterId);
+  const counts: Record<string, number> = Object.fromEntries(cards.map((k) => [k.id, 1]));
+  let n = cards.length;
+  const attacks = cards.filter((k) => k.effect.type === 'attack').sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
+  for (let round = 0; n < 16 && round < 2; round++) {
+    for (const k of attacks) {
+      if (n >= 16) break;
+      counts[k.id] = (counts[k.id] ?? 0) + 1;
+      n++;
+    }
+  }
+  return cards.map((k) => ({ id: k.id, copies: counts[k.id] ?? 1 }));
+}
+
+interface LabSpec {
+  readonly id: 'tyrantLab';
+  readonly monsterId: string;
+  /** 新しい効果を目で確かめる用の16枚（新しい効果のカードを多めに） */
+  readonly check16: Pick;
+  /** 守り手（相手の編成。ギアロスはテオ） */
+  readonly bossId?: string;
+}
+
+const boosterName = (key: BoosterKey): string => t(`introV2.pack.name.${key.slice(-1)}` as MessageKey);
+
+function makeLab(spec: LabSpec): ScreenDefinition {
+  return {
+    id: spec.id,
+    titleKey: 'axLab.title',
+    create(ctx) {
+      const store = ctx.store;
+      const element = h('main', { class: 'screen pukarim-lab geol-lab' });
+      const name = cardName(spec.monsterId);
+      type Mine = BoosterKey | 'check';
+      type Theirs = BoosterKey | `with:${BoosterKey}` | 'boss';
+      let mine: Mine = 'booster-1';
+      let theirs: Theirs = spec.bossId ? 'boss' : `with:booster-2`;
+      const keyOf = (c: string): BoosterKey => c.slice(c.indexOf(':') + 1) as BoosterKey;
+      const withMonster = (k: BoosterKey): Deck => swapDeck(k, LAB_SLOT, spec.monsterId, lab16(spec.monsterId));
+      const labelOf = (c: Theirs): string =>
+        c === 'boss' && spec.bossId ? t('axLab.boss', { boss: ENCOUNTERS[spec.bossId]?.name ?? '' }) : c.startsWith('with:') ? t('axLab.withMonster', { box: boosterName(keyOf(c)), name }) : boosterName(c as BoosterKey);
+
+      const startBattle = (): void => {
+        const playerDeck = mine === 'check' ? swapDeck('booster-1', LAB_SLOT, spec.monsterId, spec.check16) : withMonster(mine);
+        const boss = spec.bossId ? ENCOUNTERS[spec.bossId] : undefined;
+        if (theirs === 'boss' && boss) {
+          store.pendingBattle = { title: t('axLab.battleTitle', { name }), opponent: boss, playerDeck, allowSurrender: true, onFinish: () => ctx.reset(spec.id) };
+        } else {
+          const opponentDeck = theirs.startsWith('with:') ? withMonster(keyOf(theirs)) : boosterDeck(theirs as BoosterKey);
+          store.pendingBattle = {
+            title: t('axLab.battleTitle', { name }),
+            opponent: { id: `qa-${spec.id}`, name: t('axLab.opponent'), monsters: opponentDeck.monsters, lifeScale: 1 },
+            opponentDeck,
+            playerDeck,
+            allowSurrender: true,
+            onFinish: () => ctx.reset(spec.id),
+          };
+        }
+        ctx.navigate('battle');
+      };
+
+      const choice = <T extends string>(value: T, current: T, text: string, pick: (v: T) => void): HTMLButtonElement => {
+        const b = button(text, () => {
+          pick(value);
+          render();
+        }, `btn btn--small pukarim-lab__choice${value === current ? ' is-active' : ''}`);
+        b.setAttribute('aria-pressed', String(value === current));
+        return b;
+      };
+
+      const render = (): void => {
+        const keys = BOOSTERS.map((b) => b.key);
+        const theirChoices: Theirs[] = [...(spec.bossId ? (['boss'] as const) : []), ...keys, ...keys.map((k) => `with:${k}` as const)];
+        element.replaceChildren(
+          createScreenHeader({ title: t('axLab.titleOf', { name }), back: { label: t('common.back'), onTap: () => ctx.back('settings') } }),
+          h(
+            'div',
+            { class: 'screen__body pukarim-lab__body' },
+            h('p', { class: 'pukarim-lab__note', text: t('pukarimLab.note') }),
+            h(
+              'section',
+              { class: 'pukarim-lab__section' },
+              h('h2', { class: 'pukarim-lab__heading', text: t('axLab.cards', { name }) }),
+              h(
+                'div',
+                { class: 'pukarim-lab__cards' },
+                h('div', { class: 'pukarim-lab__monster' }, createBattleMonsterCard(getMonster(spec.monsterId), 110)),
+                ...[...skillsOf(spec.monsterId)].sort((a, b) => (a.displayNo ?? 0) - (b.displayNo ?? 0)).map((s) => createSkillCard(s, { width: 110, showText: true })),
+              ),
+            ),
+            h(
+              'section',
+              { class: 'pukarim-lab__section' },
+              h('h2', { class: 'pukarim-lab__heading', text: t('axLab.battle', { name }) }),
+              h('p', { class: 'pukarim-lab__label', text: t('axLab.mine', { name }) }),
+              h(
+                'div',
+                { class: 'pukarim-lab__row' },
+                ...keys.map((k) => choice<Mine>(k, mine, t('axLab.withMonster', { box: boosterName(k), name }), (v) => (mine = v))),
+                choice<Mine>('check', mine, t('axLab.effectCheck'), (v) => (mine = v)),
+              ),
+              h('p', { class: 'pukarim-lab__label', text: t('axLab.theirs') }),
+              h('div', { class: 'pukarim-lab__row' }, ...theirChoices.map((k) => choice<Theirs>(k, theirs, labelOf(k), (v) => (theirs = v)))),
+              button(t('pukarimLab.start'), startBattle, 'btn btn--primary pukarim-lab__start'),
+            ),
+          ),
+        );
+      };
+      render();
+      return { element };
+    },
+  };
+}
+
+/** タイラント：竜のまなざし・竜のちから・ドラゴンブレスを3枚ずつ（ほかは安い攻撃と守り） */
+export const tyrantLabScreen: ScreenDefinition = makeLab({
+  id: 'tyrantLab',
+  monsterId: TYRANT_MONSTER_ID,
+  check16: [
+    [9, 3], [10, 3], [7, 2], [1, 2], [5, 2], [3, 1], [11, 1], [12, 2],
+  ].map(([no, copies]) => ({ id: tyrantSkillId(no as number), copies: copies as number })),
+});

@@ -14,11 +14,12 @@ import { DESUORU_MONSTER, DESUORU_SKILLS } from './desuoru.ts';
 import { LILIL_MONSTER } from './lilil.ts';
 import { FORN_MONSTER } from './forn.ts';
 import { UZURIO_MONSTER } from './uzurio.ts';
+import { TYRANT_MONSTER } from './tyrant.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
 import { NOBITON_MONSTER, NOBITON_SKILLS } from './nobiton.ts';
 import { SORAMO_MONSTER, SORAMO_SKILLS } from './soramo.ts';
-import { AJ_SKILLS, MONSTER_HABITAT, type AjSkillRow } from './skillRebuildAJ.ts';
+import { AJ_QA_SKILLS, AJ_SKILLS, MONSTER_HABITAT, type AjSkillRow } from './skillRebuildAJ.ts';
 
 /**
  * 【仮データ】カード一覧。
@@ -313,10 +314,15 @@ export const LEGACY_SUPPORT_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map(supp
  * 確認用（?qa=1）だけで使うカード。カードの一覧（MONSTERS・SKILLS）には入れないので、図鑑・デッキ編集・ガチャ・全カード追加・初期配布・敵の編成には出ない。
  * 台帳（cardCatalog）と適合技（skillsOf）には入れる（対戦で使えるように）。
  * 2026-10-28 に試遊中のプカリムを入れていたが、2026-10-29 の最終でふつうの一覧へ移した。
- * 2026-10-29：試遊中のジオル（src/data/geol.ts）を入れていたが、同じ日のジオルの最終でふつうの一覧へ移した。いまは空
+ * 2026-10-29：試遊中のジオル（src/data/geol.ts）を入れていたが、同じ日のジオルの最終でふつうの一覧へ移した。
+ * 2026-11-05 指示書 AX【2】：タイラント（置き場所・入手が決まるまで。技は skillRebuildAJ.ts の AJ_QA_SKILLS）
  */
-export const QA_MONSTERS: readonly MonsterCard[] = [];
-export const QA_SKILLS: readonly SkillCard[] = [];
+// 2026-11-05 指示書 AX【2】：タイラント（置き場所・入手はまだ決まっていない。確かめ用の画面 ?qa=1&lab=tyrant だけ）
+export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER].map((m): MonsterCard => {
+  const habitat = MONSTER_HABITAT[m.id];
+  return habitat ? { ...m, habitat } : m;
+});
+export const QA_SKILLS: readonly SkillCard[] = QA_MONSTERS.flatMap((m) => (AJ_QA_SKILLS[m.id] ?? []).map((row, i) => ajSkill(m.id, row, i)));
 
 export const cardCatalog = createCardCatalog([...MONSTERS, ...SKILLS, ...SUPPORTS, ...QA_MONSTERS, ...QA_SKILLS]);
 

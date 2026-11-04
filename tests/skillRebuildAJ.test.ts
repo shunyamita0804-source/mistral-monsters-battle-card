@@ -114,7 +114,9 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
 
   it('居場所：地上10体（フォルンは指示書 AL・ウズリオは指示書 AQ）・空中5体（リリルは指示書 AK）・水中3体', () => {
     const by = (h: string): string[] => Object.entries(MONSTER_HABITAT).filter(([, v]) => v === h).map(([k]) => k);
-    expect(by('ground')).toHaveLength(10);
+    // 2026-11-05 指示書 AX：確かめ用だけのタイラント（地上）も入れて11体
+    expect(by('ground')).toHaveLength(11);
+    expect(by('ground')).toContain('mon-tyrant');
     expect(by('ground')).toContain('mon-forn');
     expect(by('ground')).toContain('mon-uzurio');
     expect(by('air').sort()).toEqual(['mon-desuoru', 'mon-gauul', 'mon-hyouzuku', 'mon-lilil', 'mon-pukarim']);

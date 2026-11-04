@@ -1689,6 +1689,9 @@ export const battleScreen: ScreenDefinition = {
       if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn && m.life > 0) pushText(textBadge(statusNoEvadeArt, t('battle.status.noEvade')));
       // ジオルのエネルギーをためる：かけた手番から、効く手番まで（相手からも見える。2026-10-30 指示書 X。前は右上の角の「ためている」の印）
       if (m.energy && m.life > 0 && s.turn <= m.energy.turn) pushText(textBadge(statusEnergyArt, t('battle.status.energy')));
+      // タイラントの竜のまなざし・竜のちから（2026-11-05 指示書 AX）：かけた手番から、効く手番まで（相手からも見える）。印の絵は【仮】で今ある絵を使う
+      if (m.dragonGaze && m.life > 0 && s.turn <= m.dragonGaze.turn) pushText(textBadge(statusNoEvadeArt, t('battle.status.dragonGaze')));
+      if (m.dragonMight && m.life > 0 && s.turn <= m.dragonMight.turn) pushText(textBadge(statusShieldArt, t('battle.status.dragonMight')));
       // すなをほる：攻撃の対象にならない（使った手番と相手の次の手番の間だけ出す。絵は守りの印を使う）
       if (m.hiddenTurn !== undefined && m.hiddenTurn !== null && m.hiddenTurn >= s.turn) pushText(textBadge(statusShieldArt, t('battle.status.hidden')));
       if (m.taunt && m.taunt.turn >= s.turn) pushText(textBadge(statusTauntArt, t('battle.status.taunted', { only: cardName(m.taunt.monsterId) })));

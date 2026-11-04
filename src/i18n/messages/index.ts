@@ -10,6 +10,7 @@ import { BOOK } from './book.ts';
 import { WALK_LAB } from './walkLab.ts';
 import { PUKARIM_LAB } from './pukarimLab.ts';
 import { GEOL_LAB } from './geolLab.ts';
+import { AX_LAB } from './axLab.ts';
 import { SOUKAI_LAB } from './soukaiLab.ts';
 import { EVENT_LAB } from './eventLab.ts';
 import { WORLD } from './world.ts';
@@ -35,6 +36,7 @@ export const MESSAGE_GROUPS = {
   walkLab: WALK_LAB,
   pukarimLab: PUKARIM_LAB,
   geolLab: GEOL_LAB,
+  axLab: AX_LAB,
   soukaiLab: SOUKAI_LAB,
   eventLab: EVENT_LAB,
   name: NAME_MESSAGES,
@@ -56,6 +58,7 @@ export const MESSAGES = {
   ...WALK_LAB,
   ...PUKARIM_LAB,
   ...GEOL_LAB,
+  ...AX_LAB,
   ...SOUKAI_LAB,
   ...EVENT_LAB,
   ...NAME_MESSAGES,

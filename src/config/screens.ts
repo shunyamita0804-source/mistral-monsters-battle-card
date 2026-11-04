@@ -32,6 +32,8 @@ export const SCREEN_IDS = [
   'pukarimLab',
   /** ジオルの試遊の画面（確認用。?qa=1 のときだけ設定から入れる。2026-10-29） */
   'geolLab',
+  /** 2026-11-05 指示書 AX：タイラントの確認用の画面（?qa=1&lab=tyrant） */
+  'tyrantLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

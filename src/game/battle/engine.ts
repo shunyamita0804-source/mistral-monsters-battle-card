@@ -81,6 +81,13 @@ export interface BattleMonster {
    * かしこさ技を使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える。ちから技では消えない
    */
   readonly energy?: { readonly turn: number } | null;
+  /**
+   * 竜のまなざし（2026-11-05 指示書 AX：タイラント）：効く手番（turn。かけた側の次の自分の手番）に、このモンスターが最初に使う攻撃1回は回避されない。
+   * 攻撃を使ったら消え、使わなくてもその手番が終わったら効かない。重ねない。倒れたら消える
+   */
+  readonly dragonGaze?: { readonly turn: number } | null;
+  /** 竜のちから（2026-11-05 指示書 AX：タイラント）：竜のまなざしと同じ形で、最初に使う攻撃1回は防御されない（かばうも使えない） */
+  readonly dragonMight?: { readonly turn: number } | null;
   /** このターン（turn）に次に使う攻撃技のダメージ＋amount（2026-10-30 指示書 Y：声援）。攻撃を1回使うか、ターンが終わったら効かない。倒れたら消える */
   readonly cheer?: { readonly amount: number; readonly turn: number } | null;
   /**
@@ -155,6 +162,10 @@ export interface PendingAttack {
   readonly coveredFrom?: string;
   /** エネルギーをためるで2倍になった攻撃（記録・試遊の数え用） */
   readonly energized?: boolean;
+  /** 竜のまなざし（指示書 AX）がかかった攻撃：回避されない（相手全員への攻撃なら、どの相手にも） */
+  readonly dragonGaze?: boolean;
+  /** 竜のちから（指示書 AX）がかかった攻撃：防御されない（かばうも使えない。相手全員への攻撃なら、どの相手にも） */
+  readonly dragonMight?: boolean;
   /**
    * 相手全体への攻撃で、相手がいま空中かどうかで威力が変わるとき（おおたつまき 2026-11-02 指示書 AS）：空中でない相手・空中の相手への威力。
    * 相手が替わるたびに、その相手の居場所で power を決め直す（使ったときの状態で計算した値）
@@ -462,9 +473,9 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     const against = guardAgainst(skill);
     if (against !== 'all' && against !== pending.stat) return NO(t('battle.ng.wrongStat', { stat: statLabel(pending.stat) }));
     const attackCard = attackCardOf(pending.cardId);
-    if (type === 'defense' && unblockableAgainst(state, attackCard, target)) return NO(t('battle.ng.unblockable'));
+    if (type === 'defense' && (unblockableAgainst(state, attackCard, target) || pending.dragonMight)) return NO(t('battle.ng.unblockable'));
     // 「回避されない」攻撃は、回避の条件が合っていても回避できない（防御はできる）。水中・空中の相手には回避できない攻撃も（指示書 AJ）
-    if (type === 'evade' && (undodgeableAgainst(state, attackCard, target) || pending.undodgeable)) return NO(t('battle.ng.undodgeable'));
+    if (type === 'evade' && (undodgeableAgainst(state, attackCard, target) || pending.undodgeable || pending.dragonGaze)) return NO(t('battle.ng.undodgeable'));
     // じならしをかけられたモンスターは、この手番の次の攻撃1回を回避できない（防御はできる）
     if (type === 'evade' && pending.pinned) return NO(t('battle.ng.pinned'));
     // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
@@ -531,7 +542,7 @@ export function coverUser(state: BattleState, side: Side, skill: SkillCard): Bat
 function coverUsability(state: BattleState, side: Side, skill: SkillCard, pending: PendingAttack): Usability {
   const attack = attackCardOf(pending.cardId).effect;
   const targeted = state.sides[side].monsters.find((m) => m.uid === pending.targetUid);
-  if (unblockableAgainst(state, attackCardOf(pending.cardId), targeted)) return NO(t('battle.ng.unblockable'));
+  if (unblockableAgainst(state, attackCardOf(pending.cardId), targeted) || pending.dragonMight) return NO(t('battle.ng.unblockable'));
   if (attack.type === 'attack' && attack.allTargets) return NO(t('battle.ng.coverAllTargets'));
   if (pending.coveredFrom) return NO(t('battle.ng.coverOnce'));
   if (pending.responses.length > 0) return NO(t('battle.ng.coverFirst'));
@@ -707,6 +718,18 @@ export function energyOf(state: BattleState, user: BattleMonster | undefined, sk
   return !!e && user.life > 0 && state.turn === e.turn && skill.effect.type === 'attack' && skill.stat?.type === 'wisdom';
 }
 
+/** 竜のまなざし（指示書 AX）で、この手番に user が使う攻撃が回避されないか（効く手番で、まだ攻撃を使っていないとき） */
+export function dragonGazeOf(state: BattleState, user: BattleMonster | undefined): boolean {
+  const g = user?.dragonGaze;
+  return !!g && user.life > 0 && state.turn === g.turn;
+}
+
+/** 竜のちから（指示書 AX）で、この手番に user が使う攻撃が防御されないか（効く手番で、まだ攻撃を使っていないとき） */
+export function dragonMightOf(state: BattleState, user: BattleMonster | undefined): boolean {
+  const m = user?.dragonMight;
+  return !!m && user.life > 0 && state.turn === m.turn;
+}
+
 /** 場の全体カードによる、その能力の攻撃のダメージの増減 */
 export function fieldModifier(state: BattleState, stat: StatType): number {
   const e = fieldSupport(state)?.effect;
@@ -834,7 +857,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -1088,11 +1111,16 @@ function useCard(
       if (cheerOf(state, user) > 0) next = updateMonster(next, user.uid, { cheer: null });
       // エネルギーをためる：効く手番の最初のかしこさ技で消える（ちから技では消えない）
       if (energized) next = addLog(updateMonster(next, user.uid, { energy: null }), t('battle.log.energyDouble', { name: nameOf(user.cardId) }));
+      // 竜のまなざし・竜のちから（指示書 AX）：効く手番の最初の攻撃で消える（ちから技・かしこさ技どちらでも）
+      const gaze = dragonGazeOf(state, user);
+      const might = dragonMightOf(state, user);
+      if (gaze) next = addLog(updateMonster(next, user.uid, { dragonGaze: null }), t('battle.log.dragonGazeUsed', { name: nameOf(user.cardId) }));
+      if (might) next = addLog(updateMonster(next, user.uid, { dragonMight: null }), t('battle.log.dragonMightUsed', { name: nameOf(user.cardId) }));
       if (undodgeable) next = addLog(next, t('battle.log.chargedUndodgeable', { name: nameOf(user.cardId) }));
       if (allTargets) next = addLog(next, t('battle.log.allTargets', { name: nameOf(user.cardId) }));
       if (airBonus > 0) next = addLog(next, t('battle.log.airBonus', { n: airBonus }));
-      // 防御も回避もできない攻撃は、守備を待たずにダメージ
-      if (skill.effect.unblockable && skill.effect.undodgeable) {
+      // 防御も回避もできない攻撃は、守備を待たずにダメージ（竜のまなざし・竜のちからで両方そろったときも。相手全員への攻撃は1体ずつ守りの順を回す）
+      if ((skill.effect.unblockable || might) && (skill.effect.undodgeable || gaze) && !allTargets) {
         // しめったはだ（受けるダメージ−）は守備のカードではないので、防御できない攻撃にも効く【要仕様確定】
         const dealt = Math.max(0, power - shieldOf(state, target, skill.stat.type));
         const lost = Math.min(dealt, target.life);
@@ -1114,6 +1142,8 @@ function useCard(
           ...(isPinned(state, target) ? { pinned: true } : {}),
           ...(allTargets ? { queue: targets.slice(1).map((m) => m.uid) } : {}),
           ...(energized ? { energized: true } : {}),
+          ...(gaze ? { dragonGaze: true } : {}),
+          ...(might ? { dragonMight: true } : {}),
           ...(allPower ? { allPower } : {}),
         },
       };
@@ -1201,6 +1231,16 @@ function useCard(
       next = updateMonster(next, user.uid, { energy: { turn: state.turn + 2 } });
       return addLog(next, t('battle.log.energy', { name: nameOf(user.cardId) }));
     }
+    case 'dragonGaze': {
+      // 竜のまなざし（指示書 AX）：次の自分の手番（turn + 2）に最初に使う攻撃1回は回避されない。重ねない（もう一度使ったら効く手番だけ新しく）
+      next = updateMonster(next, user.uid, { dragonGaze: { turn: state.turn + 2 } });
+      return addLog(next, t('battle.log.dragonGaze', { name: nameOf(user.cardId) }));
+    }
+    case 'dragonMight': {
+      // 竜のちから（指示書 AX）：次の自分の手番（turn + 2）に最初に使う攻撃1回は防御されない。重ねない
+      next = updateMonster(next, user.uid, { dragonMight: { turn: state.turn + 2 } });
+      return addLog(next, t('battle.log.dragonMight', { name: nameOf(user.cardId) }));
+    }
     case 'windRide': {
       // かぜのり：次の自分の手番（turn + 2）の間、使ったモンスターの攻撃技の消費マナ−discount。重ねない（もう一度使ったら効く手番だけ新しく）
       next = updateMonster(next, user.uid, { windRide: { discount: skill.effect.discount, turn: state.turn + 2 } });
@@ -1287,7 +1327,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, windRide: null, chain: null, cheer: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);

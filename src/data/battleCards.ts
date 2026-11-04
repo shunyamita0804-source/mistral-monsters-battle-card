@@ -13,6 +13,7 @@ import { DESUORU_MONSTER_ID } from './desuoru.ts';
 import { LILIL_MONSTER_ID } from './lilil.ts';
 import { FORN_MONSTER_ID } from './forn.ts';
 import { UZURIO_MONSTER_ID } from './uzurio.ts';
+import { TYRANT_MONSTER_ID } from './tyrant.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
 import { SORAMO_MONSTER_ID } from './soramo.ts';
@@ -82,6 +83,9 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   // ウズリオ（2026-11-02 指示書 AQ）：枠ははっきりした空色（#3D8FD6）。絵は届いた uzurio_battleart.png（1169×1345 透過）を無改変。
   // 頭の大きな渦の毛（絵の上の端まで）と、しっぽの先（絵の左の端まで）が枠に切られない大きさ
   [UZURIO_MONSTER_ID]: { art: 'uzurio_battlecard.png', frame: 'uzurio', scale: 0.8, offsetY: 0 },
+  // タイラント（2026-11-05 指示書 AX）：枠は真っ赤（#A31523）。絵は届いた tyrant_battle_transparent.png（800×920）の透明度を 0／255 にそろえたもの。
+  // 翼と角が枠の飾りに隠れない大きさ
+  [TYRANT_MONSTER_ID]: { art: 'tyrant_battlecard.png', frame: 'tyrant', scale: 0.86, offsetY: 0.01 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

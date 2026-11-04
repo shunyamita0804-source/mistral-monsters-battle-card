@@ -30,6 +30,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-lilil': 'air', // 2026-11-02 指示書 AK
   'mon-forn': 'ground', // 2026-11-02 指示書 AL
   'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
+  'mon-tyrant': 'ground', // 2026-11-05 指示書 AX（確かめ用だけ）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -379,6 +380,32 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-uzurio-10', name: 'ふわりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', art: 'uzurio_sk_10.webp' },
     { id: 'skl-uzurio-11', name: 'まきあげキック', cat: 'ち', mana: 3, damage: 3, text: null, art: 'uzurio_sk_11.webp' },
     { id: 'skl-uzurio-12', name: 'つむじがくれ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'uzurio_sk_12.webp' },
+  ],
+};
+
+/**
+ * 確かめ用（?qa=1）だけのモンスターの技（指示書 AJ の形。ふつうの一覧・図鑑・ガチャには出さない。src/data/cards.ts の QA_SKILLS）。
+ * AJ_MONSTER_IDS には入れない（試遊・ガチャのシリーズ・箱の点検の対象にしない）
+ */
+export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
+  // タイラント（地上・LIFE 8・A。2026-11-05 指示書 AX【2】。正本は src/data/official/tyrant_skills_20261105.csv）。置き場所・入手はまだ決まっていない。
+  // 絵は tyrant_sk_NN.webp（番号＝技番号。sk_04 は新しい絵）。新しい効果は 09 竜のまなざし（dragonGaze）・10 竜のちから（dragonMight）
+  'mon-tyrant': [
+    { id: 'skl-tyrant-01', name: 'しっぽ', cat: 'ち', mana: 2, damage: 3, text: null, art: 'tyrant_sk_01.webp' },
+    { id: 'skl-tyrant-02', name: 'ウイングアタック', cat: 'ち', mana: 4, damage: 4, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'tyrant_sk_02.webp' },
+    { id: 'skl-tyrant-03', name: 'かみつき', cat: 'ち', mana: 4, damage: 6, text: null, art: 'tyrant_sk_03.webp' },
+    { id: 'skl-tyrant-04', name: 'ドラゴンダイブ', cat: 'ち', mana: 5, damage: 8, text: null, rare: true, art: 'tyrant_sk_04.webp' },
+    { id: 'skl-tyrant-05', name: 'かえん', cat: 'か', mana: 3, damage: 5, text: null, art: 'tyrant_sk_05.webp' },
+    { id: 'skl-tyrant-06', name: 'ウイングカッター', cat: 'か', mana: 3, damage: 4, effect: atk({ halfOnEvade: true }), text: T_HALF, art: 'tyrant_sk_06.webp' },
+    // ジオルの 地ひびき・ヒョウズクの つららのあめ と同じ当て方（相手全員。守りは1体ずつ）
+    { id: 'skl-tyrant-07', name: 'ドラゴンブレス', cat: 'か', mana: 5, damage: 2, effect: atk({ allTargets: true }), text: '相手全員にダメージ', art: 'tyrant_sk_07.webp' },
+    { id: 'skl-tyrant-08', name: 'しんくのごくえん', cat: 'か', mana: 6, damage: 10, text: null, rare: true, art: 'tyrant_sk_08.webp' },
+    // 新しい効果（ジオルの エネルギーをためる と同じ形。次の自分のターンに最初に使う攻撃1回）
+    { id: 'skl-tyrant-09', name: '竜のまなざし', cat: '特', mana: 2, damage: null, effect: { type: 'dragonGaze' }, text: '次のターン回避されない', rare: true, art: 'tyrant_sk_09.webp' },
+    { id: 'skl-tyrant-10', name: '竜のちから', cat: '特', mana: 2, damage: null, effect: { type: 'dragonMight' }, text: '次のターン防御されない', art: 'tyrant_sk_10.webp' },
+    // 効果の文：CSV は「ちから技のダメージを3軽減」。防御の文は「どの技に効くか」だけにそろえる決まり（軽減の数はカードの盾の欄に出る）なので T_FORCE
+    { id: 'skl-tyrant-11', name: 'ウロコのガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, art: 'tyrant_sk_11.webp' },
+    { id: 'skl-tyrant-12', name: '上空に飛ぶ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: 'ちから技・かしこさ技を回避', rare: true, art: 'tyrant_sk_12.webp' },
   ],
 };
 
