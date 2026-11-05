@@ -346,3 +346,16 @@ ZIP「Mistral_Name_CardList_UISound_20261028」の `se/`（指示書「進行が
 
 この曲になる対戦：練習場の試験（ガレス先生・導入の初戦・負けたあとの再挑戦も）と、練習場の中で始めた練習試合（先生の練習テーブル）。
 ダンジョンの野生モンスター・ボス・大会・街の人（ピート）・となりの家で始めた練習試合は今までの曲。対戦が終わったら今までどおり練習場の曲（無心になれる作業）に戻る。
+
+## 2026-11-05 対戦の結果画面の曲（指示書 BG）
+
+指示書 BG の ZIP「Mistral_CC_BG_ResultScreen」の `audio/`（原本は `design-parts/result-screen-20261105/audio/` に無改変）。ゲームでは届いた MP3 をそのまま `assets/audio/bgm/` に置いた（加工なし）。
+設定画面のクレジット（`settings.credits`）にも足した。
+
+| 曲（BGM_REGISTRY） | ファイル | 曲名・作曲 | 出どころ |
+| --- | --- | --- | --- |
+| `battleWinJingle`：結果画面（勝ち）・1回だけ | `bgm_battle_win_jingle.mp3`（約 9.95 秒） | 勝利BGM「勝利ジングル」作曲：Make a field Music | 音楽素材提供：OpenTracks（旧 DOVA-SYNDROME） |
+| `battleLoseJingle`：結果画面（負け）・1回だけ | `bgm_battle_lose_jingle.mp3`（約 8.05 秒・最後に約 1.4 秒の無音） | 敗北BGM「ゲームオーバー」作曲：カピバラっ子 | 音楽素材提供：OpenTracks（旧 DOVA-SYNDROME） |
+
+- 大きさ：届いた曲は平均 -13.4 dB（勝ち）・-14.0 dB（負け）で、今のバトルの曲（-12.8 dB）とほぼ同じなので、バトルの曲と同じ合わせ方（gain 0.36）。設定の BGM の音量に従う
+- 結果画面では、前の2秒の効果音（`se/battle_win`・`battle_lose`）は鳴らさない（ファイルは残している）

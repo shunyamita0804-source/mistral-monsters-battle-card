@@ -4,6 +4,8 @@ import tournamentMp3 from '@assets/audio/bgm/bgm_tournament.mp3';
 import tournamentBattleMp3 from '@assets/audio/bgm/bgm_tournament_battle.mp3';
 import dungeonMp3 from '@assets/audio/bgm/bgm_dungeon.mp3';
 import battleMp3 from '@assets/audio/bgm/bgm_battle.mp3';
+import battleWinJingleMp3 from '@assets/audio/bgm/bgm_battle_win_jingle.mp3';
+import battleLoseJingleMp3 from '@assets/audio/bgm/bgm_battle_lose_jingle.mp3';
 import bossBattleMp3 from '@assets/audio/bgm/bgm_boss_battle.mp3';
 import dungeonRuinsMp3 from '@assets/audio/bgm/bgm_dungeon_ruins.mp3';
 import dungeonForestMp3 from '@assets/audio/bgm/bgm_dungeon_forest.mp3';
@@ -62,6 +64,9 @@ export type BgmId =
   | 'prologue'
   | 'departure'
   | 'battle'
+  // 2026-11-05 指示書 BG：対戦の結果画面の曲（1回だけ）
+  | 'battleWinJingle'
+  | 'battleLoseJingle'
   | 'bossBattle'
   | 'tutorialBattle';
 
@@ -128,6 +133,10 @@ export const BGM_REGISTRY: Readonly<Record<BgmId, BgmEntry>> = {
   departure: { src: departureMp3, gain: 0.68 },
   // ダンジョン・練習の対戦（野生モンスター）：神獣の試練 / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   battle: { src: battleMp3, gain: 0.36 },
+  // 2026-11-05 指示書 BG：結果画面の勝ち・負けの曲（1回だけ・くり返さない）。届いた曲は今のバトルの曲とほぼ同じ大きさ（平均 -13.4／-14.0 dB。バトルの曲は -12.8 dB）なので、
+  // バトルの曲と同じ合わせ方（0.36）。勝利ジングル：Make a field Music／ゲームオーバー：カピバラっ子（OpenTracks〔旧 DOVA-SYNDROME〕。docs/audio-credits.md）
+  battleWinJingle: { src: battleWinJingleMp3, gain: 0.36, loop: false },
+  battleLoseJingle: { src: battleLoseJingleMp3, gain: 0.36, loop: false },
   // ダンジョンのボス：己と仲間を信じて / ユーフルカ（Wingless Seraph。2026-10-26 ユーザー提供）
   bossBattle: { src: bossBattleMp3, gain: 0.31 },
   // カード練習場（教習所）の対戦：チュートリアル / いまたく（imataku。OpenTracks〔旧 DOVA-SYNDROME〕 https://opentracks.com/bgm/detail/9057。2026-11-02 ユーザー提供・指示書 AN）。
@@ -184,6 +193,30 @@ class BgmPlayer {
     if (this.#playing?.id === id) return;
     this.#stop(FADE_OUT_S);
     this.#start();
+  }
+
+  /**
+   * いまの曲を fadeS 秒で小さくして止めてから、id を鳴らす（重ねない。2026-11-05 指示書 BG：対戦の曲 → 結果画面の曲）。
+   * 待っている間にほかの曲を頼まれたら、そちらを鳴らす
+   */
+  playAfterStop(id: BgmId, fadeS: number): void {
+    this.#wanted = id;
+    if (this.#playing?.id === id) return;
+    this.#stop(fadeS);
+    setTimeout(() => {
+      if (this.#wanted === id) this.#start();
+    }, fadeS * 1000 + 60);
+  }
+
+  /** いまの曲を fadeS 秒で小さくして止める（結果画面の「続ける」など。次の画面の曲と重ねない） */
+  stop(fadeS: number): void {
+    this.#wanted = null;
+    this.#stop(fadeS);
+  }
+
+  /** いま鳴らしている（鳴らそうとしている）曲 */
+  get current(): BgmId | null {
+    return this.#playing?.id ?? this.#wanted;
   }
 
   /** 最初のタップで鳴らし始める・画面が隠れたら止める（何度呼んでもよい） */

@@ -35,6 +35,10 @@ import {
   type Side,
 } from '../../game/battle/engine.ts';
 import { faceKeyOf, opponentFace, opponentFaceUrl } from '../components/opponentFace.ts';
+import resultWinLogo from '@assets/images/ui/result/result_win_logo.webp';
+import resultLoseLogo from '@assets/images/ui/result/result_lose_logo.webp';
+import resultDrawLogo from '@assets/images/ui/result/result_draw_logo.webp';
+import resultFaceFrame from '@assets/images/ui/result/result_opponent_face_frame.webp';
 import {
   categoryLabel,
   describePlayCard,
@@ -277,6 +281,11 @@ const HAND_FLIP_STAGGER_MS = 95;
 const HAND_FLIP_MS = 240;
 /** 先攻・後攻のカードをめくってからバトルを始めるまで（ミリ秒） */
 const ORDER_REVEAL_MS = 1300;
+/** 結果画面（指示書 BG）：対戦の曲を小さくして止める時間・「続ける」で結果の曲を止める時間（秒） */
+const RESULT_BGM_FADE_S = 0.5;
+const RESULT_BGM_STOP_S = 0.3;
+/** 結果の文字の絵（日本語・英語とも同じ絵） */
+const RESULT_LOGOS: Readonly<Record<'win' | 'lose' | 'draw', string>> = { win: resultWinLogo, lose: resultLoseLogo, draw: resultDrawLogo };
 /**
  * マナにするカードが、手札の場所で光って消える時間（ミリ秒）。
  * 2026-10-24 ユーザー指示「マナにしたときはカードが一個一個、消えるエフェクトを入れその時にSEを。マナのとこに行く時のSEは不要」：
@@ -433,23 +442,27 @@ export const battleScreen: ScreenDefinition = {
     /** 相手（NPC）のモンスターが倒れた順（カード ID。切り札が最後に倒れたかを見る） */
     const oppDownOrder: string[] = [];
     /** その場面のひと言を出す（出したら true）。key の代わりに extra（切り札など）があれば先に試す */
-    const sayNpc = (key: NpcLineKey, extra?: NpcExtraKey): boolean => {
+    /** その場面のひと言の文と強さ（無言・ひと言が無いときは null） */
+    const npcTextOf = (key: NpcLineKey, extra?: NpcExtraKey): { text: string; priority: number } | null => {
       const special = extra ? npcLine(npcActor, extra) : undefined;
       const line = special ?? npcLine(npcActor, key);
-      if (line === null) return false;
+      if (line === null) return null;
       const priority = npcLinePriority(special ? (extra as NpcExtraKey) : key);
-      if (Date.now() < talkUntil && priority < talkPriority) return false;
-      let text: string | null = null;
-      if (line) text = localText(line);
-      else {
-        const generic = GENERIC[key];
-        if (!generic) return false;
-        const own = ownLine[generic];
-        text = own ? localText(own) : t(generic);
-      }
-      sayText(text, priority);
+      if (line) return { text: localText(line), priority };
+      const generic = GENERIC[key];
+      if (!generic) return null;
+      const own = ownLine[generic];
+      return { text: own ? localText(own) : t(generic), priority };
+    };
+    const sayNpc = (key: NpcLineKey, extra?: NpcExtraKey): boolean => {
+      const line = npcTextOf(key, extra);
+      if (!line) return false;
+      if (Date.now() < talkUntil && line.priority < talkPriority) return false;
+      sayText(line.text, line.priority);
       return true;
     };
+    /** 結果画面の相手のひと言（2026-11-05 指示書 BG：勝ち・負けのひと言は結果画面の窓に出す。吹き出しには出さない） */
+    let resultLine: string | null = null;
     /** 相手のセリフ（文そのもの）をふきだしで出す。対戦の進み（手番・操作）は止めない */
     const sayText = (text: string, priority = 2): void => {
       talkPriority = priority;
@@ -1957,7 +1970,8 @@ export const battleScreen: ScreenDefinition = {
      * 押すと先に消える。顔の絵がない相手（ダンジョンなど）は吹き出しだけ
      */
     const talkOverlay = (s: BattleState): HTMLElement | null => {
-      if (!oppLine || Date.now() >= talkUntil) return null;
+      // 結果画面が出ている間は吹き出しを出さない（勝ち・負けのひと言は結果画面の窓。指示書 BG）
+      if (!oppLine || Date.now() >= talkUntil || s.phase === 'ended') return null;
       const url = opponentFaceUrl(faceKeyOf(req.opponent));
       const el = h(
         'div',
@@ -2326,41 +2340,72 @@ export const battleScreen: ScreenDefinition = {
       );
     };
 
+    /**
+     * 対戦の結果画面（2026-11-05 指示書 BG。PS版のように1枚で）：上から 相手の顔＋名前とひと言 → WIN／LOSE／DRAW の文字の絵（判子のように縮んで止まる）→
+     * 主人公の勝ち・負けの絵（引き分けは出さない）→「続ける」。顔の絵が無い相手は、顔の段を出さずにひと言だけ。
+     * 曲：対戦の曲を小さくして止めてから、勝ち・負けの曲を1回だけ（引き分けは無音）。前の2秒の効果音は鳴らさない。「続ける」で曲を 0.3 秒で止める
+     */
     const resultOverlay = (s: BattleState): HTMLElement | null => {
       if (s.phase !== 'ended') return null;
       const w = s.winner;
       if (!resultSounded) {
         resultSounded = true;
         req.onDecided?.(w ?? 'draw');
-        sound.play(w === 'player' ? 'battleWin' : 'battleLose', 500);
+        if (w === 'player') bgm.playAfterStop('battleWinJingle', RESULT_BGM_FADE_S);
+        else if (w === 'opponent') bgm.playAfterStop('battleLoseJingle', RESULT_BGM_FADE_S);
+        else bgm.stop(RESULT_BGM_FADE_S);
         // 切り札が最後に倒れて負けた：切り札の敗北のひと言（ふつうの敗北のひと言の代わり。1回だけ）
         const aceLast = !!req.opponent.ace && oppDownOrder.at(-1) === req.opponent.ace && s.endReason === 'knockout';
-        sayNpc(resultLineKey(w), w === 'player' && aceLast ? 'ace_down_final' : undefined);
-        // 吹き出しはこの描き直しではもう作り終わっている（talkOverlay が先）ので、すぐもう一度描いて勝ち負けのひと言を出す
-        setTimeout(() => !destroyed && render(), 0);
+        // 引き分けは勝ち・負けのひと言が無いので出さない（名前だけ。前は勝ちのひと言を出していた）
+        resultLine = w ? (npcTextOf(resultLineKey(w), w === 'player' && aceLast ? 'ace_down_final' : undefined)?.text ?? null) : null;
+        // 対戦中の吹き出しは消す（二重に出さない）
+        oppLine = null;
+        talkUntil = 0;
       }
-      const title = t(w === 'player' ? 'battle.result.win' : w === 'opponent' ? 'battle.result.lose' : 'battle.result.draw');
+      const kind = w === 'player' ? 'win' : w === 'opponent' ? 'lose' : 'draw';
       const reason = s.endReason === 'deckOut' ? t(w === 'player' ? 'battle.result.deckOutOpponent' : 'battle.result.deckOutPlayer') : '';
       const go = seDecide(
         commandButton(t('battle.result.next'), () => {
+          if (go.disabled) return;
           go.disabled = true;
+          bgm.stop(RESULT_BGM_STOP_S);
           finish(s.winner);
         }),
       );
-      // 勝ち・負けの主人公の姿（2026-10-27 デザイン第13弾。引き分けは出さない）。結果の窓の上に、窓が足元に重なるように
+      const faceUrl = opponentFaceUrl(faceKeyOf(req.opponent));
+      const opponentRow = h(
+        'div',
+        { class: `battle-result__opponent${faceUrl ? '' : ' is-faceless'}` },
+        faceUrl
+          ? h('span', { class: 'battle-result__face' }, h('img', { class: 'battle-result__face-img', attrs: { src: faceUrl, alt: '', draggable: 'false' } }), h('img', { class: 'battle-result__face-frame', attrs: { src: resultFaceFrame, alt: '', draggable: 'false' } }))
+          : null,
+        h(
+          'div',
+          { class: 'battle-result__window' },
+          h('p', { class: 'battle-result__name', text: s.sides.opponent.name }),
+          // ひと言は文節の区切りでだけ改行（phraseText）
+          resultLine ? h('p', { class: 'battle-result__line' }, phraseText(resultLine)) : null,
+        ),
+      );
+      const title = t(w === 'player' ? 'battle.result.win' : w === 'opponent' ? 'battle.result.lose' : 'battle.result.draw');
+      // 勝ち・負けの主人公の姿（2026-10-27 デザイン第13弾。引き分けは出さない）
       const hero =
         w === 'player' || w === 'opponent'
-          ? h('img', { class: 'battle__result-hero', attrs: { src: heroResultUrl(heroProfile.gender, w === 'player'), alt: '', draggable: 'false' } })
+          ? h('img', { class: 'battle-result__hero', attrs: { src: heroResultUrl(heroProfile.gender, w === 'player'), alt: '', draggable: 'false' } })
           : null;
       return h(
         'div',
-        { class: `battle__result battle__result--${w ?? 'draw'}` },
-        hero,
+        { class: `battle__result battle-result battle-result--${kind}`, attrs: { role: 'dialog', 'aria-label': title } },
+        opponentRow,
         h(
           'div',
-          { class: 'battle__result-panel' },
-          // 勝ち・負けの帯（デザイン第2弾）の真ん中に結果の文字
-          h('div', { class: 'battle__result-banner' }, h('p', { class: 'battle__result-title', text: title })),
+          { class: 'battle-result__logo-row' },
+          h('img', { class: 'battle-result__logo', attrs: { src: RESULT_LOGOS[kind], alt: title, draggable: 'false' } }),
+        ),
+        h('div', { class: 'battle-result__hero-row' }, hero),
+        h(
+          'div',
+          { class: 'battle-result__foot' },
           h('p', { class: 'battle__result-sub', text: t('battle.result.sub', { title: req.title, n: s.turn }) }),
           reason ? h('p', { class: 'battle__result-sub', text: reason }) : null,
           go,
