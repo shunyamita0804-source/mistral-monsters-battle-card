@@ -4,34 +4,60 @@
 
 ## 0. 次のセッションへ
 
-### いまの状態（2026-11-05 指示書 BE のあと）
+### まず読む：セッションの引き継ぎ（2026-11-05 夕）
+
+- **作業中のものは無い**。main＝origin/main（指示書 BE まで）。ブランチ `claude/claude-md-handoff-notes-l4jywz` も main と同じ。**どれも未公開**
+- **公開ページはまだ開ける**（2026-11-05 も 200。中身は前に公開した古い版）。リポジトリはユーザーがプライベートにした。止めるには設定の Pages で「Unpublish site」（ユーザーの操作待ち）。**公開は「公開して」と言われたときだけ**
+- このセッション（2026-11-05）で main に入れたもの（記録はそれぞれの docs）：
+  - AX：状態の印・タイラント（確かめ用だけ）・ギアロス＋3枚コンボ・イベント第2弾（`docs/ax-tyrant-gearos-20261105.md`・`docs/ax-events-20261105.md`）
+  - AY／AY2／AY3：カードの名前をゲームが書く・テオの3枚コンボ（`docs/ay-card-names-teo-20261105.md`・`docs/ay2-teo-20261105.md`・`docs/ay3-teo-20261105.md`）
+  - AZ：状態・居場所・場のアイコン・日本語の名前のロゴ（`docs/az-status-icons-20261105.md`）
+  - BA：AZ の直し・技カードの効果のアイコン（`docs/ba-icons-fix-20261105.md`）
+  - BC：英語名 Pyrrow・Desorl・Tyrandos・英語の名前のロゴ（`docs/bc-english-names-20261105.md`）
+  - BB：正式の技132枚すべて効果をアイコンに（本体＋小さな印＋札）・大きいカードは帯なし（`docs/bb-effect-icons-all-20261105.md`）
+  - BE：英語の箱の絵・箱の英語名 Journey's Spark／Blazing Onslaught／Azure Guard（`docs/be-box-en-20261105.md`）
+- **ユーザーの返事待ち**（次の指示が来るまで待つ。要確認はそれぞれの docs の最後）：
+  - テオの3枚コンボ：勝つ割合 15.5％・山札切れ 11.6％・**コンボの対戦 0.3％（目安 5〜10％ に届かない）**。枚数・取っておく決まり・条件のどれかを変えないと上がらない見込み（表は 2026-11-05 にもう一度送った）
+  - 要確認：BE 2つ・BB 6つ・BC 3つ・BA 6つ・AZ 5つ・AX 13個
+  - iPhone 実機での確認（AX 以降まだ）
+  - 指示書 BD はまだ届いていない（BE の指示書に名前だけ出てきた）
+- 作業のしかた（このセッションで分かったこと）：
+  - 指示書の ZIP は `scratchpad` の新しいフォルダに展開。指示書と素材は `design-parts/〈名前〉-20261105/` に写して git に入れる
+  - 流れ：ブランチ → 作る → 写真 → `npm run typecheck`・`npx vitest run --maxWorkers=3`・`npm run build` → docs と「いまの状態」→ main に早送りで取り込む → `ブランチ`・`main`・`claude/claude-md-handoff-notes-l4jywz` の3つに push → 報告 ZIP（報告書.html・photos・data）を scratchpad に作ってユーザーに送る（git には入れない）
+  - 全部まとめてテストすると、ときどき時間切れで落ちるテストがある（`storyEvents` の確かめ用の入口・ソラモ／ラズック／カルシェルの絵の1バイト比べ）。1つずつ動かすと通る
+  - 写真：開発用サーバー `npx vite --port 5173 --host 127.0.0.1`。言語は設定の保存（`mistria-battle-card/settings` の `language`）で切り替える。道具は `tools/e2e/`（BB＝`bb_shot.cjs`・BC＝`bc_book_shot.cjs`／`ay_names_shot.cjs`・BE＝`be_box_shot.cjs`）
+  - 効果のアイコンの表は `src/ui/effectIcons.ts`（効果の文で決める）・重ねる所は `src/ui/components/fxIcon.ts`・ルールの窓は `battleScreen.ts` の `ICON_GUIDE`
+  - 名前のロゴを作り直す：`python3 -I tools/art/card_name_logos.py`（日本語 `logos/`・英語 `logos_en/` → 表 `src/data/cardNameLogos.generated.ts`）
+  - セーブ version は 35 のまま（このセッションでは形を変えていない）
+
+### その前：いまの状態（2026-11-05 指示書 BE のあと）
 
 - **指示書 BE（ブランチ `be-box-en`）を main に取り込んだ・未公開**。記録 `docs/be-box-en-20261105.md`
   - 英語のときは英語の箱の絵（`boosterArt.ts`）。箱の英語名 Journey's Spark・Blazing Onslaught・Azure Guard
 - **ユーザーの返事待ち**：BE の要確認2つ・BB の要確認6つ・BC の要確認3つ・BA の要確認・テオのコンボ・AX の要確認・iPhone 実機
 
-### いまの状態（2026-11-05 指示書 BB のあと）
+### その前：いまの状態（2026-11-05 指示書 BB のあと）
 
 - **指示書 BB（ブランチ `bb-effect-icons-all`）を main に取り込んだ・未公開**。記録 `docs/bb-effect-icons-all-20261105.md`
   - 正式の技132枚すべての効果をアイコンに（本体＋右上の小さな印＋右下の札。`src/ui/effectIcons.ts`・`src/ui/components/fxIcon.ts`）。押すと効果の文
   - 大きく見たときは白い帯をやめ、アイコンを下の効果の場所の真ん中に（案A）。写真の道具 `tools/e2e/bb_shot.cjs`
 - **ユーザーの返事待ち**：BB の要確認6つ・BC の要確認3つ・BA の要確認・テオのコンボの扱い（AY3 の表をもう一度送った）・AX の要確認・iPhone 実機
 
-### いまの状態（2026-11-05 指示書 BC のあと）
+### その前：いまの状態（2026-11-05 指示書 BC のあと）
 
 - **指示書 BC（ブランチ `bc-english-names`）を main に取り込んだ・未公開**。記録 `docs/bc-english-names-20261105.md`
   - 英語の名前：ガウル **Pyrrow**・デスオル **Desorl**・タイラント **Tyrandos**（日本語・ID は同じ）
   - 英語の名前もロゴの絵（`CARD_NAME_LOGOS_EN`）。Bangers をビルドから外した（名前の字体は0）
 - **ユーザーの返事待ち**：BC の要確認3つ・BA の要確認6つ・テオのコンボの扱い・AX の要確認・iPhone 実機
 
-### いまの状態（2026-11-05 指示書 BA のあと）
+### その前：いまの状態（2026-11-05 指示書 BA のあと）
 
 - **指示書 BA（ブランチ `ba-icons-fix`）を main に取り込んだ・未公開**。記録 `docs/ba-icons-fix-20261105.md`
   - 場のアイコンを上の帯の左に・数字の札 14px・スウッシュの中心を明るく・技カードの効果のアイコン（手札＝左の列・大きいカード＝帯に・押すと意味）・ルールの窓に「アイコンの見方」
 - テオの3枚コンボ（探す・最初の手札）は `ay3-teo` で済み（ユーザーが同じ指示をもう一度送った。2026-11-05）
 - **ユーザーの返事待ち**：BA の要確認6つ・テオのコンボの扱い・AX の要確認・iPhone 実機
 
-### いまの状態（2026-11-05 指示書 AZ のあと）
+### その前：いまの状態（2026-11-05 指示書 AZ のあと）
 
 - **指示書 AZ（ブランチ `az-status-icons`）を main に取り込んだ・未公開**。記録 `docs/az-status-icons-20261105.md`
   - 状態の印を新しいアイコン（文字なし・数字の札）・右上の角の印も1列に・居場所の印 T01〜T03・場のアイコン（みちしおは残りの手番）
@@ -40,7 +66,7 @@
 - **ユーザーの返事待ち**：AZ の要確認5つ・【4】の案・テオのコンボ（AY3）・AX の要確認・iPhone 実機
 - アイコンの読み出し `src/ui/statusIcons.ts`。ロゴを作り直す `python3 -I tools/art/card_name_logos.py`
 
-### いまの状態（2026-11-05 テオのコンボの見せ場のあと）
+### その前：いまの状態（2026-11-05 テオのコンボの見せ場のあと）
 
 - **ユーザー指示（AY2 のあと）の2つを main に入れた・未公開**（ブランチ `ay3-teo`）。記録 `docs/ay3-teo-20261105.md`
   - テオが α・β・γ を探す（システムチェンジ／チェック）・最初の手札に α・β・γ のうち1枚（`openingAny`）
@@ -48,7 +74,7 @@
 - **字体（AY）：3案ともやめる（ユーザー決定）**。名前はデザインのロゴの絵にする。素材は次の指示書 AZ。それまでは仮の案A のまま
 - **ユーザーの返事待ち**：コンボをどうするか・指示書 AZ（名前のロゴ）・AX の要確認・iPhone 実機
 
-### いまの状態（2026-11-05 指示書 AY2 のあと）
+### その前：いまの状態（2026-11-05 指示書 AY2 のあと）
 
 - **指示書 AY2（ブランチ `ay2-teo`）を main に取り込んだ・未公開**。記録 `docs/ay2-teo-20261105.md`
   - テオ：α・β・γ 2枚ずつ・それぞれ1枚まで取っておく・使える技が無い手番は取っておかない・lifeScale **1.60** に戻してデッキで強くした（`TEO_DECK`）
@@ -56,7 +82,7 @@
 - **ユーザーの返事待ち**：コンボの見せ場の出し方（案3つ）・字体の案（AY）・AX の要確認・iPhone 実機
 - テオだけ測る：`PLAYTEST=1000 PLAYTEST_PART=bosses PLAYTEST_ONLY=enc-machine-boss PLAYTEST_OUT=… npx vitest run tests/balancePlaytest.test.ts -t 守り手`（約15秒）
 
-### いまの状態（2026-11-05 指示書 AY のあと）
+### その前：いまの状態（2026-11-05 指示書 AY のあと）
 
 - **指示書 AY（ブランチ `ay-card-names`）を main に取り込んだ・未公開**。記録 `docs/ay-card-names-teo-20261105.md`
   - 正式カード20枚を名前なしの絵に差し替え、名前をゲームが書く（`cardNameLayer.ts`・`NAMELESS_OFFICIAL_ART`）。字体3案（今は仮に A：Reggae One＋Bangers。`html[data-card-font]`）
@@ -65,7 +91,7 @@
 - **ユーザーの返事待ち**：字体の案・コンボの割合（28.4％）・テオ戦の山札切れ・AX の要確認・iPhone 実機
 - 写真の道具：`tools/e2e/ay_names_shot.cjs`（compare・all・box・sizes）。字体を作り直す：`python3 -I tools/art/card_name_fonts.py TTFのフォルダ assets/fonts/card-name`（pip install fonttools brotli）
 
-### いまの状態（2026-11-05 指示書 AX のあと）
+### その前：いまの状態（2026-11-05 指示書 AX のあと）
 
 - **指示書 AX（ブランチ `ax-tyrant-gearos-events`）を main に取り込んだ・未公開**（指示書「公開はしない」。ユーザーがサイトを非公開にしている）。記録 `docs/ax-tyrant-gearos-20261105.md`（【1】【2】【3】【6】）・`docs/ax-events-20261105.md`（【4】【5】）
   - 【1】状態の印を場のカードの上（カードの外）に1列（2つ以上はアイコンだけ・文はカードを押した説明に）。相手側は案A
@@ -79,14 +105,14 @@
 - 写真の道具：`tools/e2e/ax_status_shot.cjs`（`PLAN=b` で案B）・`ax_monster_shot.cjs`（`lab:tyrant`・`battle:gearos` など）・`ax_book_shot.cjs`・`ax_frames_shot.cjs`・`ax_events_shot.cjs`。試遊 `npm run playtest:ax`
 - 作業のこつ：絵の道具は `pip install scipy matplotlib`（入れても絵のバイト列は変わらなかった）。ショップの棚を作り直す間（約4分）は開発用サーバーが読み直すので、写真はそのあとに撮る
 
-### いまの状態（2026-11-04 非公開にした）
+### その前：いまの状態（2026-11-04 非公開にした）
 
 - **ユーザーの指示「一旦、今のミスモンBCを非公開にしておいてください」（2026-11-04）で、ユーザーがリポジトリをプライベートにした**（設定はユーザーが自分で変えた。Claude は設定を触っていない）
 - **公開ページ（GitHub Pages）は、非公開にしてから10分たっても開けるままだった**（09:49〜10:00 に確かめた。トップページは 200）。止めるには、設定の Pages で「Unpublish site」を押す（ユーザーにお願いした。押したかどうかは次のセッションで確かめる）
 - **公開し直すのは、ユーザーが「公開して」と言ったときだけ**（リポジトリを Public に戻すかどうかもユーザーが決める。戻さないと Pages は使えないことがある）
 - コードは変えていない。main＝`0b5e3a8`（記録の更新だけ）
 
-### まず読む：セッションの引き継ぎ（2026-11-03）
+### その前：セッションの引き継ぎ（2026-11-03）
 
 - **作業中のものは無い**。main＝origin/main（`dc5b923`）。公開中は main `3998c02`（記録の更新だけがそのあと）。ブランチはすべて main に取り込み済み
 - このセッションでしたこと（どれも main に入れて公開済み）：
