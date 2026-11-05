@@ -5,6 +5,8 @@ import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
 import { createBattleMonsterCard, hasBattleCard } from './battleMonsterCard.ts';
 import { habitatMark } from './habitatMark.ts';
+import { NAMELESS_OFFICIAL_ART } from '../../data/cardNames.ts';
+import { cardNameLayer } from './cardNameLayer.ts';
 
 /**
  * モンスターカードの表示。
@@ -49,6 +51,8 @@ function createArtMonsterCard(monster: MonsterCard, options: MonsterCardOptions,
     life && life.current <= 0 ? h('div', { class: 'monster-card__down', text: t('card.down') }) : null,
     // 居場所の印（2026-11-01 指示書 AJ。正式カードの絵は描き直さず、枠の上に重ねる）
     habitatMark(monster.habitat),
+    // 名前（2026-11-05 指示書 AY：名前を消した正式カードの絵の上に、ゲームが書く）
+    !battle && NAMELESS_OFFICIAL_ART.has(monster.id) ? cardNameLayer(monster, options.width) : null,
   );
   card.style.setProperty('--theme', monster.themeColor);
   card.style.width = `${options.width}px`;

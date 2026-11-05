@@ -1,0 +1,100 @@
+/* ===== 2026-11-05 指示書 AY：モンスターカードの名前（ゲームが書く） =====
+ * 字体は使う文字だけに減らした WOFF2（tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/LICENSE_*.txt）。
+ * 3案：a＝Reggae One＋Bangers・b＝Dela Gothic One＋Bungee・c＝Yuji Boku＋Permanent Marker（html の data-card-font。無ければ a） */
+@font-face {
+  font-family: 'MM Card Name Reggae';
+  src: url('@assets/fonts/card-name/reggae-one.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MM Card Name Dela';
+  src: url('@assets/fonts/card-name/dela-gothic-one.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MM Card Name Yuji';
+  src: url('@assets/fonts/card-name/yuji-boku.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MM Card Name Bangers';
+  src: url('@assets/fonts/card-name/bangers.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MM Card Name Bungee';
+  src: url('@assets/fonts/card-name/bungee.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MM Card Name Marker';
+  src: url('@assets/fonts/card-name/permanent-marker.woff2') format('woff2');
+  font-display: swap;
+}
+
+:root {
+  --card-name-ja: 'MM Card Name Reggae';
+  --card-name-en: 'MM Card Name Bangers';
+  --card-name-en-scale: 1.12;
+}
+
+:root[data-card-font='b'] {
+  --card-name-ja: 'MM Card Name Dela';
+  --card-name-en: 'MM Card Name Bungee';
+  --card-name-en-scale: 0.86;
+}
+
+:root[data-card-font='c'] {
+  --card-name-ja: 'MM Card Name Yuji';
+  --card-name-en: 'MM Card Name Marker';
+  --card-name-en-scale: 1;
+}
+
+.card-name {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  /* 文字の高さぶん（下のスウッシュも入る） */
+  height: calc(var(--card-w) * 0.14);
+}
+
+.card-name__text {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--card-name-ja), 'Hiragino Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+  /* 暗いふち（文字の外側だけ）とやわらかい暗い光：ガウルの白い羽・ソラモの雲の上でも読める強さ */
+  -webkit-text-stroke: calc(var(--card-w) * 0.012) #1d1410;
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 calc(var(--card-w) * 0.012) rgb(0 0 0 / 0.85),
+    0 calc(var(--card-w) * 0.006) calc(var(--card-w) * 0.03) rgb(0 0 0 / 0.75),
+    0 0 calc(var(--card-w) * 0.05) rgb(0 0 0 / 0.45);
+}
+
+.card-name--en .card-name__text {
+  font-family: var(--card-name-en), var(--card-name-ja), sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.card-name__swoosh {
+  position: absolute;
+  z-index: 0;
+  left: calc(var(--card-w) * -0.01);
+  top: calc(var(--card-w) * 0.105);
+  height: auto;
+  max-width: none;
+  filter: drop-shadow(0 0 calc(var(--card-w) * 0.008) rgb(0 0 0 / 0.6));
+}
+
+/* 正式カードの絵の上に重ねるための台（バトルの大きなカードの窓） */
+.card-name-host {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}

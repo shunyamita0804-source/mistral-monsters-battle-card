@@ -29,6 +29,7 @@ import './ui/styles/tapSize.css';
 import './ui/styles/habitat.css';
 import './ui/styles/storyEvents.css';
 import './ui/styles/ax.css';
+import './ui/styles/cardName.css';
 import { startApp } from './ui/app.ts';
 
 const root = document.querySelector<HTMLElement>('#app');

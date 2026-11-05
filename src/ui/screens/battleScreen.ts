@@ -1,5 +1,7 @@
 import { getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_ID, OVERDRIVE_IDS } from '../../data/gearos.ts';
+import { NAMELESS_OFFICIAL_ART } from '../../data/cardNames.ts';
+import { cardNameLayer } from '../components/cardNameLayer.ts';
 import { provisionalRuleNotes } from '../../data/rules.ts';
 import { chooseAction, cpuRoll } from '../../game/battle/ai.ts';
 import { pickCpuLine } from '../../data/cpuLines.ts';
@@ -1538,8 +1540,10 @@ export const battleScreen: ScreenDefinition = {
       const card = getMonster(monster.cardId);
       const officialUrl = resolveCardArt(card.art);
       if (officialUrl) {
-        const img = h('img', { class: 'battle-card-detail__official', attrs: { src: officialUrl, alt: cardName(card), draggable: 'false' } });
-        img.style.width = `${OFFICIAL_CARD_DETAIL_W}px`;
+        const pic = h('img', { class: 'battle-card-detail__official', attrs: { src: officialUrl, alt: cardName(card), draggable: 'false' } });
+        pic.style.width = `${OFFICIAL_CARD_DETAIL_W}px`;
+        // 名前（2026-11-05 指示書 AY）：名前を消した正式カードの絵なら、名前の層を重ねる
+        const img = NAMELESS_OFFICIAL_ART.has(card.id) ? h('div', { class: 'card-name-host' }, pic, cardNameLayer(card, OFFICIAL_CARD_DETAIL_W)) : pic;
         const handle = openModal(element, {
           className: 'battle-card-detail',
           body: [img, ...extra.map((text) => h('p', { class: 'battle-card-detail__line', text }))],

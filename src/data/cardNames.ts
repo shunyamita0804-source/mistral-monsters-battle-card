@@ -1,0 +1,17 @@
+/**
+ * モンスターカードの名前をゲームが書く（2026-11-05 指示書 AY：ユーザー決定「名前は絵から消し、ゲームが1つの字体で上に書く」）。
+ * NAMELESS_OFFICIAL_ART：正式カードの絵（*_official.webp）から名前の文字を消した版に差し替え済みのモンスター。
+ * ここにあるモンスターだけ、正式カードの上に名前の層（src/ui/components/cardNameLayer.ts）を重ねる（名前が2つ重ならないように）。
+ * これから増えるモンスターも、名前の無い絵で入れてここに足す
+ */
+export const NAMELESS_OFFICIAL_ART: ReadonlySet<string> = new Set<string>([]);
+
+/** 字体の3案（指示書 AY【4】。ユーザーが選ぶ。今は仮に a） */
+export type CardNameFont = 'a' | 'b' | 'c';
+export const CARD_NAME_FONT_DEFAULT: CardNameFont = 'a';
+
+/**
+ * 名前の置き場所（カードの幅・高さに対する割合。正式カード 508×849。前の太い文字の16体〔ツムジなど〕の名前の位置を測った値）。
+ * 左＝枠の内側（4.3％）、右のはし＝LIFE の札の手前（74％）。文字の高さはカードの幅の 14％ くらい
+ */
+export const CARD_NAME_BOX = { left: 0.043, top: 0.022, right: 0.74, fontSize: 0.142, swooshTop: 0.112 } as const;
