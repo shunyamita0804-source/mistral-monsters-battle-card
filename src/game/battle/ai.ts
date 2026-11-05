@@ -41,7 +41,7 @@ import {
   type Side,
 } from './engine.ts';
 import type { AiStyle, CpuSkill } from '../../data/tournaments.ts';
-import { OVERDRIVE_CHOICE } from '../../data/gearos.ts';
+import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_COST, OVERDRIVE_IDS } from '../../data/gearos.ts';
 
 /**
  * 対戦相手（およびQA用のオート操作）の思考。
@@ -224,7 +224,11 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
 
   if (state.active !== side) return null;
   if (state.phase === 'mana') return chooseManaAction(state, side, style, skill);
-  const options = usableOptions(state, side);
+  // テオ（指示書 AY）：取っておく α・β・γ は1枚ずつ使わない（3枚コンボは chooseOverdrive が overdriveUsability で別に見る）
+  const held = overdriveHold(state, side, style, OVERDRIVE_HOLD_MIN);
+  // 取っておいている間は、3枚コンボのマナ5を残す（払うとマナが5より少なくなるカードは使わない。マナ0のカードは使う）
+  const reserve = held.size > 0 ? OVERDRIVE_COMBO_COST : 0;
+  const options = usableOptions(state, side).filter((o) => !held.has(o.card.uid) && (reserve === 0 || o.def.cost === 0 || manaOf(state.sides[side]) - o.def.cost >= reserve));
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
@@ -393,6 +397,25 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
 
   // 6. 使えるカードがなければ攻撃を終えてマナ化へ
   return { type: 'endAttack', side };
+}
+
+/**
+ * テオ（構え 'overdrive'。2026-11-05 指示書 AY）が取っておく手札の α・β・γ（uid）。それ以外の構えは空。
+ * α・β・γ のうち min 種類以上（技として使わないのは2種類から。マナにしないのは1枚から）が手札にあり、取っておいても危なくない（自分の生きているモンスターのどれも、相手がいまのマナで払える
+ * いちばん大きい攻撃〔affordableThreat〕で倒れない）ときだけ、その種類の1枚ずつを取っておく。危ないときは空（ふつうに使う・マナにする）
+ */
+/** テオが α・β・γ を技として使わずに取っておく、手札の種類の数（指示書 AY の「2枚」。1にするとコンボの対戦が少し増える：docs/ay-card-names-teo-20261105.md） */
+export const OVERDRIVE_HOLD_MIN = 2;
+
+export function overdriveHold(state: BattleState, side: Side, style: AiStyle, min = 2, ignoreDanger = false): Set<string> {
+  if (style !== 'overdrive') return new Set();
+  const hand = state.sides[side].hand;
+  const cards = OVERDRIVE_IDS.map((id) => hand.find((c) => c.cardId === id)).filter((c): c is HandCard => !!c);
+  if (cards.length < min) return new Set();
+  if (!aliveMonsters(state.sides[side]).some((m) => OVERDRIVE_IDS.some((id) => skillsOf(m.cardId).some((k) => k.id === id)))) return new Set();
+  const threat = affordableThreat(state, side);
+  if (!ignoreDanger && aliveMonsters(state.sides[side]).some((m) => m.life <= threat)) return new Set();
+  return new Set(cards.map((c) => c.uid));
 }
 
 /** オーバードライブの3枚コンボ（ギアロス 指示書 AX）：使えるときは使う。腕前 C は forgetTrick の割合で見落とす */
@@ -1070,7 +1093,10 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
 
 /** マナ化で次にマナにする手札（chooseManaAction の考え方。もりのたよりで捨てる1枚にも使う。2026-11-02 指示書 AL で関数に分けた） */
 function manaPick(state: BattleState, side: Side, style: AiStyle, skill: CpuSkill): HandCard | undefined {
-  const mine = state.sides[side];
+  const mine0 = state.sides[side];
+  // テオ（指示書 AY）：α・β・γ は（1枚でも・危ないときも）マナにしない（危ないときは技としてふつうに使う）
+  const held = overdriveHold(state, side, style, 1, true);
+  const mine = held.size > 0 ? { ...mine0, hand: mine0.hand.filter((c) => !held.has(c.uid)) } : mine0;
   const mana = manaOf(mine);
   const cost = (c: HandCard): number => {
     const card = getPlayCard(c.cardId);

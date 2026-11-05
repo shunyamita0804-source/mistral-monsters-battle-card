@@ -23,7 +23,11 @@ import type { ItemId } from './items.ts';
 /** デッキの組み方（src/game/deck/deck.ts の buildOpponentDeck） */
 export type DeckStyle = 'balanced' | 'power' | 'disrupt' | 'guard' | 'flashy' | 'strong';
 /** 相手の考え方の癖＝構え（キャラクターの性格。src/game/battle/ai.ts の chooseAction） */
-export type AiStyle = 'normal' | 'aggressive' | 'disrupt' | 'guard' | 'flashy' | 'hunter';
+/**
+ * 'overdrive'（2026-11-05 指示書 AY：機械の塔のテオだけ）：ふだんは normal と同じ。ギアロスのオーバードライブ α・β・γ のうち2枚以上が手札にあれば、
+ * 取っておいても危なくない間は1枚ずつ使わず（マナにもしない）、3枚そろったら3枚コンボを狙う（src/game/battle/ai.ts の overdriveHold）
+ */
+export type AiStyle = 'normal' | 'aggressive' | 'disrupt' | 'guard' | 'flashy' | 'hunter' | 'overdrive';
 /** CPU の腕前（2026-10-30 指示書 Z。C 下手・B ふつう・A 上手。構えとは別。ふるまいの数字は src/game/battle/ai.ts の CPU_SKILL） */
 export type CpuSkill = 'C' | 'B' | 'A';
 
@@ -46,6 +50,8 @@ export interface OpponentDefinition {
    * デッキに切り札の技14種を2枚ずつ必ず入れる（src/game/deck/deck.ts の buildOpponentDeck）
    */
   readonly ace?: string;
+  /** 切り札の技のうち、2枚より多く入れる技（ID → 枚数。2026-11-05 指示書 AY：テオのオーバードライブ α・β・γ を3枚ずつ） */
+  readonly aceCopies?: Readonly<Record<string, number>>;
   /** 通算の勝率（%。札を押したときに出す。仮の固定値。常連だけ） */
   readonly winRate?: number;
 }

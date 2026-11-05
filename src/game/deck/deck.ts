@@ -365,10 +365,11 @@ export const ACE_SKILL_COPIES = 2;
  * ボスのデッキ（2026-10-30 指示書 V「切り札の技を2枚ずつ」）：サポート（buildAutoDeck と同じ）＋切り札の技14種を2枚ずつ。
  * 残りは今の作り方（buildAutoDeck）と同じく、ほかのモンスターの技を並びの順に1枚ずつ入れていく（切り札の技は2枚のまま）
  */
-export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
+export function buildAceDeck(monsters: readonly string[], ace: string, aceCopies: Readonly<Record<string, number>> = {}): Deck {
   const aceSkills = skillsOf(ace).map((s) => s.id);
   const skills: string[] = NPC_SUPPORTS.flatMap((id) => Array<string>(NPC_SUPPORT_COPIES).fill(id));
-  for (const id of aceSkills) for (let n = 0; n < ACE_SKILL_COPIES && skills.length < DECK_RULES.skillCount; n++) skills.push(id);
+  // aceCopies（2026-11-05 指示書 AY：テオの α・β・γ を3枚ずつ）があれば、その技はその枚数
+  for (const id of aceSkills) for (let n = 0; n < (aceCopies[id] ?? ACE_SKILL_COPIES) && skills.length < DECK_RULES.skillCount; n++) skills.push(id);
   const counts: Record<string, number> = countCards(skills);
   const pool = monsters.filter((m) => m !== ace).flatMap((m) => skillsOf(m).map((s) => s.id));
   for (let i = 0; skills.length < DECK_RULES.skillCount && i < pool.length * DECK_RULES.maxCopies; i++) {
@@ -391,8 +392,8 @@ export function buildAceDeck(monsters: readonly string[], ace: string): Deck {
  * 大会の相手のデッキ（組み方 deckStyle が無い・balanced なら今までの buildAutoDeck。切り札 ace のあるボスは buildAceDeck）。
  * 組み方があれば、サポート（旅の手帳・投石を2枚ずつ）を入れ、適合技を点数の高い順に上限枚数まで入れて60枚にする。足りなければ点数の低い技・サポートで埋める
  */
-export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle' | 'ace'>): Deck {
-  if (opponent.ace) return buildAceDeck(opponent.monsters, opponent.ace);
+export function buildOpponentDeck(opponent: Pick<OpponentDefinition, 'monsters' | 'deckStyle' | 'ace' | 'aceCopies'>): Deck {
+  if (opponent.ace) return buildAceDeck(opponent.monsters, opponent.ace, opponent.aceCopies);
   const style = opponent.deckStyle;
   if (!style || style === 'balanced') return buildAutoDeck(opponent.monsters);
   const pool = [...new Map(opponent.monsters.flatMap((m) => skillsOf(m)).map((k) => [k.id, k])).values()];

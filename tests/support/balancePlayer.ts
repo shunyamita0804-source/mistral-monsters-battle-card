@@ -9,6 +9,7 @@ import { summarizeBattle, type BattleSummary } from '../../src/game/battle/simul
 import { buildDeckFromCollection, isDeckValid, type Deck } from '../../src/game/deck/deck.ts';
 import { drawSeriesPack } from '../../src/game/economy/gachaSeries.ts';
 import { nextRandom } from '../../src/game/rng.ts';
+import { OVERDRIVE_CHOICE } from '../../src/data/gearos.ts';
 import { boosterCardCounts } from '../../src/game/story/introV2.ts';
 
 /**
@@ -183,11 +184,16 @@ export interface BalanceCount {
   /** 使った守りのカード（防御・回避）の枚数 */
   playerGuards: number;
   opponentGuards: number;
+  /** 相手が使ったオーバードライブの3枚コンボ（2026-11-05 指示書 AY：テオ）の回数・使った対戦の数・その対戦でプレイヤーが勝った数 */
+  opponentCombos: number;
+  opponentComboGames: number;
+  opponentComboGameWins: number;
 }
 
 export const emptyBalanceCount = (): BalanceCount => ({
   games: 0, wins: 0, koWins: 0, deckOutWins: 0, koLosses: 0, deckOutLosses: 0, draws: 0, turns: 0,
   playerAttacks: 0, playerAttacksEvaded: 0, playerAttacksDefended: 0, opponentAttacks: 0, opponentAttacksEvaded: 0, opponentAttacksDefended: 0, playerGuards: 0, opponentGuards: 0,
+  opponentCombos: 0, opponentComboGames: 0, opponentComboGameWins: 0,
 });
 
 export function addBalanceCount(to: BalanceCount, from: BalanceCount): void {
@@ -204,11 +210,16 @@ export interface BalanceOpponent {
 /** プレイヤー（腕前 playerSkill・構えはふつう）と相手の1対戦。勝ったか・終わりの様子を返し、c に数える */
 export function playBalanceMatch(player: Deck, opp: BalanceOpponent, seed: number, first: Side, c: BalanceCount, playerSkill: CpuSkill = 'B'): { won: boolean; summary: BattleSummary } {
   let state: BattleState = createBattle({ name: 'A', deck: player }, { name: 'B', deck: opp.deck, lifeScale: opp.lifeScale }, seed, first);
+  let combo = false;
   for (let i = 0; i < MAX_STEPS && state.phase !== 'ended'; i++) {
     const side = actingSide(state);
     if (!side) break;
     const action = side === 'opponent' ? chooseAction(state, side, opp.ai, opp.skill ?? 'B') : chooseAction(state, side, 'normal', playerSkill);
     if (!action) break;
+    if (side === 'opponent' && action.type === 'useCard' && action.choice === OVERDRIVE_CHOICE) {
+      c.opponentCombos++;
+      combo = true;
+    }
     // 守りを終える（＝攻撃1回のダメージが決まる）ときに、回避・防御と使った守りのカードを数える
     if (action.type === 'defend' && action.cardUid === null && state.pending) {
       const used = state.pending.responses.map((id) => getSkill(id).effect.type);
@@ -232,6 +243,10 @@ export function playBalanceMatch(player: Deck, opp: BalanceOpponent, seed: numbe
   c.games++;
   c.turns += state.turn;
   const won = state.winner === 'player';
+  if (combo) {
+    c.opponentComboGames++;
+    if (won) c.opponentComboGameWins++;
+  }
   if (won) {
     c.wins++;
     if (state.endReason === 'deckOut') c.deckOutWins++;
@@ -264,5 +279,8 @@ export function summarizeBalance(c: BalanceCount): Record<string, number> {
     opponentAttackDefended: pct(c.opponentAttacksDefended, c.opponentAttacks),
     playerGuardsPerGame: avg(c.playerGuards, c.games),
     opponentGuardsPerGame: avg(c.opponentGuards, c.games),
+    opponentComboGames: pct(c.opponentComboGames, c.games),
+    opponentCombosPerGame: avg(c.opponentCombos, c.games),
+    playerWinInComboGames: pct(c.opponentComboGameWins, c.opponentComboGames),
   };
 }

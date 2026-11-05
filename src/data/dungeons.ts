@@ -238,7 +238,18 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   'enc-thunder-boss': { id: 'enc-thunder-boss', name: 'ステラ', monsters: [NOB, HAKURAN_MONSTER_ID, PUK], ace: HAKURAN_MONSTER_ID, lifeScale: 1.36, skill: 'A' },
   // 2026-11-05 指示書 AX【3】【6】：切り札（真ん中）をラズックからギアロスへ。ほかの2体はそのまま。指示書 AU の「目安のプレイヤー」（A の枠。ギアロスを持っている）で
   // 目標 13％（±3）に合わせ直した：1.92＝2.1％ → 1.60＝15.6％（ライフ 13・13・10。1.69＝8.7％ は外れる）。記録 docs/ax-tyrant-gearos-20261105.md
-  'enc-machine-boss': { id: 'enc-machine-boss', name: 'テオ', monsters: [NOB, GEAROS_MONSTER_ID, GAU], ace: GEAROS_MONSTER_ID, lifeScale: 1.6, skill: 'A' },
+  // 2026-11-05 指示書 AY【6】：テオだけ 3枚コンボを狙う（ai 'overdrive'）・α・β・γ を3枚ずつ（aceCopies）。
+  // 目安のプレイヤー（A）が勝つ割合が 36.9％ になったので lifeScale 1.60 → 1.82（ライフ 15・15・11。10.7％。1.75＝17.8％ は外れる）。記録 docs/ay-card-names-teo-20261105.md
+  'enc-machine-boss': {
+    id: 'enc-machine-boss',
+    name: 'テオ',
+    monsters: [NOB, GEAROS_MONSTER_ID, GAU],
+    ace: GEAROS_MONSTER_ID,
+    lifeScale: 1.82,
+    skill: 'A',
+    ai: 'overdrive',
+    aceCopies: { 'skl-gearos-05': 3, 'skl-gearos-06': 3, 'skl-gearos-07': 3 },
+  },
   // 2026-11-05 指示書 AX【6】：S の目安のプレイヤーがギアロスを持つようになり、1.76＝5.7％ と目標 10％（±3）から外れたので 1.66（ライフ 10・12・13）に
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.66, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。

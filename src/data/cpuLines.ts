@@ -29,6 +29,11 @@ export const CPU_LINES: Readonly<Record<AiStyle, CpuLineSet>> = {
     ],
     misguard: [{ ja: '守りなんて性に合わねえんだよ！', en: "Guarding just isn't my style!" }],
   },
+  // テオ（2026-11-05 指示書 AY）：腕前 A なので迷う・守りそこねるのセリフはふだん出ない。発明家らしい仮のセリフ
+  overdrive: {
+    hesitate: [{ ja: 'もうちょっとで、すごい仕掛けがそろうんだ……！', en: "I'm almost ready to show you something amazing...!" }],
+    misguard: [{ ja: 'わっ、計算ちがい！', en: 'Whoa, I miscalculated!' }],
+  },
   guard: {
     hesitate: [{ ja: 'まだ動くときではありませんね', en: 'It is not yet time to move.' }],
     misguard: [{ ja: 'くっ……読み違えました', en: 'Ugh... I misread that.' }],
