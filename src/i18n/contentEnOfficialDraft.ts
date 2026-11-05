@@ -400,7 +400,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-kuyo-12:name': 'Into the Fog',
   // 2026-11-05 指示書 BI：ラディエル（名前は指示書のとおり。説明は仮訳）
   'card:mon-radiel:name': 'Radiel',
-  'card:mon-radiel:description': 'One who wears a ring of light deep in the Holy Sanctuary and pronounces judgment.',
+  'card:mon-radiel:description': 'A white-winged being crowned with a ring of light, floating deep in the Celestial Sanctuary. It is said to pronounce judgment.',
   'card:skl-radiel-01:name': 'Holy Thrust',
   'card:skl-radiel-02:name': 'Cross Needle',
   'card:skl-radiel-03:name': 'Light Orb',

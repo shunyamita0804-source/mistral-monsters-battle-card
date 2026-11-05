@@ -26,14 +26,14 @@ const sor = (n: number): string => `skl-soramo14-${String(n).padStart(2, '0')}`;
 const ky = (n: number): string => `skl-kuyo-${String(n).padStart(2, '0')}`;
 
 describe('ラディエルのデータ（指示書の表のとおり）', () => {
-  it('LIFE 9・空中・金 #D9A21B。ID は mon-radiel。ふつうの一覧に入る', () => {
+  it('LIFE 9・空中・金 #BE7410。ID は mon-radiel。ふつうの一覧に入る', () => {
     const m = getMonster(RADIEL_MONSTER_ID);
     expect(m.name).toBe('ラディエル');
     expect(m.life).toBe(9);
     expect(m.habitat).toBe('air');
     expect(MONSTER_HABITAT[RADIEL_MONSTER_ID]).toBe('air');
     expect(m.themeColor).toBe(RADIEL_COLOR);
-    expect(RADIEL_COLOR).toBe('#D9A21B');
+    expect(RADIEL_COLOR).toBe('#BE7410');
     expect(MONSTERS.some((x) => x.id === RADIEL_MONSTER_ID)).toBe(true);
   });
 
@@ -113,8 +113,8 @@ describe('ラディエルのデータ（指示書の表のとおり）', () => {
       expect(existsSync(f), f).toBe(true);
     }
     expect(BATTLE_CARDS[RADIEL_MONSTER_ID]?.frame).toBe('radiel');
-    expect(CARD_NAME_LOGOS[RADIEL_MONSTER_ID]?.frame).toBe('#D9A21B');
-    expect(CARD_NAME_LOGOS_EN[RADIEL_MONSTER_ID]?.frame).toBe('#D9A21B');
+    expect(CARD_NAME_LOGOS[RADIEL_MONSTER_ID]?.frame).toBe('#BE7410');
+    expect(CARD_NAME_LOGOS_EN[RADIEL_MONSTER_ID]?.frame).toBe('#BE7410');
     setLanguage('en');
     try {
       expect(cardName(RADIEL_MONSTER_ID)).toBe('Radiel');

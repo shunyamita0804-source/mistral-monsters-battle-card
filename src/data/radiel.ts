@@ -12,10 +12,10 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
  * 絵（原本は design-parts/bi-radiel-20261105/radiel/ に無改変。作り方は tools/art/radiel_assets.py）：
  * - 技 radiel_sk_01〜12.webp・正式モンスターカード radiel_official.webp（名前なし → 名前のロゴを重ねる）・バトル用 radiel_battlecard.png（無改変）
  * - パック pack_radiel.webp（袋のまわりの黒だけ透明に）・販売機の窓 panel_radiel.webp・ショップの棚の商品
- * 色：金 #D9A21B（指示書。バトル用カードの枠・技カードの枠・名前のロゴの帯）
+ * 色：金 #BE7410（正式カードの絵の枠の色。2026-11-05 ユーザー指示で指示書の #D9A21B から合わせた。バトル用カードの枠・技カードの枠・名前のロゴの帯・図鑑）
  */
 export const RADIEL_MONSTER_ID = 'mon-radiel';
-export const RADIEL_COLOR = '#D9A21B';
+export const RADIEL_COLOR = '#BE7410';
 
 export const RADIEL_MONSTER: MonsterCard = {
   kind: 'monster',
@@ -24,8 +24,8 @@ export const RADIEL_MONSTER: MonsterCard = {
   rarity: null,
   life: 9,
   themeColor: RADIEL_COLOR,
-  // 説明の文は Claude の仮（英語は contentEnOfficialDraft.ts）
-  description: '天の聖域の奥で、光の輪をいただき裁きを告げる者。',
+  // 2026-11-05 ユーザー決定の文（英語は contentEnOfficialDraft.ts）
+  description: '天の聖域の奥に浮かぶ、光の輪をいただく白き翼。裁きを告げると伝えられる。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'radiel_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'radiel_battlecard.png', layout: 'full' },

@@ -1,0 +1,58 @@
+{
+ "games": 200,
+ "skill": "A",
+ "swap": {
+  "mon-radiel": {
+   "games": 10800,
+   "winA": 77.7,
+   "deckOut": 35,
+   "avgTurns": 33,
+   "purifyPerGame": 0,
+   "purifiedStatuses": 0,
+   "purifiedPerUse": 0,
+   "purifyHealOnly": 0,
+   "purifyHealed": 0,
+   "charmPerGame": 0,
+   "blocked": 0,
+   "blockedPerGame": 0,
+   "standInPerGame": 0,
+   "standInDamage": 0,
+   "standInDamagePerUse": 0,
+   "verdictPerGame": 0.094,
+   "judgmentPerGame": 0,
+   "gracePerGame": 0,
+   "graceMana": 0,
+   "graceManaPerUse": 0,
+   "waveUsableTurns": 0,
+   "waveUsableTurnsPerGame": 0,
+   "waveUsedPerGame": 0
+  }
+ },
+ "swapRare": {
+  "mon-radiel": {
+   "games": 10800,
+   "winA": 74.8,
+   "deckOut": 38.3,
+   "avgTurns": 33.7,
+   "purifyPerGame": 0,
+   "purifiedStatuses": 0,
+   "purifiedPerUse": 0,
+   "purifyHealOnly": 0,
+   "purifyHealed": 0,
+   "charmPerGame": 0,
+   "blocked": 0,
+   "blockedPerGame": 0,
+   "standInPerGame": 0,
+   "standInDamage": 0,
+   "standInDamagePerUse": 0,
+   "verdictPerGame": 0.115,
+   "judgmentPerGame": 0.012,
+   "gracePerGame": 0.038,
+   "graceMana": 1211,
+   "graceManaPerUse": 2.975,
+   "waveUsableTurns": 222,
+   "waveUsableTurnsPerGame": 0.021,
+   "waveUsedPerGame": 0.017
+  }
+ }
+}
