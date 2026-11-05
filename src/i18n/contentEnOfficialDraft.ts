@@ -383,6 +383,21 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-tyrant-10:name': 'Dragon Might',
   'card:skl-tyrant-11:name': 'Scale Guard',
   'card:skl-tyrant-12:name': 'Soar Skyward',
+  // 2026-11-05 指示書 BH：クヨウ（名前は指示書のとおり。説明は仮訳）
+  'card:mon-kuyo:name': 'Kuyo',
+  'card:mon-kuyo:description': 'A white spirit beast that watches over the mist with nine eyes.',
+  'card:skl-kuyo-01:name': 'Tail Sweep',
+  'card:skl-kuyo-02:name': 'Foreleg Push',
+  'card:skl-kuyo-03:name': 'Horn Thrust',
+  'card:skl-kuyo-04:name': 'Mane Shake',
+  'card:skl-kuyo-05:name': 'Shining Gaze',
+  'card:skl-kuyo-06:name': 'Nine Eyes',
+  'card:skl-kuyo-07:name': 'Purifying Light',
+  'card:skl-kuyo-08:name': 'Purify',
+  'card:skl-kuyo-09:name': 'Ward Charm',
+  'card:skl-kuyo-10:name': 'Mane Guard',
+  'card:skl-kuyo-11:name': 'Stand-In',
+  'card:skl-kuyo-12:name': 'Into the Fog',
 
   // ギアロス（2026-11-05 指示書 AX。仮訳）
   'card:mon-gearos:name': 'Gearos',

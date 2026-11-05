@@ -130,7 +130,8 @@ describe('カード図鑑', () => {
   const entries = cardBookEntries();
 
   it('すべてのカードが1回ずつ載る。番号は 1 から続き、仮のカードは番号なしで最後', () => {
-    expect(entries.length).toBe(MONSTERS.length + SKILLS.length + SUPPORTS.length);
+    // 2026-11-05 指示書 BH：確かめ用のクヨウ（本体＋技12枚）も番号だけ載せる
+    expect(entries.length).toBe(MONSTERS.length + SKILLS.length + SUPPORTS.length + 13);
     expect(new Set(entries.map((e) => e.card.id)).size).toBe(entries.length);
     const numbered = entries.filter((e) => e.no !== null);
     expect(numbered.map((e) => e.no)).toEqual(numbered.map((_, i) => i + 1));

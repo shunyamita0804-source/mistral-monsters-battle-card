@@ -19,7 +19,8 @@ describe('技カードの効果のアイコン', () => {
 
   it('指示書 BB：正式の技で効果の文があるもの（132枚）は、すべてアイコンになる（カードに文が出ない）', () => {
     const withText = official.filter((k) => skillBandText(k) !== '');
-    expect(withText.length).toBe(132);
+    // 2026-11-05 指示書 BH：クヨウの7枚（05・06・08・09・10・11・12）を足して139枚
+    expect(withText.length).toBe(139);
     for (const k of withText) expect(skillEffectIcons(k), `${k.id} ${k.effectTextJa}`).not.toBeNull();
   });
 

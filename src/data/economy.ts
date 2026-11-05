@@ -1,4 +1,4 @@
-import { ajRareNames } from './skillRebuildAJ.ts';
+import { ajQaRareNames, ajRareNames } from './skillRebuildAJ.ts';
 import { HIDDEN_MONSTER_ID, monsterId, skillId, supportId } from './cards.ts';
 import type { ItemId } from './items.ts';
 
@@ -164,6 +164,9 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // ギアロス（2026-11-05 指示書 AX）：機械の塔でギアロスのモンスターカードを受け取ったら並ぶ（ウズリオと同じ「モンスターカードを初めて手に入れたら開く」）。unlockFlag は付けない。
   // レアの枠は ロックオンビーム・オーバードライブβ・オーバードライブγ・高速機動（進行の案）。パック pack_gearos.webp・販売機の窓 panel_gearos.webp
   { id: 'gearos', monsterId: 'mon-gearos', rareSkillNames: ajRareNames('mon-gearos') },
+  // クヨウ（2026-11-05 指示書 BH）：霧の廃坑の初めてのクリアでクヨウのモンスターカードを受け取ったら並ぶ予定（今の決まり「モンスターカードを初めて手に入れたら開く」）。
+  // 霧の廃坑はまだ無いので、今はだれにも並ばない。unlockFlag は付けない。レアの枠は ここのつのめ・はらえのひかり・まよけのふだ・きりのなかへ。パック pack_kuyo.webp・販売機の窓 panel_kuyo.webp
+  { id: 'kuyo', monsterId: 'mon-kuyo', rareSkillNames: ajQaRareNames('mon-kuyo') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -202,7 +205,7 @@ export function legacyAvailableGachaSeries(storyFlags: readonly string[]): reado
  * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン・指示書 AQ のウズリオ）。
  * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
  */
-const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos'];
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos', 'kuyo'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

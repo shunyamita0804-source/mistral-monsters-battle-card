@@ -28,6 +28,7 @@ import {
   incomingDamage,
   supportUsesLeft,
   targetsFor,
+  wardCharmActive,
   type BattleAction,
   type BattleFxKind,
   type BattleMonster,
@@ -154,6 +155,8 @@ function showcaseSound(card: PlayCard): SoundId {
     case 'shield':
     case 'healSelf':
     case 'healAlly':
+    case 'purify':
+    case 'wardCharm':
       return 'cardSpecial';
     case 'seal':
       return 'cardSeal';
@@ -1236,7 +1239,7 @@ export const battleScreen: ScreenDefinition = {
       // 投石（サポート）も相手1体を選ぶ
       const stone = card.kind === 'support' && card.effect.type === 'stone';
       const enemyTarget = (card.kind === 'skill' && targetsEnemy(card) && !allTargets) || stone;
-      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind' || card.effect.type === 'ward' || card.effect.type === 'cheer') {
+      if (enemyTarget || card.effect.type === 'heal' || card.effect.type === 'healAlly' || card.effect.type === 'tailwind' || card.effect.type === 'ward' || card.effect.type === 'purify' || card.effect.type === 'cheer') {
         if (targets.length === 1 && targets[0]) {
           dispatch({ type: 'useCard', side: 'player', cardUid, targetUid: targets[0].uid });
           return;
@@ -1253,6 +1256,8 @@ export const battleScreen: ScreenDefinition = {
                   ? 'battle.prompt.tailwindTarget'
                   : card.effect.type === 'ward'
                     ? 'battle.prompt.wardTarget'
+                  : card.effect.type === 'purify'
+                    ? 'battle.prompt.purifyTarget'
                   : card.effect.type === 'cheer'
                     ? 'battle.prompt.cheerTarget'
                     : 'battle.prompt.healTarget',
@@ -1923,6 +1928,9 @@ export const battleScreen: ScreenDefinition = {
       }
       // そなえのふえ（フォルン）：受けるダメージ−
       if (m.ward && m.ward.untilTurn >= s.turn) badge('b05', t('battle.status.ward', { n: m.ward.reduce }), -m.ward.reduce);
+      // まよけのふだ（クヨウ 指示書 BH）：味方全員に悪い状態がつかない。印は【仮】で防御アップ（B05）に「味方に」の小さな印なし・数字なし（新しい絵が要る）
+      const charmSide = s.sides.player.monsters.some((x) => x.uid === m.uid) ? 'player' : 'opponent';
+      if (wardCharmActive(s, charmSide)) badge('b05', t('battle.status.wardCharm'));
       // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
       if (m.charge) badge('b09', t('battle.status.chargedN', { n: m.charge }), m.charge);
       if (m.tailwind && m.tailwind.turn >= s.turn) badge('b09', t('battle.status.tailwind', { n: m.tailwind.amount }), m.tailwind.amount);

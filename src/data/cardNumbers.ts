@@ -1,4 +1,5 @@
-import { HIDDEN_MONSTER_ID, MONSTERS, SKILLS, SUPPORTS, skillsOf } from './cards.ts';
+import { HIDDEN_MONSTER_ID, MONSTERS, QA_MONSTERS, SKILLS, SUPPORTS, skillsOf } from './cards.ts';
+import { KUYO_MONSTER_ID } from './kuyo.ts';
 import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
 import { FLUNE_MONSTER_ID } from './flune.ts';
@@ -58,6 +59,9 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   UZURIO_MONSTER_ID,
   // 2026-11-05 指示書 AX：ウズリオのあと（No.235〜247。サポート・隠しモンスターの番号は13ずつ後ろへ）
   GEAROS_MONSTER_ID,
+  // 2026-11-05 指示書 BH：ギアロスのあと（No.248〜260。サポート・隠しモンスターの番号は13ずつ後ろへ）。
+  // クヨウは霧の廃坑ができるまで確かめ用（QA_MONSTERS）だが、図鑑には番号だけ出す（手に入れるまで「？？？」）
+  KUYO_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */
@@ -78,7 +82,9 @@ function orderedSkills(monsterId: string): SkillCard[] {
   return [...skillsOf(monsterId)].sort((a, b) => (a.displayNo ?? 0) - (b.displayNo ?? 0));
 }
 
-const byId = new Map<string, CardDefinition>([...MONSTERS, ...SKILLS, ...SUPPORTS].map((c) => [c.id, c]));
+// 図鑑に出す確かめ用のモンスター（クヨウ。2026-11-05 指示書 BH）の本体と技も引けるように
+const BOOK_QA_CARDS: readonly CardDefinition[] = QA_MONSTERS.filter((m) => m.id === KUYO_MONSTER_ID).flatMap((m) => [m, ...skillsOf(m.id)]);
+const byId = new Map<string, CardDefinition>([...MONSTERS, ...SKILLS, ...SUPPORTS, ...BOOK_QA_CARDS].map((c) => [c.id, c]));
 
 /** 図鑑の並び（番号つき → 仮） */
 export function cardBookEntries(): BookEntry[] {

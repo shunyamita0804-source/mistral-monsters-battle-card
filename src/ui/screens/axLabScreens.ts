@@ -3,6 +3,7 @@ import { getMonster, skillsOf } from '../../data/cards.ts';
 import { BOOSTERS, type BoosterKey } from '../../data/introV2.ts';
 import { TYRANT_MONSTER_ID, tyrantSkillId } from '../../data/tyrant.ts';
 import { GEAROS_MONSTER_ID, gearosSkillId } from '../../data/gearos.ts';
+import { KUYO_MONSTER_ID, kuyoSkillId } from '../../data/kuyo.ts';
 import { swapDeck } from '../../game/battle/playtest.ts';
 import type { Deck } from '../../game/deck/deck.ts';
 import { boosterDeck } from '../../game/story/introV2.ts';
@@ -16,7 +17,7 @@ import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
 
 /**
- * 2026-11-05 指示書 AX の確かめ用の画面（?qa=1 のときだけ。設定の「QA用」の欄・?qa=1&lab=tyrant／gearos）。作りはジオルの試遊の画面と同じ。
+ * 2026-11-05 指示書 AX の確かめ用の画面（?qa=1 のときだけ。設定の「QA用」の欄・?qa=1&lab=tyrant／gearos／kuyo〔指示書 BH〕）。作りはジオルの試遊の画面と同じ。
  * - モンスターのバトル用カードと技カード12枚
  * - そのモンスター入りのデッキで対戦（箱の3体目と入れ替え。どちらのデッキも借り物で、持っているカード・セーブのデッキは変えない）
  * - ギアロスは、機械の塔の守り手テオ（enc-machine-boss。切り札がギアロス）とも対戦できる
@@ -44,7 +45,7 @@ function lab16(monsterId: string): Pick {
 }
 
 interface LabSpec {
-  readonly id: 'tyrantLab' | 'gearosLab';
+  readonly id: 'tyrantLab' | 'gearosLab' | 'kuyoLab';
   readonly monsterId: string;
   /** 新しい効果を目で確かめる用の16枚（新しい効果のカードを多めに） */
   readonly check16: Pick;
@@ -160,4 +161,13 @@ export const gearosLabScreen: ScreenDefinition = makeLab({
   check16: [
     [5, 3], [6, 3], [7, 3], [8, 2], [9, 2], [4, 1], [11, 1], [12, 1],
   ].map(([no, copies]) => ({ id: gearosSkillId(no as number), copies: copies as number })),
+});
+
+/** クヨウ（2026-11-05 指示書 BH）：おはらい・まよけのふだ・みがわりを3枚ずつ（ほかは安い攻撃と守り） */
+export const kuyoLabScreen: ScreenDefinition = makeLab({
+  id: 'kuyoLab',
+  monsterId: KUYO_MONSTER_ID,
+  check16: [
+    [8, 3], [9, 3], [11, 3], [1, 2], [3, 2], [5, 1], [10, 1], [12, 1],
+  ].map(([no, copies]) => ({ id: kuyoSkillId(no as number), copies: copies as number })),
 });

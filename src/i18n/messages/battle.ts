@@ -91,6 +91,11 @@ export const BATTLE = {
   'battle.log.chain': { ja: '{name}は続けて{skill}を使った！', en: '{name} followed up with {skill}!' },
   'battle.log.energyDouble': { ja: '{name}はためたエネルギーを放った！ ダメージ2倍！', en: '{name} released its stored energy! Double damage!' },
   'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
+  // 2026-11-05 指示書 BH：クヨウ（おはらい・まよけのふだ・みがわり）
+  'battle.log.standIn': { ja: 'みがわり！ {ally}への攻撃を{name}が受ける（ダメージ−{n}）。', en: 'Stand-In! {name} takes the attack aimed at {ally} (damage -{n}).' },
+  'battle.log.purify': { ja: 'おはらい！ {name}の悪い状態が消えた。', en: 'Purify! {name} is cleansed of all bad statuses.' },
+  'battle.log.wardCharm': { ja: '{side}の味方にまよけのふだ。次の相手のターンが終わるまで、悪い状態がつかない。', en: 'Ward Charm on {side} side. No bad statuses until the end of the next enemy turn.' },
+  'battle.log.wardCharmBlocked': { ja: 'まよけのふだが防いだ！ {name}に悪い状態はつかない。', en: 'The Ward Charm blocked it! {name} gets no bad status.' },
   'battle.log.nullify': { ja: '{side}は「{skill}」でダメージを0にした！', en: '{side} reduced the damage to 0 with {skill}!' },
   'battle.log.chargedUndodgeable': { ja: '{name}はためた空気をいっきに吐き出した！ この攻撃は回避されない！', en: "{name} let out all the air at once! This attack can't be dodged!" },
   'battle.log.weakenTurn': {
@@ -212,6 +217,7 @@ export const BATTLE = {
   'battle.iconGuide.badgeTurn': { ja: '時計の札「1」：次のターン', en: 'Clock plate "1": next turn' },
   'battle.status.chargedN': { ja: 'ためている（次の攻撃＋{n}）', en: 'Charged (next attack +{n})' },
   'battle.status.ward': { ja: 'ダメージ−{n}', en: 'Damage -{n}' },
+  'battle.status.wardCharm': { ja: 'まよけのふだ（悪い状態がつかない）', en: 'Ward Charm (no bad statuses)' },
   'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },
   'battle.status.cheer': { ja: '声援＋{n}', en: 'Cheer +{n}' },
   'battle.status.windRide': { ja: 'かぜのり マナ−{n}', en: 'Wind Ride: mana −{n}' },
@@ -241,6 +247,7 @@ export const BATTLE = {
   'battle.ng.coverFirst': { ja: 'ほかの守りを使ったあとは、かばえません', en: "Can't cover after another guard was used" },
   'battle.ng.coverSelf': { ja: 'かばえるのはほかの味方だけです', en: 'Can only cover another ally' },
   'battle.ng.noWardTarget': { ja: 'そなえのふえをかけられる味方がいません', en: 'No ally can be warded' },
+  'battle.ng.noPurifyTarget': { ja: '悪い状態のある味方がいません', en: 'No ally has a bad status' },
   'battle.ng.handEnough': { ja: '手札がもう{n}枚以上あるので使えません', en: 'You already have {n} or more cards in hand' },
   'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },
 
@@ -311,6 +318,7 @@ export const BATTLE = {
   'battle.prompt.attackTarget': { ja: '攻撃する相手モンスターをタップしてください', en: 'Tap an enemy monster to attack' },
   'battle.prompt.healTarget': { ja: '回復する味方モンスターをタップしてください', en: 'Tap an ally monster to heal' },
   'battle.prompt.wardTarget': { ja: 'そなえのふえをかける味方モンスターをタップしてください', en: 'Tap an ally monster to ward' },
+  'battle.prompt.purifyTarget': { ja: 'おはらいをする味方モンスターをタップしてください', en: 'Tap an ally monster to purify' },
   'battle.prompt.tailwindTarget': { ja: 'おいかぜをかける味方モンスターをタップしてください', en: 'Tap an ally monster to give a tailwind' },
   'battle.prompt.cheerTarget': { ja: '声援をかける味方モンスターをタップしてください（まだ動いていない味方）', en: 'Tap an ally monster to cheer (one that has not acted)' },
   'battle.pick.recall': { ja: '手札に戻す技カードを選んでください（思い出の箱）', en: 'Choose a skill card to return to your hand (Memory Box)' },

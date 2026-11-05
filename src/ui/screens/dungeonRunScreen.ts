@@ -76,6 +76,8 @@ import encounterFx3 from '@assets/images/effects/fx_encounter_3.webp';
 import guardianArt from '@assets/images/characters/guardian.webp';
 import miniYou from '@assets/images/ui/dungeon/mini_you.webp';
 import miniStairs from '@assets/images/ui/dungeon/mini_stairs.webp';
+// 2026-11-05 指示書 BH【4】：ミニマップのスイッチの印（原本 design-parts/mist-mine-gimmick-20261105/mini_switch.png。絵のある所を切り抜いて高さ 48px に）
+import miniSwitch from '@assets/images/ui/dungeon/mini_switch.webp';
 import miniChest from '@assets/images/ui/dungeon/mini_chest.webp';
 import miniBattler from '@assets/images/ui/dungeon/mini_battler.webp';
 import miniBoss from '@assets/images/ui/dungeon/mini_boss.webp';
@@ -137,7 +139,9 @@ const MINI_CELL = 8;
 /** ミニマップの印の大きさ（マスの何倍か。2026-10-27 デザイン第12弾の印） */
 const MINI_MARK = 3.4;
 /** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
-const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
+const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss, switch: miniSwitch } as const;
+/** ミニマップのスイッチの印の高さ（マスの何倍か。ほかの印より小さめ。後ろの開いている扉の色の札はこれより少し大きい） */
+const MINI_SWITCH = 2.8;
 /** ミニマップの色：水路・氷・扉（閉じている）（2026-10-27 ダンジョン7つ。印の絵はまだ無い） */
 const MINI_TILE_COLOR: Readonly<Record<string, string>> = { w: 'rgb(70 140 210 / 0.9)', i: 'rgb(190 230 250 / 0.9)' };
 /** ミニマップの扉（機械の塔。2026-11-05 指示書 BD）：閉じている扉はこい色、開いている扉はうすい色 */
@@ -688,13 +692,19 @@ class DungeonRunView {
     if (f.stairs && (mapped || run.explored[f.stairs.y * f.width + f.stairs.x] === '1')) mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
       if (e.kind === 'guardian') continue;
-      // スイッチ：遺跡の地図を使った階では、まだ見ていなくても出す（機械の塔。印の絵はまだ無いので金色の四角・ふちが開いている色）
+      // スイッチ：遺跡の地図を使った階では、まだ見ていなくても出す（機械の塔）。
+      // 2026-11-05 指示書 BH【4】：金色の四角をスイッチの印の絵に替えた。開いている扉の色は、印の後ろの札（ふち）の色のまま
       if (e.kind === 'switch') {
         if (run.explored[e.y * f.width + e.x] !== '1' && !mapped) continue;
+        const img = miniIcon('switch', () => !this.#destroyed && this.#drawMinimap());
+        const hgt = MINI_CELL * MINI_SWITCH;
+        const w = img ? (hgt * img.naturalWidth) / img.naturalHeight : hgt;
+        const cx = (e.x + 0.5) * MINI_CELL;
+        const cy = (e.y + 0.5) * MINI_CELL;
+        const pad = MINI_CELL * 0.28;
         g.fillStyle = openDoorColor(run) === 'blue' ? 'rgb(60 110 230)' : 'rgb(220 60 50)';
-        g.fillRect(e.x * MINI_CELL, e.y * MINI_CELL, MINI_CELL, MINI_CELL);
-        g.fillStyle = 'rgb(255 214 90)';
-        g.fillRect((e.x + 0.15) * MINI_CELL, (e.y + 0.15) * MINI_CELL, MINI_CELL * 0.7, MINI_CELL * 0.7);
+        g.fillRect(cx - w / 2 - pad, cy - hgt / 2 - pad, w + pad * 2, hgt + pad * 2);
+        if (img) g.drawImage(img, cx - w / 2, cy - hgt / 2, w, hgt);
         continue;
       }
       if (run.explored[e.y * f.width + e.x] !== '1' && !(mapped && e.kind === 'boss')) continue;

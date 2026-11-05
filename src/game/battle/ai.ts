@@ -4,6 +4,9 @@ import {
   aliveMonsters,
   attackPower,
   availableUsers,
+  badStatusKinds,
+  purifyTargets,
+  wardCharmActive,
   canConvertToMana,
   chainReady,
   cardUsability,
@@ -76,6 +79,13 @@ import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_COST, OVERDRIVE_IDS } from '../../dat
  *   そなえのふえは狙われそうな味方（相手がいまのマナで払える攻撃で倒されそうな味方。そなえで助かるなら攻撃より先に）。こもりうたはいちばん強い攻撃を持つ相手へ。
  *   もりのたよりは手札が3枚以下（指示書 AM。前は2枚以下）で山札が10枚以上あるとき（攻撃より先に。捨てる1枚は pickDrawToDiscard＝マナにする順）。みがわりのふえは狙われた味方のライフが半分以下でフォルンが倒れないとき。
  *   腕前 C は forgetTrick の割合で使いそこねる
+ * - クヨウ（2026-11-05 指示書 BH。クヨウだけ）：chooseKuyoTrick（攻撃より先）。
+ *   おはらいは、この手番に動かしたい味方（まだ動いていない）に悪い状態がついているとき（行動できない → 攻撃できない → 技のダメージ− → おびきよせ の順に見る）。
+ *   腕前 A は、消したあとその味方が払える攻撃を手札に持っているときだけ（技のダメージ−はその種類の攻撃）。B・C は手札に攻撃があれば。
+ *   まよけのふだは、相手に状態をつける技（すなかけ・まきつく・ダストキック・ちょうはつ など）を持つ生きたモンスターがいて、まだ効いていないとき（その手番に倒せる攻撃が無いとき）。
+ *   腕前 A は、相手がいまのマナで払える状態の技を持っているときだけ。
+ *   みがわりは、狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき（shouldCover。A はクヨウの防御まで見積もり、受けたあともライフ2以上残るとき。B は受けたあともライフ1以上）。
+ *   腕前 C は forgetTrick の割合で使いそこねる。まよけのふだの効いている相手には、腕前 A・B は悪い状態をつける特殊の技を使わない
  */
 
 /** 腕前ごとのふるまい（2026-10-30 指示書 Z。数字は仮。ここでまとめて合わせる） */
@@ -231,7 +241,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const allOptions = usableOptions(state, side);
   const kept = allOptions.filter((o) => !held.has(o.card.uid) && (reserve === 0 || o.def.cost === 0 || manaOf(state.sides[side]) - o.def.cost >= reserve));
   // 2026-11-05 指示書 AY2：取っておくと使える技が無くなる手番は、取っておくのをやめてふつうに使う
-  const options = held.size > 0 && !kept.some(isSkillOption) && allOptions.some(isSkillOption) ? allOptions : kept;
+  const options0 = held.size > 0 && !kept.some(isSkillOption) && allOptions.some(isSkillOption) ? allOptions : kept;
+  // まよけのふだ（クヨウ 指示書 BH）の効いている相手には、悪い状態をつけるだけの技は使わない（腕前 C は forgetTrick の割合で気づかない）
+  const charmed = wardCharmActive(state, otherSide(side)) && cpuRoll(state, side, 'wardCharmSeen', false) >= CPU_SKILL[skill].forgetTrick;
+  const options = charmed ? options0.filter((o) => !['seal', 'taunt', 'weaken'].includes(o.def.effect.type)) : options0;
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
@@ -327,6 +340,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.96 フォルン（2026-11-02 指示書 AL）：もりのたより・倒されそうな味方へのそなえのふえは、攻撃より先に
   const fornFirst = chooseFornTrick(state, side, options, enemies, style, skill, true);
   if (fornFirst) return fornFirst;
+
+  // 2.97 クヨウ（2026-11-05 指示書 BH）：おはらい・まよけのふだは攻撃より先
+  const kuyo = chooseKuyoTrick(state, side, options, skill);
+  if (kuyo) return kuyo;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
@@ -1106,6 +1123,64 @@ export function pickDrawToDiscard(state: BattleState, side: Side, cardUid: strin
   return manaPick(after, side, style, skill)?.uid ?? hand[hand.length - 1]?.uid ?? null;
 }
 
+/** 指示書 BH の考え方で、おはらい・まよけのふだ・みがわりを使うモンスター */
+const KUYO_MONSTERS: readonly string[] = ['mon-kuyo'];
+
+/** 相手に悪い状態をつける技か（すなかけ・ちょうはつ・ダストキック などの特殊、まきつく・こおりのいき などの「行動できない」攻撃） */
+const isStatusSkill = (k: SkillCard): boolean => ['seal', 'taunt', 'weaken'].includes(k.effect.type) || (k.effect.type === 'attack' && !!k.effect.stunTarget);
+
+/**
+ * クヨウ（2026-11-05 指示書 BH）。おはらい → まよけのふだ の順に見る（どちらも攻撃より先）。腕前 C は forgetTrick の割合で使いそこねる
+ */
+function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => KUYO_MONSTERS.includes(o.def.monsterId));
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'kuyoTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  const me = state.sides[side];
+  const mana = manaOf(me);
+  const purify = mine.find((o) => o.def.effect.type === 'purify');
+  if (purify) {
+    const left = mana - purify.def.cost;
+    const handAttacks = (m: BattleMonster): SkillCard[] =>
+      me.hand
+        .filter((c) => c.uid !== purify.card.uid)
+        .map((c) => getPlayCard(c.cardId))
+        .filter((k): k is SkillCard => k.kind === 'skill' && k.monsterId === m.cardId && k.effect.type === 'attack' && (skill !== 'A' || k.cost <= left));
+    const ORDER = ['stunned', 'sealed', 'weaken', 'taunt'] as const;
+    const wants = (m: BattleMonster): number => {
+      if (m.acted) return -1;
+      const kinds = badStatusKinds(state, m);
+      const attacks = handAttacks(m);
+      if (attacks.length === 0) return -1;
+      for (const [i, kind] of ORDER.entries()) {
+        if (!kinds.includes(kind)) continue;
+        // 腕前 A：技のダメージ−は、その種類の攻撃を持っているときだけ
+        if (kind === 'weaken' && skill === 'A') {
+          const stats = [m.weaken?.stat, m.weakenTurn?.stat].filter((x): x is StatType => !!x);
+          if (!attacks.some((k) => k.stat && stats.includes(k.stat.type))) continue;
+        }
+        return ORDER.length - i;
+      }
+      return -1;
+    };
+    const pick = purifyTargets(state, side)
+      .map((m) => ({ m, w: wants(m) }))
+      .filter((x) => x.w > 0)
+      .sort((a, b) => b.w - a.w)[0];
+    const user = availableUsers(state, side, purify.def)[0];
+    // クヨウ自身を消すときは、おはらいでクヨウの手番を使うので、消したあと動けない（自分のためには使わない）
+    if (pick && user && pick.m.uid !== user.uid) return { type: 'useCard', side, cardUid: purify.card.uid, userUid: user.uid, targetUid: pick.m.uid };
+  }
+  const charm = mine.find((o) => o.def.effect.type === 'wardCharm');
+  if (charm && !(me.wardCharm && me.wardCharm.untilTurn >= state.turn + 1) && !canKillThisTurn(state, side, options)) {
+    const foe = state.sides[otherSide(side)];
+    const foeMana = manaOf(foe);
+    const threat = aliveMonsters(foe).some((e) => skillsOf(e.cardId).some((k) => isStatusSkill(k) && (skill !== 'A' || k.cost <= foeMana + 1)));
+    if (threat) return { type: 'useCard', side, cardUid: charm.card.uid };
+  }
+  return null;
+}
+
 /** 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）。使えなければ null */
 function chooseSpecial(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], spare = 0): BattleAction | null {
   const mana = manaOf(state.sides[side]);
@@ -1194,7 +1269,7 @@ function manaPick(state: BattleState, side: Side, style: AiStyle, skill: CpuSkil
  * 回避は倒されそうなときか大きなダメージのときに使い、そうでなければ防御で減らす。
  */
 function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal', skill: CpuSkill = 'B'): BattleAction | null {
-  const guard = chooseGuard(state, side, style);
+  const guard = chooseGuard(state, side, style, skill);
   // 腕前 C：守れるのに一部で守らない（その攻撃の最初の守りのときだけ決める。画面が相手のセリフをふきだしで出す）
   if (guard?.type === 'defend' && guard.cardUid !== null && state.pending?.responses.length === 0 && cpuRoll(state, side, 'misguard') < CPU_SKILL[skill].misguard) {
     return { type: 'defend', side, cardUid: null, note: 'misguard' };
@@ -1203,7 +1278,7 @@ function chooseDefense(state: BattleState, side: Side, style: AiStyle = 'normal'
 }
 
 /** 守るカード（腕前で変わる前の考え方。B・A はこのまま） */
-function chooseGuard(state: BattleState, side: Side, style: AiStyle): BattleAction | null {
+function chooseGuard(state: BattleState, side: Side, style: AiStyle, skill: CpuSkill = 'B'): BattleAction | null {
   const pending = state.pending;
   if (!pending || pending.attacker === side) return null;
   const end: BattleAction = { type: 'defend', side, cardUid: null };
@@ -1214,7 +1289,7 @@ function chooseGuard(state: BattleState, side: Side, style: AiStyle): BattleActi
   const options = usableOptions(state, side).filter(isSkillOption);
   // 試遊中：ジオルのかばう（2026-10-29 指示書）。味方が倒れそうでジオルは倒れないとき、またはジオルの防御で大きく減らせるとき
   const coverOpt = options.find((o) => o.def.effect.type === 'cover');
-  if (coverOpt && target && shouldCover(state, side, coverOpt, damage, lethal, options)) return { type: 'defend', side, cardUid: coverOpt.card.uid };
+  if (coverOpt && target && shouldCover(state, side, coverOpt, damage, lethal, options, skill)) return { type: 'defend', side, cardUid: coverOpt.card.uid };
   // うっとりウインクの効いている手番に狙われたリリルは、小さなダメージでも回避する（2026-11-02 指示書 AK2）
   const attacker = findMonster(state, pending.userUid)?.monster;
   if (target && WINK_MONSTERS.includes(target.cardId) && attacker?.taunt?.turn === state.turn && attacker.taunt.monsterId === target.cardId) {
@@ -1237,7 +1312,7 @@ function chooseGuard(state: BattleState, side: Side, style: AiStyle): BattleActi
  * - 味方が倒れそうで（その味方に使える回避が無い）、ジオルは倒れない
  * - または、ジオルの防御（いわのうで・すいしょうのたて・うけとめる）でダメージを3以上減らせる
  */
-function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage: number, lethal: boolean, options: SkillOption[]): boolean {
+function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage: number, lethal: boolean, options: SkillOption[], skill: CpuSkill = 'B'): boolean {
   const pending = state.pending;
   const geol = coverUser(state, side, cover.def);
   if (!pending || !geol) return false;
@@ -1251,9 +1326,23 @@ function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage:
       return against === 'all' || against === pending.stat;
     });
   const bestGuard = Math.max(0, ...guards.map((k) => guardReduction(k)));
-  const toGeol = Math.max(0, pending.power - shieldOf(state, geol, pending.stat) - bestGuard);
+  // みがわり（クヨウ 指示書 BH）：代わりに受けたダメージ −reduce
+  const reduce = cover.def.effect.type === 'cover' ? (cover.def.effect.reduce ?? 0) : 0;
+  const toGeol = Math.max(0, pending.power - shieldOf(state, geol, pending.stat) - bestGuard - reduce);
   const geolSurvives = toGeol < geol.life;
   const allyCanEvade = options.some((o) => o.def.effect.type === 'evade');
+  if (KUYO_MONSTERS.includes(geol.cardId)) {
+    // みがわり：狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき。
+    // 腕前 A：クヨウの防御まで見積もって、受けたあともライフ2以上。B・C：防御は見ずに（威力−2）、受けたあともライフ1以上。C は forgetTrick の割合で使いそこねる
+    const target = findMonster(state, pending.targetUid)?.monster;
+    if (!target || damage <= 0) return false;
+    if (cpuRoll(state, side, 'standIn') < CPU_SKILL[skill].forgetTrick) return false;
+    const low = lethal || target.life <= target.maxLife / 2;
+    const toKuyo = skill === 'A' ? toGeol : Math.max(0, pending.power - reduce);
+    const roomy = geol.life - toKuyo >= (skill === 'A' ? 2 : 1);
+    // 倒されそうでない味方が自分で回避できるなら、そちらにまかせる
+    return low && roomy && !(allyCanEvade && !lethal);
+  }
   if (lethal && !allyCanEvade && geolSurvives) return true;
   // フォルンのみがわりのふえ（2026-11-02 指示書 AL）：狙われた味方のライフが半分以下で、フォルンは倒れないとき
   const target = findMonster(state, pending.targetUid)?.monster;

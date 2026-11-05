@@ -4,7 +4,7 @@ import { cardCatalog, getMonster, REMOVED_SKILL_IDS, skillsOf } from '../src/dat
 import { cardBookEntries, NUMBERED_MONSTERS } from '../src/data/cardNumbers.ts';
 import { GACHA_SERIES } from '../src/data/economy.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
-import { AJ_MONSTER_IDS, AJ_SKILLS, MONSTER_HABITAT } from '../src/data/skillRebuildAJ.ts';
+import { AJ_MONSTER_IDS, AJ_QA_SKILLS, AJ_SKILLS, MONSTER_HABITAT } from '../src/data/skillRebuildAJ.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
 import {
   applyAction,
@@ -117,8 +117,10 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
   it('居場所：地上10体（フォルンは指示書 AL・ウズリオは指示書 AQ）・空中5体（リリルは指示書 AK）・水中3体', () => {
     const by = (h: string): string[] => Object.entries(MONSTER_HABITAT).filter(([, v]) => v === h).map(([k]) => k);
     // 2026-11-05 指示書 AX：確かめ用だけのタイラント（地上）も入れて11体
-    expect(by('ground')).toHaveLength(11);
+    // 2026-11-05 指示書 BH：確かめ用だけのクヨウ（地上）も入れて12体
+    expect(by('ground')).toHaveLength(12);
     expect(by('ground')).toContain('mon-tyrant');
+    expect(by('ground')).toContain('mon-kuyo');
     expect(by('ground')).toContain('mon-forn');
     expect(by('ground')).toContain('mon-uzurio');
     expect(by('air').sort()).toEqual(['mon-desuoru', 'mon-gauul', 'mon-gearos', 'mon-hyouzuku', 'mon-lilil', 'mon-pukarim']);
@@ -128,7 +130,8 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
 
   it('図鑑の番号：1体ぶん13番（モンスター1＋技12）。全員を振り直す', () => {
     const entries = cardBookEntries();
-    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS].sort());
+    // 2026-11-05 指示書 BH：クヨウは確かめ用（AJ_MONSTER_IDS に入らない）だが、図鑑には番号を付ける（ギアロスのあと No.248〜260）
+    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS, 'mon-kuyo'].sort());
     let expected = 1;
     for (const id of NUMBERED_MONSTERS) {
       const mine = entries.filter((e) => e.section.kind === 'monster' && e.section.monsterId === id);
@@ -149,7 +152,7 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     for (const series of GACHA_SERIES.filter((s) => s.monsterId)) {
       expect(seriesLineup(series).all, series.id).toHaveLength(13);
       expect(series.rareSkillNames, series.id).toHaveLength(4);
-      const rare = (AJ_SKILLS[series.monsterId] ?? []).filter((r) => r.rare).map((r) => r.name);
+      const rare = (AJ_SKILLS[series.monsterId] ?? AJ_QA_SKILLS[series.monsterId] ?? []).filter((r) => r.rare).map((r) => r.name);
       expect(series.rareSkillNames).toEqual(rare);
       expect(seriesOwned(createNewSave(new Date('2026-11-01T00:00:00Z')), series).total).toBe(13);
     }

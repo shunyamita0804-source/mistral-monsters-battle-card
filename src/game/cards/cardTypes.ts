@@ -227,9 +227,20 @@ export type SkillEffect =
   | { readonly type: 'windRide'; readonly discount: number }
   /**
    * 守り（試遊中：ジオルのかばう 2026-10-29）：使ったモンスター以外の味方が攻撃で狙われたとき、使ったモンスターが代わりに受ける。
-   * 「防御されない」攻撃・相手全体への攻撃には使えない
+   * 「防御されない」攻撃・相手全体への攻撃には使えない。
+   * reduce（2026-11-05 指示書 BH：クヨウのみがわり）＝代わりに受けたダメージをさらに減らす量（0 未満にしない。無ければ減らさない＝ジオルのかばう）
    */
-  | { readonly type: 'cover' }
+  | { readonly type: 'cover'; readonly reduce?: number }
+  /**
+   * 特殊（2026-11-05 指示書 BH：クヨウのおはらい）：選んだ味方1体（使ったモンスターも選べる）の「悪い状態」（相手の技で付いた、攻撃できない・行動できない／凍る・
+   * 技のダメージ−・おびきよせ）をすべて消す。悪い状態の無い味方には使えない。決まりは docs/battle-rules.md「クヨウの効果の扱い」
+   */
+  | { readonly type: 'purify' }
+  /**
+   * 特殊（2026-11-05 指示書 BH：クヨウのまよけのふだ）：使ってから次の相手の手番が終わるまで、味方全員に悪い状態がつかない（ダメージは今までどおり）。
+   * 重ねて使っても長さは延びない
+   */
+  | { readonly type: 'wardCharm' }
   | { readonly type: 'heal' }
   /**
    * 山札の上からカードをそのままマナにする（仮カードは stat の値の枚数）。
@@ -470,8 +481,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

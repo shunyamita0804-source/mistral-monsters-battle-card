@@ -36,6 +36,8 @@ export const SCREEN_IDS = [
   'tyrantLab',
   /** 2026-11-05 指示書 AX：ギアロスの確認用の画面（?qa=1&lab=gearos。テオとの対戦も） */
   'gearosLab',
+  /** 2026-11-05 指示書 BH：クヨウの確認用の画面（?qa=1&lab=kuyo。霧の廃坑ができるまで） */
+  'kuyoLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

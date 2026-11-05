@@ -8,6 +8,8 @@ export const NAMELESS_OFFICIAL_ART: ReadonlySet<string> = new Set<string>([
   // 2026-11-05 指示書 AY：20体（原本 design-parts/card-names-20261105/noname/。前の名前入りの絵は old/）
   'mon-soramo', 'mon-gauul', 'mon-lazuck', 'mon-nobiton', 'mon-myurol', 'mon-kalshell', 'mon-pukarim', 'mon-geol', 'mon-flune', 'mon-serephine',
   'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran', 'mon-desuoru', 'mon-lilil', 'mon-forn', 'mon-uzurio', 'mon-tyrant', 'mon-gearos',
+  // 2026-11-05 指示書 BH：クヨウ（届いた正式カードがはじめから名前なし）
+  'mon-kuyo',
 ]);
 
 /* 字体の3案（指示書 AY【4】）は 2026-11-05 指示書 AZ でやめた。日本語は名前のロゴの絵（src/data/cardNameLogos.generated.ts）、英語も名前のロゴの絵（2026-11-05 指示書 BC。仮の字体 Bangers はやめた） */

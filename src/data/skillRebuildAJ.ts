@@ -32,6 +32,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-forn': 'ground', // 2026-11-02 指示書 AL
   'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
   'mon-tyrant': 'ground', // 2026-11-05 指示書 AX（確かめ用だけ）
+  'mon-kuyo': 'ground', // 2026-11-05 指示書 BH（確かめ用だけ。霧の廃坑ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -427,6 +428,24 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-tyrant-11', name: 'ウロコのガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, art: 'tyrant_sk_11.webp' },
     { id: 'skl-tyrant-12', name: '上空に飛ぶ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: 'ちから技・かしこさ技を回避', rare: true, art: 'tyrant_sk_12.webp' },
   ],
+  // クヨウ（地上・LIFE 8・B。2026-11-05 指示書 BH。正本は design-parts/bh-kuyo-20261105/00_instructions_for_claude_code.md の表）。霧の廃坑ができるまで確かめ用だけ。
+  // 絵は kuyo_sk_NN.webp（番号＝技番号）。新しい効果は 08 おはらい（purify）・09 まよけのふだ（wardCharm）・11 みがわり（cover の reduce 2）
+  'mon-kuyo': [
+    { id: 'skl-kuyo-01', name: 'しっぽはらい', cat: 'ち', mana: 0, damage: 1, text: null, art: 'kuyo_sk_01.webp' },
+    { id: 'skl-kuyo-02', name: 'まえあしでおす', cat: 'ち', mana: 1, damage: 2, text: null, art: 'kuyo_sk_02.webp' },
+    { id: 'skl-kuyo-03', name: 'つのでつく', cat: 'ち', mana: 2, damage: 3, text: null, art: 'kuyo_sk_03.webp' },
+    { id: 'skl-kuyo-04', name: 'たてがみをふるう', cat: 'ち', mana: 3, damage: 4, text: null, art: 'kuyo_sk_04.webp' },
+    { id: 'skl-kuyo-05', name: 'ひかるまなざし', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'kuyo_sk_05.webp' },
+    { id: 'skl-kuyo-06', name: 'ここのつのめ', cat: 'か', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'kuyo_sk_06.webp' },
+    { id: 'skl-kuyo-07', name: 'はらえのひかり', cat: 'か', mana: 4, damage: 5, text: null, rare: true, art: 'kuyo_sk_07.webp' },
+    { id: 'skl-kuyo-08', name: 'おはらい', cat: '特', mana: 1, damage: null, effect: { type: 'purify' }, text: '味方1体の悪い状態をすべて消す', art: 'kuyo_sk_08.webp' },
+    { id: 'skl-kuyo-09', name: 'まよけのふだ', cat: '特', mana: 2, damage: null, effect: { type: 'wardCharm' }, text: '次の相手のターンの終わりまで、味方全員に悪い状態がつかない', rare: true, art: 'kuyo_sk_09.webp' },
+    // 効果の文：防御の文の決まり（どの技に効くかだけ。軽減の数 3 はカードの盾の欄）
+    { id: 'skl-kuyo-10', name: 'たてがみのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: T_BOTH, art: 'kuyo_sk_10.webp' },
+    // ジオルの かばう と同じ仕組みに −2 を足す（cover の reduce）
+    { id: 'skl-kuyo-11', name: 'みがわり', cat: '防', mana: 1, damage: null, effect: { type: 'cover', reduce: 2 }, text: '味方への攻撃を代わりに受け、ダメージ−2', art: 'kuyo_sk_11.webp' },
+    { id: 'skl-kuyo-12', name: 'きりのなかへ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'kuyo_sk_12.webp' },
+  ],
 };
 
 /** 指示書 AJ の形の技を持つモンスター（AJ で作り直した15体＋指示書 AK のリリル・指示書 AL のフォルン。並び＝今までのモンスターの並び） */
@@ -435,6 +454,11 @@ export const AJ_MONSTER_IDS: readonly string[] = Object.keys(AJ_SKILLS);
 /** レアの枠の技の名前（ガチャのシリーズの rareSkillNames） */
 export function ajRareNames(monsterId: string): string[] {
   return (AJ_SKILLS[monsterId] ?? []).filter((r) => r.rare).map((r) => r.name);
+}
+
+/** 確かめ用のモンスター（AJ_QA_SKILLS）のレアの枠の技の名前（クヨウのガチャのシリーズ。2026-11-05 指示書 BH） */
+export function ajQaRareNames(monsterId: string): string[] {
+  return (AJ_QA_SKILLS[monsterId] ?? []).filter((r) => r.rare).map((r) => r.name);
 }
 
 /** 最初の箱の技の枚数（box の書いてある子だけ。[ID, 枚数] の並び） */

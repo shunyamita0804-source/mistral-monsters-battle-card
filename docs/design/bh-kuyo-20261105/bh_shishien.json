@@ -1,0 +1,38 @@
+{
+ "games": 200,
+ "skill": "A",
+ "swap": {
+  "mon-shishien": {
+   "games": 10800,
+   "winA": 64.6,
+   "deckOut": 44.1,
+   "avgTurns": 35.2,
+   "purifyPerGame": 0,
+   "purifiedStatuses": 0,
+   "purifiedPerUse": 0,
+   "charmPerGame": 0,
+   "blocked": 0,
+   "blockedPerGame": 0,
+   "standInPerGame": 0,
+   "standInDamage": 0,
+   "standInDamagePerUse": 0
+  }
+ },
+ "swapRare": {
+  "mon-shishien": {
+   "games": 10800,
+   "winA": 61.5,
+   "deckOut": 45,
+   "avgTurns": 35.3,
+   "purifyPerGame": 0,
+   "purifiedStatuses": 0,
+   "purifiedPerUse": 0,
+   "charmPerGame": 0,
+   "blocked": 0,
+   "blockedPerGame": 0,
+   "standInPerGame": 0,
+   "standInDamage": 0,
+   "standInDamagePerUse": 0
+  }
+ }
+}

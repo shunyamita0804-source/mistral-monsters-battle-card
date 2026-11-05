@@ -87,6 +87,10 @@ const TEXTS: Readonly<Record<string, string>> = {
   '消費マナ2以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 2+ mana.',
   '手札から1枚山札に戻し、1枚引いて、そのあと山札をシャッフル': 'Return 1 card from your hand to your deck, draw 1, then shuffle your deck.',
   山札の上から3枚まで確かめる: 'Look at up to 3 cards from the top of your deck.',
+  // 2026-11-05 指示書 BH：クヨウ（英語は仮訳）
+  味方1体の悪い状態をすべて消す: 'Remove all bad statuses from 1 ally.',
+  '次の相手のターンの終わりまで、味方全員に悪い状態がつかない': 'Until the end of the next enemy turn, your monsters cannot get bad statuses.',
+  '味方への攻撃を代わりに受け、ダメージ−2': 'Take an attack aimed at an ally, with 2 less damage.',
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(

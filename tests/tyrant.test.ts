@@ -78,8 +78,9 @@ describe('タイラントのデータ（届いた CSV のとおり）', () => {
   });
 
   it('置き場所は決まっていない：ふつうの一覧・図鑑・ガチャ・箱・ダンジョン・敵の編成に出ない（確かめ用 QA_MONSTERS・QA_SKILLS だけ）', () => {
-    expect(QA_MONSTERS.map((m) => m.id)).toEqual([TYRANT_MONSTER_ID]);
-    expect(QA_SKILLS).toHaveLength(12);
+    // 2026-11-05 指示書 BH：クヨウも確かめ用（霧の廃坑ができるまで）
+    expect(QA_MONSTERS.map((m) => m.id)).toEqual([TYRANT_MONSTER_ID, 'mon-kuyo']);
+    expect(QA_SKILLS.filter((k) => k.monsterId === TYRANT_MONSTER_ID)).toHaveLength(12);
     expect(MONSTERS.some((m) => m.id === TYRANT_MONSTER_ID)).toBe(false);
     expect(SKILLS.some((k) => k.monsterId === TYRANT_MONSTER_ID)).toBe(false);
     expect(AJ_MONSTER_IDS).not.toContain(TYRANT_MONSTER_ID);

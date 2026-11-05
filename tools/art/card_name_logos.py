@@ -21,7 +21,13 @@ GLYPH = {'left': 40, 'top': 55, 'height': 170}
 GLYPH_EN = {'left': 40, 'top': 48, 'height': 170}
 
 
+# 枠の色を測らずに指示書の色を使う子（2026-11-05 指示書 BH：クヨウの正式カードは 1016×1698 で、ほかの子〔970×1622〕と帯の位置が違うため）
+FRAME_COLOR = {'kuyo': '#9B86B8'}
+
+
 def frame_color(key: str) -> str:
+    if key in FRAME_COLOR:
+        return FRAME_COLOR[key]
     f = glob.glob(os.path.join(SRC, 'noname', f'*_{key}_official_noname.png'))[0]
     a = np.array(Image.open(f).convert('RGB')).astype(int)
     band = a[300:1300, 10:28].reshape(-1, 3)

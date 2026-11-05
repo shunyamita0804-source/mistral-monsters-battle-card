@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
 import { GACHA, GACHA_SERIES, gachaSeenFlag } from '../src/data/economy.ts';
 import { BOOSTERS } from '../src/data/introV2.ts';
-import { AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
+import { AJ_QA_SKILLS, AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import {
   availableGachaSeriesFor,
   canReselectSeries,
@@ -33,7 +33,7 @@ if (!SORAMO) throw new Error('soramo');
 
 describe('ガチャのシリーズ（2026-10-28）', () => {
   it('16シリーズ（2026-10-29 にプカリム、夜にジオル、深夜にフルーネ・セレフィーン。2026-10-30 にツムジ・ヒョウズク・道具のパック。2026-10-31 にシシエン・ハクラン・デスオル。2026-11-02 にリリル〔カルシェルのあと〕）。どれも 150G・5枚', () => {
-    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'forn', 'uzurio', 'gearos', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
+    expect(GACHA_SERIES.map((s) => s.id)).toEqual(['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'lilil', 'forn', 'uzurio', 'gearos', 'kuyo', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'hakuran', 'desuoru', 'tools']);
     expect(GACHA.price).toBe(150);
     expect(GACHA.cardsPerPack).toBe(5);
   });
@@ -77,10 +77,11 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
       forn: ['そうこうげき', 'そなえのふえ', 'もりのたより', 'みがわりのふえ'],
       uzurio: ['かぜのうず', 'おおたつまき', 'ふきとばし', 'つむじがくれ'], // 2026-11-02 指示書 AQ
       gearos: ['ロックオンビーム', 'オーバードライブβ', 'オーバードライブγ', '高速機動'], // 2026-11-05 指示書 AX（進行の案）
+      kuyo: ['ここのつのめ', 'はらえのひかり', 'まよけのふだ', 'きりのなかへ'], // 2026-11-05 指示書 BH（確かめ用の表 AJ_QA_SKILLS）
     };
     for (const s of GACHA_SERIES.filter((x) => !x.cardIds)) {
       expect(names(s.id).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
-      expect((AJ_SKILLS[s.monsterId] ?? []).filter((r) => r.rare).map((r) => r.name).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
+      expect((AJ_SKILLS[s.monsterId] ?? AJ_QA_SKILLS[s.monsterId] ?? []).filter((r) => r.rare).map((r) => r.name).sort(), s.id).toEqual([...(want[s.id] ?? [])].sort());
     }
   });
 
@@ -157,8 +158,8 @@ describe('ガチャのシリーズ（2026-10-28）', () => {
 
   it('プカリム・ジオル・フルーネ以外は最初から選べる（新しいセーブでも買える。リリル〔2026-11-02〕は旅立ちのきらめきを開けてから）', () => {
     // ウズリオ（2026-11-02 指示書 AQ）は風の渓谷でモンスターカードを受け取ってから
-    // ギアロス（2026-11-05 指示書 AX）は機械の塔でモンスターカードを受け取ってから
-    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag && s.id !== 'lilil' && s.id !== 'forn' && s.id !== 'uzurio' && s.id !== 'gearos')) {
+    // ギアロス（2026-11-05 指示書 AX）は機械の塔でモンスターカードを受け取ってから。クヨウ（指示書 BH）は霧の廃坑（まだ無い）でモンスターカードを受け取ってから
+    for (const series of GACHA_SERIES.filter((s) => !s.unlockFlag && s.id !== 'lilil' && s.id !== 'forn' && s.id !== 'uzurio' && s.id !== 'gearos' && s.id !== 'kuyo')) {
       const r = purchaseSeriesPack({ ...createNewSave(), coins: 150 }, series.id, `tx-${series.id}`, 3);
       expect(r.status).toBe('ok');
     }

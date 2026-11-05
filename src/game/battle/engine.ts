@@ -119,6 +119,11 @@ export interface BattleSide {
   readonly manaPile: readonly string[];
   /** このターンに使ったサポートの回数（回数制限のまとまりごと）。ターン開始で空に戻す */
   readonly turnUsage: Readonly<Record<string, number>>;
+  /**
+   * まよけのふだ（2026-11-05 指示書 BH：クヨウ）：untilTurn の手番が終わるまで、この側の味方全員に悪い状態（badStatusKinds）がつかない。
+   * 使った手番＋次の相手の手番。重ねて使っても延びない。クヨウが倒れても残る
+   */
+  readonly wardCharm?: { readonly untilTurn: number } | null;
 }
 
 /**
@@ -161,6 +166,8 @@ export interface PendingAttack {
   readonly queue?: readonly string[];
   /** かばうで狙いが変わったとき、もとの狙われたモンスター（uid。試遊中：ジオルのかばう） */
   readonly coveredFrom?: string;
+  /** みがわり（2026-11-05 指示書 BH：クヨウ）で代わりに受けたとき、受けるダメージをさらに減らす量（守りのあとに引く。0 未満にしない） */
+  readonly coverReduce?: number;
   /** エネルギーをためるで2倍になった攻撃（記録・試遊の数え用） */
   readonly energized?: boolean;
   /** 竜のまなざし（指示書 AX）がかかった攻撃：回避されない（相手全員への攻撃なら、どの相手にも） */
@@ -525,6 +532,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'ward' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noWardTarget'));
+  // おはらい（クヨウ 指示書 BH）：悪い状態のある味方がいないときは使えない（理由を画面に出す）
+  if (skill.effect.type === 'purify' && purifyTargets(state, side).length === 0) return NO(t('battle.ng.noPurifyTarget'));
   // もりのたより（フォルン 指示書 AL）：使ったあとの手札がすでに hand 枚以上なら使えない
   if (skill.effect.type === 'drawTo' && state.sides[side].hand.length - 1 >= skill.effect.hand) return NO(t('battle.ng.handEnough', { n: skill.effect.hand }));
   // かぜのり（ツムジ）が効いていれば、攻撃技の消費マナ−1
@@ -675,6 +684,36 @@ export function requiemVictims(state: BattleState, userUid: string): BattleMonst
 }
 
 /**
+ * 悪い状態（2026-11-05 指示書 BH：おはらいで消す・まよけのふだで防ぐもの）。相手の技で味方に付いた、いま効いているもの：
+ * sealed＝攻撃できない（すなかけ・威嚇・こもりうた・すなけむり）・stunned＝行動できない／凍る（まきつく・こおりのいき・ふぶき）・
+ * weaken＝技のダメージ−（ダストキック・吠える・熱風の威嚇）・taunt＝おびきよせ（決まった相手しか狙えない）。
+ * じならし（回避できない）は入れていない【要確認】。自分の技で付いた良い状態（ためている・エネルギー・おいかぜ・しめったはだ など）は入らない
+ */
+export type BadStatusKind = 'sealed' | 'stunned' | 'weaken' | 'taunt';
+
+export function badStatusKinds(state: BattleState, m: BattleMonster | undefined): BadStatusKind[] {
+  if (!m || m.life <= 0) return [];
+  const out: BadStatusKind[] = [];
+  if (m.sealedTurn != null && m.sealedTurn >= state.turn) out.push('sealed');
+  if (m.stunnedTurn != null && m.stunnedTurn >= state.turn) out.push('stunned');
+  const weak = (m.weaken && (m.weaken.untilTurn === undefined || m.weaken.untilTurn >= state.turn)) || (m.weakenTurn && m.weakenTurn.turn >= state.turn);
+  if (weak) out.push('weaken');
+  if (m.taunt && m.taunt.turn >= state.turn) out.push('taunt');
+  return out;
+}
+
+/** おはらいで選べる味方（生きていて、悪い状態のある味方。使ったモンスター自身も選べる） */
+export function purifyTargets(state: BattleState, side: Side): BattleMonster[] {
+  return aliveMonsters(state.sides[side]).filter((m) => badStatusKinds(state, m).length > 0);
+}
+
+/** まよけのふだが、いま side の味方に効いているか（使った手番から、次の相手の手番の終わりまで） */
+export function wardCharmActive(state: BattleState, side: Side): boolean {
+  const w = state.sides[side].wardCharm;
+  return !!w && state.turn <= w.untilTurn;
+}
+
+/**
  * 対象を選ぶ必要があるカードなら、選べる対象を返す。
  * 攻撃の技は、ちょうはつで相手が限られていればそれに従う。user を渡さなければ、使えるモンスターのだれかが攻撃できる相手すべて。
  * 【要仕様確定】ちょうはつが限るのは攻撃の技だけ（特殊の技・防御・回避・サポートは限らない）
@@ -699,6 +738,8 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
   if (card.kind === 'support' && card.effect.type === 'stone') return attackableMonsters(state, otherSide(side));
   if (card.kind === 'support' && card.effect.type === 'cheer') return cheerTargets(state, side);
   if (card.kind === 'skill' && (card.effect.type === 'tailwind' || card.effect.type === 'ward')) return tailwindTargets(state, side, card);
+  // おはらい（クヨウ 指示書 BH）：悪い状態のある味方（クヨウ自身も）
+  if (card.kind === 'skill' && card.effect.type === 'purify') return purifyTargets(state, side);
   return [];
 }
 
@@ -939,7 +980,8 @@ export function wardOf(state: BattleState, monster: BattleMonster | undefined): 
  */
 export function incomingDamage(state: BattleState, pending: PendingAttack): number {
   const target = findMonster(state, pending.targetUid)?.monster;
-  return Math.max(0, pendingDamage(pending) - shieldOf(state, target, pending.stat));
+  // みがわり（クヨウ 指示書 BH）：代わりに受けたダメージをさらに −（しめったはだ・そなえのふえと同じく、守りのあとに引く）
+  return Math.max(0, pendingDamage(pending) - shieldOf(state, target, pending.stat) - (pending.coverReduce ?? 0));
 }
 
 function resolvePending(state: BattleState): BattleState {
@@ -981,7 +1023,7 @@ function nextAllTarget(state: BattleState, done: PendingAttack): BattleState {
   const [nextUid, ...more] = rest;
   if (!nextUid) return state;
   const target = findMonster(state, nextUid)?.monster;
-  const { pinned: _p, coveredFrom: _c, ...base } = done;
+  const { pinned: _p, coveredFrom: _c, coverReduce: _r, ...base } = done;
   // おおたつまき（指示書 AS）：次の相手がいま空中なら空中の威力、そうでなければふつうの威力
   const power = base.allPower ? (habitatOf(state, target) === 'air' ? base.allPower.air : base.allPower.base) : base.power;
   const pending: PendingAttack = { ...base, power, targetUid: nextUid, responses: [], queue: more, ...(isPinned(state, target) ? { pinned: true } : {}) };
@@ -1122,7 +1164,7 @@ function useCard(
   if (allTargets) {
     target = targets[0];
     if (!target) return state;
-  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'healAlly' || skill.effect.type === 'tailwind' || skill.effect.type === 'ward') {
+  } else if (targetsEnemy(skill) || skill.effect.type === 'heal' || skill.effect.type === 'healAlly' || skill.effect.type === 'tailwind' || skill.effect.type === 'ward' || skill.effect.type === 'purify') {
     target = targetUid ? targets.find((m) => m.uid === targetUid) : undefined;
     if (!target) return state;
   }
@@ -1221,6 +1263,8 @@ function useCard(
     case 'weaken': {
       // 【要仕様確定】重ねがけはしない（すでにかかっていても同じ量のまま）
       if (!target) return state;
+      // まよけのふだ（クヨウ 指示書 BH）：相手の味方全員に悪い状態がつかない
+      if (wardCharmActive(next, otherSide(side))) return wardCharmBlocked(next, target);
       const e = skill.effect;
       if (e.duration === 'nextTurn') {
         // ダストキック：相手の次の手番（turn + 1）の間だけ。手番が過ぎたら何もしなくても効かない
@@ -1238,12 +1282,14 @@ function useCard(
     case 'seal': {
       // 相手の次の手番（turn + 1）の間、攻撃の技を使えない
       if (!target) return state;
+      if (wardCharmActive(next, otherSide(side))) return wardCharmBlocked(next, target);
       next = updateMonster(next, target.uid, { sealedTurn: state.turn + 1 });
       return addLog(next, t('battle.log.seal', { name: nameOf(target.cardId) }));
     }
     case 'taunt': {
       // ちょうはつ：相手の次の手番（turn + 1）の間、使ったモンスターと同じ種類にしか攻撃できない
       if (!target) return state;
+      if (wardCharmActive(next, otherSide(side))) return wardCharmBlocked(next, target);
       next = updateMonster(next, target.uid, { taunt: { monsterId: user.cardId, turn: state.turn + 1 } });
       return addLog(next, t('battle.log.taunt', { name: nameOf(target.cardId), only: nameOf(user.cardId) }));
     }
@@ -1311,6 +1357,18 @@ function useCard(
       next = updateMonster(next, target.uid, { ward: { reduce: skill.effect.reduce, untilTurn: state.turn + 1 } });
       return addLog(next, t('battle.log.ward', { name: nameOf(target.cardId), n: skill.effect.reduce }));
     }
+    case 'purify': {
+      // おはらい（クヨウ 指示書 BH）：選んだ味方の悪い状態をすべて消す（攻撃できない・行動できない／凍る・技のダメージ−・おびきよせ）
+      if (!target) return state;
+      next = updateMonster(next, target.uid, { sealedTurn: null, stunnedTurn: null, stunMark: null, weaken: null, weakenTurn: null, taunt: null });
+      return addLog(next, t('battle.log.purify', { name: nameOf(target.cardId) }));
+    }
+    case 'wardCharm': {
+      // まよけのふだ（クヨウ 指示書 BH）：次の相手の手番（turn + 1）が終わるまで、味方全員に悪い状態がつかない。重ねても延びない
+      const until = Math.max(state.turn + 1, wardCharmActive(next, side) ? (next.sides[side].wardCharm?.untilTurn ?? 0) : 0);
+      next = updateSide(next, side, { wardCharm: { untilTurn: until } });
+      return addLog(next, t('battle.log.wardCharm', { side: sideLabel(side) }));
+    }
     case 'drawTo':
       return drawToHand(next, side, skill.effect.hand, choice);
     case 'redrawHand':
@@ -1330,6 +1388,11 @@ function useCard(
     case 'cover':
       return state;
   }
+}
+
+/** まよけのふだ（クヨウ 指示書 BH）が悪い状態を防いだ（記録だけ。技のマナ・カードは使ったまま） */
+function wardCharmBlocked(state: BattleState, target: BattleMonster): BattleState {
+  return addLog(state, t('battle.log.wardCharmBlocked', { name: nameOf(target.cardId) }));
 }
 
 /**
@@ -1465,7 +1528,10 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
   if (e.manaDrain) next = drainMana(next, attacker, e.manaDrain);
   if (e.stunTarget) {
     const target = findMonster(next, targetUid);
-    if (target && target.monster.life > 0) {
+    if (target && target.monster.life > 0 && wardCharmActive(next, target.side)) {
+      // まよけのふだ（クヨウ 指示書 BH）：ダメージは受けるが、行動できない・凍るはつかない
+      next = wardCharmBlocked(next, target.monster);
+    } else if (target && target.monster.life > 0) {
       next = updateMonster(next, targetUid, { stunnedTurn: state.turn + 1, stunMark: e.stunMark ?? null });
       next = addLog(next, t('battle.log.stun', { name: nameOf(target.monster.cardId) }));
     }
@@ -1758,8 +1824,10 @@ function cover(state: BattleState, side: Side, cardUid: string, skill: SkillCard
   let next = removeFromHand(state, side, cardUid);
   next = payMana(next, side, guardCost(next, skill));
   const { pinned: _p, ...base } = pending;
-  next = { ...next, pending: { ...base, targetUid: user.uid, coveredFrom: ally.uid, responses: [], ...(isPinned(next, user) ? { pinned: true } : {}) } };
-  return addLog(next, t('battle.log.cover', { name: nameOf(user.cardId), ally: nameOf(ally.cardId) }));
+  const reduce = skill.effect.type === 'cover' ? (skill.effect.reduce ?? 0) : 0;
+  next = { ...next, pending: { ...base, targetUid: user.uid, coveredFrom: ally.uid, responses: [], ...(isPinned(next, user) ? { pinned: true } : {}), ...(reduce > 0 ? { coverReduce: reduce } : {}) } };
+  // みがわり（クヨウ 指示書 BH）：ダメージ−reduce の文
+  return addLog(next, reduce > 0 ? t('battle.log.standIn', { name: nameOf(user.cardId), ally: nameOf(ally.cardId), n: reduce }) : t('battle.log.cover', { name: nameOf(user.cardId), ally: nameOf(ally.cardId) }));
 }
 
 /** 行動を待っている側（防御待ちなら防御側） */
