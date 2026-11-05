@@ -253,6 +253,11 @@
   margin: 0 auto;
 }
 
+/* 機械の塔：上り階段の絵（正方形。2026-11-05 指示書 BG） */
+.drun__stairs-art--up {
+  max-width: 150px;
+}
+
 /* ===== 23 確認の窓の紋章（窓の上のふちに乗せる） ===== */
 .modal__panel.has-emblem {
   position: relative;

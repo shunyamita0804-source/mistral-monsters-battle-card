@@ -689,24 +689,121 @@
   background-image: url('@assets/images/maps/dungeon/machine_door_blue_open.webp');
 }
 
-/* 開いた扉の足元：その色のうすい光（床と見分けがつくように） */
-.is-open-red .drun__tile--door-red.is-seen::before,
-.is-open-blue .drun__tile--door-blue.is-seen::before {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 4px;
-  background: rgb(255 120 100 / 0.32);
-  box-shadow: 0 0 6px rgb(255 120 100 / 0.5);
-}
-
-.is-open-blue .drun__tile--door-blue.is-seen::before {
-  background: rgb(110 160 255 / 0.32);
-  box-shadow: 0 0 6px rgb(110 160 255 / 0.5);
-}
-
 .drun__tile--door.is-seen:not(.is-lit)::after {
   filter: brightness(0.5);
+}
+
+/*
+ * 2026-11-05 指示書 BG：扉・スイッチのランプと光のふち（自分で光っている物）。暗さ（drun__light）の上の層（#thunderLayer）に重ね、
+ * 明かりの外でも暗くしない。まわりにその色のうすい光のにじみ（開いている扉・閉じている扉どちらも）。見たマスだけ（is-seen）。
+ * BD で足した「開いた扉の足もとのうすい光」は、指示書 BG でやめた
+ */
+.drun__lamp {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  display: none;
+  pointer-events: none;
+}
+
+.drun__lamp.is-seen {
+  display: block;
+}
+
+/* 光のにじみ（扉は絵の真ん中＝マスの少し上に） */
+.drun__lamp::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 104px;
+  height: 104px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 60 45 / 0.34), rgb(255 60 45 / 0.12) 45%, rgb(255 60 45 / 0) 70%);
+  mix-blend-mode: screen;
+}
+
+.drun__lamp--blue::before,
+.is-open-blue .drun__lamp--switch::before {
+  background: radial-gradient(circle, rgb(60 200 255 / 0.34), rgb(60 200 255 / 0.12) 45%, rgb(60 200 255 / 0) 70%);
+}
+
+/* ランプと光のふち（扉の絵と同じ置き方・大きさ） */
+.drun__lamp--door::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 44px;
+  height: 60px;
+  translate: -50% 0;
+  background: url('@assets/images/maps/dungeon/machine_door_red_closed_glow.webp') center bottom / contain no-repeat;
+  filter: drop-shadow(0 0 3px rgb(255 70 50 / 0.8));
+}
+
+.drun__lamp--door.drun__lamp--blue::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_blue_closed_glow.webp');
+  filter: drop-shadow(0 0 3px rgb(60 200 255 / 0.8));
+}
+
+.is-open-red .drun__lamp--door.drun__lamp--red::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_red_open_glow.webp');
+}
+
+.is-open-blue .drun__lamp--door.drun__lamp--blue::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_blue_open_glow.webp');
+}
+
+/* スイッチのランプ（いま開いている色） */
+.drun__lamp--switch::before {
+  top: 24px;
+  width: 80px;
+  height: 80px;
+}
+
+.drun__lamp--switch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('@assets/images/maps/dungeon/machine_switch_red_glow.webp') center 85% / auto 42px no-repeat;
+  filter: drop-shadow(0 0 3px rgb(255 70 50 / 0.8));
+}
+
+.is-open-blue .drun__lamp--switch::after {
+  background-image: url('@assets/images/maps/dungeon/machine_switch_blue_glow.webp');
+  filter: drop-shadow(0 0 3px rgb(60 200 255 / 0.8));
+}
+
+.is-switching .drun__lamp:not(.drun__lamp--stairs)::after {
+  animation: drun-door-switch 0.42s ease-out;
+}
+
+/* 上り階段（塔）：マスのまわりにうすい金色の光とふち（主人公が乗っても階段と分かるように） */
+.drun__lamp--stairs::before {
+  top: 24px;
+  width: 92px;
+  height: 92px;
+  background: radial-gradient(circle, rgb(255 205 110 / 0.3), rgb(255 205 110 / 0.1) 50%, rgb(255 205 110 / 0) 70%);
+}
+
+.drun__lamp--stairs::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border: 2px solid rgb(255 214 130 / 0.55);
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgb(255 200 100 / 0.6), inset 0 0 8px rgb(255 200 100 / 0.45);
+  animation: drun-stairs-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes drun-stairs-glow {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drun__lamp--stairs::after { animation: none; }
 }
 
 /* スイッチを押したとき：扉が少しゆれて開く／閉まる */
@@ -760,7 +857,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .is-switching .drun__tile--door.is-seen::after,
-  .is-switching .drun__entity--switch { animation: none; }
+  .is-switching .drun__entity--switch,
+  .is-switching .drun__lamp::after { animation: none; }
 }
 
 /* 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）：炎の火山の溶岩のひび割れ・天の聖域の羽根・燭台・光の筋 */

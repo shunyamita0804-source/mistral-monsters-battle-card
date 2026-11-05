@@ -212,4 +212,19 @@ describe('指示書 BD【2】〜【5】', () => {
     expect(step?.kind === 'line' && step.line.picture).toBe('tutorial_tower_doors');
     expect(SQUARE_PICTURES).toContain('tutorial_tower_doors');
   });
+
+  it('指示書 BG：扉・スイッチの光は暗さの上の層（明かりの外でも暗くしない）・階段の光・上るか聞く窓は上り階段の絵・足もとの光はやめた', () => {
+    for (const c of ['red', 'blue']) {
+      for (const st of ['closed', 'open']) expect(existsSync(`assets/images/maps/dungeon/machine_door_${c}_${st}_glow.webp`)).toBe(true);
+      expect(existsSync(`assets/images/maps/dungeon/machine_switch_${c}_glow.webp`)).toBe(true);
+    }
+    const css = readFileSync('src/ui/styles/dungeonRun.css', 'utf8');
+    expect(css).toContain('.drun__lamp--door::after');
+    expect(css).toContain('.drun__lamp--switch::after');
+    expect(css).toContain('.drun__lamp--stairs::after');
+    expect(css).not.toMatch(/drun__tile--door-(red|blue)\.is-seen::before/);
+    const screen = readFileSync('src/ui/screens/dungeonRunScreen.ts', 'utf8');
+    expect(screen).toContain("this.#thunderPan.append(el);\n      this.#lamps.push");
+    expect(screen).toContain('stairsUpArt');
+  });
 });
