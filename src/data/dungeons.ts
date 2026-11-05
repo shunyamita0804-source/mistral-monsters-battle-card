@@ -259,6 +259,8 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
     skill: 'A',
     ai: 'overdrive',
     aceCopies: TEO_DECK,
+    // 2026-11-05 ユーザー決定：最初の手札に α・β・γ のうち1枚を必ず入れる（ボスだけの決まり）
+    openingAny: ['skl-gearos-05', 'skl-gearos-06', 'skl-gearos-07'],
   },
   // 2026-11-05 指示書 AX【6】：S の目安のプレイヤーがギアロスを持つようになり、1.76＝5.7％ と目標 10％（±3）から外れたので 1.66（ライフ 10・12・13）に
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.66, skill: 'A' },

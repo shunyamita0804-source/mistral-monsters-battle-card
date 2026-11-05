@@ -1027,7 +1027,7 @@ export const battleScreen: ScreenDefinition = {
         if (destroyed) return;
         state = createBattle(
           { name: heroName(heroProfile.name), deck: req.playerDeck ?? ctx.store.save.deck },
-          { name: opponentName(req.opponent), deck: req.opponentDeck ?? buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale },
+          { name: opponentName(req.opponent), deck: req.opponentDeck ?? buildOpponentDeck(req.opponent), lifeScale: req.opponent.lifeScale, ...(req.opponent.openingAny ? { openingAny: req.opponent.openingAny } : {}) },
           seed,
           first,
         );

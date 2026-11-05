@@ -246,6 +246,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // ギアロス（2026-11-05 指示書 AX）：オーバードライブの3枚コンボは使えるときは使う（腕前 C は forgetTrick の割合で見落とす）
   const overdrive = chooseOverdrive(state, side, skill);
   if (overdrive) return overdrive;
+  // テオ（2026-11-05 ユーザー決定）：α・β・γ のどれかを持っていて残りが手札に無ければ、システムチェンジ・システムチェックで探す
+  const dig = chooseOverdriveDig(state, side, style, options);
+  if (dig) return dig;
 
   // 癖：攻撃・妨害を先に使う人
   if (style === 'aggressive' || style === 'flashy' || style === 'hunter') {
@@ -417,11 +420,53 @@ export function overdriveHold(state: BattleState, side: Side, style: AiStyle, mi
   if (style !== 'overdrive') return new Set();
   const hand = state.sides[side].hand;
   const cards = OVERDRIVE_IDS.map((id) => hand.find((c) => c.cardId === id)).filter((c): c is HandCard => !!c);
-  if (cards.length < min) return new Set();
+  // システムチェックで、手札に無い α・β・γ が山札の上にあると分かっていれば（2026-11-05 ユーザー決定）、1種類でも取っておく
+  if (cards.length < min && !(cards.length >= 1 && peekShowsMissing(state, side))) return new Set();
   if (!aliveMonsters(state.sides[side]).some((m) => OVERDRIVE_IDS.some((id) => skillsOf(m.cardId).some((k) => k.id === id)))) return new Set();
   const threat = affordableThreat(state, side);
   if (!ignoreDanger && aliveMonsters(state.sides[side]).some((m) => m.life <= threat)) return new Set();
   return new Set(cards.map((c) => c.uid));
+}
+
+/** 手札に無い α・β・γ（ID） */
+function missingOverdrive(state: BattleState, side: Side): string[] {
+  const hand = state.sides[side].hand;
+  return OVERDRIVE_IDS.filter((id) => !hand.some((c) => c.cardId === id));
+}
+
+/** 前に見たシステムチェックの山札の上がまだそのままで、その中に手札に無い α・β・γ があるか */
+function peekShowsMissing(state: BattleState, side: Side): boolean {
+  const peek = state.deckPeek;
+  if (!peek || peek.viewer !== side || peek.cardIds.length === 0) return false;
+  const top = state.sides[side].deck.slice(0, peek.cardIds.length);
+  if (top.length !== peek.cardIds.length || top.some((id, i) => id !== peek.cardIds[i])) return false;
+  const missing = missingOverdrive(state, side);
+  return peek.cardIds.some((id) => missing.includes(id));
+}
+
+/**
+ * テオ（構え overdrive。2026-11-05 ユーザー決定）：α・β・γ のどれかを手札に持っていて、残りが手札に無いとき、探すために
+ * システムチェンジ（α・β・γ でない札を山札に戻して1枚引く）・システムチェック（山札の上を見る）を使う。
+ * システムチェックで上にあると分かっているあいだは使わない（overdriveHold が取っておく）。チェンジを先に考える（1枚引けるため）
+ */
+function chooseOverdriveDig(state: BattleState, side: Side, style: AiStyle, options: Option[]): BattleAction | null {
+  if (style !== 'overdrive') return null;
+  const hand = state.sides[side].hand;
+  const have = OVERDRIVE_IDS.filter((id) => hand.some((c) => c.cardId === id));
+  if (have.length === 0 || have.length === OVERDRIVE_IDS.length) return null;
+  if (peekShowsMissing(state, side)) return null;
+  const skills = options.filter(isSkillOption);
+  const change = skills.find((o) => o.def.effect.type === 'systemChange');
+  if (change) {
+    const cost = (c: HandCard): number => getPlayCard(c.cardId).cost;
+    const out = hand
+      .filter((c) => c.uid !== change.card.uid && !OVERDRIVE_IDS.includes(c.cardId) && !isGuard(c))
+      .sort((a, b) => cost(b) - cost(a))[0];
+    if (out) return { type: 'useCard', side, cardUid: change.card.uid, choice: out.uid };
+  }
+  const check = skills.find((o) => o.def.effect.type === 'systemCheck');
+  if (check && state.sides[side].deck.length > 0) return { type: 'useCard', side, cardUid: check.card.uid };
+  return null;
 }
 
 /** オーバードライブの3枚コンボ（ギアロス 指示書 AX）：使えるときは使う。腕前 C は forgetTrick の割合で見落とす */

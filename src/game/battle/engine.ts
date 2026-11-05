@@ -263,6 +263,11 @@ export interface CombatantSetup {
   readonly deck: Deck;
   /** ライフ倍率（敵の強さ調整・仮） */
   readonly lifeScale?: number;
+  /**
+   * 最初の手札に必ず1枚入れるカード（このうちのどれか1枚。2026-11-05 ユーザー決定：テオの α・β・γ。ボスだけの決まり）。
+   * シャッフルしたあと、山札でいちばん上に近い1枚を山札のいちばん上へ動かすだけ（山札の枚数は変えない）
+   */
+  readonly openingAny?: readonly string[];
 }
 
 /* ---------- 開始 ---------- */
@@ -293,6 +298,12 @@ export function createBattle(
   s = pShuffle.seed;
   const oShuffle = shuffle(opponent.deck.skills, s);
   s = oShuffle.seed;
+  const opening = (items: string[], ids: readonly string[] | undefined): string[] => {
+    const i = ids && ids.length > 0 ? items.findIndex((id) => ids.includes(id)) : -1;
+    return i <= 0 ? items : [items[i] as string, ...items.slice(0, i), ...items.slice(i + 1)];
+  };
+  pShuffle.items = opening(pShuffle.items, player.openingAny);
+  oShuffle.items = opening(oShuffle.items, opponent.openingAny);
   let firstSide = first;
   if (!firstSide) {
     const r = nextRandom(s);

@@ -55,6 +55,8 @@ export interface OpponentDefinition {
    * （2026-11-05 指示書 AY：テオの α・β・γ を3枚。指示書 AY2：2枚に戻し、ライフの代わりにデッキで強くする）
    */
   readonly aceCopies?: Readonly<Record<string, number>>;
+  /** 最初の手札に必ず1枚入れるカード（このうちのどれか。2026-11-05 ユーザー決定：テオの α・β・γ。engine.ts の CombatantSetup.openingAny） */
+  readonly openingAny?: readonly string[];
   /** 通算の勝率（%。札を押したときに出す。仮の固定値。常連だけ） */
   readonly winRate?: number;
 }

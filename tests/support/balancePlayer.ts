@@ -205,11 +205,12 @@ export interface BalanceOpponent {
   readonly lifeScale: number;
   readonly ai?: AiStyle | undefined;
   readonly skill?: CpuSkill | undefined;
+  readonly openingAny?: readonly string[] | undefined;
 }
 
 /** プレイヤー（腕前 playerSkill・構えはふつう）と相手の1対戦。勝ったか・終わりの様子を返し、c に数える */
 export function playBalanceMatch(player: Deck, opp: BalanceOpponent, seed: number, first: Side, c: BalanceCount, playerSkill: CpuSkill = 'B'): { won: boolean; summary: BattleSummary } {
-  let state: BattleState = createBattle({ name: 'A', deck: player }, { name: 'B', deck: opp.deck, lifeScale: opp.lifeScale }, seed, first);
+  let state: BattleState = createBattle({ name: 'A', deck: player }, { name: 'B', deck: opp.deck, lifeScale: opp.lifeScale, ...(opp.openingAny ? { openingAny: opp.openingAny } : {}) }, seed, first);
   let combo = false;
   for (let i = 0; i < MAX_STEPS && state.phase !== 'ended'; i++) {
     const side = actingSide(state);

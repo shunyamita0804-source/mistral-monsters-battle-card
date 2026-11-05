@@ -101,7 +101,7 @@ function guardianSeries(boss: OpponentDefinition, slot: SlotId, lifeScale: numbe
   const all = emptyBalanceCount();
   BOX_KEYS.forEach((box, k) => {
     const c = emptyBalanceCount();
-    for (let g = 0; g < games; g++) playBalanceMatch(playerDeck(box, slot), { deck, lifeScale, ai: boss.ai, skill: boss.skill }, seedBase + k * 100000 + g * 7919, g % 2 === 0 ? 'player' : 'opponent', c, PLAYER_SKILL);
+    for (let g = 0; g < games; g++) playBalanceMatch(playerDeck(box, slot), { deck, lifeScale, ai: boss.ai, skill: boss.skill, openingAny: boss.openingAny }, seedBase + k * 100000 + g * 7919, g % 2 === 0 ? 'player' : 'opponent', c, PLAYER_SKILL);
     byBox[box] = c;
     addBalanceCount(all, c);
   });

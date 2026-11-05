@@ -80,3 +80,34 @@ describe('テオ：オーバードライブの3枚コンボを狙う', () => {
     expect(chooseAction(s, 'opponent', 'overdrive', 'A')).toMatchObject({ type: 'useCard', choice: OVERDRIVE_CHOICE });
   });
 });
+
+describe('テオ：α・β・γ を探す・最初の手札（2026-11-05 ユーザー決定）', () => {
+  it('最初の手札に α・β・γ のうち1枚が必ず入る（山札の枚数は同じ）', () => {
+    const teo = ENCOUNTERS['enc-machine-boss'];
+    if (!teo?.openingAny) throw new Error('teo');
+    const deck = buildOpponentDeck(teo);
+    for (let seed = 1; seed <= 40; seed++) {
+      const s = createBattle({ name: 'P', deck }, { name: 'O', deck, openingAny: teo.openingAny }, seed, 'opponent');
+      expect(s.sides.opponent.hand.some((c) => teo.openingAny?.includes(c.cardId)), String(seed)).toBe(true);
+      expect(s.sides.opponent.hand.length + s.sides.opponent.deck.length).toBe(60);
+    }
+  });
+
+  it('α を持っていて β・γ が手札に無ければ、システムチェンジで α・β・γ でない札を戻す。チェンジが無ければシステムチェック', () => {
+    const a = chooseAction(scene([ge(5), ge(8), 'skl-nobiton-04'], 6), 'opponent', 'overdrive', 'A');
+    expect(a).toMatchObject({ type: 'useCard', cardUid: 'o1', choice: 'o2' });
+    const b = chooseAction(scene([ge(5), ge(9)], 6), 'opponent', 'overdrive', 'A');
+    expect(b).toMatchObject({ type: 'useCard', cardUid: 'o1' });
+    // ほかの構えは探さない
+    const c = chooseAction(scene([ge(5), ge(9)], 6), 'opponent', 'normal', 'A');
+    expect(c).not.toMatchObject({ cardUid: 'o1' });
+  });
+
+  it('システムチェックで山札の上に手札に無い β があると分かったら、α 1枚でも取っておく', () => {
+    const s0 = scene([ge(5), ge(4)], 6);
+    const top = [sor(2), ge(6), sor(3)];
+    const s: BattleState = { ...s0, sides: { ...s0.sides, opponent: { ...s0.sides.opponent, deck: [...top, ...s0.sides.opponent.deck] } }, deckPeek: { seq: 1, viewer: 'opponent', cardIds: top } };
+    expect(overdriveHold(s, 'opponent', 'overdrive').size).toBe(1);
+    expect(overdriveHold(s0, 'opponent', 'overdrive').size).toBe(0);
+  });
+});
