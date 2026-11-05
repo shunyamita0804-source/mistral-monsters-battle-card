@@ -73,12 +73,12 @@ export const INTRO_V2 = {
   'introV2.pack.again': { ja: '同じ箱をもう一度タップすると決定します。', en: 'Tap the same box again to decide.' },
   'introV2.pack.temp': { ja: '箱の中には、3体のモンスターカードと山札60枚が入っています。そのままあなたのデッキになります。', en: 'Each box holds 3 monster cards and a 60-card deck. It becomes your deck as it is.' },
   'introV2.pack.got': { ja: '{name} を受け取った！\nモンスターカード3枚と山札60枚が、あなたのデッキになった。', en: 'You received {name}!\nIts 3 monster cards and 60-card deck are now your deck.' },
-  'introV2.pack.name.1': { ja: '旅立ちのきらめき', en: 'Sparkle of Departure' },
+  'introV2.pack.name.1': { ja: '旅立ちのきらめき', en: "Journey's Spark" },
   'introV2.pack.name.2': { ja: '烈火の猛攻', en: 'Blazing Onslaught' },
-  'introV2.pack.name.3': { ja: '蒼海の守り', en: 'Guard of the Azure Sea' },
+  'introV2.pack.name.3': { ja: '蒼海の守り', en: 'Azure Guard' },
   'introV2.pack.guide.1': {
     ja: 'これは『旅立ちのきらめき』！ ソラモたちのパックで、バランスよく戦いたい人におすすめだよ！',
-    en: "This is \"Sparkle of Departure\"! It's Soramo's pack, great if you want a balanced fight!",
+    en: "This is \"Journey's Spark\"! It's Soramo's pack, great if you want a balanced fight!",
   },
   'introV2.pack.guide.2': {
     ja: 'これは『烈火の猛攻』！ ガウルたちのパックで、どんどん攻めたい人にぴったりだよ！',
@@ -86,7 +86,7 @@ export const INTRO_V2 = {
   },
   'introV2.pack.guide.3': {
     ja: 'これは『蒼海の守り』！ カルシェルたちのパックで、守りを大切にしたい人におすすめだよ！',
-    en: "This is \"Guard of the Azure Sea\"! It's Kalshell's pack, great if you value defense!",
+    en: "This is \"Azure Guard\"! It's Kalshell's pack, great if you value defense!",
   },
 
   // カードショップ：管理局で選ばなかった2箱（値段・中身は未定なので買えない）
