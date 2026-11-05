@@ -499,6 +499,9 @@ class DungeonRunView {
         const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}${edges}` });
         el.style.left = `${x * TILE}px`;
         el.style.top = `${y * TILE}px`;
+        // 壁と床の見分け（2026-11-05 ユーザー指示）：床には壁から落ちる短い影、壁には床に面したふちの細い線（見たマスだけ。dungeonRun.css の --edge）
+        const edge = wallEdge(f, x, y, wall);
+        if (edge) el.style.setProperty('--edge', edge);
         el.style.setProperty('--tx', `${-(x % TEXTURE_TILES) * TILE}px`);
         el.style.setProperty('--ty', `${-(y % TEXTURE_TILES) * TILE}px`);
         // 4マスで割り切れない大きさの絵（新しい5つのダンジョン）用：マスの位置そのまま
@@ -1351,6 +1354,33 @@ class DungeonRunView {
     this.#root.append(el);
     setTimeout(() => el.remove(), BANNER_MS);
   }
+}
+
+/** 壁のマスか（地図の外も壁） */
+const isWallAt = (f: DungeonFloor, x: number, y: number): boolean => {
+  const ch = f.tiles[y]?.[x];
+  return ch === '#' || ch === undefined;
+};
+
+/**
+ * 壁と床の見分けのための影・線（box-shadow の値。無ければ ''）。2026-11-05 ユーザー指示「壁があるのか分かりづらい」：
+ * - 床（歩けるマス）：上・左・右が壁なら、その辺から内側へ短い影（上の壁は手前の面の下から落ちる影なので少し長め）
+ * - 壁：床に面した辺（上・左・右）に細い明るい線（壁のふちが立って見えるように）。下が床の壁は手前の面を出しているので線は引かない
+ */
+function wallEdge(f: DungeonFloor, x: number, y: number, wall: boolean): string {
+  const out: string[] = [];
+  if (!wall) {
+    if (isWallAt(f, x, y - 1)) out.push('inset 0 14px 10px -8px rgb(0 0 0 / 0.75)');
+    if (isWallAt(f, x - 1, y)) out.push('inset 10px 0 8px -6px rgb(0 0 0 / 0.6)');
+    if (isWallAt(f, x + 1, y)) out.push('inset -10px 0 8px -6px rgb(0 0 0 / 0.6)');
+    return out.join(', ');
+  }
+  if (isWallAt(f, x, y + 1)) {
+    if (!isWallAt(f, x, y - 1)) out.push('inset 0 2px 0 rgb(255 232 190 / 0.32)');
+    if (!isWallAt(f, x - 1, y)) out.push('inset 2px 0 0 rgb(255 232 190 / 0.32)');
+    if (!isWallAt(f, x + 1, y)) out.push('inset -2px 0 0 rgb(255 232 190 / 0.32)');
+  }
+  return out.join(', ');
 }
 
 /** 階の名前（ふつうは「地下○階」。機械の塔は塔なので上へのぼる「○階」。2026-11-05 指示書 BD【4】） */

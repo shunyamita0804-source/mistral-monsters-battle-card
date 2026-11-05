@@ -999,3 +999,26 @@
 .drun__decor--stonepillar-1::after { width: 28px; height: 40px; background-image: url('@assets/images/maps/dungeon/thunder_pillar.webp'); }
 .drun__decor--scorched-1::after { width: 34px; height: 36px; background-image: url('@assets/images/maps/dungeon/thunder_rock.webp'); }
 .drun__decor--rod-1::after { width: 28px; height: 58px; background-image: url('@assets/images/maps/dungeon/thunder_rod.webp'); }
+
+/*
+ * 壁と床の見分け（2026-11-05 ユーザー指示「壁と床の見分けがつきにくい」。絵は描き直さずにコードで。全部のダンジョン）
+ * - 壁の上面を床より暗く・色をうすく（手前の面〔drun__tile--face〕はそのまま明るく出して、壁の高さが分かるように）
+ * - 明かりの外（前に見たマス）の床を少し明るく
+ * - 床には壁から落ちる短い影、壁には床に面したふちの細い明るい線（dungeonRunScreen.ts の wallEdge → --edge。見たマスだけ）
+ */
+.drun__tile--wall:not(.drun__tile--face).is-seen {
+  filter: brightness(0.55) saturate(0.7);
+}
+
+.drun__tile--wall:not(.drun__tile--face).is-lit {
+  filter: brightness(0.7) saturate(0.8);
+}
+
+.drun__tile--floor.is-seen:not(.is-lit),
+.drun__tile--ice.is-seen:not(.is-lit) {
+  filter: brightness(1.25);
+}
+
+.drun__tile.is-seen {
+  box-shadow: var(--edge, none);
+}
