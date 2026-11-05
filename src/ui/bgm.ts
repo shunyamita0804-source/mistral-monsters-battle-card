@@ -169,6 +169,9 @@ class BgmPlayer {
   #playing: { id: BgmId; track: Track } | null = null;
   #volume = 1;
   #unlocked = false;
+  /** stop() で小さくしている間（この時刻まで）は、次の曲を鳴らし始めない（重ねない。2026-11-05 指示書 BG） */
+  #quietUntil = 0;
+  #quietTimer: ReturnType<typeof setTimeout> | null = null;
   #installed = false;
   /** 最初のタップで鳴らせる状態にした audio（Web Audio につないだまま使い回す） */
   readonly #pool: Track[] = [];
@@ -212,6 +215,7 @@ class BgmPlayer {
   stop(fadeS: number): void {
     this.#wanted = null;
     this.#stop(fadeS);
+    this.#quietUntil = Date.now() + fadeS * 1000 + 60;
   }
 
   /** いま鳴らしている（鳴らそうとしている）曲 */
@@ -266,6 +270,16 @@ class BgmPlayer {
   #start(): void {
     const id = this.#wanted;
     if (!id || !this.#unlocked || this.#volume <= 0 || this.#playing) return;
+    // 前の曲を stop() で小さくしている途中なら、止め終わってから鳴らす
+    const wait = this.#quietUntil - Date.now();
+    if (wait > 0) {
+      if (this.#quietTimer) clearTimeout(this.#quietTimer);
+      this.#quietTimer = setTimeout(() => {
+        this.#quietTimer = null;
+        this.#start();
+      }, wait);
+      return;
+    }
     const track = this.#takeTrack();
     const entry = BGM_REGISTRY[id];
     track.el.src = entry.src;

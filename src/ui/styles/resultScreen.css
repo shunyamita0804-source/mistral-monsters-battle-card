@@ -1,15 +1,18 @@
 /*
  * 対戦の結果画面（2026-11-05 指示書 BG。PS版のように1枚で）。battleScreen.ts の resultOverlay。
- * 上から：相手の顔＋名前とひと言 → WIN／LOSE／DRAW の文字の絵 → 主人公の勝ち・負けの絵 → 「続ける」。
- * 文字の絵の後ろに今の帯（result_win／result_lose）を敷く形は :root[data-result-band='on'] で（写真で比べる用。ふだんは帯なし）
+ * 上から：相手の顔＋名前とひと言 →（すき間）→ WIN／LOSE／DRAW の文字の絵 →（すき間）→ 主人公の勝ち・負けの絵 → 「続ける」。
+ * 2026-11-05 ユーザー指示（2回目）：相手も目立つように、相手の段を少し下げて顔を 1.4 倍・ひと言の文字を大きく。結果の文字は相手と主人公の真ん中。
+ * 描き直しで作り直しても動きをやり直さないよう、動きの始まりは --result-t（出し始めからの時間）だけ前にずらす。
+ * 主人公は前の 85％。320×568 では主人公だけ縮める（相手の段は縮めない・「続ける」と重ねない）。帯はなし
  */
 .battle__result.battle-result {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 18px 12px 18px;
+  gap: 0;
+  padding: 44px 12px 16px;
   background: radial-gradient(ellipse at 50% 45%, rgb(20 26 44 / 0.88), rgb(4 5 9 / 0.94) 75%);
+  animation: fade-in 120ms ease-out calc(0ms - var(--result-t, 0ms)) both;
 }
 
 /* 相手の段：左に顔（枠の中）、右に名前とひと言の窓 */
@@ -17,16 +20,16 @@
   flex: none;
   display: flex;
   align-items: stretch;
-  gap: 8px;
-  min-height: 112px;
-  animation: fade-in 200ms ease-out both;
+  gap: 6px;
+  min-height: 156px;
+  animation: fade-in 200ms ease-out calc(0ms - var(--result-t, 0ms)) both;
 }
 
 .battle-result__face {
   position: relative;
   flex: none;
-  width: 112px;
-  height: 112px;
+  width: 156px;
+  height: 156px;
 }
 
 /* 顔：枠の内側の窓（600 の絵の 500 の所。角は丸い）に切り抜く */
@@ -35,7 +38,7 @@
   inset: 8.3%;
   width: 83.4%;
   height: 83.4%;
-  border-radius: 9px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
@@ -52,16 +55,16 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 12px 10px;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 4px 6px 6px;
   border: 14px solid transparent;
   border-image: url('@assets/images/ui/battle/window_result.webp') 60 fill / 14px / 0 stretch;
-  margin: -6px 0;
 }
 
 .battle-result__name {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   color: #e9c977;
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
@@ -69,7 +72,7 @@
 
 .battle-result__line {
   margin: 0;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.45;
   color: #f3ead2;
@@ -81,6 +84,22 @@
   min-height: 0;
 }
 
+/* ひと言が無い（引き分け）：窓を名前だけの高さに縮め、顔の真ん中の高さに */
+.battle-result__opponent.is-nameonly {
+  align-items: center;
+}
+
+.battle-result__opponent.is-nameonly .battle-result__window {
+  flex: 1;
+  align-self: center;
+}
+
+/* 相手の段と結果の文字・結果の文字と主人公のあいだのすき間（同じ大きさ。余った高さを分ける） */
+.battle-result__space {
+  flex: 1 1 0;
+  min-height: 6px;
+}
+
 /* WIN／LOSE／DRAW：判子を押すように、少し大きい所から縮んで止まる（0.3 秒） */
 .battle-result__logo-row {
   position: relative;
@@ -88,7 +107,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2px -6px 0;
+  margin: 0 -6px;
 }
 
 .battle-result__logo {
@@ -98,7 +117,7 @@
   max-width: 400px;
   height: auto;
   filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.65));
-  animation: battle-result-stamp 300ms cubic-bezier(0.2, 0.8, 0.3, 1) 150ms both;
+  animation: battle-result-stamp 300ms cubic-bezier(0.2, 0.8, 0.3, 1) calc(150ms - var(--result-t, 0ms)) both;
 }
 
 @keyframes battle-result-stamp {
@@ -107,24 +126,9 @@
   100% { opacity: 1; transform: none; }
 }
 
-/* 帯あり（比べる用）：今の帯の上に文字の絵を少し小さく重ねる */
-:root[data-result-band='on'] .battle-result__logo-row {
-  aspect-ratio: 760 / 248;
-  background: url('@assets/images/ui/result_lose.webp') center / contain no-repeat;
-}
-
-:root[data-result-band='on'] .battle-result--win .battle-result__logo-row {
-  background-image: url('@assets/images/ui/result_win.webp');
-}
-
-:root[data-result-band='on'] .battle-result__logo {
-  width: 74%;
-  margin-top: -2%;
-}
-
-/* 主人公の勝ち・負けの絵（のこりの高さいっぱい。足もとを下にそろえる） */
+/* 主人公の勝ち・負けの絵（前の 85％。高さが足りなければここだけ縮む。足もとを下にそろえる） */
 .battle-result__hero-row {
-  flex: 1 1 auto;
+  flex: 0 1 323px;
   min-height: 0;
   display: flex;
   justify-content: center;
@@ -133,14 +137,14 @@
 
 .battle-result__hero {
   height: 100%;
-  max-height: 380px;
+  max-height: 323px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
   object-position: center bottom;
   pointer-events: none;
   filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.6));
-  animation: result-hero-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1) 250ms both;
+  animation: result-hero-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(250ms - var(--result-t, 0ms)) both;
 }
 
 .battle-result--lose .battle-result__hero {
@@ -153,6 +157,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  padding-top: 10px;
 }
 
 .battle-result__foot .battle__result-sub {

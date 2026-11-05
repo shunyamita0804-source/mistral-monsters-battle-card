@@ -38,12 +38,24 @@ function keepWords(line: string, parts: string[]): string[] {
   return out;
 }
 
+/** 行の頭に来てはいけない字（句読点・閉じかっこなど）。この字で始まる文節は前の文節につなげる（2026-11-05：結果画面で「、」が行の頭に来ていた） */
+const NO_LINE_START = /^[、。，．！？!?）」』〕】〉》・：；]/;
+
+function glueClosers(parts: string[]): string[] {
+  const out: string[] = [];
+  for (const p of parts) {
+    if (out.length > 0 && NO_LINE_START.test(p)) out[out.length - 1] += p;
+    else out.push(p);
+  }
+  return out;
+}
+
 /** 文を文節に区切る（日本語の字のない行はそのまま1つ） */
 export function phrases(text: string): string[] {
   if (!JA.test(text)) return [text];
   parser ??= new Parser(jaModel);
   return text.split('\n').flatMap((line, i) => {
-    const parts = JA.test(line) ? keepWords(line, parser!.parse(line)) : [line];
+    const parts = JA.test(line) ? glueClosers(keepWords(line, parser!.parse(line))) : [line];
     return i === 0 ? parts : ['\n', ...parts];
   });
 }

@@ -29,6 +29,13 @@ describe('文節の区切りで改行する（phraseText）', () => {
     expect(breaksInside('ちから技・かしこさ技のダメージを5軽減', 'ダメージ')).toBe(false);
   });
 
+  it('句読点・閉じかっこで始まる文節は作らない（行の頭に「、」が来ない。2026-11-05）', () => {
+    const text = '計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。';
+    const parts = phrases(text);
+    expect(parts.join('')).toBe(text);
+    for (const p of parts) expect(p, p).not.toMatch(/^[、。！？」』）]/);
+  });
+
   it('改行の文字はそのまま残す', () => {
     expect(phrases('相手のマナを1減らす\n回避されない')).toContain('\n');
   });

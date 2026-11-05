@@ -463,6 +463,8 @@ export const battleScreen: ScreenDefinition = {
     };
     /** 結果画面の相手のひと言（2026-11-05 指示書 BG：勝ち・負けのひと言は結果画面の窓に出す。吹き出しには出さない） */
     let resultLine: string | null = null;
+    /** 結果画面を出し始めた時刻（描き直しても、出てくる動きを最初からやり直さない） */
+    let resultShownAt = 0;
     /** 相手のセリフ（文そのもの）をふきだしで出す。対戦の進み（手番・操作）は止めない */
     const sayText = (text: string, priority = 2): void => {
       talkPriority = priority;
@@ -2358,6 +2360,7 @@ export const battleScreen: ScreenDefinition = {
         const aceLast = !!req.opponent.ace && oppDownOrder.at(-1) === req.opponent.ace && s.endReason === 'knockout';
         // 引き分けは勝ち・負けのひと言が無いので出さない（名前だけ。前は勝ちのひと言を出していた）
         resultLine = w ? (npcTextOf(resultLineKey(w), w === 'player' && aceLast ? 'ace_down_final' : undefined)?.text ?? null) : null;
+        resultShownAt = Date.now();
         // 対戦中の吹き出しは消す（二重に出さない）
         oppLine = null;
         talkUntil = 0;
@@ -2375,7 +2378,8 @@ export const battleScreen: ScreenDefinition = {
       const faceUrl = opponentFaceUrl(faceKeyOf(req.opponent));
       const opponentRow = h(
         'div',
-        { class: `battle-result__opponent${faceUrl ? '' : ' is-faceless'}` },
+        // ひと言が無い（引き分け）ときは、窓を名前だけの高さに（is-nameonly）
+        { class: `battle-result__opponent${faceUrl ? '' : ' is-faceless'}${resultLine ? '' : ' is-nameonly'}` },
         faceUrl
           ? h('span', { class: 'battle-result__face' }, h('img', { class: 'battle-result__face-img', attrs: { src: faceUrl, alt: '', draggable: 'false' } }), h('img', { class: 'battle-result__face-frame', attrs: { src: resultFaceFrame, alt: '', draggable: 'false' } }))
           : null,
@@ -2393,15 +2397,18 @@ export const battleScreen: ScreenDefinition = {
         w === 'player' || w === 'opponent'
           ? h('img', { class: 'battle-result__hero', attrs: { src: heroResultUrl(heroProfile.gender, w === 'player'), alt: '', draggable: 'false' } })
           : null;
-      return h(
+      const overlay = h(
         'div',
         { class: `battle__result battle-result battle-result--${kind}`, attrs: { role: 'dialog', 'aria-label': title } },
         opponentRow,
+        // 相手の段と主人公のあいだの真ん中に結果の文字（上下に同じだけのすき間）
+        h('div', { class: 'battle-result__space' }),
         h(
           'div',
           { class: 'battle-result__logo-row' },
           h('img', { class: 'battle-result__logo', attrs: { src: RESULT_LOGOS[kind], alt: title, draggable: 'false' } }),
         ),
+        h('div', { class: 'battle-result__space' }),
         h('div', { class: 'battle-result__hero-row' }, hero),
         h(
           'div',
@@ -2411,6 +2418,9 @@ export const battleScreen: ScreenDefinition = {
           go,
         ),
       );
+      // 描き直しで作り直しても、出てくる動き（判子・主人公）は出し始めからの時間の所から続ける（resultScreen.css の --result-t）
+      overlay.style.setProperty('--result-t', `${Date.now() - resultShownAt}ms`);
+      return overlay;
     };
 
     const v2Hints = req.hintSet === 'introV2';

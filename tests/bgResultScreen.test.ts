@@ -45,4 +45,15 @@ describe('指示書 BG：結果画面', () => {
     expect(c.ja).toContain('OpenTracks（旧DOVA-SYNDROME）');
     expect(c.en).toContain('Make a field Music');
   });
+
+  it('2回目の直し：帯なし（帯ありはやめた）・ひと言が無いときは窓を名前だけの高さ・描き直しで動きをやり直さない・止めている間は次の曲を鳴らさない', () => {
+    const css = readFileSync('src/ui/styles/resultScreen.css', 'utf8');
+    expect(css).not.toContain('data-result-band');
+    expect(css).toContain('.battle-result__opponent.is-nameonly');
+    expect(css).toMatch(/\.battle-result__face \{[^}]*width: 156px;/);
+    expect(css).toMatch(/\.battle-result__hero \{[^}]*max-height: 323px;/);
+    expect(css).toContain('var(--result-t, 0ms)');
+    expect(screen).toContain("${resultLine ? '' : ' is-nameonly'}");
+    expect(bgm).toContain('#quietUntil');
+  });
 });

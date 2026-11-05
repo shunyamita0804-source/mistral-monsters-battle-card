@@ -65,6 +65,8 @@ fs.mkdirSync(out, { recursive: true });
     await page.waitForTimeout(500);
     await page.locator('.battle-order__card').first().click();
     await page.waitForSelector('.battle-result', { timeout: 15000 });
+    // 絵（主人公・顔・文字）を読み込み終わるまで待つ
+    await page.waitForFunction(() => [...document.querySelectorAll('.battle-result img')].every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 15000 }).catch(() => console.log('img not loaded'));
     await page.waitForTimeout(1400);
   };
 
@@ -88,8 +90,8 @@ fs.mkdirSync(out, { recursive: true });
   });
   fs.writeFileSync(`${out}/faceless.json`, JSON.stringify(faceless, null, 2));
 
-  for (const band of [false, true]) {
-    const b = band ? 'band' : 'noband';
+  for (const band of [false]) {
+    const b = 'noband';
     await result('e-1', 'player', band);
     await page.screenshot({ path: `${out}/result_win_${b}${suffix}.png` });
     await result('e-1', 'opponent', band);
