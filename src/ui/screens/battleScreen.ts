@@ -48,7 +48,8 @@ import { buildOpponentDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { summarizeBattle } from '../../game/battle/simulate.ts';
-import { knockTalk } from '../../game/battle/talk.ts';
+import { attackLineKey, attackTalkOf, isMidReaction, knockLineKey, midReactionAllowed, midReactionLimit, npcLinePriority, talkRoll, type NpcExtraKey, type NpcLineKey } from '../../game/battle/npcTalk.ts';
+import { npcActorOf, npcLine } from '../../data/npcBattleLines.ts';
 import { handOverlap } from '../components/handLayout.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
 import { cardName, heroName, localText, opponentName } from '../../i18n/content.ts';
@@ -407,12 +408,51 @@ export const battleScreen: ScreenDefinition = {
     const ownLine: Partial<Record<string, LocalText>> = personLines
       ? { 'battle.talk.start': personLines.start, 'battle.talk.win': personLines.win, 'battle.talk.lose': personLines.lose }
       : {};
-    const say = (key: Parameters<typeof t>[0]): void => {
-      const own = ownLine[key];
-      sayText(own ? localText(own) : t(key));
+    /**
+     * NPC バトルセリフ 43 名（2026-11-05 第1弾。src/data/npcBattleLines.ts）。その人のひと言が無い場面・相手は、今までの共通のひと言（battle.talk.*）。
+     * 無言（？？？の7場面）は吹き出しを出さない
+     */
+    const npcActor = npcActorOf(req.opponent);
+    const GENERIC: Partial<Record<NpcLineKey, Parameters<typeof t>[0]>> = {
+      start: 'battle.talk.start',
+      npc_knock: 'battle.talk.knock',
+      npc_knock_last: 'battle.talk.knockLast',
+      npc_own_down: 'battle.talk.ownDown',
+      npc_own_down_last: 'battle.talk.ownDownLast',
+      npc_win: 'battle.talk.win',
+      npc_lose: 'battle.talk.lose',
+    };
+    /** いま出ているひと言の強さ（npcLinePriority）。出ている間は、それより弱いひと言で上書きしない */
+    let talkPriority = 0;
+    /** 途中の反応（命中・防御・回避）を出した回数・最後に出した手番・数えた回数（間引きの種） */
+    let midUsed = 0;
+    let midLastTurn = -1;
+    let midSeq = 0;
+    /** 切り札の命中のひと言を出したか（1試合に1回） */
+    let aceHitSaid = false;
+    /** 相手（NPC）のモンスターが倒れた順（カード ID。切り札が最後に倒れたかを見る） */
+    const oppDownOrder: string[] = [];
+    /** その場面のひと言を出す（出したら true）。key の代わりに extra（切り札など）があれば先に試す */
+    const sayNpc = (key: NpcLineKey, extra?: NpcExtraKey): boolean => {
+      const special = extra ? npcLine(npcActor, extra) : undefined;
+      const line = special ?? npcLine(npcActor, key);
+      if (line === null) return false;
+      const priority = npcLinePriority(special ? (extra as NpcExtraKey) : key);
+      if (Date.now() < talkUntil && priority < talkPriority) return false;
+      let text: string | null = null;
+      if (line) text = localText(line);
+      else {
+        const generic = GENERIC[key];
+        if (!generic) return false;
+        const own = ownLine[generic];
+        text = own ? localText(own) : t(generic);
+      }
+      sayText(text, priority);
+      return true;
     };
     /** 相手のセリフ（文そのもの）をふきだしで出す。対戦の進み（手番・操作）は止めない */
-    const sayText = (text: string): void => {
+    const sayText = (text: string, priority = 2): void => {
+      talkPriority = priority;
       oppLine = text;
       talkStart = Date.now();
       // 1文字ずつ出し終わってから TALK_MS 読めるように
@@ -762,6 +802,7 @@ export const battleScreen: ScreenDefinition = {
         damageHoldUntil = Math.max(damageHoldUntil, Date.now() + revealDelay + hold);
         setTimeout(() => !destroyed && render(), revealDelay + hold + 15);
       }
+      npcReaction(before, next);
       // 大きく見せる欄を先に出し（相手のカードは着くまで隠しておく）、そこへ相手のカードを飛ばす
       if (played) showcase(played.cardId, played.side, playedBy(before, next, action), action.type === 'useCard' ? (action.targetUid ?? null) : null, flyIn ? OPP_CARD_FLY_MS : 0);
       render();
@@ -770,6 +811,39 @@ export const battleScreen: ScreenDefinition = {
         if (action.type === 'convertToMana') vanishOpponentCard(oppFrom);
         else flyOpponentCard(oppFrom);
       }
+    };
+
+    /**
+     * NPC の途中の反応（2026-11-05 NPC バトルセリフ第1弾）：攻撃1回の結果（命中・防御成功・回避成功）でひと言。
+     * 倒れた・決着したときは撃破・勝ち負けのひと言を優先して言わない。1手番に1回・1試合に数回まで（人ごとの上限。半分くらいに間引く）。
+     * ダメージを見せるとき（damageHoldUntil）まで待ってから出す。相手のモンスターが倒れた順も覚える（切り札の最後の撃破）
+     */
+    const npcReaction = (before: BattleState, after: BattleState): void => {
+      for (const m of after.sides.opponent.monsters) {
+        const was = before.sides.opponent.monsters.find((x) => x.uid === m.uid)?.life ?? 0;
+        if (was > 0 && m.life <= 0) oppDownOrder.push(m.cardId);
+      }
+      const a = attackTalkOf(before, after);
+      // 導入・練習のヒントが出る対戦（tutorial）では途中の反応を出さない（ヒントの窓を塞がないように）
+      if (!a || a.knockedOut || a.ended || !npcActor || req.tutorial) return;
+      const key = attackLineKey(a);
+      const ace = key === 'npc_attack_hit' && !aceHitSaid && !!req.opponent.ace && a.userCardId === req.opponent.ace && npcLine(npcActor, 'ace_attack_hit') ? ('ace_attack_hit' as const) : undefined;
+      if (!isMidReaction(key)) return;
+      const allowed = midReactionAllowed({ used: midUsed, limit: midReactionLimit(npcActor.id), turn: after.turn, lastTurn: midLastTurn, roll: ace ? 0 : talkRoll(after.seed, midSeq++) });
+      if (!allowed) return;
+      // 先に枠を取っておく（同じ手番の次の攻撃で重ねて言わない）。言えなかったら回数だけ戻す
+      midUsed++;
+      midLastTurn = after.turn;
+      const speak = (): void => {
+        if (destroyed || !state || state.phase === 'ended' || !sayNpc(key, ace)) {
+          midUsed--;
+          return;
+        }
+        if (ace) aceHitSaid = true;
+      };
+      const wait = Math.max(damageHoldUntil, cpuLineUntil) - Date.now();
+      if (wait > 0) setTimeout(speak, wait + 60);
+      else speak();
     };
 
     /**
@@ -1062,7 +1136,7 @@ export const battleScreen: ScreenDefinition = {
           seed,
           first,
         );
-        say('battle.talk.start');
+        sayNpc('start');
         render();
       }, ORDER_REVEAL_MS);
     };
@@ -2259,7 +2333,10 @@ export const battleScreen: ScreenDefinition = {
         resultSounded = true;
         req.onDecided?.(w ?? 'draw');
         sound.play(w === 'player' ? 'battleWin' : 'battleLose', 500);
-        say(w === 'player' ? 'battle.talk.lose' : 'battle.talk.win');
+        // 切り札が最後に倒れて負けた：切り札の敗北のひと言（ふつうの敗北のひと言の代わり。1回だけ）
+        const aceLast = !!req.opponent.ace && oppDownOrder.at(-1) === req.opponent.ace && s.endReason === 'knockout';
+        if (w === 'player') sayNpc('npc_lose', aceLast ? 'ace_down_final' : undefined);
+        else sayNpc('npc_win');
       }
       const title = t(w === 'player' ? 'battle.result.win' : w === 'opponent' ? 'battle.result.lose' : 'battle.result.draw');
       const reason = s.endReason === 'deckOut' ? t(w === 'player' ? 'battle.result.deckOutOpponent' : 'battle.result.deckOutPlayer') : '';
@@ -2748,11 +2825,13 @@ export const battleScreen: ScreenDefinition = {
             sound.play('knockout', (countEnds.get(m.uid) ?? 0) + 200);
             // 相手のひと言（【仮】台詞）：自分のモンスターが倒れた／こちらのモンスターを倒した。
             // 何体目かで言葉を変える（2026-10-28：2体目・3体目でも「まず1体」と言っていた）。最後の1体のときは何も言わない（勝ち・負けのひと言が出る）
-            const line = knockTalk(side, s.sides[side].monsters);
+            const line = knockLineKey(side, s.sides[side].monsters);
+            // 切り札が倒れて対戦が続く：切り札のひと言（ふつうの撃破のひと言の代わり）
+            const ace = side === 'opponent' && !!req.opponent.ace && m.cardId === req.opponent.ace ? ('ace_down_continue' as const) : undefined;
             // CPU のセリフ（守りそこねる など）を出している間は、言い終わってから（すぐ上書きしない。2026-10-31 指示書 AB【2】）
             const wait = cpuLineUntil - Date.now();
-            if (line && wait > 0) setTimeout(() => !destroyed && say(`battle.talk.${line}`), wait);
-            else if (line) say(`battle.talk.${line}`);
+            if (line && wait > 0) setTimeout(() => !destroyed && sayNpc(line, ace), wait);
+            else if (line) sayNpc(line, ace);
           }
           else if (before !== undefined && m.life > before) sound.play('heal');
           if (!holding || before === undefined) prevLife.set(m.uid, m.life);

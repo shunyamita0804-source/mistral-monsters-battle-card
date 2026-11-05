@@ -1,0 +1,3260 @@
+{
+  "archive_title": "ミストラルモンスターズBC NPCバトルセリフ 43名 完成・Claude一括依頼版",
+  "archive_date": "2026-11-05",
+  "reference_repo": "https://github.com/shunyamita0804-source/mistral-monsters-battle-card",
+  "keys": [
+    {
+      "key": "start",
+      "label": "対戦開始"
+    },
+    {
+      "key": "npc_attack_hit",
+      "label": "NPCの攻撃が命中"
+    },
+    {
+      "key": "player_attack_hit",
+      "label": "NPCが攻撃を受ける"
+    },
+    {
+      "key": "npc_defense_success",
+      "label": "NPCの防御成功"
+    },
+    {
+      "key": "player_defense_success",
+      "label": "主人公の防御成功"
+    },
+    {
+      "key": "npc_evade_success",
+      "label": "NPCの回避成功"
+    },
+    {
+      "key": "player_evade_success",
+      "label": "主人公の回避成功"
+    },
+    {
+      "key": "npc_knock",
+      "label": "NPCが主人公のモンスターを撃破"
+    },
+    {
+      "key": "npc_knock_last",
+      "label": "主人公のモンスターが残り1体"
+    },
+    {
+      "key": "npc_own_down",
+      "label": "NPCのモンスターが倒される"
+    },
+    {
+      "key": "npc_own_down_last",
+      "label": "NPCのモンスターが残り1体"
+    },
+    {
+      "key": "npc_win",
+      "label": "NPC勝利"
+    },
+    {
+      "key": "npc_lose",
+      "label": "NPC敗北"
+    }
+  ],
+  "actors": [
+    {
+      "id": "gareth",
+      "name": "ガレス先生",
+      "category": "練習場の先生・元大会選手",
+      "personality": "厳格さと温かさが両立する、相手の成長を見守る指導者",
+      "first_person": "私",
+      "face_asset": "face_teacher.webp",
+      "opponent_ids": [
+        "exam-teacher"
+      ],
+      "status": "approved_direction_with_text_verification_needed",
+      "source_accuracy": "11_reconstructed_from_summary_2_new_proposals",
+      "notes": "ユーザーはガレス案を承認済み。ただし13本＋再戦1本の原文全文が現対話ログに提示されておらず、上記のうち11行は過去の要約からの再構成、残り1体分岐2行は今回の補完案（未承認）。導入実技試験イベントの既存台詞と重複を避ける。通常対戦の人物参照は既存コードでは結びつかないため実装時に確認。",
+      "lines": {
+        "start": {
+          "text": "さあ、始めようか。落ち着いていこう。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_attack_hit": {
+          "text": "うむ、いい手応えだ。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "player_attack_hit": {
+          "text": "なるほど、いい攻撃だな。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_defense_success": {
+          "text": "守りも大切な戦術だよ。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "player_defense_success": {
+          "text": "うむ、いい守りだ。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_evade_success": {
+          "text": "そう簡単には当たらないぞ。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "player_evade_success": {
+          "text": "よく見ていたな！",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_knock": {
+          "text": "惜しかったな。次の一手を考えよう。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_knock_last": {
+          "text": "残り1体だ。ここからどう戦うか、見せてもらおう。",
+          "status": "proposed_not_approved"
+        },
+        "npc_own_down": {
+          "text": "見事だ！ よく考えて戦っているな。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_own_down_last": {
+          "text": "こちらもあと1体だな。最後まで手は抜かないぞ。",
+          "status": "proposed_not_approved"
+        },
+        "npc_win": {
+          "text": "よく頑張ったな。今回の経験を次に活かそう。",
+          "status": "reconstruction_pending_text_check"
+        },
+        "npc_lose": {
+          "text": "見事だ！ 君の成長が嬉しいよ。",
+          "status": "reconstruction_pending_text_check"
+        }
+      }
+    },
+    {
+      "id": "mireille",
+      "name": "ミレイユ",
+      "category": "クリア後対戦・幼馴染",
+      "personality": "明るく世話焼きで負けず嫌い。主人公を応援するが勝負には本気で臨む。",
+      "first_person": "私",
+      "face_asset": "neighbor_guide_talk_normal.webp",
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "ゲームクリア後に初めて対戦。既存実装の専用対戦相手データは未確認／追加が必要。再戦可能は提案として承認時に説明したが、実装確定条件は要整理。クリア後イベントは別ファイル参照。",
+      "lines": {
+        "start": {
+          "text": "やっと勝負できるね！ 今日は遠慮しないから！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よしっ、決まった！",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "うわっ、やるじゃない！",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふっ、そこは読んでたよ！",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あっ、ちゃんと守ってきた！",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "あぶなっ！ 今のは危なかった〜！",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "えっ、今のをかわすの！？",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "よーし、まずは1体！",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体！ でも油断しないよ！",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "うそっ！ やるじゃない！",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "もう最後の1体か……でも、まだ負けないよ！",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やったー！ ふふっ、私だって強いんだから！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "あーっ、負けちゃった！ ……本当に強くなったね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "pete",
+      "name": "ピート",
+      "category": "街の対戦NPC",
+      "personality": "人懐っこく少し自慢好き。カード集めとデッキへの愛着が強い、憎めない青年",
+      "first_person": "俺",
+      "face_asset": "face_resident_b.webp",
+      "opponent_ids": [
+        "town-pete"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "ユーザー指示により一人称「僕/ぼく」→「俺」に修正。現行の通常会話の「ぼく」は第2弾で直す。既存のプカリム初勝利・再戦報酬、通常イベントは第1弾で変更しない。",
+      "lines": {
+        "start": {
+          "text": "よーし！ 俺の自慢のデッキ、見せてあげるよ！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "へへっ、いい感じ！",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "うわっ！ その技、強いな！",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "よしっ！ このカード、取っておいて正解だった！",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あーっ、うまく防がれた！",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "あぶなっ！ なんとかかわした！",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ええっ！ 今のもかわしちゃうの！？",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "やった！ まずは1体！",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体！ このままいくぞ！",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "うわー！ それ、結構お気に入りのカードなのに！",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "ま、まだ1体いる！ ここからだ！",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "へへっ、俺の勝ち！ デッキを組んだ甲斐があったな！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "まいったー！ 君のデッキ、すごくいいね！",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "noel",
+      "name": "ノエル",
+      "category": "Eランク大会",
+      "personality": "礼儀正しく、少し緊張しやすい頑張り屋。素直に喜び、試合で成長する。",
+      "first_person": "わたし",
+      "face_asset": "face_opponent_e1.webp",
+      "opponent_ids": [
+        "e-1"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "ユーザー指示「語尾の！はなるべく使わない」に基づき、承認された内容の感情表現を維持して句読点のみ整理。開始・命中・防御・敗北の4本は会話で訂正例が明示済み。他9本は句読点をその基準へ正規化。",
+      "lines": {
+        "start": {
+          "text": "あ、あの……よろしくお願いします。頑張ります。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "あっ、当たった。よかったぁ……。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "わっ、なかなかやりますね……。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "よかった……守れました。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あっ、ちゃんと防がれちゃいました。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "あ、危なかったぁ……。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ええっ、今のも避けるんですか？",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "やった、1体倒せました。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体……落ち着いていこう。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "ああっ、で、でもまだ頑張れます。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の1体……諦めません。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やったぁ、勝てました。ありがとうございます。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けちゃいました……でも、とっても楽しかったです。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "viktor",
+      "name": "ヴィクトル",
+      "category": "Eランク大会",
+      "personality": "ベルモント商会の跡取り。カードの希少性や金銭価値の話を熱心に語る、上品で少し変わっているが憎めない青年。幼稚な言葉遣いにしない。",
+      "first_person": "僕",
+      "face_asset": "face_opponent_e2.webp",
+      "opponent_ids": [
+        "e-2"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "最初の人物案をユーザー要望に従い修正した「価値にこだわる少し変わったかわいらしい大人」の版が最終承認。",
+      "lines": {
+        "start": {
+          "text": "さて、君のデッキにはどれほどの価値があるのかな。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふふ、さすが僕が選んだカードだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "おや……そのカード、思った以上に値打ちがありそうだね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "この守り、実にいい買い物だったよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "ほう、そのカードはどこで手に入れたんだい？",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ない危ない。大事な勝負だからね。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "なるほど。君はカードの扱いも上手いんだね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "どうだい。僕のコレクションもなかなかだろう？",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体か。実に価値のある勝利になりそうだ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "なっ……あれは相当な希少品なんだが……。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "ふむ……どうやら僕の見積もりが甘かったようだ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ふふ、いい勝負だった。やはり目利きには自信があるんだ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったね。君の実力には、値段のつけようがないよ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "sienna",
+      "name": "シエナ",
+      "category": "Eランク/Cランク大会",
+      "personality": "ノルディス出身の旅のカード使い。穏やかで観察眼が鋭く、少しつかみどころのない落ち着いた女性。発言頻度やや少なめ。",
+      "first_person": "私",
+      "face_asset": "face_opponent_e3.webp",
+      "opponent_ids": [
+        "e-3",
+        "reg-sienna"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "EランクとCランクの双方で同一人物として扱う。Eランクで不在時は代替のマリーが入る既存仕様。",
+      "lines": {
+        "start": {
+          "text": "ふふ、どんな戦い方をするのか楽しみね。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "うん、いい流れね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら、なかなか鋭い一手ね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふ、そう来ると思ったわ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あら、よく見ているのね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ないところだったわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、身のこなしがいいのね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まずは1体。さて、次はどう来るかしら。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体ね。最後まで楽しませてね。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あら……少し読み違えたみたい。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "ふふ、こんな展開も悪くないわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "いい勝負だったわ。またどこかで会いましょう。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "ふふ、参ったわ。あなたと戦えてよかった。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "dario",
+      "name": "ダリオ",
+      "category": "Dランク大会",
+      "personality": "港町の漁師で港町カードクラブのメンバー。豪快で陽気、失敗に動じない兄貴分。勝負そのものを楽しむ。",
+      "first_person": "俺",
+      "face_asset": "face_opponent_d1.webp",
+      "opponent_ids": [
+        "d-1"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "水系デッキ（ミュロル/カルシェル/プカリム）は現行コード上の編成であり、デッキ構成の最終仕様自体は本セリフ作業の対象外。",
+      "lines": {
+        "start": {
+          "text": "おう、よろしくな。いい勝負にしようぜ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、いい当たりだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "おっと、なかなかやるじゃねえか。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そう簡単には通さねえよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "ほう、いい守りだな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、危ねえ危ねえ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ははっ、うまくかわしたな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "よっしゃ、まずは1体だ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと1体か。気を抜かずにいくぜ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "おっと、一本取られたな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "まだ終わっちゃいねえ。ここからだぜ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "はっはっは、俺の勝ちだ。いい勝負だったぜ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "いやあ、参った。今日はお前の方が一枚上手だったな。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "isabella",
+      "name": "イザベラ",
+      "category": "Dランク大会",
+      "personality": "ローゼンベルク家の夫人。気品と礼節を重んじ、芯が強く勝負には静かな負けず嫌い。追い込まれるとわずかに本音が漏れる。",
+      "first_person": "わたくし",
+      "face_asset": "face_opponent_d2.webp",
+      "opponent_ids": [
+        "d-2"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "ユーザーが2026-11-05に「OK」で13本全て承認。普段は丁寧な口調、負け際のみ余裕が揺らぐ。",
+      "lines": {
+        "start": {
+          "text": "ごきげんよう。互いに、悔いのない一戦にしましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふふ、狙いどおりですわ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "まあ……思い切りがよろしいのね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "慌てては、いけませんもの。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "まあ、見事な守りですこと。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "失礼、そこは譲れませんわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、軽やかですこと。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まずは一体。慎重に参りますわ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体……けれど、油断は禁物ね。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あら……お見事。一本取られましたわ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "……少し、余裕を見せすぎたかしら。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ふふ、わたくしの勝ちですわ。楽しいひとときでした。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参りましたわ。あなたの勝ち方、とても素敵ね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "gordon",
+      "name": "ゴードン",
+      "category": "Dランク大会（条件によりCランクにも登場）",
+      "personality": "かつて上位の大会で戦っていた歴戦のカードバトラー。寡黙寄りで頑固だが、若い相手を見下さない。戦いの中でかつての闘志が蘇る。",
+      "first_person": "俺",
+      "face_asset": "face_opponent_d3.webp",
+      "opponent_ids": [
+        "d-3",
+        "c-gordon"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で提示された人物像および13本を承認。終盤ほど闘志が見える。",
+      "lines": {
+        "start": {
+          "text": "……昔の勘がどこまで通じるか。試させてもらおう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "……よし。狙いどおりだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ほう……いい踏み込みだ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "その手は、何度も見てきた。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "……今のを受け止めるか。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "読みどおりだ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ふっ、読みを外されたな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。勝負はここからだ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体か。気を抜くつもりはない。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……やるな。久しぶりに熱くなる。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残るは一体……望むところだ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "勝負勘は、まだ捨てたものじゃないな。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……参ったな。久々に、本気で悔しいと思った。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "dolf",
+      "name": "ドルフ",
+      "category": "C〜Sランク大会の常連・鍛冶屋",
+      "personality": "豪快で単純明快、腕っぷしと鍛冶屋としての技術に誇りを持つ。真っ向勝負と力強い攻撃を好み、相手の実力は素直に認める職人気質。ダリオの陽気な兄貴分気質とは異なる。",
+      "first_person": "俺",
+      "face_asset": "face_regular_dolf.webp",
+      "opponent_ids": [
+        "reg-dolf"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザーが「OK」で人物像・13本を承認。現在のCPUは攻撃偏重で防御が少ない仮デッキ。セリフは行動結果に応じて発火し、防御発言を強制しない。",
+      "lines": {
+        "start": {
+          "text": "俺のデッキは力押しだ。正面から受けてみな。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "どうだ、重いだろ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ほう、そっちもいい一撃だ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "受け止めた。次はこっちの番だ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "硬えな……なかなか割れねえ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、そこは外すぜ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ちっ、うまくすり抜けたな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "よし、一体目だ。このまま叩くぜ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。押し切るだけだ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "やるじゃねえか。火がついたぜ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体か……上等だ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "俺の勝ちだ。力を出し切る勝負は気持ちいいな。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "くそっ、負けたか……だが、いい腕してるぜ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "leonard",
+      "name": "レナード",
+      "category": "C〜Sランク大会・自称カード評論家",
+      "personality": "知的で皮肉屋。相手の戦術を分析・評論したがる。自分の読みへの自信が強いが、予想外の展開では言葉が詰まる。軽いユーモアも持つ大人の策士。",
+      "first_person": "私",
+      "face_asset": "face_regular_leonard.webp",
+      "opponent_ids": [
+        "reg-leonard"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で提案13本と人物像を承認。一人称「私」、相手を「君」と呼ぶ。妨害型CPU設定は現在仮データであり変更対象外。",
+      "lines": {
+        "start": {
+          "text": "では始めよう。君の戦術、拝見させてもらうよ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふむ、狙いどおりだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……ほう。その手は予想していなかった。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "これくらいは読めていたよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "なるほど、君も考えているようだね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "そこを狙うのは、少し安直だったかな。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……なるほど。私の読みを上回ったか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。こちらの読みが当たったね。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体か。ここからの選択が見ものだ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "ふむ……その切り返しは見事だ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "……解説している場合ではないな。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "勝負の決め手は、やはり読みの深さだね。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったね。今回は私の戦い方を講評してもらいたいくらいだ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "greta",
+      "name": "グレタ",
+      "category": "C〜Sランク大会・元衛兵（鉄壁の守り手）",
+      "personality": "冷静沈着で規律正しい元衛兵。守りを戦術として重視し、必要な攻めは躊躇わない。相手の優れた判断や実力には率直に敬意を払う。感情の起伏は控えめ。",
+      "first_person": "私",
+      "face_asset": "face_regular_greta.webp",
+      "opponent_ids": [
+        "reg-greta"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と13本を承認。相手を君と呼ぶ。発言頻度低め。既存の防御型CPU設定は変更対象外。",
+      "lines": {
+        "start": {
+          "text": "私は簡単には崩れない。君はどう攻める？",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "攻めるべき時は、攻める。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……いい一撃だ。だが、まだ崩れない。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "守るべきところを、守っただけだ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい判断だ。守りを軽く見ていないな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "そこは通さない。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……今のをかわすか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体倒した。ここからも慎重にいく。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。急ぐ必要はない。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……守りを破られたか。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体か。ならば、ここを守り抜く。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "焦らなければ、勝機は見えてくる。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……見事だ。私の守りを、正面から破るとは。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "julius",
+      "name": "ユリウス",
+      "category": "C〜Sランク大会常連・人気No.1の若手（若き天才）",
+      "personality": "華やかで自信に満ち、観客を意識した勝負を好むスター選手。礼儀正しく努力家で、相手にも敬意を示す。追い込まれると焦りも素直に見せる。",
+      "first_person": "僕",
+      "face_asset": "face_regular_julius.webp",
+      "opponent_ids": [
+        "reg-julius"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と13本を承認。華やかな大技を好む既存戦術は変更しない。発言頻度は中～やや高め。",
+      "lines": {
+        "start": {
+          "text": "せっかくの舞台だ。最高の勝負にしよう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、綺麗に決まったね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "へえ……今のは見事だね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "攻めるだけが僕の戦いじゃないよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "お見事。見せ場を奪われたな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふふ、間一髪だったね。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "今のをかわすんだ。いいね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まずは一体。さあ、次を見せてよ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。最後まで全力でいくよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "やられたか……でも、盛り上がってきたね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "……少し焦ってる。でも、まだ終わってない。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ありがとう。君のおかげで、いい試合になった。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったな。今日は君が主役だったね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "camilla",
+      "name": "カミラ",
+      "category": "A・Sランク大会常連・各地の大会を制した実力者（勝率9割の女王）",
+      "personality": "実力至上主義で、勝ち切ることを重視する大人の女性。相手を無意味に見下さず、隙を逃さない合理性と強者に対する敬意を持ち、苦境でも冷静に勝機を探す。",
+      "first_person": "私",
+      "face_asset": "face_regular_camilla.webp",
+      "opponent_ids": [
+        "reg-camilla"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」により人物像とセリフ13本を承認。相手を「あなた」と呼ぶ。発言頻度は低〜中。既存CPUはhunterで弱いモンスターを優先する（変更しない）。",
+      "lines": {
+        "start": {
+          "text": "あなたがここまで来た理由、確かめさせてもらうわ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "隙が見えたわ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……その一手は評価するわ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "その攻めは通さない。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい守りね。次はどうかしら。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "見えているわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……思ったより反応が速いのね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "着実に一体ね。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体。ここで決めるわ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……少し見誤ったようね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体ね。それでも、勝つ道はあるわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "私の勝ちね。でも、あなたの戦い方は覚えておくわ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けを認めるわ。あなたの判断が、私より一歩上だった。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "alvin",
+      "name": "アルヴィン",
+      "category": "Sランク大会決勝・現チャンピオン（無敗の王者）",
+      "personality": "自分の強さを誇示しない威厳と対戦相手への敬意を持つ、冷静沈着な王者。真の強者との対戦では静かな闘志を表す。",
+      "first_person": "私",
+      "face_asset": "face_regular_alvin.webp",
+      "opponent_ids": [
+        "reg-alvin"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05ユーザー「OK」で人物像と13本を正式承認。相手は「君」。低頻度・簡潔。既存強さ/AI/デッキ/試合結果には干渉しない。",
+      "lines": {
+        "start": {
+          "text": "よくここまで来た。私も全力で応えよう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "いい手応えだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……ほう。そこまで踏み込むとは。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ここは譲れん。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "見事な判断だ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "届かなかったな。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……見切ったか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体倒した。まだ気は抜かん。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体だ。力を出し切れ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……やるな。私も応えよう。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "一体か。……久々に胸が高鳴る。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "いい勝負だった。君の挑戦、忘れない。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……私が敗れるとはな。見事だ。君の勝ちだ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "flora",
+      "name": "フローラ",
+      "category": "ダンジョン・遺跡探検家",
+      "personality": "未知のものに目がない、好奇心旺盛で行動力と観察力のある探検家。勝負の中の新しい発見も喜ぶ。",
+      "first_person": "私",
+      "face_asset": "face_battler_1.webp",
+      "opponent_ids": [],
+      "opponent_faces": [
+        "battler-1"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「いいね」で13本と人物像を正式承認。相手は「あなた」。対戦ID未確定、既存の opponentFaces=battler-1 で紐付け。対戦演出のみ、CPUやダンジョン仕様は変更禁止。",
+      "lines": {
+        "start": {
+          "text": "思いがけない出会いね。どんな戦い方をするのか楽しみだわ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふふ、この組み合わせ、試してみたかったの。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら、面白い攻め方ね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "備えは大事よ。探検でも勝負でもね。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい準備ね。見習わなくちゃ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危なかった……回避が間に合ったわね。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "へえ、そのタイミングでかわすのね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。いい調子だわ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。まだ何が起こるか分からないわね。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あら、一本取られたわね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体ね……ここからが正念場だわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "私の勝ちね。なかなか刺激的な一戦だったわ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けちゃった。でも、今日の勝負で新しい発見があったわ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "oscar",
+      "name": "オスカー",
+      "category": "ダンジョン・古代史の学者",
+      "personality": "知的で穏やかな古代史研究者。古い戦術に明るく、未知の手を見て好奇心を隠せない。研究を楽しむが、対戦にも本気で向き合う。",
+      "first_person": "私",
+      "face_asset": "face_battler_2.webp",
+      "opponent_ids": [],
+      "opponent_faces": [
+        "battler-2"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK.」にて13本と人物像を正式承認。相手は君。対戦ID未確定、opponentFaces=battler-2に対応。セリフと戦闘演出以外のルールは変更しない。",
+      "lines": {
+        "start": {
+          "text": "昔の戦術が、どこまで通じるか試してみようか。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "うん、古いやり方も悪くないね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ほう、そんな手があるのか。興味深い。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "備えを怠らない。基本は時代を問わないよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい守りだ。よく考えているね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、危ないところだった。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "見事だ。その判断は覚えておこう。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体目だね。まだ先は読めないな。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。どういう結末になるかな。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……なるほど。そこを突かれたか。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残るは一体か。私も頭を切り替えないとね。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "私の勝ちだね。実に興味深い一戦だった。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったよ。君の一手から学ぶことが多かった。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "kyle",
+      "name": "カイル",
+      "category": "ダンジョン・腕試しの旅人",
+      "personality": "強敵との出会いを心から楽しむ率直な挑戦者。より強くなることを求めて各地を旅する。ドルフの力押しやゴードンの過去の栄光ではなく、向上心と挑戦自体の喜びを個性にする。",
+      "first_person": "俺",
+      "face_asset": "face_battler_3.webp",
+      "opponent_ids": [],
+      "opponent_faces": [
+        "battler-3"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK.」にて13本と人物像を正式承認。相手はあんた。対戦ID未確定、opponentFaces=battler-3に対応。",
+      "lines": {
+        "start": {
+          "text": "強い相手を探してたんだ。あんたの腕、見せてくれ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、手応えありだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……いい一撃だ。わくわくしてきた。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そこは読んでたぜ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい守りだ。簡単には崩せないな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ねえ、紙一重だった。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "へえ、よく見切ったな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。まだまだいくぜ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体か。最後まで全力でこい。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "やるな……ますます面白くなってきた。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体か。なら、全部ぶつける。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "俺の勝ちだ。いい手合わせだったぜ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったよ。あんたみたいな相手がいるから、旅はやめられない。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "guardian",
+      "name": "？？？",
+      "category": "ダンジョン・見えない番人",
+      "personality": "正体・性別・所属を明かさない寡黙な存在。神秘性を保つため発言の少なさ自体を個性とする。詳細な背景は追加しない。",
+      "first_person": null,
+      "face_asset": "face_guardian.webp",
+      "opponent_ids": [],
+      "opponent_faces": [
+        "guardian"
+      ],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」により6発話・7無言の全13枠を正式承認。無言枠はnullとして保存し、吹き出しを出さない。runGuardianOpponent()のfaceはguardian、ボス守り手とは異なる。",
+      "lines": {
+        "start": {
+          "text": "…………",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "player_attack_hit": {
+          "text": "……ほう。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "player_defense_success": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "npc_evade_success": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "player_evade_success": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "npc_knock": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "npc_knock_last": {
+          "text": "……あと一体。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": null,
+          "status": "approved_silent_no_bubble"
+        },
+        "npc_own_down_last": {
+          "text": "……まだだ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "……終わりだ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……見事だ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "grant",
+      "name": "グラント",
+      "category": "太古の遺跡・守り手／一族の長老",
+      "personality": "穏やかな包容力と守り手としての威厳を兼ね備えた長老。訪問者の力と覚悟を測り、強さを認める。ガレス先生より悠然とした物腰。",
+      "first_person": "わし",
+      "face_asset": "face_guardian_ruins_grant.webp",
+      "opponent_ids": [
+        "enc-b3-boss"
+      ],
+      "opponent_faces": [],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で13本正式承認。開始・勝・敗はGitHub既存people.tsの台詞を維持。既存イベントで同じ台詞を二重表示しない。ジオル専用3本もユーザー「OK」で正式承認。共通13本は不変。ボス編成 [ガウル,ジオル,ラズック]、ace=ジオル。",
+      "lines": {
+        "start": {
+          "text": "さて、おぬしの力、見せてもらおうかの。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふむ、よい手応えじゃ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ほう、その手を選ぶか。面白いのう。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "遺跡を守るには、辛抱も要るでな。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "うむ、守りの心得があるのう。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ほっほ、まだ読みは鈍っておらんぞ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "よく見切ったのう。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。おぬしならどう立て直す？",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体じゃ。ここからが試されるぞ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "ほう……なかなかの腕じゃ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残るは一体か。わしも気を引き締めねばの。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ほっほ。焦らずとも、遺跡は逃げはせんよ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "見事じゃ。おぬしなら、遺跡も認めよう。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "sera",
+      "name": "セラ",
+      "category": "精霊の森の巫女・守り手",
+      "personality": "穏やかで優しいが、森を守る覚悟に揺るぎない芯の強さを持つ。相手の力量を見守りつつ本気で戦う。",
+      "first_person": "わたし",
+      "face_asset": "face_guardian_forest_sera.webp",
+      "opponent_ids": [
+        "enc-forest-boss"
+      ],
+      "opponent_faces": [],
+      "status": "approved",
+      "source_accuracy": "verbatim_approved",
+      "notes": "2026-11-05 ユーザー「OK」で13本＋切り札フルーネ固有3本正式承認。通常の開始・勝・敗はGitHub people.ts既存文のまま。元の場面イベントと二重表示禁止。編成 [プカリム,フルーネ,ミュロル]、ace=フルーネ。",
+      "lines": {
+        "start": {
+          "text": "ゆっくりでいいわ。でも、手は抜かないから。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふふ、こちらの番ね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら……思い切った一手ね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そう簡単には、通さないわ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい守りね。落ち着いているわ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふふ、危ないところだったわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、よく見ていたのね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体ね。まだ勝負は続くわ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体……最後まで見せてちょうだい。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……なるほど。強いのね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残るは一体。最後まで、守り抜くわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ふふ。森はまだ、あなたを見ているところよ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……うん。森の声も、あなたを認めてる。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "lucia",
+      "name": "ルシア",
+      "category": "水の神殿の司祭・守り手",
+      "personality": "静かで礼儀正しく、秩序を重んじる慈悲深くも厳格な司祭。穏やかな威厳を保ち、切り札への思いは少しだけ見せる。",
+      "first_person": "私",
+      "second_person": "あなた",
+      "face_asset": "face_guardian_water_lucia.webp",
+      "opponent_ids": [
+        "enc-water-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05ユーザー「OK」。共通13本とセレフィーン専用3本すべて承認済み。戦闘・ストーリーで既存の開始・勝利・敗北が二重表示されないこと。",
+      "lines": {
+        "start": {
+          "text": "では、始めましょう。どうぞ、全力で。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "うまく決まりましたね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……その一手、見事です。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "慌てず、受け止めましょう。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "落ち着いた守りですね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "……間に合いました。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "今のを見切るとは……。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体倒れました。まだ続けましょう。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体ですね。最後まで見届けます。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……よく鍛えられていますね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体。私も覚悟を決めましょう。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "水は、急ぐ者を拒みます。また、いらしてください。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "お見事です。神殿は、あなたを迎え入れます。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "ivan",
+      "name": "イヴァン",
+      "category": "氷の洞窟の守り手・ノルディス地方出身",
+      "personality": "寡黙で冷静。言葉より行動で実力を示す、不器用な守り手。感情はあるが表には出さず、要所で短い言葉を発する。",
+      "first_person": "原則省略",
+      "second_person": "原則省略",
+      "face_asset": "face_guardian_ice_ivan.webp",
+      "opponent_ids": [
+        "enc-ice-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05、ユーザー「OK」で共通13本＋切り札ヒョウズク3本を承認。開始・勝利・敗北はGitHub people.ts既存文。必要なときだけ短く発言。謎の番人とは別人。既存ストーリー会話との二重表示に注意。編成はミュロル／ヒョウズク／カルシェル。",
+      "lines": {
+        "start": {
+          "text": "……来い。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "……捉えた。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……悪くない。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "……通さない。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "……守ったか。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "……見えている。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……かわしたか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "……一体。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "……残り一体。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……やるな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "……まだ、終わらん。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "……まだだ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……認めよう。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "balka",
+      "name": "バルカ",
+      "category": "炎の火山の守り手",
+      "personality": "豪快で陽気。強い相手との勝負を心から楽しみ、勝敗を問わず相手の強さを称える情熱的な守り手。",
+      "first_person": "俺",
+      "second_person": "明示なし（自然なくだけた呼びかけ）",
+      "face_asset": "face_guardian_fire_balka.webp",
+      "opponent_ids": [
+        "enc-fire-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「はい」で共通13本＋切り札シシエン3本が正式確定。開始・勝利・敗北はGitHub people.ts の既存発言を原文維持。感嘆符は既存バルカ固有表現の例外。切り札反応の二重表示はしない。編成はガウル／シシエン／ラズック。",
+      "lines": {
+        "start": {
+          "text": "火山より熱くいくぞ！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "おう、いい一撃だ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ははっ、そう来たか。いいぞ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "力任せじゃ通らねえぞ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "がっちり受けたな。いい根性だ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、まだ捕まらねえぜ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ははっ、やるじゃねえか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。まだまだいくぞ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。最後まで気を抜くなよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "くっ、やるな。こっちも熱くなってきたぜ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体だと？ 上等じゃねえか。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "はっはっは！ いい勝負だった！ また来い！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "はっはっは！ やるじゃないか！ 気に入ったぞ！",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "teo",
+      "name": "テオ",
+      "category": "機械の塔の守り手",
+      "personality": "守り手の一族で最も若い発明家。好奇心旺盛で、カードの仕組み・組み合わせを研究する。明るく親しみやすいが戦術は真剣。",
+      "first_person": "ぼく",
+      "second_person": "きみ",
+      "face_asset": "face_guardian_machine_teo.webp",
+      "opponent_ids": [
+        "enc-machine-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK」で共通13本＋切り札ギアロス3本を正式確定。開始・勝利・敗北は既存台詞を原文維持。CPUのα・β・γコンボ仕様は変更しない。切り札反応の重複表示はしない。",
+      "lines": {
+        "start": {
+          "text": "よーし、塔の守り手として、がんばるぞ！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、ちゃんと動いてくれた。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "えっ、そこを突いてくるんだ。面白いな。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふ、そこは対策済みだよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "そう防ぐのか。なるほど、参考になるな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ない危ない。今のはぎりぎりだった。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あれっ、そっちに動くのか。覚えておこう。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。まだ試したい手があるんだ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。最後まで手は抜かないよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あちゃあ……組み立て直さないと。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体か。ここからが腕の見せどころだね。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やったー！ でも、きみの戦い方、おもしろかった！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "うわー、負けちゃった！ すごいや、どうやったの？",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "aurelio",
+      "name": "アウレリオ",
+      "category": "天の聖域の守り手・一族の当主",
+      "personality": "厳格で威厳があり、挑戦者の実力だけでなく覚悟も見極める。公平な立場を貫く寡黙な守り手。",
+      "first_person": "私",
+      "second_person": "そなた",
+      "face_asset": "face_guardian_holy_aurelio.webp",
+      "opponent_ids": [
+        "enc-holy-boss"
+      ],
+      "status": "approved_regular_lines",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と通常13本を承認。直後に「ソラモは仮でお願いします」と明示。現在のゲームではソラモが切り札だが、恒久的な最終切り札として確定しない。ソラモ専用3本は仮条件付きであり、新切り札の決定時には再作成・再承認。既存の戦闘/報酬/デッキは変更しない。",
+      "ace_monster": "ソラモ",
+      "ace_monster_id_symbol": "SORAMO_MONSTER_ID",
+      "ace_status": "provisional_not_final",
+      "lines": {
+        "start": {
+          "text": "来るがよい。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "迷いのない一手だ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……臆せず踏み込んできたか。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "その一手は通さぬ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "……よく見極めた。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "まだ届かぬ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……見切ったか。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。試練はまだ続く。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残るは一体。そなたの覚悟を見せよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……ここまで来た理由が、見えてきた。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残るは一体か。私も、全力で応えよう。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "まだ、聖域の扉は開かぬ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "……見事だ。聖域は、そなたを受け入れる。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "pia",
+      "name": "ピア",
+      "category": "水の神殿の一般バトラー・潜水が得意な探検家",
+      "personality": "好奇心旺盛で人懐っこく、多少の失敗も笑って乗り越える行動派。水中探索で培った機転がある。",
+      "first_person": "わたし",
+      "second_person": "きみ",
+      "face_asset": "face_battler_water_pia.webp",
+      "opponent_faces": [
+        "battler-pia"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05ユーザー「ピアはOKです」で人物像・通常13本を正式承認。ルシアの切り札セレフィーンはピアの通常編成には含まれない。GitHub src/data/dungeonRun.ts の dungeon-03 npcTeams を参照し、セレフィーン専用セリフを追加しない。表示時は個別 opponent ID ではなく face=battler-pia のマッピングが必要。",
+      "lines": {
+        "start": {
+          "text": "いっくよー！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、いい流れに乗れたね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "わっ、今のは効いたなあ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふ、ちゃんと備えてたよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "おっ、今のを受け止めるんだ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、するっとセーフ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あれ、そんなに素早く動けるの？",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体目。いい調子だね。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。最後まで泳ぎ切るよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あちゃー、ちょっと深追いしすぎたかな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体……まだ息は上がってないよ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やったね！ 息つぎしてから、また来てね！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "あちゃー、負けちゃった！ でも楽しかった！",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "hans",
+      "name": "ハンス",
+      "category": "氷の洞窟の一般バトラー・雪山の登山家",
+      "personality": "経験豊富で気さく。厳しい自然を知るからこそ気遣いを忘れず、勝負では慎重で粘り強い頼れる山男。",
+      "first_person": "俺",
+      "second_person": "君",
+      "face_asset": "face_battler_ice_hans.webp",
+      "opponent_faces": [
+        "battler-hans"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05ユーザー「OK」で人物像・通常13本を正式承認。開始・NPC勝利・NPC敗北はGitHub既存セリフを原文維持。氷の洞窟の一般バトラーであり切り札専用セリフは設けない。個別相手のマッピングは opponent face=battler-hans を参照。",
+      "lines": {
+        "start": {
+          "text": "よろしく頼むよ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、狙いどおりだ。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "おっと、油断できないね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "備えがあれば慌てずに済むさ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "うん、堅実な守りだね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ない危ない。足もとを見ておいてよかった。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "いい身のこなしだ。山でも通用しそうだね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。まだ先は長いぞ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体か。最後まで気をつけな。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "おっと、やられたか。なかなかやるね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "あと一体だな。焦らず、一歩ずつだ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "おっと、勝っちまった。足もと、気をつけてな。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "いやあ、まいった。君は強いな。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "zack",
+      "name": "ザック",
+      "category": "炎の火山・一般バトラー／鉱石掘り",
+      "personality": "口は悪いが面倒見がよく、仕事にも勝負にも妥協しない鉱石掘り。勝負後には相手の体調・安全を気遣う不器用な優しさを見せる。",
+      "first_person": "俺",
+      "second_person": "お前（必要なときのみ）",
+      "face_asset": "face_battler_fire_zack.webp",
+      "opponent_faces": [
+        "battler-zack"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05、ユーザー「OK」で人物像と通常13本を正式承認。開始・NPC勝利・NPC敗北はGitHub既存文を維持。炎の火山の一般バトラーで切り札専用セリフはなし。",
+      "lines": {
+        "start": {
+          "text": "手加減なんかしねえぞ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、芯を捉えたな。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ぐっ……いい腕してるじゃねえか。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そいつは通さねえ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "おっ、硬えな。簡単には崩せねえか。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと、間一髪だな。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ちっ、身軽なやつだ。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体目だ。まだいけるだろ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体か。踏ん張ってみせろ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "くそっ、一本取られたか。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体……簡単には引かねえぞ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "へっ、まだまだだな。……ほら、水でも飲んどけ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "ちっ、やるじゃねえか。……気をつけて進めよ。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "otto",
+      "name": "オットー",
+      "category": "機械の塔・一般バトラー／時計職人",
+      "personality": "時間と正確さを何より大切にする、少し変わった几帳面な時計職人。穏やかで礼儀正しいが予定外の展開には少し戸惑う。",
+      "first_person": "私",
+      "second_person": "あなた（必要な場合）",
+      "face_asset": "face_battler_machine_otto.webp",
+      "opponent_faces": [
+        "battler-otto"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK」により13本承認。通常3本（開始／勝ち／負け）はGitHub原文。一般バトラーにつき切り札専用なし。",
+      "lines": {
+        "start": {
+          "text": "正確に、参りましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "ふむ、予定どおりですな。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "ほう……少々、計算が狂いました。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "この一手は読んでおりました。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "なるほど、堅実な選択ですな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふむ、間一髪でした。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "おや、見事なタイミングです。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。手順は順調ですな。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体。最後まで丁寧に参りましょう。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……これは想定外ですな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体……ここからは手順を変えましょう。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "予定どおりの結果ですな。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "ほう、私の計算が狂いましたか。お見事。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "mina",
+      "name": "ミナ",
+      "category": "天の聖域・一般バトラー／巡礼の見習い",
+      "personality": "穏やかで礼儀正しい。自分も成長の途中にいる巡礼者として、困難に諦めず向き合う芯の強さと相手への敬意を持つ。",
+      "first_person": "わたし",
+      "second_person": "あなた",
+      "face_asset": "face_battler_holy_mina.webp",
+      "opponent_faces": [
+        "battler-mina"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05ユーザー「OK」で人物像・通常13本承認。開始・NPC勝利・NPC敗北はGitHub原文維持。一般バトラーのため切り札専用なし。",
+      "lines": {
+        "start": {
+          "text": "よろしくお願いします。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よかった……落ち着いて決められました。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……強い一手ですね。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "守りが間に合いました。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "落ち着いた判断ですね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "……間に合ってよかったです。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "今のをかわすなんて……お見事です。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。気を抜かずに続けます。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体ですね。最後まで、よろしくお願いします。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……まだ、続けられます。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体。諦めずに進みます。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ありがとうございました。あなたの旅に、光がありますように。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けてしまいました……。でも、いい勝負でした。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "zephyra",
+      "name": "ゼフィラ",
+      "category": "風の渓谷・守り手／一族でいちばん若い",
+      "personality": "明るく自由奔放でおしゃべり。感情表現が豊かで、うっかり余計なことまで話す。守り手として責任感と確かな実力がある。",
+      "first_person": "わたし",
+      "face_asset": "face_guardian_wind_zephyra.webp",
+      "opponent_ids": [
+        "enc-wind-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "ユーザー2026-11-05「OK」で通常13本およびウズリオ専用3本を承認。切り札はウズリオ（UZURIO_MONSTER_ID）。GitHub既存セリフの開始・勝ち・負けは原文維持。勝利後の他の聖地の守り手に関するうっかり口を滑らせる物語の伏線は変更しない。",
+      "lines": {
+        "start": {
+          "text": "いっくよー！ 風みたいに速いんだから、ちゃんとついてきてね！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、決まった。今の見た？",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "わっ、いい一手。油断したなあ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふ、ちゃんと受け止めたよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あっ、今の止められちゃった。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "へへ、風みたいにすり抜けたよ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "えー、今のもかわすの？ やるね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体、いい調子。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体か。最後までいくよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あちゃ、やられた。けど、ここからだよ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "えっ、もう一体だけ？ まだまだ動けるよ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やったー！ でも惜しかったよ！ 風を読めば、次はきっといけるって！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "うそっ、負けちゃった！ すごいね、風よりも速かったかも！",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "niko",
+      "name": "ニコ",
+      "category": "風の渓谷・一般バトラー／つり橋の番",
+      "personality": "明るく親切で、渓谷の危険をよく知る、穏やかで世話好きな青年。勝負中も相手を気遣う。",
+      "first_person": "ぼく",
+      "face_asset": "face_battler_wind.webp",
+      "opponent_faces": [
+        "battler-niko"
+      ],
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK。」で通常13本を承認。開始・NPC勝利・NPC敗北はGitHub既存原文。一般バトラーのため切り札専用台詞なし。",
+      "lines": {
+        "start": {
+          "text": "よし、いこうか。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、いいところに決まったね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "おっと、今のは効いたな。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ちゃんと備えておいてよかったよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "いい守りだね。落ち着いてる。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふう、うまくかわせた。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あ、今のを避けたんだ。すごいな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。でも勝負はまだこれからだよ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体だね。最後まで気をつけて。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あれ、倒されちゃったか。やるね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体か……落ち着いて続けよう。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ぼくの勝ちだね。足もとの風に気をつけて進むんだよ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "まいったな、君は強いね。この先も、気をつけて。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "stella",
+      "name": "ステラ",
+      "category": "雷の高原・守り手／一族の記録係・天文の学者",
+      "personality": "理屈っぽく早口で自信がある天文学者。計算と観測結果のずれを知的な好奇心として受け止める。ステラの弟子はルカ。",
+      "first_person": "私",
+      "face_asset": "face_guardian_thunder_stella.webp",
+      "opponent_ids": [
+        "enc-thunder-boss"
+      ],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK」で13場面＋切り札ハクラン専用3本の合計16本を承認。開始・NPC勝利・NPC敗北はGitHubの既存原文を維持。既存イベントの星図の門、祭壇およびルカとの師弟関係は変更しない。",
+      "lines": {
+        "start": {
+          "text": "勝つ確率は計算済みよ。さあ、始めましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、予測どおりの一手ね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら……その角度は想定外だわ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "その攻めは計算に入れてあるわ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "なるほど、いい判断ね。記録しておくわ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふふ、その軌道なら読めるわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "……今のを見切るのね。予測を修正しないと。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。経過は順調ね。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体ね。ここで気を緩めるわけにはいかないわ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……予想より早いわね。計算し直すわ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体……まだ結論を出すには早いわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "計算どおりね。次は、雲の流れをもう少し読んでからいらっしゃい。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "luka",
+      "name": "ルカ",
+      "category": "雷の高原・観測所の見習い／ステラの弟子",
+      "personality": "元気で真面目な観測所の見習い。師匠ステラを尊敬し、観測と記録を通じて実践的に学ぶ。驚きや喜びを素直に表現する。",
+      "first_person": "ぼく",
+      "face_asset": "face_battler_thunder.webp",
+      "opponent_ids": [],
+      "status": "approved",
+      "source_accuracy": "3_existing_GitHub_lines_plus_10_approved_new_lines",
+      "notes": "2026-11-05 ユーザー「OK」で通常13本承認。一般バトラーのため固有切り札反応は不要。対戦キーは battler-luka (opponent.face)。「！」はGitHub既存3本のみ維持。 / 対戦顔キー battler-luka は GitHub src/data/dungeonRun.ts と src/data/people.ts で照合。",
+      "lines": {
+        "start": {
+          "text": "よろしくお願いします！",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "やった、うまく決まりました。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "うわっ……今の一手、記録しないと。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "よし、習ったとおりにできました。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あっ、そこを守るんですね。勉強になります。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふう……危なかったです。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "えっ、今のを避けるんですか。すごいな……。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。焦らず続けます。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体ですね。ここで油断したら先生に怒られちゃう。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あちゃ……予想と違ったな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体……でも、観測はまだ終わってません。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "やった！ 先生に報告しなきゃ！",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "うわあ、負けちゃった……。記録帳に書いておきます、あなたの勝ちって！",
+          "status": "approved"
+        }
+      },
+      "opponent_faces": [
+        "battler-luka"
+      ]
+    },
+    {
+      "id": "tobias",
+      "name": "トビアス",
+      "category": "C・Bランク大会の一般出場者",
+      "personality": "人当たりがよく、勝負中にも軽口を挟む茶目っ気のある青年。勝負には真剣だが、予想外の展開を楽しみ、負けても相手を素直に認める。",
+      "first_person": "俺",
+      "face_asset": "face_entrant_tobias.webp",
+      "opponent_ids": [
+        "gen-tobias"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; character_traits_proposed",
+      "notes": "2026-11-05 ユーザー「OK」で13本承認。GitHubに人物の詳細設定はない。C・B大会一般出場者（gen-tobias）。現行デッキ編成やAIは変更しない。",
+      "lines": {
+        "start": {
+          "text": "お、対戦相手は君か。面白い勝負になりそうだ。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、ここは俺の読み勝ちだな。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "へえ、そう来るか。一本取られた。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そう簡単には通さないって。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あらら、見透かされてたか。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "おっと。今のは紙一重だな。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "へえ、いい反応するね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。ここからどうする？",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体か。最後まで油断しないぜ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "おっと、やられた。やるね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "はは、俺の余裕はどこ行ったんだか。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "俺の勝ちだな。君との勝負、楽しかったよ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けたか。いやあ、最後まで読めなかったな。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "marie",
+      "name": "マリー",
+      "category": "Eランク大会の代役／C・Bランク大会の一般出場者",
+      "personality": "落ち着いた物腰の慎重派。考えすぎて迷うこともあるが、肝心な場面では自分で決断できる芯の強い女性。",
+      "first_person": "私",
+      "face_asset": "face_entrant_marie.webp",
+      "opponent_ids": [
+        "gen-marie",
+        "e-marie"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と通常13本を正式承認。E大会シエナ不在時の代役（e-marie）はface=gen-marie。C・B大会のgen-marieと同一人物として同じセリフを使う。既存のカード編成・難易度は変更しない。",
+      "lines": {
+        "start": {
+          "text": "よろしくお願いします。じっくり、いい勝負をしましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "……よし。思い切ってよかった。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あっ……そこを狙われるとは。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ここは守ると決めていました。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "さすがですね。簡単には通りませんか。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふう……間に合いましたね。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、そこをかわすんですね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "これで一体。まだ焦らずにいきましょう。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体……最後まで丁寧に。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……読み違えましたね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "あと一体。ここは迷っていられません。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "勝てましたね。最後まで気を抜かなくてよかった。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参りました。あなたの決断力、見習いたいです。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "jean",
+      "name": "ジャン",
+      "category": "C・Bランク大会の一般出場者",
+      "personality": "勝負に熱くなりやすい実直な負けず嫌い。相手の力を認める潔さがあり、目の前の勝負に勝ちたいという競争心を原動力とする青年。",
+      "first_person": "俺",
+      "face_asset": "face_entrant_jean.webp",
+      "opponent_ids": [
+        "gen-jean"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と13本の通常バトルセリフを正式承認。既存のラズック・ノビトン・カルシェル編成とCPU難易度は変更しない。",
+      "lines": {
+        "start": {
+          "text": "さあ、始めようぜ。いい勝負にしよう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、狙ったところに入った。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "くっ、いい攻めだな。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そう来ると思ってたぜ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "へえ、そこで守るか。やるな。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "あぶねえ。今のはぎりぎりだ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "ちぇっ、うまくかわされたな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体倒したな。この勢いでいくぜ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。最後まで気を抜かねえ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……いい腕してるな。負けてられねえ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "最後の一体か。ここで引くわけにはいかねえ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "俺の勝ちだ。手応えのある勝負だったぜ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったな。完敗だ。次は負けねえからな。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "helena",
+      "name": "ヘレナ",
+      "category": "C・Bランク大会の一般出場者",
+      "personality": "柔らかく上品な物腰を持ち、勝負どころでは大胆に攻める芯の強い女性。穏やかさと決断力の対比が個性。",
+      "first_person": "私",
+      "face_asset": "face_entrant_helena.webp",
+      "opponent_ids": [
+        "gen-helena"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で13本と人物像を承認。ミュロル・カルシェル・ソラモの現行デッキ・CPU難易度は変更しない。",
+      "lines": {
+        "start": {
+          "text": "ふふ、お互いに悔いのない勝負にしましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "うん、ここは思い切って正解ね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら、いい一手ね。少し驚いたわ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "その攻めは、ちゃんと見ていたわ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "ふふ、簡単には通してくれないのね。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "よかった、間に合ったわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、いい反応ね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体ね。まだ油断はしないわ。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体。ここは攻めどころね。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あら……一本取られたわね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体ね。ここから思い切っていくわ。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "ありがとう。最後の一手まで楽しめたわ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "ふふ、参ったわ。あなたの思い切りのよさ、素敵ね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "claude",
+      "name": "クロード",
+      "category": "A・Sランク大会の一般出場者",
+      "personality": "一見近寄りがたいが誠実で、良い一手を素直に認める寡黙な実戦派。冷静だが負けたときに思わず笑う人間味がある。",
+      "first_person": "俺",
+      "face_asset": "face_entrant_claude.webp",
+      "opponent_ids": [
+        "gen-claude"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で13本と人物像を正式承認。現在のガウル・カルシェル・ラズックの編成とCPU実力は変更しない。",
+      "lines": {
+        "start": {
+          "text": "愛想はよくないが、勝負には真剣だ。よろしくな。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし、ここは通した。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……なるほど。いいところを突く。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "そう簡単には崩れんさ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "ほう、そこを守るか。悪くない。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "……危ないところだった。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "今のをかわすか。見事だ。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "一体倒した。まだ決まったわけじゃない。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "残り一体か。最後まで気を抜くなよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……ここから立て直す。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "あと一体。まあ、諦める理由にはならん。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "俺の勝ちだ。……いい相手だったよ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参った。……あんたの強さには、つい笑っちまうな。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "beatrice",
+      "name": "ベアトリス",
+      "category": "A・Sランク大会の一般出場者",
+      "personality": "大人の余裕と少し皮肉混じりの遊び心を持つ女性。予想外の一手を楽しみ、相手を軽くからかいながらも実力を認める。",
+      "first_person": "私",
+      "face_asset": "face_entrant_beatrice.webp",
+      "opponent_ids": [
+        "gen-beatrice"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と通常13本を正式承認。現行のミュロル・ソラモ・カルシェルの編成とCPU実力は変更しない。",
+      "lines": {
+        "start": {
+          "text": "ふふ、肩の力を抜いて。いい勝負にしましょう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "あら、思い切ってみるものね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "まあ……その一手は少し意外だったわ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "ふふ、そう簡単にはいかないわよ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "あら、慎重なのね。悪くないわ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "危ないところね。運も味方したかしら。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あらあら、きれいに外されたわね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。さて、どう立て直すのかしら。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体ね。最後の一手まで楽しませて。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……ふふ、そう来なくちゃ。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "一体だけね。少し大胆にいこうかしら。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "私の勝ちね。なかなか愉快な一戦だったわ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けたわ。でも、あなたのおかげで退屈しなかった。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "zara",
+      "name": "ザラ",
+      "category": "A・Sランク大会の一般出場者",
+      "personality": "勝負の流れを直感的に読み、積極的な判断と柔軟な対応を見せる女性。計算よりも経験や局面の感覚を重視し、劣勢でも自分から動く。",
+      "first_person": "私",
+      "face_asset": "face_entrant_zara.webp",
+      "opponent_ids": [
+        "gen-zara"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と通常13本を正式承認。現行のラズック・ガウル・ノビトンの編成とCPU難易度は変更しない。",
+      "lines": {
+        "start": {
+          "text": "ふふ、いい勝負になりそうね。先に流れをつかむのはどちらかしら。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "今なら通ると思ったの。正解ね。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "あら、その手は読めなかったわ。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "悪いけど、ここは譲れないわ。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "へえ、いい勘してるじゃない。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ふふ、危ないところだったわ。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "あら、タイミングを読まれたわね。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。流れがこちらに来たかしら。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体ね。でも、最後まで何が起こるか分からないわ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "あらら、やられたわ。じゃあ、次の手ね。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体……ここからひっくり返せたら面白いでしょう？",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "最後に流れをつかめたわね。いい勝負だったわ。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "参ったわ。あなた、勝負どころで思い切りがいいのね。",
+          "status": "approved"
+        }
+      }
+    },
+    {
+      "id": "walter",
+      "name": "ウォルター",
+      "category": "A・Sランク大会の一般出場者",
+      "personality": "目先の勝敗に浮かれず、一手一手を大切にする誠実で落ち着いた経験派。判断の誤りは素直に認め、相手を敬う。",
+      "first_person": "私",
+      "second_person": "君",
+      "face_asset": "face_entrant_walter.webp",
+      "opponent_ids": [
+        "gen-walter"
+      ],
+      "status": "approved",
+      "source_accuracy": "13_user_approved_new_lines; personality_proposed_approved",
+      "notes": "2026-11-05 ユーザー「OK」で人物像と通常13本を正式承認。ノビトン・カルシェル・ミュロルの現行編成とCPU難易度は変更しない。",
+      "lines": {
+        "start": {
+          "text": "よろしく頼む。互いに悔いのない勝負をしよう。",
+          "status": "approved"
+        },
+        "npc_attack_hit": {
+          "text": "よし。狙いは外していない。",
+          "status": "approved"
+        },
+        "player_attack_hit": {
+          "text": "……いい攻めだ。侮れんな。",
+          "status": "approved"
+        },
+        "npc_defense_success": {
+          "text": "守るべきところは、守る。",
+          "status": "approved"
+        },
+        "player_defense_success": {
+          "text": "ほう。無理をしないのも強さだ。",
+          "status": "approved"
+        },
+        "npc_evade_success": {
+          "text": "ここは、外させてもらう。",
+          "status": "approved"
+        },
+        "player_evade_success": {
+          "text": "見事だ。よく見ているな。",
+          "status": "approved"
+        },
+        "npc_knock": {
+          "text": "まず一体。まだ勝負は決まらん。",
+          "status": "approved"
+        },
+        "npc_knock_last": {
+          "text": "あと一体か。油断はせんよ。",
+          "status": "approved"
+        },
+        "npc_own_down": {
+          "text": "……私の判断が遅れたな。",
+          "status": "approved"
+        },
+        "npc_own_down_last": {
+          "text": "残り一体。今こそ落ち着かねばな。",
+          "status": "approved"
+        },
+        "npc_win": {
+          "text": "私の勝ちだ。いい手合わせだった。",
+          "status": "approved"
+        },
+        "npc_lose": {
+          "text": "負けたか。……君の積み重ねが、一枚上だったな。",
+          "status": "approved"
+        }
+      }
+    }
+  ],
+  "extra_lines": {
+    "gareth": {
+      "rematch_start": {
+        "text": "よし、もう一度やってみよう。",
+        "status": "reconstruction_pending_text_check"
+      }
+    },
+    "grant": {
+      "ace_attack_hit": {
+        "text": "うむ、ジオル。よい一撃じゃ。",
+        "status": "approved",
+        "condition": "ジオルが有効な攻撃を命中させたとき",
+        "priority": "中",
+        "replaces": "通常の攻撃命中を差し替え（同一試合最大1回を初期案）",
+        "ace_monster": "ジオル",
+        "ace_monster_id_symbol": "GEOL_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……ジオルが倒れるとはのう。おぬし、見事じゃ。",
+        "status": "approved",
+        "condition": "ジオルのLIFEが初めて0になり、グラントに生存モンスターが残るとき",
+        "priority": "高",
+        "replaces": "通常の自軍モンスター撃破／残り1体セリフを差し替え",
+        "ace_monster": "ジオル",
+        "ace_monster_id_symbol": "GEOL_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "ジオルまで倒すとは……見事じゃ。おぬしなら、遺跡も認めよう。",
+        "status": "approved",
+        "condition": "ジオルが最後のモンスターとして倒され、グラントが敗北するとき",
+        "priority": "最高",
+        "replaces": "通常の敗北セリフを差し替え。既存勝敗後イベントとの二重表示は禁止",
+        "ace_monster": "ジオル",
+        "ace_monster_id_symbol": "GEOL_MONSTER_ID"
+      }
+    },
+    "sera": {
+      "ace_attack_hit": {
+        "text": "うん、フルーネ。その調子よ。",
+        "status": "approved",
+        "condition": "フルーネの攻撃が実際に命中",
+        "replaces": "通常の攻撃命中と置換",
+        "ace_monster": "フルーネ",
+        "ace_monster_id_symbol": "FLUNE_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……フルーネまで。あなた、本当に強いのね。",
+        "status": "approved",
+        "condition": "フルーネのLIFEが0になり、他のセラのモンスターが生存",
+        "replaces": "自軍撃破反応と置換",
+        "ace_monster": "フルーネ",
+        "ace_monster_id_symbol": "FLUNE_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "フルーネまで……。うん、森の声も、あなたを認めてる。",
+        "status": "approved",
+        "condition": "フルーネが最後に倒れ、セラが敗北",
+        "replaces": "敗北セリフと置換",
+        "ace_monster": "フルーネ",
+        "ace_monster_id_symbol": "FLUNE_MONSTER_ID"
+      }
+    },
+    "lucia": {
+      "ace_attack_hit": {
+        "text": "セレフィーン、あなたの力を見せてください。",
+        "status": "approved",
+        "condition": "セレフィーンの攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を差し替え",
+        "ace_monster": "セレフィーン",
+        "ace_monster_id_symbol": "SEREPHINE_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……セレフィーンまで。あなたの強さ、確かに受け取りました。",
+        "status": "approved",
+        "condition": "セレフィーンのLIFEが0になり、ほかのルシアのモンスターが生存",
+        "replaces": "共通自軍撃破反応を差し替え",
+        "ace_monster": "セレフィーン",
+        "ace_monster_id_symbol": "SEREPHINE_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "セレフィーンまで倒されるとは……お見事です。神殿は、あなたを迎え入れます。",
+        "status": "approved",
+        "condition": "セレフィーンが最後の自軍モンスターとして倒れてルシア敗北が確定",
+        "replaces": "共通敗北セリフを差し替え",
+        "ace_monster": "セレフィーン",
+        "ace_monster_id_symbol": "SEREPHINE_MONSTER_ID"
+      }
+    },
+    "ivan": {
+      "ace_attack_hit": {
+        "text": "……よし、ヒョウズク。",
+        "status": "approved",
+        "condition": "ヒョウズクの攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を差し替え",
+        "ace_monster": "ヒョウズク",
+        "ace_monster_id_symbol": "HYOUZUKU_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……ヒョウズクまで……。だが、まだだ。",
+        "status": "approved",
+        "condition": "ヒョウズクのLIFEが0になり、ほかのイヴァンのモンスターが生存",
+        "replaces": "共通自軍撃破反応を差し替え",
+        "ace_monster": "ヒョウズク",
+        "ace_monster_id_symbol": "HYOUZUKU_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "……ヒョウズクも、倒したか。……認めよう。",
+        "status": "approved",
+        "condition": "ヒョウズクが最後の自軍モンスターとして倒され、イヴァン敗北が確定",
+        "replaces": "共通敗北セリフを差し替え",
+        "ace_monster": "ヒョウズク",
+        "ace_monster_id_symbol": "HYOUZUKU_MONSTER_ID"
+      }
+    },
+    "balka": {
+      "ace_attack_hit": {
+        "text": "いいぞ、シシエン。火山の力を見せてやれ。",
+        "status": "approved",
+        "condition": "シシエンの攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を差し替え",
+        "ace_monster": "シシエン",
+        "ace_monster_id_symbol": "SHISHIEN_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……シシエンが倒れるとはな。ははっ、ますます燃えてきたぜ。",
+        "status": "approved",
+        "condition": "シシエンのLIFEが0になり、バルカ側にほかの生存モンスターがいるとき",
+        "replaces": "共通自軍撃破反応を差し替え",
+        "ace_monster": "シシエン",
+        "ace_monster_id_symbol": "SHISHIEN_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "シシエンまで倒すとはな。はっはっは、やるじゃねえか。気に入ったぞ。",
+        "status": "approved",
+        "condition": "シシエンが最後の自軍モンスターとして倒され、バルカ敗北が確定したとき",
+        "replaces": "共通敗北セリフを差し替え",
+        "ace_monster": "シシエン",
+        "ace_monster_id_symbol": "SHISHIEN_MONSTER_ID"
+      }
+    },
+    "teo": {
+      "ace_attack_hit": {
+        "text": "いいぞ、ギアロス。狙いどおりの出力だ。",
+        "status": "approved",
+        "condition": "ギアロスの攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を差し替え",
+        "ace_monster": "ギアロス",
+        "ace_monster_id_symbol": "GEAROS_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "えっ、ギアロスが……。でも、まだ次の手がある。",
+        "status": "approved",
+        "condition": "ギアロスのLIFEが0になり、テオ側にほかの生存モンスターがいるとき",
+        "replaces": "共通自軍撃破反応を差し替え",
+        "ace_monster": "ギアロス",
+        "ace_monster_id_symbol": "GEAROS_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "ギアロスまで倒すなんて……すごいや。どうやったの？",
+        "status": "approved",
+        "condition": "ギアロスが最後の自軍モンスターとして倒され、テオの敗北が確定したとき",
+        "replaces": "共通敗北セリフを差し替え",
+        "ace_monster": "ギアロス",
+        "ace_monster_id_symbol": "GEAROS_MONSTER_ID"
+      }
+    },
+    "aurelio": {
+      "ace_attack_hit": {
+        "text": "……よく応えた、ソラモ。",
+        "status": "provisional_ace_pending_replacement",
+        "condition": "現在の仮切り札ソラモの攻撃が実際に命中したとき",
+        "replaces": "通常の攻撃命中と置換",
+        "ace_monster": "ソラモ",
+        "ace_monster_id_symbol": "SORAMO_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……ソラモを退けるか。見事だ、そなた。",
+        "status": "provisional_ace_pending_replacement",
+        "condition": "現在の仮切り札ソラモが倒され、アウレリオのモンスターがほかに生存するとき",
+        "replaces": "通常の自軍モンスター撃破／残り1体反応と置換",
+        "ace_monster": "ソラモ",
+        "ace_monster_id_symbol": "SORAMO_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "ソラモまでも……見事だ。聖域は、そなたを受け入れる。",
+        "status": "provisional_ace_pending_replacement",
+        "condition": "現在の仮切り札ソラモが最後に倒されアウレリオが敗北したとき",
+        "replaces": "通常の敗北セリフと置換",
+        "ace_monster": "ソラモ",
+        "ace_monster_id_symbol": "SORAMO_MONSTER_ID"
+      }
+    },
+    "zephyra": {
+      "ace_attack_hit": {
+        "text": "いいね、ウズリオ。風に乗れてるよ。",
+        "status": "approved",
+        "condition": "ウズリオの有効な攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を置換",
+        "ace_monster": "ウズリオ",
+        "ace_monster_id_symbol": "UZURIO_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "えっ、ウズリオが……。すごい、でもわたしもまだ負けないよ。",
+        "status": "approved",
+        "condition": "ウズリオが倒れた後、ゼフィラ側に生存モンスターが残るとき",
+        "replaces": "共通自軍撃破反応を置換",
+        "ace_monster": "ウズリオ",
+        "ace_monster_id_symbol": "UZURIO_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "ウズリオまで倒しちゃうなんて……うそっ、負けちゃった。すごいね、風よりも速かったかも！",
+        "status": "approved",
+        "condition": "ウズリオが最後の1体として倒され、ゼフィラ敗北が確定したとき",
+        "replaces": "共通敗北台詞を置換",
+        "ace_monster": "ウズリオ",
+        "ace_monster_id_symbol": "UZURIO_MONSTER_ID"
+      }
+    },
+    "stella": {
+      "ace_attack_hit": {
+        "text": "ハクラン、その一撃も記録しておくわ。",
+        "status": "approved",
+        "condition": "ハクランの有効な攻撃が実際に命中したとき",
+        "replaces": "共通攻撃命中を置換",
+        "ace_monster": "ハクラン",
+        "ace_monster_id_symbol": "HAKURAN_MONSTER_ID"
+      },
+      "ace_down_continue": {
+        "text": "……ハクランが倒れるなんて。予測を見直さないと。",
+        "status": "approved",
+        "condition": "ハクランが倒れた後、ステラ側に生存モンスターが残るとき",
+        "replaces": "共通自軍撃破反応を置換",
+        "ace_monster": "ハクラン",
+        "ace_monster_id_symbol": "HAKURAN_MONSTER_ID"
+      },
+      "ace_down_final": {
+        "text": "ハクランまで……。計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。",
+        "status": "approved",
+        "condition": "ハクランが最後の1体として倒され、ステラ敗北が確定したとき",
+        "replaces": "共通敗北セリフを置換",
+        "ace_monster": "ハクラン",
+        "ace_monster_id_symbol": "HAKURAN_MONSTER_ID"
+      }
+    }
+  },
+  "global_writing_rule": "語尾の「！」はなるべく使わず、感情は言い回し・間で表現。第一弾の戦闘セリフすべてに適用。",
+  "approval_warning": "ガレスの11件は要約再構成・2件は未承認。ノエル9件は句読点整形。他キャラクターは会話中に承認された最終全文。 アウレリオの通常13本は確定。ただしソラモは仮切り札であり、専用3本は仮条件付き。新切り札選定時に再確定すること。 ピアの13本は2026-11-05に正式承認。ハンスの通常13本は2026-11-05に正式承認。 ミナの通常13本は2026-11-05承認。ゼフィラの通常13本＋ウズリオ専用3本は2026-11-05承認。ニコの通常13本は2026-11-05に正式承認。 ステラの通常13本＋ハクラン専用3本は2026-11-05ユーザー「OK」で正式承認。 マリーは2026-11-05に13本と人物像を正式承認。gen-marie / e-marie の同一NPCへのマッピングが必要。 2026-11-05 ジャンの人物像と13本正式承認。 2026-11-05 ヘレナの人物像と13本を正式承認。 2026-11-05 クロードの人物像・通常13本を正式承認。 2026-11-05 ベアトリスの人物像と13本を正式承認。 2026-11-05 ザラの人物像と13本を正式承認。 2026-11-05 ウォルターの人物像・13本は正式承認。全43名を照合済み。ただしガレスの2本は未承認、11本・再戦用の原文照合が残る。"
+}

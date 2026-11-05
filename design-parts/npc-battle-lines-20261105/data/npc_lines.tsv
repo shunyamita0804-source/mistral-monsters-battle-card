@@ -1,0 +1,588 @@
+npc_id	npc_name	event_key	event_label	line_ja	approval_status	source_accuracy
+gareth	ガレス先生	start	対戦開始	さあ、始めようか。落ち着いていこう。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_attack_hit	NPCの攻撃が命中	うむ、いい手応えだ。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	player_attack_hit	NPCが攻撃を受ける	なるほど、いい攻撃だな。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_defense_success	NPCの防御成功	守りも大切な戦術だよ。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	player_defense_success	主人公の防御成功	うむ、いい守りだ。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_evade_success	NPCの回避成功	そう簡単には当たらないぞ。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	player_evade_success	主人公の回避成功	よく見ていたな！	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_knock	NPCが主人公のモンスターを撃破	惜しかったな。次の一手を考えよう。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_knock_last	主人公のモンスターが残り1体	残り1体だ。ここからどう戦うか、見せてもらおう。	proposed_not_approved	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_own_down	NPCのモンスターが倒される	見事だ！ よく考えて戦っているな。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_own_down_last	NPCのモンスターが残り1体	こちらもあと1体だな。最後まで手は抜かないぞ。	proposed_not_approved	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_win	NPC勝利	よく頑張ったな。今回の経験を次に活かそう。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+gareth	ガレス先生	npc_lose	NPC敗北	見事だ！ 君の成長が嬉しいよ。	reconstruction_pending_text_check	11_reconstructed_from_summary_2_new_proposals
+mireille	ミレイユ	start	対戦開始	やっと勝負できるね！ 今日は遠慮しないから！	approved	verbatim_approved
+mireille	ミレイユ	npc_attack_hit	NPCの攻撃が命中	よしっ、決まった！	approved	verbatim_approved
+mireille	ミレイユ	player_attack_hit	NPCが攻撃を受ける	うわっ、やるじゃない！	approved	verbatim_approved
+mireille	ミレイユ	npc_defense_success	NPCの防御成功	ふふっ、そこは読んでたよ！	approved	verbatim_approved
+mireille	ミレイユ	player_defense_success	主人公の防御成功	あっ、ちゃんと守ってきた！	approved	verbatim_approved
+mireille	ミレイユ	npc_evade_success	NPCの回避成功	あぶなっ！ 今のは危なかった〜！	approved	verbatim_approved
+mireille	ミレイユ	player_evade_success	主人公の回避成功	えっ、今のをかわすの！？	approved	verbatim_approved
+mireille	ミレイユ	npc_knock	NPCが主人公のモンスターを撃破	よーし、まずは1体！	approved	verbatim_approved
+mireille	ミレイユ	npc_knock_last	主人公のモンスターが残り1体	あと1体！ でも油断しないよ！	approved	verbatim_approved
+mireille	ミレイユ	npc_own_down	NPCのモンスターが倒される	うそっ！ やるじゃない！	approved	verbatim_approved
+mireille	ミレイユ	npc_own_down_last	NPCのモンスターが残り1体	もう最後の1体か……でも、まだ負けないよ！	approved	verbatim_approved
+mireille	ミレイユ	npc_win	NPC勝利	やったー！ ふふっ、私だって強いんだから！	approved	verbatim_approved
+mireille	ミレイユ	npc_lose	NPC敗北	あーっ、負けちゃった！ ……本当に強くなったね。	approved	verbatim_approved
+pete	ピート	start	対戦開始	よーし！ 俺の自慢のデッキ、見せてあげるよ！	approved	verbatim_approved
+pete	ピート	npc_attack_hit	NPCの攻撃が命中	へへっ、いい感じ！	approved	verbatim_approved
+pete	ピート	player_attack_hit	NPCが攻撃を受ける	うわっ！ その技、強いな！	approved	verbatim_approved
+pete	ピート	npc_defense_success	NPCの防御成功	よしっ！ このカード、取っておいて正解だった！	approved	verbatim_approved
+pete	ピート	player_defense_success	主人公の防御成功	あーっ、うまく防がれた！	approved	verbatim_approved
+pete	ピート	npc_evade_success	NPCの回避成功	あぶなっ！ なんとかかわした！	approved	verbatim_approved
+pete	ピート	player_evade_success	主人公の回避成功	ええっ！ 今のもかわしちゃうの！？	approved	verbatim_approved
+pete	ピート	npc_knock	NPCが主人公のモンスターを撃破	やった！ まずは1体！	approved	verbatim_approved
+pete	ピート	npc_knock_last	主人公のモンスターが残り1体	あと1体！ このままいくぞ！	approved	verbatim_approved
+pete	ピート	npc_own_down	NPCのモンスターが倒される	うわー！ それ、結構お気に入りのカードなのに！	approved	verbatim_approved
+pete	ピート	npc_own_down_last	NPCのモンスターが残り1体	ま、まだ1体いる！ ここからだ！	approved	verbatim_approved
+pete	ピート	npc_win	NPC勝利	へへっ、俺の勝ち！ デッキを組んだ甲斐があったな！	approved	verbatim_approved
+pete	ピート	npc_lose	NPC敗北	まいったー！ 君のデッキ、すごくいいね！	approved	verbatim_approved
+noel	ノエル	start	対戦開始	あ、あの……よろしくお願いします。頑張ります。	approved	verbatim_approved
+noel	ノエル	npc_attack_hit	NPCの攻撃が命中	あっ、当たった。よかったぁ……。	approved	verbatim_approved
+noel	ノエル	player_attack_hit	NPCが攻撃を受ける	わっ、なかなかやりますね……。	approved	verbatim_approved
+noel	ノエル	npc_defense_success	NPCの防御成功	よかった……守れました。	approved	verbatim_approved
+noel	ノエル	player_defense_success	主人公の防御成功	あっ、ちゃんと防がれちゃいました。	approved	verbatim_approved
+noel	ノエル	npc_evade_success	NPCの回避成功	あ、危なかったぁ……。	approved	verbatim_approved
+noel	ノエル	player_evade_success	主人公の回避成功	ええっ、今のも避けるんですか？	approved	verbatim_approved
+noel	ノエル	npc_knock	NPCが主人公のモンスターを撃破	やった、1体倒せました。	approved	verbatim_approved
+noel	ノエル	npc_knock_last	主人公のモンスターが残り1体	あと1体……落ち着いていこう。	approved	verbatim_approved
+noel	ノエル	npc_own_down	NPCのモンスターが倒される	ああっ、で、でもまだ頑張れます。	approved	verbatim_approved
+noel	ノエル	npc_own_down_last	NPCのモンスターが残り1体	最後の1体……諦めません。	approved	verbatim_approved
+noel	ノエル	npc_win	NPC勝利	やったぁ、勝てました。ありがとうございます。	approved	verbatim_approved
+noel	ノエル	npc_lose	NPC敗北	負けちゃいました……でも、とっても楽しかったです。	approved	verbatim_approved
+viktor	ヴィクトル	start	対戦開始	さて、君のデッキにはどれほどの価値があるのかな。	approved	verbatim_approved
+viktor	ヴィクトル	npc_attack_hit	NPCの攻撃が命中	ふふ、さすが僕が選んだカードだ。	approved	verbatim_approved
+viktor	ヴィクトル	player_attack_hit	NPCが攻撃を受ける	おや……そのカード、思った以上に値打ちがありそうだね。	approved	verbatim_approved
+viktor	ヴィクトル	npc_defense_success	NPCの防御成功	この守り、実にいい買い物だったよ。	approved	verbatim_approved
+viktor	ヴィクトル	player_defense_success	主人公の防御成功	ほう、そのカードはどこで手に入れたんだい？	approved	verbatim_approved
+viktor	ヴィクトル	npc_evade_success	NPCの回避成功	危ない危ない。大事な勝負だからね。	approved	verbatim_approved
+viktor	ヴィクトル	player_evade_success	主人公の回避成功	なるほど。君はカードの扱いも上手いんだね。	approved	verbatim_approved
+viktor	ヴィクトル	npc_knock	NPCが主人公のモンスターを撃破	どうだい。僕のコレクションもなかなかだろう？	approved	verbatim_approved
+viktor	ヴィクトル	npc_knock_last	主人公のモンスターが残り1体	あと1体か。実に価値のある勝利になりそうだ。	approved	verbatim_approved
+viktor	ヴィクトル	npc_own_down	NPCのモンスターが倒される	なっ……あれは相当な希少品なんだが……。	approved	verbatim_approved
+viktor	ヴィクトル	npc_own_down_last	NPCのモンスターが残り1体	ふむ……どうやら僕の見積もりが甘かったようだ。	approved	verbatim_approved
+viktor	ヴィクトル	npc_win	NPC勝利	ふふ、いい勝負だった。やはり目利きには自信があるんだ。	approved	verbatim_approved
+viktor	ヴィクトル	npc_lose	NPC敗北	参ったね。君の実力には、値段のつけようがないよ。	approved	verbatim_approved
+sienna	シエナ	start	対戦開始	ふふ、どんな戦い方をするのか楽しみね。	approved	verbatim_approved
+sienna	シエナ	npc_attack_hit	NPCの攻撃が命中	うん、いい流れね。	approved	verbatim_approved
+sienna	シエナ	player_attack_hit	NPCが攻撃を受ける	あら、なかなか鋭い一手ね。	approved	verbatim_approved
+sienna	シエナ	npc_defense_success	NPCの防御成功	ふふ、そう来ると思ったわ。	approved	verbatim_approved
+sienna	シエナ	player_defense_success	主人公の防御成功	あら、よく見ているのね。	approved	verbatim_approved
+sienna	シエナ	npc_evade_success	NPCの回避成功	危ないところだったわ。	approved	verbatim_approved
+sienna	シエナ	player_evade_success	主人公の回避成功	あら、身のこなしがいいのね。	approved	verbatim_approved
+sienna	シエナ	npc_knock	NPCが主人公のモンスターを撃破	まずは1体。さて、次はどう来るかしら。	approved	verbatim_approved
+sienna	シエナ	npc_knock_last	主人公のモンスターが残り1体	あと1体ね。最後まで楽しませてね。	approved	verbatim_approved
+sienna	シエナ	npc_own_down	NPCのモンスターが倒される	あら……少し読み違えたみたい。	approved	verbatim_approved
+sienna	シエナ	npc_own_down_last	NPCのモンスターが残り1体	ふふ、こんな展開も悪くないわ。	approved	verbatim_approved
+sienna	シエナ	npc_win	NPC勝利	いい勝負だったわ。またどこかで会いましょう。	approved	verbatim_approved
+sienna	シエナ	npc_lose	NPC敗北	ふふ、参ったわ。あなたと戦えてよかった。	approved	verbatim_approved
+dario	ダリオ	start	対戦開始	おう、よろしくな。いい勝負にしようぜ。	approved	verbatim_approved
+dario	ダリオ	npc_attack_hit	NPCの攻撃が命中	よし、いい当たりだ。	approved	verbatim_approved
+dario	ダリオ	player_attack_hit	NPCが攻撃を受ける	おっと、なかなかやるじゃねえか。	approved	verbatim_approved
+dario	ダリオ	npc_defense_success	NPCの防御成功	そう簡単には通さねえよ。	approved	verbatim_approved
+dario	ダリオ	player_defense_success	主人公の防御成功	ほう、いい守りだな。	approved	verbatim_approved
+dario	ダリオ	npc_evade_success	NPCの回避成功	おっと、危ねえ危ねえ。	approved	verbatim_approved
+dario	ダリオ	player_evade_success	主人公の回避成功	ははっ、うまくかわしたな。	approved	verbatim_approved
+dario	ダリオ	npc_knock	NPCが主人公のモンスターを撃破	よっしゃ、まずは1体だ。	approved	verbatim_approved
+dario	ダリオ	npc_knock_last	主人公のモンスターが残り1体	あと1体か。気を抜かずにいくぜ。	approved	verbatim_approved
+dario	ダリオ	npc_own_down	NPCのモンスターが倒される	おっと、一本取られたな。	approved	verbatim_approved
+dario	ダリオ	npc_own_down_last	NPCのモンスターが残り1体	まだ終わっちゃいねえ。ここからだぜ。	approved	verbatim_approved
+dario	ダリオ	npc_win	NPC勝利	はっはっは、俺の勝ちだ。いい勝負だったぜ。	approved	verbatim_approved
+dario	ダリオ	npc_lose	NPC敗北	いやあ、参った。今日はお前の方が一枚上手だったな。	approved	verbatim_approved
+isabella	イザベラ	start	対戦開始	ごきげんよう。互いに、悔いのない一戦にしましょう。	approved	verbatim_approved
+isabella	イザベラ	npc_attack_hit	NPCの攻撃が命中	ふふ、狙いどおりですわ。	approved	verbatim_approved
+isabella	イザベラ	player_attack_hit	NPCが攻撃を受ける	まあ……思い切りがよろしいのね。	approved	verbatim_approved
+isabella	イザベラ	npc_defense_success	NPCの防御成功	慌てては、いけませんもの。	approved	verbatim_approved
+isabella	イザベラ	player_defense_success	主人公の防御成功	まあ、見事な守りですこと。	approved	verbatim_approved
+isabella	イザベラ	npc_evade_success	NPCの回避成功	失礼、そこは譲れませんわ。	approved	verbatim_approved
+isabella	イザベラ	player_evade_success	主人公の回避成功	あら、軽やかですこと。	approved	verbatim_approved
+isabella	イザベラ	npc_knock	NPCが主人公のモンスターを撃破	まずは一体。慎重に参りますわ。	approved	verbatim_approved
+isabella	イザベラ	npc_knock_last	主人公のモンスターが残り1体	あと一体……けれど、油断は禁物ね。	approved	verbatim_approved
+isabella	イザベラ	npc_own_down	NPCのモンスターが倒される	あら……お見事。一本取られましたわ。	approved	verbatim_approved
+isabella	イザベラ	npc_own_down_last	NPCのモンスターが残り1体	……少し、余裕を見せすぎたかしら。	approved	verbatim_approved
+isabella	イザベラ	npc_win	NPC勝利	ふふ、わたくしの勝ちですわ。楽しいひとときでした。	approved	verbatim_approved
+isabella	イザベラ	npc_lose	NPC敗北	参りましたわ。あなたの勝ち方、とても素敵ね。	approved	verbatim_approved
+gordon	ゴードン	start	対戦開始	……昔の勘がどこまで通じるか。試させてもらおう。	approved	verbatim_approved
+gordon	ゴードン	npc_attack_hit	NPCの攻撃が命中	……よし。狙いどおりだ。	approved	verbatim_approved
+gordon	ゴードン	player_attack_hit	NPCが攻撃を受ける	ほう……いい踏み込みだ。	approved	verbatim_approved
+gordon	ゴードン	npc_defense_success	NPCの防御成功	その手は、何度も見てきた。	approved	verbatim_approved
+gordon	ゴードン	player_defense_success	主人公の防御成功	……今のを受け止めるか。	approved	verbatim_approved
+gordon	ゴードン	npc_evade_success	NPCの回避成功	読みどおりだ。	approved	verbatim_approved
+gordon	ゴードン	player_evade_success	主人公の回避成功	ふっ、読みを外されたな。	approved	verbatim_approved
+gordon	ゴードン	npc_knock	NPCが主人公のモンスターを撃破	まず一体。勝負はここからだ。	approved	verbatim_approved
+gordon	ゴードン	npc_knock_last	主人公のモンスターが残り1体	あと一体か。気を抜くつもりはない。	approved	verbatim_approved
+gordon	ゴードン	npc_own_down	NPCのモンスターが倒される	……やるな。久しぶりに熱くなる。	approved	verbatim_approved
+gordon	ゴードン	npc_own_down_last	NPCのモンスターが残り1体	残るは一体……望むところだ。	approved	verbatim_approved
+gordon	ゴードン	npc_win	NPC勝利	勝負勘は、まだ捨てたものじゃないな。	approved	verbatim_approved
+gordon	ゴードン	npc_lose	NPC敗北	……参ったな。久々に、本気で悔しいと思った。	approved	verbatim_approved
+dolf	ドルフ	start	対戦開始	俺のデッキは力押しだ。正面から受けてみな。	approved	verbatim_approved
+dolf	ドルフ	npc_attack_hit	NPCの攻撃が命中	どうだ、重いだろ。	approved	verbatim_approved
+dolf	ドルフ	player_attack_hit	NPCが攻撃を受ける	ほう、そっちもいい一撃だ。	approved	verbatim_approved
+dolf	ドルフ	npc_defense_success	NPCの防御成功	受け止めた。次はこっちの番だ。	approved	verbatim_approved
+dolf	ドルフ	player_defense_success	主人公の防御成功	硬えな……なかなか割れねえ。	approved	verbatim_approved
+dolf	ドルフ	npc_evade_success	NPCの回避成功	おっと、そこは外すぜ。	approved	verbatim_approved
+dolf	ドルフ	player_evade_success	主人公の回避成功	ちっ、うまくすり抜けたな。	approved	verbatim_approved
+dolf	ドルフ	npc_knock	NPCが主人公のモンスターを撃破	よし、一体目だ。このまま叩くぜ。	approved	verbatim_approved
+dolf	ドルフ	npc_knock_last	主人公のモンスターが残り1体	あと一体。押し切るだけだ。	approved	verbatim_approved
+dolf	ドルフ	npc_own_down	NPCのモンスターが倒される	やるじゃねえか。火がついたぜ。	approved	verbatim_approved
+dolf	ドルフ	npc_own_down_last	NPCのモンスターが残り1体	最後の一体か……上等だ。	approved	verbatim_approved
+dolf	ドルフ	npc_win	NPC勝利	俺の勝ちだ。力を出し切る勝負は気持ちいいな。	approved	verbatim_approved
+dolf	ドルフ	npc_lose	NPC敗北	くそっ、負けたか……だが、いい腕してるぜ。	approved	verbatim_approved
+leonard	レナード	start	対戦開始	では始めよう。君の戦術、拝見させてもらうよ。	approved	verbatim_approved
+leonard	レナード	npc_attack_hit	NPCの攻撃が命中	ふむ、狙いどおりだ。	approved	verbatim_approved
+leonard	レナード	player_attack_hit	NPCが攻撃を受ける	……ほう。その手は予想していなかった。	approved	verbatim_approved
+leonard	レナード	npc_defense_success	NPCの防御成功	これくらいは読めていたよ。	approved	verbatim_approved
+leonard	レナード	player_defense_success	主人公の防御成功	なるほど、君も考えているようだね。	approved	verbatim_approved
+leonard	レナード	npc_evade_success	NPCの回避成功	そこを狙うのは、少し安直だったかな。	approved	verbatim_approved
+leonard	レナード	player_evade_success	主人公の回避成功	……なるほど。私の読みを上回ったか。	approved	verbatim_approved
+leonard	レナード	npc_knock	NPCが主人公のモンスターを撃破	まず一体。こちらの読みが当たったね。	approved	verbatim_approved
+leonard	レナード	npc_knock_last	主人公のモンスターが残り1体	残り一体か。ここからの選択が見ものだ。	approved	verbatim_approved
+leonard	レナード	npc_own_down	NPCのモンスターが倒される	ふむ……その切り返しは見事だ。	approved	verbatim_approved
+leonard	レナード	npc_own_down_last	NPCのモンスターが残り1体	……解説している場合ではないな。	approved	verbatim_approved
+leonard	レナード	npc_win	NPC勝利	勝負の決め手は、やはり読みの深さだね。	approved	verbatim_approved
+leonard	レナード	npc_lose	NPC敗北	参ったね。今回は私の戦い方を講評してもらいたいくらいだ。	approved	verbatim_approved
+greta	グレタ	start	対戦開始	私は簡単には崩れない。君はどう攻める？	approved	verbatim_approved
+greta	グレタ	npc_attack_hit	NPCの攻撃が命中	攻めるべき時は、攻める。	approved	verbatim_approved
+greta	グレタ	player_attack_hit	NPCが攻撃を受ける	……いい一撃だ。だが、まだ崩れない。	approved	verbatim_approved
+greta	グレタ	npc_defense_success	NPCの防御成功	守るべきところを、守っただけだ。	approved	verbatim_approved
+greta	グレタ	player_defense_success	主人公の防御成功	いい判断だ。守りを軽く見ていないな。	approved	verbatim_approved
+greta	グレタ	npc_evade_success	NPCの回避成功	そこは通さない。	approved	verbatim_approved
+greta	グレタ	player_evade_success	主人公の回避成功	……今のをかわすか。	approved	verbatim_approved
+greta	グレタ	npc_knock	NPCが主人公のモンスターを撃破	一体倒した。ここからも慎重にいく。	approved	verbatim_approved
+greta	グレタ	npc_knock_last	主人公のモンスターが残り1体	あと一体。急ぐ必要はない。	approved	verbatim_approved
+greta	グレタ	npc_own_down	NPCのモンスターが倒される	……守りを破られたか。	approved	verbatim_approved
+greta	グレタ	npc_own_down_last	NPCのモンスターが残り1体	最後の一体か。ならば、ここを守り抜く。	approved	verbatim_approved
+greta	グレタ	npc_win	NPC勝利	焦らなければ、勝機は見えてくる。	approved	verbatim_approved
+greta	グレタ	npc_lose	NPC敗北	……見事だ。私の守りを、正面から破るとは。	approved	verbatim_approved
+julius	ユリウス	start	対戦開始	せっかくの舞台だ。最高の勝負にしよう。	approved	verbatim_approved
+julius	ユリウス	npc_attack_hit	NPCの攻撃が命中	よし、綺麗に決まったね。	approved	verbatim_approved
+julius	ユリウス	player_attack_hit	NPCが攻撃を受ける	へえ……今のは見事だね。	approved	verbatim_approved
+julius	ユリウス	npc_defense_success	NPCの防御成功	攻めるだけが僕の戦いじゃないよ。	approved	verbatim_approved
+julius	ユリウス	player_defense_success	主人公の防御成功	お見事。見せ場を奪われたな。	approved	verbatim_approved
+julius	ユリウス	npc_evade_success	NPCの回避成功	ふふ、間一髪だったね。	approved	verbatim_approved
+julius	ユリウス	player_evade_success	主人公の回避成功	今のをかわすんだ。いいね。	approved	verbatim_approved
+julius	ユリウス	npc_knock	NPCが主人公のモンスターを撃破	まずは一体。さあ、次を見せてよ。	approved	verbatim_approved
+julius	ユリウス	npc_knock_last	主人公のモンスターが残り1体	あと一体。最後まで全力でいくよ。	approved	verbatim_approved
+julius	ユリウス	npc_own_down	NPCのモンスターが倒される	やられたか……でも、盛り上がってきたね。	approved	verbatim_approved
+julius	ユリウス	npc_own_down_last	NPCのモンスターが残り1体	……少し焦ってる。でも、まだ終わってない。	approved	verbatim_approved
+julius	ユリウス	npc_win	NPC勝利	ありがとう。君のおかげで、いい試合になった。	approved	verbatim_approved
+julius	ユリウス	npc_lose	NPC敗北	参ったな。今日は君が主役だったね。	approved	verbatim_approved
+camilla	カミラ	start	対戦開始	あなたがここまで来た理由、確かめさせてもらうわ。	approved	verbatim_approved
+camilla	カミラ	npc_attack_hit	NPCの攻撃が命中	隙が見えたわ。	approved	verbatim_approved
+camilla	カミラ	player_attack_hit	NPCが攻撃を受ける	……その一手は評価するわ。	approved	verbatim_approved
+camilla	カミラ	npc_defense_success	NPCの防御成功	その攻めは通さない。	approved	verbatim_approved
+camilla	カミラ	player_defense_success	主人公の防御成功	いい守りね。次はどうかしら。	approved	verbatim_approved
+camilla	カミラ	npc_evade_success	NPCの回避成功	見えているわ。	approved	verbatim_approved
+camilla	カミラ	player_evade_success	主人公の回避成功	……思ったより反応が速いのね。	approved	verbatim_approved
+camilla	カミラ	npc_knock	NPCが主人公のモンスターを撃破	着実に一体ね。	approved	verbatim_approved
+camilla	カミラ	npc_knock_last	主人公のモンスターが残り1体	残り一体。ここで決めるわ。	approved	verbatim_approved
+camilla	カミラ	npc_own_down	NPCのモンスターが倒される	……少し見誤ったようね。	approved	verbatim_approved
+camilla	カミラ	npc_own_down_last	NPCのモンスターが残り1体	残り一体ね。それでも、勝つ道はあるわ。	approved	verbatim_approved
+camilla	カミラ	npc_win	NPC勝利	私の勝ちね。でも、あなたの戦い方は覚えておくわ。	approved	verbatim_approved
+camilla	カミラ	npc_lose	NPC敗北	負けを認めるわ。あなたの判断が、私より一歩上だった。	approved	verbatim_approved
+alvin	アルヴィン	start	対戦開始	よくここまで来た。私も全力で応えよう。	approved	verbatim_approved
+alvin	アルヴィン	npc_attack_hit	NPCの攻撃が命中	いい手応えだ。	approved	verbatim_approved
+alvin	アルヴィン	player_attack_hit	NPCが攻撃を受ける	……ほう。そこまで踏み込むとは。	approved	verbatim_approved
+alvin	アルヴィン	npc_defense_success	NPCの防御成功	ここは譲れん。	approved	verbatim_approved
+alvin	アルヴィン	player_defense_success	主人公の防御成功	見事な判断だ。	approved	verbatim_approved
+alvin	アルヴィン	npc_evade_success	NPCの回避成功	届かなかったな。	approved	verbatim_approved
+alvin	アルヴィン	player_evade_success	主人公の回避成功	……見切ったか。	approved	verbatim_approved
+alvin	アルヴィン	npc_knock	NPCが主人公のモンスターを撃破	一体倒した。まだ気は抜かん。	approved	verbatim_approved
+alvin	アルヴィン	npc_knock_last	主人公のモンスターが残り1体	残り一体だ。力を出し切れ。	approved	verbatim_approved
+alvin	アルヴィン	npc_own_down	NPCのモンスターが倒される	……やるな。私も応えよう。	approved	verbatim_approved
+alvin	アルヴィン	npc_own_down_last	NPCのモンスターが残り1体	一体か。……久々に胸が高鳴る。	approved	verbatim_approved
+alvin	アルヴィン	npc_win	NPC勝利	いい勝負だった。君の挑戦、忘れない。	approved	verbatim_approved
+alvin	アルヴィン	npc_lose	NPC敗北	……私が敗れるとはな。見事だ。君の勝ちだ。	approved	verbatim_approved
+flora	フローラ	start	対戦開始	思いがけない出会いね。どんな戦い方をするのか楽しみだわ。	approved	verbatim_approved
+flora	フローラ	npc_attack_hit	NPCの攻撃が命中	ふふ、この組み合わせ、試してみたかったの。	approved	verbatim_approved
+flora	フローラ	player_attack_hit	NPCが攻撃を受ける	あら、面白い攻め方ね。	approved	verbatim_approved
+flora	フローラ	npc_defense_success	NPCの防御成功	備えは大事よ。探検でも勝負でもね。	approved	verbatim_approved
+flora	フローラ	player_defense_success	主人公の防御成功	いい準備ね。見習わなくちゃ。	approved	verbatim_approved
+flora	フローラ	npc_evade_success	NPCの回避成功	危なかった……回避が間に合ったわね。	approved	verbatim_approved
+flora	フローラ	player_evade_success	主人公の回避成功	へえ、そのタイミングでかわすのね。	approved	verbatim_approved
+flora	フローラ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。いい調子だわ。	approved	verbatim_approved
+flora	フローラ	npc_knock_last	主人公のモンスターが残り1体	あと一体。まだ何が起こるか分からないわね。	approved	verbatim_approved
+flora	フローラ	npc_own_down	NPCのモンスターが倒される	あら、一本取られたわね。	approved	verbatim_approved
+flora	フローラ	npc_own_down_last	NPCのモンスターが残り1体	最後の一体ね……ここからが正念場だわ。	approved	verbatim_approved
+flora	フローラ	npc_win	NPC勝利	私の勝ちね。なかなか刺激的な一戦だったわ。	approved	verbatim_approved
+flora	フローラ	npc_lose	NPC敗北	負けちゃった。でも、今日の勝負で新しい発見があったわ。	approved	verbatim_approved
+oscar	オスカー	start	対戦開始	昔の戦術が、どこまで通じるか試してみようか。	approved	verbatim_approved
+oscar	オスカー	npc_attack_hit	NPCの攻撃が命中	うん、古いやり方も悪くないね。	approved	verbatim_approved
+oscar	オスカー	player_attack_hit	NPCが攻撃を受ける	ほう、そんな手があるのか。興味深い。	approved	verbatim_approved
+oscar	オスカー	npc_defense_success	NPCの防御成功	備えを怠らない。基本は時代を問わないよ。	approved	verbatim_approved
+oscar	オスカー	player_defense_success	主人公の防御成功	いい守りだ。よく考えているね。	approved	verbatim_approved
+oscar	オスカー	npc_evade_success	NPCの回避成功	おっと、危ないところだった。	approved	verbatim_approved
+oscar	オスカー	player_evade_success	主人公の回避成功	見事だ。その判断は覚えておこう。	approved	verbatim_approved
+oscar	オスカー	npc_knock	NPCが主人公のモンスターを撃破	一体目だね。まだ先は読めないな。	approved	verbatim_approved
+oscar	オスカー	npc_knock_last	主人公のモンスターが残り1体	あと一体。どういう結末になるかな。	approved	verbatim_approved
+oscar	オスカー	npc_own_down	NPCのモンスターが倒される	……なるほど。そこを突かれたか。	approved	verbatim_approved
+oscar	オスカー	npc_own_down_last	NPCのモンスターが残り1体	残るは一体か。私も頭を切り替えないとね。	approved	verbatim_approved
+oscar	オスカー	npc_win	NPC勝利	私の勝ちだね。実に興味深い一戦だった。	approved	verbatim_approved
+oscar	オスカー	npc_lose	NPC敗北	参ったよ。君の一手から学ぶことが多かった。	approved	verbatim_approved
+kyle	カイル	start	対戦開始	強い相手を探してたんだ。あんたの腕、見せてくれ。	approved	verbatim_approved
+kyle	カイル	npc_attack_hit	NPCの攻撃が命中	よし、手応えありだ。	approved	verbatim_approved
+kyle	カイル	player_attack_hit	NPCが攻撃を受ける	……いい一撃だ。わくわくしてきた。	approved	verbatim_approved
+kyle	カイル	npc_defense_success	NPCの防御成功	そこは読んでたぜ。	approved	verbatim_approved
+kyle	カイル	player_defense_success	主人公の防御成功	いい守りだ。簡単には崩せないな。	approved	verbatim_approved
+kyle	カイル	npc_evade_success	NPCの回避成功	危ねえ、紙一重だった。	approved	verbatim_approved
+kyle	カイル	player_evade_success	主人公の回避成功	へえ、よく見切ったな。	approved	verbatim_approved
+kyle	カイル	npc_knock	NPCが主人公のモンスターを撃破	まず一体。まだまだいくぜ。	approved	verbatim_approved
+kyle	カイル	npc_knock_last	主人公のモンスターが残り1体	あと一体か。最後まで全力でこい。	approved	verbatim_approved
+kyle	カイル	npc_own_down	NPCのモンスターが倒される	やるな……ますます面白くなってきた。	approved	verbatim_approved
+kyle	カイル	npc_own_down_last	NPCのモンスターが残り1体	最後の一体か。なら、全部ぶつける。	approved	verbatim_approved
+kyle	カイル	npc_win	NPC勝利	俺の勝ちだ。いい手合わせだったぜ。	approved	verbatim_approved
+kyle	カイル	npc_lose	NPC敗北	参ったよ。あんたみたいな相手がいるから、旅はやめられない。	approved	verbatim_approved
+guardian	？？？	start	対戦開始	…………	approved	verbatim_approved
+guardian	？？？	npc_attack_hit	NPCの攻撃が命中		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	player_attack_hit	NPCが攻撃を受ける	……ほう。	approved	verbatim_approved
+guardian	？？？	npc_defense_success	NPCの防御成功		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	player_defense_success	主人公の防御成功		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	npc_evade_success	NPCの回避成功		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	player_evade_success	主人公の回避成功		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	npc_knock	NPCが主人公のモンスターを撃破		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	npc_knock_last	主人公のモンスターが残り1体	……あと一体。	approved	verbatim_approved
+guardian	？？？	npc_own_down	NPCのモンスターが倒される		approved_silent_no_bubble	verbatim_approved
+guardian	？？？	npc_own_down_last	NPCのモンスターが残り1体	……まだだ。	approved	verbatim_approved
+guardian	？？？	npc_win	NPC勝利	……終わりだ。	approved	verbatim_approved
+guardian	？？？	npc_lose	NPC敗北	……見事だ。	approved	verbatim_approved
+grant	グラント	start	対戦開始	さて、おぬしの力、見せてもらおうかの。	approved	verbatim_approved
+grant	グラント	npc_attack_hit	NPCの攻撃が命中	ふむ、よい手応えじゃ。	approved	verbatim_approved
+grant	グラント	player_attack_hit	NPCが攻撃を受ける	ほう、その手を選ぶか。面白いのう。	approved	verbatim_approved
+grant	グラント	npc_defense_success	NPCの防御成功	遺跡を守るには、辛抱も要るでな。	approved	verbatim_approved
+grant	グラント	player_defense_success	主人公の防御成功	うむ、守りの心得があるのう。	approved	verbatim_approved
+grant	グラント	npc_evade_success	NPCの回避成功	ほっほ、まだ読みは鈍っておらんぞ。	approved	verbatim_approved
+grant	グラント	player_evade_success	主人公の回避成功	よく見切ったのう。	approved	verbatim_approved
+grant	グラント	npc_knock	NPCが主人公のモンスターを撃破	まず一体。おぬしならどう立て直す？	approved	verbatim_approved
+grant	グラント	npc_knock_last	主人公のモンスターが残り1体	残り一体じゃ。ここからが試されるぞ。	approved	verbatim_approved
+grant	グラント	npc_own_down	NPCのモンスターが倒される	ほう……なかなかの腕じゃ。	approved	verbatim_approved
+grant	グラント	npc_own_down_last	NPCのモンスターが残り1体	残るは一体か。わしも気を引き締めねばの。	approved	verbatim_approved
+grant	グラント	npc_win	NPC勝利	ほっほ。焦らずとも、遺跡は逃げはせんよ。	approved	verbatim_approved
+grant	グラント	npc_lose	NPC敗北	見事じゃ。おぬしなら、遺跡も認めよう。	approved	verbatim_approved
+sera	セラ	start	対戦開始	ゆっくりでいいわ。でも、手は抜かないから。	approved	verbatim_approved
+sera	セラ	npc_attack_hit	NPCの攻撃が命中	ふふ、こちらの番ね。	approved	verbatim_approved
+sera	セラ	player_attack_hit	NPCが攻撃を受ける	あら……思い切った一手ね。	approved	verbatim_approved
+sera	セラ	npc_defense_success	NPCの防御成功	そう簡単には、通さないわ。	approved	verbatim_approved
+sera	セラ	player_defense_success	主人公の防御成功	いい守りね。落ち着いているわ。	approved	verbatim_approved
+sera	セラ	npc_evade_success	NPCの回避成功	ふふ、危ないところだったわ。	approved	verbatim_approved
+sera	セラ	player_evade_success	主人公の回避成功	あら、よく見ていたのね。	approved	verbatim_approved
+sera	セラ	npc_knock	NPCが主人公のモンスターを撃破	まず一体ね。まだ勝負は続くわ。	approved	verbatim_approved
+sera	セラ	npc_knock_last	主人公のモンスターが残り1体	あと一体……最後まで見せてちょうだい。	approved	verbatim_approved
+sera	セラ	npc_own_down	NPCのモンスターが倒される	……なるほど。強いのね。	approved	verbatim_approved
+sera	セラ	npc_own_down_last	NPCのモンスターが残り1体	残るは一体。最後まで、守り抜くわ。	approved	verbatim_approved
+sera	セラ	npc_win	NPC勝利	ふふ。森はまだ、あなたを見ているところよ。	approved	verbatim_approved
+sera	セラ	npc_lose	NPC敗北	……うん。森の声も、あなたを認めてる。	approved	verbatim_approved
+lucia	ルシア	start	対戦開始	では、始めましょう。どうぞ、全力で。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_attack_hit	NPCの攻撃が命中	うまく決まりましたね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	player_attack_hit	NPCが攻撃を受ける	……その一手、見事です。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_defense_success	NPCの防御成功	慌てず、受け止めましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	player_defense_success	主人公の防御成功	落ち着いた守りですね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_evade_success	NPCの回避成功	……間に合いました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	player_evade_success	主人公の回避成功	今のを見切るとは……。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_knock	NPCが主人公のモンスターを撃破	一体倒れました。まだ続けましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_knock_last	主人公のモンスターが残り1体	あと一体ですね。最後まで見届けます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_own_down	NPCのモンスターが倒される	……よく鍛えられていますね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_own_down_last	NPCのモンスターが残り1体	残り一体。私も覚悟を決めましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_win	NPC勝利	水は、急ぐ者を拒みます。また、いらしてください。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+lucia	ルシア	npc_lose	NPC敗北	お見事です。神殿は、あなたを迎え入れます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	start	対戦開始	……来い。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_attack_hit	NPCの攻撃が命中	……捉えた。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	player_attack_hit	NPCが攻撃を受ける	……悪くない。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_defense_success	NPCの防御成功	……通さない。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	player_defense_success	主人公の防御成功	……守ったか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_evade_success	NPCの回避成功	……見えている。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	player_evade_success	主人公の回避成功	……かわしたか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_knock	NPCが主人公のモンスターを撃破	……一体。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_knock_last	主人公のモンスターが残り1体	……残り一体。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_own_down	NPCのモンスターが倒される	……やるな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_own_down_last	NPCのモンスターが残り1体	……まだ、終わらん。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_win	NPC勝利	……まだだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+ivan	イヴァン	npc_lose	NPC敗北	……認めよう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	start	対戦開始	火山より熱くいくぞ！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_attack_hit	NPCの攻撃が命中	おう、いい一撃だ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	player_attack_hit	NPCが攻撃を受ける	ははっ、そう来たか。いいぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_defense_success	NPCの防御成功	力任せじゃ通らねえぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	player_defense_success	主人公の防御成功	がっちり受けたな。いい根性だ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_evade_success	NPCの回避成功	おっと、まだ捕まらねえぜ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	player_evade_success	主人公の回避成功	ははっ、やるじゃねえか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。まだまだいくぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_knock_last	主人公のモンスターが残り1体	あと一体。最後まで気を抜くなよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_own_down	NPCのモンスターが倒される	くっ、やるな。こっちも熱くなってきたぜ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_own_down_last	NPCのモンスターが残り1体	残り一体だと？ 上等じゃねえか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_win	NPC勝利	はっはっは！ いい勝負だった！ また来い！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+balka	バルカ	npc_lose	NPC敗北	はっはっは！ やるじゃないか！ 気に入ったぞ！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	start	対戦開始	よーし、塔の守り手として、がんばるぞ！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_attack_hit	NPCの攻撃が命中	よし、ちゃんと動いてくれた。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	player_attack_hit	NPCが攻撃を受ける	えっ、そこを突いてくるんだ。面白いな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_defense_success	NPCの防御成功	ふふ、そこは対策済みだよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	player_defense_success	主人公の防御成功	そう防ぐのか。なるほど、参考になるな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_evade_success	NPCの回避成功	危ない危ない。今のはぎりぎりだった。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	player_evade_success	主人公の回避成功	あれっ、そっちに動くのか。覚えておこう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。まだ試したい手があるんだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_knock_last	主人公のモンスターが残り1体	あと一体。最後まで手は抜かないよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_own_down	NPCのモンスターが倒される	あちゃあ……組み立て直さないと。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_own_down_last	NPCのモンスターが残り1体	残り一体か。ここからが腕の見せどころだね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_win	NPC勝利	やったー！ でも、きみの戦い方、おもしろかった！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+teo	テオ	npc_lose	NPC敗北	うわー、負けちゃった！ すごいや、どうやったの？	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	start	対戦開始	来るがよい。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_attack_hit	NPCの攻撃が命中	迷いのない一手だ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	player_attack_hit	NPCが攻撃を受ける	……臆せず踏み込んできたか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_defense_success	NPCの防御成功	その一手は通さぬ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	player_defense_success	主人公の防御成功	……よく見極めた。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_evade_success	NPCの回避成功	まだ届かぬ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	player_evade_success	主人公の回避成功	……見切ったか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。試練はまだ続く。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_knock_last	主人公のモンスターが残り1体	残るは一体。そなたの覚悟を見せよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_own_down	NPCのモンスターが倒される	……ここまで来た理由が、見えてきた。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_own_down_last	NPCのモンスターが残り1体	残るは一体か。私も、全力で応えよう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_win	NPC勝利	まだ、聖域の扉は開かぬ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+aurelio	アウレリオ	npc_lose	NPC敗北	……見事だ。聖域は、そなたを受け入れる。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	start	対戦開始	いっくよー！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_attack_hit	NPCの攻撃が命中	よし、いい流れに乗れたね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	player_attack_hit	NPCが攻撃を受ける	わっ、今のは効いたなあ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_defense_success	NPCの防御成功	ふふ、ちゃんと備えてたよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	player_defense_success	主人公の防御成功	おっ、今のを受け止めるんだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_evade_success	NPCの回避成功	おっと、するっとセーフ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	player_evade_success	主人公の回避成功	あれ、そんなに素早く動けるの？	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_knock	NPCが主人公のモンスターを撃破	一体目。いい調子だね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_knock_last	主人公のモンスターが残り1体	あと一体。最後まで泳ぎ切るよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_own_down	NPCのモンスターが倒される	あちゃー、ちょっと深追いしすぎたかな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_own_down_last	NPCのモンスターが残り1体	残り一体……まだ息は上がってないよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_win	NPC勝利	やったね！ 息つぎしてから、また来てね！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+pia	ピア	npc_lose	NPC敗北	あちゃー、負けちゃった！ でも楽しかった！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	start	対戦開始	よろしく頼むよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_attack_hit	NPCの攻撃が命中	よし、狙いどおりだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	player_attack_hit	NPCが攻撃を受ける	おっと、油断できないね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_defense_success	NPCの防御成功	備えがあれば慌てずに済むさ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	player_defense_success	主人公の防御成功	うん、堅実な守りだね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_evade_success	NPCの回避成功	危ない危ない。足もとを見ておいてよかった。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	player_evade_success	主人公の回避成功	いい身のこなしだ。山でも通用しそうだね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_knock	NPCが主人公のモンスターを撃破	まず一体。まだ先は長いぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_knock_last	主人公のモンスターが残り1体	残り一体か。最後まで気をつけな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_own_down	NPCのモンスターが倒される	おっと、やられたか。なかなかやるね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_own_down_last	NPCのモンスターが残り1体	あと一体だな。焦らず、一歩ずつだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_win	NPC勝利	おっと、勝っちまった。足もと、気をつけてな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+hans	ハンス	npc_lose	NPC敗北	いやあ、まいった。君は強いな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	start	対戦開始	手加減なんかしねえぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_attack_hit	NPCの攻撃が命中	よし、芯を捉えたな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	player_attack_hit	NPCが攻撃を受ける	ぐっ……いい腕してるじゃねえか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_defense_success	NPCの防御成功	そいつは通さねえ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	player_defense_success	主人公の防御成功	おっ、硬えな。簡単には崩せねえか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_evade_success	NPCの回避成功	おっと、間一髪だな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	player_evade_success	主人公の回避成功	ちっ、身軽なやつだ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_knock	NPCが主人公のモンスターを撃破	一体目だ。まだいけるだろ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_knock_last	主人公のモンスターが残り1体	残り一体か。踏ん張ってみせろ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_own_down	NPCのモンスターが倒される	くそっ、一本取られたか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_own_down_last	NPCのモンスターが残り1体	残り一体……簡単には引かねえぞ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_win	NPC勝利	へっ、まだまだだな。……ほら、水でも飲んどけ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zack	ザック	npc_lose	NPC敗北	ちっ、やるじゃねえか。……気をつけて進めよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	start	対戦開始	正確に、参りましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_attack_hit	NPCの攻撃が命中	ふむ、予定どおりですな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	player_attack_hit	NPCが攻撃を受ける	ほう……少々、計算が狂いました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_defense_success	NPCの防御成功	この一手は読んでおりました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	player_defense_success	主人公の防御成功	なるほど、堅実な選択ですな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_evade_success	NPCの回避成功	ふむ、間一髪でした。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	player_evade_success	主人公の回避成功	おや、見事なタイミングです。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_knock	NPCが主人公のモンスターを撃破	まず一体。手順は順調ですな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_knock_last	主人公のモンスターが残り1体	残り一体。最後まで丁寧に参りましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_own_down	NPCのモンスターが倒される	……これは想定外ですな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_own_down_last	NPCのモンスターが残り1体	残り一体……ここからは手順を変えましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_win	NPC勝利	予定どおりの結果ですな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+otto	オットー	npc_lose	NPC敗北	ほう、私の計算が狂いましたか。お見事。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	start	対戦開始	よろしくお願いします。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_attack_hit	NPCの攻撃が命中	よかった……落ち着いて決められました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	player_attack_hit	NPCが攻撃を受ける	……強い一手ですね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_defense_success	NPCの防御成功	守りが間に合いました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	player_defense_success	主人公の防御成功	落ち着いた判断ですね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_evade_success	NPCの回避成功	……間に合ってよかったです。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	player_evade_success	主人公の回避成功	今のをかわすなんて……お見事です。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。気を抜かずに続けます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_knock_last	主人公のモンスターが残り1体	あと一体ですね。最後まで、よろしくお願いします。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_own_down	NPCのモンスターが倒される	……まだ、続けられます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_own_down_last	NPCのモンスターが残り1体	残り一体。諦めずに進みます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_win	NPC勝利	ありがとうございました。あなたの旅に、光がありますように。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+mina	ミナ	npc_lose	NPC敗北	負けてしまいました……。でも、いい勝負でした。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	start	対戦開始	いっくよー！ 風みたいに速いんだから、ちゃんとついてきてね！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_attack_hit	NPCの攻撃が命中	よし、決まった。今の見た？	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	player_attack_hit	NPCが攻撃を受ける	わっ、いい一手。油断したなあ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_defense_success	NPCの防御成功	ふふ、ちゃんと受け止めたよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	player_defense_success	主人公の防御成功	あっ、今の止められちゃった。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_evade_success	NPCの回避成功	へへ、風みたいにすり抜けたよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	player_evade_success	主人公の回避成功	えー、今のもかわすの？ やるね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_knock	NPCが主人公のモンスターを撃破	まず一体、いい調子。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_knock_last	主人公のモンスターが残り1体	あと一体か。最後までいくよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_own_down	NPCのモンスターが倒される	あちゃ、やられた。けど、ここからだよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_own_down_last	NPCのモンスターが残り1体	えっ、もう一体だけ？ まだまだ動けるよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_win	NPC勝利	やったー！ でも惜しかったよ！ 風を読めば、次はきっといけるって！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+zephyra	ゼフィラ	npc_lose	NPC敗北	うそっ、負けちゃった！ すごいね、風よりも速かったかも！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+gareth	ガレス先生	rematch_start	rematch_start	よし、もう一度やってみよう。	reconstruction_pending_text_check	ace_specific_or_other
+grant	グラント	ace_attack_hit	ace_attack_hit	うむ、ジオル。よい一撃じゃ。	approved	ace_specific_or_other
+grant	グラント	ace_down_continue	ace_down_continue	……ジオルが倒れるとはのう。おぬし、見事じゃ。	approved	ace_specific_or_other
+grant	グラント	ace_down_final	ace_down_final	ジオルまで倒すとは……見事じゃ。おぬしなら、遺跡も認めよう。	approved	ace_specific_or_other
+sera	セラ	ace_attack_hit	ace_attack_hit	うん、フルーネ。その調子よ。	approved	ace_specific_or_other
+sera	セラ	ace_down_continue	ace_down_continue	……フルーネまで。あなた、本当に強いのね。	approved	ace_specific_or_other
+sera	セラ	ace_down_final	ace_down_final	フルーネまで……。うん、森の声も、あなたを認めてる。	approved	ace_specific_or_other
+lucia	ルシア	ace_attack_hit	ace_attack_hit	セレフィーン、あなたの力を見せてください。	approved	ace_specific_or_other
+lucia	ルシア	ace_down_continue	ace_down_continue	……セレフィーンまで。あなたの強さ、確かに受け取りました。	approved	ace_specific_or_other
+lucia	ルシア	ace_down_final	ace_down_final	セレフィーンまで倒されるとは……お見事です。神殿は、あなたを迎え入れます。	approved	ace_specific_or_other
+ivan	イヴァン	ace_attack_hit	ace_attack_hit	……よし、ヒョウズク。	approved	ace_specific_or_other
+ivan	イヴァン	ace_down_continue	ace_down_continue	……ヒョウズクまで……。だが、まだだ。	approved	ace_specific_or_other
+ivan	イヴァン	ace_down_final	ace_down_final	……ヒョウズクも、倒したか。……認めよう。	approved	ace_specific_or_other
+balka	バルカ	ace_attack_hit	ace_attack_hit	いいぞ、シシエン。火山の力を見せてやれ。	approved	ace_specific_or_other
+balka	バルカ	ace_down_continue	ace_down_continue	……シシエンが倒れるとはな。ははっ、ますます燃えてきたぜ。	approved	ace_specific_or_other
+balka	バルカ	ace_down_final	ace_down_final	シシエンまで倒すとはな。はっはっは、やるじゃねえか。気に入ったぞ。	approved	ace_specific_or_other
+teo	テオ	ace_attack_hit	ace_attack_hit	いいぞ、ギアロス。狙いどおりの出力だ。	approved	ace_specific_or_other
+teo	テオ	ace_down_continue	ace_down_continue	えっ、ギアロスが……。でも、まだ次の手がある。	approved	ace_specific_or_other
+teo	テオ	ace_down_final	ace_down_final	ギアロスまで倒すなんて……すごいや。どうやったの？	approved	ace_specific_or_other
+aurelio	アウレリオ	ace_attack_hit	ace_attack_hit	……よく応えた、ソラモ。	provisional_ace_pending_replacement	ace_specific_or_other
+aurelio	アウレリオ	ace_down_continue	ace_down_continue	……ソラモを退けるか。見事だ、そなた。	provisional_ace_pending_replacement	ace_specific_or_other
+aurelio	アウレリオ	ace_down_final	ace_down_final	ソラモまでも……見事だ。聖域は、そなたを受け入れる。	provisional_ace_pending_replacement	ace_specific_or_other
+zephyra	ゼフィラ	ace_attack_hit	ace_attack_hit	いいね、ウズリオ。風に乗れてるよ。	approved	ace_specific_or_other
+zephyra	ゼフィラ	ace_down_continue	ace_down_continue	えっ、ウズリオが……。すごい、でもわたしもまだ負けないよ。	approved	ace_specific_or_other
+zephyra	ゼフィラ	ace_down_final	ace_down_final	ウズリオまで倒しちゃうなんて……うそっ、負けちゃった。すごいね、風よりも速かったかも！	approved	ace_specific_or_other
+niko	ニコ	start	対戦開始	よし、いこうか。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_attack_hit	NPCの攻撃が命中	よし、いいところに決まったね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	player_attack_hit	NPCが攻撃を受ける	おっと、今のは効いたな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_defense_success	NPCの防御成功	ちゃんと備えておいてよかったよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	player_defense_success	主人公の防御成功	いい守りだね。落ち着いてる。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_evade_success	NPCの回避成功	ふう、うまくかわせた。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	player_evade_success	主人公の回避成功	あ、今のを避けたんだ。すごいな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。でも勝負はまだこれからだよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_knock_last	主人公のモンスターが残り1体	あと一体だね。最後まで気をつけて。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_own_down	NPCのモンスターが倒される	あれ、倒されちゃったか。やるね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_own_down_last	NPCのモンスターが残り1体	残り一体か……落ち着いて続けよう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_win	NPC勝利	ぼくの勝ちだね。足もとの風に気をつけて進むんだよ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+niko	ニコ	npc_lose	NPC敗北	まいったな、君は強いね。この先も、気をつけて。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	start	対戦開始	勝つ確率は計算済みよ。さあ、始めましょう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_attack_hit	NPCの攻撃が命中	よし、予測どおりの一手ね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	player_attack_hit	NPCが攻撃を受ける	あら……その角度は想定外だわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_defense_success	NPCの防御成功	その攻めは計算に入れてあるわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	player_defense_success	主人公の防御成功	なるほど、いい判断ね。記録しておくわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_evade_success	NPCの回避成功	ふふ、その軌道なら読めるわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	player_evade_success	主人公の回避成功	……今のを見切るのね。予測を修正しないと。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。経過は順調ね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_knock_last	主人公のモンスターが残り1体	残り一体ね。ここで気を緩めるわけにはいかないわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_own_down	NPCのモンスターが倒される	……予想より早いわね。計算し直すわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_own_down_last	NPCのモンスターが残り1体	残り一体……まだ結論を出すには早いわ。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_win	NPC勝利	計算どおりね。次は、雲の流れをもう少し読んでからいらっしゃい。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	npc_lose	NPC敗北	計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+stella	ステラ	ace_attack_hit	切り札の攻撃命中	ハクラン、その一撃も記録しておくわ。	approved	user_approved_special_ace_line
+stella	ステラ	ace_down_continue	切り札撃破後も続行	……ハクランが倒れるなんて。予測を見直さないと。	approved	user_approved_special_ace_line
+stella	ステラ	ace_down_final	切り札撃破と同時に敗北	ハクランまで……。計算が……合わない？ ……いいえ、合わなかったのは、あなたを測る物差しのほうね。	approved	user_approved_special_ace_line
+luka	ルカ	start	対戦開始	よろしくお願いします！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_attack_hit	NPCの攻撃が命中	やった、うまく決まりました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	player_attack_hit	NPCが攻撃を受ける	うわっ……今の一手、記録しないと。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_defense_success	NPCの防御成功	よし、習ったとおりにできました。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	player_defense_success	主人公の防御成功	あっ、そこを守るんですね。勉強になります。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_evade_success	NPCの回避成功	ふう……危なかったです。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	player_evade_success	主人公の回避成功	えっ、今のを避けるんですか。すごいな……。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。焦らず続けます。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_knock_last	主人公のモンスターが残り1体	あと一体ですね。ここで油断したら先生に怒られちゃう。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_own_down	NPCのモンスターが倒される	あちゃ……予想と違ったな。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_own_down_last	NPCのモンスターが残り1体	最後の一体……でも、観測はまだ終わってません。	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_win	NPC勝利	やった！ 先生に報告しなきゃ！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+luka	ルカ	npc_lose	NPC敗北	うわあ、負けちゃった……。記録帳に書いておきます、あなたの勝ちって！	approved	3_existing_GitHub_lines_plus_10_approved_new_lines
+tobias	トビアス	start	対戦開始	お、対戦相手は君か。面白い勝負になりそうだ。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_attack_hit	NPCの攻撃が命中	よし、ここは俺の読み勝ちだな。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	player_attack_hit	NPCが攻撃を受ける	へえ、そう来るか。一本取られた。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_defense_success	NPCの防御成功	そう簡単には通さないって。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	player_defense_success	主人公の防御成功	あらら、見透かされてたか。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_evade_success	NPCの回避成功	おっと。今のは紙一重だな。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	player_evade_success	主人公の回避成功	へえ、いい反応するね。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_knock	NPCが主人公のモンスターを撃破	まず一体。ここからどうする？	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_knock_last	主人公のモンスターが残り1体	あと一体か。最後まで油断しないぜ。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_own_down	NPCのモンスターが倒される	おっと、やられた。やるね。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_own_down_last	NPCのモンスターが残り1体	はは、俺の余裕はどこ行ったんだか。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_win	NPC勝利	俺の勝ちだな。君との勝負、楽しかったよ。	approved	13_user_approved_new_lines; character_traits_proposed
+tobias	トビアス	npc_lose	NPC敗北	負けたか。いやあ、最後まで読めなかったな。	approved	13_user_approved_new_lines; character_traits_proposed
+marie	マリー	start	対戦開始	よろしくお願いします。じっくり、いい勝負をしましょう。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_attack_hit	NPCの攻撃が命中	……よし。思い切ってよかった。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	player_attack_hit	NPCが攻撃を受ける	あっ……そこを狙われるとは。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_defense_success	NPCの防御成功	ここは守ると決めていました。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	player_defense_success	主人公の防御成功	さすがですね。簡単には通りませんか。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_evade_success	NPCの回避成功	ふう……間に合いましたね。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	player_evade_success	主人公の回避成功	あら、そこをかわすんですね。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_knock	NPCが主人公のモンスターを撃破	これで一体。まだ焦らずにいきましょう。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_knock_last	主人公のモンスターが残り1体	あと一体……最後まで丁寧に。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_own_down	NPCのモンスターが倒される	……読み違えましたね。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_own_down_last	NPCのモンスターが残り1体	あと一体。ここは迷っていられません。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_win	NPC勝利	勝てましたね。最後まで気を抜かなくてよかった。	approved	13_user_approved_new_lines; personality_proposed_approved
+marie	マリー	npc_lose	NPC敗北	参りました。あなたの決断力、見習いたいです。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	start	対戦開始	さあ、始めようぜ。いい勝負にしよう。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_attack_hit	NPCの攻撃が命中	よし、狙ったところに入った。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	player_attack_hit	NPCが攻撃を受ける	くっ、いい攻めだな。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_defense_success	NPCの防御成功	そう来ると思ってたぜ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	player_defense_success	主人公の防御成功	へえ、そこで守るか。やるな。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_evade_success	NPCの回避成功	あぶねえ。今のはぎりぎりだ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	player_evade_success	主人公の回避成功	ちぇっ、うまくかわされたな。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_knock	NPCが主人公のモンスターを撃破	一体倒したな。この勢いでいくぜ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_knock_last	主人公のモンスターが残り1体	あと一体。最後まで気を抜かねえ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_own_down	NPCのモンスターが倒される	……いい腕してるな。負けてられねえ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_own_down_last	NPCのモンスターが残り1体	最後の一体か。ここで引くわけにはいかねえ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_win	NPC勝利	俺の勝ちだ。手応えのある勝負だったぜ。	approved	13_user_approved_new_lines; personality_proposed_approved
+jean	ジャン	npc_lose	NPC敗北	参ったな。完敗だ。次は負けねえからな。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	start	対戦開始	ふふ、お互いに悔いのない勝負にしましょう。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_attack_hit	NPCの攻撃が命中	うん、ここは思い切って正解ね。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	player_attack_hit	NPCが攻撃を受ける	あら、いい一手ね。少し驚いたわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_defense_success	NPCの防御成功	その攻めは、ちゃんと見ていたわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	player_defense_success	主人公の防御成功	ふふ、簡単には通してくれないのね。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_evade_success	NPCの回避成功	よかった、間に合ったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	player_evade_success	主人公の回避成功	あら、いい反応ね。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_knock	NPCが主人公のモンスターを撃破	まず一体ね。まだ油断はしないわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_knock_last	主人公のモンスターが残り1体	あと一体。ここは攻めどころね。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_own_down	NPCのモンスターが倒される	あら……一本取られたわね。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_own_down_last	NPCのモンスターが残り1体	残り一体ね。ここから思い切っていくわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_win	NPC勝利	ありがとう。最後の一手まで楽しめたわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+helena	ヘレナ	npc_lose	NPC敗北	ふふ、参ったわ。あなたの思い切りのよさ、素敵ね。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	start	対戦開始	愛想はよくないが、勝負には真剣だ。よろしくな。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_attack_hit	NPCの攻撃が命中	よし、ここは通した。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	player_attack_hit	NPCが攻撃を受ける	……なるほど。いいところを突く。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_defense_success	NPCの防御成功	そう簡単には崩れんさ。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	player_defense_success	主人公の防御成功	ほう、そこを守るか。悪くない。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_evade_success	NPCの回避成功	……危ないところだった。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	player_evade_success	主人公の回避成功	今のをかわすか。見事だ。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_knock	NPCが主人公のモンスターを撃破	一体倒した。まだ決まったわけじゃない。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_knock_last	主人公のモンスターが残り1体	残り一体か。最後まで気を抜くなよ。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_own_down	NPCのモンスターが倒される	……ここから立て直す。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_own_down_last	NPCのモンスターが残り1体	あと一体。まあ、諦める理由にはならん。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_win	NPC勝利	俺の勝ちだ。……いい相手だったよ。	approved	13_user_approved_new_lines; personality_proposed_approved
+claude	クロード	npc_lose	NPC敗北	参った。……あんたの強さには、つい笑っちまうな。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	start	対戦開始	ふふ、肩の力を抜いて。いい勝負にしましょう。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_attack_hit	NPCの攻撃が命中	あら、思い切ってみるものね。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	player_attack_hit	NPCが攻撃を受ける	まあ……その一手は少し意外だったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_defense_success	NPCの防御成功	ふふ、そう簡単にはいかないわよ。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	player_defense_success	主人公の防御成功	あら、慎重なのね。悪くないわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_evade_success	NPCの回避成功	危ないところね。運も味方したかしら。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	player_evade_success	主人公の回避成功	あらあら、きれいに外されたわね。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_knock	NPCが主人公のモンスターを撃破	まず一体。さて、どう立て直すのかしら。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_knock_last	主人公のモンスターが残り1体	あと一体ね。最後の一手まで楽しませて。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_own_down	NPCのモンスターが倒される	……ふふ、そう来なくちゃ。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_own_down_last	NPCのモンスターが残り1体	一体だけね。少し大胆にいこうかしら。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_win	NPC勝利	私の勝ちね。なかなか愉快な一戦だったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+beatrice	ベアトリス	npc_lose	NPC敗北	負けたわ。でも、あなたのおかげで退屈しなかった。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	start	対戦開始	ふふ、いい勝負になりそうね。先に流れをつかむのはどちらかしら。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_attack_hit	NPCの攻撃が命中	今なら通ると思ったの。正解ね。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	player_attack_hit	NPCが攻撃を受ける	あら、その手は読めなかったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_defense_success	NPCの防御成功	悪いけど、ここは譲れないわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	player_defense_success	主人公の防御成功	へえ、いい勘してるじゃない。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_evade_success	NPCの回避成功	ふふ、危ないところだったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	player_evade_success	主人公の回避成功	あら、タイミングを読まれたわね。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_knock	NPCが主人公のモンスターを撃破	まず一体。流れがこちらに来たかしら。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_knock_last	主人公のモンスターが残り1体	あと一体ね。でも、最後まで何が起こるか分からないわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_own_down	NPCのモンスターが倒される	あらら、やられたわ。じゃあ、次の手ね。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_own_down_last	NPCのモンスターが残り1体	残り一体……ここからひっくり返せたら面白いでしょう？	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_win	NPC勝利	最後に流れをつかめたわね。いい勝負だったわ。	approved	13_user_approved_new_lines; personality_proposed_approved
+zara	ザラ	npc_lose	NPC敗北	参ったわ。あなた、勝負どころで思い切りがいいのね。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	start	対戦開始	よろしく頼む。互いに悔いのない勝負をしよう。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_attack_hit	NPCの攻撃が命中	よし。狙いは外していない。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	player_attack_hit	NPCが攻撃を受ける	……いい攻めだ。侮れんな。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_defense_success	NPCの防御成功	守るべきところは、守る。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	player_defense_success	主人公の防御成功	ほう。無理をしないのも強さだ。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_evade_success	NPCの回避成功	ここは、外させてもらう。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	player_evade_success	主人公の回避成功	見事だ。よく見ているな。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_knock	NPCが主人公のモンスターを撃破	まず一体。まだ勝負は決まらん。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_knock_last	主人公のモンスターが残り1体	あと一体か。油断はせんよ。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_own_down	NPCのモンスターが倒される	……私の判断が遅れたな。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_own_down_last	NPCのモンスターが残り1体	残り一体。今こそ落ち着かねばな。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_win	NPC勝利	私の勝ちだ。いい手合わせだった。	approved	13_user_approved_new_lines; personality_proposed_approved
+walter	ウォルター	npc_lose	NPC敗北	負けたか。……君の積み重ねが、一枚上だったな。	approved	13_user_approved_new_lines; personality_proposed_approved

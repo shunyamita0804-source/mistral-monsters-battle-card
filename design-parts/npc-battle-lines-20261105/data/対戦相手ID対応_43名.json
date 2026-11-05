@@ -1,0 +1,607 @@
+[
+  {
+    "order": 1,
+    "npc_id": "gareth",
+    "name": "ガレス先生",
+    "status": "approved_direction_with_text_verification_needed",
+    "opponent_ids": [
+      "exam-teacher"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_teacher.webp",
+    "line_status_counts": {
+      "proposed_not_approved": 2,
+      "reconstruction_pending_text_check": 11
+    }
+  },
+  {
+    "order": 2,
+    "npc_id": "mireille",
+    "name": "ミレイユ",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [],
+    "face_asset": "neighbor_guide_talk_normal.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 3,
+    "npc_id": "pete",
+    "name": "ピート",
+    "status": "approved",
+    "opponent_ids": [
+      "town-pete"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_resident_b.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 4,
+    "npc_id": "noel",
+    "name": "ノエル",
+    "status": "approved",
+    "opponent_ids": [
+      "e-1"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_e1.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 5,
+    "npc_id": "viktor",
+    "name": "ヴィクトル",
+    "status": "approved",
+    "opponent_ids": [
+      "e-2"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_e2.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 6,
+    "npc_id": "sienna",
+    "name": "シエナ",
+    "status": "approved",
+    "opponent_ids": [
+      "e-3",
+      "reg-sienna"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_e3.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 7,
+    "npc_id": "dario",
+    "name": "ダリオ",
+    "status": "approved",
+    "opponent_ids": [
+      "d-1"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_d1.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 8,
+    "npc_id": "isabella",
+    "name": "イザベラ",
+    "status": "approved",
+    "opponent_ids": [
+      "d-2"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_d2.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 9,
+    "npc_id": "gordon",
+    "name": "ゴードン",
+    "status": "approved",
+    "opponent_ids": [
+      "d-3",
+      "c-gordon"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_opponent_d3.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 10,
+    "npc_id": "dolf",
+    "name": "ドルフ",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-dolf"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_dolf.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 11,
+    "npc_id": "leonard",
+    "name": "レナード",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-leonard"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_leonard.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 12,
+    "npc_id": "greta",
+    "name": "グレタ",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-greta"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_greta.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 13,
+    "npc_id": "julius",
+    "name": "ユリウス",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-julius"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_julius.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 14,
+    "npc_id": "camilla",
+    "name": "カミラ",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-camilla"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_camilla.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 15,
+    "npc_id": "alvin",
+    "name": "アルヴィン",
+    "status": "approved",
+    "opponent_ids": [
+      "reg-alvin"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_regular_alvin.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 16,
+    "npc_id": "flora",
+    "name": "フローラ",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-1"
+    ],
+    "face_asset": "face_battler_1.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 17,
+    "npc_id": "oscar",
+    "name": "オスカー",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-2"
+    ],
+    "face_asset": "face_battler_2.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 18,
+    "npc_id": "kyle",
+    "name": "カイル",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-3"
+    ],
+    "face_asset": "face_battler_3.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 19,
+    "npc_id": "guardian",
+    "name": "？？？",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "guardian"
+    ],
+    "face_asset": "face_guardian.webp",
+    "line_status_counts": {
+      "approved": 6,
+      "approved_silent_no_bubble": 7
+    }
+  },
+  {
+    "order": 20,
+    "npc_id": "grant",
+    "name": "グラント",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-b3-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_ruins_grant.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 21,
+    "npc_id": "sera",
+    "name": "セラ",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-forest-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_forest_sera.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 22,
+    "npc_id": "lucia",
+    "name": "ルシア",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-water-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_water_lucia.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 23,
+    "npc_id": "ivan",
+    "name": "イヴァン",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-ice-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_ice_ivan.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 24,
+    "npc_id": "balka",
+    "name": "バルカ",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-fire-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_fire_balka.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 25,
+    "npc_id": "teo",
+    "name": "テオ",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-machine-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_machine_teo.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 26,
+    "npc_id": "aurelio",
+    "name": "アウレリオ",
+    "status": "approved_regular_lines",
+    "opponent_ids": [
+      "enc-holy-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_holy_aurelio.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 27,
+    "npc_id": "pia",
+    "name": "ピア",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-pia"
+    ],
+    "face_asset": "face_battler_water_pia.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 28,
+    "npc_id": "hans",
+    "name": "ハンス",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-hans"
+    ],
+    "face_asset": "face_battler_ice_hans.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 29,
+    "npc_id": "zack",
+    "name": "ザック",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-zack"
+    ],
+    "face_asset": "face_battler_fire_zack.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 30,
+    "npc_id": "otto",
+    "name": "オットー",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-otto"
+    ],
+    "face_asset": "face_battler_machine_otto.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 31,
+    "npc_id": "mina",
+    "name": "ミナ",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-mina"
+    ],
+    "face_asset": "face_battler_holy_mina.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 32,
+    "npc_id": "zephyra",
+    "name": "ゼフィラ",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-wind-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_wind_zephyra.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 33,
+    "npc_id": "niko",
+    "name": "ニコ",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-niko"
+    ],
+    "face_asset": "face_battler_wind.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 34,
+    "npc_id": "stella",
+    "name": "ステラ",
+    "status": "approved",
+    "opponent_ids": [
+      "enc-thunder-boss"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_guardian_thunder_stella.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 35,
+    "npc_id": "luka",
+    "name": "ルカ",
+    "status": "approved",
+    "opponent_ids": [],
+    "opponent_faces": [
+      "battler-luka"
+    ],
+    "face_asset": "face_battler_thunder.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 36,
+    "npc_id": "tobias",
+    "name": "トビアス",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-tobias"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_tobias.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 37,
+    "npc_id": "marie",
+    "name": "マリー",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-marie",
+      "e-marie"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_marie.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 38,
+    "npc_id": "jean",
+    "name": "ジャン",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-jean"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_jean.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 39,
+    "npc_id": "helena",
+    "name": "ヘレナ",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-helena"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_helena.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 40,
+    "npc_id": "claude",
+    "name": "クロード",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-claude"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_claude.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 41,
+    "npc_id": "beatrice",
+    "name": "ベアトリス",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-beatrice"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_beatrice.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 42,
+    "npc_id": "zara",
+    "name": "ザラ",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-zara"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_zara.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  },
+  {
+    "order": 43,
+    "npc_id": "walter",
+    "name": "ウォルター",
+    "status": "approved",
+    "opponent_ids": [
+      "gen-walter"
+    ],
+    "opponent_faces": [],
+    "face_asset": "face_entrant_walter.webp",
+    "line_status_counts": {
+      "approved": 13
+    }
+  }
+]

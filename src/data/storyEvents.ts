@@ -211,7 +211,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
     // 今の対戦の前に足す。ピートは守り手ではないので、自分のプカリムを見せてよい（ピートの持ち物。見せるだけ）
     steps: [
       L('pete', 'その箱、きみの最初のデッキ？ いいな、新しいカードってわくわくするよな！', "Is that box your first deck? Nice, new cards are so exciting!"),
-      L('pete', '見てくれよ、これがぼくのお気に入り、プカリム！', "Check it out, this is my favorite, Pukarim!"),
+      // 2026-11-05 ユーザー指示：ピートの一人称は「俺」（NPC バトルセリフと同じ）
+      L('pete', '見てくれよ、これが俺のお気に入り、プカリム！', "Check it out, this is my favorite, Pukarim!"),
       { kind: 'cards', show: { mode: 'preview_only', cards: ['mon-pukarim'], holder: 'pete' } },
       L('pete', '技を集めるのにずいぶん苦労したんだ。', "It took me ages to collect its skills."),
       L('pete', '勝負しよう！ きみが勝ったら、プカリムのカードを1枚ゆずってやるよ。', "Let's battle! If you win, I'll give you a Pukarim card."),
