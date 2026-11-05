@@ -52,8 +52,9 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-lazuck-itazura:name': 'Mischief',
   'card:skl-lazuck-itazura:effect': '1 random enemy card back to deck (no redraw).',
   // ガウル14技（2026-10-26・仮訳。技名・効果の英語はどちらも Claude の仮訳。正式な英語は未承認。旧16技は削除）
-  'card:mon-gauul:name': 'Gaul',
-  'card:mon-gauul:description': 'Gaul.',
+  // 2026-11-05 指示書 BC（ユーザー決定）：英語名 Gaul → Pyrrow・Desuoru → Desorl・Tyrant → Tyrandos
+  'card:mon-gauul:name': 'Pyrrow',
+  'card:mon-gauul:description': 'Pyrrow.',
   'card:skl-gauul14-01:name': 'Peck',
   'card:skl-gauul14-02:name': 'Rapid Peck',
   'card:skl-gauul14-03:name': 'Talon',
@@ -301,8 +302,8 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-hakuran-14:name': 'Mist Step',
   'card:skl-hakuran-14:effect': 'Dodge any POW or INT skill.',
   // デスオル（2026-10-31 指示書 AG。仮訳）
-  'card:mon-desuoru:name': 'Desuoru',
-  'card:mon-desuoru:description': 'Desuoru.',
+  'card:mon-desuoru:name': 'Desorl',
+  'card:mon-desuoru:description': 'Desorl.',
   'card:skl-desuoru-01:name': 'Butt Strike',
   'card:skl-desuoru-02:name': 'Gauntlet Claw',
   'card:skl-desuoru-03:name': 'Dark Raven',
@@ -368,7 +369,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-uzurio-12:name': 'Whirlwind Veil',
 
   // タイラント（2026-11-05 指示書 AX。確かめ用だけ。仮訳）
-  'card:mon-tyrant:name': 'Tyrant',
+  'card:mon-tyrant:name': 'Tyrandos',
   'card:mon-tyrant:description': 'A crimson dragon that rules the burning sky.',
   'card:skl-tyrant-01:name': 'Tail',
   'card:skl-tyrant-02:name': 'Wing Attack',

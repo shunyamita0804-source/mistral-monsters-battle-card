@@ -170,7 +170,7 @@ describe('デスオル：データ（届いた JSON・CSV を無改変で置き�
   it('英語の名前（仮訳）', () => {
     setLanguage('en');
     try {
-      expect(cardName(DESUORU_MONSTER_ID)).toBe('Desuoru');
+      expect(cardName(DESUORU_MONSTER_ID)).toBe('Desorl');
       expect(cardName(des(10))).toBe("Raven's Eye");
       expect(cardName(des(14))).toBe('Fade into Darkness'); // 指示書 AJ で名前を やみにまぎれる に
     } finally {

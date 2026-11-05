@@ -1,17 +1,10 @@
-/* ===== 2026-11-05 指示書 AY・AZ：モンスターカードの名前（ゲームが重ねる） =====
- * 日本語は名前のロゴの絵（指示書 AZ。src/ui/components/cardNameLayer.ts）。英語のロゴはまだ無いので、英語は仮の字体 Bangers で書く
- * （使う文字だけに減らした WOFF2。tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/license_bangers.txt）。
- * AY の字体3案（Reggae One・Dela Gothic One・Yuji Boku・Bungee・Permanent Marker）は指示書 AZ でやめた */
-@font-face {
-  font-family: 'MM Card Name Bangers';
-  src: url('@assets/fonts/card-name/bangers.woff2') format('woff2');
-  font-display: swap;
-}
-
+/* ===== 2026-11-05 指示書 AY・AZ・BC：モンスターカードの名前（ゲームが重ねる） =====
+ * 日本語・英語とも名前のロゴの絵（src/ui/components/cardNameLayer.ts）。ロゴの無いモンスターだけ、ふつうの字体で書く。
+ * AY の字体（Reggae One など）は指示書 AZ、英語の仮の字体 Bangers は指示書 BC でやめた */
 :root {
   --card-name-ja: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
-  --card-name-en: 'MM Card Name Bangers';
-  --card-name-en-scale: 1.12;
+  --card-name-en: 'Georgia', 'Times New Roman', serif;
+  --card-name-en-scale: 1;
 }
 
 .card-name {

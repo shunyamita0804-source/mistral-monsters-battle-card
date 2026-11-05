@@ -177,7 +177,7 @@ export const SCREENS = {
   'collection.progress': { ja: '集めた割合 {n}%', en: 'Collected {n}%' },
   'collection.count': {
     ja: '登録 {owned}/{total} 種類（正式カードはソラモ・ラズック・ガウル・ノビトン・ミュロル・カルシェル・プカリム・ジオル・フルーネ・セレフィーン・ツムジ・ヒョウズク・シシエン・ハクラン・デスオル・リリル・フォルン・ウズリオ・ギアロス。ほかは仮データ）',
-    en: 'Registered {owned}/{total} (Soramo, Lazuck, Gaul, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune, Serephine, Tsumuji, Hyozuku, Shishien, Hakuran, Desuoru, Lilil, Forn, Uzurio and Gearos cards are official; others are temporary)',
+    en: 'Registered {owned}/{total} (Soramo, Lazuck, Pyrrow, Nobiton, Myurol, Kalshell, Pukarim, Geol, Flune, Serephine, Tsumuji, Hyozuku, Shishien, Hakuran, Desorl, Lilil, Forn, Uzurio and Gearos cards are official; others are temporary)',
   },
   'cardList.title': { ja: 'カード一覧', en: 'Card List' },
   'cardList.heading': { ja: 'カードを見る', en: 'View Cards' },

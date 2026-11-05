@@ -1,5 +1,5 @@
 import { CARD_NAME_BOX } from '../../data/cardNames.ts';
-import { CARD_NAME_LOGOS, LOGO_GLYPH } from '../../data/cardNameLogos.generated.ts';
+import { CARD_NAME_LOGOS, CARD_NAME_LOGOS_EN, LOGO_GLYPH, LOGO_GLYPH_EN, type CardNameLogo } from '../../data/cardNameLogos.generated.ts';
 import type { MonsterCard } from '../../game/cards/cardTypes.ts';
 import { cardName } from '../../i18n/content.ts';
 import { getLanguage } from '../../i18n/i18n.ts';
@@ -16,12 +16,14 @@ const LOGO_GLYPH_H = 0.135;
 /** ロゴの字の上のはし（カードの幅に対する割合） */
 const LOGO_GLYPH_TOP = 0.04;
 
-/** そのモンスター・いまの言語のロゴ（無ければ undefined。英語のロゴはまだ無い） */
-export function cardNameLogo(monsterId: string): { url: string; logo: (typeof CARD_NAME_LOGOS)[string] } | undefined {
-  if (getLanguage() !== 'ja') return undefined;
-  const logo = CARD_NAME_LOGOS[monsterId];
+type Glyph = { readonly left: number; readonly top: number; readonly height: number };
+
+/** そのモンスター・いまの言語のロゴ（無ければ undefined。英語のロゴは 2026-11-05 指示書 BC から） */
+export function cardNameLogo(monsterId: string): { url: string; logo: CardNameLogo; glyph: Glyph } | undefined {
+  const en = getLanguage() === 'en';
+  const logo = (en ? CARD_NAME_LOGOS_EN : CARD_NAME_LOGOS)[monsterId];
   const url = logo ? LOGO_URLS[`/assets/images/ui/card_name/logos/${logo.file}`] : undefined;
-  return logo && url ? { url, logo } : undefined;
+  return logo && url ? { url, logo, glyph: en ? LOGO_GLYPH_EN : LOGO_GLYPH } : undefined;
 }
 
 /**
@@ -29,11 +31,11 @@ export function cardNameLogo(monsterId: string): { url: string; logo: (typeof CA
  * - 日本語でロゴの絵があるとき（2026-11-05 指示書 AZ【7】）：ロゴの絵を、字の部分（原本の左 40px・上 55px・高さ 170px）が
  *   AY で決めた名前の位置と大きさ（左 4.3％・字の高さ 13.5％）になるように置く。LIFE の札の手前（74％）に入りきらなければ縮める。
  *   下にスウッシュをカードの枠の色に染めて、字の幅に合わせて置く
- * - それ以外（英語・ロゴの無いモンスター）：AY の文字（仮の英語の字体 Bangers）。長い名前は自動で小さくする（fitCardName）
+ * - 英語もロゴ（2026-11-05 指示書 BC。字の上 48px）。ロゴの無いモンスター（これから足す子）は AY の文字（ふつうの字体）。長い名前は自動で小さくする（fitCardName）
  */
 export function cardNameLayer(monster: MonsterCard, width: number): HTMLElement {
   const found = cardNameLogo(monster.id);
-  if (found) return logoLayer(found.url, found.logo, width);
+  if (found) return logoLayer(found.url, found.logo, found.glyph, width);
   const name = cardName(monster);
   const en = getLanguage() === 'en';
   const text = h('span', { class: 'card-name__text', text: name, attrs: { lang: en ? 'en' : 'ja' } });
@@ -52,16 +54,16 @@ export function cardNameLayer(monster: MonsterCard, width: number): HTMLElement 
   return box;
 }
 
-function logoLayer(url: string, logo: (typeof CARD_NAME_LOGOS)[string], width: number): HTMLElement {
+function logoLayer(url: string, logo: CardNameLogo, glyph: Glyph, width: number): HTMLElement {
   const left = CARD_NAME_BOX.left * width;
   const right = CARD_NAME_BOX.right * width;
   // 原本の px → 画面の px。字の幅（字の左はし〜絵の右はし）が LIFE の札の手前に入りきらなければ縮める
-  const glyphW = logo.x + logo.w - LOGO_GLYPH.left;
-  const k = Math.min((LOGO_GLYPH_H * width) / LOGO_GLYPH.height, (right - left) / glyphW);
+  const glyphW = logo.x + logo.w - glyph.left;
+  const k = Math.min((LOGO_GLYPH_H * width) / glyph.height, (right - left) / glyphW);
   const top = LOGO_GLYPH_TOP * width;
   const img = h('img', { class: 'card-name__logo', attrs: { src: url, alt: '', draggable: 'false' } });
-  img.style.left = `${left - (LOGO_GLYPH.left - logo.x) * k}px`;
-  img.style.top = `${top - (LOGO_GLYPH.top - logo.y) * k}px`;
+  img.style.left = `${left - (glyph.left - logo.x) * k}px`;
+  img.style.top = `${top - (glyph.top - logo.y) * k}px`;
   img.style.width = `${logo.w * k}px`;
   img.style.height = `${logo.h * k}px`;
   // スウッシュ（指示書 BA【3】）：前の名前入りのカード（ガウル・ソラモ・ラズック）のように、ふちと先は枠の色・中心は明るい色（白〜うすい金）。
@@ -72,7 +74,7 @@ function logoLayer(url: string, logo: (typeof CARD_NAME_LOGOS)[string], width: n
   if (swoosh && tint && core && SWOOSH_LOGO) {
     const sw = glyphW * k;
     swoosh.style.left = `${left}px`;
-    swoosh.style.top = `${top + LOGO_GLYPH.height * k * 1.0}px`;
+    swoosh.style.top = `${top + glyph.height * k * 1.0}px`;
     swoosh.style.width = `${sw}px`;
     swoosh.style.height = `${sw * 0.12}px`;
     tint.style.backgroundColor = logo.frame;

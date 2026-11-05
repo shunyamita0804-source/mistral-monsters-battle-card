@@ -10,7 +10,7 @@ export const NAMELESS_OFFICIAL_ART: ReadonlySet<string> = new Set<string>([
   'mon-tsumuji', 'mon-hyouzuku', 'mon-shishien', 'mon-hakuran', 'mon-desuoru', 'mon-lilil', 'mon-forn', 'mon-uzurio', 'mon-tyrant', 'mon-gearos',
 ]);
 
-/* 字体の3案（指示書 AY【4】）は 2026-11-05 指示書 AZ でやめた。日本語は名前のロゴの絵（src/data/cardNameLogos.generated.ts）、英語は仮の字体 Bangers */
+/* 字体の3案（指示書 AY【4】）は 2026-11-05 指示書 AZ でやめた。日本語は名前のロゴの絵（src/data/cardNameLogos.generated.ts）、英語も名前のロゴの絵（2026-11-05 指示書 BC。仮の字体 Bangers はやめた） */
 
 /**
  * 名前の置き場所（カードの幅・高さに対する割合。正式カード 508×849。前の太い文字の16体〔ツムジなど〕の名前の位置を測った値）。

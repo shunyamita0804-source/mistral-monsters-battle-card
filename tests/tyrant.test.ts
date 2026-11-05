@@ -106,7 +106,7 @@ describe('タイラントのデータ（届いた CSV のとおり）', () => {
   it('英語の名前と効果の文（仮訳）がある', () => {
     setLanguage('en');
     try {
-      expect(cardName(TYRANT_MONSTER_ID)).toBe('Tyrant');
+      expect(cardName(TYRANT_MONSTER_ID)).toBe('Tyrandos');
       expect(cardName(ty(9))).toBe('Dragon Gaze');
     } finally {
       setLanguage('ja');

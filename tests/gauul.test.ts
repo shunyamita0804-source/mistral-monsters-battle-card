@@ -206,7 +206,7 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     expect(describeSkill(getSkill(laz(4))).match(/回避されない/g)).toHaveLength(1);
     expect(skillCardFace(getSkill(gau(14))).description).toBe('マナに関係なく、ちから技・かしこさ技を回避');
     setLanguage('en');
-    expect(cardName(GAUUL_MONSTER)).toBe('Gaul');
+    expect(cardName(GAUUL_MONSTER)).toBe('Pyrrow');
     for (const s of skillsOf('mon-gauul')) {
       expect(cardName(s)).not.toMatch(/[ぁ-んァ-ン一-龯]/);
       expect(skillCardFace(s).description).not.toMatch(/[ぁ-んァ-ン一-龯]/);

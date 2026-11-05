@@ -11,7 +11,7 @@ from pathlib import Path
 from fontTools import subset
 
 # 2026-11-05 指示書 AZ：日本語の名前はロゴの絵にしたので、英語の Bangers だけ使う（ほかの5つは試した案。作り直すときは SOURCES から外す）
-USED = {'bangers'}
+USED: set = set()  # 2026-11-05 指示書 BC：英語もロゴにしたので、どの字体も使わない（記録として残す）
 SOURCES = {
     # 名前: (TTF のファイル名, 出どころ, ライセンス, 日本語か)
     'reggae-one': ('ReggaeOne.ttf', 'https://fonts.google.com/specimen/Reggae+One', 'OFL-1.1', True),

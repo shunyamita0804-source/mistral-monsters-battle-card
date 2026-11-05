@@ -64,7 +64,7 @@ const TEXTS: Readonly<Record<string, string>> = {
   '当たると自分のライフ−3': 'On hit, you lose 3 life.',
   '倒れている味方1体につき＋2': '+2 for each fallen ally.',
   相手の手札をすべて見て1枚選んで捨てさせる: "See the opponent's hand and make them discard 1 card you choose.",
-  'ライフ1以下の、デスオル以外のモンスターをすべて倒す': 'Knock out every monster with 1 life or less, except Desuoru.',
+  'ライフ1以下の、デスオル以外のモンスターをすべて倒す': 'Knock out every monster with 1 life or less, except Desorl.',
   // 2026-11-02 指示書 AK リリル（仮訳）
   '相手は次のターン、リリルしか攻撃できない': 'Next turn, the enemy can only attack Lilil.',
   '相手は次のターン、リリルを攻撃できない': "Next turn, the enemy can't attack Lilil.",
