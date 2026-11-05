@@ -438,7 +438,8 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-kuyo-05', name: 'ひかるまなざし', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'kuyo_sk_05.webp' },
     { id: 'skl-kuyo-06', name: 'ここのつのめ', cat: 'か', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'kuyo_sk_06.webp' },
     { id: 'skl-kuyo-07', name: 'はらえのひかり', cat: 'か', mana: 4, damage: 5, text: null, rare: true, art: 'kuyo_sk_07.webp' },
-    { id: 'skl-kuyo-08', name: 'おはらい', cat: '特', mana: 1, damage: null, effect: { type: 'purify' }, text: '味方1体の悪い状態をすべて消す', art: 'kuyo_sk_08.webp' },
+    // 2026-11-05 ユーザー決定（BH の直し）：ライフ＋1 を足した
+    { id: 'skl-kuyo-08', name: 'おはらい', cat: '特', mana: 1, damage: null, effect: { type: 'purify', heal: 1 }, text: '味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）', art: 'kuyo_sk_08.webp' },
     { id: 'skl-kuyo-09', name: 'まよけのふだ', cat: '特', mana: 2, damage: null, effect: { type: 'wardCharm' }, text: '次の相手のターンの終わりまで、味方全員に悪い状態がつかない', rare: true, art: 'kuyo_sk_09.webp' },
     // 効果の文：防御の文の決まり（どの技に効くかだけ。軽減の数 3 はカードの盾の欄）
     { id: 'skl-kuyo-10', name: 'たてがみのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: T_BOTH, art: 'kuyo_sk_10.webp' },

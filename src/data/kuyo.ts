@@ -15,10 +15,10 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
  * - 正式モンスターカード kuyo_official.webp（1016×1698 を 508×849 に。名前なし。名前はロゴを重ねる）
  * - バトル用 kuyo_battlecard.png（1169×1346・透明。無改変。毛先の半透明はそのまま）
  * - パック pack_kuyo.webp（袋のまわりの黒だけ透明に）・販売機の窓 panel_kuyo.webp
- * 色：霧の藤ねず #9B86B8（バトル用カードの枠・技カードの枠・名前のロゴの帯）
+ * 色：霧の藤ねず #87649C（正式カードの絵の枠の色。2026-11-05 ユーザー指示で指示書の #9B86B8 から合わせた。バトル用カードの枠・技カードの枠・名前のロゴの帯・パックの縁・図鑑）
  */
 export const KUYO_MONSTER_ID = 'mon-kuyo';
-export const KUYO_COLOR = '#9B86B8';
+export const KUYO_COLOR = '#87649C';
 
 export const KUYO_MONSTER: MonsterCard = {
   kind: 'monster',
@@ -27,7 +27,8 @@ export const KUYO_MONSTER: MonsterCard = {
   rarity: null,
   life: 8,
   themeColor: KUYO_COLOR,
-  description: '霧の奥から九つの目で見守る、白い霊獣。',
+  // 2026-11-05 ユーザー決定の文（英語は contentEnOfficialDraft.ts）
+  description: '霧の奥から九つの目で見守る霊獣。悪いものをはらうと伝えられる。',
   isPlaceholder: false,
   art: { category: 'monsterCards', file: 'kuyo_official.webp', layout: 'full' },
   battleArt: { category: 'monsterCards', file: 'kuyo_battlecard.png', layout: 'full' },

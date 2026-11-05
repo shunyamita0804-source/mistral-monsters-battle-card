@@ -385,7 +385,7 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-tyrant-12:name': 'Soar Skyward',
   // 2026-11-05 指示書 BH：クヨウ（名前は指示書のとおり。説明は仮訳）
   'card:mon-kuyo:name': 'Kuyo',
-  'card:mon-kuyo:description': 'A white spirit beast that watches over the mist with nine eyes.',
+  'card:mon-kuyo:description': 'A sacred beast that watches from deep in the mist with nine eyes. It is said to drive away evil.',
   'card:skl-kuyo-01:name': 'Tail Sweep',
   'card:skl-kuyo-02:name': 'Foreleg Push',
   'card:skl-kuyo-03:name': 'Horn Thrust',

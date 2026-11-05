@@ -38,14 +38,14 @@ const DUST = 'skl-lazuck-08'; // ダストキック（ちから技−1）
 const WRAP = 'skl-nobiton-03'; // まきつく（行動できない）
 
 describe('クヨウのデータ（指示書の表のとおり）', () => {
-  it('LIFE 8・地上・霧の藤ねず #9B86B8。ID は mon-kuyo', () => {
+  it('LIFE 8・地上・霧の藤ねず #87649C。ID は mon-kuyo', () => {
     const m = getMonster(KUYO_MONSTER_ID);
     expect(m.name).toBe('クヨウ');
     expect(m.life).toBe(8);
     expect(m.habitat).toBe('ground');
     expect(MONSTER_HABITAT[KUYO_MONSTER_ID]).toBe('ground');
     expect(m.themeColor).toBe(KUYO_COLOR);
-    expect(KUYO_COLOR).toBe('#9B86B8');
+    expect(KUYO_COLOR).toBe('#87649C');
     expect(m.isPlaceholder).toBe(false);
   });
 
@@ -77,7 +77,8 @@ describe('クヨウのデータ（指示書の表のとおり）', () => {
     expect(byId.get(ky(5))?.effect).toMatchObject({ type: 'attack', undodgeable: true });
     expect(byId.get(ky(6))?.effect).toMatchObject({ type: 'attack', undodgeable: true });
     expect(byId.get(ky(7))?.effect).toEqual({ type: 'attack' });
-    expect(byId.get(ky(8))?.effect).toEqual({ type: 'purify' });
+    expect(byId.get(ky(8))?.effect).toEqual({ type: 'purify', heal: 1 });
+    expect(byId.get(ky(8))?.effectTextJa).toBe('味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）');
     expect(byId.get(ky(9))?.effect).toEqual({ type: 'wardCharm' });
     expect(byId.get(ky(10))?.effect).toEqual({ type: 'defense', reduce: 3, against: 'all' });
     expect(byId.get(ky(11))?.effect).toEqual({ type: 'cover', reduce: 2 });
@@ -124,8 +125,8 @@ describe('クヨウのデータ（指示書の表のとおり）', () => {
       expect(existsSync(f), f).toBe(true);
     }
     expect(BATTLE_CARDS[KUYO_MONSTER_ID]?.frame).toBe('kuyo');
-    expect(CARD_NAME_LOGOS[KUYO_MONSTER_ID]?.frame).toBe('#9B86B8');
-    expect(CARD_NAME_LOGOS_EN[KUYO_MONSTER_ID]?.frame).toBe('#9B86B8');
+    expect(CARD_NAME_LOGOS[KUYO_MONSTER_ID]?.frame).toBe('#87649C');
+    expect(CARD_NAME_LOGOS_EN[KUYO_MONSTER_ID]?.frame).toBe('#87649C');
   });
 
   it('英語の名前と効果の文（仮訳）がある', () => {
@@ -216,9 +217,31 @@ describe('悪い状態（相手の技で味方についたもの）', () => {
 });
 
 describe('08 おはらい：味方1体の悪い状態をすべて消す', () => {
-  it('悪い状態の無い味方しかいないときは使えない（理由を出す）', () => {
+  it('悪い状態も無く、ライフも満タンの味方しかいないときだけ使えない（理由を出す）', () => {
     const s = scene({ player: [ky(8)] });
-    expect(cardUsability(s, 'player', 'p0')).toEqual({ usable: false, reason: '悪い状態のある味方がいません' });
+    expect(cardUsability(s, 'player', 'p0')).toEqual({ usable: false, reason: '悪い状態のある味方も、ライフの減った味方もいません' });
+    const hurt = patchMonster(s, 'p-m3', { life: 5 });
+    expect(cardUsability(hurt, 'player', 'p0').usable).toBe(true);
+  });
+
+  it('BH の直し：悪い状態が無くても、ライフの減った味方を +1（もとの LIFE まで）', () => {
+    let s = patchMonster(scene({ player: [ky(8), ky(8)] }), 'p-m3', { life: 5 });
+    s = use(s, 'player', 'p0', 'p-m3');
+    expect(monster(s, 'p-m3').life).toBe(6);
+    expect(s.log.some((l) => l.text.startsWith('おはらい！'))).toBe(false);
+    // 満タンなら上がらない（悪い状態だけ消す）
+    let f = patchMonster(scene({ player: [ky(8)] }), 'p-m2', { sealedTurn: 1 });
+    f = use(f, 'player', 'p0', 'p-m2');
+    expect(monster(f, 'p-m2').life).toBe(monster(f, 'p-m2').maxLife);
+    expect(badStatusKinds(f, monster(f, 'p-m2'))).toEqual([]);
+  });
+
+  it('BH の直し：じならし（回避できない）も悪い状態。消せる', () => {
+    let s = patchMonster(scene({ player: [ky(8)] }), 'p-m2', { pinTurn: 1, life: 4 });
+    expect(badStatusKinds(s, monster(s, 'p-m2'))).toEqual(['pinned']);
+    s = use(s, 'player', 'p0', 'p-m2');
+    expect(monster(s, 'p-m2').pinTurn).toBeNull();
+    expect(monster(s, 'p-m2').life).toBe(5);
   });
 
   it('相手のすなかけ・まきつくのあと、自分の手番に消すと、その味方はすぐ動ける。記録の文が出る', () => {
@@ -319,17 +342,47 @@ describe('11 みがわり：味方（クヨウ以外）への攻撃1回をクヨ
     expect(monster(s, 'p-m2').life).toBe(monster(s, 'p-m2').maxLife);
   });
 
-  it('代わりに受けたあと、クヨウは自分の防御も使える（かばうと同じ）。0 未満にはならない', () => {
+  it('BH の直し：代わりに受けたあと、クヨウの防御・回避は重ねて使えない（−2 だけ）。0 未満にはならない', () => {
     let s = scene({});
     s = toOpponent(s, [sor(5)]);
-    s = { ...s, sides: { ...s.sides, player: { ...s.sides.player, hand: [{ uid: 'z0', cardId: ky(11) }, { uid: 'z1', cardId: ky(10) }] } } };
+    s = { ...s, sides: { ...s.sides, player: { ...s.sides.player, hand: [{ uid: 'z0', cardId: ky(11) }, { uid: 'z1', cardId: ky(10) }, { uid: 'z2', cardId: ky(12) }] } } };
+    s = use(s, 'opponent', 'q0', 'p-m2');
+    s = applyAction(s, { type: 'defend', side: 'player', cardUid: 'z0' });
+    expect(cardUsability(s, 'player', 'z1')).toEqual({ usable: false, reason: 'みがわりで受けた攻撃には、守りを重ねて使えません' });
+    expect(cardUsability(s, 'player', 'z2').usable).toBe(false);
+    expect(applyAction(s, { type: 'defend', side: 'player', cardUid: 'z1' })).toBe(s);
+    s = applyAction(s, { type: 'defend', side: 'player', cardUid: null });
+    expect(monster(s, 'p-m1').life).toBe(5);
+    // 威力1（−2 で 0 未満にならない）
+    let w = scene({});
+    w = toOpponent(w, [sor(1)]);
+    w = { ...w, sides: { ...w.sides, player: { ...w.sides.player, hand: [{ uid: 'z0', cardId: ky(11) }] } } };
+    w = use(w, 'opponent', 'q0', 'p-m2');
+    w = applyAction(w, { type: 'defend', side: 'player', cardUid: 'z0' });
+    expect(incomingDamage(w, w.pending!)).toBe(0);
+  });
+
+  it('ジオルのかばうは今までどおり、代わりに受けたあと自分の防御を使える', () => {
+    let s = createBattle(
+      { name: 'P', deck: { monsters: ['mon-geol', 'mon-soramo', 'mon-nobiton'], skills: Array.from({ length: 60 }, () => sor(1)) } },
+      { name: 'O', deck: { monsters: ['mon-soramo', 'mon-lazuck', 'mon-nobiton'], skills: Array.from({ length: 60 }, () => sor(1)) } },
+      5,
+      'opponent',
+    );
+    const guard = skillsOf('mon-geol').find((k) => k.effect.type === 'defense' && (k.effect.against === 'all' || k.effect.against === 'force'));
+    if (!guard) throw new Error('ジオルの防御');
+    s = {
+      ...s,
+      phase: 'main',
+      manaConvertLimit: null,
+      sides: {
+        player: { ...s.sides.player, hand: [{ uid: 'z0', cardId: 'skl-geol-11' }, { uid: 'z1', cardId: guard.id }], manaPile: Array.from({ length: 9 }, () => sor(1)) },
+        opponent: { ...s.sides.opponent, hand: [{ uid: 'q0', cardId: sor(5) }], manaPile: Array.from({ length: 9 }, () => sor(1)) },
+      },
+    };
     s = use(s, 'opponent', 'q0', 'p-m2');
     s = applyAction(s, { type: 'defend', side: 'player', cardUid: 'z0' });
     expect(cardUsability(s, 'player', 'z1').usable).toBe(true);
-    s = applyAction(s, { type: 'defend', side: 'player', cardUid: 'z1' });
-    expect(incomingDamage(s, s.pending!)).toBe(0);
-    s = applyAction(s, { type: 'defend', side: 'player', cardUid: null });
-    expect(monster(s, 'p-m1').life).toBe(8);
   });
 
   it('クヨウが狙われたとき・相手全員への攻撃・クヨウが倒れているときは使えない', () => {
@@ -370,6 +423,18 @@ describe('11 みがわり：味方（クヨウ以外）への攻撃1回をクヨ
 });
 
 describe('CPU：おはらい・まよけのふだ・みがわり', () => {
+  it('BH の直し：悪い状態の味方がいなければ、ライフの減った味方に使う（半分以下なら攻撃より先）', () => {
+    // ライフ半分以下のノビトン（3/8）。クヨウの攻撃も手札にあるが、先におはらいで回復
+    const s = patchMonster(scene({ player: [ky(8), ky(3)] }), 'p-m3', { life: 3 });
+    expect(chooseAction(s, 'player', 'normal', 'A')).toMatchObject({ type: 'useCard', cardUid: 'p0', targetUid: 'p-m3' });
+    // 少しだけ減っている（6/8）なら、攻撃が先
+    const t = patchMonster(scene({ player: [ky(8), ky(3)] }), 'p-m3', { life: 6 });
+    expect(chooseAction(t, 'player', 'normal', 'A')).toMatchObject({ type: 'useCard', cardUid: 'p1' });
+    // 攻撃できないとき（クヨウの攻撃が手札に無い）は回復に使う
+    const u = patchMonster(scene({ player: [ky(8)] }), 'p-m3', { life: 6 });
+    expect(chooseAction(u, 'player', 'normal', 'A')).toMatchObject({ type: 'useCard', cardUid: 'p0', targetUid: 'p-m3' });
+  });
+
   it('おはらい：まだ動いていない味方が攻撃を封じられていて、その味方の攻撃が手札にあれば消す', () => {
     let s = scene({ player: [ky(8), sor(3)] });
     s = patchMonster(s, 'p-m2', { sealedTurn: s.turn });

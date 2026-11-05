@@ -7,7 +7,7 @@ const [base, out] = process.argv.slice(2);
 const W = +(process.env.W || 390);
 const H = +(process.env.H || 844);
 const LANG = process.env.LANG === 'en' ? 'en' : 'ja';
-const ONLY = (process.env.ONLY || 'lab,book,logos,gacha,purify,charm,blocked,standin,tower').split(',');
+const ONLY = (process.env.ONLY || 'lab,book,logos,gacha,purify,purifyHeal,charm,blocked,standin,tower').split(',');
 const suffix = `_${LANG}_${W}x${H}`;
 fs.mkdirSync(out, { recursive: true });
 const ky = (n) => `skl-kuyo-${String(n).padStart(2, '0')}`;
@@ -212,7 +212,7 @@ const USE = LANG === 'en' ? 'Use' : '使う';
       'purify',
       `${head}
       let player = mk('player', ['${ky(8)}', 'skl-soramo14-04', '${ky(3)}', '${ky(10)}', '${ky(11)}']);
-      player = { ...player, monsters: player.monsters.map((m, i) => i === 1 ? { ...m, sealedTurn: t } : i === 2 ? { ...m, stunnedTurn: t } : m) };
+      player = { ...player, monsters: player.monsters.map((m, i) => i === 1 ? { ...m, sealedTurn: t, life: 4 } : i === 2 ? { ...m, stunnedTurn: t } : m) };
       const opponent = mk('opponent', s.sides.opponent.deck.slice(0, 5));
       return { ...s, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { player, opponent } };`,
       ['mon-soramo', 'mon-lazuck', 'mon-hyouzuku'],
@@ -226,6 +226,26 @@ const USE = LANG === 'en' ? 'Use' : '使う';
     await page.waitForTimeout(1500);
     await page.screenshot({ path: `${out}/purify_play${suffix}.png` });
     await openLog('purify');
+  }
+
+  // 4.5 おはらい（BH の直し）：悪い状態の無い味方（ノビトン ライフ4/8）を回復するだけ
+  if (ONLY.includes('purifyHeal')) {
+    await battle(
+      'purifyHeal',
+      `${head}
+      let player = mk('player', ['${ky(8)}', 'skl-soramo14-04', '${ky(10)}']);
+      player = { ...player, monsters: player.monsters.map((m, i) => i === 2 ? { ...m, life: 4 } : i === 1 ? { ...m, life: 6 } : m) };
+      const opponent = mk('opponent', s.sides.opponent.deck.slice(0, 5));
+      return { ...s, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { player, opponent } };`,
+      ['mon-soramo', 'mon-lazuck', 'mon-hyouzuku'],
+    );
+    await tapHand('x0');
+    await useBtn();
+    await page.screenshot({ path: `${out}/purifyHeal_target${suffix}.png` });
+    await page.locator('.battle__monster[data-uid="p-m3"]').click({ timeout: 3000, force: true }).catch((e) => console.log('no target', e.message.slice(0, 120)));
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: `${out}/purifyHeal_play${suffix}.png` });
+    await openLog('purifyHeal');
   }
 
   // 5. まよけのふだ：使う → 味方全員に印
@@ -288,6 +308,10 @@ const USE = LANG === 'en' ? 'Use' : '使う';
     await page.locator('.battle__defense-card').first().click({ timeout: 3000 }).catch(() => console.log('no defense card'));
     await page.waitForTimeout(1500);
     await page.screenshot({ path: `${out}/standin_play${suffix}.png` });
+    // BH の直し：みがわりのあとはクヨウの防御（たてがみのまもり）が「使えない」。押したときの理由
+    await page.locator('.battle__defense-card').last().click({ timeout: 2000, force: true }).catch(() => {});
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `${out}/standin_noguard${suffix}.png` });
     await openLog('standin');
   }
 

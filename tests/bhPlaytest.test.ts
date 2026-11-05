@@ -67,12 +67,16 @@ interface Count {
   turns: number;
   purify: number;
   purified: number;
+  /** おはらいでライフが戻った量（BH の直し） */
+  purifyHealed: number;
+  /** 悪い状態が無く、回復だけに使った回数 */
+  purifyHealOnly: number;
   charm: number;
   blocked: number;
   standIn: number;
   standInDamage: number;
 }
-const empty = (): Count => ({ games: 0, winsA: 0, deckOut: 0, turns: 0, purify: 0, purified: 0, charm: 0, blocked: 0, standIn: 0, standInDamage: 0 });
+const empty = (): Count => ({ games: 0, winsA: 0, deckOut: 0, turns: 0, purify: 0, purified: 0, purifyHealed: 0, purifyHealOnly: 0, charm: 0, blocked: 0, standIn: 0, standInDamage: 0 });
 
 const BLOCKED_PREFIX = 'まよけのふだが防いだ';
 
@@ -80,6 +84,7 @@ const BLOCKED_PREFIX = 'まよけのふだが防いだ';
 function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
   let s: BattleState = createBattle({ name: 'A', deck: a }, { name: 'B', deck: b }, seed, first);
   let watch: { uid: string; life: number } | null = null;
+  let purifyWatch: { uid: string; life: number } | null = null;
   for (let i = 0; i < MAX_STEPS && s.phase !== 'ended'; i++) {
     const side = actingSide(s);
     if (!side) break;
@@ -91,7 +96,11 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
       const card = hand ? getPlayCard(hand.cardId) : null;
       if (card?.kind === 'skill' && card.effect.type === 'purify') {
         c.purify++;
-        c.purified += badStatusKinds(s, action.targetUid ? findMonster(s, action.targetUid)?.monster : undefined).length;
+        const tm = action.targetUid ? findMonster(s, action.targetUid)?.monster : undefined;
+        const kinds = badStatusKinds(s, tm).length;
+        c.purified += kinds;
+        if (kinds === 0) c.purifyHealOnly++;
+        purifyWatch = tm ? { uid: tm.uid, life: tm.life } : null;
       }
       if (card?.kind === 'skill' && card.effect.type === 'wardCharm') c.charm++;
     }
@@ -102,6 +111,10 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
     }
     const logBefore = s.log.length;
     s = applyAction(s, action);
+    if (purifyWatch) {
+      c.purifyHealed += Math.max(0, (findMonster(s, purifyWatch.uid)?.monster.life ?? 0) - purifyWatch.life);
+      purifyWatch = null;
+    }
     c.blocked += s.log.slice(logBefore).filter((l) => l.text.startsWith(BLOCKED_PREFIX)).length;
     if (standIn && s.pending?.coverReduce) {
       c.standIn++;
@@ -132,6 +145,8 @@ const summary = (c: Count): Record<string, number> => ({
   purifyPerGame: per(c.purify, c.games),
   purifiedStatuses: c.purified,
   purifiedPerUse: per(c.purified, c.purify),
+  purifyHealOnly: c.purifyHealOnly,
+  purifyHealed: c.purifyHealed,
   charmPerGame: per(c.charm, c.games),
   blocked: c.blocked,
   blockedPerGame: per(c.blocked, c.games),

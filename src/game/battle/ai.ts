@@ -80,11 +80,11 @@ import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_COST, OVERDRIVE_IDS } from '../../dat
  *   もりのたよりは手札が3枚以下（指示書 AM。前は2枚以下）で山札が10枚以上あるとき（攻撃より先に。捨てる1枚は pickDrawToDiscard＝マナにする順）。みがわりのふえは狙われた味方のライフが半分以下でフォルンが倒れないとき。
  *   腕前 C は forgetTrick の割合で使いそこねる
  * - クヨウ（2026-11-05 指示書 BH。クヨウだけ）：chooseKuyoTrick（攻撃より先）。
- *   おはらいは、この手番に動かしたい味方（まだ動いていない）に悪い状態がついているとき（行動できない → 攻撃できない → 技のダメージ− → おびきよせ の順に見る）。
+ *   おはらいは、この手番に動かしたい味方（まだ動いていない）に悪い状態がついているとき（行動できない → 攻撃できない → 技のダメージ− → おびきよせ の順に見る）。いなければライフの減った味方を回復（半分以下なら攻撃より先、ほかは攻撃のあと。BH の直し）。
  *   腕前 A は、消したあとその味方が払える攻撃を手札に持っているときだけ（技のダメージ−はその種類の攻撃）。B・C は手札に攻撃があれば。
  *   まよけのふだは、相手に状態をつける技（すなかけ・まきつく・ダストキック・ちょうはつ など）を持つ生きたモンスターがいて、まだ効いていないとき（その手番に倒せる攻撃が無いとき）。
  *   腕前 A は、相手がいまのマナで払える状態の技を持っているときだけ。
- *   みがわりは、狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき（shouldCover。A はクヨウの防御まで見積もり、受けたあともライフ2以上残るとき。B は受けたあともライフ1以上）。
+ *   みがわりは、狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき（shouldCover。受けるのは威力−2〔BH の直しで守りは重ねられない〕。A は受けたあともライフ2以上・B は1以上残るとき）。
  *   腕前 C は forgetTrick の割合で使いそこねる。まよけのふだの効いている相手には、腕前 A・B は悪い状態をつける特殊の技を使わない
  */
 
@@ -244,7 +244,7 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const options0 = held.size > 0 && !kept.some(isSkillOption) && allOptions.some(isSkillOption) ? allOptions : kept;
   // まよけのふだ（クヨウ 指示書 BH）の効いている相手には、悪い状態をつけるだけの技は使わない（腕前 C は forgetTrick の割合で気づかない）
   const charmed = wardCharmActive(state, otherSide(side)) && cpuRoll(state, side, 'wardCharmSeen', false) >= CPU_SKILL[skill].forgetTrick;
-  const options = charmed ? options0.filter((o) => !['seal', 'taunt', 'weaken'].includes(o.def.effect.type)) : options0;
+  const options = charmed ? options0.filter((o) => !['seal', 'taunt', 'weaken', 'pin'].includes(o.def.effect.type)) : options0;
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
@@ -348,6 +348,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
+
+  // 3.4 クヨウ（BH の直し）：攻撃のあと、おはらいでライフの減った味方を回復
+  const kuyoAfter = chooseKuyoTrick(state, side, options, skill, false);
+  if (kuyoAfter) return kuyoAfter;
 
   // 3.5 リリル（2026-11-02 指示書 AK2）：攻撃のあと、回避を払えるならうっとりウインク
   const trickAfter = chooseLililTrick(state, side, options, enemies, skill, false);
@@ -1127,12 +1131,14 @@ export function pickDrawToDiscard(state: BattleState, side: Side, cardUid: strin
 const KUYO_MONSTERS: readonly string[] = ['mon-kuyo'];
 
 /** 相手に悪い状態をつける技か（すなかけ・ちょうはつ・ダストキック などの特殊、まきつく・こおりのいき などの「行動できない」攻撃） */
-const isStatusSkill = (k: SkillCard): boolean => ['seal', 'taunt', 'weaken'].includes(k.effect.type) || (k.effect.type === 'attack' && !!k.effect.stunTarget);
+const isStatusSkill = (k: SkillCard): boolean => ['seal', 'taunt', 'weaken', 'pin'].includes(k.effect.type) || (k.effect.type === 'attack' && !!k.effect.stunTarget);
 
 /**
- * クヨウ（2026-11-05 指示書 BH）。おはらい → まよけのふだ の順に見る（どちらも攻撃より先）。腕前 C は forgetTrick の割合で使いそこねる
+ * クヨウ（2026-11-05 指示書 BH）。first（攻撃より先）：おはらい（悪い状態の味方 → いなければライフが半分以下の味方）→ まよけのふだ。
+ * first でない（攻撃のあと）：おはらいでライフの減った味方を回復（BH の直し・ユーザー決定「悪い状態の味方がいれば先に、いなければライフの減った味方」）。
+ * 腕前 C は forgetTrick の割合で使いそこねる
  */
-function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill): BattleAction | null {
+function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill, first = true): BattleAction | null {
   const mine = options.filter(isSkillOption).filter((o) => KUYO_MONSTERS.includes(o.def.monsterId));
   if (mine.length === 0) return null;
   if (cpuRoll(state, side, 'kuyoTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
@@ -1169,8 +1175,15 @@ function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skil
       .sort((a, b) => b.w - a.w)[0];
     const user = availableUsers(state, side, purify.def)[0];
     // クヨウ自身を消すときは、おはらいでクヨウの手番を使うので、消したあと動けない（自分のためには使わない）
-    if (pick && user && pick.m.uid !== user.uid) return { type: 'useCard', side, cardUid: purify.card.uid, userUid: user.uid, targetUid: pick.m.uid };
+    if (first && pick && user && pick.m.uid !== user.uid) return { type: 'useCard', side, cardUid: purify.card.uid, userUid: user.uid, targetUid: pick.m.uid };
+    // 悪い状態の味方がいなければ、ライフの減った味方（いちばん減っている割合の多い味方。クヨウ自身も）を回復。
+    // 攻撃より先は、ライフが半分以下でその手番に倒せる攻撃が無いときだけ
+    const hurt = aliveMonsters(me)
+      .filter((m) => m.life < m.maxLife && (!first || (m.life <= m.maxLife / 2 && !canKillThisTurn(state, side, options))))
+      .sort((a, b) => a.life / a.maxLife - b.life / b.maxLife || a.life - b.life)[0];
+    if (!pick && hurt && user) return { type: 'useCard', side, cardUid: purify.card.uid, userUid: user.uid, targetUid: hurt.uid };
   }
+  if (!first) return null;
   const charm = mine.find((o) => o.def.effect.type === 'wardCharm');
   if (charm && !(me.wardCharm && me.wardCharm.untilTurn >= state.turn + 1) && !canKillThisTurn(state, side, options)) {
     const foe = state.sides[otherSide(side)];
@@ -1333,12 +1346,13 @@ function shouldCover(state: BattleState, side: Side, cover: SkillOption, damage:
   const allyCanEvade = options.some((o) => o.def.effect.type === 'evade');
   if (KUYO_MONSTERS.includes(geol.cardId)) {
     // みがわり：狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき。
-    // 腕前 A：クヨウの防御まで見積もって、受けたあともライフ2以上。B・C：防御は見ずに（威力−2）、受けたあともライフ1以上。C は forgetTrick の割合で使いそこねる
+    // 腕前 A：受けたあともライフ2以上。B・C：受けたあともライフ1以上。C は forgetTrick の割合で使いそこねる
     const target = findMonster(state, pending.targetUid)?.monster;
     if (!target || damage <= 0) return false;
     if (cpuRoll(state, side, 'standIn') < CPU_SKILL[skill].forgetTrick) return false;
     const low = lethal || target.life <= target.maxLife / 2;
-    const toKuyo = skill === 'A' ? toGeol : Math.max(0, pending.power - reduce);
+    // BH の直し：みがわりのあとはクヨウの守りを重ねられないので、防御は見積もりに入れない
+    const toKuyo = Math.max(0, pending.power - shieldOf(state, geol, pending.stat) - reduce);
     const roomy = geol.life - toKuyo >= (skill === 'A' ? 2 : 1);
     // 倒されそうでない味方が自分で回避できるなら、そちらにまかせる
     return low && roomy && !(allyCanEvade && !lethal);

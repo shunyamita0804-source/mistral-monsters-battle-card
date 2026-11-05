@@ -140,8 +140,8 @@ const MINI_CELL = 8;
 const MINI_MARK = 3.4;
 /** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
 const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss, switch: miniSwitch } as const;
-/** ミニマップのスイッチの印の高さ（マスの何倍か。ほかの印より小さめ。後ろの開いている扉の色の札はこれより少し大きい） */
-const MINI_SWITCH = 2.8;
+/** ミニマップのスイッチの印の高さ（マスの何倍か。2026-11-05 ユーザー指示：ほかの印と同じ大きさ。後ろの開いている扉の色の札はこれより少し大きい） */
+const MINI_SWITCH = MINI_MARK;
 /** ミニマップの色：水路・氷・扉（閉じている）（2026-10-27 ダンジョン7つ。印の絵はまだ無い） */
 const MINI_TILE_COLOR: Readonly<Record<string, string>> = { w: 'rgb(70 140 210 / 0.9)', i: 'rgb(190 230 250 / 0.9)' };
 /** ミニマップの扉（機械の塔。2026-11-05 指示書 BD）：閉じている扉はこい色、開いている扉はうすい色 */

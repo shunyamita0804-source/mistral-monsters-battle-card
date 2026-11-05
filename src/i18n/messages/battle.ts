@@ -247,7 +247,8 @@ export const BATTLE = {
   'battle.ng.coverFirst': { ja: 'ほかの守りを使ったあとは、かばえません', en: "Can't cover after another guard was used" },
   'battle.ng.coverSelf': { ja: 'かばえるのはほかの味方だけです', en: 'Can only cover another ally' },
   'battle.ng.noWardTarget': { ja: 'そなえのふえをかけられる味方がいません', en: 'No ally can be warded' },
-  'battle.ng.noPurifyTarget': { ja: '悪い状態のある味方がいません', en: 'No ally has a bad status' },
+  'battle.ng.noPurifyTarget': { ja: '悪い状態のある味方も、ライフの減った味方もいません', en: 'No ally has a bad status or lost life' },
+  'battle.ng.standInDone': { ja: 'みがわりで受けた攻撃には、守りを重ねて使えません', en: 'No more guards after Stand-In' },
   'battle.ng.handEnough': { ja: '手札がもう{n}枚以上あるので使えません', en: 'You already have {n} or more cards in hand' },
   'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },
 
