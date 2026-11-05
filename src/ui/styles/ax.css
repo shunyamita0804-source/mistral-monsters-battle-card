@@ -255,3 +255,210 @@
   font-weight: 900;
   line-height: 1;
 }
+
+/* 指示書 BA【1】：上の帯の左の枠（72px）。降参のボタンと場の状態のアイコンを並べる */
+.battle__header-left {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.battle__header-left .battle-turn__fieldicon {
+  width: 40px;
+}
+
+/* ===== 指示書 BA【2】：数字の札を大きく（数字 14px 以上。5つ以上で 19px にするときも 13px） ===== */
+.battle__monster .battle__status--icons {
+  gap: 9px;
+}
+
+.battle__st-num {
+  right: -10px;
+  bottom: -7px;
+  min-width: 26px;
+  height: 18px;
+  padding: 0 4px;
+}
+
+.battle__st-digits {
+  height: 14px;
+}
+
+.battle__st-times {
+  font-size: 14px;
+}
+
+.battle__monster .battle__status--icons.is-many {
+  gap: 7px;
+}
+
+.battle__status--icons.is-many .battle__st-num {
+  right: -9px;
+  min-width: 24px;
+  height: 17px;
+}
+
+.battle__status--icons.is-many .battle__st-digits {
+  height: 13px;
+}
+
+.battle__status--icons.is-many .battle__st-times {
+  font-size: 13px;
+}
+
+/* 場の残りの手番の札 */
+.battle-turn__fieldicon-turns {
+  right: -4px;
+  bottom: 0;
+  width: 30px;
+  height: 18px;
+  padding-right: 6px;
+  font-size: 14px;
+}
+
+/* ===== 指示書 BA【4】：技カードの効果のアイコン ===== */
+/* 大きいカード：帯の中にアイコンだけ（はっきり見える大きさ）。押すと意味を帯の上に小さく */
+.skill-card__band--icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.skill-card__fx {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4%;
+  height: 100%;
+}
+
+.skill-card__fx-btn {
+  display: block;
+  height: 175%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.75));
+}
+
+.skill-card__fx-btn .skill-card__fx-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.skill-card__fx-tip {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 22%;
+  z-index: 5;
+  padding: 4px 6px;
+  border: 1px solid rgb(201 162 74 / 0.8);
+  border-radius: 6px;
+  background: rgb(10 14 24 / 0.92);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* 手札の大きさ：右上（マナの玉の反対）に効果のアイコン。2つなら縦に */
+.skill-card__fx-hand {
+  position: absolute;
+  right: 4%;
+  top: 22%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+  width: 30%;
+  pointer-events: none;
+}
+
+.skill-card__fx-hand .skill-card__fx-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.8));
+}
+
+/* ルールの窓の「アイコンの見方」 */
+.icon-guide {
+  margin-top: 10px;
+}
+
+.icon-guide__title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: #f0d79a;
+}
+
+.icon-guide__list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.icon-guide__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.icon-guide__img {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+/* 指示書 BA【2】：数字の札（下に 7px はみ出す）がカードの絵にかからないよう、印の列をカードの 8px 上に */
+.battle__monster .battle__status--icons {
+  bottom: calc(100% + 8px);
+}
+
+.battle-camera .battle-row--opponent {
+  padding-top: 14px;
+}
+
+.battle__monster.has-status .battle__pointer {
+  top: -46px;
+}
+
+/* 指示書 BA：手札は重ねて並ぶので、右上だと次のカードに隠れる → 左の列（分類の印の下）。大きいカードは帯の真ん中に大きく */
+.skill-card__fx-hand {
+  left: 3%;
+  right: auto;
+  top: 44%;
+  width: 29%;
+}
+
+.skill-card__band--icons {
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+.skill-card__band--icons .skill-card__fx {
+  width: 100%;
+}
+
+.skill-card__fx-btn {
+  height: 210%;
+}
+
+/* 2つのときは小さく（ダメージの四角にかからない） */
+.skill-card__fx-hand:has(.skill-card__fx-img + .skill-card__fx-img) {
+  top: 40%;
+  width: 19%;
+  left: 6%;
+}

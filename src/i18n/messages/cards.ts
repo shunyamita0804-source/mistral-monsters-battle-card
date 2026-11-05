@@ -43,6 +43,13 @@ export const CARDS = {
   'card.effect.hide': { ja: '特殊', en: 'Special' },
   'card.detail.habitat': { ja: '居場所', en: 'Habitat' },
   'habitat.ground': { ja: '地上', en: 'Ground' },
+  // 技カードの効果のアイコンの意味（2026-11-05 指示書 BA【4】。カードのアイコンを押したとき・ルールの一覧）
+  'card.fx.e01': { ja: '回避されない', en: "Can't be dodged" },
+  'card.fx.e02': { ja: '防御されない', en: "Can't be guarded" },
+  'card.fx.e03': { ja: '回避されても半分のダメージ', en: 'Half damage even if dodged' },
+  'card.fx.e04': { ja: '相手全員に当たる（守りは1体ずつ）', en: 'Hits every enemy (each guards separately)' },
+  'card.fx.e05': { ja: 'ちから技に効く防御', en: 'Guard against POW skills' },
+  'card.fx.e06': { ja: 'かしこさ技に効く防御', en: 'Guard against INT skills' },
   'habitat.field.ground': { ja: '場：すべてのモンスターを地上として扱う', en: 'Field: all monsters count as grounded' },
   'habitat.field.air': { ja: '場：すべてのモンスターを空中として扱う', en: 'Field: all monsters count as airborne' },
   'habitat.field.water': { ja: '場：すべてのモンスターを水中として扱う', en: 'Field: all monsters count as underwater' },

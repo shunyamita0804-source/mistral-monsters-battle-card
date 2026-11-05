@@ -89,6 +89,16 @@ fs.mkdirSync(out, { recursive: true });
   await page.waitForTimeout(700);
   await page.locator('.battle-order__card').first().click();
   await page.waitForTimeout(4500);
+  // FIELDPOS=b（指示書 BA【1】の案B・写真だけ）：場のアイコンを上の帯の右のはし（ルールのボタンの手前）へ
+  if (process.env.FIELDPOS === 'b') {
+    await page.addStyleTag({ content: '.battle__heading{padding-right:44px!important;position:relative}.battle__heading .battle-turn__fieldicon{position:absolute;right:0;top:50%;transform:translateY(-50%)}' });
+    await page.evaluate(() => {
+      const icon = document.querySelector('.battle__header-left .battle-turn__fieldicon');
+      const heading = document.querySelector('.battle__heading');
+      if (icon && heading) heading.append(icon);
+    });
+    await page.waitForTimeout(300);
+  }
   await page.screenshot({ path: `${out}/${name}${suffix}.png` });
   console.log('shot', `${out}/${name}${suffix}.png`);
   await browser.close();

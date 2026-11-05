@@ -8,6 +8,9 @@ import { resolveCardArt } from '../cardArtSources.ts';
 import { h } from '../dom.ts';
 import { fitValueFont } from './valueFit.ts';
 import { phrases, phraseText } from '../phraseText.ts';
+import { skillEffectIcons } from '../effectIcons.ts';
+import { statusIconUrl, type StatusIconId } from '../statusIcons.ts';
+import type { MessageKey } from '../../i18n/messages/index.ts';
 
 /**
  * 技カード・サポートカード（2026-10-29 新しい形：平らな名前の帯＋大きな絵の窓だけの枠。
@@ -316,10 +319,13 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
   const frame = frameUrl(size, f.monsterId);
   // 2026-10-30 指示書 O3：9文字の技の名前（フェイントステップ など）が約2px 切れていたので、8.4文字ぶんより長い名前から字を小さくする（前は 9）
   const name = showName && l.name ? fitText(place(h('div', { class: 'skill-card__title', text: f.name }), l, l.name), f.name, 7.6, 8.4, 4) : null;
+  // 効果のアイコン（2026-11-05 指示書 BA【4】）：大きいカードは帯の文の代わりにアイコン（押すと意味を小さく出す）、手札の大きさは右上にアイコン
+  const icons = f.skill ? skillEffectIcons(f.skill) : null;
   const band =
     showText && l.band && f.text !== ''
-      ? place(h('div', { class: 'skill-card__band' }, fitBandText(l, l.band, f.text)), l, l.band)
+      ? place(h('div', { class: `skill-card__band${icons ? ' skill-card__band--icons' : ''}` }, icons ? effectIconButtons(icons) : fitBandText(l, l.band, f.text)), l, l.band)
       : null;
+  const handIcons = icons && !l.band ? h('div', { class: 'skill-card__fx-hand', attrs: { 'aria-hidden': 'true' } }, ...icons.map((id) => h('img', { class: 'skill-card__fx-img', attrs: { src: statusIconUrl(id), alt: '', draggable: 'false' } }))) : null;
   const card = h(
     'div',
     { class: `skill-card skill-card--${size}${f.skill ? '' : ' skill-card--support'}`, dataset: { category: f.category }, attrs: { role: 'img', 'aria-label': f.aria } },
@@ -327,6 +333,7 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
     frame ? h('img', { class: 'skill-card__frame', attrs: { src: frame, alt: '', draggable: 'false' } }) : null,
     valueBox(l, size, f.skill, f.supportLabel, options.damage),
     band,
+    handIcons,
     name,
     manaOrb(l, options.mana ?? f.mana, options.mana !== undefined && options.mana < f.mana),
     categoryIcon(l, f.tile),
@@ -334,6 +341,41 @@ function render(f: Face, options: SkillCardOptions): HTMLElement {
   card.style.width = `${options.width}px`;
   card.style.height = `${((options.width * l.h) / l.w).toFixed(1)}px`;
   return card;
+}
+
+/**
+ * 帯の中の効果のアイコン（押すとその意味を帯の上に小さく出す。もう一度押すか、2.5秒で消える。押さなければ文は出さない）
+ */
+function effectIconButtons(icons: readonly StatusIconId[]): HTMLElement {
+  const row = h('div', { class: 'skill-card__fx' });
+  for (const id of icons) {
+    const meaning = t(`card.fx.${id}` as MessageKey);
+    const btn = h(
+      'button',
+      {
+        class: 'skill-card__fx-btn',
+        attrs: { type: 'button', 'aria-label': meaning },
+        dataset: { se: 'none' },
+        on: {
+          click: (e: Event) => {
+            e.stopPropagation();
+            const card = btn.closest('.skill-card');
+            const old = card?.querySelector('.skill-card__fx-tip');
+            const same = old?.getAttribute('data-icon') === id;
+            old?.remove();
+            if (same || !card) return;
+            const tip = h('span', { class: 'skill-card__fx-tip', text: meaning, attrs: { 'data-icon': id, role: 'status' } });
+            card.append(tip);
+            setTimeout(() => tip.remove(), 2500);
+          },
+          pointerdown: (e: Event) => e.stopPropagation(),
+        },
+      },
+      h('img', { class: 'skill-card__fx-img', attrs: { src: statusIconUrl(id), alt: '', draggable: 'false' } }),
+    );
+    row.append(btn);
+  }
+  return row;
 }
 
 export function createSkillCard(skill: SkillCard, options: SkillCardOptions): HTMLElement {

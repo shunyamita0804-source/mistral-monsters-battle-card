@@ -64,17 +64,19 @@ function logoLayer(url: string, logo: (typeof CARD_NAME_LOGOS)[string], width: n
   img.style.top = `${top - (LOGO_GLYPH.top - logo.y) * k}px`;
   img.style.width = `${logo.w * k}px`;
   img.style.height = `${logo.h * k}px`;
+  // スウッシュ（指示書 BA【3】）：前の名前入りのカード（ガウル・ソラモ・ラズック）のように、ふちと先は枠の色・中心は明るい色（白〜うすい金）。
+  // 枠の色の線の上に、少し細く短い明るい線を重ねる（どちらも同じ形の mask）。外側に暗い細いふち
   const tint = SWOOSH_LOGO ? h('span', { class: 'card-name__swoosh-tint' }) : null;
-  const swoosh = tint ? h('span', { class: 'card-name__swoosh-wrap' }, tint) : null;
-  if (swoosh && tint && SWOOSH_LOGO) {
+  const core = SWOOSH_LOGO ? h('span', { class: 'card-name__swoosh-core' }) : null;
+  const swoosh = tint && core ? h('span', { class: 'card-name__swoosh-wrap' }, tint, core) : null;
+  if (swoosh && tint && core && SWOOSH_LOGO) {
     const sw = glyphW * k;
     swoosh.style.left = `${left}px`;
-    swoosh.style.top = `${top + LOGO_GLYPH.height * k * 1.02}px`;
-    tint.style.display = 'block';
-    tint.style.width = `${sw}px`;
-    tint.style.height = `${sw * 0.07}px`;
+    swoosh.style.top = `${top + LOGO_GLYPH.height * k * 1.0}px`;
+    swoosh.style.width = `${sw}px`;
+    swoosh.style.height = `${sw * 0.12}px`;
     tint.style.backgroundColor = logo.frame;
-    tint.style.setProperty('--swoosh', `url("${SWOOSH_LOGO}")`);
+    for (const el of [tint, core]) el.style.setProperty('--swoosh', `url("${SWOOSH_LOGO}")`);
   }
   return h('div', { class: 'card-name card-name--logo', attrs: { 'aria-hidden': 'true' } }, swoosh, img);
 }

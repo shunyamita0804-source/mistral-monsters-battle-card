@@ -217,6 +217,24 @@ const SHOWCASE_MS = 1200;
 const OPP_SHOWCASE_MS = 2400;
 /** 命中したときの一瞬の間（ヒットストップ）と画面の揺れ */
 const HIT_PAUSE_MS = 320;
+/** ルールの窓の「アイコンの見方」（2026-11-05 指示書 BA【4】） */
+const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [StatusIconId, MessageKey])[] }[] = [
+  {
+    title: 'battle.iconGuide.status',
+    items: [
+      ['b02', 'battle.iconGuide.b02'], ['b04', 'battle.iconGuide.b04'], ['b03', 'battle.iconGuide.b03'], ['b09', 'battle.iconGuide.b09'], ['b13', 'battle.iconGuide.b13'],
+      ['b05', 'battle.iconGuide.b05'], ['e05', 'battle.iconGuide.e05s'], ['e06', 'battle.iconGuide.e06s'],
+      ['s07', 'battle.iconGuide.s07'], ['s08', 'battle.iconGuide.s08'], ['s09', 'battle.iconGuide.s09'], ['s12', 'battle.iconGuide.s12'], ['s13', 'battle.iconGuide.s13'],
+      ['e01', 'battle.iconGuide.e01s'], ['e02', 'battle.iconGuide.e02s'], ['n01', 'battle.iconGuide.n01'],
+    ],
+  },
+  { title: 'battle.iconGuide.habitat', items: [['t01', 'habitat.ground'], ['t02', 'habitat.air'], ['t03', 'habitat.water']] },
+  { title: 'battle.iconGuide.field', items: [['t03', 'battle.iconGuide.fieldWater'], ['t02', 'battle.iconGuide.fieldAir'], ['t01', 'battle.iconGuide.fieldGround'], ['n02', 'battle.iconGuide.n02']] },
+  {
+    title: 'battle.iconGuide.effect',
+    items: [['e01', 'card.fx.e01'], ['e02', 'card.fx.e02'], ['e03', 'card.fx.e03'], ['e04', 'card.fx.e04'], ['e05', 'card.fx.e05'], ['e06', 'card.fx.e06']],
+  },
+];
 /** 技の対象に出す指のマークを、カードを大きく見せ終わってからも残す時間（ミリ秒） */
 const POINTER_EXTRA_MS = 500;
 /** ダメージでライフを1ずつ減らす間隔と、命中から数え始めるまで（ミリ秒） */
@@ -462,10 +480,10 @@ export const battleScreen: ScreenDefinition = {
      */
     const DETAIL_MAX_H = 240;
     /** 相手3体と自分3体のあいだ（帯のすき間も含めた見た目の値。2026-10-31 指示書 AC【1】：43 → 16 に戻す。小さい画面では FIELD_GAP_MIN まで詰める。論理px） */
-    // 2026-11-05 指示書 AZ：状態の印を 22px にしたので 16 → 24
-    const FIELD_GAP = 24;
+    // 2026-11-05 指示書 AZ：状態の印を 22px にしたので 16 → 24。指示書 BA：数字の札を大きくしたので 32
+    const FIELD_GAP = 32;
     // 2026-11-05 指示書 AX【1】：6 → 16（自分3体の上に状態の印〔高さ15〕を出すすき間。小さい画面では説明の欄が少し低くなる）
-    const FIELD_GAP_MIN = 24;
+    const FIELD_GAP_MIN = 32;
     /** 相手の手札の段の高さ（守りの選択の間はたたむので、たたむ前に測った値を覚えておく） */
     let oppHandH = 0;
     /**
@@ -1564,6 +1582,21 @@ export const battleScreen: ScreenDefinition = {
           ),
           h('p', { class: 'modal__text', text: t('battle.rulesLead') }),
           h('ul', { class: 'rule-list' }, ...provisionalRuleNotes().map((note) => h('li', { text: note }))),
+          // アイコンの見方（2026-11-05 指示書 BA【4】：状態・居場所・場・技の効果。アイコンと短い説明）
+          ...ICON_GUIDE.map((group) =>
+            h(
+              'section',
+              { class: 'icon-guide' },
+              h('h3', { class: 'icon-guide__title', text: t(group.title) }),
+              h(
+                'ul',
+                { class: 'icon-guide__list' },
+                ...group.items.map(([id, key]) =>
+                  h('li', { class: 'icon-guide__item' }, h('img', { class: 'icon-guide__img', attrs: { src: statusIconUrl(id), alt: '', draggable: 'false' } }), h('span', { text: t(key) })),
+                ),
+              ),
+            ),
+          ),
         ],
         actions: [{ label: t('common.close'), primary: true, onTap: () => handle.close() }],
       });
@@ -2301,8 +2334,15 @@ export const battleScreen: ScreenDefinition = {
       h(
         'header',
         { class: `battle__header${s ? ` battle__header--${s.phase === 'ended' ? 'ended' : s.active}` : ''}` },
-        req.allowSurrender ? topButton('surrender', t('battle.surrender'), surrender) : h('span'),
-        h('div', { class: 'battle__heading' }, s && fieldSupport(s) ? fieldChip(s) : null, s && isTideActive(s) ? tideChip(s) : null, ticker(s)),
+        // 2026-11-05 指示書 BA【1】：場の状態のアイコン（みちしお・居場所を変える場のカード）は、上の帯の左の枠（帯・相手の手札・モンスターに重ならない所）
+        h(
+          'div',
+          { class: 'battle__header-left' },
+          req.allowSurrender ? topButton('surrender', t('battle.surrender'), surrender) : null,
+          s && isTideActive(s) ? tideChip(s) : null,
+          s && fieldSupport(s)?.effect.type === 'habitat' ? fieldChip(s) : null,
+        ),
+        h('div', { class: 'battle__heading' }, s && fieldSupport(s) && fieldSupport(s)?.effect.type !== 'habitat' ? fieldChip(s) : null, ticker(s)),
         topButton('rules', t('battle.rules'), showRules),
       );
 
