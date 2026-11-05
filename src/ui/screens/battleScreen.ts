@@ -65,6 +65,8 @@ import { resolveCardArt } from '../cardArtSources.ts';
 import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import { statusIconUrl, type StatusIconId } from '../statusIcons.ts';
+import type { FxIcon, FxMark } from '../effectIcons.ts';
+import { createFxIcon, fxMarkUrl } from '../components/fxIcon.ts';
 import iconMana from '@assets/images/ui/battle/icon_mana.webp';
 import iconDeck from '@assets/images/ui/battle/icon_deck.webp';
 import iconHand from '@assets/images/ui/battle/icon_hand.webp';
@@ -218,7 +220,9 @@ const OPP_SHOWCASE_MS = 2400;
 /** 命中したときの一瞬の間（ヒットストップ）と画面の揺れ */
 const HIT_PAUSE_MS = 320;
 /** ルールの窓の「アイコンの見方」（2026-11-05 指示書 BA【4】） */
-const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [StatusIconId, MessageKey])[] }[] = [
+/** ルールの窓の絵：状態のアイコン・小さな印・効果のアイコンの見本（指示書 BB） */
+type GuideImg = StatusIconId | { readonly mark: FxMark } | { readonly fx: FxIcon };
+const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [GuideImg, MessageKey])[] }[] = [
   {
     title: 'battle.iconGuide.status',
     items: [
@@ -232,9 +236,29 @@ const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [Statu
   { title: 'battle.iconGuide.field', items: [['t03', 'battle.iconGuide.fieldWater'], ['t02', 'battle.iconGuide.fieldAir'], ['t01', 'battle.iconGuide.fieldGround'], ['n02', 'battle.iconGuide.n02']] },
   {
     title: 'battle.iconGuide.effect',
-    items: [['e01', 'card.fx.e01'], ['e02', 'card.fx.e02'], ['e03', 'card.fx.e03'], ['e04', 'card.fx.e04'], ['e05', 'card.fx.e05'], ['e06', 'card.fx.e06']],
+    items: [
+      ['e01', 'card.fx.e01'], ['e02', 'card.fx.e02'], ['e03', 'card.fx.e03'], ['e04', 'card.fx.e04'], ['e05', 'card.fx.e05'], ['e06', 'card.fx.e06'],
+      ['e15', 'card.fx.e15'], ['e17', 'card.fx.e17'], ['e18', 'card.fx.e18'], ['e21', 'card.fx.e21'], ['e24', 'card.fx.e24'], ['b11', 'card.fx.b11'], ['e13', 'card.fx.e13'],
+      ['s08', 'battle.iconGuide.effectMore'],
+    ],
+  },
+  {
+    title: 'battle.iconGuide.marks',
+    items: [
+      [{ mark: 'ally' }, 'battle.iconGuide.mAlly'], [{ mark: 'target' }, 'battle.iconGuide.mTarget'], [{ mark: 'ko' }, 'battle.iconGuide.mKo'],
+      [{ mark: 'water' }, 'battle.iconGuide.mHabitat'], [{ mark: 'force' }, 'battle.iconGuide.mForce'], [{ mark: 'wisdom' }, 'battle.iconGuide.mWisdom'],
+      [{ mark: 'charge' }, 'battle.iconGuide.mCharge'],
+      [{ fx: { main: 'b09', badge: { kind: 'value', text: '+2' } } }, 'battle.iconGuide.badgeValue'],
+      [{ fx: { main: 'e01', badge: { kind: 'turn', text: '1' } } }, 'battle.iconGuide.badgeTurn'],
+    ],
   },
 ];
+
+function guideImg(img: GuideImg): HTMLElement {
+  if (typeof img === 'string') return h('img', { class: 'icon-guide__img', attrs: { src: statusIconUrl(img), alt: '', draggable: 'false' } });
+  if ('mark' in img) return h('img', { class: 'icon-guide__img icon-guide__img--mark', attrs: { src: fxMarkUrl(img.mark), alt: '', draggable: 'false' } });
+  return h('span', { class: 'icon-guide__img icon-guide__img--fx' }, createFxIcon(img.fx));
+}
 /** 技の対象に出す指のマークを、カードを大きく見せ終わってからも残す時間（ミリ秒） */
 const POINTER_EXTRA_MS = 500;
 /** ダメージでライフを1ずつ減らす間隔と、命中から数え始めるまで（ミリ秒） */
@@ -1592,7 +1616,7 @@ export const battleScreen: ScreenDefinition = {
                 'ul',
                 { class: 'icon-guide__list' },
                 ...group.items.map(([id, key]) =>
-                  h('li', { class: 'icon-guide__item' }, h('img', { class: 'icon-guide__img', attrs: { src: statusIconUrl(id), alt: '', draggable: 'false' } }), h('span', { text: t(key) })),
+                  h('li', { class: 'icon-guide__item' }, guideImg(id), h('span', { text: t(key) })),
                 ),
               ),
             ),

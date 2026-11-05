@@ -10,7 +10,8 @@ const USED = ['b01', 'b02', 'b03', 'b04', 'b05', 'b07', 'b09', 'b13', 's07', 's0
 describe('指示書 AZ', () => {
   it('アイコン：ゲームで使う分の WebP と、43点の原本がある。使わないアイコン（S02〜S06・E08 など）はゲームに入れない', () => {
     for (const id of USED) expect(existsSync(`assets/images/ui/status/icon_${id}.webp`), id).toBe(true);
-    for (const id of ['s02', 's03', 's04', 's05', 's06', 'e08', 'e09', 'e11', 'e13', 'e14', 'n03', 'n05', 'b06', 'b08', 'b11']) {
+    // 2026-11-05 指示書 BB：e13（場の効果）・b11（回復）は技カードの効果に使うので入れた
+    for (const id of ['s02', 's03', 's04', 's05', 's06', 'e08', 'e09', 'e11', 'e14', 'n03', 'n05', 'b06', 'b08']) {
       expect(existsSync(`assets/images/ui/status/icon_${id}.webp`), id).toBe(false);
       expect(existsSync(`design-parts/status-icons-20261105/${id.toUpperCase()}.png`), id).toBe(true);
     }

@@ -462,3 +462,202 @@
   width: 19%;
   left: 6%;
 }
+
+/* ===== 指示書 BB：効果のアイコン＝本体＋小さな印（右上）＋札（右下）。大きさは .fx-icon の幅の割合（cqw） ===== */
+.fx-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8%;
+}
+
+.fx-icon {
+  position: relative;
+  display: block;
+  flex: none;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+.fx-icon__main {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.8));
+}
+
+.fx-icon__marks {
+  position: absolute;
+  top: -14%;
+  right: -16%;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 2cqw;
+}
+
+.fx-icon__mark {
+  display: block;
+  width: 48cqw;
+  height: 48cqw;
+  object-fit: contain;
+  filter: drop-shadow(0 0 1.5cqw rgb(0 0 0 / 0.95)) drop-shadow(0 0 1cqw rgb(0 0 0 / 0.9));
+}
+
+/* 分類の印（八角形の札）は少し小さく見えるので大きめに */
+.fx-icon__mark--force,
+.fx-icon__mark--wisdom {
+  width: 50cqw;
+  height: 54cqw;
+}
+
+.fx-icon__marks--2 .fx-icon__mark {
+  width: 42cqw;
+  height: 42cqw;
+}
+
+.fx-icon__badge {
+  position: absolute;
+  right: -20%;
+  bottom: -12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 80cqw;
+  height: 48cqw;
+  padding: 0 11cqw;
+  background: center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 1.5cqw rgb(0 0 0 / 0.9));
+}
+
+/* 時計の札（N02）：数字は時計の右 */
+.fx-icon__badge--turn {
+  min-width: 92cqw;
+  padding: 0 11cqw 0 42cqw;
+}
+
+.fx-icon__badge-text {
+  font-family: 'Arial Black', 'Hiragino Sans', sans-serif;
+  font-size: 33cqw;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffe08a;
+  white-space: nowrap;
+}
+
+.fx-icon__digits {
+  display: flex;
+  height: 37cqw;
+}
+
+.fx-icon__digits .battle-digits__glyph {
+  height: 100%;
+  width: auto;
+}
+
+/* 手札：左の列（分類の印の下）。本体2つは縦に小さく */
+.skill-card__fx-hand {
+  left: 3%;
+  top: 42%;
+  width: 29%;
+}
+
+.skill-card__fx-hand-row {
+  flex-direction: column;
+  gap: 10%;
+}
+
+.skill-card__fx-hand .fx-icon {
+  width: 100%;
+}
+
+.skill-card__fx-hand .fx-icon__badge {
+  right: -34%;
+  bottom: -24%;
+  min-width: 96cqw;
+  height: 60cqw;
+}
+
+.skill-card__fx-hand .fx-icon__badge--turn {
+  min-width: 112cqw;
+  padding-left: 52cqw;
+}
+
+.skill-card__fx-hand .fx-icon__badge-text {
+  font-size: 42cqw;
+}
+
+.skill-card__fx-hand .fx-icon__digits {
+  height: 46cqw;
+}
+
+.skill-card__fx-hand .fx-icon__mark {
+  width: 58cqw;
+  height: 58cqw;
+}
+
+.skill-card__fx-hand--2 {
+  top: 37%;
+  left: 7%;
+  width: 18%;
+}
+
+/* 大きいカード（指示書 BB【4】）：白い帯はやめる。案A＝帯なし（絵の上に、アイコンだけを下の効果の場所〔ダメージの四角の右〕の真ん中に） */
+.skill-card__band--icons {
+  top: 77% !important;
+  height: 20% !important;
+  background: none !important;
+  overflow: visible;
+}
+
+.skill-card__band--icons .skill-card__fx-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 90%;
+  aspect-ratio: auto;
+  filter: none;
+}
+
+.skill-card__fx {
+  height: 100%;
+  gap: 14%;
+}
+
+.skill-card__fx .fx-icon {
+  height: 100%;
+  width: auto;
+}
+
+/* 案B＝カードの枠に合う細い暗い帯（写真で比べる用：html[data-fx-band='b']） */
+:root[data-fx-band='b'] .skill-card__band--icons {
+  top: 84% !important;
+  height: 8% !important;
+  border: 1px solid rgb(201 162 74 / 0.85);
+  border-radius: 1.6cqw;
+  background: linear-gradient(rgb(28 36 58 / 0.92), rgb(12 16 28 / 0.92)) !important;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+
+:root[data-fx-band='b'] .skill-card__band--icons .skill-card__fx-btn {
+  height: 200%;
+}
+
+/* ルールの窓：小さな印は少し小さく、効果のアイコンの見本は札が入るよう右に余白 */
+.icon-guide__img--mark {
+  width: 20px;
+  height: 20px;
+  margin: 0 3px;
+}
+
+.icon-guide__img--fx {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+}
+
+.icon-guide__img--fx .fx-icon {
+  width: 100%;
+}
