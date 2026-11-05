@@ -432,7 +432,8 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   // 絵は kuyo_sk_NN.webp（番号＝技番号）。新しい効果は 08 おはらい（purify）・09 まよけのふだ（wardCharm）・11 みがわり（cover の reduce 2）
   'mon-kuyo': [
     { id: 'skl-kuyo-01', name: 'しっぽはらい', cat: 'ち', mana: 0, damage: 1, text: null, art: 'kuyo_sk_01.webp' },
-    { id: 'skl-kuyo-02', name: 'まえあしでおす', cat: 'ち', mana: 1, damage: 2, text: null, art: 'kuyo_sk_02.webp' },
+    // 2026-11-05 ユーザー決定（案G）：ダメージ 2 → 1（レア抜きの強さを下げる。docs/bh-kuyo-20261105.md）
+    { id: 'skl-kuyo-02', name: 'まえあしでおす', cat: 'ち', mana: 1, damage: 1, text: null, art: 'kuyo_sk_02.webp' },
     { id: 'skl-kuyo-03', name: 'つのでつく', cat: 'ち', mana: 2, damage: 3, text: null, art: 'kuyo_sk_03.webp' },
     { id: 'skl-kuyo-04', name: 'たてがみをふるう', cat: 'ち', mana: 3, damage: 4, text: null, art: 'kuyo_sk_04.webp' },
     { id: 'skl-kuyo-05', name: 'ひかるまなざし', cat: 'か', mana: 1, damage: 1, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'kuyo_sk_05.webp' },
