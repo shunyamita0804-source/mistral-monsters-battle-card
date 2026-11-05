@@ -46,10 +46,12 @@ export interface EventLine {
 export type PictureId =
   | 'ev2_s01_last_card' | 'ev2_s02_travel_notebook' | 'ev2_s04_promise'
   | 'ev2_n02_shop_keepsake' | 'ev2_n03_pete_sorting' | 'ev2_n07_florist' | 'ev2_n08_card_case'
-  | 'tutorial_shop_and_packs' | 'tutorial_dungeon_overview' | 'tutorial_tournament_overview' | 'tutorial_bureau_board';
+  | 'tutorial_shop_and_packs' | 'tutorial_dungeon_overview' | 'tutorial_tournament_overview' | 'tutorial_bureau_board'
+  // 2026-11-05 指示書 BF：機械の塔の赤と青の扉とスイッチ
+  | 'tutorial_tower_doors';
 
 /** 正方形の絵（説明の絵）。ほかは横長の小挿絵 */
-export const SQUARE_PICTURES: readonly PictureId[] = ['tutorial_shop_and_packs', 'tutorial_dungeon_overview', 'tutorial_tournament_overview', 'tutorial_bureau_board'];
+export const SQUARE_PICTURES: readonly PictureId[] = ['tutorial_shop_and_packs', 'tutorial_dungeon_overview', 'tutorial_tournament_overview', 'tutorial_bureau_board', 'tutorial_tower_doors'];
 
 /**
  * 会話の顔の絵を今の顔の絵の代わりに使うもの（2026-11-05 指示書 AX【4】）：シエナの会話の絵（design-parts/talk-portraits-20261030/ の承認済み）と、
@@ -449,12 +451,12 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
   },
   {
     // 機械の塔に初めて入る（2026-11-05 指示書 BD【5】。入るときの絵のあと・1回だけ。英語は仮訳）。
-    // 説明の絵（赤と青の扉とスイッチを並べた絵）はまだ無いので絵なし【要確認：絵があるとよい】
     id: 'D06', chapter: 6, order: 25.8, kind: 'main', trigger: 'dungeonEnter', dungeon: 'dungeon-06', review: true, title: { ja: '機械の塔に初めて入る', en: 'Into the Machine Tower' },
     steps: [
       L('system', '歯車の音が、塔のてっぺんまで響いている。', 'The sound of gears echoes all the way to the top of the tower.'),
       // 2026-11-05 ユーザー指示：スイッチは「調べる」なので「踏む」→「調べる」
-      L('system', '赤と青の扉は、スイッチを調べるたびに開く色が入れかわります。', 'Each time you check a switch, the open color swaps between the red and blue doors.'),
+      // 2026-11-05 指示書 BF：この行で説明の絵（赤と青の扉とスイッチ）
+      P('system', 'tutorial_tower_doors', '赤と青の扉は、スイッチを調べるたびに開く色が入れかわります。', 'Each time you check a switch, the open color swaps between the red and blue doors.'),
       L('system', 'どの扉を開けておくか考えて、上の階を目指しましょう。', 'Think about which doors to leave open, and make your way to the upper floors.'),
     ],
   },

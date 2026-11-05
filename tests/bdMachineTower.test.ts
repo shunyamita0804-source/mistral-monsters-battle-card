@@ -1,9 +1,9 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { skillsOf } from '../src/data/cards.ts';
 import { DUNGEON_RUN, runConfig, towerClimbs } from '../src/data/dungeonRun.ts';
-import { getStoryEvent } from '../src/data/storyEvents.ts';
+import { getStoryEvent, SQUARE_PICTURES } from '../src/data/storyEvents.ts';
 import {
   countDoors,
   DOOR_TILES,
@@ -187,5 +187,29 @@ describe('指示書 BD【2】〜【5】', () => {
     expect(reviewableStoryEvents(seen).map((e) => e.id)).toEqual(['D06']);
     expect(reviewableStoryEvents(s)).toEqual([]);
     expect(ev?.steps[1]?.kind === 'line' && ev.steps[1].line.text.en).toBe('Each time you check a switch, the open color swaps between the red and blue doors.');
+  });
+
+  it('指示書 BF：正式の絵（扉・スイッチ・上り階段・上の帯の印・説明の絵）。説明の絵は場面の2行目', () => {
+    for (const f of [
+      'assets/images/maps/dungeon/machine_door_red_closed.webp',
+      'assets/images/maps/dungeon/machine_door_red_open.webp',
+      'assets/images/maps/dungeon/machine_door_blue_closed.webp',
+      'assets/images/maps/dungeon/machine_door_blue_open.webp',
+      'assets/images/maps/dungeon/machine_switch_red.webp',
+      'assets/images/maps/dungeon/machine_switch_blue.webp',
+      'assets/images/maps/dungeon/machine_stairs_up.webp',
+      'assets/images/ui/dungeon/badge_door_red.webp',
+      'assets/images/ui/dungeon/badge_door_blue.webp',
+      'assets/images/backgrounds/tutorial_tower_doors.webp',
+    ]) {
+      expect(existsSync(f), f).toBe(true);
+    }
+    const css = readFileSync('src/ui/styles/dungeonRun.css', 'utf8');
+    expect(css).toContain('machine_stairs_up.webp');
+    expect(css).not.toContain('machine_stairs_down.webp');
+    expect(css).toContain('badge_door_blue.webp');
+    const step = getStoryEvent('D06').steps[1];
+    expect(step?.kind === 'line' && step.line.picture).toBe('tutorial_tower_doors');
+    expect(SQUARE_PICTURES).toContain('tutorial_tower_doors');
   });
 });

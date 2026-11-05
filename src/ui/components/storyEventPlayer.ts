@@ -11,6 +11,7 @@ import ev2N07 from '@assets/images/backgrounds/event_ev2_n07_florist.webp';
 import ev2N08 from '@assets/images/backgrounds/event_ev2_n08_card_case.webp';
 import tutShop from '@assets/images/backgrounds/tutorial_shop_and_packs.webp';
 import tutDungeon from '@assets/images/backgrounds/tutorial_dungeon_overview.webp';
+import tutTowerDoors from '@assets/images/backgrounds/tutorial_tower_doors.webp';
 import tutTournament from '@assets/images/backgrounds/tutorial_tournament_overview.webp';
 import tutBoard from '@assets/images/backgrounds/tutorial_bureau_board.webp';
 import siennaSmile from '@assets/images/characters/talk_sienna_smile.webp';
@@ -76,6 +77,7 @@ const PICTURES: Readonly<Record<PictureId, string>> = {
   ev2_n08_card_case: ev2N08,
   tutorial_shop_and_packs: tutShop,
   tutorial_dungeon_overview: tutDungeon,
+  tutorial_tower_doors: tutTowerDoors,
   tutorial_tournament_overview: tutTournament,
   tutorial_bureau_board: tutBoard,
 };

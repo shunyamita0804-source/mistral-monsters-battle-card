@@ -162,7 +162,11 @@ describe('説明の絵（指示書 AX【5】）', () => {
 
   it('原本は design-parts/ax-events-20261105/ に無改変（小挿絵7・説明の絵4）', () => {
     for (const ev of EV2) if (ev.picture) expect(existsSync(`design-parts/ax-events-20261105/small/event_small_${ev.picture}.png`), ev.id).toBe(true);
-    for (const p of SQUARE_PICTURES) expect(existsSync(`design-parts/ax-events-20261105/tutorial/${p}.png`), p).toBe(true);
+    // 2026-11-05 指示書 BF の説明の絵（機械の塔）は design-parts/machine-tower-20261105/
+    for (const p of SQUARE_PICTURES) {
+      const dir = p === 'tutorial_tower_doors' ? 'design-parts/machine-tower-20261105' : 'design-parts/ax-events-20261105/tutorial';
+      expect(existsSync(`${dir}/${p}.png`), p).toBe(true);
+    }
     expect(readFileSync('design-parts/ax-events-20261105/event_batch02_scripts.md', 'utf8')).toContain('EV2_S01');
   });
 });

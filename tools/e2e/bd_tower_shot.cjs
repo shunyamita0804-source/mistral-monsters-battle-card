@@ -21,9 +21,9 @@ fs.mkdirSync(out, { recursive: true });
   await page.addStyleTag({ content: '.stage-diag{display:none!important}' });
 
   /** その階で、スイッチのとなりに立つ場所（扉がいちばん近いスイッチ）。explored＝全部見た（ミニマップに全部出す）か、まわりだけか */
-  const mount = async ({ floor, explored, intro, seen, door = false, blue = false }) =>
+  const mount = async ({ floor, explored, intro, seen, door = false, blue = false, stairs = false }) =>
     page.evaluate(
-      async ({ floor, explored, intro, seen, seed, door, blue }) => {
+      async ({ floor, explored, intro, seen, seed, door, blue, stairs }) => {
         const { createNewSave } = await import('/src/game/save/saveData.ts');
         const { runFloor, startRun } = await import('/src/game/dungeon/run.ts');
         const { isDoorTile, isWalkableTile } = await import('/src/game/dungeon/generate.ts');
@@ -40,7 +40,8 @@ fs.mkdirSync(out, { recursive: true });
         const dirs = [['up', 0, 1], ['down', 0, -1], ['left', 1, 0], ['right', -1, 0]];
         let at = { x: f.start.x, y: f.start.y, dir: 'down' };
         // door＝扉のとなりに立つ（扉の方を向く）。ふだんはスイッチのとなり
-        const target = door ? doors[Math.floor(doors.length / 2)] : sw;
+        // stairs＝上り階段のとなり（2026-11-05 指示書 BF）
+        const target = stairs && f.stairs ? f.stairs : door ? doors[Math.floor(doors.length / 2)] : sw;
         for (const [dir, dx, dy] of dirs) {
           const p = { x: target.x + dx, y: target.y + dy };
           if (isWalkableTile(f.tiles[p.y]?.[p.x], 'all') && !isDoorTile(f.tiles[p.y]?.[p.x]) && !f.entities.some((e) => e.x === p.x && e.y === p.y)) {
@@ -48,7 +49,7 @@ fs.mkdirSync(out, { recursive: true });
             break;
           }
         }
-        const run = { ...save.dungeonRun, floor, x: at.x, y: at.y, dir: at.dir, explored: explored ? '1'.repeat(f.width * f.height) : '', cooldown: 999, blueDoorFloor: blue ? floor : null, torchFloor: door ? floor : null };
+        const run = { ...save.dungeonRun, floor, x: at.x, y: at.y, dir: at.dir, explored: explored ? '1'.repeat(f.width * f.height) : '', cooldown: 999, blueDoorFloor: blue ? floor : null, torchFloor: door || stairs ? floor : null };
         save = { ...save, dungeonRun: run };
         localStorage.setItem('mistria-battle-card/save', JSON.stringify(save));
         const { GameStore } = await import('/src/ui/gameStore.ts');
@@ -62,7 +63,7 @@ fs.mkdirSync(out, { recursive: true });
         stage.element.dataset.screen = 'dungeonRun';
         stage.element.replaceChildren(screen.element);
       },
-      { floor, explored, intro, seen, seed: SEED, door, blue },
+      { floor, explored, intro, seen, seed: SEED, door, blue, stairs },
     );
   const closeModal = async () => {
     await page.locator('.modal button').last().click({ timeout: 2000 }).catch(() => {});
@@ -103,6 +104,12 @@ fs.mkdirSync(out, { recursive: true });
       await page.waitForTimeout(2200);
       await page.screenshot({ path: `${out}/tower_f${floor + 1}_door_${blue ? 'blue' : 'red'}${suffix}.png` });
     }
+  }
+  // 上り階段のとなり（1階・3階。指示書 BF）
+  for (const floor of [0, 2]) {
+    await mount({ floor, explored: true, intro: false, seen: true, stairs: true });
+    await page.waitForTimeout(2200);
+    await page.screenshot({ path: `${out}/tower_f${floor + 1}_stairs${suffix}.png` });
   }
   // 3. 上の帯の印とミニマップ（1階の青・赤を大きく切り出す）
   await mount({ floor: 2, explored: true, intro: false, seen: true });

@@ -363,7 +363,8 @@
   --d5-floor: url('@assets/images/maps/dungeon/machine_floor.webp');
   --d5-top: url('@assets/images/maps/dungeon/machine_wall_top.webp');
   --d5-face: url('@assets/images/maps/dungeon/machine_wall_face.webp');
-  --d5-stairs: url('@assets/images/maps/dungeon/machine_stairs_down.webp');
+  /* 2026-11-05 指示書 BF：塔なので上り階段の絵 */
+  --d5-stairs: url('@assets/images/maps/dungeon/machine_stairs_up.webp');
   --d5-floor-size: 135px 137px;
   --d5-top-size: 130px 137px;
   --d5-face-size: 101px 48px;
@@ -648,7 +649,7 @@
 }
 
 /*
- * 扉（機械の塔。2026-11-05 指示書 BD：赤の扉と青の扉）：開いている色の扉だけ開いた絵（is-open-red／is-open-blue）。上のマスに少しはみ出して立てる。
+ * 扉（機械の塔。2026-11-05 指示書 BD：赤の扉と青の扉。絵は指示書 BF の正式の絵）：開いている色の扉だけ開いた絵（is-open-red／is-open-blue）。上のマスに少しはみ出して立てる。
  * 開いた扉は床の上に色のうすい光を敷いて、床と見分けがつくように
  */
 .drun__tile--door {
@@ -732,7 +733,7 @@
   animation: drun-door-switch 0.42s ease-out;
 }
 
-/* 上の帯の左：いま開いている扉の色の印（文字なし） */
+/* 上の帯の左：いま開いている扉の色の印（文字なし。2026-11-05 指示書 BF で正式の絵に） */
 .drun__place-row {
   display: flex;
   align-items: center;
@@ -742,21 +743,15 @@
 
 .drun__door-mark {
   flex: none;
-  width: 30px;
-  height: 30px;
-  border: 2px solid rgb(255 236 190 / 0.95);
-  border-radius: 50%;
-  background:
-    url('@assets/images/maps/dungeon/machine_door_red_open.webp') center 70% / auto 20px no-repeat,
-    radial-gradient(circle at 50% 40%, #ff8a78, #c8281e 70%);
-  box-shadow: 0 0 8px rgb(255 90 70 / 0.9);
+  width: 32px;
+  height: 32px;
+  background: url('@assets/images/ui/dungeon/badge_door_red.webp') center / contain no-repeat;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
 }
 
+/* 2026-11-05 指示書 BF：正式の印（赤＝三角のランプ・青＝丸のランプ） */
 .drun__door-mark--blue {
-  background:
-    url('@assets/images/maps/dungeon/machine_door_blue_open.webp') center 70% / auto 20px no-repeat,
-    radial-gradient(circle at 50% 40%, #8cb8ff, #2457c8 70%);
-  box-shadow: 0 0 8px rgb(90 140 255 / 0.9);
+  background-image: url('@assets/images/ui/dungeon/badge_door_blue.webp');
 }
 
 .drun__door-mark[hidden] {
