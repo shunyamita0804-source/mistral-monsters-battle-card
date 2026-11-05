@@ -116,3 +116,142 @@
   width: 100%;
   min-height: 44px;
 }
+
+/* ===== 2026-11-05 指示書 AZ【2】：状態の印を新しいアイコンだけで（文字なし）。22px・数字は右下の札 ===== */
+.battle__monster .battle__status--icons {
+  height: 22px;
+  gap: 3px;
+}
+
+.battle__st {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+.battle__st-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 数字の札（N01）：アイコンの右下に小さく。数字は今のゲームの数字の絵（battleDigits）、×2 は文字 */
+.battle__st-num {
+  position: absolute;
+  right: -7px;
+  bottom: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 11px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  background: center / 100% 100% no-repeat;
+}
+
+.battle__st-digits {
+  display: flex;
+  align-items: center;
+  height: 9px;
+}
+
+.battle__st-digits .battle-digits__glyph {
+  height: 100%;
+  width: auto;
+}
+
+.battle__st-times {
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffe08a;
+}
+
+/* 5つ以上でカードの幅に入らないときは少し小さく */
+.battle__monster .battle__status--icons.is-many {
+  gap: 1px;
+}
+
+.battle__status--icons.is-many .battle__st {
+  width: 19px;
+  height: 19px;
+}
+
+.battle__monster.has-status .battle__pointer {
+  top: -38px;
+}
+
+/* 相手3体の上（相手の手札の段とのあいだ）に、印の分のすき間 */
+.battle-camera .battle-row--opponent {
+  padding-top: 8px;
+}
+
+/* ===== 指示書 AZ【3】：居場所の印は新しいアイコン（丸い地と白いふちは使わない） ===== */
+.habitat-mark--icon {
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+  width: calc(32px * var(--u, 1));
+  height: calc(32px * var(--u, 1));
+}
+
+.habitat-mark__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6));
+}
+
+.habitat-mark--icon.is-tide {
+  box-shadow: 0 0 0 2px rgb(110 210 255 / 0.85), 0 0 6px 2px rgb(40 140 220 / 0.7);
+}
+
+.battle__monster .habitat-mark--icon {
+  width: 21px;
+  height: 21px;
+  border-width: 0;
+}
+
+/* 指示書 AZ【3】：場の状態（上の帯）：アイコンだけ。みちしおは右下に残りの手番の札（N02） */
+.battle-turn__fieldicon {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.battle-turn__fieldicon-img {
+  display: block;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.7));
+}
+
+.battle-turn__fieldicon-turns {
+  position: absolute;
+  right: -6px;
+  bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 28px;
+  height: 12px;
+  padding-right: 4px;
+  box-sizing: border-box;
+  background: center / 100% 100% no-repeat;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+}

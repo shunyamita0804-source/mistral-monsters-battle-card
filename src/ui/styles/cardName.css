@@ -1,53 +1,17 @@
-/* ===== 2026-11-05 指示書 AY：モンスターカードの名前（ゲームが書く） =====
- * 字体は使う文字だけに減らした WOFF2（tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/license_*.txt）。
- * 3案：a＝Reggae One＋Bangers・b＝Dela Gothic One＋Bungee・c＝Yuji Boku＋Permanent Marker（html の data-card-font。無ければ a） */
-@font-face {
-  font-family: 'MM Card Name Reggae';
-  src: url('@assets/fonts/card-name/reggae-one.woff2') format('woff2');
-  font-display: swap;
-}
-@font-face {
-  font-family: 'MM Card Name Dela';
-  src: url('@assets/fonts/card-name/dela-gothic-one.woff2') format('woff2');
-  font-display: swap;
-}
-@font-face {
-  font-family: 'MM Card Name Yuji';
-  src: url('@assets/fonts/card-name/yuji-boku.woff2') format('woff2');
-  font-display: swap;
-}
+/* ===== 2026-11-05 指示書 AY・AZ：モンスターカードの名前（ゲームが重ねる） =====
+ * 日本語は名前のロゴの絵（指示書 AZ。src/ui/components/cardNameLayer.ts）。英語のロゴはまだ無いので、英語は仮の字体 Bangers で書く
+ * （使う文字だけに減らした WOFF2。tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/license_bangers.txt）。
+ * AY の字体3案（Reggae One・Dela Gothic One・Yuji Boku・Bungee・Permanent Marker）は指示書 AZ でやめた */
 @font-face {
   font-family: 'MM Card Name Bangers';
   src: url('@assets/fonts/card-name/bangers.woff2') format('woff2');
   font-display: swap;
 }
-@font-face {
-  font-family: 'MM Card Name Bungee';
-  src: url('@assets/fonts/card-name/bungee.woff2') format('woff2');
-  font-display: swap;
-}
-@font-face {
-  font-family: 'MM Card Name Marker';
-  src: url('@assets/fonts/card-name/permanent-marker.woff2') format('woff2');
-  font-display: swap;
-}
 
 :root {
-  --card-name-ja: 'MM Card Name Reggae';
+  --card-name-ja: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --card-name-en: 'MM Card Name Bangers';
   --card-name-en-scale: 1.12;
-}
-
-:root[data-card-font='b'] {
-  --card-name-ja: 'MM Card Name Dela';
-  --card-name-en: 'MM Card Name Bungee';
-  --card-name-en-scale: 0.86;
-}
-
-:root[data-card-font='c'] {
-  --card-name-ja: 'MM Card Name Yuji';
-  --card-name-en: 'MM Card Name Marker';
-  --card-name-en-scale: 1;
 }
 
 .card-name {
@@ -97,4 +61,39 @@
   position: relative;
   display: inline-block;
   line-height: 0;
+}
+
+/* 指示書 AZ：ロゴの絵とスウッシュ（枠の色に染める）。位置と大きさはカードの幅から JS が決める */
+.card-name--logo {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.card-name__logo {
+  position: absolute;
+  z-index: 1;
+  max-width: none;
+  filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.35));
+}
+
+.card-name__swoosh-wrap {
+  position: absolute;
+  z-index: 0;
+  filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.75)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.5));
+}
+
+.card-name__swoosh-tint {
+  position: absolute;
+  z-index: 0;
+  -webkit-mask: var(--swoosh) center / 100% 100% no-repeat;
+  mask: var(--swoosh) center / 100% 100% no-repeat;
+  /* 枠の色と同じ色の背景でも線が分かるよう、暗いふちを付ける（mask の外側に出す影なので、包む span の filter） */
+}
+
+/* 名前の層がカードの外（図鑑の上のボタンなど）に重ならないよう、カードの中だけで重ね順を決める */
+.monster-card--art,
+.card-name-host {
+  isolation: isolate;
 }

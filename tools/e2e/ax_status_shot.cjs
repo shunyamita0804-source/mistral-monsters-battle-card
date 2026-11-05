@@ -37,20 +37,37 @@ fs.mkdirSync(out, { recursive: true });
         '.battle__monster--opponent .battle__status.is-many .battle__status-text{padding:0 4px 0 0!important}',
     });
   }
-  await page.evaluate(async ([plan]) => {
+  await page.evaluate(async ([plan, marks, field]) => {
+    globalThis.__marks = marks;
+    globalThis.__field = field;
     globalThis.__battlePatch = (s) => {
       const t = s.turn;
-      // 自分：1体目に3つ・2体目に1つ（＋右上の角の印）・3体目は0
+      // MARKS=az：自分 5・1・0／相手 0・3・ためている系。ふだん（AX）：自分 3・1・0／相手 0・3・1
+      const az = globalThis.__marks === 'az';
       const pm = s.sides.player.monsters.map((m, i) =>
-        i === 0 ? { ...m, weaken: { stat: 'force', amount: 1 }, sealedTurn: t, energy: { turn: t + 2 } } : i === 1 ? { ...m, pinTurn: t, tailwind: { turn: t + 2, amount: 1 } } : m,
+        i === 0
+          ? az
+            ? { ...m, weaken: { stat: 'force', amount: 1 }, sealedTurn: t, energy: { turn: t + 2 }, shield: { untilTurn: t + 1, against: 'wisdom', reduce: 2 }, windRide: { turn: t + 2, discount: 1 } }
+            : { ...m, weaken: { stat: 'force', amount: 1 }, sealedTurn: t, energy: { turn: t + 2 } }
+          : i === 1
+            ? { ...m, pinTurn: t, tailwind: { turn: t + 2, amount: 1 } }
+            : m,
       );
-      // 相手：1体目は0・2体目に3つ・3体目に1つ
       const om = s.sides.opponent.monsters.map((m, i) =>
-        i === 1 ? { ...m, stunnedTurn: t, stunMark: 'frozen', weaken: { stat: 'wisdom', amount: 2 }, shield: { untilTurn: t + 1, against: 'all', reduce: 1 } } : i === 2 ? { ...m, hiddenTurn: t + 1, charge: true } : m,
+        i === 1
+          ? { ...m, stunnedTurn: t, stunMark: 'frozen', weaken: { stat: 'wisdom', amount: 2 }, shield: { untilTurn: t + 1, against: 'all', reduce: 1 } }
+          : i === 2
+            ? az
+              ? { ...m, hiddenTurn: t + 1, charge: 2, dragonGaze: { turn: t + 2 } }
+              : { ...m, hiddenTurn: t + 1, charge: true }
+            : m,
       );
       const player = { ...s.sides.player, monsters: pm, manaPile: s.sides.player.deck.slice(0, 3), deck: s.sides.player.deck.slice(3) };
       const opponent = { ...s.sides.opponent, monsters: om, hand: s.sides.opponent.deck.slice(0, 5), manaPile: s.sides.opponent.deck.slice(5, 8), deck: s.sides.opponent.deck.slice(8) };
-      return { ...s, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player, opponent } };
+      // FIELD=tide（みちしお。あと2手番）・air（まいあがる風）・ground（しずまる大地）
+      const f = globalThis.__field;
+      const field = f === 'tide' ? { cardId: 'skl-kalshell-15', owner: 'opponent', habitat: 'water', untilTurn: t + 1 } : f === 'air' ? { cardId: 'sup-12', owner: 'opponent', habitat: 'air' } : f === 'ground' ? { cardId: 'sup-13', owner: 'player', habitat: 'ground' } : null;
+      return { ...s, field, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { ...s.sides, player, opponent } };
     };
     const { createNewSave } = await import('/src/game/save/saveData.ts');
     const s0 = createNewSave(new Date(2026, 10, 5));
@@ -67,7 +84,7 @@ fs.mkdirSync(out, { recursive: true });
     const screen = SCREENS.battle.create({ navigate: noop, back: noop, reset: noop, store });
     stage.element.dataset.screen = 'battle';
     stage.element.replaceChildren(screen.element);
-  }, [PLAN]);
+  }, [PLAN, process.env.MARKS || '', process.env.FIELD || '']);
   await page.waitForSelector('.battle-order__card', { timeout: 15000 });
   await page.waitForTimeout(700);
   await page.locator('.battle-order__card').first().click();

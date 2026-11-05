@@ -10,6 +10,8 @@ from pathlib import Path
 
 from fontTools import subset
 
+# 2026-11-05 指示書 AZ：日本語の名前はロゴの絵にしたので、英語の Bangers だけ使う（ほかの5つは試した案。作り直すときは SOURCES から外す）
+USED = {'bangers'}
 SOURCES = {
     # 名前: (TTF のファイル名, 出どころ, ライセンス, 日本語か)
     'reggae-one': ('ReggaeOne.ttf', 'https://fonts.google.com/specimen/Reggae+One', 'OFL-1.1', True),
@@ -27,6 +29,8 @@ KATAKANA = ''.join(chr(c) for c in range(0x30A1, 0x30F7)) + 'ー・仮'
 def main(src: Path, dst: Path) -> None:
     dst.mkdir(parents=True, exist_ok=True)
     for name, (ttf, _url, _lic, ja) in SOURCES.items():
+        if name not in USED:
+            continue
         text = (KATAKANA + LATIN) if ja else LATIN
         opts = subset.Options()
         opts.flavor = 'woff2'

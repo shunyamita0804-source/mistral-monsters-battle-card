@@ -1,4 +1,4 @@
-import { getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
+import { cardCatalog, getMonster, getPlayCard, getSkill } from '../../data/cards.ts';
 import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_ID, OVERDRIVE_IDS } from '../../data/gearos.ts';
 import { NAMELESS_OFFICIAL_ART } from '../../data/cardNames.ts';
 import { cardNameLayer } from '../components/cardNameLayer.ts';
@@ -64,8 +64,7 @@ import { versusBanner } from '../components/versusBanner.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
 import { battleDigits } from '../components/battleDigits.ts';
-import iconStatForce from '@assets/images/ui/battle/icon_stat_force.webp';
-import iconStatWisdom from '@assets/images/ui/battle/icon_stat_wisdom.webp';
+import { statusIconUrl, type StatusIconId } from '../statusIcons.ts';
 import iconMana from '@assets/images/ui/battle/icon_mana.webp';
 import iconDeck from '@assets/images/ui/battle/icon_deck.webp';
 import iconHand from '@assets/images/ui/battle/icon_hand.webp';
@@ -82,18 +81,8 @@ import fxManaSpend from '@assets/images/effects/fx_mana_spend.webp';
 import targetPlayerArt from '@assets/images/ui/battle/target_player.webp';
 import targetOpponentArt from '@assets/images/ui/battle/target_opponent.webp';
 import knockoutArt from '@assets/images/ui/battle/knockout_mark.webp';
-import statusSealedArt from '@assets/images/ui/battle/status_sealed.webp';
-import statusChargedArt from '@assets/images/ui/battle/status_charged.webp';
-import statusTailwindArt from '@assets/images/ui/battle/status_tailwind.webp';
-import statusStunnedArt from '@assets/images/ui/battle/status_stunned.webp';
-import statusTauntArt from '@assets/images/ui/battle/status_taunt.webp';
-import statusShieldArt from '@assets/images/ui/battle/status_shield.webp';
 import statusActedArt from '@assets/images/ui/battle/status_acted.webp';
-import statusWeakenArt from '@assets/images/ui/battle/status_weaken.webp';
 // 2026-10-30 指示書 X：凍った（ヒョウズク）・エネルギーをためた・回避できない（原本 design-parts/battle-status-20261030/。256×256 を 64×64 に縮めただけ）
-import statusFrozenArt from '@assets/images/ui/battle/status_frozen.webp';
-import statusEnergyArt from '@assets/images/ui/battle/status_energy.webp';
-import statusNoEvadeArt from '@assets/images/ui/battle/status_no_evade.webp';
 import rulesArt1 from '@assets/images/ui/rules/rules_1.webp';
 import rulesArt2 from '@assets/images/ui/rules/rules_2.webp';
 import rulesArt3 from '@assets/images/ui/rules/rules_3.webp';
@@ -228,8 +217,6 @@ const SHOWCASE_MS = 1200;
 const OPP_SHOWCASE_MS = 2400;
 /** 命中したときの一瞬の間（ヒットストップ）と画面の揺れ */
 const HIT_PAUSE_MS = 320;
-/** 状態の印の能力の絵（技カードのバーの拳・本の丸。tools/design/stat_icon_crop.py） */
-const STAT_ICON: Readonly<Record<StatType, string>> = { force: iconStatForce, wisdom: iconStatWisdom };
 /** 技の対象に出す指のマークを、カードを大きく見せ終わってからも残す時間（ミリ秒） */
 const POINTER_EXTRA_MS = 500;
 /** ダメージでライフを1ずつ減らす間隔と、命中から数え始めるまで（ミリ秒） */
@@ -475,9 +462,10 @@ export const battleScreen: ScreenDefinition = {
      */
     const DETAIL_MAX_H = 240;
     /** 相手3体と自分3体のあいだ（帯のすき間も含めた見た目の値。2026-10-31 指示書 AC【1】：43 → 16 に戻す。小さい画面では FIELD_GAP_MIN まで詰める。論理px） */
-    const FIELD_GAP = 16;
+    // 2026-11-05 指示書 AZ：状態の印を 22px にしたので 16 → 24
+    const FIELD_GAP = 24;
     // 2026-11-05 指示書 AX【1】：6 → 16（自分3体の上に状態の印〔高さ15〕を出すすき間。小さい画面では説明の欄が少し低くなる）
-    const FIELD_GAP_MIN = 16;
+    const FIELD_GAP_MIN = 24;
     /** 相手の手札の段の高さ（守りの選択の間はたたむので、たたむ前に測った値を覚えておく） */
     let oppHandH = 0;
     /**
@@ -1691,7 +1679,6 @@ export const battleScreen: ScreenDefinition = {
               acted && !down ? h('span', { class: 'battle__acted' }, statusIcon(statusActedArt), h('span', { text: t('battle.monster.acted') })) : null,
               // 吠える・ダストキック（技のダメージ−）・すなかけ（次の手番は攻撃できない）・ちょうはつ（ラズックだけ）がかかっている印
               !down ? statusBadges(s, m) : null,
-              !down ? cornerMarks(s, m) : null,
               diff < 0 ? h('span', { class: 'battle__burst', attrs: { 'aria-hidden': 'true' } }) : null,
               ...hitFxOn(m.uid),
               // 回復は「+2」、ダメージは「-3」のように出す（2026-10-29 夜 ユーザー指示「ダメージの数字とライフが減る」。前はダメージの数字を出さなかった）。
@@ -1732,79 +1719,68 @@ export const battleScreen: ScreenDefinition = {
 
     /**
      * 状態の印と、その文（大きく見せたときの説明の行・読み上げに使う）。
-     * 2026-11-05 指示書 AX【1】：印は場のカードの上（カードの外）に横一列で出す。絵には重ねない
+     * 2026-11-05 指示書 AX【1】：印は場のカードの上（カードの外）に横一列で出す。絵には重ねない。
+     * 2026-11-05 指示書 AZ【2】：新しいアイコン（src/ui/statusIcons.ts）だけで出す（画面に文字は出さない。数字は出す）。
+     * 数字は N01 の札に今の数字（battleDigits）で −n・＋n、×2 は文字。右上の角の印（ためている・おいかぜ・声援・かぜのり）もこの1列にまとめた
      */
     const statusEntries = (s: BattleState, m: BattleMonster): { el: HTMLElement; label: string }[] => {
       const items: { el: HTMLElement; label: string }[] = [];
-      const push = (el: HTMLElement, label: string): void => {
-        items.push({ el, label });
+      const badge = (icon: StatusIconId, label: string, num?: number | 'x2'): void => {
+        items.push({
+          el: h(
+            'span',
+            { class: 'battle__st', attrs: { role: 'img', 'aria-label': label } },
+            h('img', { class: 'battle__st-icon', attrs: { src: statusIconUrl(icon), alt: '', draggable: 'false' } }),
+            num === undefined
+              ? null
+              : h(
+                  'span',
+                  { class: 'battle__st-num', attrs: { style: `background-image:url("${statusIconUrl('n01')}")` } },
+                  num === 'x2' ? h('span', { class: 'battle__st-times', text: '×2' }) : battleDigits(num, 'battle__st-digits'),
+                ),
+          ),
+          label,
+        });
       };
-      const weakenBadge = (stat: StatType, n: number): HTMLElement =>
-        h(
-          'span',
-          { class: 'battle__status-stat', attrs: { role: 'img', 'aria-label': t('battle.status.weaken', { stat: statLabel(stat), n }) } },
-          statusIcon(statusWeakenArt),
-          h('img', { class: 'battle__status-icon', attrs: { src: STAT_ICON[stat], alt: '', draggable: 'false' } }),
-          battleDigits(-n, 'battle__status-num'),
-        );
-      // 熱風の威嚇は期限（untilTurn）が過ぎたら出さない
-      if (m.weaken && (m.weaken.untilTurn === undefined || m.weaken.untilTurn >= s.turn)) push(weakenBadge(m.weaken.stat, m.weaken.amount), t('battle.status.weaken', { stat: statLabel(m.weaken.stat), n: m.weaken.amount }));
-      // ダストキック：かけた手番（相手の番）と、効く手番（次の手番）の間だけ出す
-      if (m.weakenTurn && m.weakenTurn.turn >= s.turn) push(weakenBadge(m.weakenTurn.stat, m.weakenTurn.amount), t('battle.status.weaken', { stat: statLabel(m.weakenTurn.stat), n: m.weakenTurn.amount }));
-      // 状態のアイコン（2026-10-26 デザイン第9弾。文字も残す）
-      const textBadge = (art: string, text: string): { el: HTMLElement; label: string } => ({
-        el: h('span', { class: 'battle__status-text', attrs: { title: text } }, statusIcon(art), h('span', { class: 'battle__status-label', text })),
-        label: text,
-      });
-      const pushText = (b: { el: HTMLElement; label: string }): void => push(b.el, b.label);
-      if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) pushText(textBadge(statusSealedArt, t('battle.status.sealed')));
-      // まきつく：次の手番は技を使えない（2026-10-26 から印を出す）。ヒョウズクのこおりのいき・ふぶきで付いたときは「凍った」の印（2026-10-30 指示書 X）
-      if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) {
-        pushText(m.stunMark === 'frozen' ? textBadge(statusFrozenArt, t('battle.status.frozen')) : textBadge(statusStunnedArt, t('battle.status.stunned')));
-      }
-      // ジオルのじならし：この手番に受ける次の攻撃1回を回避できない（2026-10-30 指示書 X）
-      if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn && m.life > 0) pushText(textBadge(statusNoEvadeArt, t('battle.status.noEvade')));
-      // ジオルのエネルギーをためる：かけた手番から、効く手番まで（相手からも見える。2026-10-30 指示書 X。前は右上の角の「ためている」の印）
-      if (m.energy && m.life > 0 && s.turn <= m.energy.turn) pushText(textBadge(statusEnergyArt, t('battle.status.energy')));
-      // タイラントの竜のまなざし・竜のちから（2026-11-05 指示書 AX）：かけた手番から、効く手番まで（相手からも見える）。印の絵は【仮】で今ある絵を使う
-      if (m.dragonGaze && m.life > 0 && s.turn <= m.dragonGaze.turn) pushText(textBadge(statusNoEvadeArt, t('battle.status.dragonGaze')));
-      if (m.dragonMight && m.life > 0 && s.turn <= m.dragonMight.turn) pushText(textBadge(statusShieldArt, t('battle.status.dragonMight')));
-      // すなをほる：攻撃の対象にならない（使った手番と相手の次の手番の間だけ出す。絵は守りの印を使う）
-      if (m.hiddenTurn !== undefined && m.hiddenTurn !== null && m.hiddenTurn >= s.turn) pushText(textBadge(statusShieldArt, t('battle.status.hidden')));
-      if (m.taunt && m.taunt.turn >= s.turn) pushText(textBadge(statusTauntArt, t('battle.status.taunted', { only: cardName(m.taunt.monsterId) })));
-      // しめったはだ：受けるダメージ−（使った手番と相手の次の手番の間だけ出す）
+      if (m.life <= 0) return items;
+      const weakenIcon = (stat: StatType): StatusIconId => (stat === 'force' ? 'b02' : 'b04');
+      // 吠える・熱風の威嚇（期限 untilTurn が過ぎたら出さない）
+      if (m.weaken && (m.weaken.untilTurn === undefined || m.weaken.untilTurn >= s.turn)) badge(weakenIcon(m.weaken.stat), t('battle.status.weaken', { stat: statLabel(m.weaken.stat), n: m.weaken.amount }), -m.weaken.amount);
+      // ダストキック：かけた手番（相手の番）と、効く手番（次の手番）の間だけ
+      if (m.weakenTurn && m.weakenTurn.turn >= s.turn) badge(weakenIcon(m.weakenTurn.stat), t('battle.status.weaken', { stat: statLabel(m.weakenTurn.stat), n: m.weakenTurn.amount }), -m.weakenTurn.amount);
+      if (m.sealedTurn !== undefined && m.sealedTurn !== null && m.sealedTurn >= s.turn) badge('s08', t('battle.status.sealed'));
+      // まきつく・凍った（指示書 AZ：どちらも鎖 S07。説明の文は分ける）
+      if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) badge('s07', t(m.stunMark === 'frozen' ? 'battle.status.frozen' : 'battle.status.stunned'));
+      // ジオルのじならし：この手番に受ける次の攻撃1回を回避できない
+      if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn) badge('s09', t('battle.status.noEvade'));
+      // ジオルのエネルギーをためる：次のかしこさ技 2倍
+      if (m.energy && s.turn <= m.energy.turn) badge('b03', t('battle.status.energy'), 'x2');
+      // タイラントの竜のまなざし・竜のちから
+      if (m.dragonGaze && s.turn <= m.dragonGaze.turn) badge('e01', t('battle.status.dragonGaze'));
+      if (m.dragonMight && s.turn <= m.dragonMight.turn) badge('e02', t('battle.status.dragonMight'));
+      // すなをほる：攻撃の対象にならない
+      if (m.hiddenTurn !== undefined && m.hiddenTurn !== null && m.hiddenTurn >= s.turn) badge('s12', t('battle.status.hidden'));
+      if (m.taunt && m.taunt.turn >= s.turn) badge('s13', t('battle.status.taunted', { only: cardName(m.taunt.monsterId) }));
+      // しめったはだ：受けるダメージ−（ちから＝E05・かしこさ＝E06・両方＝B05）
       if (m.shield && m.shield.untilTurn >= s.turn) {
         const stat = m.shield.against === 'all' ? t('card.stat.all') : statLabel(m.shield.against);
-        pushText(textBadge(statusShieldArt, t('battle.status.shield', { stat, n: m.shield.reduce })));
+        badge(m.shield.against === 'force' ? 'e05' : m.shield.against === 'wisdom' ? 'e06' : 'b05', t('battle.status.shield', { stat, n: m.shield.reduce }), -m.shield.reduce);
       }
-      // そなえのふえ（フォルン 2026-11-02 指示書 AL）：受けるダメージ−（かけた手番と相手の次の手番の間だけ出す。相手からも見える。しめったはだと同じ盾の印）
-      if (m.ward && m.life > 0 && m.ward.untilTurn >= s.turn) pushText(textBadge(statusShieldArt, t('battle.status.ward', { n: m.ward.reduce })));
+      // そなえのふえ（フォルン）：受けるダメージ−
+      if (m.ward && m.ward.untilTurn >= s.turn) badge('b05', t('battle.status.ward', { n: m.ward.reduce }), -m.ward.reduce);
+      // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
+      if (m.charge) badge('b09', t('battle.status.chargedN', { n: m.charge }), m.charge);
+      if (m.tailwind && m.tailwind.turn >= s.turn) badge('b09', t('battle.status.tailwind', { n: m.tailwind.amount }), m.tailwind.amount);
+      if (m.cheer && m.cheer.turn === s.turn) badge('b09', t('battle.status.cheer', { n: m.cheer.amount }), m.cheer.amount);
+      if (m.windRide && m.windRide.turn >= s.turn) badge('b13', t('battle.status.windRide', { n: m.windRide.discount }), -m.windRide.discount);
       return items;
     };
 
     const statusBadges = (s: BattleState, m: BattleMonster): HTMLElement | null => {
       const items = statusEntries(s, m);
       if (items.length === 0) return null;
-      // 2つ以上のときは文字を隠してアイコンだけ（カードの幅に入れる。文はカードを押したときの説明に出す）
-      return h('span', { class: `battle__status${items.length > 1 ? ' is-many' : ''}`, attrs: { 'aria-label': items.map((i) => i.label).join('・') } }, ...items.map((i) => i.el));
-    };
-
-    /**
-     * 場のカードの右上の角の印（2026-10-29 正式の絵。ライフの札を消して空いた所。顔に重ならない）：
-     * プカリムのほっぺにためる（相手からも見える）・おいかぜ（かけてから、＋1 が効く次の自分のターンまで出す）。手札・大きなカードには出さない
-     */
-    const cornerMarks = (s: BattleState, m: BattleMonster): HTMLElement | null => {
-      const marks: HTMLElement[] = [];
-      const mark = (src: string, label: string, kind: string): HTMLElement =>
-        h('img', { class: `battle__corner-mark battle__corner-mark--${kind}`, attrs: { src, alt: label, title: label, draggable: 'false' } });
-      if (m.charge && m.life > 0) marks.push(mark(statusChargedArt, t('battle.status.charged'), 'charged'));
-      // ジオルのエネルギーをためるは 2026-10-30（指示書 X）から状態の印（statusBadges の status_energy）
-      if (m.tailwind && m.life > 0 && m.tailwind.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.tailwind', { n: m.tailwind.amount }), 'tailwind'));
-      // かぜのり（ツムジ 2026-10-30）：おいかぜと同じ風の印。かけてから、マナ−1 が効く次の自分のターンまで出す（相手からも見える）
-      if (m.windRide && m.life > 0 && m.windRide.turn >= s.turn) marks.push(mark(statusTailwindArt, t('battle.status.windRide', { n: m.windRide.discount }), 'tailwind'));
-      // 声援（2026-10-30 指示書 Y）：おいかぜと同じ形の印。このターンの次の攻撃まで（相手からも見える）
-      if (m.cheer && m.life > 0 && m.cheer.turn === s.turn) marks.push(mark(statusTailwindArt, t('battle.status.cheer', { n: m.cheer.amount }), 'tailwind'));
-      return marks.length ? h('span', { class: 'battle__corner-marks' }, ...marks) : null;
+      // 文字は出さない（指示書 AZ。1つのときも）。意味の文はカードを押したときの説明に出す
+      return h('span', { class: `battle__status battle__status--icons${items.length > 3 ? ' is-many' : ''}`, attrs: { 'aria-label': items.map((i) => i.label).join('・') } }, ...items.map((i) => i.el));
     };
 
     /**
@@ -2384,14 +2360,44 @@ export const battleScreen: ScreenDefinition = {
       return null;
     };
 
-    /** 場が水中（みちしお。指示書 AJ）：上の帯に「水中 あと○手番」 */
-    const tideChip = (s: BattleState): HTMLElement =>
-      h('span', { class: 'battle-turn__tide', attrs: { role: 'status' }, text: t('battle.tide.chip', { n: Math.max(1, (activeField(s)?.untilTurn ?? s.turn) - s.turn + 1) }) });
+    /**
+     * 場が水中（みちしお。指示書 AJ）：上の帯に出す。2026-11-05 指示書 AZ【3】：文字は出さず、T03（水中）＋N02 の札に残りの手番の数字。
+     * 押すと、場のカード（みちしお）の説明と「場が水中 あと○手番」の文
+     */
+    const tideChip = (s: BattleState): HTMLElement => {
+      const n = Math.max(1, (activeField(s)?.untilTurn ?? s.turn) - s.turn + 1);
+      const text = t('battle.tide.chip', { n });
+      const field = activeField(s);
+      const card = field ? cardCatalog.get(field.cardId) : undefined;
+      return h(
+        'button',
+        {
+          class: 'battle-turn__fieldicon battle-turn__fieldicon--tide',
+          attrs: { type: 'button', role: 'status', 'aria-label': text },
+          on: { click: () => card && openCardDetail(element, card, { extra: [text, t(`battle.field.by.${field?.owner ?? 'player'}`)] }) },
+        },
+        h('img', { class: 'battle-turn__fieldicon-img', attrs: { src: statusIconUrl('t03'), alt: '', draggable: 'false' } }),
+        h('span', { class: 'battle-turn__fieldicon-turns', attrs: { style: `background-image:url("${statusIconUrl('n02')}")` } }, h('span', { text: String(n) })),
+      );
+    };
 
     /** 場の全体カード（上の帯の左に出す。タップで詳しく） */
     const fieldChip = (s: BattleState): HTMLElement => {
       const card = fieldSupport(s);
       if (!card || !s.field) return h('span', { class: 'battle-turn__first', text: t(s.first === 'player' ? 'battle.field.first' : 'battle.field.second') });
+      // 居場所を変える場のカード（指示書 AZ【3】）：文字は出さず、アイコンだけ（まいあがる風＝T02 空中・しずまる大地＝T01 地上）。押すと今までどおり詳しく
+      if (card.effect.type === 'habitat') {
+        const label = t('battle.field.aria', { name: cardName(card) });
+        return h(
+          'button',
+          {
+            class: `battle-turn__fieldicon battle-turn__fieldicon--${s.field.owner}`,
+            attrs: { type: 'button', 'aria-label': label },
+            on: { click: () => openCardDetail(element, card, { extra: [t(`habitat.field.${card.effect.type === 'habitat' ? card.effect.habitat : 'ground'}`), t(`battle.field.by.${s.field?.owner ?? 'player'}`)] }) },
+          },
+          h('img', { class: 'battle-turn__fieldicon-img', attrs: { src: statusIconUrl(card.effect.habitat === 'air' ? 't02' : card.effect.habitat === 'water' ? 't03' : 't01'), alt: '', draggable: 'false' } }),
+        );
+      }
       return h(
         'button',
         {

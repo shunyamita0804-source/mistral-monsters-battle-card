@@ -173,6 +173,7 @@ export const BATTLE = {
   'battle.status.dragonMight': { ja: '次は防御されない', en: 'Next: no guard' },
   'battle.status.hidden': { ja: '攻撃されない', en: 'Untargetable' },
   'battle.status.charged': { ja: 'ためている', en: 'Charged' },
+  'battle.status.chargedN': { ja: 'ためている（次の攻撃＋{n}）', en: 'Charged (next attack +{n})' },
   'battle.status.ward': { ja: 'ダメージ−{n}', en: 'Damage -{n}' },
   'battle.status.tailwind': { ja: 'おいかぜ＋{n}', en: 'Tailwind +{n}' },
   'battle.status.cheer': { ja: '声援＋{n}', en: 'Cheer +{n}' },

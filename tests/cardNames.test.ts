@@ -7,11 +7,13 @@ import { setLanguage } from '../src/i18n/i18n.ts';
 
 /** 指示書 AY（2026-11-05）：モンスターカードの名前をゲームが書く。字体は使う文字だけに減らした WOFF2（tools/art/card_name_fonts.py） */
 
-const FONTS = ['reggae-one', 'dela-gothic-one', 'yuji-boku', 'bangers', 'bungee', 'permanent-marker'];
+// 2026-11-05 指示書 AZ：英語の仮の字体 Bangers だけ残す（日本語はロゴの絵）
+const FONTS = ['bangers'];
 const official = [...MONSTERS, ...QA_MONSTERS].filter((m) => !m.isPlaceholder && m.art);
 
 describe('モンスターカードの名前', () => {
-  it('字体6つとライセンスの文がある（OFL 1.1・Permanent Marker は Apache 2.0）', () => {
+  it('英語の字体 Bangers とライセンスの文がある（OFL 1.1）。ほかの案の字体はビルドに入れない', () => {
+    for (const f of ['reggae-one', 'dela-gothic-one', 'yuji-boku', 'bungee', 'permanent-marker']) expect(existsSync(`assets/fonts/card-name/${f}.woff2`), f).toBe(false);
     for (const f of FONTS) {
       expect(existsSync(`assets/fonts/card-name/${f}.woff2`), f).toBe(true);
       expect(existsSync(`assets/fonts/card-name/license_${f}.txt`), f).toBe(true);
