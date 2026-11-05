@@ -42,12 +42,16 @@ const textOf = (actor, key) => {
   await page.waitForTimeout(1200);
   await page.addStyleTag({ content: '.stage-diag{display:none!important}' });
 
-  const battle = async (opponent, { line, ended } = {}) => {
+  const battle = async (opponent, { line, ended, winner = 'player' } = {}) => {
     await page.evaluate(
-      async ({ opponent, line, ended }) => {
+      async ({ opponent, line, ended, winner }) => {
         globalThis.__npcLineOverride = line ?? undefined;
         globalThis.__battlePatch = ended
-          ? (s) => ({ ...s, phase: 'ended', winner: 'player', endReason: 'knockout', sides: { ...s.sides, opponent: { ...s.sides.opponent, monsters: s.sides.opponent.monsters.map((m) => ({ ...m, life: 0 })) } } })
+          ? (s) => {
+              // 勝った側（winner）。負けた側のモンスターを全部倒れた状態に
+              const loser = winner === 'player' ? 'opponent' : 'player';
+              return { ...s, phase: 'ended', winner, endReason: 'knockout', sides: { ...s.sides, [loser]: { ...s.sides[loser], monsters: s.sides[loser].monsters.map((m) => ({ ...m, life: 0 })) } } };
+            }
           : undefined;
         const { createNewSave } = await import('/src/game/save/saveData.ts');
         const s0 = createNewSave(new Date(2026, 10, 5));
@@ -69,7 +73,7 @@ const textOf = (actor, key) => {
         stage.element.dataset.screen = 'battle';
         stage.element.replaceChildren(screen.element);
       },
-      { opponent, line, ended },
+      { opponent, line, ended, winner },
     );
     await page.waitForSelector('.battle-order__card', { timeout: 15000 });
     await page.waitForTimeout(600);
@@ -104,8 +108,14 @@ const textOf = (actor, key) => {
     await battle(opp, { line });
     await page.waitForTimeout(wait);
     await page.screenshot({ path: `${out}/npc_long_${actor}_${key}_battle${suffix}.png` });
-    await battle(opp, { line, ended: true });
-    await page.waitForTimeout(wait);
+    // 勝ち負けの画面：npc_win は相手（NPC）の勝ち＝主人公の負けの画面。ほかは主人公の勝ちの画面。
+    // npc_win・npc_lose はゲームのしくみのまま選ばせる（文を差しかえない）。切り札の最後のひと言だけ差しかえる
+    const winner = key === 'npc_win' ? 'opponent' : 'player';
+    await battle(opp, { line: key.startsWith('ace_') ? line : undefined, ended: true, winner });
+    // そのひと言の名前の下の文が出はじめるまで待ち、全部出たところで撮る（始めのひと言が先に出ることがあるため）
+    const head = [...line[LANG]].slice(0, 3).join('');
+    await page.waitForFunction((t) => document.querySelector('.battle__talk')?.textContent?.includes(t), head, { timeout: 15000 }).catch(() => console.log('NOTFOUND', actor, key));
+    await page.waitForTimeout([...line[LANG]].length * 45 + 300);
     await page.screenshot({ path: `${out}/npc_long_${actor}_${key}_result${suffix}.png` });
   }
   console.log('npc', LANG, W, H);

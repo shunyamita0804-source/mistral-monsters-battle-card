@@ -16,6 +16,7 @@ import {
   midReactionLimit,
   NPC_LINE_KEYS,
   npcLinePriority,
+  resultLineKey,
   talkRoll,
 } from '../src/game/battle/npcTalk.ts';
 import { PETE_OPPONENT } from '../src/game/story/pete.ts';
@@ -252,6 +253,14 @@ describe('場面の判定（表示用。ルールは変えない）', () => {
     expect(knockLineKey('opponent', [{ life: 0 }, { life: 3 }, { life: 3 }])).toBe('npc_own_down');
     expect(knockLineKey('opponent', [{ life: 0 }, { life: 0 }, { life: 3 }])).toBe('npc_own_down_last');
     expect(knockLineKey('opponent', [{ life: 0 }, { life: 0 }, { life: 0 }])).toBeNull();
+  });
+
+  it('決着：主人公が勝った＝NPC の負けのひと言（npc_lose）・NPC が勝った＝勝ちのひと言（npc_win）。正本の場面名もそのとおり', () => {
+    expect(resultLineKey('player')).toBe('npc_lose');
+    expect(resultLineKey('opponent')).toBe('npc_win');
+    const labels = Object.fromEntries((JSON.parse(readFileSync('design-parts/npc-battle-lines-20261105/data/npc_battle_lines.json', 'utf8')) as { keys: { key: string; label: string }[] }).keys.map((k) => [k.key, k.label]));
+    expect(labels.npc_win).toBe('NPC勝利');
+    expect(labels.npc_lose).toBe('NPC敗北');
   });
 
   it('強さの順：決着・切り札の最後 ＞ 切り札の撃破（続く）＞ 撃破・始め ＞ 途中の反応', () => {

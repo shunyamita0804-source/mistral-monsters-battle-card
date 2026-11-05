@@ -113,6 +113,11 @@ export function knockLineKey(side: Side, monsters: readonly Pick<BattleMonster, 
   return null;
 }
 
+/** 決着のひと言：主人公が勝った＝NPC の負け（npc_lose）、それ以外（NPC が勝った・引き分け）＝npc_win（今までと同じ分け方） */
+export function resultLineKey(winner: Side | 'draw' | null): NpcLineKey {
+  return winner === 'player' ? 'npc_lose' : 'npc_win';
+}
+
 /**
  * ひと言の強さ（上の数ほど優先。出ているひと言より弱いひと言は、出ている間は出さない）。
  * 決着・切り札の最後の撃破 ＞ 切り札の撃破（続く）＞ 撃破・残り1体・始め ＞ そのほかの反応

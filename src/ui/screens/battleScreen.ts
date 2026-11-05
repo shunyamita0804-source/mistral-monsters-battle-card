@@ -48,7 +48,7 @@ import { buildOpponentDeck } from '../../game/deck/deck.ts';
 import { nextBattleHint, type BattleHintId } from '../../game/story/battleTutorial.ts';
 import { recordPersonBattle } from '../../game/people/peopleBook.ts';
 import { summarizeBattle } from '../../game/battle/simulate.ts';
-import { attackLineKey, attackTalkOf, isMidReaction, knockLineKey, midReactionAllowed, midReactionLimit, npcLinePriority, talkRoll, type NpcExtraKey, type NpcLineKey } from '../../game/battle/npcTalk.ts';
+import { attackLineKey, attackTalkOf, isMidReaction, resultLineKey, knockLineKey, midReactionAllowed, midReactionLimit, npcLinePriority, talkRoll, type NpcExtraKey, type NpcLineKey } from '../../game/battle/npcTalk.ts';
 import { npcActorOf, npcLine } from '../../data/npcBattleLines.ts';
 import { handOverlap } from '../components/handLayout.ts';
 import { randomSeed, shuffle } from '../../game/rng.ts';
@@ -2335,8 +2335,9 @@ export const battleScreen: ScreenDefinition = {
         sound.play(w === 'player' ? 'battleWin' : 'battleLose', 500);
         // 切り札が最後に倒れて負けた：切り札の敗北のひと言（ふつうの敗北のひと言の代わり。1回だけ）
         const aceLast = !!req.opponent.ace && oppDownOrder.at(-1) === req.opponent.ace && s.endReason === 'knockout';
-        if (w === 'player') sayNpc('npc_lose', aceLast ? 'ace_down_final' : undefined);
-        else sayNpc('npc_win');
+        sayNpc(resultLineKey(w), w === 'player' && aceLast ? 'ace_down_final' : undefined);
+        // 吹き出しはこの描き直しではもう作り終わっている（talkOverlay が先）ので、すぐもう一度描いて勝ち負けのひと言を出す
+        setTimeout(() => !destroyed && render(), 0);
       }
       const title = t(w === 'player' ? 'battle.result.win' : w === 'opponent' ? 'battle.result.lose' : 'battle.result.draw');
       const reason = s.endReason === 'deckOut' ? t(w === 'player' ? 'battle.result.deckOutOpponent' : 'battle.result.deckOutPlayer') : '';
