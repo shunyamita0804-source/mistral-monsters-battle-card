@@ -647,7 +647,10 @@
   .drun.is-thunder .drun__view::before { animation: none; opacity: 0; }
 }
 
-/* 扉（スイッチで開く）：閉じた扉 → スイッチを入れた階では開いた扉。上のマスに少しはみ出して立てる */
+/*
+ * 扉（機械の塔。2026-11-05 指示書 BD：赤の扉と青の扉）：開いている色の扉だけ開いた絵（is-open-red／is-open-blue）。上のマスに少しはみ出して立てる。
+ * 開いた扉は床の上に色のうすい光を敷いて、床と見分けがつくように
+ */
 .drun__tile--door {
   z-index: 1;
 }
@@ -661,25 +664,108 @@
   width: 44px;
   height: 60px;
   translate: -50% 0;
-  background: url('@assets/images/maps/dungeon/machine_door_closed.webp') center bottom / contain no-repeat;
+  background: center bottom / contain no-repeat;
+  transition: transform 0.2s ease-out;
 }
 
-.is-doors-open .drun__tile--door.is-seen::after,
-.is-doors-open .drun__tile--door.is-lit::after {
-  background-image: url('@assets/images/maps/dungeon/machine_door_open.webp');
+.drun__tile--door-red.is-seen::after,
+.drun__tile--door-red.is-lit::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_red_closed.webp');
+}
+
+.drun__tile--door-blue.is-seen::after,
+.drun__tile--door-blue.is-lit::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_blue_closed.webp');
+}
+
+.is-open-red .drun__tile--door-red.is-seen::after,
+.is-open-red .drun__tile--door-red.is-lit::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_red_open.webp');
+}
+
+.is-open-blue .drun__tile--door-blue.is-seen::after,
+.is-open-blue .drun__tile--door-blue.is-lit::after {
+  background-image: url('@assets/images/maps/dungeon/machine_door_blue_open.webp');
+}
+
+/* 開いた扉の足元：その色のうすい光（床と見分けがつくように） */
+.is-open-red .drun__tile--door-red.is-seen::before,
+.is-open-blue .drun__tile--door-blue.is-seen::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 4px;
+  background: rgb(255 120 100 / 0.32);
+  box-shadow: 0 0 6px rgb(255 120 100 / 0.5);
+}
+
+.is-open-blue .drun__tile--door-blue.is-seen::before {
+  background: rgb(110 160 255 / 0.32);
+  box-shadow: 0 0 6px rgb(110 160 255 / 0.5);
 }
 
 .drun__tile--door.is-seen:not(.is-lit)::after {
   filter: brightness(0.5);
 }
 
-/* スイッチ（調べると扉が開く）：切 → 入 */
-.drun__entity--switch {
-  background: url('@assets/images/maps/dungeon/machine_switch_off.webp') center 85% / auto 42px no-repeat;
+/* スイッチを押したとき：扉が少しゆれて開く／閉まる */
+.is-switching .drun__tile--door.is-seen::after {
+  animation: drun-door-switch 0.42s ease-out;
 }
 
-.drun__entity--switch.is-open {
-  background-image: url('@assets/images/maps/dungeon/machine_switch_on.webp');
+@keyframes drun-door-switch {
+  0% { transform: scaleX(0.82); opacity: 0.6; }
+  60% { transform: scaleX(1.06); opacity: 1; }
+  100% { transform: none; }
+}
+
+/* スイッチ（調べるたびに開く色が入れかわる）：赤が開いている＝赤のレバー（下）／青が開いている＝青のレバー（上） */
+.drun__entity--switch {
+  background: url('@assets/images/maps/dungeon/machine_switch_red.webp') center 85% / auto 42px no-repeat;
+}
+
+.drun__entity--switch.is-blue {
+  background-image: url('@assets/images/maps/dungeon/machine_switch_blue.webp');
+}
+
+.is-switching .drun__entity--switch {
+  animation: drun-door-switch 0.42s ease-out;
+}
+
+/* 上の帯の左：いま開いている扉の色の印（文字なし） */
+.drun__place-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.drun__door-mark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgb(255 236 190 / 0.95);
+  border-radius: 50%;
+  background:
+    url('@assets/images/maps/dungeon/machine_door_red_open.webp') center 70% / auto 20px no-repeat,
+    radial-gradient(circle at 50% 40%, #ff8a78, #c8281e 70%);
+  box-shadow: 0 0 8px rgb(255 90 70 / 0.9);
+}
+
+.drun__door-mark--blue {
+  background:
+    url('@assets/images/maps/dungeon/machine_door_blue_open.webp') center 70% / auto 20px no-repeat,
+    radial-gradient(circle at 50% 40%, #8cb8ff, #2457c8 70%);
+  box-shadow: 0 0 8px rgb(90 140 255 / 0.9);
+}
+
+.drun__door-mark[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-switching .drun__tile--door.is-seen::after,
+  .is-switching .drun__entity--switch { animation: none; }
 }
 
 /* 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）：炎の火山の溶岩のひび割れ・天の聖域の羽根・燭台・光の筋 */

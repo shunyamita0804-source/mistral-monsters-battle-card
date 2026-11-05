@@ -1,8 +1,17 @@
-# 引き継ぎメモ（2026-11-05：指示書 BE を main に入れた・未公開・公開ページはまだ開ける）
+# 引き継ぎメモ（2026-11-05：指示書 BD を main に入れた・未公開・公開ページはまだ開ける）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
+
+### いちばん新しい：いまの状態（2026-11-05 指示書 BD のあと）
+
+- **指示書 BD（ブランチ `bd-machine-tower`）を main に取り込んだ・未公開**。記録 `docs/bd-machine-tower-20261105.md`
+  - 機械の塔：赤と青の切り替えの扉（スイッチを調べるたびに入れかわる。1・2階は切り替え1回・3〜5階は2回）・敵を B の子に（floorLife 0.9〜1.2 に下げて前と同じくらい）・上へのぼる「○階」・初めて入ったときの場面 `D06`
+  - **セーブ version 36**（`switchFloor` → `blueDoorFloor`。前のセーブで塔の途中なら、その階のスタートから）
+  - あわせて：対戦で場のカードを大きく見たときに居場所の印（新しいアイコン）を足した。ほかの画面はもう新しいアイコンだった
+- **ユーザーの返事待ち**：BD の要確認8つ（「踏む」か「調べる」か など）・それより前の要確認（下の「まず読む」）
+- 作業のブランチ（このセッション）：`claude/claude-md-handoff-notes-0sow2x`（main と同じに push する）
 
 ### まず読む：セッションの引き継ぎ（2026-11-05 夕）
 
@@ -28,7 +37,7 @@
   - 写真：開発用サーバー `npx vite --port 5173 --host 127.0.0.1`。言語は設定の保存（`mistria-battle-card/settings` の `language`）で切り替える。道具は `tools/e2e/`（BB＝`bb_shot.cjs`・BC＝`bc_book_shot.cjs`／`ay_names_shot.cjs`・BE＝`be_box_shot.cjs`）
   - 効果のアイコンの表は `src/ui/effectIcons.ts`（効果の文で決める）・重ねる所は `src/ui/components/fxIcon.ts`・ルールの窓は `battleScreen.ts` の `ICON_GUIDE`
   - 名前のロゴを作り直す：`python3 -I tools/art/card_name_logos.py`（日本語 `logos/`・英語 `logos_en/` → 表 `src/data/cardNameLogos.generated.ts`）
-  - セーブ version は 35 のまま（このセッションでは形を変えていない）
+  - セーブ version は 35 のまま（このセッションでは形を変えていない）→ 指示書 BD で 36 に
 
 ### その前：いまの状態（2026-11-05 指示書 BE のあと）
 

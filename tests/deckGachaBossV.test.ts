@@ -67,7 +67,8 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
     expect(RUN_DUNGEONS['dungeon-03']?.guardianTeam).toEqual(['mon-kalshell', 'mon-myurol', 'mon-nobiton']);
     expect(RUN_DUNGEONS['dungeon-04']?.guardianTeam).toEqual(['mon-kalshell', 'mon-nobiton', 'mon-myurol']);
     expect(RUN_DUNGEONS['dungeon-05']?.guardianTeam).toEqual(['mon-gauul', 'mon-lazuck', 'mon-nobiton']);
-    expect(RUN_DUNGEONS['dungeon-06']?.guardianTeam).toEqual(['mon-lazuck', 'mon-nobiton', 'mon-gauul']);
+    // 2026-11-05 指示書 BD【2】：機械の塔は B の子に
+    expect(RUN_DUNGEONS['dungeon-06']?.guardianTeam).toEqual(['mon-hyouzuku', 'mon-shishien', 'mon-hakuran']);
     expect(TEST_TEAM).toEqual(['mon-soramo', 'mon-lazuck', 'mon-pukarim']);
     expect(TEST_TEAM_ALT).toEqual(['mon-lazuck', 'mon-soramo', 'mon-pukarim']);
   });
@@ -120,7 +121,7 @@ describe('V1 同じモンスターは1つのデッキに1体まで', () => {
   });
 
   it('セーブの version は上げていない（デッキ・カードは書きかえないので。2026-10-30 指示書 W で氷の洞窟の祭壇のために 30 に）', () => {
-    expect(SAVE_VERSION).toBe(35); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に。指示書 AT でダンジョンの並び直しの大会の条件のために 34 に。2026-11-02 指示書 AV で販売機の「新入荷」の記録のために 35 に
+    expect(SAVE_VERSION).toBe(36); // 2026-10-31 指示書 AB で炎の火山の祭壇のために 31 に。2026-11-01 指示書 AH で B の大会の条件のために 32 に。指示書 AJ で外した技を消すために 33 に。指示書 AT でダンジョンの並び直しの大会の条件のために 34 に。2026-11-02 指示書 AV で販売機の「新入荷」の記録のために 35 に。2026-11-05 指示書 BD で機械の塔の赤と青の扉のために 36 に
   });
 });
 

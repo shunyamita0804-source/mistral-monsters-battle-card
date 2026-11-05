@@ -1,0 +1,96 @@
+{
+  "games": 300,
+  "teams": {
+    "npc": [
+      [
+        "mon-geol",
+        "mon-hyouzuku",
+        "mon-shishien"
+      ],
+      [
+        "mon-hakuran",
+        "mon-flune",
+        "mon-geol"
+      ]
+    ],
+    "guardian": [
+      "mon-hyouzuku",
+      "mon-shishien",
+      "mon-hakuran"
+    ]
+  },
+  "rows": [
+    {
+      "floor": 1,
+      "life": 0.5,
+      "npc": [
+        99.7,
+        99
+      ],
+      "guardian": 100
+    },
+    {
+      "floor": 2,
+      "life": 0.6,
+      "npc": [
+        100,
+        98.7
+      ],
+      "guardian": 100
+    },
+    {
+      "floor": 3,
+      "life": 0.7,
+      "npc": [
+        98.7,
+        96.3
+      ],
+      "guardian": 100
+    },
+    {
+      "floor": 4,
+      "life": 0.8,
+      "npc": [
+        95,
+        90.7
+      ],
+      "guardian": 98.3
+    },
+    {
+      "floor": 5,
+      "life": 0.9,
+      "npc": [
+        90.3,
+        86.7
+      ],
+      "guardian": 98.7
+    },
+    {
+      "floor": 6,
+      "life": 1,
+      "npc": [
+        86.7,
+        70.3
+      ],
+      "guardian": 96
+    },
+    {
+      "floor": 7,
+      "life": 1.1,
+      "npc": [
+        68.7,
+        47.3
+      ],
+      "guardian": 89
+    },
+    {
+      "floor": 8,
+      "life": 1.2,
+      "npc": [
+        60.3,
+        37.7
+      ],
+      "guardian": 87.3
+    }
+  ]
+}

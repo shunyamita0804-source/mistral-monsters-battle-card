@@ -63,6 +63,7 @@ import { heroFaceUrl, heroResultUrl } from '../components/heroArt.ts';
 import { versusBanner } from '../components/versusBanner.ts';
 import { resolveCardArt } from '../cardArtSources.ts';
 import { BATTLE_CARD_RATIO, createBattleMonsterCard, hasBattleCard } from '../components/battleMonsterCard.ts';
+import { habitatMark } from '../components/habitatMark.ts';
 import { battleDigits } from '../components/battleDigits.ts';
 import { statusIconUrl, type StatusIconId } from '../statusIcons.ts';
 import type { FxIcon, FxMark } from '../effectIcons.ts';
@@ -1572,8 +1573,16 @@ export const battleScreen: ScreenDefinition = {
       if (officialUrl) {
         const pic = h('img', { class: 'battle-card-detail__official', attrs: { src: officialUrl, alt: cardName(card), draggable: 'false' } });
         pic.style.width = `${OFFICIAL_CARD_DETAIL_W}px`;
-        // 名前（2026-11-05 指示書 AY）：名前を消した正式カードの絵なら、名前の層を重ねる
-        const img = NAMELESS_OFFICIAL_ART.has(card.id) ? h('div', { class: 'card-name-host' }, pic, cardNameLayer(card, OFFICIAL_CARD_DETAIL_W)) : pic;
+        // 名前（2026-11-05 指示書 AY）：名前を消した正式カードの絵なら、名前の層を重ねる。
+        // 居場所の印（2026-11-05：図鑑・デッキ編集の大きいカードと同じ新しいアイコン T01〜T03。前はこの窓だけ印が無かった）。場が居場所を変えていれば、その居場所
+        const habitat = state ? habitatOf(state, monster) : card.habitat ?? null;
+        const img = h(
+          'div',
+          { class: 'card-name-host monster-card--art battle-card-detail__host' },
+          pic,
+          NAMELESS_OFFICIAL_ART.has(card.id) ? cardNameLayer(card, OFFICIAL_CARD_DETAIL_W) : null,
+          habitatMark(habitat, { tide: habitat !== null && habitat !== (card.habitat ?? null) }),
+        );
         const handle = openModal(element, {
           className: 'battle-card-detail',
           body: [img, ...extra.map((text) => h('p', { class: 'battle-card-detail__line', text }))],

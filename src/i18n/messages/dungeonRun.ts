@@ -7,6 +7,8 @@ import type { MessageEntry } from '../i18n.ts';
 export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.title': { ja: 'ダンジョン探索', en: 'Dungeon' },
   'dungeonRun.floorName': { ja: '地下{n}階', en: 'B{n}' },
+  // 機械の塔（2026-11-05 指示書 BD【4】）：塔なので上へのぼる。英語は仮訳
+  'dungeonRun.floorNameUp': { ja: '{n}階', en: '{n}F' },
   'dungeonRun.losses': { ja: '負け {n}/{max}', en: 'Losses {n}/{max}' },
   'dungeonRun.gained': { ja: '獲得 {n}枚', en: 'Cards {n}' },
   'dungeonRun.minimap': { ja: '地図', en: 'Map' },
@@ -26,8 +28,13 @@ export const DUNGEON_RUN_MESSAGES = {
   'dungeonRun.bossTalk': { ja: '{name}が立ちはだかる！\n（{monsters}）', en: '{name} blocks your way!\n({monsters})' },
   'dungeonRun.stairsTitle': { ja: '階段を下りますか？', en: 'Go down the stairs?' },
   'dungeonRun.stairsBody': { ja: '下りると、この階には戻れません。', en: 'You cannot come back to this floor.' },
-  'dungeonRun.switchOpened': { ja: 'スイッチを入れた。\nどこかで扉の開く音がした。', en: 'You flipped the switch.\nSomewhere, a door creaked open.' },
-  'dungeonRun.switchAlready': { ja: 'スイッチはもう入っている。', en: 'The switch is already on.' },
+  // 機械の塔の切り替えの扉（2026-11-05 指示書 BD。英語は仮訳）
+  'dungeonRun.switchBlue': { ja: 'スイッチを切り替えた。\n青の扉が開き、赤の扉が閉まった。', en: 'You flipped the switch.\nThe blue doors opened and the red doors closed.' },
+  'dungeonRun.switchRed': { ja: 'スイッチを切り替えた。\n赤の扉が開き、青の扉が閉まった。', en: 'You flipped the switch.\nThe red doors opened and the blue doors closed.' },
+  'dungeonRun.doorMarkRed': { ja: '赤の扉が開いている', en: 'Red doors are open' },
+  'dungeonRun.doorMarkBlue': { ja: '青の扉が開いている', en: 'Blue doors are open' },
+  'dungeonRun.stairsUpTitle': { ja: '階段を上りますか？', en: 'Go up the stairs?' },
+  'dungeonRun.stairsUpBody': { ja: '上ると、この階には戻れません。', en: 'You cannot come back to this floor.' },
   // 宝箱の中身（2026-10-28 指示書「お金の入る側」。中身は【仮】）
   'dungeonRun.chestCoins': { ja: '宝箱を開けた！\n{coins} を手に入れた！', en: 'Opened the chest!\nGot {coins}!' },
   'dungeonRun.chestItem': { ja: '宝箱を開けた！\n{item}を手に入れた！', en: 'Opened the chest!\nGot a {item}!' },

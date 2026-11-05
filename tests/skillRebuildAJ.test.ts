@@ -187,7 +187,7 @@ describe('AJ：最初の箱（2026-11-02 指示書 AM）', () => {
 
 describe('AJ：前のセーブ（v32 → v33）', () => {
   it('外したカードを持っているカードとデッキから消し、デッキの抜けた分は持っているカードで埋める', () => {
-    expect(SAVE_VERSION).toBe(35); // 2026-11-02 指示書 AT で 34 に。2026-11-02 指示書 AV で販売機の「新入荷」の記録のために 35 に
+    expect(SAVE_VERSION).toBe(36); // 2026-11-02 指示書 AT で 34 に。2026-11-02 指示書 AV で販売機の「新入荷」の記録のために 35 に。2026-11-05 指示書 BD で機械の塔の赤と青の扉のために 36 に
     const s = createNewSave(new Date('2026-11-01T00:00:00Z'));
     const removed = ['skl-soramo14-11', 'skl-soramo14-13'];
     const deckSkills = [...s.deck.skills.slice(0, 58), ...removed];

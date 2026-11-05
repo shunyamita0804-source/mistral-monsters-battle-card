@@ -79,3 +79,8 @@
   height: 19px;
   border-width: 1.5px;
 }
+
+/* 対戦で場のカードを大きく見たとき（正式カードの絵・幅 250px。2026-11-05：前はこの窓だけ居場所の印が無かった） */
+.battle-card-detail__host .habitat-mark {
+  --u: 1;
+}

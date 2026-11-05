@@ -60,7 +60,9 @@
     "playtest:barca": "PLAYTEST=1000 PLAYTEST_BOSSES=enc-fire-boss PLAYTEST_SCALES=1.0:1.09:0.01 PLAYTEST_OUT=docs/design/barca-ac-20261031/barca_scan_1000.json vitest run tests/bossPlaytest.test.ts",
     "playtest:regulars": "PLAYTEST=200 PLAYTEST_OUT=docs/design/cpu-skill-z-20261030/regulars_200.json vitest run tests/regularsPlaytest.test.ts",
     "playtest:balance": "PLAYTEST=1000 PLAYTEST_OUT=docs/design/balance-au-20261102/balance_1000.json vitest run tests/balancePlaytest.test.ts",
-    "playtest:ax": "PLAYTEST=100 PLAYTEST_OUT=docs/design/ax-tyrant-gearos-20261105/swap_100.json vitest run tests/axPlaytest.test.ts"
+    "playtest:ax": "PLAYTEST=100 PLAYTEST_OUT=docs/design/ax-tyrant-gearos-20261105/swap_100.json vitest run tests/axPlaytest.test.ts",
+    "playtest:bd-doors": "PLAYTEST_OUT=docs/design/bd-machine-tower-20261105/doors_150.json vitest run tests/bdMachineTower.test.ts",
+    "playtest:bd-enemies": "PLAYTEST=200 PLAYTEST_OUT=docs/design/bd-machine-tower-20261105/enemies_after_200.json vitest run tests/bdPlaytest.test.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

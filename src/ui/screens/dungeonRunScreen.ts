@@ -4,7 +4,7 @@ import { markStoryEventSeen, pendingStoryEvent, type EventContext } from '../../
 import type { EventTrigger } from '../../data/storyEvents.ts';
 import { getDungeon } from '../../data/dungeons.ts';
 import { recordPersonCard } from '../../game/people/peopleBook.ts';
-import { DUNGEON_RUN, runBattlerFace, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
+import { DUNGEON_RUN, towerClimbs, runBattlerFace, runBossOpponent, runGuardianOpponent, runNpcOpponent } from '../../data/dungeonRun.ts';
 import { personOfOpponent } from '../../data/people.ts';
 import { battlerStandUrl, talkFaceVisual } from '../components/dungeonPeopleArt.ts';
 import { faceKeyOf } from '../components/opponentFace.ts';
@@ -14,13 +14,13 @@ import { itemBlock, itemCount, type ItemBlock } from '../../game/items/items.ts'
 import type { OpponentDefinition } from '../../data/tournaments.ts';
 import { deckInvalidText, isDeckValid } from '../../game/deck/deck.ts';
 import { floorDecorations } from '../../game/dungeon/decor.ts';
-import { isWalkableTile, isWindTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
+import { DOOR_TILES, isDoorTile, isWalkableTile, isWindTile, type DungeonFloor, type FloorEntity } from '../../game/dungeon/generate.ts';
 import {
   activeEntities,
   bossRewardCandidates,
   chooseRunReward,
   descend,
-  doorsOpen,
+  openDoorColor,
   floorsOf,
   maxLossesOf,
   pressSwitch,
@@ -128,6 +128,8 @@ const TILE = 48;
 const TEXTURE_TILES = 4;
 /** 1歩の動きの長さ（ミリ秒。押しっぱなしの1歩の間隔より少し短く） */
 const STEP_MS = 150;
+/** スイッチを押したときの扉の動き（ms。機械の塔） */
+const SWITCH_ANIM_MS = 420;
 /** ミニマップの1マスの大きさ（ミニマップの絵の中の px。画面では枠に合わせて縮める。印の絵がつぶれないよう細かめに描く） */
 const MINI_CELL = 8;
 /** ミニマップの印の大きさ（マスの何倍か。2026-10-27 デザイン第12弾の印） */
@@ -135,7 +137,12 @@ const MINI_MARK = 3.4;
 /** ミニマップの印の絵（自分・階段・宝箱・バトラー・ボス） */
 const MINI_ICONS = { you: miniYou, stairs: miniStairs, chest: miniChest, npc: miniBattler, boss: miniBoss } as const;
 /** ミニマップの色：水路・氷・扉（閉じている）（2026-10-27 ダンジョン7つ。印の絵はまだ無い） */
-const MINI_TILE_COLOR: Readonly<Record<string, string>> = { w: 'rgb(70 140 210 / 0.9)', i: 'rgb(190 230 250 / 0.9)', D: 'rgb(150 110 60 / 0.95)' };
+const MINI_TILE_COLOR: Readonly<Record<string, string>> = { w: 'rgb(70 140 210 / 0.9)', i: 'rgb(190 230 250 / 0.9)' };
+/** ミニマップの扉（機械の塔。2026-11-05 指示書 BD）：閉じている扉はこい色、開いている扉はうすい色 */
+const MINI_DOOR_COLOR: Readonly<Record<string, { readonly open: string; readonly closed: string }>> = {
+  R: { open: 'rgb(240 150 140 / 0.95)', closed: 'rgb(190 40 40 / 0.95)' },
+  B: { open: 'rgb(140 180 250 / 0.95)', closed: 'rgb(40 80 200 / 0.95)' },
+};
 /** スティック（街と同じ大きさ・働き。worldScreen.ts の STICK_*）：動かし始める距離・向きを決めない真ん中・輪の半径・輪を出さない上の帯 */
 const STICK_START = 12;
 const STICK_DEAD = 16;
@@ -231,6 +238,8 @@ class DungeonRunView {
   readonly #omenMark = h('div', { class: 'drun__omen-mark', attrs: { 'aria-hidden': 'true' } });
   readonly #omenEdge = h('div', { class: 'drun__omen-edge', attrs: { 'aria-hidden': 'true' } });
   readonly #place = h('p', { class: 'drun__place' });
+  /** 機械の塔：いま開いている扉の色の印（文字なし。2026-11-05 指示書 BD） */
+  readonly #doorMark = h('span', { class: 'drun__door-mark', attrs: { role: 'img', 'aria-label': t('dungeonRun.doorMarkRed') } });
   readonly #losses = h('span', { class: 'drun__chip' });
   /** 手に入れた技カードの枚数：革袋（ふくらみ3段階。デザイン33点の 7）と数 */
   readonly #pouch = h('img', { class: 'drun__pouch', attrs: { alt: '', draggable: 'false', 'aria-hidden': 'true' } });
@@ -308,7 +317,7 @@ class DungeonRunView {
       this.#omenEdge,
       this.#player,
       this.#omenMark,
-      h('header', { class: 'drun__hud' }, this.#place, h('div', { class: 'drun__chips' }, this.#losses, this.#gained), this.#effects),
+      h('header', { class: 'drun__hud' }, h('div', { class: 'drun__place-row' }, this.#doorMark, this.#place), h('div', { class: 'drun__chips' }, this.#losses, this.#gained), this.#effects),
       this.#mini,
       this.#stick,
       this.#actBtn,
@@ -480,7 +489,7 @@ class DungeonRunView {
         const stairs = !!f.stairs && f.stairs.x === x && f.stairs.y === y;
         // 水路・氷は床の代わり、扉は床の上に重ねる（dungeonRun.css）。強い風のマス（風の渓谷）は床の上に風の線を重ねる
         const kind = wall ? 'wall' : ch === 'w' ? 'water' : ch === 'i' ? 'ice' : 'floor';
-        const door = ch === 'D' ? ' drun__tile--door' : isWindTile(ch) ? ` drun__tile--wind drun__tile--wind-${WIND_CLASS[ch as string]}` : '';
+        const door = isDoorTile(ch) ? ` drun__tile--door drun__tile--door-${DOOR_TILES[ch as string]}` : isWindTile(ch) ? ` drun__tile--wind drun__tile--wind-${WIND_CLASS[ch as string]}` : '';
         // 水路のふちの石：となりが水路でも壁でもない辺（水と床の境目）
         const edges = kind !== 'water' ? '' : WATER_EDGES.filter(([, dx, dy]) => isShore(f.tiles[y + dy]?.[x + dx])).map(([d]) => ` drun__tile--edge-${d}`).join('');
         const el = h('div', { class: `drun__tile drun__tile--${kind}${face ? ' drun__tile--face' : ''}${stairs ? ' drun__tile--stairs' : ''}${door}${edges}` });
@@ -492,7 +501,7 @@ class DungeonRunView {
         el.style.setProperty('--ax', `${-x * TILE}px`);
         el.style.setProperty('--ay', `${-y * TILE}px`);
         // 扉は上のマスにはみ出して立てるので、人や物と同じく行の順に重ねる
-        if (ch === 'D') el.style.zIndex = rowZ(y, false);
+        if (isDoorTile(ch)) el.style.zIndex = rowZ(y, false);
         this.#tiles.push(el);
         frag.append(el);
       }
@@ -560,10 +569,16 @@ class DungeonRunView {
       const nearBoss = e.kind === 'boss' && Math.max(Math.abs(e.x - run.x), Math.abs(e.y - run.y)) <= 2;
       el.hidden = !(seen || nearBoss) || !active.has(e.id);
       el.classList.toggle('is-lit', nearBoss || (Math.abs(e.x - run.x) <= r && Math.abs(e.y - run.y) <= r));
-      el.classList.toggle('is-open', (e.kind === 'chest' && run.opened.includes(e.id)) || (e.kind === 'switch' && doorsOpen(run)));
+      el.classList.toggle('is-open', e.kind === 'chest' && run.opened.includes(e.id));
+      if (e.kind === 'switch') el.classList.toggle('is-blue', openDoorColor(run) === 'blue');
     }
-    // 扉：スイッチを押した階では開いている
-    this.#root.classList.toggle('is-doors-open', doorsOpen(run));
+    // 扉（機械の塔。2026-11-05 指示書 BD）：開いている色の扉だけ開いた絵。上の帯の左に、いま開いている色の印
+    const color = openDoorColor(run);
+    this.#root.classList.toggle('is-open-red', color === 'red');
+    this.#root.classList.toggle('is-open-blue', color === 'blue');
+    this.#doorMark.hidden = !this.#floor?.tiles.some((row) => /[RB]/.test(row));
+    this.#doorMark.className = `drun__door-mark drun__door-mark--${color}`;
+    this.#doorMark.setAttribute('aria-label', t(color === 'blue' ? 'dungeonRun.doorMarkBlue' : 'dungeonRun.doorMarkRed'));
     // 雷の高原（2026-11-01 指示書 AH）：落雷の予告の印（次の1歩のあとにここへ雷が落ちる。うすく点滅）
     this.#drawThunderMarks();
     // カメラ：主人公のマスが画面の真ん中
@@ -581,7 +596,7 @@ class DungeonRunView {
     this.#omenMark.style.top = `${Math.round(viewTop + cy + TILE * 0.32 - PLAYER_H - 6)}px`;
     // 上の札
     const dungeon = getDungeon(run.dungeonId);
-    this.#place.textContent = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) });
+    this.#place.textContent = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: floorLabel(run) });
     // 負けた回数：灯りが負けるたびに1つずつ消える（2026-10-27 デザイン第13弾。文字は読み上げ用）
     // 天の聖域は灯りが2つ（負けられる回数がダンジョンごと）
     const maxLosses = maxLossesOf(run.dungeonId);
@@ -602,7 +617,7 @@ class DungeonRunView {
     // 向いている先にバトラー・ボス・宝箱がある、または階段の上：「調べる」が金色に光る（街と同じ）
     const ahead = talkTarget(run);
     const onStairs = !!f.stairs && f.stairs.x === run.x && f.stairs.y === run.y && !isLastFloor(run);
-    this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian' && !(ahead.kind === 'switch' && doorsOpen(run))) || onStairs);
+    this.#actBtn.classList.toggle('is-ready', (!!ahead && ahead.kind !== 'guardian') || onStairs);
   }
 
   /** 右上の地図：見たマスだけ。自分・階段・見たバトラー・宝箱・ボスは印の絵（2026-10-27 デザイン第12弾） */
@@ -618,7 +633,8 @@ class DungeonRunView {
       for (let x = 0; x < f.width; x++) {
         const ch = f.tiles[y]?.[x] ?? '#';
         const floor = ch !== '#';
-        const special = ch === 'D' && doorsOpen(run) ? undefined : MINI_TILE_COLOR[ch];
+        const doorColor = MINI_DOOR_COLOR[ch];
+        const special = doorColor ? (DOOR_TILES[ch] === openDoorColor(run) ? doorColor.open : doorColor.closed) : MINI_TILE_COLOR[ch];
         if (run.explored[y * f.width + x] !== '1') {
           if (mapped && floor) {
             g.fillStyle = 'rgb(214 200 168 / 0.42)';
@@ -641,10 +657,12 @@ class DungeonRunView {
     if (f.stairs && (mapped || run.explored[f.stairs.y * f.width + f.stairs.x] === '1')) mark(f.stairs.x, f.stairs.y, 'stairs');
     for (const e of activeEntities(run, f)) {
       if (e.kind === 'guardian') continue;
-      // スイッチ：遺跡の地図を使った階では、まだ見ていなくても出す（機械の塔。印の絵はまだ無いので金色の四角）
+      // スイッチ：遺跡の地図を使った階では、まだ見ていなくても出す（機械の塔。印の絵はまだ無いので金色の四角・ふちが開いている色）
       if (e.kind === 'switch') {
         if (run.explored[e.y * f.width + e.x] !== '1' && !mapped) continue;
-        g.fillStyle = doorsOpen(run) ? 'rgb(120 200 120)' : 'rgb(255 214 90)';
+        g.fillStyle = openDoorColor(run) === 'blue' ? 'rgb(60 110 230)' : 'rgb(220 60 50)';
+        g.fillRect(e.x * MINI_CELL, e.y * MINI_CELL, MINI_CELL, MINI_CELL);
+        g.fillStyle = 'rgb(255 214 90)';
         g.fillRect((e.x + 0.15) * MINI_CELL, (e.y + 0.15) * MINI_CELL, MINI_CELL * 0.7, MINI_CELL * 0.7);
         continue;
       }
@@ -814,17 +832,20 @@ class DungeonRunView {
     if (f.stairs && f.stairs.x === run.x && f.stairs.y === run.y) this.#askStairs();
   }
 
-  /** スイッチを調べた（機械の塔）：その階の扉が開く */
+  /**
+   * スイッチを調べた（機械の塔。2026-11-05 指示書 BD）：開いている扉の色が入れかわる。何度でも押せる。
+   * 短い音と、扉が開く／閉まる小さな動き（is-switching の間だけ。dungeonRun.css）
+   */
   #pressSwitch(): void {
     const r = pressSwitch(this.#run);
-    if (!r.opened) {
-      this.#message(t('dungeonRun.switchAlready'));
-      return;
-    }
     this.#store.update((s) => ({ ...s, dungeonRun: r.run }));
     sound.play('chestUnlock');
+    this.#root.classList.remove('is-switching');
+    void this.#root.offsetWidth;
+    this.#root.classList.add('is-switching');
+    setTimeout(() => this.#root.classList.remove('is-switching'), SWITCH_ANIM_MS);
     this.#refresh(false);
-    this.#message(t('dungeonRun.switchOpened'));
+    this.#message(t(r.color === 'blue' ? 'dungeonRun.switchBlue' : 'dungeonRun.switchRed'));
   }
 
   /**
@@ -886,7 +907,7 @@ class DungeonRunView {
     const dx = front.x - run.x;
     const dy = front.y - run.y;
     const spots = [front, { x: run.x + dy, y: run.y - dx }, { x: run.x - dy, y: run.y + dx }, { x: run.x - dx, y: run.y - dy }];
-    const spot = spots.find((p) => isWalkableTile(f.tiles[p.y]?.[p.x], doorsOpen(run))) ?? front;
+    const spot = spots.find((p) => isWalkableTile(f.tiles[p.y]?.[p.x], openDoorColor(run))) ?? front;
     const w = Math.round((GUARDIAN_H * 244) / 360);
     const el = h('img', { class: 'drun__guardian', attrs: { src: guardianArt, alt: '', draggable: 'false', 'aria-hidden': 'true' } });
     el.style.width = `${w}px`;
@@ -1003,9 +1024,9 @@ class DungeonRunView {
     this.#busy = true;
     confirmModal(
       this.#root,
-      t('dungeonRun.stairsTitle'),
+      t(towerClimbs(this.#run.dungeonId) ? 'dungeonRun.stairsUpTitle' : 'dungeonRun.stairsTitle'),
       // 階段を下りる確認の挿絵（2026-10-27 デザイン33点の 18）
-      [h('img', { class: 'drun__stairs-art', attrs: { src: stairsConfirmArt, alt: '', draggable: 'false' } }), h('p', { class: 'modal__text', text: t('dungeonRun.stairsBody') })],
+      [h('img', { class: 'drun__stairs-art', attrs: { src: stairsConfirmArt, alt: '', draggable: 'false' } }), h('p', { class: 'modal__text', text: t(towerClimbs(this.#run.dungeonId) ? 'dungeonRun.stairsUpBody' : 'dungeonRun.stairsBody') })],
       () => {
         sound.play('stairs');
         this.#store.update((s) => (s.dungeonRun ? { ...s, dungeonRun: descend(s.dungeonRun) } : s));
@@ -1039,7 +1060,7 @@ class DungeonRunView {
       title: t('dungeonRun.menuTitle'),
       className: 'drun__menu',
       body: [
-        h('p', { class: 'modal__text drun__menu-place', text: t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) }) }),
+        h('p', { class: 'modal__text drun__menu-place', text: t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: floorLabel(run) }) }),
         h('div', { class: 'drun__menu-row' }, icon(menuIconLosses), h('p', { class: 'modal__text', text: t('dungeonRun.menuLosses', { n: run.losses, max: maxLossesOf(run.dungeonId) }) })),
         h('div', { class: 'drun__menu-row' }, icon(menuIconGained), h('p', { class: 'modal__text drun__menu-head', text: t('dungeonRun.menuGained') })),
         cards.length > 0
@@ -1296,11 +1317,16 @@ class DungeonRunView {
     if (!run) return;
     const dungeon = getDungeon(run.dungeonId);
     const kind = isLastFloor(run) ? 'boss' : 'floor';
-    const text = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: t('dungeonRun.floorName', { n: run.floor + 1 }) });
+    const text = t('world.placeDungeon', { dungeon: dungeon ? dungeonName(dungeon) : '', floor: floorLabel(run) });
     const el = h('div', { class: `world__banner world__banner--${kind}`, attrs: { 'aria-hidden': 'true' } }, h('span', { class: 'world__banner-text', text }));
     this.#root.append(el);
     setTimeout(() => el.remove(), BANNER_MS);
   }
+}
+
+/** 階の名前（ふつうは「地下○階」。機械の塔は塔なので上へのぼる「○階」。2026-11-05 指示書 BD【4】） */
+function floorLabel(run: Pick<DungeonRun, 'floor' | 'dungeonId'>): string {
+  return t(towerClimbs(run.dungeonId) ? 'dungeonRun.floorNameUp' : 'dungeonRun.floorName', { n: run.floor + 1 });
 }
 
 /** 技カードを手に入れたときの絵：後ろに光、台座の上にカード（デザイン33点の 6） */

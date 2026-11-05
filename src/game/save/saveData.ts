@@ -46,7 +46,7 @@ import { RANK_BOSS_DUNGEONS, RANK_BOSS_DUNGEONS_BEFORE_AT, reorderWaivedFlag, ST
  * - 読み込み時は normalizeSave() で型・範囲を確認し、壊れた値は既定値に戻す
  * - 変更はすべて「古いセーブを受け取り新しいセーブを返す」純粋関数で行う
  */
-export const SAVE_VERSION = 35;
+export const SAVE_VERSION = 36;
 
 export type Gender = 'male' | 'female';
 export type Direction = 'down' | 'up' | 'left' | 'right';
@@ -170,8 +170,11 @@ export interface DungeonRun {
   readonly sealBoxUsed: boolean;
   /** 封印の小箱で守った技カード（追い出されても失わない1枚） */
   readonly sealedCard: string | null;
-  /** スイッチを押して扉を開けた階（機械の塔。その階にいる間だけ開いたまま。下りたら閉じた扉の新しい階） */
-  readonly switchFloor: number | null;
+  /**
+   * 機械の塔（2026-11-05 指示書 BD）：青の扉が開いている階。ほかの階（null を含む）では赤の扉が開いている。
+   * スイッチを押すたびに、いまの階の番号と null が入れかわる。上の階へ進むと赤が開いた新しい階（前は switchFloor＝扉を開けた階）
+   */
+  readonly blueDoorFloor: number | null;
   /** 雷の高原（2026-11-01 指示書 AH）の落雷の予告（ほかのダンジョン・前のセーブは無い。src/game/dungeon/thunder.ts） */
   readonly thunder?: ThunderState | null;
 }
@@ -187,7 +190,7 @@ export const NO_RUN_EFFECTS = {
   rewardChoice: null,
   sealBoxUsed: false,
   sealedCard: null,
-  switchFloor: null,
+  blueDoorFloor: null,
 } as const satisfies Partial<DungeonRun>;
 
 export interface SaveData {
@@ -813,6 +816,19 @@ function migrateSkillRebuildV33(raw: RawObject): RawObject {
   return { ...raw, collection, deck: { ...deck, skills: filled.skills } };
 }
 
+/**
+ * version 36（2026-11-05 指示書 BD）：機械の塔の扉を「赤と青の切り替えの扉」にした。
+ * 前の switchFloor（扉を開けた階）はやめて blueDoorFloor（青が開いている階）に。機械の塔の階の形が変わったので、
+ * 機械の塔の挑戦の途中なら、いまの階のスタートからやり直す（見た地図は消す。倒した相手・開けた宝箱・手に入れたカードはそのまま）
+ */
+function migrateMachineDoorsV36(raw: RawObject): RawObject {
+  if (!isObject(raw.dungeonRun)) return raw;
+  const { switchFloor: _old, ...run } = raw.dungeonRun as RawObject;
+  if (run.dungeonId !== 'dungeon-06') return { ...raw, dungeonRun: { ...run, blueDoorFloor: null } };
+  // x・y を壁（0,0）にしておくと、読み込んだときに sanitizeRun がその階のスタートへ戻す
+  return { ...raw, dungeonRun: { ...run, blueDoorFloor: null, x: 0, y: 0, explored: '', thunder: null } };
+}
+
 /** version n → n+1 の変換。形式を変えるときはここに足し、SAVE_VERSION を上げる */
 const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   1: migrateDeckRulesV2,
@@ -852,6 +868,7 @@ const MIGRATIONS: Readonly<Record<number, (raw: RawObject) => RawObject>> = {
   33: migrateDungeonOrderV34,
   // 2026-11-02 指示書 AV：ガチャのシリーズが並んだ順（gachaShelf）。前のセーブには無いので、読みこむときに今並んでいるシリーズで作る（NEW は付けない。normalize の seedGachaShelf）
   34: (raw) => raw,
+  35: migrateMachineDoorsV36,
 };
 
 export function migrate(raw: RawObject): RawObject | null {
@@ -1003,7 +1020,7 @@ function normalizeDungeonRun(v: unknown): DungeonRun | null {
     rewardChoice: Array.isArray(v.rewardChoice) ? asStringArray(v.rewardChoice).filter((id) => !!cardCatalog.get(id)) : null,
     sealBoxUsed: asBool(v.sealBoxUsed, false) || typeof v.sealedCard === 'string',
     sealedCard: typeof v.sealedCard === 'string' && cardCatalog.get(v.sealedCard) ? v.sealedCard : null,
-    switchFloor: asFloorOrNull(v.switchFloor),
+    blueDoorFloor: asFloorOrNull(v.blueDoorFloor),
     // 雷の高原の予告があるときだけ（ほかのダンジョンの挑戦は今までと同じ形）
     ...(normalizeThunder(v.thunder) ? { thunder: normalizeThunder(v.thunder) } : {}),
   };

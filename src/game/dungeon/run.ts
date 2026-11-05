@@ -6,7 +6,7 @@ import { ITEM_RULES, type ItemId } from '../../data/items.ts';
 import { addItem, canAddItem, consumeItem, itemCount, useItem, type UseItemResult } from '../items/items.ts';
 import { nextRandom } from '../rng.ts';
 import { addCards, addCoins, NO_RUN_EFFECTS, type Direction, type DungeonRun, type SaveData } from '../save/saveData.ts';
-import { generateFloor, isWalkableTile, isWindTile, reachable, slide, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
+import { generateFloor, isWalkableTile, isWindTile, reachable, slide, type DoorColor, type DungeonFloor, type FloorEntity, type Point } from './generate.ts';
 import { advanceMonth } from '../calendar/calendar.ts';
 import { strikeGuardianId, thunderStep } from './thunder.ts';
 
@@ -21,7 +21,7 @@ import { strikeGuardianId, thunderStep } from './thunder.ts';
  * 道具（2026-10-27）の効き目：たいまつ（見える範囲）・魔除けの香（番人が出ない歩数）・遺跡の地図・身代わりのお守り（負けを1回なかったことに）・
  * 封印の小箱（追い出されても失わない1枚）・幸運のコイン（報酬を候補から選ぶ）・煙玉（番人から逃げる）。使うのは src/game/items/items.ts
  * 2026-10-27 指示書「ダンジョン7つ」：階の数・見える範囲・番人の確率・負けられる回数はダンジョンごと（src/data/dungeonRun.ts の RUN_DUNGEONS）。
- * 仕掛け：すべる床（move ですべる）・スイッチで開く扉（pressSwitch）
+ * 仕掛け：すべる床（move ですべる）・赤と青の切り替えの扉（pressSwitch。2026-11-05 指示書 BD）
  */
 
 /** 階の形を決めるもの（dungeonId が無ければ太古の遺跡） */
@@ -37,9 +37,9 @@ export function maxLossesOf(dungeonId: string | undefined): number {
   return runConfig(dungeonId).maxLosses;
 }
 
-/** 扉が開いているか（機械の塔：その階でスイッチを押した） */
-export function doorsOpen(run: Pick<DungeonRun, 'floor' | 'switchFloor'>): boolean {
-  return run.switchFloor === run.floor;
+/** いま開いている扉の色（機械の塔。2026-11-05 指示書 BD：階に入ったときは赤。スイッチを押すたびに入れかわる） */
+export function openDoorColor(run: Pick<DungeonRun, 'floor' | 'blueDoorFloor'>): DoorColor {
+  return run.blueDoorFloor === run.floor ? 'blue' : 'red';
 }
 
 /** 階の形（同じシード・階なら同じ。作り直しを減らすため、直近に作った階を覚えておく） */
@@ -205,7 +205,7 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   const turned: DungeonRun = { ...run, dir };
   const d = STEP[dir];
   // 風の渓谷：風のマスに乗ったら押し流される（階段・人や物の手前で止まる）
-  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y) || nextToBoss(run, f, x, y), doorsOpen(run), f.stairs);
+  const path = slide(f.tiles, run, d.x, d.y, (x, y) => !!entityAt(run, f, x, y) || nextToBoss(run, f, x, y), openDoorColor(run), f.stairs);
   const end = path?.[path.length - 1];
   if (!path || !end) return { run: turned, path: [], moved: false, onStairs: false, omen: nearGuardian(turned, f), guardian: null };
   let explored = run.explored;
@@ -245,10 +245,13 @@ export function move(run: DungeonRun, dir: Direction): MoveResult {
   return { run: next, path, moved: true, onStairs, omen: nearGuardian(next, f), guardian, gust, strikes, thunderStruck };
 }
 
-/** スイッチを調べた（機械の塔）：その階の扉が開く。もう開いていれば何もしない（opened: false） */
-export function pressSwitch(run: DungeonRun): { run: DungeonRun; opened: boolean } {
-  if (doorsOpen(run)) return { run, opened: false };
-  return { run: { ...run, switchFloor: run.floor }, opened: true };
+/**
+ * スイッチを調べた（機械の塔。2026-11-05 指示書 BD）：開いている扉の色が入れかわる（赤 ⇔ 青）。何度でも押せる。
+ * color＝押したあとに開いている色
+ */
+export function pressSwitch(run: DungeonRun): { run: DungeonRun; color: DoorColor } {
+  const next: DungeonRun = { ...run, blueDoorFloor: openDoorColor(run) === 'blue' ? null : run.floor };
+  return { run: next, color: openDoorColor(next) };
 }
 
 /** 見えない番人の予兆を出すか（近くにいて、戦ったあとの休みでなく、魔除けの香が効いていない） */
@@ -525,7 +528,7 @@ export function sanitizeRun(run: DungeonRun): DungeonRun | null {
   const floor = Math.min(run.floor, floorsOf(run.dungeonId) - 1);
   const f = runFloor({ seed: run.seed, floor, dungeonId: run.dungeonId });
   const fixed: DungeonRun = { ...run, floor, losses: Math.min(run.losses, maxLossesOf(run.dungeonId) - 1) };
-  const onFloor = isWalkableTile(f.tiles[fixed.y]?.[fixed.x], doorsOpen(fixed)) && !entityAt(fixed, f, fixed.x, fixed.y);
+  const onFloor = isWalkableTile(f.tiles[fixed.y]?.[fixed.x], openDoorColor(fixed)) && !entityAt(fixed, f, fixed.x, fixed.y);
   const at = onFloor && floor === run.floor ? { x: fixed.x, y: fixed.y } : f.start;
   // 雷の高原の予告は、階が変わった・位置を直したときは消す（次の1歩から新しく出る）
   const thunder = run.thunder && run.thunder.floor === floor && at.x === run.x && at.y === run.y ? run.thunder : null;

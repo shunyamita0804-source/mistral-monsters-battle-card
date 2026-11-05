@@ -3,10 +3,10 @@ import { DUNGEONS, ENCOUNTERS } from '../src/data/dungeons.ts';
 import { DUNGEON_RUN, RUN_DUNGEONS, runBossOpponent, runConfig, runGuardianOpponent } from '../src/data/dungeonRun.ts';
 import { getTournament } from '../src/data/tournaments.ts';
 import { personOfOpponent } from '../src/data/people.ts';
-import { isFloorReachable, isSwitchReachable, slide, type DungeonFloor } from '../src/game/dungeon/generate.ts';
+import { countDoors, isFloorReachable, slide, switchPuzzle, type DungeonFloor } from '../src/game/dungeon/generate.ts';
 import {
   descend,
-  doorsOpen,
+  openDoorColor,
   floorsOf,
   loseRunBattle,
   move,
@@ -48,14 +48,17 @@ describe('ダンジョンの一覧（2026-10-27 指示書「ダンジョン7つ�
     }
   });
 
-  it('強さ（階ごとのライフ）はそのランクの段の今の値：最初 ＜ 水 ＜ 森 ＜ 氷・火 ＜ 遺跡・雷 ＜ 機械 ＜ 聖域（最後の階）', () => {
+  it('強さ（階ごとのライフ）はそのランクの段の今の値：最初 ＜ 水 ＜ 森 ＜ 氷・火 ＜ 遺跡・雷 ＜ 聖域（最後の階。機械の塔は B の子なので別）', () => {
     // 同じ段どうしは同じ値（D の段は 0.8 から1階ごとに +0.1。水の神殿は3階なので 1.0 まで）
     expect(runConfig('dungeon-08').floorLife).toEqual([0.6, 0.75, 0.85]);
     expect(runConfig('dungeon-03').floorLife).toEqual([0.8, 0.9, 1]);
     expect(runConfig('dungeon-02').floorLife).toEqual([0.8, 0.9, 1, 1.1]);
     expect(runConfig('dungeon-05').floorLife).toEqual(runConfig('dungeon-04').floorLife);
     expect(runConfig('dungeon-01').floorLife).toEqual(runConfig('dungeon-09').floorLife);
-    const ids = ['dungeon-08', 'dungeon-03', 'dungeon-02', 'dungeon-04', 'dungeon-01', 'dungeon-06', 'dungeon-07'];
+    // 2026-11-05 指示書 BD【2】：機械の塔は敵を B の子にして、強さが前と同じくらいになるよう floorLife を下げた（ライフの倍率では比べない。
+    // 勝つ割合で前と並べた表は docs/bd-machine-tower-20261105.md）
+    expect(runConfig('dungeon-06').floorLife).toEqual([0.9, 0.95, 1.05, 1.1, 1.2]);
+    const ids = ['dungeon-08', 'dungeon-03', 'dungeon-02', 'dungeon-04', 'dungeon-01', 'dungeon-07'];
     const last = ids.map((id) => runConfig(id).floorLife.at(-1) ?? 0);
     for (let i = 1; i < ids.length; i++) expect(last[i]).toBeGreaterThan(last[i - 1] as number);
   });
@@ -139,21 +142,21 @@ describe('仕掛け：必ず階段・ボスまで行ける（多くのシード�
     expect(ice).toBeGreaterThan(0);
   });
 
-  it('機械の塔：階段・ボスの部屋は閉じた扉の向こう。スイッチは扉の手前から行ける。開ければ全部行ける', () => {
+  it('機械の塔（2026-11-05 指示書 BD）：赤と青の扉。どの状態からでもゴールへ行ける・全部のバトラー・宝箱に行ける', () => {
     let doors = 0;
     eachFloor('dungeon-06', 150, (f) => {
       expect(isFloorReachable(f)).toBe(true);
-      expect(isSwitchReachable(f)).toBe(true);
-      const n = f.tiles.join('').split('D').length - 1;
-      doors += n;
-      if (n > 0) expect(f.entities.filter((e) => e.kind === 'switch')).toHaveLength(1);
+      const p = switchPuzzle(f);
+      expect(p.solvable && p.trapped === 0 && p.entitiesReachable).toBe(true);
+      expect(p.minToggles).toBeGreaterThanOrEqual(1);
+      doors += countDoors(f.tiles);
     });
     expect(doors).toBeGreaterThan(0);
-  });
+  }, 120000);
 
   it('仕掛けのないダンジョンは今までと同じ階（遺跡の階は変わらない）', () => {
     const f = runFloor({ seed: 42, floor: 1, dungeonId: 'dungeon-01' });
-    expect(f.tiles.join('')).not.toMatch(/[wiD]/);
+    expect(f.tiles.join('')).not.toMatch(/[wiRB]/);
     expect(f.entities.some((e) => e.kind === 'switch')).toBe(false);
   });
 });
@@ -220,13 +223,15 @@ describe('炎の火山・天の聖域・機械の塔', () => {
     }
   });
 
-  it('機械の塔：スイッチで扉が開き、その階にいる間は開いたまま。下りると次の階の扉は閉じている', () => {
+  it('機械の塔（2026-11-05 指示書 BD）：階に入ったときは赤が開いている。スイッチを押すたびに入れかわる。上の階へ進むと赤に戻る', () => {
     const run = runOf(startRun(fresh(), 'dungeon-06', 11));
-    expect(doorsOpen(run)).toBe(false);
+    expect(openDoorColor(run)).toBe('red');
     const pressed = pressSwitch(run);
-    expect(pressed.opened).toBe(true);
-    expect(doorsOpen(pressed.run)).toBe(true);
-    expect(pressSwitch(pressed.run).opened).toBe(false);
-    expect(doorsOpen(descend(pressed.run))).toBe(false);
+    expect(pressed.color).toBe('blue');
+    expect(openDoorColor(pressed.run)).toBe('blue');
+    const again = pressSwitch(pressed.run);
+    expect(again.color).toBe('red');
+    expect(openDoorColor(pressSwitch(again.run).run)).toBe('blue');
+    expect(openDoorColor(descend(pressed.run))).toBe('red');
   });
 });

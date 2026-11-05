@@ -1,0 +1,120 @@
+{
+  "seeds": 150,
+  "table": [
+    {
+      "floor": 1,
+      "toggles": {
+        "min": 1,
+        "avg": 1,
+        "max": 1
+      },
+      "steps": {
+        "min": 49,
+        "avg": 91.4,
+        "max": 176
+      },
+      "doors": {
+        "min": 2,
+        "avg": 2.2,
+        "max": 3
+      },
+      "switches": {
+        "min": 1,
+        "avg": 1,
+        "max": 1
+      }
+    },
+    {
+      "floor": 2,
+      "toggles": {
+        "min": 1,
+        "avg": 1,
+        "max": 1
+      },
+      "steps": {
+        "min": 38,
+        "avg": 91.1,
+        "max": 202
+      },
+      "doors": {
+        "min": 2,
+        "avg": 2.2,
+        "max": 3
+      },
+      "switches": {
+        "min": 1,
+        "avg": 1,
+        "max": 1
+      }
+    },
+    {
+      "floor": 3,
+      "toggles": {
+        "min": 2,
+        "avg": 2,
+        "max": 2
+      },
+      "steps": {
+        "min": 44,
+        "avg": 101.9,
+        "max": 165
+      },
+      "doors": {
+        "min": 4,
+        "avg": 4.5,
+        "max": 5
+      },
+      "switches": {
+        "min": 2,
+        "avg": 2.5,
+        "max": 3
+      }
+    },
+    {
+      "floor": 4,
+      "toggles": {
+        "min": 2,
+        "avg": 2,
+        "max": 2
+      },
+      "steps": {
+        "min": 49,
+        "avg": 108,
+        "max": 218
+      },
+      "doors": {
+        "min": 4,
+        "avg": 4.5,
+        "max": 5
+      },
+      "switches": {
+        "min": 2,
+        "avg": 2.5,
+        "max": 3
+      }
+    },
+    {
+      "floor": 5,
+      "toggles": {
+        "min": 2,
+        "avg": 2,
+        "max": 2
+      },
+      "steps": {
+        "min": 46,
+        "avg": 101.4,
+        "max": 193
+      },
+      "doors": {
+        "min": 4,
+        "avg": 4.5,
+        "max": 6
+      },
+      "switches": {
+        "min": 2,
+        "avg": 2.6,
+        "max": 3
+      }
+    }
+  ]
+}

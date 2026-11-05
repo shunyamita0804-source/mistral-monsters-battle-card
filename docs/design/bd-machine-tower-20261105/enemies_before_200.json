@@ -1,0 +1,69 @@
+{
+  "games": 600,
+  "teams": {
+    "npc": [
+      [
+        "mon-nobiton",
+        "mon-lazuck",
+        "mon-kalshell"
+      ],
+      [
+        "mon-lazuck",
+        "mon-nobiton",
+        "mon-gauul"
+      ]
+    ],
+    "guardian": [
+      "mon-lazuck",
+      "mon-nobiton",
+      "mon-gauul"
+    ]
+  },
+  "rows": [
+    {
+      "floor": 1,
+      "life": 1.1,
+      "npc": [
+        85.8,
+        87.3
+      ],
+      "guardian": 99.7
+    },
+    {
+      "floor": 2,
+      "life": 1.2,
+      "npc": [
+        76.2,
+        85.8
+      ],
+      "guardian": 97.7
+    },
+    {
+      "floor": 3,
+      "life": 1.3,
+      "npc": [
+        72.7,
+        76.3
+      ],
+      "guardian": 96
+    },
+    {
+      "floor": 4,
+      "life": 1.4,
+      "npc": [
+        55.7,
+        69.3
+      ],
+      "guardian": 88
+    },
+    {
+      "floor": 5,
+      "life": 1.5,
+      "npc": [
+        40.5,
+        55.7
+      ],
+      "guardian": 87.7
+    }
+  ]
+}

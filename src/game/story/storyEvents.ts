@@ -274,9 +274,13 @@ export function resolveCards(save: SaveData, show: CardShow): string[] {
   return show.mode === 'preview_only' ? ids : ids.filter(owned);
 }
 
-/** 研究所の「記録をふり返る」で見直せるイベント（2026-11-05 指示書 AX【4】：第2弾のうち見たもの。見直しても印・報酬は動かさない） */
+/**
+ * 研究所の「記録をふり返る」で見直せるイベント（2026-11-05 指示書 AX【4】：第2弾のうち見たもの。見直しても印・報酬は動かさない）。
+ * 2026-11-05 指示書 BD【5】：機械の塔に初めて入った場面（review）も。並びは第2弾のあと
+ */
 export function reviewableStoryEvents(save: SaveData): StoryEventDefinition[] {
-  return STORY_EVENTS.filter((ev) => ev.batch === 2 && hasSeenStoryEvent(save, ev.id)).sort((a, b) => a.order - b.order);
+  const order = (ev: StoryEventDefinition): number => (ev.batch === 2 ? ev.order : 1000 + ev.order);
+  return STORY_EVENTS.filter((ev) => (ev.batch === 2 || ev.review) && hasSeenStoryEvent(save, ev.id)).sort((a, b) => order(a) - order(b));
 }
 
 /** 確かめ用の入口（?qa=1&lab=events）の並び：章と順番 */

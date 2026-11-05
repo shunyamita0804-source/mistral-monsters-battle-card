@@ -1,7 +1,11 @@
 import { ENCOUNTERS } from './dungeons.ts';
 import type { RankId } from './economy.ts';
 import { GAUUL_MONSTER_ID as GAU } from './gauul.ts';
+import { FLUNE_MONSTER_ID as FLU } from './flune.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
+import { HAKURAN_MONSTER_ID as HAK } from './hakuran.ts';
+import { HYOUZUKU_MONSTER_ID as HYO } from './hyouzuku.ts';
+import { SHISHIEN_MONSTER_ID as SHI } from './shishien.ts';
 import { KALSHELL_MONSTER_ID as KAL } from './kalshell.ts';
 import { LAZUCK_MONSTER_ID } from './lazuck.ts';
 import { MYUROL_MONSTER_ID as MYU } from './myurol.ts';
@@ -12,6 +16,7 @@ import { TEST_TEAM } from './testTeams.ts';
 import type { CpuSkill, OpponentDefinition } from './tournaments.ts';
 
 const LAZ = LAZUCK_MONSTER_ID;
+const GEO = GEOL_MONSTER_ID;
 const SOR = SORAMO_MONSTER_ID;
 
 /**
@@ -142,10 +147,12 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
     floors: 5, gimmick: 'thunder', unlockRank: 'B', floorLife: [1, 1.1, 1.2, 1.3, 1.4], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
     guardianLifeBonus: -0.2, npcTeams: [[NOB, PUK, KAL], [PUK, NOB, MYU]], guardianTeam: [NOB, KAL, PUK], bossId: 'enc-thunder-boss',
   },
-  // 機械の塔（A ランク）：スイッチで開く扉
+  // 機械の塔（A ランク）：赤と青の切り替えの扉（2026-11-05 指示書 BD。前はスイッチで開く扉）。上へのぼる塔（towerClimbs）。
+  // 2026-11-05 指示書 BD【2】：バトラー・見えない番人を B の子に（ギアロスはボスの切り札なので入れない。編成は指示書の例のまま）。
+  // 強さは前（C の子・floorLife 1.1〜1.5）と同じくらいになるよう floorLife を下げた（目安のプレイヤー A の枠で測った。docs/bd-machine-tower-20261105.md）
   'dungeon-06': {
-    floors: 5, gimmick: 'switch', unlockRank: 'A', floorLife: [1.1, 1.2, 1.3, 1.4, 1.5], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
-    guardianLifeBonus: -0.3, npcTeams: [[NOB, LAZ, KAL], [LAZ, NOB, GAU]], guardianTeam: [LAZ, NOB, GAU], bossId: 'enc-machine-boss',
+    floors: 5, gimmick: 'switch', unlockRank: 'A', floorLife: [0.9, 0.95, 1.05, 1.1, 1.2], viewRadius: 1, guardianRate: 0.3, maxLosses: 3,
+    guardianLifeBonus: -0.3, npcTeams: [[GEO, HYO, SHI], [HAK, FLU, GEO]], guardianTeam: [HYO, SHI, HAK], bossId: 'enc-machine-boss',
   },
   // 天の聖域（S ランク）：見えない番人が強く、2回負けると戻される
   'dungeon-07': {
@@ -153,6 +160,11 @@ export const RUN_DUNGEONS: Readonly<Record<string, RunDungeonConfig>> = {
     guardianLifeBonus: 0.3, npcTeams: [[SOR, GAU, KAL], [GAU, SOR, MYU]], guardianTeam: [GAU, KAL, SOR], bossId: 'enc-holy-boss',
   },
 };
+
+/** 上へのぼるダンジョンか（機械の塔。階の名前が「○階」・階段は「上る」。2026-11-05 指示書 BD【4】） */
+export function towerClimbs(dungeonId: string | undefined): boolean {
+  return dungeonId === 'dungeon-06';
+}
 
 /** ランダム生成のダンジョン（2026-10-27 からは7つすべて） */
 export const RUN_DUNGEON_IDS: readonly string[] = Object.keys(RUN_DUNGEONS);

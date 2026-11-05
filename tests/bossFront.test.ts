@@ -1,24 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { RUN_DUNGEONS } from '../src/data/dungeonRun.ts';
-import { floorsOf, move, runFloor, startRun, talkTarget } from '../src/game/dungeon/run.ts';
+import { floorsOf, move, pressSwitch, runFloor, startRun, talkTarget } from '../src/game/dungeon/run.ts';
 import { createNewSave, type Direction, type DungeonRun } from '../src/game/save/saveData.ts';
 
 const DIRS: readonly Direction[] = ['up', 'down', 'left', 'right'];
 
-/** 最後の階の入口から歩いて行ける所（すべる床もふくめ、本当の1歩で）をすべて調べる */
+/** 最後の階の入口から歩いて行ける所（すべる床もふくめ、本当の1歩で）をすべて調べる。機械の塔はスイッチも押す（2026-11-05 指示書 BD：赤と青の扉） */
 function reachable(run0: DungeonRun): DungeonRun[] {
   const seen = new Set<string>();
   const out: DungeonRun[] = [];
   const queue: DungeonRun[] = [run0];
   while (queue.length) {
     const r = queue.shift() as DungeonRun;
-    const key = `${r.x},${r.y}`;
+    const key = `${r.x},${r.y},${r.blueDoorFloor}`;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(r);
     for (const dir of DIRS) {
       const m = move({ ...r, cooldown: 99, incenseSteps: 99 }, dir);
       if (m.moved) queue.push({ ...m.run, dir: 'down' });
+      if (talkTarget({ ...r, dir })?.kind === 'switch') queue.push(pressSwitch({ ...r, dir }).run);
     }
   }
   return out;
@@ -36,7 +37,7 @@ describe('ボスには1マス手前から話しかける（2026-10-30 指示書 
         if (!base) throw new Error(d.id);
         const last = floorsOf(d.id) - 1;
         const f = runFloor({ seed: base.seed, floor: last, dungeonId: d.id });
-        const run: DungeonRun = { ...base, floor: last, x: f.start.x, y: f.start.y, switchFloor: last };
+        const run: DungeonRun = { ...base, floor: last, x: f.start.x, y: f.start.y };
         const boss = f.entities.find((e) => e.kind === 'boss');
         if (!boss) throw new Error('boss');
         const spots = reachable(run);

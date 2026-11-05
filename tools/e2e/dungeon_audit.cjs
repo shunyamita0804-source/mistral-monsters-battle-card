@@ -29,7 +29,7 @@ const SEEDS = [7919, 15838, 23757];
     const run = {
       dungeonId: s.dungeonId, seed: s.seed, floor: s.floor, x: s.x, y: s.y, dir: 'down', explored: '1'.repeat(s.cells),
       defeated: [], opened: [], losses: 0, gained: [], cooldown: 999, rng: 1, torchFloor: null, mapFloor: null, incenseSteps: 0,
-      charm: false, charmUsed: false, luckyCoin: false, rewardChoice: null, sealBoxUsed: false, sealedCard: null, switchFloor: null,
+      charm: false, charmUsed: false, luckyCoin: false, rewardChoice: null, sealBoxUsed: false, sealedCard: null, blueDoorFloor: null,
     };
     const save = { ...save0, location: { mapId: 'town', x: 31, y: 186, dir: 'down' }, dungeonRun: run };
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, hasTouch: true });

@@ -18,6 +18,8 @@ export type StoryEventId =
   | 'M02' | 'M03' | 'M04' | 'M05' | 'M05W' | 'M06' | 'M07' | 'M08' | 'M09' | 'M10' | 'M11' | 'M11T' | 'M12'
   | 'M13' | 'M14' | 'M15' | 'M16' | 'M17' | 'M17R' | 'M18' | 'M18F' | 'M19' | 'M19R' | 'M21' | 'M22'
   | 'M23' | 'M24' | 'M24I' | 'M24R' | 'M25' | 'M25B' | 'M25R' | 'M26' | 'M27' | 'M27E' | 'M28' | 'M29' | 'M30'
+  // 機械の塔に初めて入る（2026-11-05 指示書 BD【5】）
+  | 'D06'
   | 'O01' | 'O02' | 'O03' | 'O04' | 'O05' | 'O06' | 'O09' | 'O10' | 'O11S' | 'O11A' | 'O11W' | 'O11P'
   // イベント第2弾（2026-11-05 指示書 AX【4】）：シエナの4本（大会会場に入ったとき）・町の人の8本（その人に次に話しかけたとき）
   | 'EV2_S01' | 'EV2_S02' | 'EV2_S03' | 'EV2_S04'
@@ -143,6 +145,8 @@ export interface StoryEventDefinition {
   readonly face?: TalkFace;
   /** イベント第2弾（研究所の「記録をふり返る」で見直せる） */
   readonly batch?: 2;
+  /** 第2弾でなくても、研究所の「記録をふり返る」で見直せる（2026-11-05 指示書 BD【5】：機械の塔の場面） */
+  readonly review?: true;
 }
 
 const L = (speaker: EventSpeaker, ja: string, en: string, when?: LineWhen): EventStep => ({ kind: 'line', line: { speaker, text: { ja, en }, ...(when ? { when } : {}) } });
@@ -442,6 +446,16 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
   {
     id: 'M25R', chapter: 5, order: 25.5, kind: 'main', trigger: 'reward', dungeon: 'dungeon-05', title: { ja: 'シシエンの報酬', en: "Shishien's Reward" },
     steps: [{ kind: 'cards', show: { mode: 'reward', cards: ['mon-shishien'] } }, L('system', 'シシエンのカードを手に入れた！', 'You got the Shishien card!')],
+  },
+  {
+    // 機械の塔に初めて入る（2026-11-05 指示書 BD【5】。入るときの絵のあと・1回だけ。英語は仮訳）。
+    // 説明の絵（赤と青の扉とスイッチを並べた絵）はまだ無いので絵なし【要確認：絵があるとよい】
+    id: 'D06', chapter: 6, order: 25.8, kind: 'main', trigger: 'dungeonEnter', dungeon: 'dungeon-06', review: true, title: { ja: '機械の塔に初めて入る', en: 'Into the Machine Tower' },
+    steps: [
+      L('system', '歯車の音が、塔のてっぺんまで響いている。', 'The sound of gears echoes all the way to the top of the tower.'),
+      L('system', '赤と青の扉は、スイッチを踏むたびに開く色が入れかわります。', 'Each time you step on a switch, the open color swaps between the red and blue doors.'),
+      L('system', 'どの扉を開けておくか考えて、上の階を目指しましょう。', 'Think about which doors to leave open, and make your way to the upper floors.'),
+    ],
   },
   {
     id: 'M26', chapter: 6, order: 26, kind: 'main', trigger: 'tournamentEntry', rank: 'C', title: { ja: 'C大会の前のシエナ', en: 'Sienna Before the Rank C Cup' },
