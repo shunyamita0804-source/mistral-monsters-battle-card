@@ -213,7 +213,7 @@ describe('指示書 BD【2】〜【5】', () => {
     expect(SQUARE_PICTURES).toContain('tutorial_tower_doors');
   });
 
-  it('指示書 BG：扉・スイッチの光は暗さの上の層（明かりの外でも暗くしない）・階段の光・上るか聞く窓は上り階段の絵・足もとの光はやめた', () => {
+  it('BF のあとのユーザー指示：扉・スイッチの光は暗さの上の層（明かりの外でも暗くしない）・階段の光・上るか聞く窓は上り階段の絵・足もとの光はやめた', () => {
     for (const c of ['red', 'blue']) {
       for (const st of ['closed', 'open']) expect(existsSync(`assets/images/maps/dungeon/machine_door_${c}_${st}_glow.webp`)).toBe(true);
       expect(existsSync(`assets/images/maps/dungeon/machine_switch_${c}_glow.webp`)).toBe(true);

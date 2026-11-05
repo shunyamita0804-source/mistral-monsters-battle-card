@@ -4,7 +4,7 @@ python3 -I tools/art/machine_tower_art.py
 - 上の帯の印（赤・青）：256×256 → 96×96 → assets/images/ui/dungeon/badge_door_{red,blue}.webp
 - 説明の絵：1024×1024 → 600×600（ほかの説明の絵と同じ） → assets/images/backgrounds/tutorial_tower_doors.webp
 （BD の「今の絵を染めた仮の扉・スイッチ」〔tools/art/machine_door_colors.py〕はやめた）
-- 2026-11-05 指示書 BG：扉・スイッチの「自分で光る部分」（赤・青のランプと光のふち）だけを取り出した絵 *_glow.webp
+- 2026-11-05 BF のあとのユーザー指示：扉・スイッチの「自分で光る部分」（赤・青のランプと光のふち）だけを取り出した絵 *_glow.webp
   （赤・水色の強い所だけを残し、そのとなりの白く光る芯も入れる。暗さの層の上に重ねて、明かりの外でも暗くしない）
 """
 import os

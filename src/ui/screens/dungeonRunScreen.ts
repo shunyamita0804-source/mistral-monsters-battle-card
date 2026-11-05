@@ -81,7 +81,7 @@ import miniBattler from '@assets/images/ui/dungeon/mini_battler.webp';
 import miniBoss from '@assets/images/ui/dungeon/mini_boss.webp';
 // 2026-10-27 デザイン33点（tools/design/ui33_build.py が切り出した部品）
 import stairsConfirmArt from '@assets/images/ui/dungeon/stairs_confirm.webp';
-// 機械の塔は上り階段の絵（2026-11-05 指示書 BG）
+// 機械の塔は上り階段の絵（2026-11-05 BF のあとのユーザー指示）
 import stairsUpArt from '@assets/images/maps/dungeon/machine_stairs_up.webp';
 import pouchArt1 from '@assets/images/ui/dungeon/pouch_1.webp';
 import pouchArt2 from '@assets/images/ui/dungeon/pouch_2.webp';
@@ -233,7 +233,7 @@ class DungeonRunView {
   /** マス・置いてあるものを並べる層（主人公が真ん中に来るように動かす） */
   readonly #world = h('div', { class: 'drun__world' });
   readonly #view = h('div', { class: 'drun__view' }, this.#world);
-  /** 暗さ（drun__light）の上に重ねる層：雷の高原（2026-11-01 指示書 AH）の予告の印と稲妻・機械の塔の扉とスイッチの光（2026-11-05 指示書 BG）。動きは床（#world）と同じ */
+  /** 暗さ（drun__light）の上に重ねる層：雷の高原（2026-11-01 指示書 AH）の予告の印と稲妻・機械の塔の扉とスイッチの光（2026-11-05 BF のあとのユーザー指示）。動きは床（#world）と同じ */
   readonly #thunderPan = h('div', { class: 'drun__thunder-pan' });
   readonly #thunderLayer = h('div', { class: 'drun__thunder-layer', attrs: { 'aria-hidden': 'true' } }, this.#thunderPan);
   readonly #player = h('div', { class: 'drun__player', attrs: { 'aria-hidden': 'true' } });
@@ -264,7 +264,7 @@ class DungeonRunView {
   #tiles: HTMLElement[] = [];
   /** 床の上の飾り（炎の火山・天の聖域）と、そのマスの番号 */
   #decors: { readonly i: number; readonly el: HTMLElement }[] = [];
-  /** 機械の塔の扉・スイッチの光（暗さの上の層。2026-11-05 指示書 BG）。i＝マスの番号（見たマスだけ出す） */
+  /** 機械の塔の扉・スイッチの光（暗さの上の層。2026-11-05 BF のあとのユーザー指示）。i＝マスの番号（見たマスだけ出す） */
   #lamps: { readonly i: number; readonly el: HTMLElement }[] = [];
   readonly #entityEls = new Map<string, HTMLElement>();
   #floor: DungeonFloor | null = null;
@@ -510,7 +510,7 @@ class DungeonRunView {
         frag.append(el);
       }
     }
-    // 機械の塔（2026-11-05 指示書 BG）：扉・スイッチのランプと光のふち・まわりの光のにじみ。暗さ（drun__light）の上の層に置き、
+    // 機械の塔（2026-11-05 BF のあとのユーザー指示）：扉・スイッチのランプと光のふち・まわりの光のにじみ。暗さ（drun__light）の上の層に置き、
     // 明かりの外（前に見たマス）でも暗くしない。見たマスだけ出す（#refresh）
     for (const old of this.#thunderPan.querySelectorAll('.drun__lamp')) old.remove();
     this.#lamps = [];
@@ -528,7 +528,7 @@ class DungeonRunView {
       }
     }
     for (const e of f.entities) if (e.kind === 'switch') lamp(e.x, e.y, 'switch');
-    // 上り階段（塔）：主人公が乗っても階段と分かるよう、マスのまわりにうすい光（2026-11-05 指示書 BG）
+    // 上り階段（塔）：主人公が乗っても階段と分かるよう、マスのまわりにうすい光（2026-11-05 BF のあとのユーザー指示）
     if (f.stairs && towerClimbs(this.#run.dungeonId)) lamp(f.stairs.x, f.stairs.y, 'stairs');
     // 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）
     this.#decors = floorDecorations(f, this.#run.seed, this.#run.dungeonId).map((d) => {

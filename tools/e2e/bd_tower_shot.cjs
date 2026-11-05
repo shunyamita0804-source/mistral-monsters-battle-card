@@ -49,7 +49,7 @@ fs.mkdirSync(out, { recursive: true });
             break;
           }
         }
-        // far＝扉から3〜5マス離れた所（扉は明かりの外＝前に見たマス。指示書 BG）。onStairs＝上り階段の上に乗る
+        // far＝扉から3〜5マス離れた所（扉は明かりの外＝前に見たマス。BF のあとのユーザー指示）。onStairs＝上り階段の上に乗る
         if (far) {
           const d0 = doors[Math.floor(doors.length / 2)];
           let best = null;
@@ -117,7 +117,7 @@ fs.mkdirSync(out, { recursive: true });
       await page.screenshot({ path: `${out}/tower_f${floor + 1}_door_${blue ? 'blue' : 'red'}${suffix}.png` });
     }
   }
-  // 明かりの外（前に見たマス）の扉とスイッチ：赤が開いている／青が開いている（指示書 BG）
+  // 明かりの外（前に見たマス）の扉とスイッチ：赤が開いている／青が開いている（BF のあとのユーザー指示）
   for (const floor of [0, 2, 4]) {
     for (const blue of [false, true]) {
       await mount({ floor, explored: true, intro: false, seen: true, far: true, blue });
@@ -125,7 +125,7 @@ fs.mkdirSync(out, { recursive: true });
       await page.screenshot({ path: `${out}/tower_f${floor + 1}_far_${blue ? 'blue' : 'red'}${suffix}.png` });
     }
   }
-  // 上り階段の上に乗ったとき・上るか聞く窓（指示書 BG）
+  // 上り階段の上に乗ったとき・上るか聞く窓（BF のあとのユーザー指示）
   await mount({ floor: 0, explored: true, intro: false, seen: true, onStairs: true });
   await page.waitForTimeout(2200);
   await page.screenshot({ path: `${out}/tower_f1_on_stairs${suffix}.png` });
