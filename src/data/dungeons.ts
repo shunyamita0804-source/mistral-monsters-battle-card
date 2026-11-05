@@ -191,6 +191,16 @@ export function getDungeon(id: string): DungeonDefinition | undefined {
   return DUNGEONS.find((d) => d.id === id);
 }
 
+/**
+ * テオのデッキの枚数（2026-11-05 指示書 AY2：ライフは 1.60 のまま、デッキで強くする）。
+ * α・β・γ は2枚ずつ（ほかの切り札の技と同じ）。弱い技を減らし、強い攻撃を増やす（試した組み合わせは docs/ay2-teo-20261105.md）
+ */
+const TEO_DECK: Readonly<Record<string, number>> = {
+  'skl-gearos-09': 0, 'skl-gearos-12': 1, 'skl-gearos-04': 1, 'skl-gearos-01': 3, 'skl-gearos-02': 3, 'skl-gearos-10': 1, 'skl-gearos-11': 1,
+  'skl-nobiton-01': 0, 'skl-nobiton-05': 0, 'skl-nobiton-04': 3, 'skl-nobiton-12': 0, 'skl-nobiton-16': 0,
+  'skl-gauul14-05': 2, 'skl-gauul14-08': 2, 'skl-gauul14-07': 2, 'skl-gauul14-09': 2, 'skl-gauul14-13': 0, 'skl-gauul14-14': 1,
+};
+
 export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   // 2026-10-30 指示書 V：ボス8人の lifeScale は、切り札の技を2枚ずつにしたあと、直す前の勝つ割合から ±3 ポイントに入るように合わせ直した
   // （最初の手持ち3箱 × 1000回で決め、200回でも確かめた。npm run playtest:bosses・docs/deck-gacha-boss-v-20261030.md）。
@@ -245,10 +255,10 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
     name: 'テオ',
     monsters: [NOB, GEAROS_MONSTER_ID, GAU],
     ace: GEAROS_MONSTER_ID,
-    lifeScale: 1.82,
+    lifeScale: 1.6,
     skill: 'A',
     ai: 'overdrive',
-    aceCopies: { 'skl-gearos-05': 3, 'skl-gearos-06': 3, 'skl-gearos-07': 3 },
+    aceCopies: TEO_DECK,
   },
   // 2026-11-05 指示書 AX【6】：S の目安のプレイヤーがギアロスを持つようになり、1.76＝5.7％ と目標 10％（±3）から外れたので 1.66（ライフ 10・12・13）に
   'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, SORAMO_MONSTER_ID, KAL], ace: SORAMO_MONSTER_ID, lifeScale: 1.66, skill: 'A' },

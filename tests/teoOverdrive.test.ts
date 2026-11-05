@@ -19,13 +19,17 @@ function scene(hand: string[], mana: number, playerMana = 0, playerMonsters = ['
 }
 
 describe('テオ：オーバードライブの3枚コンボを狙う', () => {
-  it('テオだけ構え overdrive・α・β・γ は3枚ずつ（ほかの切り札の技は2枚）', () => {
+  it('テオだけ構え overdrive・α・β・γ は2枚ずつ（指示書 AY2）。弱い技を減らし強い攻撃を増やしたデッキ', () => {
     const teo = ENCOUNTERS['enc-machine-boss'];
     if (!teo) throw new Error('teo');
     expect(teo.ai).toBe('overdrive');
     const counts = countCards(buildOpponentDeck(teo).skills);
-    expect([ge(5), ge(6), ge(7)].map((id) => counts[id])).toEqual([3, 3, 3]);
-    expect(counts[ge(1)]).toBe(2);
+    expect([ge(5), ge(6), ge(7)].map((id) => counts[id])).toEqual([2, 2, 2]);
+    expect(counts[ge(9)]).toBeUndefined();
+    expect(counts[ge(1)]).toBe(3);
+    expect(counts['skl-nobiton-04']).toBe(3);
+    expect(buildOpponentDeck(teo).skills).toHaveLength(60);
+    expect(teo.lifeScale).toBe(1.6);
     for (const e of Object.values(ENCOUNTERS)) if (e.id !== 'enc-machine-boss') expect(e.ai).not.toBe('overdrive');
   });
 
@@ -39,8 +43,8 @@ describe('テオ：オーバードライブの3枚コンボを狙う', () => {
     expect(normal?.type === 'useCard' && ['o0', 'o1'].includes(normal.cardUid)).toBe(true);
   });
 
-  it('マナにもしない（1枚でも）', () => {
-    let s = scene([ge(5), sor(1), sor(1)], 2);
+  it('2種類あればマナにもしない（指示書 AY2：1種類だけのときは取っておかない）', () => {
+    let s = scene([ge(5), ge(6), sor(1), sor(1)], 2);
     s = { ...s, phase: 'mana' };
     for (let i = 0; i < 5 && s.phase === 'mana'; i++) {
       const a = chooseAction(s, 'opponent', 'overdrive', 'A');
@@ -49,6 +53,18 @@ describe('テオ：オーバードライブの3枚コンボを狙う', () => {
       s = applyAction(s, a);
     }
     expect(s.sides.opponent.hand.some((c) => c.cardId === ge(5))).toBe(true);
+    expect(overdriveHold(scene([ge(5), sor(1)], 2), 'opponent', 'overdrive', 2).size).toBe(0);
+  });
+
+  it('同じ札の2枚目は取っておかない（それぞれ1枚まで）', () => {
+    const held = overdriveHold(scene([ge(5), ge(5), ge(6)], 6), 'opponent', 'overdrive');
+    expect([...held].sort()).toEqual(['o0', 'o2']);
+  });
+
+  it('取っておくと使える技が無くなる手番は、ふつうに使う（指示書 AY2）', () => {
+    // 手札は α・β だけ・マナ4（取っておくと使える技が0枚）→ どちらかを使う
+    const a = chooseAction(scene([ge(5), ge(6)], 4), 'opponent', 'overdrive', 'A');
+    expect(a?.type).toBe('useCard');
   });
 
   it('味方が次の相手の攻撃で倒れそうなら、取っておかない', () => {

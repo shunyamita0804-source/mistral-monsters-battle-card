@@ -370,8 +370,11 @@ export function buildAceDeck(monsters: readonly string[], ace: string, aceCopies
   const skills: string[] = NPC_SUPPORTS.flatMap((id) => Array<string>(NPC_SUPPORT_COPIES).fill(id));
   // aceCopies（2026-11-05 指示書 AY：テオの α・β・γ を3枚ずつ）があれば、その技はその枚数
   for (const id of aceSkills) for (let n = 0; n < (aceCopies[id] ?? ACE_SKILL_COPIES) && skills.length < DECK_RULES.skillCount; n++) skills.push(id);
+  // 切り札以外のモンスターの技で枚数を決めたもの（aceCopies）を先に入れる。決めた技は、そのあとの埋める所では足さない
+  const pool0 = monsters.filter((m) => m !== ace).flatMap((m) => skillsOf(m).map((s) => s.id));
+  for (const id of pool0) for (let n = 0; n < (aceCopies[id] ?? 0) && skills.length < DECK_RULES.skillCount; n++) skills.push(id);
   const counts: Record<string, number> = countCards(skills);
-  const pool = monsters.filter((m) => m !== ace).flatMap((m) => skillsOf(m).map((s) => s.id));
+  const pool = pool0.filter((id) => aceCopies[id] === undefined);
   for (let i = 0; skills.length < DECK_RULES.skillCount && i < pool.length * DECK_RULES.maxCopies; i++) {
     const id = pool[i % pool.length] as string;
     if ((counts[id] ?? 0) < DECK_RULES.maxCopies) {

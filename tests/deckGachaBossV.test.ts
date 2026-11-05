@@ -219,7 +219,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       'enc-ice-boss': 1.07, // 2026-11-02 指示書 AU：目安のプレイヤー（C の枠）で 19％ に
       'enc-fire-boss': 1.1, // 2026-10-31 指示書 AC【2】で 1.08。2026-11-02 指示書 AT で C の守り手になり、前の C（イヴァン）の水準に
       'enc-thunder-boss': 1.36, // 2026-11-01 指示書 AH で 1.0。2026-11-02 指示書 AU：目安のプレイヤー（B の枠）で 16％ に
-      'enc-machine-boss': 1.82, // 2026-11-05 指示書 AX で 1.6。指示書 AY：3枚コンボを狙うようにして 10.7％ に
+      'enc-machine-boss': 1.6, // 2026-11-05 指示書 AX で 1.6。AY で 1.82、指示書 AY2 で 1.6 に戻した（デッキで強くした）
       'enc-holy-boss': 1.66, // 2026-11-05 指示書 AX：S の目安のプレイヤーがギアロスを持ち、1.76 では 5.7％ になったので 1.66 に
     });
   });
@@ -232,7 +232,7 @@ describe('V3 ボスのデッキ：切り札の技を2枚ずつ', () => {
       expect(deck.skills, id).toHaveLength(DECK_RULES.skillCount);
       expect(deck.monsters).toEqual(boss.monsters);
       const counts = countCards(deck.skills);
-      for (const k of skillsOf(ace)) expect(counts[k.id], `${id} ${k.id}`).toBe(boss.aceCopies?.[k.id] ?? ACE_SKILL_COPIES);
+      for (const k of skillsOf(ace)) expect(counts[k.id], `${id} ${k.id}`).toBe((boss.aceCopies?.[k.id] ?? ACE_SKILL_COPIES) || undefined);
       for (const m of boss.monsters.filter((x) => x !== ace)) expect(skillsOf(m).some((k) => (counts[k.id] ?? 0) > 0), `${id} ${m}`).toBe(true);
       expect(isDeckValid(deck), id).toBe(true);
     }

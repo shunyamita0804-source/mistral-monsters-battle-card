@@ -50,7 +50,10 @@ export interface OpponentDefinition {
    * デッキに切り札の技14種を2枚ずつ必ず入れる（src/game/deck/deck.ts の buildOpponentDeck）
    */
   readonly ace?: string;
-  /** 切り札の技のうち、2枚より多く入れる技（ID → 枚数。2026-11-05 指示書 AY：テオのオーバードライブ α・β・γ を3枚ずつ） */
+  /**
+   * ボスのデッキで、枚数を決めておく技（ID → 枚数。0 なら入れない）。切り札の技はふつう2枚、ほかのモンスターの技は決めた分を先に入れ、残りを今までどおり埋める
+   * （2026-11-05 指示書 AY：テオの α・β・γ を3枚。指示書 AY2：2枚に戻し、ライフの代わりにデッキで強くする）
+   */
   readonly aceCopies?: Readonly<Record<string, number>>;
   /** 通算の勝率（%。札を押したときに出す。仮の固定値。常連だけ） */
   readonly winRate?: number;

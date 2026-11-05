@@ -228,7 +228,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const held = overdriveHold(state, side, style, OVERDRIVE_HOLD_MIN);
   // 取っておいている間は、3枚コンボのマナ5を残す（払うとマナが5より少なくなるカードは使わない。マナ0のカードは使う）
   const reserve = held.size > 0 ? OVERDRIVE_COMBO_COST : 0;
-  const options = usableOptions(state, side).filter((o) => !held.has(o.card.uid) && (reserve === 0 || o.def.cost === 0 || manaOf(state.sides[side]) - o.def.cost >= reserve));
+  const allOptions = usableOptions(state, side);
+  const kept = allOptions.filter((o) => !held.has(o.card.uid) && (reserve === 0 || o.def.cost === 0 || manaOf(state.sides[side]) - o.def.cost >= reserve));
+  // 2026-11-05 指示書 AY2：取っておくと使える技が無くなる手番は、取っておくのをやめてふつうに使う
+  const options = held.size > 0 && !kept.some(isSkillOption) && allOptions.some(isSkillOption) ? allOptions : kept;
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
@@ -406,6 +409,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
  */
 /** テオが α・β・γ を技として使わずに取っておく、手札の種類の数（指示書 AY の「2枚」。1にするとコンボの対戦が少し増える：docs/ay-card-names-teo-20261105.md） */
 export const OVERDRIVE_HOLD_MIN = 2;
+/** マナにしないで取っておく α・β・γ の種類の数・危ないときも取っておくか（2026-11-05 指示書 AY2 で見直し） */
+export const OVERDRIVE_MANA_HOLD_MIN = 2;
+export const OVERDRIVE_MANA_HOLD_IN_DANGER = false;
 
 export function overdriveHold(state: BattleState, side: Side, style: AiStyle, min = 2, ignoreDanger = false): Set<string> {
   if (style !== 'overdrive') return new Set();
@@ -1095,7 +1101,7 @@ function chooseManaAction(state: BattleState, side: Side, style: AiStyle = 'norm
 function manaPick(state: BattleState, side: Side, style: AiStyle, skill: CpuSkill): HandCard | undefined {
   const mine0 = state.sides[side];
   // テオ（指示書 AY）：α・β・γ は（1枚でも・危ないときも）マナにしない（危ないときは技としてふつうに使う）
-  const held = overdriveHold(state, side, style, 1, true);
+  const held = overdriveHold(state, side, style, OVERDRIVE_MANA_HOLD_MIN, OVERDRIVE_MANA_HOLD_IN_DANGER);
   const mine = held.size > 0 ? { ...mine0, hand: mine0.hand.filter((c) => !held.has(c.uid)) } : mine0;
   const mana = manaOf(mine);
   const cost = (c: HandCard): number => {
