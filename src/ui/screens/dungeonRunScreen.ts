@@ -834,12 +834,13 @@ class DungeonRunView {
 
   /**
    * スイッチを調べた（機械の塔。2026-11-05 指示書 BD）：開いている扉の色が入れかわる。何度でも押せる。
-   * 短い音と、扉が開く／閉まる小さな動き（is-switching の間だけ。dungeonRun.css）
+   * 専用の音（レバー）と、扉が開く／閉まる小さな動き（is-switching の間だけ。dungeonRun.css）
    */
   #pressSwitch(): void {
     const r = pressSwitch(this.#run);
     this.#store.update((s) => ({ ...s, dungeonRun: r.run }));
-    sound.play('chestUnlock');
+    // スイッチの専用の音（レバーのカチッ。2026-11-05 ユーザー指示：宝箱とちがう機械の音）
+    sound.play(r.color === 'blue' ? 'switchBlue' : 'switchRed');
     this.#root.classList.remove('is-switching');
     void this.#root.offsetWidth;
     this.#root.classList.add('is-switching');

@@ -453,7 +453,8 @@ export const STORY_EVENTS: readonly StoryEventDefinition[] = [
     id: 'D06', chapter: 6, order: 25.8, kind: 'main', trigger: 'dungeonEnter', dungeon: 'dungeon-06', review: true, title: { ja: '機械の塔に初めて入る', en: 'Into the Machine Tower' },
     steps: [
       L('system', '歯車の音が、塔のてっぺんまで響いている。', 'The sound of gears echoes all the way to the top of the tower.'),
-      L('system', '赤と青の扉は、スイッチを踏むたびに開く色が入れかわります。', 'Each time you step on a switch, the open color swaps between the red and blue doors.'),
+      // 2026-11-05 ユーザー指示：スイッチは「調べる」なので「踏む」→「調べる」
+      L('system', '赤と青の扉は、スイッチを調べるたびに開く色が入れかわります。', 'Each time you check a switch, the open color swaps between the red and blue doors.'),
       L('system', 'どの扉を開けておくか考えて、上の階を目指しましょう。', 'Think about which doors to leave open, and make your way to the upper floors.'),
     ],
   },

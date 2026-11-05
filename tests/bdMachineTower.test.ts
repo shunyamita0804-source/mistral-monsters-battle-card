@@ -176,7 +176,7 @@ describe('指示書 BD【2】〜【5】', () => {
     const ev = getStoryEvent('D06');
     expect(ev?.steps.map((s) => (s.kind === 'line' ? s.line.text.ja : ''))).toEqual([
       '歯車の音が、塔のてっぺんまで響いている。',
-      '赤と青の扉は、スイッチを踏むたびに開く色が入れかわります。',
+      '赤と青の扉は、スイッチを調べるたびに開く色が入れかわります。',
       'どの扉を開けておくか考えて、上の階を目指しましょう。',
     ]);
     const s = fresh();
@@ -186,5 +186,6 @@ describe('指示書 BD【2】〜【5】', () => {
     expect(pendingStoryEvent(seen, 'dungeonEnter', { dungeon: ID })).toBeNull();
     expect(reviewableStoryEvents(seen).map((e) => e.id)).toEqual(['D06']);
     expect(reviewableStoryEvents(s)).toEqual([]);
+    expect(ev?.steps[1]?.kind === 'line' && ev.steps[1].line.text.en).toBe('Each time you check a switch, the open color swaps between the red and blue doors.');
   });
 });

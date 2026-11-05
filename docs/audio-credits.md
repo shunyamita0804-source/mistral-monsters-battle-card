@@ -302,6 +302,22 @@ OtoLogic は設定画面のクレジットに前から表記している）。
 - 2026-10-26（同じ日の2回目）：ユーザー指示「カードの音はこれ1つで1枚に1度鳴らすように」で、届いた `Motion-Swish07-5.mp3` だけにした
   （`assets/audio/se/card_deal/swish.mp3`。切り出しは同じ。7種類から選ぶのはやめた）
 
+## 2026-11-05 機械の塔のスイッチの音（OpenGameArt「SFX - Circuit breaker」・CC0）
+
+ユーザー指示（指示書 BD の要確認への答え・2026-11-05）「スイッチの音は宝箱とちがう専用の機械の音（レバーやカチッという音）に。CC0 など自由に使える音を探し、出どころとライセンスを書く」。
+Kenney・Freesound・Pixabay はこの作業環境からダウンロードを断られた（403）ため、OpenGameArt から選んだ。**ユーザーの試聴はまだ**（気に入らなければ差し替える）。
+
+- 素材：**「SFX - Circuit breaker」** 作者 **CleytonKauffman**（https://opengameart.org/content/sfx-circuit-breaker 。`Circuit Breaker.zip` の `switch on.wav`・`switch off.wav`）
+- ライセンス：**CC0**（パブリックドメイン。誰でも自由に使える・改変してよい・クレジット不要）。2026-11-05 にページの表記で確認
+- 加工：頭の無音を切り（レバーの音の始まりから 0.37〜0.38 秒）、最後 0.1 秒をフェードアウト、最大の大きさを約 −7dB にそろえて MP3（128k）に。音色は変えていない
+
+| 場面（SE_REGISTRY）・鳴らすとき | ファイル | 元の素材 | 切り出し |
+| --- | --- | --- | --- |
+| `switchBlue`：スイッチを調べて青の扉が開いたとき | `switch_lever_blue.mp3` | switch on.wav | 0.47〜0.85 秒 |
+| `switchRed`：スイッチを調べて赤の扉が開いたとき | `switch_lever_red.mp3` | switch off.wav | 0.43〜0.80 秒 |
+
+- 前は宝箱の鍵の音（`chestUnlock`）を鳴らしていた
+
 ## 2026-10-28 ボタンの音（進行が合成した音）
 
 ZIP「Mistral_Name_CardList_UISound_20261028」の `se/`（指示書「進行が合成した音なので使ってよい」）。原本（.wav）とゲーム用（.mp3）は

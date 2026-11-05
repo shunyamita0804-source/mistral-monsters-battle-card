@@ -34,6 +34,8 @@ import gateOpenMp3 from '@assets/audio/se/gate_open.mp3';
 import gateCloseMp3 from '@assets/audio/se/gate_close.mp3';
 import stairsMp3 from '@assets/audio/se/stairs.mp3';
 import chestUnlockMp3 from '@assets/audio/se/chest_unlock.mp3';
+import switchLeverBlueMp3 from '@assets/audio/se/switch_lever_blue.mp3';
+import switchLeverRedMp3 from '@assets/audio/se/switch_lever_red.mp3';
 import chestOpenWoodMp3 from '@assets/audio/se/chest_open_wood.mp3';
 import chestOpenIronMp3 from '@assets/audio/se/chest_open_iron.mp3';
 import registerMp3 from '@assets/audio/se/register.mp3';
@@ -98,6 +100,9 @@ export type SoundId =
   | 'drip'
   | 'ironDoorOpen'
   | 'autoDoor'
+  // 2026-11-05：機械の塔のスイッチ（レバーのカチッ。青にする・赤にする。CC0。docs/audio-credits.md）
+  | 'switchBlue'
+  | 'switchRed'
   | 'uiTap'
   | 'uiDecide'
   | 'uiCancel'
@@ -190,6 +195,8 @@ export const SE_REGISTRY: Readonly<Record<SoundId, SoundEntry>> = {
   gateClose: { mp3: gateCloseMp3, gain: 0.8 },
   stairs: { mp3: stairsMp3, gain: 0.9 },
   chestUnlock: { mp3: chestUnlockMp3, gain: 1.0 },
+  switchBlue: { mp3: switchLeverBlueMp3, gain: 0.9 },
+  switchRed: { mp3: switchLeverRedMp3, gain: 0.9 },
   chestOpenWood: { mp3: chestOpenWoodMp3, gain: 0.7 },
   chestOpenIron: { mp3: chestOpenIronMp3, gain: 0.6 },
   register: { mp3: registerMp3, gain: 0.7 },
