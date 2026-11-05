@@ -91,6 +91,10 @@ const TEXTS: Readonly<Record<string, string>> = {
   '味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）': 'Remove all bad statuses from 1 ally and restore 1 life (up to max).',
   '次の相手のターンの終わりまで、味方全員に悪い状態がつかない': 'Until the end of the next enemy turn, your monsters cannot get bad statuses.',
   '味方への攻撃を代わりに受け、ダメージ−2': 'Take an attack aimed at an ally, with 2 less damage.',
+  // 2026-11-05 指示書 BI：ラディエル（英語は仮訳）
+  '相手1体は次の攻撃を行えない。相手のマナ−1': 'One enemy cannot attack next time. The enemy loses 1 mana.',
+  'おたがいの手札を山札に戻し、同じ枚数を引いて山札をシャッフル': 'Both players return their hands to their decks, draw the same number, then shuffle.',
+  '自分の捨て札から3枚をマナにする': 'Turn 3 cards from your discard pile into mana.',
 };
 
 export const AJ_EN: Readonly<Record<string, string>> = Object.fromEntries(

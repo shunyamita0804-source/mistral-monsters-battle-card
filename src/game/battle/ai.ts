@@ -86,6 +86,11 @@ import { OVERDRIVE_CHOICE, OVERDRIVE_COMBO_COST, OVERDRIVE_IDS } from '../../dat
  *   腕前 A は、相手がいまのマナで払える状態の技を持っているときだけ。
  *   みがわりは、狙われた味方のライフが低く（倒されそう・半分以下）、クヨウのライフに余裕があるとき（shouldCover。受けるのは威力−2〔BH の直しで守りは重ねられない〕。A は受けたあともライフ2以上・B は1以上残るとき）。
  *   腕前 C は forgetTrick の割合で使いそこねる。まよけのふだの効いている相手には、腕前 A・B は悪い状態をつける特殊の技を使わない
+ * - ラディエル（2026-11-05 指示書 BI。ラディエルだけ）：chooseRadielTrick。
+ *   攻撃より先：天の恵み（大きな技〔てんりんのさばき・てんのはどう〕が手札にあってマナが足りないとき。A は捨て札が2枚以上あるときだけ）・
+ *   最後の審判（自分の手札が使えないカードばかりのとき、または相手の手札が多いとき）。どちらもその手番に倒せる攻撃が無いとき。
+ *   攻撃のあと：しんぱんのせんこく（相手のいちばん強そうな攻撃役へ。A は相手が次の手番に払える攻撃でいちばん大きいダメージの相手、B は技の最大ダメージ、C はばらばら）。
+ *   腕前 C は forgetTrick の割合で使いそこねる
  */
 
 /** 腕前ごとのふるまい（2026-10-30 指示書 Z。数字は仮。ここでまとめて合わせる） */
@@ -341,6 +346,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const fornFirst = chooseFornTrick(state, side, options, enemies, style, skill, true);
   if (fornFirst) return fornFirst;
 
+  // 2.965 ラディエル（2026-11-05 指示書 BI）：天の恵み・最後の審判は攻撃より先
+  const radielFirst = chooseRadielTrick(state, side, options, skill, true);
+  if (radielFirst) return radielFirst;
   // 2.97 クヨウ（2026-11-05 指示書 BH）：おはらい・まよけのふだは攻撃より先
   const kuyo = chooseKuyoTrick(state, side, options, skill);
   if (kuyo) return kuyo;
@@ -349,6 +357,9 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
 
+  // 3.35 ラディエル（指示書 BI）：攻撃のあと、しんぱんのせんこく
+  const radielAfter = chooseRadielTrick(state, side, options, skill, false);
+  if (radielAfter) return radielAfter;
   // 3.4 クヨウ（BH の直し）：攻撃のあと、おはらいでライフの減った味方を回復
   const kuyoAfter = chooseKuyoTrick(state, side, options, skill, false);
   if (kuyoAfter) return kuyoAfter;
@@ -1194,13 +1205,62 @@ function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skil
   return null;
 }
 
+/** 指示書 BI の考え方で、しんぱんのせんこく・最後の審判・天の恵みを使うモンスター */
+const RADIEL_MONSTERS: readonly string[] = ['mon-radiel'];
+/** 天の恵みで払いたい「大きな技」の消費マナ（てんりんのさばき 6・てんのはどう 7） */
+const RADIEL_BIG_COST = 6;
+/** 最後の審判：相手の手札がこの枚数以上なら「多い」 */
+const JUDGMENT_FOE_HAND = 5;
+
+/** ラディエル（2026-11-05 指示書 BI）。first：天の恵み → 最後の審判（攻撃より先）。first でない：しんぱんのせんこく（攻撃のあと） */
+function chooseRadielTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill, first: boolean): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => RADIEL_MONSTERS.includes(o.def.monsterId));
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'radielTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  const me = state.sides[side];
+  const mana = manaOf(me);
+  if (first) {
+    if (canKillThisTurn(state, side, options)) return null;
+    const grace = mine.find((o) => o.def.effect.type === 'heavenGrace');
+    if (grace) {
+      const big = me.hand.map((c) => getPlayCard(c.cardId)).filter((k) => k.kind === 'skill' && RADIEL_MONSTERS.includes(k.monsterId) && k.effect.type === 'attack' && k.cost >= RADIEL_BIG_COST);
+      const short = big.some((k) => k.cost > mana);
+      if (short && (skill !== 'A' || me.discard.length >= 2)) return { type: 'useCard', side, cardUid: grace.card.uid };
+    }
+    const judgment = mine.find((o) => o.def.effect.type === 'lastJudgment');
+    if (judgment) {
+      const rest = me.hand.filter((c) => c.uid !== judgment.card.uid);
+      const stuck = rest.filter((c) => !isGuard(c) && !cardUsability(state, side, c.uid).usable).length;
+      const foeHand = state.sides[otherSide(side)].hand.length;
+      const badHand = rest.length >= 3 && stuck / rest.length >= (skill === 'A' ? 0.6 : 0.5);
+      const bigFoe = foeHand >= JUDGMENT_FOE_HAND && (skill !== 'A' || foeHand >= rest.length);
+      if (badHand || bigFoe) return { type: 'useCard', side, cardUid: judgment.card.uid };
+    }
+    return null;
+  }
+  const verdict = mine.find((o) => o.def.effect.type === 'seal');
+  if (!verdict) return null;
+  const foe = otherSide(side);
+  const foeMana = manaOf(state.sides[foe]);
+  const reach = targetsFor(state, side, verdict.def).filter((e) => e.sealedTurn !== state.turn + 1);
+  if (reach.length === 0) return null;
+  // A：相手が次の手番に払える攻撃でいちばん大きいダメージ。B：技の最大ダメージ。C：ばらばら
+  const afford = (e: BattleMonster): number =>
+    Math.max(0, ...skillsOf(e.cardId).filter((k) => k.effect.type === 'attack' && k.stat !== null && k.cost <= foeMana + 1).map((k) => skillValue(k)));
+  const target =
+    skill === 'C'
+      ? reach[Math.floor(cpuRoll(state, side, 'verdictTarget') * reach.length)]
+      : [...reach].sort((a, b) => (skill === 'A' ? afford(b) - afford(a) : 0) || threatOf(state, b) - threatOf(state, a) || b.life - a.life)[0];
+  return target ? attackAction(state, side, verdict, target.uid) : null;
+}
+
 /** 特殊（吠える・すなかけ・ダストキック・ちょうはつ）：一番ライフの多い相手に使う（仮の思考）。使えなければ null */
 function chooseSpecial(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[], spare = 0): BattleAction | null {
   const mana = manaOf(state.sides[side]);
   // リリルのうっとりウインクは chooseLililTrick、フォルンのこもりうたは chooseFornTrick だけで考える（2026-11-02 指示書 AK2・AL）
   const special = options
     .filter(isSkillOption)
-    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && !FORN_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
+    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && !FORN_MONSTERS.includes(o.def.monsterId) && !RADIEL_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
   const strongestEnemy = [...enemies].sort((a, b) => b.life - a.life)[0];
   return special && strongestEnemy ? attackAction(state, side, special, strongestEnemy.uid) : null;
 }

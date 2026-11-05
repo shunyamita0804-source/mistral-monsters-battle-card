@@ -6,7 +6,7 @@ import { BOOSTERS, type BoosterKey } from '../src/data/introV2.ts';
 import { AJ_QA_SKILLS, AJ_SKILLS } from '../src/data/skillRebuildAJ.ts';
 import type { CpuSkill } from '../src/data/tournaments.ts';
 import { chooseAction } from '../src/game/battle/ai.ts';
-import { actingSide, applyAction, badStatusKinds, createBattle, findMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
+import { actingSide, applyAction, badStatusKinds, cardUsability, createBattle, findMonster, type BattleState, type Side } from '../src/game/battle/engine.ts';
 import { swapDeck } from '../src/game/battle/playtest.ts';
 import { countCards, isDeckValid, type Deck } from '../src/game/deck/deck.ts';
 import { boosterDeck } from '../src/game/story/introV2.ts';
@@ -24,6 +24,7 @@ const MAX_STEPS = 6000;
 const SUBJECTS = (process.env.PLAYTEST_SUBJECTS ?? 'mon-kuyo,mon-hakuran,mon-shishien,mon-geol').split(',');
 const SKILL: CpuSkill = (process.env.PLAYTEST_SKILL ?? 'A') as CpuSkill;
 const KUYO = 'mon-kuyo';
+const WAVE = 'skl-radiel-06';
 const STATUS_MONSTERS = ['mon-soramo', 'mon-nobiton', 'mon-hyouzuku'] as const;
 
 type Pick = { readonly id: string; readonly copies: number }[];
@@ -75,8 +76,15 @@ interface Count {
   blocked: number;
   standIn: number;
   standInDamage: number;
+  /** 2026-11-05 指示書 BI：ラディエル（しんぱんのせんこく・最後の審判・天の恵み・天の恵みで増えたマナ・てんのはどう〔7マナ〕を使えた手番・使った回数） */
+  verdict: number;
+  judgment: number;
+  grace: number;
+  graceMana: number;
+  waveUsable: number;
+  waveUsed: number;
 }
-const empty = (): Count => ({ games: 0, winsA: 0, deckOut: 0, turns: 0, purify: 0, purified: 0, purifyHealed: 0, purifyHealOnly: 0, charm: 0, blocked: 0, standIn: 0, standInDamage: 0 });
+const empty = (): Count => ({ games: 0, winsA: 0, deckOut: 0, turns: 0, purify: 0, purified: 0, purifyHealed: 0, purifyHealOnly: 0, charm: 0, blocked: 0, standIn: 0, standInDamage: 0, verdict: 0, judgment: 0, grace: 0, graceMana: 0, waveUsable: 0, waveUsed: 0 });
 
 const BLOCKED_PREFIX = 'まよけのふだが防いだ';
 
@@ -85,13 +93,29 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
   let s: BattleState = createBattle({ name: 'A', deck: a }, { name: 'B', deck: b }, seed, first);
   let watch: { uid: string; life: number } | null = null;
   let purifyWatch: { uid: string; life: number } | null = null;
+  let waveTurn = -1;
+  let graceBefore: number | null = null;
   for (let i = 0; i < MAX_STEPS && s.phase !== 'ended'; i++) {
     const side = actingSide(s);
     if (!side) break;
     const action = chooseAction(s, side, 'normal', SKILL);
     if (!action) break;
     let standIn = false;
+    // てんのはどう（7マナ）を使えた手番：自分の手番の攻撃のはじめ（まだだれも動いていない）に、手札のてんのはどうが使えるか
+    if (side === 'player' && s.phase === 'main' && s.active === 'player' && s.turn !== waveTurn && s.sides.player.monsters.every((m) => !m.acted)) {
+      waveTurn = s.turn;
+      if (s.sides.player.hand.some((h) => h.cardId === WAVE && cardUsability(s, 'player', h.uid).usable)) c.waveUsable++;
+    }
     if (side === 'player' && action.type === 'useCard' && s.phase === 'main') {
+      const used = s.sides.player.hand.find((x) => x.uid === action.cardUid);
+      const k = used ? getPlayCard(used.cardId) : null;
+      if (k?.kind === 'skill' && k.effect.type === 'seal' && k.effect.manaDrain) c.verdict++;
+      if (k?.kind === 'skill' && k.effect.type === 'lastJudgment') c.judgment++;
+      if (k?.kind === 'skill' && k.effect.type === 'heavenGrace') {
+        c.grace++;
+        graceBefore = s.sides.player.manaPile.length - k.cost;
+      }
+      if (used?.cardId === WAVE) c.waveUsed++;
       const hand = s.sides.player.hand.find((x) => x.uid === action.cardUid);
       const card = hand ? getPlayCard(hand.cardId) : null;
       if (card?.kind === 'skill' && card.effect.type === 'purify') {
@@ -111,6 +135,10 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
     }
     const logBefore = s.log.length;
     s = applyAction(s, action);
+    if (graceBefore !== null) {
+      c.graceMana += Math.max(0, s.sides.player.manaPile.length - graceBefore);
+      graceBefore = null;
+    }
     if (purifyWatch) {
       c.purifyHealed += Math.max(0, (findMonster(s, purifyWatch.uid)?.monster.life ?? 0) - purifyWatch.life);
       purifyWatch = null;
@@ -153,6 +181,14 @@ const summary = (c: Count): Record<string, number> => ({
   standInPerGame: per(c.standIn, c.games),
   standInDamage: c.standInDamage,
   standInDamagePerUse: per(c.standInDamage, c.standIn),
+  verdictPerGame: per(c.verdict, c.games),
+  judgmentPerGame: per(c.judgment, c.games),
+  gracePerGame: per(c.grace, c.games),
+  graceMana: c.graceMana,
+  graceManaPerUse: per(c.graceMana, c.grace),
+  waveUsableTurns: c.waveUsable,
+  waveUsableTurnsPerGame: per(c.waveUsable, c.games),
+  waveUsedPerGame: per(c.waveUsed, c.games),
 });
 
 /** X を入れられる（箱に X がいない）箱と入れ替える場所 */

@@ -38,6 +38,8 @@ export const SCREEN_IDS = [
   'gearosLab',
   /** 2026-11-05 指示書 BH：クヨウの確認用の画面（?qa=1&lab=kuyo。霧の廃坑ができるまで） */
   'kuyoLab',
+  /** 2026-11-05 指示書 BI：ラディエルの確認用の画面（?qa=1&lab=radiel。アウレリオとの対戦も） */
+  'radielLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

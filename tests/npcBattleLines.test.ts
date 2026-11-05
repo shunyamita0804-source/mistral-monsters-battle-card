@@ -55,17 +55,18 @@ describe('データ（正本と同じ）', () => {
     expect(silent).toBe(7);
   });
 
-  it('切り札専用（8名×3本＋アウレリオの仮3本）・ガレスの再戦1本も正本と同じ', () => {
+  it('切り札専用（8名×3本＋アウレリオの3本）・ガレスの再戦1本も正本と同じ（アウレリオの3本は 2026-11-05 指示書 BI でラディエルの名前に差し替え）', () => {
     let n = 0;
     for (const [id, extra] of Object.entries(SRC.extra_lines)) {
       const a = NPC_BATTLE_ACTORS.find((x) => x.id === id);
       for (const [key, v] of Object.entries(extra)) {
-        expect(a?.extra?.[key as 'ace_attack_hit']?.ja, `${id} ${key}`).toBe(v.text);
+        if (id !== 'aurelio') expect(a?.extra?.[key as 'ace_attack_hit']?.ja, `${id} ${key}`).toBe(v.text);
         n++;
       }
     }
     expect(n).toBe(28);
-    expect(NPC_BATTLE_ACTORS.find((a) => a.id === 'aurelio')?.extra?.ace_attack_hit?.status).toBe('provisional_ace_pending_replacement');
+    const aurelio = NPC_BATTLE_ACTORS.find((a) => a.id === 'aurelio');
+    expect(aurelio?.extra?.ace_attack_hit).toMatchObject({ ja: '……よく応えた、ラディエル。', status: 'approved_bi_20261105' });
   });
 
   it('無言は吹き出しを出さない（null）。ガレスの未承認2本は出さない（今までの共通のひと言：undefined）', () => {
@@ -182,7 +183,8 @@ describe('対戦相手との結びつけ', () => {
     for (const [actor, boss] of Object.entries(bosses)) {
       const ace = ENCOUNTERS[boss]?.ace;
       expect(ace, boss).toBeTruthy();
-      expect(cardName(getMonster(ace as string)), actor).toBe(SRC.extra_lines[actor]?.ace_attack_hit?.ace_monster);
+      // アウレリオ（2026-11-05 指示書 BI）：正本は仮のソラモのまま。切り札はラディエルに替えた（セリフも上書き）
+      expect(cardName(getMonster(ace as string)), actor).toBe(actor === 'aurelio' ? 'ラディエル' : SRC.extra_lines[actor]?.ace_attack_hit?.ace_monster);
     }
   });
 });

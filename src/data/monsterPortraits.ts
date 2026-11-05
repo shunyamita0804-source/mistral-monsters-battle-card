@@ -50,6 +50,8 @@ export const PORTRAIT_FOCUS: Readonly<Record<string, PortraitFocus>> = {
   'mon-gearos': { x: 0.5, y: 0.36, zoom: 1.9 },
   // クヨウ（2026-11-05 指示書 BH）：顔は絵の左上（角とひたいの目が入るように）
   'mon-kuyo': { x: 0.3, y: 0.22, zoom: 1.9 },
+  // ラディエル（2026-11-05 指示書 BI）：顔は真ん中の上（光輪が入るように）
+  'mon-radiel': { x: 0.5, y: 0.2, zoom: 2.0 },
 };
 
 export function portraitFocus(monsterId: string): PortraitFocus {

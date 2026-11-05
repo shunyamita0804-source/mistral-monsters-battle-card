@@ -129,7 +129,9 @@ type RegularId = 'sienna' | 'dolf' | 'leonard' | 'greta' | 'julius' | 'camilla' 
  */
 // 2026-11-05 指示書 AX【6】：A・S の目安のプレイヤーがギアロス（機械の塔の切り札）を持つようになったので、目標から外れた A・S だけ合わせ直した
 // （A 1.06＝30.7％ → 1.13＝20.4％、S 1.00＝25.8％ → 1.05＝15.6％。docs/ax-tyrant-gearos-20261105.md）
-export const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 0.86, B: 0.9, A: 1.13, S: 1.05 };
+// 2026-11-05 指示書 BI：S の目安のプレイヤーがラディエル（天の聖域の切り札）も持つようになり、S 1.05＝24.3％ と目標から外れたので 1.13（13.4％。1.12＝17.6％）に。
+// A は目安のプレイヤーが変わらないので測っていない（docs/bi-radiel-20261105.md）
+export const RANK_SCALE: Readonly<Record<BracketRank, number>> = { C: 0.86, B: 0.9, A: 1.13, S: 1.13 };
 
 /**
  * E・D の総当たりの全体の強さ（2026-11-02 指示書 AU）。相手3人の lifeScale（下の rounds の値）に掛ける。

@@ -126,6 +126,8 @@ export const settingsScreen: ScreenDefinition = {
                 button(t('axLab.titleOf', { name: cardName('mon-gearos') }), () => ctx.navigate('gearosLab'), 'btn btn--small'),
                 // 2026-11-05 指示書 BH：クヨウ（霧の廃坑ができるまで、ここからだけ）
                 button(t('axLab.titleOf', { name: cardName('mon-kuyo') }), () => ctx.navigate('kuyoLab'), 'btn btn--small'),
+                // 2026-11-05 指示書 BI：ラディエル（アウレリオとの対戦も）
+                button(t('axLab.titleOf', { name: cardName('mon-radiel') }), () => ctx.navigate('radielLab'), 'btn btn--small'),
                 // 2026-11-02 指示書 AP：蒼海（みちしおあり）を試す
                 button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small'),
                 button(t('storyEvent.lab.title'), () => ctx.navigate('storyEventLab'), 'btn btn--small'),

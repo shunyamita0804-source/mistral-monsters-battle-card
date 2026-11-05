@@ -398,6 +398,21 @@ export const OFFICIAL_DRAFT_EN: Readonly<Record<string, string>> = {
   'card:skl-kuyo-10:name': 'Mane Guard',
   'card:skl-kuyo-11:name': 'Stand-In',
   'card:skl-kuyo-12:name': 'Into the Fog',
+  // 2026-11-05 指示書 BI：ラディエル（名前は指示書のとおり。説明は仮訳）
+  'card:mon-radiel:name': 'Radiel',
+  'card:mon-radiel:description': 'One who wears a ring of light deep in the Holy Sanctuary and pronounces judgment.',
+  'card:skl-radiel-01:name': 'Holy Thrust',
+  'card:skl-radiel-02:name': 'Cross Needle',
+  'card:skl-radiel-03:name': 'Light Orb',
+  'card:skl-radiel-04:name': 'Halo Light',
+  'card:skl-radiel-05:name': 'Holy Gaze',
+  'card:skl-radiel-06:name': "Heaven's Wave",
+  'card:skl-radiel-07:name': 'Wheel of Judgment',
+  'card:skl-radiel-08:name': 'Verdict',
+  'card:skl-radiel-09:name': 'Last Judgment',
+  'card:skl-radiel-10:name': 'Wing Guard',
+  'card:skl-radiel-11:name': "Heaven's Aegis",
+  'card:skl-radiel-12:name': "Heaven's Grace",
 
   // ギアロス（2026-11-05 指示書 AX。仮訳）
   'card:mon-gearos:name': 'Gearos',

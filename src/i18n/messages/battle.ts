@@ -93,6 +93,9 @@ export const BATTLE = {
   'battle.log.cover': { ja: '{name}が{ally}をかばった！ 攻撃は{name}が受ける。', en: '{name} covered {ally}! {name} takes the attack.' },
   // 2026-11-05 指示書 BH：クヨウ（おはらい・まよけのふだ・みがわり）
   'battle.log.standIn': { ja: 'みがわり！ {ally}への攻撃を{name}が受ける（ダメージ−{n}）。', en: 'Stand-In! {name} takes the attack aimed at {ally} (damage -{n}).' },
+  // 2026-11-05 指示書 BI：ラディエル（最後の審判・天の恵み）
+  'battle.log.lastJudgment': { ja: '最後の審判！ おたがいの手札が山札に戻り、引き直した。', en: 'Last Judgment! Both hands returned to the decks and were redrawn.' },
+  'battle.log.heavenGrace': { ja: '天の恵み！ 捨て札から{n}枚がマナになった。', en: "Heaven's Grace! {n} cards from the discard pile became mana." },
   'battle.log.purify': { ja: 'おはらい！ {name}の悪い状態が消えた。', en: 'Purify! {name} is cleansed of all bad statuses.' },
   'battle.log.wardCharm': { ja: '{side}の味方にまよけのふだ。次の相手のターンが終わるまで、悪い状態がつかない。', en: 'Ward Charm on {side} side. No bad statuses until the end of the next enemy turn.' },
   'battle.log.wardCharmBlocked': { ja: 'まよけのふだが防いだ！ {name}に悪い状態はつかない。', en: 'The Ward Charm blocked it! {name} gets no bad status.' },
@@ -248,6 +251,8 @@ export const BATTLE = {
   'battle.ng.coverSelf': { ja: 'かばえるのはほかの味方だけです', en: 'Can only cover another ally' },
   'battle.ng.noWardTarget': { ja: 'そなえのふえをかけられる味方がいません', en: 'No ally can be warded' },
   'battle.ng.noPurifyTarget': { ja: '悪い状態のある味方も、ライフの減った味方もいません', en: 'No ally has a bad status or lost life' },
+  'battle.ng.noHandsToReturn': { ja: '戻す手札がありません（自分も相手も）', en: 'Neither side has cards in hand to return' },
+  'battle.ng.noDiscard': { ja: '捨て札がありません', en: 'Your discard pile is empty' },
   'battle.ng.standInDone': { ja: 'みがわりで受けた攻撃には、守りを重ねて使えません', en: 'No more guards after Stand-In' },
   'battle.ng.handEnough': { ja: '手札がもう{n}枚以上あるので使えません', en: 'You already have {n} or more cards in hand' },
   'battle.ng.noTailwindTarget': { ja: 'おいかぜをかけられる味方がいません', en: 'No ally can receive the tailwind' },

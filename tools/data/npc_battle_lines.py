@@ -3,6 +3,7 @@ python3 -I tools/data/npc_battle_lines.py
 - 日本語：design-parts/npc-battle-lines-20261105/data/npc_battle_lines.json（ユーザー承認の正本。一字一句そのまま）
 - 英語：design-parts/npc-battle-lines-20261105/en_provisional_claude.json（**仮訳・未承認**）
 - 対戦相手の ID・顔のキーは正本のまま（opponent_ids・opponent_faces）
+- 上書き：design-parts/bi-radiel-20261105/aurelio_ace_lines.json（2026-11-05 指示書 BI：アウレリオの切り札専用3本をラディエルの名前に。日英とも指示書の文）
 """
 import json
 import os
@@ -11,6 +12,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/npc-battle-lines-20261105')
 d = json.load(open(os.path.join(SRC, 'data/npc_battle_lines.json'), encoding='utf-8'))
 en = json.load(open(os.path.join(SRC, 'en_provisional_claude.json'), encoding='utf-8'))['en']
+OVERRIDE = json.load(open(os.path.join(ROOT, 'design-parts/bi-radiel-20261105/aurelio_ace_lines.json'), encoding='utf-8'))
 
 js = lambda v: json.dumps(v, ensure_ascii=False)
 out = [
@@ -26,6 +28,9 @@ for a in d['actors']:
     extra = {}
     for k, v in d['extra_lines'].get(a['id'], {}).items():
         extra[k] = {'ja': v['text'], 'en': e[k], 'status': v['status']}
+        o = OVERRIDE.get(a['id'], {}).get(k)
+        if o:
+            extra[k] = {'ja': o['ja'], 'en': o['en'], 'status': o['status']}
     item = {'id': a['id'], 'opponentIds': a.get('opponent_ids') or [], 'opponentFaces': a.get('opponent_faces') or [], 'status': a['status'], 'lines': lines}
     if extra:
         item['extra'] = extra

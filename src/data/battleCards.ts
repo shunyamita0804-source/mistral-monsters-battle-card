@@ -15,6 +15,7 @@ import { FORN_MONSTER_ID } from './forn.ts';
 import { UZURIO_MONSTER_ID } from './uzurio.ts';
 import { TYRANT_MONSTER_ID } from './tyrant.ts';
 import { KUYO_MONSTER_ID } from './kuyo.ts';
+import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
 import { NOBITON_MONSTER_ID } from './nobiton.ts';
@@ -92,6 +93,9 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [GEAROS_MONSTER_ID]: { art: 'gearos_battlecard.png', frame: 'gearos', scale: 0.86, offsetY: 0 },
   // クヨウ（2026-11-05 指示書 BH）：枠は霧の藤ねず（#87649C。カードの絵の枠の色）。絵は届いた kuyo_battlecard.png（1169×1346 透過）を無改変（毛先の半透明はそのまま）。ハクランと同じ大きさ・縦横比
   [KUYO_MONSTER_ID]: { art: 'kuyo_battlecard.png', frame: 'kuyo', scale: 0.8, offsetY: -0.02 },
+  // ラディエル（2026-11-05 指示書 BI）：枠は金（#D9A21B）。絵は届いた radiel_battlecard.png（1169×1346 透過）を無改変（光輪と光の尾の半透明はそのまま）。
+  // 翼が絵の幅いっぱいまで広がるので、翼の先が枠の飾りに切られすぎない大きさ
+  [RADIEL_MONSTER_ID]: { art: 'radiel_battlecard.png', frame: 'radiel', scale: 0.82, offsetY: -0.01 },
   // ガウル（2026-10-27）：枠はオレンジ（#E68A46。技カードの枠と同じ色）。絵はユーザーがチャットで届けた背景なしの絵（1169×1345・透明）を無改変
   // （原本 design-parts/cards-original/gauul-battle-20261027/）。0.9：翼の先と舞う羽根が枠の飾りに少しかかるくらい（体・顔・足の爪は隠れない）
   [GAUUL_MONSTER_ID]: { art: 'gauul_battlecard.png', frame: 'gauul', scale: 0.9, offsetY: 0 },

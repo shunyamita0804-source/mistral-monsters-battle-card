@@ -28,6 +28,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-hyouzuku': 'air',
   'mon-desuoru': 'air',
   'mon-gearos': 'air', // 2026-11-05 指示書 AX（浮いている）
+  'mon-radiel': 'air', // 2026-11-05 指示書 BI（脚が無く浮いている）
   'mon-lilil': 'air', // 2026-11-02 指示書 AK
   'mon-forn': 'ground', // 2026-11-02 指示書 AL
   'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
@@ -401,6 +402,24 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-gearos-10', name: 'エネルギーシールド', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, art: 'gearos_sk_10.webp' },
     { id: 'skl-gearos-11', name: '高速機動', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: '消費マナ2以上のちから技・かしこさ技を回避', rare: true, art: 'gearos_sk_11.webp' },
     { id: 'skl-gearos-12', name: 'ギアクロー', cat: 'ち', mana: 0, damage: 1, text: null, art: 'gearos_sk_12.webp' },
+  ],
+  // ラディエル（空中・LIFE 9・A。2026-11-05 指示書 BI。天の聖域の切り札）。数字・効果は指示書の表のとおり。回避の技は無い（決まり）。
+  // 新しい効果は 08 しんぱんのせんこく（seal＋manaDrain）・09 最後の審判（lastJudgment）・12 天の恵み（heavenGrace）
+  'mon-radiel': [
+    { id: 'skl-radiel-01', name: 'せいなるつき', cat: 'ち', mana: 2, damage: 3, effect: atk({ unblockable: true }), text: T_UNBLOCK, art: 'radiel_sk_01.webp' },
+    { id: 'skl-radiel-02', name: 'クロスニードル', cat: 'ち', mana: 3, damage: 5, text: null, art: 'radiel_sk_02.webp' },
+    { id: 'skl-radiel-03', name: 'ひかりだま', cat: 'か', mana: 1, damage: 2, text: null, art: 'radiel_sk_03.webp' },
+    { id: 'skl-radiel-04', name: 'こうりんのひかり', cat: 'か', mana: 3, damage: 2, effect: atk({ allTargets: true }), text: '相手全員に当たる（守りは1体ずつ）', art: 'radiel_sk_04.webp' },
+    { id: 'skl-radiel-05', name: 'せいなるしせん', cat: 'か', mana: 4, damage: 5, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'radiel_sk_05.webp' },
+    { id: 'skl-radiel-06', name: 'てんのはどう', cat: 'か', mana: 7, damage: 4, effect: atk({ allTargets: true }), text: '相手全員に当たる（守りは1体ずつ）', rare: true, art: 'radiel_sk_06.webp' },
+    { id: 'skl-radiel-07', name: 'てんりんのさばき', cat: 'か', mana: 6, damage: 8, effect: atk({ halfOnEvade: true }), text: T_HALF, art: 'radiel_sk_07.webp' },
+    // すなかけ と同じ「攻撃できない」（sealedTurn。クヨウのおはらいで消せて、まよけのふだで防げる悪い状態）＋相手のマナ−1（0 未満にしない。まよけのふだでも減る）
+    { id: 'skl-radiel-08', name: 'しんぱんのせんこく', cat: '特', mana: 3, damage: null, effect: { type: 'seal', manaDrain: 1 }, text: '相手1体は次の攻撃を行えない。相手のマナ−1', art: 'radiel_sk_08.webp' },
+    { id: 'skl-radiel-09', name: '最後の審判', cat: '特', mana: 3, damage: null, effect: { type: 'lastJudgment' }, text: 'おたがいの手札を山札に戻し、同じ枚数を引いて山札をシャッフル', rare: true, art: 'radiel_sk_09.webp' },
+    // 効果の文：防御の文の決まり（どの技に効くかだけ。軽減の数 5 はカードの盾の欄）
+    { id: 'skl-radiel-10', name: 'つばさの守り', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: T_FORCE, art: 'radiel_sk_10.webp' },
+    { id: 'skl-radiel-11', name: '天の加護', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: T_WISDOM, art: 'radiel_sk_11.webp' },
+    { id: 'skl-radiel-12', name: '天の恵み', cat: '特', mana: 2, damage: null, effect: { type: 'heavenGrace', count: 3 }, text: '自分の捨て札から3枚をマナにする', rare: true, art: 'radiel_sk_12.webp' },
   ],
 };
 

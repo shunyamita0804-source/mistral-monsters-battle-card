@@ -16,6 +16,7 @@ import { FORN_MONSTER } from './forn.ts';
 import { UZURIO_MONSTER } from './uzurio.ts';
 import { TYRANT_MONSTER } from './tyrant.ts';
 import { KUYO_MONSTER } from './kuyo.ts';
+import { RADIEL_MONSTER } from './radiel.ts';
 import { GEAROS_MONSTER, GEAROS_MONSTER_ID, OVERDRIVE_COMBO_COST, OVERDRIVE_COMBO_DAMAGE, OVERDRIVE_COMBO_ID } from './gearos.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
 import { MYUROL_MONSTER, MYUROL_SKILLS } from './myurol.ts';
@@ -188,6 +189,8 @@ const OFFICIAL_MONSTERS: readonly MonsterCard[] = [
   UZURIO_MONSTER,
   // 2026-11-05 指示書 AX【3】：機械の塔の切り札
   GEAROS_MONSTER,
+  // 2026-11-05 指示書 BI：天の聖域の切り札
+  RADIEL_MONSTER,
 ].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;

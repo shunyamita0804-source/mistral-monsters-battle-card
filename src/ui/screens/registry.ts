@@ -16,7 +16,7 @@ import { tournamentScreen } from './tournamentScreen.ts';
 import { walkLabScreen } from './walkLabScreen.ts';
 import { pukarimLabScreen } from './pukarimLabScreen.ts';
 import { geolLabScreen } from './geolLabScreen.ts';
-import { gearosLabScreen, kuyoLabScreen, tyrantLabScreen } from './axLabScreens.ts';
+import { gearosLabScreen, kuyoLabScreen, radielLabScreen, tyrantLabScreen } from './axLabScreens.ts';
 import { soukaiLabScreen } from './soukaiLabScreen.ts';
 import { storyEventLabScreen } from './storyEventLabScreen.ts';
 import { eventDungeonLabScreen } from './eventDungeonLabScreen.ts';
@@ -50,6 +50,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   geolLab: geolLabScreen,
   tyrantLab: tyrantLabScreen,
   kuyoLab: kuyoLabScreen,
+  radielLab: radielLabScreen,
   gearosLab: gearosLabScreen,
   soukaiLab: soukaiLabScreen,
   storyEventLab: storyEventLabScreen,

@@ -158,8 +158,21 @@ export type SkillEffect =
        */
       readonly duration?: 'nextTurn' | 'nextUseByNextTurn';
     }
-  /** 特殊（正式：ソラモのすなかけ・ガウルの威嚇）：選んだ相手モンスターは次回攻撃できない */
-  | { readonly type: 'seal' }
+  /**
+   * 特殊（正式：ソラモのすなかけ・ガウルの威嚇）：選んだ相手モンスターは次回攻撃できない。
+   * manaDrain（2026-11-05 指示書 BI：ラディエルのしんぱんのせんこく）＝あわせて相手のマナを減らす量（0 未満にしない）
+   */
+  | { readonly type: 'seal'; readonly manaDrain?: number }
+  /**
+   * 特殊（2026-11-05 指示書 BI：ラディエルの最後の審判）：自分と相手の両方が、それぞれ手札をすべて自分の山札（いちばん下）に戻す →
+   * それぞれ戻した枚数と同じ枚数を引く → それぞれ山札をシャッフル（この順番）。使った最後の審判のカードは先に捨て札へ（戻す手札に入らない）
+   */
+  | { readonly type: 'lastJudgment' }
+  /**
+   * 特殊（2026-11-05 指示書 BI：ラディエルの天の恵み）：自分の捨て札から count 枚（捨て札の新しい順）を自分のマナにする。山札は減らさない。
+   * 数えるのは使う前の捨て札（このカードと払ったマナは入らない）。足りなければあるだけ。0枚なら使えない
+   */
+  | { readonly type: 'heavenGrace'; readonly count: number }
   /** 特殊（正式：ラズックのちょうはつ）：選んだ相手モンスターは次の手番、使ったモンスターと同じ種類（ラズック）にしか攻撃できない */
   | { readonly type: 'taunt' }
   /** 特殊（正式：ラズックのいたずら 2026-10-24）：相手の手札からランダムに1枚を相手の山札へ戻してシャッフルする。相手は補充しない */
@@ -482,8 +495,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm' | 'lastJudgment' | 'heavenGrace';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm', 'lastJudgment', 'heavenGrace'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

@@ -1,0 +1,8 @@
+{
+  "note": "2026-11-05 指示書 BI【3】：アウレリオの切り札専用のセリフ3本（切り札がラディエルのとき）。指示書の文のまま。npc_battle_lines.json（正本）の extra_lines.aurelio を上書きする（正本は無改変）",
+  "aurelio": {
+    "ace_attack_hit": { "ja": "……よく応えた、ラディエル。", "en": "...Well answered, Radiel.", "status": "approved_bi_20261105" },
+    "ace_down_continue": { "ja": "……ラディエルを退けるか。見事だ、そなた。", "en": "...You drove back Radiel. Splendid.", "status": "approved_bi_20261105" },
+    "ace_down_final": { "ja": "ラディエルまでも……見事だ。聖域は、そなたを受け入れよう。", "en": "Even Radiel... Splendid. The Sanctuary accepts you.", "status": "approved_bi_20261105" }
+  }
+}

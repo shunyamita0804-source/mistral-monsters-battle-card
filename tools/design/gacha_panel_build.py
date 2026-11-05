@@ -50,7 +50,8 @@ FACE = {
     'forn': (0.58, 0.2),  # 2026-11-02 指示書 AL：顔は絵の上のほう、真ん中より少し右（角が入るように）
     'uzurio': (0.58, 0.3),  # 2026-11-02 指示書 AQ：顔は絵の上から約3割、真ん中より少し右
     'gearos': (0.5, 0.42),  # 2026-11-05 指示書 AX：単眼は絵の真ん中より少し上
-    'kuyo': (0.46, 0.2),  # 2026-11-05 指示書 BH：顔は絵の上から2割、真ん中より少し左（窓の絵はパックから切り抜いた build/pack_art_kuyo.png）
+    'kuyo': (0.46, 0.2),
+    'radiel': (0.52, 0.3),  # 2026-11-05 指示書 BI：顔は絵の上から3割の真ん中（窓の絵はパックから切り抜いた build/pack_art_radiel.png）  # 2026-11-05 指示書 BH：顔は絵の上から2割、真ん中より少し左（窓の絵はパックから切り抜いた build/pack_art_kuyo.png）
     # 道具のパック（仮）：顔は無いので、絵の真ん中（手帳と薬草のあたり。2026-10-30 指示書 Z）
     'tools': (0.50, 0.52),
 }
@@ -59,6 +60,7 @@ PACK_ART_PATH = {
     'tools': os.path.join(ROOT, 'design-parts/support-art-z-20261030/pack_art_tools.png'),
     # 2026-11-05 指示書 BH：クヨウはパックの絵だけが届いたので、窓の中を切り抜いたもの（tools/art/kuyo_assets.py）
     'kuyo': os.path.join(ROOT, 'design-parts/bh-kuyo-20261105/build/pack_art_kuyo.png'),
+    'radiel': os.path.join(ROOT, 'design-parts/bi-radiel-20261105/build/pack_art_radiel.png'),
 }
 # 窓の四すみの星（machine_front の px。左・上・右・下）
 STAR_BOXES = [(192, 252, 280, 345), (620, 252, 708, 345), (188, 677, 280, 756), (620, 677, 712, 756)]

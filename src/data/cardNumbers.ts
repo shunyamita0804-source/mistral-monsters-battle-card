@@ -1,5 +1,6 @@
 import { HIDDEN_MONSTER_ID, MONSTERS, QA_MONSTERS, SKILLS, SUPPORTS, skillsOf } from './cards.ts';
 import { KUYO_MONSTER_ID } from './kuyo.ts';
+import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
 import { FLUNE_MONSTER_ID } from './flune.ts';
@@ -62,6 +63,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   // 2026-11-05 指示書 BH：ギアロスのあと（No.248〜260。サポート・隠しモンスターの番号は13ずつ後ろへ）。
   // クヨウは霧の廃坑ができるまで確かめ用（QA_MONSTERS）だが、図鑑には番号だけ出す（手に入れるまで「？？？」）
   KUYO_MONSTER_ID,
+  // 2026-11-05 指示書 BI：クヨウのあと（No.261〜273。サポート・隠しモンスターの番号は13ずつ後ろへ）
+  RADIEL_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */

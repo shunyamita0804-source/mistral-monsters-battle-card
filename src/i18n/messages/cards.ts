@@ -68,6 +68,8 @@ export const CARDS = {
   'card.effect.ward': { ja: '特殊', en: 'Special' },
   'card.effect.purify': { ja: '特殊', en: 'Special' },
   'card.effect.wardCharm': { ja: '特殊', en: 'Special' },
+  'card.effect.lastJudgment': { ja: '特殊', en: 'Special' },
+  'card.effect.heavenGrace': { ja: '特殊', en: 'Special' },
   'card.effect.drawTo': { ja: '特殊', en: 'Special' },
   'card.effect.charge': { ja: '特殊', en: 'Special' },
   'card.effect.tailwind': { ja: '特殊', en: 'Special' },

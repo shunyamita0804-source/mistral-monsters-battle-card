@@ -534,6 +534,10 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'ward' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noWardTarget'));
+  // 最後の審判（ラディエル 指示書 BI）：このカードのほかに自分の手札も相手の手札も無いときは使えない（戻す手札が無い）
+  if (skill.effect.type === 'lastJudgment' && state.sides[side].hand.length <= 1 && state.sides[otherSide(side)].hand.length === 0) return NO(t('battle.ng.noHandsToReturn'));
+  // 天の恵み（ラディエル 指示書 BI）：自分の捨て札が0枚なら使えない（理由を画面に出す）
+  if (skill.effect.type === 'heavenGrace' && state.sides[side].discard.length === 0) return NO(t('battle.ng.noDiscard'));
   // おはらい（クヨウ 指示書 BH）：悪い状態のある味方も、ライフの減った味方もいないときは使えない（理由を画面に出す）
   if (skill.effect.type === 'purify' && purifyTargets(state, side).length === 0) return NO(t('battle.ng.noPurifyTarget'));
   // もりのたより（フォルン 指示書 AL）：使ったあとの手札がすでに hand 枚以上なら使えない
@@ -1286,9 +1290,15 @@ function useCard(
     case 'seal': {
       // 相手の次の手番（turn + 1）の間、攻撃の技を使えない
       if (!target) return state;
-      if (wardCharmActive(next, otherSide(side))) return wardCharmBlocked(next, target);
-      next = updateMonster(next, target.uid, { sealedTurn: state.turn + 1 });
-      return addLog(next, t('battle.log.seal', { name: nameOf(target.cardId) }));
+      // しんぱんのせんこく（ラディエル 指示書 BI）：あわせて相手のマナ−manaDrain（0 未満にしない）。マナは悪い状態ではないので、まよけのふだが効いていても減る
+      const drain = skill.effect.manaDrain ?? 0;
+      if (wardCharmActive(next, otherSide(side))) {
+        next = wardCharmBlocked(next, target);
+      } else {
+        next = updateMonster(next, target.uid, { sealedTurn: state.turn + 1 });
+        next = addLog(next, t('battle.log.seal', { name: nameOf(target.cardId) }));
+      }
+      return drain > 0 ? drainMana(next, side, drain) : next;
     }
     case 'taunt': {
       // ちょうはつ：相手の次の手番（turn + 1）の間、使ったモンスターと同じ種類にしか攻撃できない
@@ -1382,6 +1392,17 @@ function useCard(
       const until = Math.max(state.turn + 1, wardCharmActive(next, side) ? (next.sides[side].wardCharm?.untilTurn ?? 0) : 0);
       next = updateSide(next, side, { wardCharm: { untilTurn: until } });
       return addLog(next, t('battle.log.wardCharm', { side: sideLabel(side) }));
+    }
+    case 'lastJudgment':
+      return lastJudgment(next, side);
+    case 'heavenGrace': {
+      // 天の恵み（ラディエル 指示書 BI）：使う前の捨て札の新しい順から count 枚をマナに（このカードと払ったマナは入らない）。山札は減らさない
+      const before = state.sides[side].discard;
+      const k = Math.min(skill.effect.count, before.length);
+      const picked = before.slice(before.length - k);
+      const now = next.sides[side];
+      next = updateSide(next, side, { discard: [...before.slice(0, before.length - k), ...now.discard.slice(before.length)], manaPile: [...now.manaPile, ...picked.reverse()] });
+      return addLog(k > 0 ? addFx(next, 'manaGain', side) : next, t('battle.log.heavenGrace', { n: k }));
     }
     case 'drawTo':
       return drawToHand(next, side, skill.effect.hand, choice);
@@ -1509,6 +1530,25 @@ export function defaultSystemChange(state: BattleState, side: Side): HandCard | 
   const stuck = hand.filter((c) => !guard(c) && (cost(c) > mana || !cardUsability(state, side, c.uid).usable));
   const pool = stuck.length > 0 ? stuck : hand.filter((c) => !guard(c)).length > 0 ? hand.filter((c) => !guard(c)) : hand;
   return [...pool].sort((a, b) => cost(b) - cost(a))[0];
+}
+
+/**
+ * 最後の審判（ラディエル 2026-11-05 指示書 BI）：使った側 → 相手 の順に、それぞれ
+ * ① 手札をすべて自分の山札のいちばん下に戻す → ② 戻した枚数と同じ枚数を山札の上から引く → ③ 山札をシャッフル（この順番。先にシャッフルしない）。
+ * 戻した札が山札に入るので、引く枚数が足りないことは無い（山札切れの負けにはならない）。使った最後の審判のカードは先に捨て札へ行っている
+ */
+function lastJudgment(state: BattleState, side: Side): BattleState {
+  let next = state;
+  for (const who of [side, otherSide(side)] as const) {
+    const s = next.sides[who];
+    const n = s.hand.length;
+    next = updateSide(next, who, { hand: [], deck: [...s.deck, ...s.hand.map((c) => c.cardId)] });
+    const drawn = drawCards(next.sides[who], n, next.nextUid);
+    next = updateSide({ ...next, nextUid: drawn.nextUid }, who, drawn.side);
+    const mixed = shuffle([...next.sides[who].deck], next.seed);
+    next = updateSide({ ...next, seed: mixed.seed }, who, { deck: mixed.items });
+  }
+  return addLog(next, t('battle.log.lastJudgment'));
 }
 
 /**

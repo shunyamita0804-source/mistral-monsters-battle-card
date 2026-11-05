@@ -270,7 +270,8 @@ describe('ダンジョンの挑戦', () => {
     expect(bossRewardCandidates(w.save, 'dungeon-05', ['mon-soramo'])).toEqual([]); // 2026-10-31 指示書 AB：炎の火山も切り札の報酬
     // 2026-11-05 指示書 AX：機械の塔も切り札（ギアロス）の報酬
     expect(bossRewardCandidates(w.save, 'dungeon-06', ['mon-soramo'])).toEqual([]);
-    expect(bossRewardCandidates(w.save, 'dungeon-07', ['mon-soramo'])).toEqual(skillsOf('mon-soramo').map((k) => k.id));
+    // 2026-11-05 指示書 BI：天の聖域も切り札（ラディエル）の報酬
+    expect(bossRewardCandidates(w.save, 'dungeon-07', ['mon-soramo'])).toEqual([]);
   });
 });
 

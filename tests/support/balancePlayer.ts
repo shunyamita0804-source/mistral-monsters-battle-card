@@ -35,6 +35,8 @@ export const MONSTER_RANK: Readonly<Record<string, 'C' | 'B' | 'A'>> = {
   'mon-desuoru': 'A',
   // 2026-11-05 指示書 AX：ギアロス（機械の塔の切り札）は A
   'mon-gearos': 'A',
+  // 2026-11-05 指示書 BI：ラディエル（天の聖域の切り札）は A
+  'mon-radiel': 'A',
 };
 
 const RANK_ORDER: Readonly<Record<'C' | 'B' | 'A', number>> = { C: 0, B: 1, A: 2 };
@@ -61,7 +63,8 @@ export const BALANCE_SLOTS: readonly BalanceSlot[] = (() => {
     ['B', 70, ['mon-hyouzuku', 'mon-shishien']],
     // 2026-11-05 指示書 AX：A・S の目安のプレイヤーは機械の塔の切り札（ギアロス）を持っている（前は S だけ）
     ['A', 95, ['mon-geol', 'mon-hakuran', MACHINE_ACE]],
-    ['S', 120, []],
+    // 2026-11-05 指示書 BI：S の目安のプレイヤーはラディエルも持っている
+    ['S', 120, ['mon-radiel']],
   ];
   const owned: string[] = [];
   return steps.map(([id, packs, add]) => {
