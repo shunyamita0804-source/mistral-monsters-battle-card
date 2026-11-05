@@ -528,8 +528,11 @@ class DungeonRunView {
       }
     }
     for (const e of f.entities) if (e.kind === 'switch') lamp(e.x, e.y, 'switch');
-    // 上り階段（塔）：主人公が乗っても階段と分かるよう、マスのまわりにうすい光（2026-11-05 BF のあとのユーザー指示）
-    if (f.stairs && towerClimbs(this.#run.dungeonId)) lamp(f.stairs.x, f.stairs.y, 'stairs');
+    // 上り階段（塔）：人が乗っていなくても・乗っていても上り階段と分かるよう、階段の絵を暗さの上に・上向きの矢印（2026-11-05 ユーザー指示）
+    if (f.stairs && towerClimbs(this.#run.dungeonId)) {
+      lamp(f.stairs.x, f.stairs.y, 'stairs');
+      this.#lamps.at(-1)?.el.append(h('span', { class: 'drun__lamp-arrow' }));
+    }
     // 床の上の飾り（見た目だけ。src/game/dungeon/decor.ts）
     this.#decors = floorDecorations(f, this.#run.seed, this.#run.dungeonId).map((d) => {
       const el = h('div', { class: `drun__decor drun__decor--${d.kind}-${d.variant + 1}`, attrs: { 'aria-hidden': 'true' } });

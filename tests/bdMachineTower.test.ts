@@ -222,6 +222,11 @@ describe('指示書 BD【2】〜【5】', () => {
     expect(css).toContain('.drun__lamp--door::after');
     expect(css).toContain('.drun__lamp--switch::after');
     expect(css).toContain('.drun__lamp--stairs::after');
+    // 2回目の直し：閉じている扉（開いていない色）は暗く、にじみなし。階段は上り階段の絵と上向きの矢印
+    expect(css).toContain('.is-open-red .drun__lamp--door.drun__lamp--blue::before');
+    expect(css).toContain('.is-open-blue .drun__tile--door-red.is-seen::after');
+    expect(css).toMatch(/\.drun__lamp--stairs::after \{[^}]*machine_stairs_up\.webp/);
+    expect(css).toContain('.drun__lamp-arrow');
     expect(css).not.toMatch(/drun__tile--door-(red|blue)\.is-seen::before/);
     const screen = readFileSync('src/ui/screens/dungeonRunScreen.ts', 'utf8');
     expect(screen).toContain("this.#thunderPan.append(el);\n      this.#lamps.push");

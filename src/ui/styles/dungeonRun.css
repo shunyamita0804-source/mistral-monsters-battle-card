@@ -693,10 +693,22 @@
   filter: brightness(0.5);
 }
 
+/* 閉じている扉（いま開いていない色）はもっと暗く・色をうすく（開いている扉との違いがひと目で分かるように。2026-11-05 ユーザー指示） */
+.is-open-red .drun__tile--door-blue.is-seen::after,
+.is-open-blue .drun__tile--door-red.is-seen::after {
+  filter: brightness(0.32) saturate(0.5);
+}
+
+.is-open-red .drun__tile--door-blue.is-lit::after,
+.is-open-blue .drun__tile--door-red.is-lit::after {
+  filter: brightness(0.6) saturate(0.6);
+}
+
 /*
  * 2026-11-05 BF のあとのユーザー指示：扉・スイッチのランプと光のふち（自分で光っている物）。暗さ（drun__light）の上の層（#thunderLayer）に重ね、
- * 明かりの外でも暗くしない。まわりにその色のうすい光のにじみ（開いている扉・閉じている扉どちらも）。見たマスだけ（is-seen）。
- * BD で足した「開いた扉の足もとのうすい光」は、BF のあとのユーザー指示 でやめた
+ * 明かりの外でも暗くしない。見たマスだけ（is-seen）。BD で足した「開いた扉の足もとのうすい光」はやめた。
+ * 2026-11-05 ユーザー指示（2回目）：遠くから赤の状態と青の状態が分かるように、**開いている色の扉だけ**強く光らせ、まわりに光のにじみ。
+ * 閉じている扉のランプはごく弱く（にじみなし）
  */
 .drun__lamp {
   position: absolute;
@@ -710,23 +722,35 @@
   display: block;
 }
 
-/* 光のにじみ（扉は絵の真ん中＝マスの少し上に） */
+/* 光のにじみ（扉は絵の真ん中＝マスの少し上に）。開いている扉とスイッチだけ */
 .drun__lamp::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 14px;
-  width: 104px;
-  height: 104px;
+  width: 120px;
+  height: 120px;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 60 45 / 0.34), rgb(255 60 45 / 0.12) 45%, rgb(255 60 45 / 0) 70%);
+  background: radial-gradient(circle, rgb(255 60 45 / 0.5), rgb(255 60 45 / 0.18) 45%, rgb(255 60 45 / 0) 70%);
   mix-blend-mode: screen;
 }
 
 .drun__lamp--blue::before,
 .is-open-blue .drun__lamp--switch::before {
-  background: radial-gradient(circle, rgb(60 200 255 / 0.34), rgb(60 200 255 / 0.12) 45%, rgb(60 200 255 / 0) 70%);
+  background: radial-gradient(circle, rgb(60 200 255 / 0.5), rgb(60 200 255 / 0.18) 45%, rgb(60 200 255 / 0) 70%);
+}
+
+/* 閉じている扉：にじみなし・ランプはごく弱く */
+.is-open-red .drun__lamp--door.drun__lamp--blue::before,
+.is-open-blue .drun__lamp--door.drun__lamp--red::before {
+  opacity: 0;
+}
+
+.is-open-red .drun__lamp--door.drun__lamp--blue::after,
+.is-open-blue .drun__lamp--door.drun__lamp--red::after {
+  opacity: 0.18;
+  filter: none;
 }
 
 /* ランプと光のふち（扉の絵と同じ置き方・大きさ） */
@@ -739,12 +763,12 @@
   height: 60px;
   translate: -50% 0;
   background: url('@assets/images/maps/dungeon/machine_door_red_closed_glow.webp') center bottom / contain no-repeat;
-  filter: drop-shadow(0 0 3px rgb(255 70 50 / 0.8));
+  filter: drop-shadow(0 0 4px rgb(255 70 50 / 0.95)) brightness(1.25);
 }
 
 .drun__lamp--door.drun__lamp--blue::after {
   background-image: url('@assets/images/maps/dungeon/machine_door_blue_closed_glow.webp');
-  filter: drop-shadow(0 0 3px rgb(60 200 255 / 0.8));
+  filter: drop-shadow(0 0 4px rgb(60 200 255 / 0.95)) brightness(1.25);
 }
 
 .is-open-red .drun__lamp--door.drun__lamp--red::after {
@@ -758,8 +782,8 @@
 /* スイッチのランプ（いま開いている色） */
 .drun__lamp--switch::before {
   top: 24px;
-  width: 80px;
-  height: 80px;
+  width: 84px;
+  height: 84px;
 }
 
 .drun__lamp--switch::after {
@@ -779,31 +803,51 @@
   animation: drun-door-switch 0.42s ease-out;
 }
 
-/* 上り階段（塔）：マスのまわりにうすい金色の光とふち（主人公が乗っても階段と分かるように） */
+/*
+ * 上り階段（塔）：人が乗っていなくても上り階段と分かるように（2026-11-05 ユーザー指示・2回目）。
+ * 上り階段の絵を暗さの上に大きめに出し、上に金色の上向きの矢印（ゆっくり明るさが変わる）。まわりにうすい金色の光
+ */
 .drun__lamp--stairs::before {
   top: 24px;
-  width: 92px;
-  height: 92px;
-  background: radial-gradient(circle, rgb(255 205 110 / 0.3), rgb(255 205 110 / 0.1) 50%, rgb(255 205 110 / 0) 70%);
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(circle, rgb(255 205 110 / 0.32), rgb(255 205 110 / 0.1) 50%, rgb(255 205 110 / 0) 70%);
 }
 
 .drun__lamp--stairs::after {
   content: '';
   position: absolute;
-  inset: 1px;
-  border: 2px solid rgb(255 214 130 / 0.55);
-  border-radius: 6px;
-  box-shadow: 0 0 8px rgb(255 200 100 / 0.6), inset 0 0 8px rgb(255 200 100 / 0.45);
+  left: 50%;
+  bottom: -2px;
+  width: 56px;
+  height: 58px;
+  translate: -50% 0;
+  background: url('@assets/images/maps/dungeon/machine_stairs_up.webp') center bottom / contain no-repeat;
+  filter: drop-shadow(0 0 4px rgb(255 205 110 / 0.7));
+}
+
+/* 上向きの矢印（CSS で描く山形） */
+.drun__lamp-arrow {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  width: 16px;
+  height: 16px;
+  translate: -50% 0;
+  border-top: 4px solid #ffd77a;
+  border-left: 4px solid #ffd77a;
+  rotate: 45deg;
+  filter: drop-shadow(0 0 4px rgb(255 190 80 / 0.95));
   animation: drun-stairs-glow 1.6s ease-in-out infinite alternate;
 }
 
 @keyframes drun-stairs-glow {
-  from { opacity: 0.6; }
-  to { opacity: 1; }
+  from { opacity: 0.55; translate: -50% 2px; }
+  to { opacity: 1; translate: -50% -2px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drun__lamp--stairs::after { animation: none; }
+  .drun__lamp-arrow { animation: none; }
 }
 
 /* スイッチを押したとき：扉が少しゆれて開く／閉まる */
