@@ -3,7 +3,7 @@
 python3 -I tools/art/card_name_fonts.py 入力フォルダ assets/fonts/card-name
 - 日本語の字体：カタカナ全部（ァ〜ヶ・ヴ）・ー・・・仮・数字・ラテン文字（英語名の予備）
 - 英語の字体：ラテン文字（A〜Z・a〜z）・数字・空白と - ' . &
-どれも SIL Open Font License 1.1（Permanent Marker は Apache License 2.0）。ライセンスの文は同じフォルダの LICENSE_*.txt
+どれも SIL Open Font License 1.1（Permanent Marker は Apache License 2.0）。ライセンスの文は同じフォルダの license_*.txt
 """
 import sys
 from pathlib import Path

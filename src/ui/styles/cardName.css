@@ -1,5 +1,5 @@
 /* ===== 2026-11-05 指示書 AY：モンスターカードの名前（ゲームが書く） =====
- * 字体は使う文字だけに減らした WOFF2（tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/LICENSE_*.txt）。
+ * 字体は使う文字だけに減らした WOFF2（tools/art/card_name_fonts.py。ライセンスは assets/fonts/card-name/license_*.txt）。
  * 3案：a＝Reggae One＋Bangers・b＝Dela Gothic One＋Bungee・c＝Yuji Boku＋Permanent Marker（html の data-card-font。無ければ a） */
 @font-face {
   font-family: 'MM Card Name Reggae';
@@ -85,8 +85,8 @@
 .card-name__swoosh {
   position: absolute;
   z-index: 0;
-  left: calc(var(--card-w) * -0.01);
-  top: calc(var(--card-w) * 0.105);
+  left: calc(var(--card-w) * 0.01);
+  top: calc(var(--card-w) * 0.125);
   height: auto;
   max-width: none;
   filter: drop-shadow(0 0 calc(var(--card-w) * 0.008) rgb(0 0 0 / 0.6));

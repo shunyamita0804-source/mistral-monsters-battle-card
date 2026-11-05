@@ -14,7 +14,7 @@ describe('モンスターカードの名前', () => {
   it('字体6つとライセンスの文がある（OFL 1.1・Permanent Marker は Apache 2.0）', () => {
     for (const f of FONTS) {
       expect(existsSync(`assets/fonts/card-name/${f}.woff2`), f).toBe(true);
-      expect(existsSync(`assets/fonts/card-name/LICENSE_${f}.txt`), f).toBe(true);
+      expect(existsSync(`assets/fonts/card-name/license_${f}.txt`), f).toBe(true);
     }
   });
 

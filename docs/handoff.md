@@ -1,8 +1,17 @@
-# 引き継ぎメモ（2026-11-05：指示書 AX を main に入れた・未公開・公開ページはまだ開ける）
+# 引き継ぎメモ（2026-11-05：指示書 AY を main に入れた・未公開・公開ページはまだ開ける）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
+
+### いまの状態（2026-11-05 指示書 AY のあと）
+
+- **指示書 AY（ブランチ `ay-card-names`）を main に取り込んだ・未公開**。記録 `docs/ay-card-names-teo-20261105.md`
+  - 正式カード20枚を名前なしの絵に差し替え、名前をゲームが書く（`cardNameLayer.ts`・`NAMELESS_OFFICIAL_ART`）。字体3案（今は仮に A：Reggae One＋Bangers。`html[data-card-font]`）
+  - テオだけ α・β・γ を取っておいて3枚コンボを狙う（構え `overdrive`・α・β・γ 3枚ずつ）。lifeScale 1.60→**1.82**（10.7％・コンボの対戦 28.4％・山札切れ 50.2％）
+- セーブ version 35 のまま。報告 ZIP（`MistralBC_AY_Report_20261105.zip`）はユーザーに渡した
+- **ユーザーの返事待ち**：字体の案・コンボの割合（28.4％）・テオ戦の山札切れ・AX の要確認・iPhone 実機
+- 写真の道具：`tools/e2e/ay_names_shot.cjs`（compare・all・box・sizes）。字体を作り直す：`python3 -I tools/art/card_name_fonts.py TTFのフォルダ assets/fonts/card-name`（pip install fonttools brotli）
 
 ### いまの状態（2026-11-05 指示書 AX のあと）
 

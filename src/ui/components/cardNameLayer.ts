@@ -4,7 +4,7 @@ import { cardName } from '../../i18n/content.ts';
 import { getLanguage } from '../../i18n/i18n.ts';
 import { h } from '../dom.ts';
 
-/** 名前の下の白いスウッシュ（指示書 AY の素材 name_swoosh_white.png。届くまでは無し） */
+/** 名前の下の白いスウッシュ（指示書 AY の素材 name_swoosh_white.png〔900×160〕の線の所だけ切り抜いて WebP に。464×56） */
 const SWOOSH = Object.values(import.meta.glob<string>('/assets/images/ui/card_name/name_swoosh_white.*', { eager: true, query: '?url', import: 'default' }))[0];
 
 /**
@@ -50,7 +50,7 @@ export function fitCardName(box: HTMLElement, tries = 20): void {
     if (max > 0 && used > max) text.style.fontSize = `${Math.max(base * 0.4, (base * max) / used)}px`;
     // スウッシュは文字の幅に合わせる
     const swoosh = box.querySelector<HTMLElement>('.card-name__swoosh');
-    if (swoosh) swoosh.style.width = `${Math.min(max, text.scrollWidth) * 1.08}px`;
+    if (swoosh) swoosh.style.width = `${Math.min(max * 1.04, text.scrollWidth * 1.02)}px`;
   };
   run();
   // 字体を読み終えたら測り直す（読む前の字体で測ると幅がちがう）
