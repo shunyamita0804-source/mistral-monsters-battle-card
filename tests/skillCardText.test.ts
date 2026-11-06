@@ -26,7 +26,7 @@ describe('カードに書く短い効果の文', () => {
       const e = card.effect;
       if (e.type === 'defense' && !e.nullify) {
         guards++;
-        expect(card.effectTextJa, card.id).toBe(`${STAT[e.against]}の受けるダメージを${e.reduce}減らす。`);
+        expect(card.effectTextJa, card.id).toBe(`${STAT[e.against ?? 'all']}の受けるダメージを${e.reduce}減らす。`);
       }
       if (e.type === 'evade') {
         dodges++;
