@@ -2,7 +2,7 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
 
 /**
  * ロウガ（2026-11-06 指示書 BL）。雪原の大狼。ノルディス地方の王者アイゼルの切り札（1体で完結。仲間と組む仕組みは無い）。
- * LIFE 8・**内部ランク B**（B の上。画面に出さない）・居場所は地上（src/data/skillRebuildAJ.ts の MONSTER_HABITAT）・防御1・回避1。
+ * LIFE 7（2026-11-06 ユーザー決定。前は 8）・**内部ランク B**（B の上。画面に出さない）・居場所は地上（src/data/skillRebuildAJ.ts の MONSTER_HABITAT）・防御1・回避1。
  * 技12枚は指示書の表のとおり（表は skillRebuildAJ.ts の AJ_QA_SKILLS['mon-rouga']。正本 design-parts/bl-rouga-20261106/data/rouga_skills.csv）。
  * レア＝05 ゆきけむりダッシュ・08 ひょうしょうのやいば・10 ひょうろうのいちげき・12 ジャンプ。
  * 少しだけ新しい効果：09 とおぼえ（ほっぺにためると同じ「次の攻撃＋2」に期限：使った次の自分の手番の終わりまで）。決まりは docs/battle-rules.md「ロウガの効果の扱い」
@@ -20,7 +20,7 @@ export const ROUGA_MONSTER: MonsterCard = {
   id: ROUGA_MONSTER_ID,
   name: 'ロウガ',
   rarity: null,
-  life: 8,
+  life: 7, // 2026-11-06 ユーザー決定（BL の案 R1）：8 → 7
   themeColor: ROUGA_COLOR,
   // 説明の文は仮（英語は contentEnOfficialDraft.ts）
   description: '霜をまとう雪原の狼。氷の結晶が背に連なる。',

@@ -24,10 +24,10 @@ const rg = rougaSkillId;
 const sor = (n: number): string => `skl-soramo14-${String(n).padStart(2, '0')}`;
 
 describe('ロウガのデータ（指示書の表のとおり）', () => {
-  it('LIFE 8・地上・淡い藤色 #B7A3DA。ID は mon-rouga', () => {
+  it('LIFE 7（BL の案 R1）・地上・淡い藤色 #B7A3DA。ID は mon-rouga', () => {
     const m = getMonster(ROUGA_MONSTER_ID);
     expect(m.name).toBe('ロウガ');
-    expect(m.life).toBe(8);
+    expect(m.life).toBe(7);
     expect(m.habitat).toBe('ground');
     expect(MONSTER_HABITAT[ROUGA_MONSTER_ID]).toBe('ground');
     expect(m.themeColor).toBe(ROUGA_COLOR);
@@ -109,7 +109,7 @@ describe('ロウガのデータ（指示書の表のとおり）', () => {
 
 /* ---------- バトル ---------- */
 
-// 自分：ロウガ（p-m1 ライフ8）・ソラモ（p-m2）・ノビトン（p-m3）。相手：ソラモ（o-m1）・ラズック（o-m2）・ガウル（o-m3）
+// 自分：ロウガ（p-m1 ライフ7）・ソラモ（p-m2）・ノビトン（p-m3）。相手：ソラモ（o-m1）・ラズック（o-m2）・ガウル（o-m3）
 function scene(hand: Partial<Record<Side, string[]>>, opts: { mana?: Partial<Record<Side, number>>; foes?: string[]; mine?: string[] } = {}): BattleState {
   const filler = Array.from({ length: 60 }, () => sor(1));
   const s = createBattle(
