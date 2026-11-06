@@ -49,6 +49,10 @@ const TEXTS: Readonly<Record<string, string>> = {
   'ちから技・かしこさ技のダメージを0に': 'Reduce POW and INT damage to 0.',
   '相手は次のターン、ラズックしか攻撃できない': 'Next turn, the enemy can only attack Lazuck.',
   // 2026-11-06 指示書 BK：クロシオ（英語は仮訳）
+  // 2026-11-06 指示書 BM：フギン（英語は仮訳）
+  '回避されなければ、相手は次の攻撃を行えない': "If not evaded, the enemy can't attack next turn.",
+  '山札から回避の技カードを1枚選んで手札に加える。なければ1枚引く': 'Choose an Evade skill card from your deck and add it to your hand. If there is none, draw 1 card.',
+  'このあと自分が使う回避の技1回のマナを0にする': 'The next Evade skill this monster uses costs 0 mana.',
   // 2026-11-06 指示書 BL：ロウガ（英語は仮訳）
   '相手は次のターン行動できない（凍る）': "The enemy can't act next turn (frozen).",
   '次の自分のターンの終わりまで、次の攻撃＋2': 'Until the end of your next turn, your next attack +2.',

@@ -16,7 +16,7 @@ import { tournamentScreen } from './tournamentScreen.ts';
 import { walkLabScreen } from './walkLabScreen.ts';
 import { pukarimLabScreen } from './pukarimLabScreen.ts';
 import { geolLabScreen } from './geolLabScreen.ts';
-import { gearosLabScreen, kuroshioLabScreen, rougaLabScreen, kuyoLabScreen, radielLabScreen, tyrantLabScreen } from './axLabScreens.ts';
+import { gearosLabScreen, kuroshioLabScreen, rougaLabScreen, huginnLabScreen, kuyoLabScreen, radielLabScreen, tyrantLabScreen } from './axLabScreens.ts';
 import { soukaiLabScreen } from './soukaiLabScreen.ts';
 import { storyEventLabScreen } from './storyEventLabScreen.ts';
 import { eventDungeonLabScreen } from './eventDungeonLabScreen.ts';
@@ -53,6 +53,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDefinition>> = {
   radielLab: radielLabScreen,
   kuroshioLab: kuroshioLabScreen,
   rougaLab: rougaLabScreen,
+  huginnLab: huginnLabScreen,
   gearosLab: gearosLabScreen,
   soukaiLab: soukaiLabScreen,
   storyEventLab: storyEventLabScreen,

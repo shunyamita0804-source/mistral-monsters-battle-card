@@ -36,6 +36,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-kuyo': 'ground', // 2026-11-05 指示書 BH（確かめ用だけ。霧の廃坑ができるまで）
   'mon-kuroshio': 'water', // 2026-11-06 指示書 BK（確かめ用だけ。セイランの招待大会ができるまで）
   'mon-rouga': 'ground', // 2026-11-06 指示書 BL（確かめ用だけ。ノルディスの招待大会ができるまで）
+  'mon-huginn': 'air', // 2026-11-06 指示書 BM（確かめ用だけ。ネブラシアの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -505,6 +506,23 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-rouga-10', name: 'ひょうろうのいちげき', cat: 'ち', mana: 6, damage: 9, text: null, rare: true, art: 'rouga_sk_10.webp' },
     { id: 'skl-rouga-11', name: 'けがわでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'rouga_sk_11.webp' },
     { id: 'skl-rouga-12', name: 'ジャンプ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'rouga_sk_12.webp' },
+  ],
+  // フギン（空中・LIFE 6・B の上。2026-11-06 指示書 BM。正本は design-parts/bm-huginn-20261106/data/huginn_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は huginn_sk_NN.webp（番号＝技番号）。05 は halfOnEvade・08 は くしゃみと同じ manaDrain・09 は防御されない・12 は dodge('all', 2)。
+  // 新しい効果：06 よみのまなざし（sealTarget）・07 ちえのささやき（searchEvade）・10 はねやすめ（featherRest）
+  'mon-huginn': [
+    { id: 'skl-huginn-01', name: 'つつく', cat: 'ち', mana: 0, damage: 1, text: null, art: 'huginn_sk_01.webp' },
+    { id: 'skl-huginn-02', name: 'ついばむ', cat: 'ち', mana: 1, damage: 2, text: null, art: 'huginn_sk_02.webp' },
+    { id: 'skl-huginn-03', name: 'くろはねのつぶて', cat: 'か', mana: 1, damage: 2, text: null, art: 'huginn_sk_03.webp' },
+    { id: 'skl-huginn-04', name: 'けっしょうのはね', cat: 'か', mana: 2, damage: 3, text: null, art: 'huginn_sk_04.webp' },
+    { id: 'skl-huginn-05', name: 'ふたつのくちばし', cat: 'ち', mana: 3, damage: 4, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, art: 'huginn_sk_05.webp' },
+    { id: 'skl-huginn-06', name: 'よみのまなざし', cat: 'か', mana: 3, damage: 4, effect: atk({ sealTarget: true }), text: '回避されなければ、相手は次の攻撃を行えない', rare: true, art: 'huginn_sk_06.webp' },
+    { id: 'skl-huginn-07', name: 'ちえのささやき', cat: '特', mana: 1, damage: null, effect: { type: 'searchEvade' }, text: '山札から回避の技カードを1枚選んで手札に加える。なければ1枚引く', art: 'huginn_sk_07.webp' },
+    { id: 'skl-huginn-08', name: 'ひかりものをぬすむ', cat: 'か', mana: 2, damage: 2, effect: atk({ manaDrain: 1 }), text: '相手のマナ−1', art: 'huginn_sk_08.webp' },
+    { id: 'skl-huginn-09', name: 'すいりのいちげき', cat: 'か', mana: 5, damage: 8, effect: atk({ unblockable: true }), text: T_UNBLOCK, rare: true, art: 'huginn_sk_09.webp' },
+    { id: 'skl-huginn-10', name: 'はねやすめ', cat: '特', mana: 1, damage: null, effect: { type: 'featherRest' }, text: 'このあと自分が使う回避の技1回のマナを0にする', art: 'huginn_sk_10.webp' },
+    { id: 'skl-huginn-11', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), art: 'huginn_sk_11.webp' },
+    { id: 'skl-huginn-12', name: 'さきよみ', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), rare: true, art: 'huginn_sk_12.webp' },
   ],
 };
 

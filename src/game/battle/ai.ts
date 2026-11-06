@@ -357,6 +357,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const kuyo = chooseKuyoTrick(state, side, options, skill);
   if (kuyo) return kuyo;
 
+  // 2.98 フギン（2026-11-06 指示書 BM）：ちえのささやき（手札に回避が無いとき）・はねやすめ（かぜよみがあってマナが足りない・大技が来そう）は攻撃より先
+  const huginn = chooseHuginnTrick(state, side, options, skill);
+  if (huginn) return huginn;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
@@ -1403,7 +1407,7 @@ function manaPick(state: BattleState, side: Side, style: AiStyle, skill: CpuSkil
   const mana = manaOf(mine);
   const cost = (c: HandCard): number => {
     const card = getPlayCard(c.cardId);
-    return card.kind === 'skill' ? guardCost(state, card) : card.cost;
+    return card.kind === 'skill' ? guardCost(state, card, side) : card.cost;
   };
   // 次の相手の手番も場が水中で、相手に水中で強くなる攻撃を持つモンスターがいれば、守りを1枚多く残す（指示書 AJ の追加その3。3枚まで）
   const field = activeField(state);
@@ -1475,7 +1479,8 @@ function chooseGuard(state: BattleState, side: Side, style: AiStyle, skill: CpuS
   }
   // いつも攻撃（aggressive）は、倒されそうなときだけ守る
   if (style === 'aggressive' && !lethal) return end;
-  const evade = options.filter((o) => o.def.effect.type === 'evade').sort((a, b) => a.def.cost - b.def.cost)[0];
+  // はねやすめ（フギン 指示書 BM）で0になる回避も、いちばん安い回避として先に使う
+  const evade = options.filter((o) => o.def.effect.type === 'evade').sort((a, b) => guardCost(state, a.def, side) - guardCost(state, b.def, side))[0];
   if (evade && (damage >= (style === 'guard' ? 2 : 3) || lethal)) {
     return { type: 'defend', side, cardUid: evade.card.uid };
   }
@@ -1541,4 +1546,44 @@ function attackAction(state: BattleState, side: Side, option: SkillOption, targe
     ...(user ? { userUid: user.uid } : {}),
     ...(target ? { targetUid: target.uid } : {}),
   };
+}
+
+/** はねやすめを使う目安（指示書 BM）：相手のマナがこれ以上なら「次の相手の手番に大技が来そう」 */
+const FEATHER_REST_FOE_MANA = 4;
+
+/**
+ * フギン（2026-11-06 指示書 BM）の特殊の技（CPU の目安）。その手番に相手を倒せるときは使わない。腕前 C は forgetTrick の割合で使いそこねる
+ * - ちえのささやき：手札（このカードのほか）に、使える味方の回避の技が1枚も無く、山札が1枚以上あるとき
+ * - はねやすめ：まだ印が無く、手札にそのフギンのマナ1以上の回避（かぜよみ）があって、
+ *   ① はねやすめを払った残りのマナがその回避のマナに足りないとき、または ② 相手のマナが FEATHER_REST_FOE_MANA 以上（大技が来そう）のとき
+ */
+function chooseHuginnTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'searchEvade' || o.def.effect.type === 'featherRest');
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'huginnTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  const me = state.sides[side];
+  const mana = manaOf(me);
+  const alive = new Set(aliveMonsters(me).map((m) => m.cardId));
+  const evadesInHand = (except: string): SkillCard[] =>
+    me.hand
+      .filter((c) => c.uid !== except)
+      .map((c) => getPlayCard(c.cardId))
+      .filter((k): k is SkillCard => k.kind === 'skill' && k.effect.type === 'evade' && alive.has(k.monsterId));
+
+  const search = mine.find((o) => o.def.effect.type === 'searchEvade');
+  if (search && me.deck.length > 0 && evadesInHand(search.card.uid).length === 0) {
+    const user = availableUsers(state, side, search.def)[0];
+    if (user) return { type: 'useCard', side, cardUid: search.card.uid, userUid: user.uid };
+  }
+
+  const rest = mine.find((o) => o.def.effect.type === 'featherRest');
+  if (rest) {
+    const user = availableUsers(state, side, rest.def).find((m) => !m.featherRest);
+    const paid = user ? evadesInHand(rest.card.uid).filter((k) => k.monsterId === user.cardId && guardCost(state, k) >= 1) : [];
+    const short = paid.some((k) => mana - rest.def.cost < guardCost(state, k));
+    const bigComing = manaOf(state.sides[otherSide(side)]) >= FEATHER_REST_FOE_MANA;
+    if (user && paid.length > 0 && (short || bigComing)) return { type: 'useCard', side, cardUid: rest.card.uid, userUid: user.uid };
+  }
+  return null;
 }

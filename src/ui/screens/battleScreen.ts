@@ -24,6 +24,7 @@ import {
   isTideActive,
   handSkillCost,
   recallChoices,
+  searchEvadeChoices,
   manaOf,
   otherSide,
   incomingDamage,
@@ -926,7 +927,8 @@ export const battleScreen: ScreenDefinition = {
       if (card.kind !== 'skill') return {};
       // 守りの陣（2026-10-30 指示書 Y）：場にある間、防御・回避のカードはいつでも下げて見せる（守りは相手の手番に使う）
       if (card.effect.type === 'defense' || card.effect.type === 'evade' || card.effect.type === 'cover') {
-        const cost = guardCost(s, card);
+        // はねやすめ（フギン 指示書 BM）の印があれば、そのモンスターの回避は 0 で見せる
+        const cost = guardCost(s, card, 'player');
         return cost < card.cost ? { mana: cost } : {};
       }
       if (card.effect.type !== 'attack' || s.active !== 'player') return {};
@@ -1222,6 +1224,11 @@ export const battleScreen: ScreenDefinition = {
         pickSupportCard(cardUid, card.effect.type);
         return;
       }
+      // ちえのささやき（フギン 指示書 BM）：山札に回避があれば、風まかせと同じ窓で手札に加える1枚を選ぶ（無ければ選ばずに使う＝1枚引く）
+      if (card.kind === 'skill' && card.effect.type === 'searchEvade' && searchEvadeChoices(state, 'player').length > 0) {
+        pickSupportCard(cardUid, 'searchEvade');
+        return;
+      }
       // システムチェンジ（ギアロス 指示書 AX）：風まかせと同じ窓で、山札に戻す手札を選ぶ
       if (card.kind === 'skill' && card.effect.type === 'systemChange') {
         pickSupportCard(cardUid, 'systemChange');
@@ -1309,14 +1316,16 @@ export const battleScreen: ScreenDefinition = {
      * 思い出の箱（捨て札の技カードから）・風まかせ（このカードのほかの手札から）で1枚を選ぶ窓（2026-10-30 指示書 Y）。
      * 押したカードを選んで使う。「やめる」で使わずに閉じる。システムチェンジ（ギアロス 指示書 AX）も風まかせと同じ窓
      */
-    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap' | 'systemChange'): void => {
+    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap' | 'systemChange' | 'searchEvade'): void => {
       if (!state) return;
       const choices: { readonly choice: string; readonly cardId: string }[] =
         kind === 'recall'
           ? recallChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
+          : kind === 'searchEvade'
+            ? searchEvadeChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
           : state.sides.player.hand.filter((c) => c.uid !== cardUid).map((c) => ({ choice: c.uid, cardId: c.cardId }));
       const handle = openModal(element, {
-        title: t(kind === 'recall' ? 'battle.pick.recall' : kind === 'systemChange' ? 'battle.pick.systemChange' : 'battle.pick.swap'),
+        title: t(kind === 'recall' ? 'battle.pick.recall' : kind === 'systemChange' ? 'battle.pick.systemChange' : kind === 'searchEvade' ? 'battle.pick.searchEvade' : 'battle.pick.swap'),
         className: 'battle-pick',
         body: [
           h(
@@ -1888,6 +1897,13 @@ export const battleScreen: ScreenDefinition = {
      */
     const statusEntries = (s: BattleState, m: BattleMonster): { el: HTMLElement; label: string }[] => {
       const items: { el: HTMLElement; label: string }[] = [];
+      /** 札の「0」（はねやすめ 指示書 BM）：数字の絵は ＋／− が付くので、0 だけは符号を外す */
+      const zeroDigits = (): HTMLElement => {
+        const el = battleDigits(0, 'battle__st-digits');
+        if (el.children.length > 1) el.firstElementChild?.remove();
+        el.setAttribute('aria-label', '0');
+        return el;
+      };
       const badge = (icon: StatusIconId, label: string, num?: number | 'x2'): void => {
         items.push({
           el: h(
@@ -1899,7 +1915,7 @@ export const battleScreen: ScreenDefinition = {
               : h(
                   'span',
                   { class: 'battle__st-num', attrs: { style: `background-image:url("${statusIconUrl('n01')}")` } },
-                  num === 'x2' ? h('span', { class: 'battle__st-times', text: '×2' }) : battleDigits(num, 'battle__st-digits'),
+                  num === 'x2' ? h('span', { class: 'battle__st-times', text: '×2' }) : num === 0 ? zeroDigits() : battleDigits(num, 'battle__st-digits'),
                 ),
           ),
           label,
@@ -1937,6 +1953,8 @@ export const battleScreen: ScreenDefinition = {
       const charmSide = s.sides.player.monsters.some((x) => x.uid === m.uid) ? 'player' : 'opponent';
       if (wardCharmActive(s, charmSide)) badge('f02', t('battle.status.wardCharm'));
       // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
+      // はねやすめ（フギン 指示書 BM）：次の回避のマナ0＝回避の印（E15）に 0 の札（ほっぺにためるの B09 とは別の見た目）
+      if (m.featherRest && m.life > 0) badge('e15', t('battle.status.featherRest'), 0);
       if (m.charge) badge('b09', t(m.chargeUntil != null ? 'battle.status.howl' : 'battle.status.chargedN', { n: m.charge }), m.charge);
       if (m.tailwind && m.tailwind.turn >= s.turn) badge('b09', t('battle.status.tailwind', { n: m.tailwind.amount }), m.tailwind.amount);
       if (m.cheer && m.cheer.turn === s.turn) badge('b09', t('battle.status.cheer', { n: m.cheer.amount }), m.cheer.amount);
@@ -2332,8 +2350,9 @@ export const battleScreen: ScreenDefinition = {
               dataset: { se: 'none' },
               on: { click: () => dispatch({ type: 'defend', side: 'player', cardUid: c.uid }) },
             },
-            // 守りの数値（−3・回避 など）はカードの絵に出ているので、使えないカードにだけ「使えない」と1行
-            createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'tall' }),
+            // 守りの数値（−3・回避 など）はカードの絵に出ているので、使えないカードにだけ「使えない」と1行。
+            // マナが下がっていれば（守りの陣・はねやすめ〔フギン 指示書 BM〕）手札と同じく下がった数で見せる
+            createBattleCard(skill, { width: DEFENSE_CARD_W, size: 'tall', ...handMana(s, skill) }),
             usable.usable ? null : h('span', { class: 'battle__defense-label', text: t('battle.defense.unusable') }),
           );
           b.disabled = !usable.usable;

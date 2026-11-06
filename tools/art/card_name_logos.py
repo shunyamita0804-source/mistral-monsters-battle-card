@@ -23,7 +23,7 @@ GLYPH_EN = {'left': 40, 'top': 48, 'height': 170}
 
 # 枠の色を測らずに決めた色を使う子（2026-11-05 指示書 BH：クヨウの正式カードは 1016×1698 で、ほかの子〔970×1622〕と帯の位置が違うため。
 # 直しでユーザー決定：カードの絵の枠の色 #87649C）
-FRAME_COLOR = {'kuyo': '#87649C', 'radiel': '#BE7410', 'kuroshio': '#F08A78', 'rouga': '#B7A3DA'}  # ラディエル：カードの絵の枠の金（BI のあとユーザー指示）。クロシオ：指示書 BK の珊瑚
+FRAME_COLOR = {'kuyo': '#87649C', 'radiel': '#BE7410', 'kuroshio': '#F08A78', 'rouga': '#B7A3DA', 'huginn': '#1F5C58'}  # ラディエル：カードの絵の枠の金（BI のあとユーザー指示）。クロシオ：指示書 BK の珊瑚
 
 
 def frame_color(key: str) -> str:

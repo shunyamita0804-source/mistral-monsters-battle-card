@@ -44,6 +44,8 @@ export const SCREEN_IDS = [
   'kuroshioLab',
   /** 2026-11-06 指示書 BL：ロウガの確認用の画面（?qa=1&lab=rouga。置き場所ができるまで） */
   'rougaLab',
+  /** 2026-11-06 指示書 BM：フギンの確認用の画面（?qa=1&lab=huginn。置き場所ができるまで） */
+  'huginnLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

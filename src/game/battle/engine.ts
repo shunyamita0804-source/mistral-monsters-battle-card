@@ -71,6 +71,11 @@ export interface BattleMonster {
   /** とおぼえ（ロウガ 指示書 BL）：charge がこの手番の終わりまでで消える（期限つき）。ほっぺにためるは null（使うまで続く） */
   readonly chargeUntil?: number | null;
   /**
+   * はねやすめ（フギン 2026-11-06 指示書 BM）の印：このあとこのモンスターが回避の技を1回使うとき、その技のマナが0。
+   * 使ったら消える。期限なし。重ねない。倒れたら消える
+   */
+  readonly featherRest?: boolean | null;
+  /**
    * 攻撃技のダメージ＋amount（プカリムのおいかぜ。2026-10-29 ユーザー指示でカードの文のとおりに）。効くのは turn の手番（かけた側の次の自分の手番）だけ。
    * その手番にそのモンスターが攻撃技を1回使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える
    */
@@ -414,7 +419,7 @@ export function skillCost(state: BattleState, skill: SkillCard, user?: BattleMon
 
 /** 手札のその技を、いま使えるモンスターのだれかが使うときのいちばん少ない消費マナ（使えるモンスターがいなければカードのマナ） */
 export function handSkillCost(state: BattleState, side: Side, skill: SkillCard): number {
-  if (isGuardSkill(skill)) return guardCost(state, skill);
+  if (isGuardSkill(skill)) return guardCost(state, skill, side);
   const users = availableUsers(state, side, skill);
   return users.length === 0 ? skill.cost : Math.min(...users.map((u) => skillCost(state, skill, u)));
 }
@@ -518,7 +523,7 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (minCost > 0 && attackCard.cost < minCost) return NO(t('battle.ng.evadeMinCost', { n: minCost }));
     const maxCost = guardMaxCost(skill);
     if (maxCost !== null && attackCard.cost > maxCost) return NO(t('battle.ng.maxCost', { n: maxCost }));
-    if (manaOf(state.sides[side]) < guardCost(state, skill)) return NO(t('battle.ng.noMana'));
+    if (manaOf(state.sides[side]) < guardCost(state, skill, side)) return NO(t('battle.ng.noMana'));
     return YES;
   }
 
@@ -804,9 +809,26 @@ export function guardDiscountOf(state: BattleState): number {
 /** 守りのカード（防御・回避・かばう）か */
 const isGuardSkill = (skill: SkillCard): boolean => skill.effect.type === 'defense' || skill.effect.type === 'evade' || skill.effect.type === 'cover';
 
-/** 守りのカードの必要マナ（守りの陣が場にあれば−。0より下にならない） */
-export function guardCost(state: BattleState, skill: SkillCard): number {
-  return isGuardSkill(skill) ? Math.max(0, skill.cost - guardDiscountOf(state)) : skill.cost;
+/**
+ * 守りのカードの必要マナ（守りの陣が場にあれば−。0より下にならない）。
+ * side を渡すと、はねやすめ（フギン 指示書 BM）も見る：そのカードの持ち主（守る手番では狙われたモンスター）に印があれば、回避のマナは0
+ */
+export function guardCost(state: BattleState, skill: SkillCard, side?: Side): number {
+  if (!isGuardSkill(skill)) return skill.cost;
+  if (side && featherRestOwner(state, side, skill)) return 0;
+  return Math.max(0, skill.cost - guardDiscountOf(state));
+}
+
+/**
+ * はねやすめ（フギン 指示書 BM）の印で、この回避の技のマナが0になるモンスター（無ければ undefined）。
+ * 守る手番では狙われたモンスターだけ（守りに使えるのは狙われたモンスターのカードだけ）。それ以外（手札の表示）は、印のある同じ種類の味方
+ */
+export function featherRestOwner(state: BattleState, side: Side, skill: SkillCard): BattleMonster | undefined {
+  if (skill.effect.type !== 'evade') return undefined;
+  const pending = state.phase === 'defense' ? state.pending : null;
+  const pool = state.sides[side].monsters.filter((m) => m.cardId === skill.monsterId && m.life > 0 && !!m.featherRest);
+  if (pending && pending.attacker !== side) return pool.find((m) => m.uid === pending.targetUid);
+  return pool[0];
 }
 
 /** 使うモンスターがためている「次の攻撃技のダメージ＋」（ほっぺにためる） */
@@ -970,7 +992,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, chargeUntil: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -1442,6 +1464,13 @@ function useCard(
     }
     case 'drawTo':
       return drawToHand(next, side, skill.effect.hand, choice);
+    case 'searchEvade':
+      return searchEvade(next, side, choice);
+    case 'featherRest': {
+      // はねやすめ（フギン 指示書 BM）：使ったモンスターに印。重ねない（印が付いていても1回分のまま）
+      next = updateMonster(next, user.uid, { featherRest: true });
+      return addLog(next, t('battle.log.featherRest', { name: nameOf(user.cardId) }));
+    }
     case 'redrawHand':
       return redrawHand(next, side);
     case 'systemChange':
@@ -1515,7 +1544,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, chargeUntil: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);
@@ -1626,6 +1655,16 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
       next = addLog(next, t('battle.log.stun', { name: nameOf(target.monster.cardId) }));
     }
   }
+  if (e.sealTarget) {
+    // よみのまなざし（フギン 指示書 BM）：当たったら（防御でダメージが減っても）相手の次の手番は攻撃できない（すなかけと同じ印）。まよけのふだの間はつかない
+    const target = findMonster(next, targetUid);
+    if (target && target.monster.life > 0 && wardCharmActive(next, target.side)) {
+      next = wardCharmBlocked(next, target.monster);
+    } else if (target && target.monster.life > 0) {
+      next = updateMonster(next, targetUid, { sealedTurn: state.turn + 1 });
+      next = addLog(next, t('battle.log.seal', { name: nameOf(target.monster.cardId) }));
+    }
+  }
   if (e.dragUnder) {
     // ひきずりこむ（クロシオ 指示書 BK）：当たったら（防御でダメージが減っても）水中に。期限は使った側の次の自分の手番の終わり（みちしおと同じ）。
     // 重ねない（数え直す）。まよけのふだの間はつかない。倒れた相手にはつけない
@@ -1702,6 +1741,54 @@ function drawToHand(state: BattleState, side: Side, size: number, choice: string
   const s2 = next.sides[side];
   next = updateSide(next, side, { hand: s2.hand.filter((c) => c.uid !== out.uid), discard: [...s2.discard, out.cardId] });
   return addLog(next, t('battle.log.drawToDiscard', { side: sideLabel(side), card: nameOf(out.cardId) }));
+}
+
+/** ちえのささやき（フギン 指示書 BM）で選べる、自分の山札の回避の技カード（同じカードは1つにまとめる。山札の順） */
+export function searchEvadeChoices(state: BattleState, side: Side): string[] {
+  return [...new Set(state.sides[side].deck.filter((id) => isEvadeCardId(id)))];
+}
+
+const isEvadeCardId = (id: string): boolean => {
+  const c = cardCatalog.get(id);
+  return c?.kind === 'skill' && c.effect.type === 'evade';
+};
+
+/** さきよみ → かぜよみ の順（指示書 BM の CPU の選び方。同じ条件のとき） */
+const SEARCH_EVADE_ORDER: readonly string[] = ['skl-huginn-12', 'skl-huginn-11'];
+
+/**
+ * ちえのささやきで手札に加える回避の決まった選び方（指定が無いとき：CPU・試遊）：
+ * ① いまのマナで出せる回避（はねやすめ・守りの陣も入れる）→ ② さきよみ → かぜよみ → ほかの回避（マナの少ない順）
+ */
+export function defaultSearchEvade(state: BattleState, side: Side): string | undefined {
+  const mana = manaOf(state.sides[side]);
+  const rank = (id: string): number => {
+    const i = SEARCH_EVADE_ORDER.indexOf(id);
+    return i >= 0 ? i : SEARCH_EVADE_ORDER.length;
+  };
+  const cost = (id: string): number => guardCost(state, getSkill(id), side);
+  return searchEvadeChoices(state, side).sort((a, b) => Number(cost(a) > mana) - Number(cost(b) > mana) || rank(a) - rank(b) || cost(a) - cost(b))[0];
+}
+
+/**
+ * ちえのささやき（フギン 2026-11-06 指示書 BM）：山札から回避の技カードを1枚（choice＝カードの ID。無い・合わなければ決まった選び方）手札に加え、山札をシャッフル。
+ * 山札に回避が無ければ、かわりに1枚引く。山札が0枚なら何もしない（山札切れの負けにはしない）
+ */
+function searchEvade(state: BattleState, side: Side, choice: string | undefined): BattleState {
+  const s = state.sides[side];
+  if (s.deck.length === 0) return addLog(state, t('battle.log.searchEvadeNone', { side: sideLabel(side) }));
+  const choices = searchEvadeChoices(state, side);
+  if (choices.length === 0) {
+    const drawn = drawCards(s, 1, state.nextUid);
+    const next = updateSide({ ...state, nextUid: drawn.nextUid }, side, drawn.side);
+    return addLog(next, t('battle.log.searchEvadeDraw', { side: sideLabel(side) }));
+  }
+  const id = choice && choices.includes(choice) ? choice : (defaultSearchEvade(state, side) as string);
+  const at = s.deck.indexOf(id);
+  const rest = [...s.deck.slice(0, at), ...s.deck.slice(at + 1)];
+  const mixed = shuffle(rest, state.seed);
+  const next = updateSide({ ...state, seed: mixed.seed, nextUid: state.nextUid + 1 }, side, { deck: mixed.items, hand: [...s.hand, { uid: `c${state.nextUid}`, cardId: id }] });
+  return addLog(next, t('battle.log.searchEvade', { side: sideLabel(side), card: nameOf(id) }));
 }
 
 /** もりのたよりで捨てる1枚の決まった選び方（指定が無いとき：試遊・テスト）。必要マナのいちばん多い札（同じなら右はし）。CPU は ai.ts の pickDrawToDiscard で選ぶ */
@@ -1906,8 +1993,11 @@ function defend(state: BattleState, side: Side, cardUid: string | null): BattleS
   if (!hand) return state;
   const skill = getSkill(hand.cardId);
   if (skill.effect.type === 'cover') return cover(state, side, cardUid, skill, pending);
+  // はねやすめ（フギン 指示書 BM）：印があれば、この回避はマナ0で使え、印は消える
+  const rested = featherRestOwner(state, side, skill);
   let next = removeFromHand(state, side, cardUid);
-  next = payMana(next, side, guardCost(next, skill));
+  next = payMana(next, side, guardCost(next, skill, side));
+  if (rested) next = addLog(updateMonster(next, rested.uid, { featherRest: null }), t('battle.log.featherRestUsed', { name: nameOf(rested.cardId) }));
   next = { ...next, pending: { ...pending, responses: [...pending.responses, skill.id] } };
   const params = { side: sideLabel(side), skill: cardName(skill), v: guardReduction(skill) };
   const logKey = skill.effect.type === 'evade' ? 'battle.log.evade' : skill.effect.type === 'defense' && skill.effect.nullify ? 'battle.log.nullify' : 'battle.log.guard';

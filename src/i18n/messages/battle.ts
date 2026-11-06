@@ -69,6 +69,12 @@ export const BATTLE = {
   'battle.log.requiemNone': { ja: '死のレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
+  // 2026-11-06 指示書 BM：フギンのちえのささやき・はねやすめ
+  'battle.log.searchEvade': { ja: '{side}はちえのささやきで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Whisper of Wisdom.' },
+  'battle.log.searchEvadeDraw': { ja: '{side}の山札に回避のカードが無い。かわりに1枚引いた。', en: '{side} has no Evade card in the deck, so drew 1 card instead.' },
+  'battle.log.searchEvadeNone': { ja: '{side}の山札が無い。何も起きなかった。', en: '{side} has no deck. Nothing happened.' },
+  'battle.log.featherRest': { ja: '{name}ははねをやすめた。次の回避のマナが0になる。', en: '{name} rests its wings. Its next Evade costs 0 mana.' },
+  'battle.log.featherRestUsed': { ja: '{name}ははねやすめの力で、マナを使わずに回避した。', en: '{name} evades for 0 mana thanks to Wing Rest.' },
   // 2026-11-06 指示書 BL：ロウガのとおぼえ（期限つきの次の攻撃＋）
   'battle.log.howl': { ja: '{name}のとおぼえ！ 次の攻撃のダメージ＋{n}（次の自分のターンの終わりまで）。', en: "{name} howls! Its next attack deals +{n} (until the end of its next turn)." },
   'battle.log.howlFaded': { ja: '{name}のとおぼえの力が消えた。', en: "{name}'s howl wore off." },
@@ -225,6 +231,7 @@ export const BATTLE = {
   'battle.iconGuide.mCharge': { ja: 'ためているとき', en: 'While charged' },
   'battle.iconGuide.badgeValue': { ja: '数字の札：＋2 増える・−1 減る・×2 2倍・2+ マナ2以上・≤1 1以下', en: 'Number plate: +2 up, −1 down, ×2 double, 2+ mana 2 or more, ≤1 one or less' },
   'battle.iconGuide.badgeTurn': { ja: '時計の札「1」：次のターン', en: 'Clock plate "1": next turn' },
+  'battle.status.featherRest': { ja: 'はねやすめ（次の回避のマナ0）', en: 'Wing Rest (next Evade costs 0)' },
   'battle.status.howl': { ja: 'とおぼえ（次の攻撃＋{n}・次の自分のターンまで）', en: 'Howl (next attack +{n}, until its next turn)' },
   'battle.status.chargedN': { ja: 'ためている（次の攻撃＋{n}）', en: 'Charged (next attack +{n})' },
   'battle.status.ward': { ja: 'ダメージ−{n}', en: 'Damage -{n}' },
@@ -338,6 +345,7 @@ export const BATTLE = {
   'battle.prompt.cheerTarget': { ja: '声援をかける味方モンスターをタップしてください（まだ動いていない味方）', en: 'Tap an ally monster to cheer (one that has not acted)' },
   'battle.pick.recall': { ja: '手札に戻す技カードを選んでください（思い出の箱）', en: 'Choose a skill card to return to your hand (Memory Box)' },
   'battle.pick.swap': { ja: '山札に戻す手札を選んでください（風まかせ）', en: 'Choose a card from your hand to shuffle into your deck (Drift)' },
+  'battle.pick.searchEvade': { ja: '手札に加える回避の技カードを選んでください（ちえのささやき）', en: 'Choose an Evade skill card to add to your hand (Whisper of Wisdom)' },
   'battle.pick.systemChange': { ja: '山札に戻す手札を選んでください（システムチェンジ）', en: 'Choose a card from your hand to return to your deck (System Change)' },
   // ギアロス（2026-11-05 指示書 AX）：システムチェック・オーバードライブの3枚コンボ
   'battle.peek.title': { ja: '山札の上（上から順）', en: 'Top of your deck (top first)' },
