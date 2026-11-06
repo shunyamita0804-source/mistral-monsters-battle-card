@@ -3,7 +3,7 @@ python3 -I tools/art/rouga_assets.py
 
 原本は design-parts/bl-rouga-20261106/art/ に無改変で置いてある（描き直し・色の変更はしない。縮める・形式を変える・透明度をそろえるだけ）。
 - 技 skills/rouga_sk_01〜12.png（827×937）→ assets/images/cards/skills/rouga_sk_NN.webp
-- 正式カード rouga_official.png（969×1622。名前なし）→ assets/images/cards/monsters/rouga_official.webp（508×849）
+- 正式カード rouga_official.png（969×1622。名前なし。LIFE の数字を 7 にした build/rouga_official_life7.png〔tools/art/rouga_life7.py〕を使う）→ assets/images/cards/monsters/rouga_official.webp（508×849）
 - バトル用 rouga_battle_transparent.png（1169×1345・透明）→ 透明度を 0／255 にそろえて assets/images/cards/monsters/rouga_battlecard.png（色は変えない）
 - パック：窓の絵 pack_art_rouga.png（948×1659）をほかの子と同じ型に入れる（縁は淡い藤色 #B7A3DA）→ assets/images/ui/gacha/pack_rouga.webp
 - 名前のロゴ name_ja_rouga.png（2004×785）・name_en_rouga.png（2054×766）：まわりのもやを消し、字の高さをそろえて（日本語 174px・英語 160px）1400×300 の形に
@@ -38,7 +38,8 @@ def skills() -> None:
 
 
 def official() -> None:
-    im = Image.open(os.path.join(SRC, 'rouga_official.png')).convert('RGB')
+    # 2026-11-06：LIFE を 7 にしたので、札の数字を 7 にした絵（tools/art/rouga_life7.py。原本は変えない）を使う
+    im = Image.open(os.path.join(BUILD, 'rouga_official_life7.png')).convert('RGB')
     # 969×1622 で届いた（ほかの子は 970×1622）。ほかの子と同じ 508×849 にする（縦横比の差は 0.1% ほど）
     small = im.resize((508, 849), Image.LANCZOS)
     small.save(os.path.join(ROOT, 'assets/images/cards/monsters/rouga_official.webp'), 'WEBP', quality=90, method=6)
