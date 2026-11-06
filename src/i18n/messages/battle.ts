@@ -69,6 +69,9 @@ export const BATTLE = {
   'battle.log.requiemNone': { ja: '死のレクイエム：だれも倒れなかった。', en: 'Requiem of Death: no one fell.' },
   'battle.log.hide': { ja: '{name}は砂にもぐった。次のターン攻撃の対象にならない。', en: "{name} burrowed into the sand. It can't be targeted by attacks next turn." },
   // 試遊中：プカリム（2026-10-28）
+  // 2026-11-06 指示書 BL：ロウガのとおぼえ（期限つきの次の攻撃＋）
+  'battle.log.howl': { ja: '{name}のとおぼえ！ 次の攻撃のダメージ＋{n}（次の自分のターンの終わりまで）。', en: "{name} howls! Its next attack deals +{n} (until the end of its next turn)." },
+  'battle.log.howlFaded': { ja: '{name}のとおぼえの力が消えた。', en: "{name}'s howl wore off." },
   'battle.log.charge': { ja: '{name}はほっぺに空気をためた。次の攻撃技のダメージ＋{n}。', en: '{name} puffed up its cheeks. Its next attack deals +{n}.' },
   'battle.log.ward': { ja: '{name}にそなえのふえ。次の相手のターン、受けるダメージ−{n}。', en: '{name} is warded. It takes {n} less damage during the next enemy turn.' },
   'battle.log.drawTo': { ja: '{side}はもりのたよりで{n}枚引いた。', en: '{side} drew {n} {n|card|cards} with Forest Tidings.' },
@@ -222,6 +225,7 @@ export const BATTLE = {
   'battle.iconGuide.mCharge': { ja: 'ためているとき', en: 'While charged' },
   'battle.iconGuide.badgeValue': { ja: '数字の札：＋2 増える・−1 減る・×2 2倍・2+ マナ2以上・≤1 1以下', en: 'Number plate: +2 up, −1 down, ×2 double, 2+ mana 2 or more, ≤1 one or less' },
   'battle.iconGuide.badgeTurn': { ja: '時計の札「1」：次のターン', en: 'Clock plate "1": next turn' },
+  'battle.status.howl': { ja: 'とおぼえ（次の攻撃＋{n}・次の自分のターンまで）', en: 'Howl (next attack +{n}, until its next turn)' },
   'battle.status.chargedN': { ja: 'ためている（次の攻撃＋{n}）', en: 'Charged (next attack +{n})' },
   'battle.status.ward': { ja: 'ダメージ−{n}', en: 'Damage -{n}' },
   'battle.status.wardCharm': { ja: 'まよけのふだ（悪い状態がつかない）', en: 'Ward Charm (no bad statuses)' },

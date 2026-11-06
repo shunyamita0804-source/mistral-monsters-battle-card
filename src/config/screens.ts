@@ -42,6 +42,8 @@ export const SCREEN_IDS = [
   'radielLab',
   /** 2026-11-06 指示書 BK：クロシオの確認用の画面（?qa=1&lab=kuroshio。置き場所ができるまで） */
   'kuroshioLab',
+  /** 2026-11-06 指示書 BL：ロウガの確認用の画面（?qa=1&lab=rouga。置き場所ができるまで） */
+  'rougaLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

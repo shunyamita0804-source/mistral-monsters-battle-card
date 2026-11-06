@@ -119,7 +119,8 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     const by = (h: string): string[] => Object.entries(MONSTER_HABITAT).filter(([, v]) => v === h).map(([k]) => k);
     // 2026-11-05 指示書 AX：確かめ用だけのタイラント（地上）も入れて11体
     // 2026-11-05 指示書 BH：確かめ用だけのクヨウ（地上）も入れて12体
-    expect(by('ground')).toHaveLength(12);
+    // 2026-11-06 指示書 BL：確かめ用だけのロウガ（地上）も入れて13体
+    expect(by('ground')).toHaveLength(13);
     expect(by('ground')).toContain('mon-tyrant');
     expect(by('ground')).toContain('mon-kuyo');
     expect(by('ground')).toContain('mon-forn');
@@ -134,7 +135,7 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     const entries = cardBookEntries();
     // 2026-11-05 指示書 BH：クヨウは確かめ用（AJ_MONSTER_IDS に入らない）だが、図鑑には番号を付ける（ギアロスのあと No.248〜260）
     // 2026-11-06 指示書 BK：クロシオも同じ（ラディエルのあと No.274〜286）
-    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS, 'mon-kuyo', 'mon-kuroshio'].sort());
+    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS, 'mon-kuyo', 'mon-kuroshio', 'mon-rouga'].sort());
     let expected = 1;
     for (const id of NUMBERED_MONSTERS) {
       const mine = entries.filter((e) => e.section.kind === 'monster' && e.section.monsterId === id);

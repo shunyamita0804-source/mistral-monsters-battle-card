@@ -49,6 +49,9 @@ const TEXTS: Readonly<Record<string, string>> = {
   'ちから技・かしこさ技のダメージを0に': 'Reduce POW and INT damage to 0.',
   '相手は次のターン、ラズックしか攻撃できない': 'Next turn, the enemy can only attack Lazuck.',
   // 2026-11-06 指示書 BK：クロシオ（英語は仮訳）
+  // 2026-11-06 指示書 BL：ロウガ（英語は仮訳）
+  '相手は次のターン行動できない（凍る）': "The enemy can't act next turn (frozen).",
+  '次の自分のターンの終わりまで、次の攻撃＋2': 'Until the end of your next turn, your next attack +2.',
   '相手は次のターン、クロシオしか攻撃できない': 'Next turn, the enemy can only attack Kuroshio.',
   '当たった相手1体を、次の自分の手番の終わりまで水中にする': 'If it hits, that enemy counts as underwater until the end of your next turn.',
   '水中の相手全員に当たる（守りは1体ずつ）。水中の相手がいないと使えない': "Hits every underwater enemy (each guards separately). Can't be used if no enemy is underwater.",

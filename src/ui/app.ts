@@ -16,7 +16,7 @@ const NO_SAVE_SCREENS: readonly ScreenId[] = ['title', 'prologue', 'newGame', 'o
 /** 最初に開く画面。QA（?qa=1）のときだけ、?lab=walk で歩きの確認画面、?lab=pukarim でプカリムの試遊の画面・?lab=geol でジオルの試遊の画面・?lab=event でイベントのダンジョンの絵（セーブが要る）・?lab=soukai で蒼海（みちしおあり）を試す画面（2026-11-02 指示書 AP。セーブがなくても開ける）を直接開ける */
 export function initialScreen(qa: boolean, search: string): ScreenId {
   const lab = qa ? new URLSearchParams(search).get('lab') : null;
-  return lab === 'walk' ? 'walkLab' : lab === 'pukarim' ? 'pukarimLab' : lab === 'geol' ? 'geolLab' : lab === 'tyrant' ? 'tyrantLab' : lab === 'gearos' ? 'gearosLab' : lab === 'kuyo' ? 'kuyoLab' : lab === 'radiel' ? 'radielLab' : lab === 'kuroshio' ? 'kuroshioLab' : lab === 'event' ? 'eventDungeonLab' : lab === 'soukai' ? 'soukaiLab' : lab === 'events' ? 'storyEventLab' : INITIAL_SCREEN;
+  return lab === 'walk' ? 'walkLab' : lab === 'pukarim' ? 'pukarimLab' : lab === 'geol' ? 'geolLab' : lab === 'tyrant' ? 'tyrantLab' : lab === 'gearos' ? 'gearosLab' : lab === 'kuyo' ? 'kuyoLab' : lab === 'radiel' ? 'radielLab' : lab === 'kuroshio' ? 'kuroshioLab' : lab === 'rouga' ? 'rougaLab' : lab === 'event' ? 'eventDungeonLab' : lab === 'soukai' ? 'soukaiLab' : lab === 'events' ? 'storyEventLab' : INITIAL_SCREEN;
 }
 
 /**

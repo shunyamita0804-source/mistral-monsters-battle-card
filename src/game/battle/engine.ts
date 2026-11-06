@@ -68,6 +68,8 @@ export interface BattleMonster {
   readonly hiddenTurn?: number | null;
   /** 次に使う攻撃技のダメージ＋（試遊中：プカリムのほっぺにためる 2026-10-28）。使うまで続く。攻撃技を使ったら・倒れたら消える */
   readonly charge?: number | null;
+  /** とおぼえ（ロウガ 指示書 BL）：charge がこの手番の終わりまでで消える（期限つき）。ほっぺにためるは null（使うまで続く） */
+  readonly chargeUntil?: number | null;
   /**
    * 攻撃技のダメージ＋amount（プカリムのおいかぜ。2026-10-29 ユーザー指示でカードの文のとおりに）。効くのは turn の手番（かけた側の次の自分の手番）だけ。
    * その手番にそのモンスターが攻撃技を1回使ったら消え、使わなくてもその手番が終わったら効かない。倒れたら消える
@@ -968,7 +970,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, chargeUntil: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -1104,6 +1106,15 @@ function startTurn(state: BattleState, side: Side): BattleState {
     next = { ...next, field: null };
     if (state.field.habitat === 'water') next = addLog(next, t('battle.log.tideEnd'));
   }
+  // とおぼえ（ロウガ 指示書 BL）：期限の手番が過ぎても攻撃しなかったら、＋は消える
+  for (const k of ['player', 'opponent'] as const) {
+    for (const m of next.sides[k].monsters) {
+      if (m.chargeUntil != null && state.turn > m.chargeUntil) {
+        next = updateMonster(next, m.uid, { charge: null, chargeUntil: null });
+        if (m.life > 0 && m.charge) next = addLog(next, t('battle.log.howlFaded', { name: nameOf(m.cardId) }));
+      }
+    }
+  }
   const need = BATTLE_RULES.refillHandTo - s.hand.length;
   if (need > 0) {
     if (s.deck.length < need) return loseByDeckOut(next, side);
@@ -1221,7 +1232,7 @@ function useCard(
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
       // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）。おいかぜは効く手番に使ったときだけ消える
-      if (user.charge) next = updateMonster(next, user.uid, { charge: null });
+      if (user.charge) next = updateMonster(next, user.uid, { charge: null, chargeUntil: null });
       if (tailwindOf(state, user) > 0) next = updateMonster(next, user.uid, { tailwind: null });
       // 声援：攻撃技を1回使ったら消える
       if (cheerOf(state, user) > 0) next = updateMonster(next, user.uid, { cheer: null });
@@ -1334,7 +1345,12 @@ function useCard(
     }
     case 'charge': {
       // ほっぺにためる：次の攻撃技のダメージ＋amount。重ねない（もう一度使っても amount のまま）
-      next = updateMonster(next, user.uid, { charge: skill.effect.amount });
+      // とおぼえ（ロウガ 指示書 BL）：期限つき（使った側の次の自分の手番の終わりまで）。重ねない（もう一度使ったら期限を数え直す）
+      if (skill.effect.untilNextTurn) {
+        next = updateMonster(next, user.uid, { charge: skill.effect.amount, chargeUntil: state.turn + 2 });
+        return addLog(next, t('battle.log.howl', { name: nameOf(user.cardId), n: skill.effect.amount }));
+      }
+      next = updateMonster(next, user.uid, { charge: skill.effect.amount, chargeUntil: null });
       return addLog(next, t('battle.log.charge', { name: nameOf(user.cardId), n: skill.effect.amount }));
     }
     case 'tailwind': {
@@ -1499,7 +1515,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, chargeUntil: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);

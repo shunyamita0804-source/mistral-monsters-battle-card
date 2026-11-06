@@ -970,6 +970,10 @@ function chooseDragonFocus(state: BattleState, side: Side, options: Option[], en
  * - ほっぺにためるが無ければ、おいかぜ：まだ動いていない味方が、おいかぜのあとのマナで攻撃技を使えるならその味方に
  *   （2026-10-29 からおいかぜは次の自分のターンだけ効くが、選び方は試遊のときのまま。ユーザー了承）
  */
+/** とおぼえのあとに使いたい「大きな攻撃」（ロウガの ひょうけつのかぎづめ 3マナ5・ひょうろうのいちげき 6マナ9） */
+const HOWL_BIG_COST = 3;
+const HOWL_BIG_DAMAGE = 5;
+
 function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[], enemies: BattleMonster[]): BattleAction | null {
   const skills = options.filter(isSkillOption);
   const special = skills.filter((o) => o.def.effect.type === 'charge' || o.def.effect.type === 'tailwind');
@@ -977,10 +981,26 @@ function chooseChargeOrTailwind(state: BattleState, side: Side, options: Option[
   const attacks = skills.filter((o) => o.def.effect.type === 'attack');
   const canKill = (user: BattleMonster): boolean =>
     attacks.some((o) => availableUsers(state, side, o.def).some((u) => u.uid === user.uid) && targetsFor(state, side, o.def, user).some((e) => e.life <= attackPower(state, o.def, user)));
-  const charge = special.find((o) => o.def.effect.type === 'charge');
+  const charge = special.find((o) => o.def.effect.type === 'charge' && !o.def.effect.untilNextTurn);
   if (charge) {
     const user = availableUsers(state, side, charge.def).find((m) => !m.charge && !canKill(m));
     if (user) return { type: 'useCard', side, cardUid: charge.card.uid, userUid: user.uid };
+  }
+  // とおぼえ（ロウガ 指示書 BL。期限つき）：次の自分の手番に、ロウガの大きな攻撃（マナ3以上・ダメージ5以上：ひょうけつのかぎづめ・ひょうろうのいちげき）を
+  // 払えるマナと手札があるときだけ使う（期限で消えないように）。次の手番のマナ＝いまのマナ − とおぼえ ＋ この手番の終わりにマナにできる手札（その大技ほか1枚は残す）
+  const howl = special.find((o) => o.def.effect.type === 'charge' && !!o.def.effect.untilNextTurn);
+  if (howl) {
+    const mine = state.sides[side];
+    const manaNext = manaOf(mine) - howl.def.cost + Math.max(0, mine.hand.length - 3);
+    const user = availableUsers(state, side, howl.def).find((m) => !m.charge && !canKill(m));
+    const big = user
+      ? mine.hand.some((c) => {
+          if (c.uid === howl.card.uid) return false;
+          const k = getPlayCard(c.cardId);
+          return k.kind === 'skill' && k.effect.type === 'attack' && k.monsterId === user.cardId && k.cost >= HOWL_BIG_COST && (k.stat?.value ?? 0) >= HOWL_BIG_DAMAGE && k.cost <= manaNext;
+        })
+      : false;
+    if (user && big) return { type: 'useCard', side, cardUid: howl.card.uid, userUid: user.uid };
   }
   const wind = special.find((o) => o.def.effect.type === 'tailwind');
   if (!wind) return null;

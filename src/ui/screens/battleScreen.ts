@@ -1937,7 +1937,7 @@ export const battleScreen: ScreenDefinition = {
       const charmSide = s.sides.player.monsters.some((x) => x.uid === m.uid) ? 'player' : 'opponent';
       if (wardCharmActive(s, charmSide)) badge('f02', t('battle.status.wardCharm'));
       // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
-      if (m.charge) badge('b09', t('battle.status.chargedN', { n: m.charge }), m.charge);
+      if (m.charge) badge('b09', t(m.chargeUntil != null ? 'battle.status.howl' : 'battle.status.chargedN', { n: m.charge }), m.charge);
       if (m.tailwind && m.tailwind.turn >= s.turn) badge('b09', t('battle.status.tailwind', { n: m.tailwind.amount }), m.tailwind.amount);
       if (m.cheer && m.cheer.turn === s.turn) badge('b09', t('battle.status.cheer', { n: m.cheer.amount }), m.cheer.amount);
       if (m.windRide && m.windRide.turn >= s.turn) badge('b13', t('battle.status.windRide', { n: m.windRide.discount }), -m.windRide.discount);

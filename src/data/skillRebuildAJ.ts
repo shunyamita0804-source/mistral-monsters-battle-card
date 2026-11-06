@@ -35,6 +35,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-tyrant': 'ground', // 2026-11-05 指示書 AX（確かめ用だけ）
   'mon-kuyo': 'ground', // 2026-11-05 指示書 BH（確かめ用だけ。霧の廃坑ができるまで）
   'mon-kuroshio': 'water', // 2026-11-06 指示書 BK（確かめ用だけ。セイランの招待大会ができるまで）
+  'mon-rouga': 'ground', // 2026-11-06 指示書 BL（確かめ用だけ。ノルディスの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -488,6 +489,22 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-kuroshio-10', name: 'よびごえ', cat: '特', mana: 2, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、クロシオしか攻撃できない', art: 'kuroshio_sk_10.webp' },
     { id: 'skl-kuroshio-11', name: 'もぐってかわす', cat: '避', mana: 2, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), art: 'kuroshio_sk_11.webp' },
     { id: 'skl-kuroshio-12', name: 'うずまきターン', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'kuroshio_sk_12.webp' },
+  ],
+  // ロウガ（地上・LIFE 8・B の上。2026-11-06 指示書 BL。正本は design-parts/bl-rouga-20261106/data/rouga_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は rouga_sk_NN.webp（番号＝技番号）。04 は ヒョウズクのこおりのいき・05 は回避されない・08 は防御されない・09 は ほっぺにためるに期限（untilNextTurn）
+  'mon-rouga': [
+    { id: 'skl-rouga-01', name: 'ひっかく', cat: 'ち', mana: 0, damage: 1, text: null, art: 'rouga_sk_01.webp' },
+    { id: 'skl-rouga-02', name: 'かみつき', cat: 'ち', mana: 1, damage: 2, text: null, art: 'rouga_sk_02.webp' },
+    { id: 'skl-rouga-03', name: 'とびかかる', cat: 'ち', mana: 1, damage: 2, text: null, art: 'rouga_sk_03.webp' },
+    { id: 'skl-rouga-04', name: 'こおりのきば', cat: 'ち', mana: 3, damage: 2, effect: atk({ stunTarget: true, stunMark: 'frozen' }), text: '相手は次のターン行動できない（凍る）', art: 'rouga_sk_04.webp' },
+    { id: 'skl-rouga-05', name: 'ゆきけむりダッシュ', cat: 'ち', mana: 1, damage: 2, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'rouga_sk_05.webp' },
+    { id: 'skl-rouga-06', name: 'ひょうけつのかぎづめ', cat: 'ち', mana: 3, damage: 5, text: null, art: 'rouga_sk_06.webp' },
+    { id: 'skl-rouga-07', name: 'けっしょうのつぶて', cat: 'か', mana: 1, damage: 2, text: null, art: 'rouga_sk_07.webp' },
+    { id: 'skl-rouga-08', name: 'ひょうしょうのやいば', cat: 'か', mana: 3, damage: 4, effect: atk({ unblockable: true }), text: T_UNBLOCK, rare: true, art: 'rouga_sk_08.webp' },
+    { id: 'skl-rouga-09', name: 'とおぼえ', cat: '特', mana: 1, damage: null, effect: { type: 'charge', amount: 2, untilNextTurn: true }, text: '次の自分のターンの終わりまで、次の攻撃＋2', art: 'rouga_sk_09.webp' },
+    { id: 'skl-rouga-10', name: 'ひょうろうのいちげき', cat: 'ち', mana: 6, damage: 9, text: null, rare: true, art: 'rouga_sk_10.webp' },
+    { id: 'skl-rouga-11', name: 'けがわでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'rouga_sk_11.webp' },
+    { id: 'skl-rouga-12', name: 'ジャンプ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'rouga_sk_12.webp' },
   ],
 };
 
