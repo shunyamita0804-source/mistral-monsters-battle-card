@@ -1,0 +1,31 @@
+{
+ "games": 200,
+ "skill": "A",
+ "subject": "mon-rouga",
+ "swap": {
+  "games": 10800,
+  "win": 72.5,
+  "deckOut": 41.7,
+  "avgTurns": 34.4,
+  "howlPerGame": 0.029,
+  "howlUsedRate": 68.3,
+  "howlFadedRate": 19.4,
+  "iceFangHitsPerGame": 0.146,
+  "bigPerGame": 0,
+  "bigChargedPerGame": 0,
+  "bigChargedKillsPerGame": 0
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 72.2,
+  "deckOut": 41.7,
+  "avgTurns": 34.6,
+  "howlPerGame": 0.017,
+  "howlUsedRate": 60.1,
+  "howlFadedRate": 25,
+  "iceFangHitsPerGame": 0.066,
+  "bigPerGame": 0.019,
+  "bigChargedPerGame": 0,
+  "bigChargedKillsPerGame": 0
+ }
+}
