@@ -1,18 +1,49 @@
-# 引き継ぎメモ（2026-11-06：main の 4331e1b〔指示書 BJ まで〕を公開した）
+# 引き継ぎメモ（2026-11-06：セッションの引き継ぎ。main＝公開済み〔4331e1b・指示書 BJ まで〕＋引き継ぎメモ）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
 
-### まず読む：公開した（2026-11-06）
+### まず読む：セッションの引き継ぎ（2026-11-06）
+
+- **作業中のものは無い**。このセッションの作業はすべて main に入れた（main＝origin/main。ブランチ `claude/claude-handoff-docs-review-nt8pnx` も main と同じ）
+- **2026-11-06 に公開した**（ユーザーの「公開して」）。公開したのは main の `4331e1b`（指示書 BJ まで）。そのあとの main は引き継ぎメモだけ
+- このセッションで main に入れたもの（記録はそれぞれの docs）：
+  | 作業 | 記録 |
+  | --- | --- |
+  | 指示書 BH：クヨウ（霧の廃坑の切り札・B。**確かめ用だけ** `?qa=1&lab=kuyo`）・おはらい・まよけのふだ・みがわり・ミニマップのスイッチの印 | `docs/bh-kuyo-20261105.md` |
+  | BH の直し：みがわりは守りを重ねない・おはらいにライフ＋1・じならしも悪い状態・色 #87649C・説明文。クヨウの数字は案G（まえあしでおす 2→1） | 同じ docs の後半 |
+  | 指示書 BI：ラディエル（天の聖域の切り札・A）・しんぱんのせんこく・最後の審判・天の恵み・アウレリオの切り札と専用セリフ | `docs/bi-radiel-20261105.md` |
+  | BI のあと：色 #BE7410・説明文。ラディエルの数字は R4（せいなるつき 3→2・クロスニードル 5→4）。アウレリオ lifeScale **1.70**・大会 S RANK_SCALE **1.05** | 同じ docs の後半 |
+  | 指示書 BJ：効果のアイコン4つ（おはらい・まよけのふだ・最後の審判・天の恵み）とルールの画面の一覧 | `docs/bj-effect-icons-20261106.md` |
+- いまの数字（試遊・腕前 A どうしの1体入れ替え）：クヨウ 67.3／61.0％（B）・ラディエル 75.3／73.0％（A。ギアロスくらい）。アウレリオ 10.2％・大会 S 15.5％（目安のプレイヤー）
+- **ユーザーの返事待ち・保留**：
+  - BJ の要確認2つ（`docs/bj-effect-icons-20261106.md`）・BI の要確認のうち 5〜9・11（ユーザーが「今のままでよい」と言ったのは 1〜4・10・12〜14。5・6・8・11 はそのあと解決済み〔アイコン・説明文・色・強さ〕。残りは 7 ロゴの縮め方・9 天の恵みは指示書の「捨て札から3枚」）
+  - BH の要確認のうち、答えをもらっていないもの（`docs/bh-kuyo-20261105.md` の最後。図鑑の番号・ロゴの大きさ・まよけのふだがクヨウが倒れても残る は「今のまま」で決定）
+  - 霧の廃坑（クヨウの入手）・天の聖域の中身はまだ作っていない（仮）
+  - 前からの返事待ち（下の「その前のセッションの引き継ぎ（2026-11-05 夜）」：静かなる祭壇の壁の絵・NPC セリフの保留7つ・吹き出しの折り返し・iPhone 実機の確認 など）
+- 作業のしかた（このセッションで分かったこと）：
+  - 指示書の ZIP は scratchpad の新しいフォルダに展開。指示書と素材の原本は `design-parts/〈名前〉-〈日付〉/` に無改変で写して git に入れる
+  - 流れ：ブランチ → 作る → 写真 → `npm run typecheck`・`npx vitest run --maxWorkers=3 --testTimeout=30000`・`npm run build` → docs と「いまの状態」→ main に早送り（`git branch -f main HEAD`）→ `ブランチ`・`main`・`claude/…` の3つに push → 報告 ZIP（報告書.html・photos〔jpg にすると軽い〕・data）を scratchpad に作って送る
+  - ローカルの `main` が古い指していることがある：origin/main の上に作って、`git merge-base --is-ancestor origin/main HEAD` を確かめてから `git branch -f main HEAD`（force push はしない）
+  - **数字の案を「測るだけ」のとき**は、`git worktree add --detach 〈scratchpad〉/案 origin/main` で別の作業場所を作り、`node_modules` をリンクして数字だけ変えて測る（main は変えない）。終わったら `git worktree remove --force`
+  - 1体入れ替えの試遊：`PLAYTEST=200 PLAYTEST_SUBJECTS=mon-xxx PLAYTEST_OUT=… npx vitest run tests/bhPlaytest.test.ts`（1体 約2分。クヨウなら状態を使う相手との相性も）
+  - 守り手・大会の合わせ直し：`PLAYTEST=1000 PLAYTEST_PART=bosses|tournaments PLAYTEST_ONLY=enc-holy-boss|tournament-s PLAYTEST_SCALES=1.66,1.70,… npx vitest run tests/balancePlaytest.test.ts`。
+    **同時にいくつも回すときは、1つずつ別の「バックグラウンドの実行」にする**（1つのコマンドの中で `&` で並べると途中で止まることがあった）
+  - 絵の道具は scipy・matplotlib・opencv が要る：`pip install scipy matplotlib opencv-python-headless`
+  - 写真の道具：`tools/e2e/bh_kuyo_shot.cjs`・`bi_radiel_shot.cjs`・`bj_icons_shot.cjs`（開発用サーバー `npx vite --port 5173 --host 127.0.0.1`）。手札は重なるので、カードの右寄りを押す。守りの番は `.battle__defense-card` を押す
+  - 公開：GitHub MCP の `actions_run_trigger`（`deploy-pages.yml`・ref `main`）→ 新しいファイルが公開URLで 200 になるのを curl で確かめる
+  - セーブ version は **36**
+
+### その前：公開した（2026-11-06）
 
 - **ユーザーの「公開して」で、main の `4331e1b`（指示書 BJ まで：クヨウ・ラディエル・効果のアイコン4つ など）を公開した**（GitHub Actions `deploy-pages.yml` の run 163・成功）。
   公開URLで新しいファイル（`static/icon_f01-*.webp`・`static/radiel_official-*.webp`・`static/pack_radiel-*.webp`）が 200 になるのを確かめた
 - その前の公開は 2026-11-02 の `3998c02`（指示書 AV）。そのあとの作業（AW〜BJ）はこの公開で入った
 
-### まず読む：いまの状態（2026-11-06 指示書 BJ のあと）
+### その前：いまの状態（2026-11-06 指示書 BJ のあと）
 
-- **指示書 BJ（新しい効果のアイコン4つ）を main に入れた・未公開**（ブランチ `bj-effect-icons`）。記録 `docs/bj-effect-icons-20261106.md`
+- **指示書 BJ（新しい効果のアイコン4つ）を main に入れた**（2026-11-06 に公開した）（ブランチ `bj-effect-icons`）。記録 `docs/bj-effect-icons-20261106.md`
   - おはらい（f01）・まよけのふだ（f02。状態の印にも）・最後の審判（f03）・天の恵み（f04）。ルールの画面の一覧にも足した
 - その前に R4（ラディエル）と合わせ直しを main に入れた（下の「その前」）
 - テスト 1561 件（まとめて回すときは --testTimeout=30000）。セーブ version 36 のまま
