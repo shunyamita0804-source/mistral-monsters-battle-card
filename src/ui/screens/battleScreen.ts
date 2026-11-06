@@ -25,6 +25,7 @@ import {
   handSkillCost,
   recallChoices,
   searchEvadeChoices,
+  searchAnyChoices,
   manaOf,
   otherSide,
   incomingDamage,
@@ -1229,6 +1230,11 @@ export const battleScreen: ScreenDefinition = {
         pickSupportCard(cardUid, 'searchEvade');
         return;
       }
+      // ぜんちぜんのう（ノウス 指示書 BN）：同じ窓で、山札から手札に加える1枚を選ぶ
+      if (card.kind === 'skill' && card.effect.type === 'searchAny' && searchAnyChoices(state, 'player').length > 0) {
+        pickSupportCard(cardUid, 'searchAny');
+        return;
+      }
       // システムチェンジ（ギアロス 指示書 AX）：風まかせと同じ窓で、山札に戻す手札を選ぶ
       if (card.kind === 'skill' && card.effect.type === 'systemChange') {
         pickSupportCard(cardUid, 'systemChange');
@@ -1316,16 +1322,18 @@ export const battleScreen: ScreenDefinition = {
      * 思い出の箱（捨て札の技カードから）・風まかせ（このカードのほかの手札から）で1枚を選ぶ窓（2026-10-30 指示書 Y）。
      * 押したカードを選んで使う。「やめる」で使わずに閉じる。システムチェンジ（ギアロス 指示書 AX）も風まかせと同じ窓
      */
-    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap' | 'systemChange' | 'searchEvade'): void => {
+    const pickSupportCard = (cardUid: string, kind: 'recall' | 'swap' | 'systemChange' | 'searchEvade' | 'searchAny'): void => {
       if (!state) return;
       const choices: { readonly choice: string; readonly cardId: string }[] =
         kind === 'recall'
           ? recallChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
           : kind === 'searchEvade'
             ? searchEvadeChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
+            : kind === 'searchAny'
+              ? searchAnyChoices(state, 'player').map((id) => ({ choice: id, cardId: id }))
           : state.sides.player.hand.filter((c) => c.uid !== cardUid).map((c) => ({ choice: c.uid, cardId: c.cardId }));
       const handle = openModal(element, {
-        title: t(kind === 'recall' ? 'battle.pick.recall' : kind === 'systemChange' ? 'battle.pick.systemChange' : kind === 'searchEvade' ? 'battle.pick.searchEvade' : 'battle.pick.swap'),
+        title: t(kind === 'recall' ? 'battle.pick.recall' : kind === 'systemChange' ? 'battle.pick.systemChange' : kind === 'searchEvade' ? 'battle.pick.searchEvade' : kind === 'searchAny' ? 'battle.pick.searchAny' : 'battle.pick.swap'),
         className: 'battle-pick',
         body: [
           h(

@@ -1,0 +1,67 @@
+{
+ "games": 200,
+ "skill": "A",
+ "subject": "mon-huginn",
+ "swap": {
+  "games": 10800,
+  "win": 57.7,
+  "deckOut": 46.6,
+  "deckOutWin": 20.5,
+  "avgTurns": 35.3,
+  "drainedPerGame": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "drainUsesPerGame": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "drainHitRate": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "emptyHitsPerGame": 0,
+  "millPerGame": 0,
+  "milledPerGame": 0,
+  "searchPerGame": 0,
+  "picks": {},
+  "flashPerGame": 0,
+  "foeLowTurnRate": 14.2,
+  "starved3Rate": 3.5,
+  "maxStarved": 5
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 61.8,
+  "deckOut": 42,
+  "deckOutWin": 21.8,
+  "avgTurns": 35,
+  "drainedPerGame": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "drainUsesPerGame": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "drainHitRate": {
+   "skl-nous-02": 0,
+   "skl-nous-04": 0,
+   "skl-nous-06": 0
+  },
+  "emptyHitsPerGame": 0,
+  "millPerGame": 0,
+  "milledPerGame": 0,
+  "searchPerGame": 0,
+  "picks": {},
+  "flashPerGame": 0,
+  "foeLowTurnRate": 13.8,
+  "starved3Rate": 3.1,
+  "maxStarved": 6
+ }
+}

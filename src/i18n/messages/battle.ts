@@ -72,6 +72,10 @@ export const BATTLE = {
   // 2026-11-06 指示書 BM：フギンのちえのささやき・はねやすめ
   'battle.log.searchEvade': { ja: '{side}はちえのささやきで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Whisper of Wisdom.' },
   'battle.log.searchEvadeDraw': { ja: '{side}の山札に回避のカードが無い。かわりに1枚引いた。', en: '{side} has no Evade card in the deck, so drew 1 card instead.' },
+  // 2026-11-07 指示書 BN：ノウスのぜんちぜんのう・ときをすいとる
+  'battle.log.searchAny': { ja: '{side}はぜんちぜんのうで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Omniscience.' },
+  'battle.log.millDeck': { ja: '{side}の山札の上から{n}枚が捨て札になった（{cards}）。', en: "{n} card(s) from the top of {side}'s deck went to the discard pile ({cards})." },
+  'battle.log.millDeckNone': { ja: '{side}の山札が無い。何も起きなかった。', en: '{side} has no deck. Nothing happened.' },
   'battle.log.featherRest': { ja: '{name}ははねをやすめた。次の回避のマナが0になる。', en: '{name} rests its wings. Its next Evade costs 0 mana.' },
   'battle.log.featherRestUsed': { ja: '{name}ははねやすめの力で、マナを使わずに回避した。', en: '{name} evades for 0 mana thanks to Wing Rest.' },
   // 2026-11-06 指示書 BL：ロウガのとおぼえ（期限つきの次の攻撃＋）
@@ -344,6 +348,7 @@ export const BATTLE = {
   'battle.prompt.cheerTarget': { ja: '声援をかける味方モンスターをタップしてください（まだ動いていない味方）', en: 'Tap an ally monster to cheer (one that has not acted)' },
   'battle.pick.recall': { ja: '手札に戻す技カードを選んでください（思い出の箱）', en: 'Choose a skill card to return to your hand (Memory Box)' },
   'battle.pick.swap': { ja: '山札に戻す手札を選んでください（風まかせ）', en: 'Choose a card from your hand to shuffle into your deck (Drift)' },
+  'battle.pick.searchAny': { ja: '手札に加えるカードを選んでください（ぜんちぜんのう）', en: 'Choose a card to add to your hand (Omniscience)' },
   'battle.pick.searchEvade': { ja: '手札に加える回避の技カードを選んでください（ちえのささやき）', en: 'Choose an Evade skill card to add to your hand (Whisper of Wisdom)' },
   'battle.pick.systemChange': { ja: '山札に戻す手札を選んでください（システムチェンジ）', en: 'Choose a card from your hand to return to your deck (System Change)' },
   // ギアロス（2026-11-05 指示書 AX）：システムチェック・オーバードライブの3枚コンボ

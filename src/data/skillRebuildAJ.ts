@@ -37,6 +37,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-kuroshio': 'water', // 2026-11-06 指示書 BK（確かめ用だけ。セイランの招待大会ができるまで）
   'mon-rouga': 'ground', // 2026-11-06 指示書 BL（確かめ用だけ。ノルディスの招待大会ができるまで）
   'mon-huginn': 'air', // 2026-11-06 指示書 BM（確かめ用だけ。ネブラシアの招待大会ができるまで）
+  'mon-nous': 'air', // 2026-11-07 指示書 BN（確かめ用だけ。ネブラシアの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -523,6 +524,23 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-huginn-10', name: 'はねやすめ', cat: '特', mana: 1, damage: null, effect: { type: 'featherRest' }, text: 'このあと自分が使う回避の技1回のマナを0にする', art: 'huginn_sk_10.webp' },
     { id: 'skl-huginn-11', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), art: 'huginn_sk_11.webp' },
     { id: 'skl-huginn-12', name: 'さきよみ', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), rare: true, art: 'huginn_sk_12.webp' },
+  ],
+  // ノウス（空中・LIFE 7・B の上。2026-11-07 指示書 BN。正本は design-parts/bn-nous-20261107/data/nous_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は nous_sk_NN.webp（番号＝技番号）。02・04 は くしゃみと同じ manaDrain・08 は 考える と同じ redrawHand・11 は guard(3,'force')・12 は dodge('all')。
+  // 新しい効果：06 からっぽのつぼ（manaZero）・09 ときをすいとる（millDeck）・10 ぜんちぜんのう（searchAny）。特殊技ではマナを減らさない（ユーザーの決まり 2026-11-06）
+  'mon-nous': [
+    { id: 'skl-nous-01', name: 'ろっぽんづき', cat: 'ち', mana: 1, damage: 2, text: null, art: 'nous_sk_01.webp' },
+    { id: 'skl-nous-02', name: 'マナをすう', cat: 'か', mana: 1, damage: 1, effect: atk({ manaDrain: 1 }), text: '回避されなければ、相手のマナを1減らす', art: 'nous_sk_02.webp' },
+    { id: 'skl-nous-03', name: 'ひかりのわ', cat: 'か', mana: 2, damage: 3, text: null, art: 'nous_sk_03.webp' },
+    { id: 'skl-nous-04', name: 'うずまくつぼ', cat: 'か', mana: 3, damage: 2, effect: atk({ manaDrain: 2 }), text: '回避されなければ、相手のマナを2減らす', art: 'nous_sk_04.webp' },
+    { id: 'skl-nous-05', name: 'ろっぽんうでのらんぶ', cat: 'ち', mana: 4, damage: 6, text: null, rare: true, art: 'nous_sk_05.webp' },
+    { id: 'skl-nous-06', name: 'からっぽのつぼ', cat: 'か', mana: 4, damage: 2, effect: atk({ manaZero: true }), text: '回避されなければ、相手のマナを0にする', rare: true, art: 'nous_sk_06.webp' },
+    { id: 'skl-nous-07', name: 'ずのうのせんこう', cat: 'か', mana: 4, damage: 7, text: null, rare: true, art: 'nous_sk_07.webp' },
+    { id: 'skl-nous-08', name: 'ろっぽんのてさばき', cat: '特', mana: 1, damage: null, effect: { type: 'redrawHand' }, text: '手札をすべて山札に戻し、同じ枚数を引く', art: 'nous_sk_08.webp' },
+    { id: 'skl-nous-09', name: 'ときをすいとる', cat: '特', mana: 2, damage: null, effect: { type: 'millDeck', count: 2 }, text: '相手の山札の上から2枚を捨て札にする', art: 'nous_sk_09.webp' },
+    { id: 'skl-nous-10', name: 'ぜんちぜんのう', cat: '特', mana: 3, damage: null, effect: { type: 'searchAny' }, text: '山札から好きなカードを1枚選んで手札に加える', rare: true, art: 'nous_sk_10.webp' },
+    { id: 'skl-nous-11', name: 'ろっぽんうででうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'nous_sk_11.webp' },
+    { id: 'skl-nous-12', name: 'みらいよち', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), art: 'nous_sk_12.webp' },
   ],
 };
 

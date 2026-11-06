@@ -361,6 +361,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const huginn = chooseHuginnTrick(state, side, options, skill);
   if (huginn) return huginn;
 
+  // 2.99 ノウス（2026-11-07 指示書 BN）：からっぽのつぼ（相手のマナが多いとき）・ときをすいとる（相手の山札が少ないとき）・ぜんちぜんのう（撃てる攻撃が無いとき）は攻撃より先
+  const nous = chooseNousTrick(state, side, options, style, skill);
+  if (nous) return nous;
+
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
   if (attack) return attack;
@@ -407,6 +411,13 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 不思議な嗅覚：相手の手札が3枚以上あり、マナに余裕があるときだけ（仮の思考。思考は手札を見なくても動く）
   const sniff = options.filter(isSkillOption).find((o) => o.def.effect.type === 'revealHand');
   if (sniff && state.sides[otherSide(side)].hand.length >= 3 && manaOf(mine) >= sniff.def.cost + 3) return { type: 'useCard', side, cardUid: sniff.card.uid };
+
+  // 4.4 ときをすいとる（ノウス 指示書 BN。攻撃のあと）：相手の山札があり、払っても回避1回ぶん（2）のマナが残るとき
+  const mill = options.filter(isSkillOption).find((o) => o.def.effect.type === 'millDeck');
+  if (mill && state.sides[otherSide(side)].deck.length > 0 && manaOf(mine) >= mill.def.cost + NOUS_MILL_KEEP) {
+    const user = availableUsers(state, side, mill.def)[0];
+    if (user) return { type: 'useCard', side, cardUid: mill.card.uid, userUid: user.uid };
+  }
 
   // 4.5 投石（攻撃のあと）：マナが投石の分＋2以上残っていれば。狙いは攻撃と同じ（2026-10-30 指示書 Z で「いちばんライフの少ない相手」をやめた）
   const stone = supportOf(options, 'stone');
@@ -1584,6 +1595,53 @@ function chooseHuginnTrick(state: BattleState, side: Side, options: Option[], sk
     const short = paid.some((k) => mana - rest.def.cost < guardCost(state, k));
     const bigComing = manaOf(state.sides[otherSide(side)]) >= FEATHER_REST_FOE_MANA;
     if (user && paid.length > 0 && (short || bigComing)) return { type: 'useCard', side, cardUid: rest.card.uid, userUid: user.uid };
+  }
+  return null;
+}
+
+/** からっぽのつぼを優先する相手のマナ（指示書 BN の目安：3以上） */
+export const NOUS_EMPTY_FOE_MANA = 3;
+/** ときをすいとるを攻撃より先に使う相手の山札の枚数（これ以下。指示書 BN の「山札が少ないほど優先」） */
+export const NOUS_MILL_FIRST_DECK = 10;
+/** 攻撃のあとにときをすいとるを使うとき、残しておくマナ（回避1回ぶん） */
+const NOUS_MILL_KEEP = 2;
+
+/**
+ * ノウス（2026-11-07 指示書 BN）の技（CPU の目安）。その手番に相手を倒せるときは使わない（倒す攻撃が先）。腕前 C は forgetTrick の割合で使いそこねる
+ * - からっぽのつぼ：相手のマナが NOUS_EMPTY_FOE_MANA 以上のとき、ほかの攻撃より先に（狙いはふつうの攻撃と同じ）
+ * - ときをすいとる：相手の山札が NOUS_MILL_FIRST_DECK 枚以下（1枚以上）のとき、攻撃より先に（ほかのときは攻撃のあと 4.4）
+ * - ぜんちぜんのう：手札（このカードのほか）に、払ったあとのマナで撃てる攻撃が1枚も無いとき
+ * - ろっぽんのてさばき（考える と同じ redrawHand）は、ノビトンと同じ 4 の決まり（攻撃できる技が無いとき）
+ */
+function chooseNousTrick(state: BattleState, side: Side, options: Option[], style: AiStyle, skill: CpuSkill): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => (o.def.effect.type === 'attack' && !!o.def.effect.manaZero) || o.def.effect.type === 'millDeck' || o.def.effect.type === 'searchAny');
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'nousTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  const me = state.sides[side];
+  const foe = state.sides[otherSide(side)];
+  const mana = manaOf(me);
+
+  const empty = mine.find((o) => o.def.effect.type === 'attack');
+  if (empty && manaOf(foe) >= NOUS_EMPTY_FOE_MANA) {
+    const target = pickTarget(state, side, targetsFor(state, side, empty.def), style, skill, 'nousEmpty');
+    if (target) return attackAction(state, side, empty, target.uid);
+  }
+
+  const mill = mine.find((o) => o.def.effect.type === 'millDeck');
+  if (mill && foe.deck.length > 0 && foe.deck.length <= NOUS_MILL_FIRST_DECK) {
+    const user = availableUsers(state, side, mill.def)[0];
+    if (user) return { type: 'useCard', side, cardUid: mill.card.uid, userUid: user.uid };
+  }
+
+  const search = mine.find((o) => o.def.effect.type === 'searchAny');
+  if (search && me.deck.length > 0) {
+    const left = mana - search.def.cost;
+    const canHit = options
+      .filter(isSkillOption)
+      .some((o) => o.card.uid !== search.card.uid && o.def.effect.type === 'attack' && availableUsers(state, side, o.def).some((u) => skillCost(state, o.def, u) <= left));
+    const user = availableUsers(state, side, search.def)[0];
+    if (!canHit && user) return { type: 'useCard', side, cardUid: search.card.uid, userUid: user.uid };
   }
   return null;
 }

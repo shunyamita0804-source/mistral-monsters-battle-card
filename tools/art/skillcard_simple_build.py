@@ -59,6 +59,7 @@ MONSTER_COLORS = {
     'kuroshio': '#F08A78',  # 2026-11-06 クロシオ（珊瑚。指示書 BK）
     'rouga': '#B7A3DA',  # 2026-11-06 ロウガ（淡い藤色。指示書 BL）
     'huginn': '#1E6B45',  # 2026-11-06 フギン（深い翠の緑。指示書 BM の直し：前は #1F5C58 でハクランと見分けにくかった）
+    'nous': '#CC6A1F',  # 2026-11-07 ノウス（深い琥珀。指示書 BN）
     # 仮のモンスター（cards.ts の MONSTER_SEEDS・TMP_BOSS_SEEDS）
     'a': '#d65a4a',
     'b': '#3f7fd6',

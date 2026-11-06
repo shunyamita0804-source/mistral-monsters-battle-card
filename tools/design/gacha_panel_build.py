@@ -54,6 +54,7 @@ FACE = {
     'kuroshio': (0.5, 0.5),  # 2026-11-06 指示書 BK：顔（目と白い玉）は絵の真ん中
     'rouga': (0.3, 0.2),  # 2026-11-06 指示書 BL：顔（とおぼえ）は絵の左上
     'huginn': (0.5, 0.3),  # 2026-11-06 指示書 BM：2つの頭が入るように（絵の上から3割の真ん中）
+    'nous': (0.5, 0.22),  # 2026-11-07 指示書 BN：水晶の頭（絵の上から 10〜25％）が入るように
     'radiel': (0.52, 0.3),  # 2026-11-05 指示書 BI：顔は絵の上から3割の真ん中（窓の絵はパックから切り抜いた build/pack_art_radiel.png）  # 2026-11-05 指示書 BH：顔は絵の上から2割、真ん中より少し左（窓の絵はパックから切り抜いた build/pack_art_kuyo.png）
     # 道具のパック（仮）：顔は無いので、絵の真ん中（手帳と薬草のあたり。2026-10-30 指示書 Z）
     'tools': (0.50, 0.52),
@@ -68,6 +69,7 @@ PACK_ART_PATH = {
     'kuroshio': os.path.join(ROOT, 'design-parts/bk-kuroshio-20261106/art/pack_art_kuroshio.png'),
     'rouga': os.path.join(ROOT, 'design-parts/bl-rouga-20261106/art/pack_art_rouga.png'),
     'huginn': os.path.join(ROOT, 'design-parts/bm-huginn-20261106/art/pack_art_huginn.png'),
+    'nous': os.path.join(ROOT, 'design-parts/bn-nous-20261107/art/pack_art_nous.png'),
 }
 # 窓の四すみの星（machine_front の px。左・上・右・下）
 STAR_BOXES = [(192, 252, 280, 345), (620, 252, 708, 345), (188, 677, 280, 756), (620, 677, 712, 756)]

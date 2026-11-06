@@ -1,10 +1,10 @@
 // 2026-11-06 BM の直し：まだガチャに並んでいない子（フギン・クロシオ・ロウガ・クヨウ・ラディエル・ギアロス）のパックと販売機の窓を、ゲームの画面で撮る。
 // タイラントはガチャのシリーズが無い（パック・窓の絵も無い）ので撮らない。開発用サーバー（npx vite）で動かす。
-// 使い方: node tools/e2e/bm_pack_window_shot.cjs URL 出力フォルダ
+// 使い方: node tools/e2e/bm_pack_window_shot.cjs URL 出力フォルダ（IDS=nous,huginn でしぼる）
 const { chromium } = require('playwright');
 const fs = require('fs');
 const [base, out] = process.argv.slice(2);
-const IDS = ['huginn', 'kuroshio', 'rouga', 'kuyo', 'radiel', 'gearos'];
+const IDS = process.env.IDS ? process.env.IDS.split(',') : ['huginn', 'kuroshio', 'rouga', 'kuyo', 'radiel', 'gearos']; // 2026-11-07 指示書 BN：IDS=nous,huginn,… で変えられる
 fs.mkdirSync(out, { recursive: true });
 
 (async () => {

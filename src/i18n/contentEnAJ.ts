@@ -51,6 +51,13 @@ const TEXTS: Readonly<Record<string, string>> = {
   // 2026-11-06 指示書 BK：クロシオ（英語は仮訳）
   // 2026-11-06 指示書 BM：フギン（英語は仮訳）
   '回避されなければ、相手は次の攻撃を行えない': "If not evaded, the enemy can't attack next turn.",
+  // 2026-11-07 指示書 BN：ノウス（英語は仮訳）
+  '回避されなければ、相手のマナを1減らす': "If not evaded, the opponent's mana -1.",
+  '回避されなければ、相手のマナを2減らす': "If not evaded, the opponent's mana -2.",
+  '回避されなければ、相手のマナを0にする': "If not evaded, the opponent's mana becomes 0.",
+  '手札をすべて山札に戻し、同じ枚数を引く': 'Return your whole hand to the deck and draw the same number of cards.',
+  '相手の山札の上から2枚を捨て札にする': "Put the top 2 cards of the opponent's deck into the discard pile.",
+  '山札から好きなカードを1枚選んで手札に加える': 'Choose any card from your deck and add it to your hand.',
   '山札から回避の技カードを1枚選んで手札に加える。なければ1枚引く': 'Choose an Evade skill card from your deck and add it to your hand. If there is none, draw 1 card.',
   'このあと自分が使う回避の技1回のマナを0にする': 'The next Evade skill this monster uses costs 0 mana.',
   // 2026-11-06 指示書 BL：ロウガ（英語は仮訳）

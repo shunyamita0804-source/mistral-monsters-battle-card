@@ -545,6 +545,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'systemCheck' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
   // ちえのささやき（フギン 指示書 BM の直し・ユーザー決定）：山札が0枚なら使えない（暗くして選べない）
   if (skill.effect.type === 'searchEvade' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
+  // ぜんちぜんのう（ノウス 指示書 BN）：ちえのささやきと同じく、山札が0枚なら使えない。ときをすいとるは相手の山札が0枚でも使える（何も起きない）
+  if (skill.effect.type === 'searchAny' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
@@ -1468,6 +1470,10 @@ function useCard(
       return drawToHand(next, side, skill.effect.hand, choice);
     case 'searchEvade':
       return searchEvade(next, side, choice);
+    case 'searchAny':
+      return searchAny(next, side, choice);
+    case 'millDeck':
+      return millDeck(next, side, skill.effect.count);
     case 'featherRest': {
       // はねやすめ（フギン 指示書 BM）：使ったモンスターに印。重ねない（印が付いていても1回分のまま）
       next = updateMonster(next, user.uid, { featherRest: true });
@@ -1647,6 +1653,8 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
   if (e.type !== 'attack' || state.phase === 'ended') return state;
   let next = state;
   if (e.manaDrain) next = drainMana(next, attacker, e.manaDrain);
+  // からっぽのつぼ（ノウス 指示書 BN）：相手のマナを 0 に（くしゃみと同じ減らし方・記録。もともと 0 なら「0減った」と出す）
+  if (e.manaZero) next = drainMana(next, attacker, manaOf(next.sides[otherSide(attacker)]));
   if (e.stunTarget) {
     const target = findMonster(next, targetUid);
     if (target && target.monster.life > 0 && wardCharmActive(next, target.side)) {
@@ -1792,6 +1800,70 @@ function searchEvade(state: BattleState, side: Side, choice: string | undefined)
   const mixed = shuffle(rest, state.seed);
   const next = updateSide({ ...state, seed: mixed.seed, nextUid: state.nextUid + 1 }, side, { deck: mixed.items, hand: [...s.hand, { uid: `c${state.nextUid}`, cardId: id }] });
   return addLog(next, t('battle.log.searchEvade', { side: sideLabel(side), card: nameOf(id) }));
+}
+
+/** ぜんちぜんのう（ノウス 指示書 BN）で選べる、自分の山札のカード（同じカードは1つにまとめる。山札の順） */
+export function searchAnyChoices(state: BattleState, side: Side): string[] {
+  return [...new Set(state.sides[side].deck)];
+}
+
+/** 攻撃のダメージ（カードの数字。無ければ 0） */
+const cardDamageOf = (id: string): number => {
+  const c = cardCatalog.get(id);
+  return c?.kind === 'skill' && c.effect.type === 'attack' ? (c.stat?.value ?? 0) : 0;
+};
+
+/**
+ * ぜんちぜんのうで手札に加えるカードの決まった選び方（指定が無いとき：CPU・試遊。指示書 BN の目安）：
+ * ① 生きている味方が使える攻撃で、いまのマナ（ぜんちぜんのうを払ったあと）で撃てる、いちばんダメージの大きいもの（同じならマナの多い方）
+ * → ② 回避（マナの少ない順）→ ③ 生きている味方が使える攻撃（マナが足りなくても。ダメージの大きい順）→ ④ 山札のいちばん上
+ */
+export function defaultSearchAny(state: BattleState, side: Side): string | undefined {
+  const choices = searchAnyChoices(state, side);
+  if (choices.length === 0) return undefined;
+  const me = state.sides[side];
+  const mana = manaOf(me);
+  const alive = new Set(me.monsters.filter((m) => m.life > 0).map((m) => m.cardId));
+  const skillOf = (id: string): SkillCard | null => {
+    const c = cardCatalog.get(id);
+    return c?.kind === 'skill' && alive.has(c.monsterId) ? c : null;
+  };
+  const attacks = choices.filter((id) => skillOf(id)?.effect.type === 'attack');
+  const byDamage = (a: string, b: string): number => cardDamageOf(b) - cardDamageOf(a) || getSkill(b).cost - getSkill(a).cost;
+  const affordable = attacks.filter((id) => getSkill(id).cost <= mana).sort(byDamage);
+  if (affordable[0]) return affordable[0];
+  const evades = choices.filter((id) => skillOf(id)?.effect.type === 'evade').sort((a, b) => guardCost(state, getSkill(a), side) - guardCost(state, getSkill(b), side));
+  if (evades[0]) return evades[0];
+  return attacks.sort(byDamage)[0] ?? choices[0];
+}
+
+/**
+ * ぜんちぜんのう（ノウス 2026-11-07 指示書 BN）：山札から好きなカードを1枚（choice＝カードの ID。無い・合わなければ決まった選び方）手札に加え、山札をシャッフル。
+ * 山札が0枚なら使えない（cardUsability）。ここでは念のため何もしない
+ */
+function searchAny(state: BattleState, side: Side, choice: string | undefined): BattleState {
+  const s = state.sides[side];
+  if (s.deck.length === 0) return state;
+  const choices = searchAnyChoices(state, side);
+  const id = choice && choices.includes(choice) ? choice : (defaultSearchAny(state, side) as string);
+  const at = s.deck.indexOf(id);
+  const rest = [...s.deck.slice(0, at), ...s.deck.slice(at + 1)];
+  const mixed = shuffle(rest, state.seed);
+  const next = updateSide({ ...state, seed: mixed.seed, nextUid: state.nextUid + 1 }, side, { deck: mixed.items, hand: [...s.hand, { uid: `c${state.nextUid}`, cardId: id }] });
+  return addLog(next, t('battle.log.searchAny', { side: sideLabel(side), card: nameOf(id) }));
+}
+
+/**
+ * ときをすいとる（ノウス 2026-11-07 指示書 BN）：相手の山札の上から count 枚を相手の捨て札に。足りなければあるだけ、0枚なら何もしない。
+ * この技で山札切れの負けにはしない。捨てたカードは記録に出す
+ */
+function millDeck(state: BattleState, side: Side, count: number): BattleState {
+  const foe = otherSide(side);
+  const s = state.sides[foe];
+  const milled = s.deck.slice(0, Math.max(0, Math.min(count, s.deck.length)));
+  if (milled.length === 0) return addLog(state, t('battle.log.millDeckNone', { side: sideLabel(foe) }));
+  const next = updateSide(state, foe, { deck: s.deck.slice(milled.length), discard: [...s.discard, ...milled] });
+  return addLog(next, t('battle.log.millDeck', { side: sideLabel(foe), n: milled.length, cards: milled.map((id) => nameOf(id)).join(t('common.listSeparator')) }));
 }
 
 /** もりのたよりで捨てる1枚の決まった選び方（指定が無いとき：試遊・テスト）。必要マナのいちばん多い札（同じなら右はし）。CPU は ai.ts の pickDrawToDiscard で選ぶ */
