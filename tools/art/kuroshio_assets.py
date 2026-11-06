@@ -27,6 +27,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/bk-kuroshio-20261106/art')
 BUILD = os.path.join(ROOT, 'design-parts/bk-kuroshio-20261106/build')
 COLOR = '#F08A78'
+PACK_SHIFT = int(os.environ.get('PACK_SHIFT', 180))  # パックの窓で絵を下げる量（型の px。BM の直し：尾びれの先まで窓に入る）
 LOGO_HEIGHT = {'ja': 174, 'en': 160}
 LOGO_ANCHOR = (38, 53)
 HAZE = 2  # この透明度以下のもやは透明に（ロゴ）
@@ -59,7 +60,11 @@ def official() -> None:
 def pack() -> None:
     tpl = np.array(Image.open(os.path.join(ROOT, 'design-parts/gacha-20261029/pack_template_symmetric.png')).convert('RGBA'))
     window = Image.open(os.path.join(SRC, 'pack_art_kuroshio.png')).convert('RGBA')
-    art = pack_tint.cover(window, (tpl.shape[1], tpl.shape[0]))
+    art0 = pack_tint.cover(window, (tpl.shape[1], tpl.shape[0]))
+    # 2026-11-06 BM の直し（ユーザー指摘のあとの見直し）：ほかの子と同じ合わせ方だと、尾びれの先が窓の上の飾りにかかるので、絵を PACK_SHIFT px 下げる
+    # （フギン・ロウガと同じやり方。絵は描き直さない。上のすきまは窓の外の飾りの裏になる）
+    art = Image.new('RGBA', art0.size, (0, 0, 0, 0))
+    art.alpha_composite(art0, (0, PACK_SHIFT))
     frame = Image.fromarray(pack_tint.tint_template(tpl, COLOR), 'RGBA')
     out = art.copy()
     out.alpha_composite(frame)

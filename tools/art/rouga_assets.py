@@ -22,6 +22,7 @@ BUILD = os.path.join(ROOT, 'design-parts/bl-rouga-20261106/build')
 COLOR = '#B7A3DA'
 LOGO_HEIGHT = {'ja': 174, 'en': 160}
 LOGO_ANCHOR = (38, 53)
+PACK_SHIFT = int(os.environ.get('PACK_SHIFT', 120))  # パックの窓で絵を下げる量（型の px。BM の直し）
 HAZE = 2  # この透明度以下のもやは透明に（ロゴ）
 
 sys.path.insert(0, os.path.join(ROOT, 'tools/design'))
@@ -53,7 +54,11 @@ def official() -> None:
 def pack() -> None:
     tpl = np.array(Image.open(os.path.join(ROOT, 'design-parts/gacha-20261029/pack_template_symmetric.png')).convert('RGBA'))
     window = Image.open(os.path.join(SRC, 'pack_art_rouga.png')).convert('RGBA')
-    art = pack_tint.cover(window, (tpl.shape[1], tpl.shape[0]))
+    art0 = pack_tint.cover(window, (tpl.shape[1], tpl.shape[0]))
+    # 2026-11-06 BM の直し（ユーザー指摘）：ほかの子と同じ合わせ方だと、上を向いた頭（とおぼえ）が窓の上の飾りにかかるので、絵を PACK_SHIFT px 下げる
+    # （フギンと同じやり方。絵は描き直さない。上のすきまは窓の外の飾りの裏になる）
+    art = Image.new('RGBA', art0.size, (0, 0, 0, 0))
+    art.alpha_composite(art0, (0, PACK_SHIFT))
     frame = Image.fromarray(pack_tint.tint_template(tpl, COLOR), 'RGBA')
     out = art.copy()
     out.alpha_composite(frame)
