@@ -58,6 +58,11 @@ export const CARDS = {
   'card.fx.e24': { ja: '反動（当たると自分のライフも減る）', en: 'Recoil (you lose life too)' },
   'card.fx.b11': { ja: 'ライフが回復する', en: 'Restore life' },
   'card.fx.e13': { ja: '場の効果', en: 'Field effect' },
+  // 2026-11-06 指示書 BJ（英語は仮訳）
+  'card.fx.f01': { ja: '味方の悪い状態を消す', en: "Clear an ally's bad statuses" },
+  'card.fx.f02': { ja: '味方に悪い状態がつかない', en: 'Allies get no bad statuses' },
+  'card.fx.f03': { ja: 'おたがいの手札を引き直す', en: 'Both players redraw their hands' },
+  'card.fx.f04': { ja: '捨て札をマナにする', en: 'Turn discards into mana' },
   'habitat.field.ground': { ja: '場：すべてのモンスターを地上として扱う', en: 'Field: all monsters count as grounded' },
   'habitat.field.air': { ja: '場：すべてのモンスターを空中として扱う', en: 'Field: all monsters count as airborne' },
   'habitat.field.water': { ja: '場：すべてのモンスターを水中として扱う', en: 'Field: all monsters count as underwater' },

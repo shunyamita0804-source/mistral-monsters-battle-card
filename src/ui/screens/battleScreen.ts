@@ -238,7 +238,7 @@ const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [Guide
       ['b02', 'battle.iconGuide.b02'], ['b04', 'battle.iconGuide.b04'], ['b03', 'battle.iconGuide.b03'], ['b09', 'battle.iconGuide.b09'], ['b13', 'battle.iconGuide.b13'],
       ['b05', 'battle.iconGuide.b05'], ['e05', 'battle.iconGuide.e05s'], ['e06', 'battle.iconGuide.e06s'],
       ['s07', 'battle.iconGuide.s07'], ['s08', 'battle.iconGuide.s08'], ['s09', 'battle.iconGuide.s09'], ['s12', 'battle.iconGuide.s12'], ['s13', 'battle.iconGuide.s13'],
-      ['e01', 'battle.iconGuide.e01s'], ['e02', 'battle.iconGuide.e02s'], ['n01', 'battle.iconGuide.n01'],
+      ['e01', 'battle.iconGuide.e01s'], ['e02', 'battle.iconGuide.e02s'], ['f02', 'battle.iconGuide.f02s'], ['n01', 'battle.iconGuide.n01'],
     ],
   },
   { title: 'battle.iconGuide.habitat', items: [['t01', 'habitat.ground'], ['t02', 'habitat.air'], ['t03', 'habitat.water']] },
@@ -248,6 +248,8 @@ const ICON_GUIDE: readonly { title: MessageKey; items: readonly (readonly [Guide
     items: [
       ['e01', 'card.fx.e01'], ['e02', 'card.fx.e02'], ['e03', 'card.fx.e03'], ['e04', 'card.fx.e04'], ['e05', 'card.fx.e05'], ['e06', 'card.fx.e06'],
       ['e15', 'card.fx.e15'], ['e17', 'card.fx.e17'], ['e18', 'card.fx.e18'], ['e21', 'card.fx.e21'], ['e24', 'card.fx.e24'], ['b11', 'card.fx.b11'], ['e13', 'card.fx.e13'],
+      // 2026-11-06 指示書 BJ：おはらい・まよけのふだ・最後の審判・天の恵み
+      ['f01', 'card.fx.f01'], ['f02', 'card.fx.f02'], ['f03', 'card.fx.f03'], ['f04', 'card.fx.f04'],
       ['s08', 'battle.iconGuide.effectMore'],
     ],
   },
@@ -1928,9 +1930,9 @@ export const battleScreen: ScreenDefinition = {
       }
       // そなえのふえ（フォルン）：受けるダメージ−
       if (m.ward && m.ward.untilTurn >= s.turn) badge('b05', t('battle.status.ward', { n: m.ward.reduce }), -m.ward.reduce);
-      // まよけのふだ（クヨウ 指示書 BH）：味方全員に悪い状態がつかない。印は【仮】で防御アップ（B05）に「味方に」の小さな印なし・数字なし（新しい絵が要る）
+      // まよけのふだ（クヨウ 指示書 BH）：味方全員に悪い状態がつかない。印は 2026-11-06 指示書 BJ の新しいアイコン（F02）
       const charmSide = s.sides.player.monsters.some((x) => x.uid === m.uid) ? 'player' : 'opponent';
-      if (wardCharmActive(s, charmSide)) badge('b05', t('battle.status.wardCharm'));
+      if (wardCharmActive(s, charmSide)) badge('f02', t('battle.status.wardCharm'));
       // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
       if (m.charge) badge('b09', t('battle.status.chargedN', { n: m.charge }), m.charge);
       if (m.tailwind && m.tailwind.turn >= s.turn) badge('b09', t('battle.status.tailwind', { n: m.tailwind.amount }), m.tailwind.amount);

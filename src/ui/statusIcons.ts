@@ -8,6 +8,7 @@
  * - b01・b07・s10・e03・e04 は、写真で比べる・技カードの効果の案（指示書 AZ【4】）に使う
  * - 2026-11-05 指示書 BB：技カードの効果に b11 回復・e13 場の効果・e15 回避・e17 手札が減る・e18 見る・e21 引く／入れかえる・e24 反動、
  *   小さな印 m01 味方に（64×64）を足した（原本 design-parts/effect-icons-20261105/・status-icons-20261105/）
+ * - 2026-11-06 指示書 BJ：f01 おはらい・f02 まよけのふだ・f03 最後の審判・f04 天の恵み（原本 design-parts/effect-icons-20261105/icons_new/icon_*.png）
  */
 const URLS = import.meta.glob<string>('/assets/images/ui/status/icon_*.webp', { eager: true, query: '?url', import: 'default' });
 
@@ -15,7 +16,9 @@ export type StatusIconId =
   | 'b01' | 'b02' | 'b03' | 'b04' | 'b05' | 'b07' | 'b09' | 'b11' | 'b13'
   | 's07' | 's08' | 's09' | 's10' | 's12' | 's13'
   | 'e01' | 'e02' | 'e03' | 'e04' | 'e05' | 'e06' | 'e13' | 'e15' | 'e17' | 'e18' | 'e21' | 'e24' | 'm01'
-  | 't01' | 't02' | 't03' | 'n01' | 'n02';
+  | 't01' | 't02' | 't03' | 'n01' | 'n02'
+  // 2026-11-06 指示書 BJ：f01 おはらい・f02 まよけのふだ（状態の印にも）・f03 最後の審判・f04 天の恵み
+  | 'f01' | 'f02' | 'f03' | 'f04';
 
 export function statusIconUrl(id: StatusIconId): string {
   const url = URLS[`/assets/images/ui/status/icon_${id}.webp`];

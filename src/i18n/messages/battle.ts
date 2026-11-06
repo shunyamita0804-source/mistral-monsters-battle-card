@@ -200,6 +200,7 @@ export const BATTLE = {
   'battle.iconGuide.s12': { ja: '攻撃の対象にならない', en: "Can't be targeted" },
   'battle.iconGuide.s13': { ja: 'ちょうはつされている（決まった相手しか攻撃できない）', en: 'Taunted (can only attack a certain monster)' },
   'battle.iconGuide.e01s': { ja: '次の攻撃は回避されない', en: "Next attack can't be dodged" },
+  'battle.iconGuide.f02s': { ja: 'まよけのふだ：悪い状態がつかない', en: 'Ward Charm: no bad statuses' },
   'battle.iconGuide.e02s': { ja: '次の攻撃は防御されない', en: "Next attack can't be guarded" },
   'battle.iconGuide.n01': { ja: '数字の札：効果の量（−3・＋1・×2 など）', en: 'Number plate: amount (−3, +1, ×2...)' },
   'battle.iconGuide.fieldWater': { ja: '場が水中（全員を水中として扱う）', en: 'Underwater field (all count as underwater)' },
