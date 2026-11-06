@@ -267,8 +267,9 @@ export const ENCOUNTERS: Readonly<Record<string, OpponentDefinition>> = {
   },
   // 2026-11-05 指示書 AX【6】：S の目安のプレイヤーがギアロスを持つようになり、1.76＝5.7％ と目標 10％（±3）から外れたので 1.66（ライフ 10・12・13）に
   // 2026-11-05 指示書 BI：切り札（真ん中）を仮のソラモからラディエルへ。脇の2体（ガウル・カルシェル）はそのまま。
-  // lifeScale は目安のプレイヤー（S。ラディエルも持つ）で目標 10％（±3）に合わせ直した：1.66＝15.0％ → 1.74＝9.6％（ライフ 10・16・14。1.70＝12.2％・1.76＝6.7％）（docs/bi-radiel-20261105.md）
-  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, RADIEL_MONSTER_ID, KAL], ace: RADIEL_MONSTER_ID, lifeScale: 1.74, skill: 'A' },
+  // lifeScale は目安のプレイヤー（S。ラディエルも持つ）で目標 10％（±3）に合わせ直した：1.66＝15.0％ → 1.74＝9.6％（ライフ 10・16・14。1.70＝12.2％・1.76＝6.7％）。
+  // 2026-11-06 ラディエルの数字を R4 にしたので合わせ直した：1.74＝7.7％ → 1.70＝10.2％（ライフ 10・15・14。1.66＝12.8％・1.78＝5.5％）（docs/bi-radiel-20261105.md）
+  'enc-holy-boss': { id: 'enc-holy-boss', name: 'アウレリオ', monsters: [GAU, RADIEL_MONSTER_ID, KAL], ace: RADIEL_MONSTER_ID, lifeScale: 1.7, skill: 'A' },
   // 風の渓谷のボス（2026-10-30 指示書 U）：ツムジを真ん中に、左右はソラモ・ガウル。lifeScale はルシアと同じ 1.2 から試遊（最初の手持ち3箱 × 200回）。
   // 1.2 では勝つ割合 11.5％（ルシア 20.3％）と勝ちにくかったので、ルシアといちばん近い 1.0（21.0％）にした（docs/wind-valley-u-20261030.md・npm run playtest:zephyra）。2026-10-30 指示書 V で 1.1 に
   // 2026-11-02 指示書 AQ：切り札（真ん中）をツムジからウズリオへ。ほかの2体はそのまま。lifeScale はツムジのときの勝つ割合（いまの最初の3箱・腕前 B・1000回で 2.8％）に

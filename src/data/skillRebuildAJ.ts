@@ -406,8 +406,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   // ラディエル（空中・LIFE 9・A。2026-11-05 指示書 BI。天の聖域の切り札）。数字・効果は指示書の表のとおり。回避の技は無い（決まり）。
   // 新しい効果は 08 しんぱんのせんこく（seal＋manaDrain）・09 最後の審判（lastJudgment）・12 天の恵み（heavenGrace）
   'mon-radiel': [
-    { id: 'skl-radiel-01', name: 'せいなるつき', cat: 'ち', mana: 2, damage: 3, effect: atk({ unblockable: true }), text: T_UNBLOCK, art: 'radiel_sk_01.webp' },
-    { id: 'skl-radiel-02', name: 'クロスニードル', cat: 'ち', mana: 3, damage: 5, text: null, art: 'radiel_sk_02.webp' },
+    // 2026-11-06 ユーザー決定（R4）：せいなるつき 3 → 2・クロスニードル 5 → 4（ラディエルを下げる。docs/bi-radiel-20261105.md）
+    { id: 'skl-radiel-01', name: 'せいなるつき', cat: 'ち', mana: 2, damage: 2, effect: atk({ unblockable: true }), text: T_UNBLOCK, art: 'radiel_sk_01.webp' },
+    { id: 'skl-radiel-02', name: 'クロスニードル', cat: 'ち', mana: 3, damage: 4, text: null, art: 'radiel_sk_02.webp' },
     { id: 'skl-radiel-03', name: 'ひかりだま', cat: 'か', mana: 1, damage: 2, text: null, art: 'radiel_sk_03.webp' },
     { id: 'skl-radiel-04', name: 'こうりんのひかり', cat: 'か', mana: 3, damage: 2, effect: atk({ allTargets: true }), text: '相手全員に当たる（守りは1体ずつ）', art: 'radiel_sk_04.webp' },
     { id: 'skl-radiel-05', name: 'せいなるしせん', cat: 'か', mana: 4, damage: 5, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'radiel_sk_05.webp' },
