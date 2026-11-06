@@ -3,9 +3,9 @@ python3 -I tools/art/huginn_assets.py
 
 原本は design-parts/bm-huginn-20261106/art/ に無改変で置いてある（描き直し・色の変更はしない。縮める・形式を変える・透明度をそろえるだけ）。
 - 技 skills/huginn_sk_01〜12.png（827×937）→ assets/images/cards/skills/huginn_sk_NN.webp
-- 正式カード huginn_official.png（970×1622。名前なし・LIFE 6 入り）→ assets/images/cards/monsters/huginn_official.webp（508×849）
+- 正式カード huginn_official.png（970×1622。名前なし・LIFE 6 入り。枠だけ緑にした build/huginn_official_green.png〔tools/art/huginn_frame_green.py〕を使う）→ assets/images/cards/monsters/huginn_official.webp（508×849）
 - バトル用 huginn_battle_transparent.png（1169×1345・透明）→ 透明度を 0／255 にそろえて assets/images/cards/monsters/huginn_battlecard.png（色は変えない）
-- パック：窓の絵 pack_art_huginn.png（949×1658）をほかの子と同じ型に入れる（縁は深い暗めの青緑 #1F5C58）→ assets/images/ui/gacha/pack_huginn.webp
+- パック：窓の絵 pack_art_huginn.png（949×1658）をほかの子と同じ型に入れる（縁は深い翠の緑 #1E6B45）→ assets/images/ui/gacha/pack_huginn.webp
 - 名前のロゴ name_ja_huginn.png（2003×785）・name_en_huginn.png（2087×753）：まわりのもやを消し、字の高さをそろえて（日本語 174px・英語 160px）1400×300 の形に
 """
 import os
@@ -19,7 +19,7 @@ from PIL import Image
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/bm-huginn-20261106/art')
 BUILD = os.path.join(ROOT, 'design-parts/bm-huginn-20261106/build')
-COLOR = '#1F5C58'
+COLOR = '#1E6B45'
 LOGO_HEIGHT = {'ja': 174, 'en': 160}
 LOGO_ANCHOR = (38, 53)
 HAZE = 2  # この透明度以下のもやは透明に（ロゴ）
@@ -38,7 +38,8 @@ def skills() -> None:
 
 
 def official() -> None:
-    im = Image.open(os.path.join(SRC, 'huginn_official.png')).convert('RGB')
+    # 2026-11-06 BM の直し：枠だけを深い翠の緑にした絵（tools/art/huginn_frame_green.py。原本は変えない）を使う
+    im = Image.open(os.path.join(BUILD, 'huginn_official_green.png')).convert('RGB')
     small = im.resize((508, 849), Image.LANCZOS)
     small.save(os.path.join(ROOT, 'assets/images/cards/monsters/huginn_official.webp'), 'WEBP', quality=90, method=6)
     subprocess.run(

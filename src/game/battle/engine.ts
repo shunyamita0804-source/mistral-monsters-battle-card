@@ -543,6 +543,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   // システムチェンジ（ギアロス 指示書 AX）：このカードのほかに手札がないときは使えない。システムチェック：山札が0枚なら使えない
   if (skill.effect.type === 'systemChange' && state.sides[side].hand.length <= 1) return NO(t('battle.ng.noHandToReturn'));
   if (skill.effect.type === 'systemCheck' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
+  // ちえのささやき（フギン 指示書 BM の直し・ユーザー決定）：山札が0枚なら使えない（暗くして選べない）
+  if (skill.effect.type === 'searchEvade' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
@@ -1772,11 +1774,12 @@ export function defaultSearchEvade(state: BattleState, side: Side): string | und
 
 /**
  * ちえのささやき（フギン 2026-11-06 指示書 BM）：山札から回避の技カードを1枚（choice＝カードの ID。無い・合わなければ決まった選び方）手札に加え、山札をシャッフル。
- * 山札に回避が無ければ、かわりに1枚引く。山札が0枚なら何もしない（山札切れの負けにはしない）
+ * 山札に回避が無ければ、かわりに1枚引く。山札が0枚なら使えない（cardUsability。BM の直し）
  */
 function searchEvade(state: BattleState, side: Side, choice: string | undefined): BattleState {
   const s = state.sides[side];
-  if (s.deck.length === 0) return addLog(state, t('battle.log.searchEvadeNone', { side: sideLabel(side) }));
+  // 山札が0枚のときは使えない（cardUsability）。念のため何もしない
+  if (s.deck.length === 0) return state;
   const choices = searchEvadeChoices(state, side);
   if (choices.length === 0) {
     const drawn = drawCards(s, 1, state.nextUid);

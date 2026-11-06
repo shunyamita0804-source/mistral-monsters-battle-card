@@ -72,7 +72,6 @@ export const BATTLE = {
   // 2026-11-06 指示書 BM：フギンのちえのささやき・はねやすめ
   'battle.log.searchEvade': { ja: '{side}はちえのささやきで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Whisper of Wisdom.' },
   'battle.log.searchEvadeDraw': { ja: '{side}の山札に回避のカードが無い。かわりに1枚引いた。', en: '{side} has no Evade card in the deck, so drew 1 card instead.' },
-  'battle.log.searchEvadeNone': { ja: '{side}の山札が無い。何も起きなかった。', en: '{side} has no deck. Nothing happened.' },
   'battle.log.featherRest': { ja: '{name}ははねをやすめた。次の回避のマナが0になる。', en: '{name} rests its wings. Its next Evade costs 0 mana.' },
   'battle.log.featherRestUsed': { ja: '{name}ははねやすめの力で、マナを使わずに回避した。', en: '{name} evades for 0 mana thanks to Wing Rest.' },
   // 2026-11-06 指示書 BL：ロウガのとおぼえ（期限つきの次の攻撃＋）

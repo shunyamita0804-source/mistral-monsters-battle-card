@@ -1,4 +1,4 @@
-// 2026-11-06 指示書 BM：フギンの写真（確かめ用の画面・図鑑・大きなカード・手札の枠〔ハクラン・プカリム・ウズリオと並べて〕・パック・
+// 2026-11-06 指示書 BM：フギンの写真（確かめ用の画面・図鑑・大きなカード・手札の枠〔ハクラン・フルーネ・フォルン・ウズリオと並べて〕・パック・
 // 対戦〔ちえのささやきで選ぶ画面と手札・はねやすめの印とかぜよみが0マナ・よみのまなざしで封じた・ひかりものをぬすむでマナが減った〕）。開発用サーバー（npx vite）で動かす。
 // 使い方: node tools/e2e/bm_huginn_shot.cjs URL 出力フォルダ（W・H で画面の大きさ、LANG=en で英語、ONLY=lab,book,… でしぼる）
 const { chromium } = require('playwright');
@@ -180,18 +180,30 @@ const END_TURN = LANG === 'en' ? 'End Turn' : 'ターン終了';
   const MINE = ['mon-huginn', 'mon-soramo', 'mon-nobiton'];
   const FOES = ['mon-soramo', 'mon-lazuck', 'mon-gauul'];
 
-  // 3. 手札とバトル用カード：フギン・ハクラン・プカリム（自分）とウズリオ（相手）。手札は4体の技（暗い青緑の枠が見分けられるか）
+  // 3. 手札とバトル用カード（BM の直し：枠を #1E6B45 に）：フギン・ハクラン・フルーネ（自分）とフォルン・ウズリオ（相手）。
+  //    手札は5体の技（フギン・ハクラン・フルーネ・フォルン・ウズリオ・フギン）。暗い緑の枠が見分けられるか
   if (ONLY.includes('hand')) {
     await battle(
       'hand',
       `${head}
-      const player = mk('player', ['${hg(4)}', 'skl-hakuran-03', 'skl-pukarim-03', 'skl-uzurio-03', '${hg(2)}', 'skl-hakuran-04']);
+      const player = mk('player', ['${hg(4)}', 'skl-hakuran-03', 'skl-flune-03', 'skl-forn-03', 'skl-uzurio-03', '${hg(2)}']);
       const opponent = mk('opponent', s.sides.opponent.deck.slice(0, 5));
       return { ...s, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { player, opponent } };`,
-      ['mon-uzurio', 'mon-soramo', 'mon-gauul'],
-      ['mon-huginn', 'mon-hakuran', 'mon-pukarim'],
+      ['mon-forn', 'mon-uzurio', 'mon-gauul'],
+      ['mon-huginn', 'mon-hakuran', 'mon-flune'],
     );
     await page.screenshot({ path: `${out}/hand_compare${suffix}.png` });
+    // フォルン・ウズリオの技も使える色で並べる（自分の場をフギン・フォルン・ウズリオに。相手はハクラン・フルーネ）
+    await battle(
+      'hand2',
+      `${head}
+      const player = mk('player', ['${hg(4)}', 'skl-forn-03', 'skl-uzurio-03', 'skl-hakuran-03', 'skl-flune-03', '${hg(2)}']);
+      const opponent = mk('opponent', s.sides.opponent.deck.slice(0, 5));
+      return { ...s, active: 'player', first: 'player', phase: 'main', manaConvertLimit: null, sides: { player, opponent } };`,
+      ['mon-hakuran', 'mon-flune', 'mon-gauul'],
+      ['mon-huginn', 'mon-forn', 'mon-uzurio'],
+    );
+    await page.screenshot({ path: `${out}/hand_compare2${suffix}.png` });
   }
 
   // 4. ガチャ：フギンのモンスターカードを持っているときだけ並ぶ

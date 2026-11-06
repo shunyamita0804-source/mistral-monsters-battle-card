@@ -100,7 +100,7 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [KUROSHIO_MONSTER_ID]: { art: 'kuroshio_battlecard.png', frame: 'kuroshio', scale: 0.8, offsetY: -0.02 },
   // ロウガ（2026-11-06 指示書 BL）：枠は淡い藤色（#B7A3DA）。絵は透明度を 0／255 にそろえたもの（色は変えていない）
   [ROUGA_MONSTER_ID]: { art: 'rouga_battlecard.png', frame: 'rouga', scale: 0.8, offsetY: -0.02 },
-  // フギン（2026-11-06 指示書 BM）：枠は深い暗めの青緑（#1F5C58）。絵は透明度を 0／255 にそろえたもの（色は変えていない）
+  // フギン（2026-11-06 指示書 BM）：枠は深い翠の緑（#1E6B45）。絵は透明度を 0／255 にそろえたもの（色は変えていない）
   [HUGINN_MONSTER_ID]: { art: 'huginn_battlecard.png', frame: 'huginn', scale: 0.8, offsetY: -0.02 },
   // ラディエル（2026-11-05 指示書 BI）：枠は金（#BE7410。カードの絵の枠の色）。絵は届いた radiel_battlecard.png（1169×1346 透過）を無改変（光輪と光の尾の半透明はそのまま）。
   // 翼が絵の幅いっぱいまで広がるので、翼の先が枠の飾りに切られすぎない大きさ

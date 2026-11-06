@@ -11,10 +11,10 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
  * **置き場所はまだ無い**（ネブラシアの招待大会を作るときに入れる）。今はクロシオ・ロウガと同じく確かめ用だけ（?qa=1&lab=huginn）。
  * 図鑑には番号だけ付けて出す（ロウガのあと。手に入れるまで「？？？」）。ガチャのシリーズは準備だけ（モンスターカードを持つまで並ばない）
  *
- * 絵（原本は design-parts/bm-huginn-20261106/art/ に無改変。作り方は tools/art/huginn_assets.py）。色：深い暗めの青緑 #1F5C58
+ * 絵（原本は design-parts/bm-huginn-20261106/art/ に無改変。作り方は tools/art/huginn_assets.py）。色：深い翠の緑 #1E6B45
  */
 export const HUGINN_MONSTER_ID = 'mon-huginn';
-export const HUGINN_COLOR = '#1F5C58';
+export const HUGINN_COLOR = '#1E6B45';
 
 export const HUGINN_MONSTER: MonsterCard = {
   kind: 'monster',

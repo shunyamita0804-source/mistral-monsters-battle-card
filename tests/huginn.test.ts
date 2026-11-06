@@ -37,14 +37,14 @@ const sor = (n: number): string => `skl-soramo14-${String(n).padStart(2, '0')}`;
 const SORAMO_EVADE = sor(14);
 
 describe('フギンのデータ（指示書の表のとおり）', () => {
-  it('LIFE 6・空中・深い暗めの青緑 #1F5C58。ID は mon-huginn', () => {
+  it('LIFE 6・空中・深い翠の緑 #1E6B45。ID は mon-huginn', () => {
     const m = getMonster(HUGINN_MONSTER_ID);
     expect(m.name).toBe('フギン');
     expect(m.life).toBe(6);
     expect(m.habitat).toBe('air');
     expect(MONSTER_HABITAT[HUGINN_MONSTER_ID]).toBe('air');
     expect(m.themeColor).toBe(HUGINN_COLOR);
-    expect(HUGINN_COLOR).toBe('#1F5C58');
+    expect(HUGINN_COLOR).toBe('#1E6B45');
   });
 
   it('技12枚：名前・分類・マナ・ダメージ・レアは表のとおり（レア＝05・06・09・12）。防御0・回避2', () => {
@@ -111,8 +111,8 @@ describe('フギンのデータ（指示書の表のとおり）', () => {
       expect(existsSync(`assets/images/${f}`), f).toBe(true);
     }
     expect(BATTLE_CARDS[HUGINN_MONSTER_ID]?.frame).toBe('huginn');
-    expect(CARD_NAME_LOGOS[HUGINN_MONSTER_ID]?.frame).toBe('#1F5C58');
-    expect(CARD_NAME_LOGOS_EN[HUGINN_MONSTER_ID]?.frame).toBe('#1F5C58');
+    expect(CARD_NAME_LOGOS[HUGINN_MONSTER_ID]?.frame).toBe('#1E6B45');
+    expect(CARD_NAME_LOGOS_EN[HUGINN_MONSTER_ID]?.frame).toBe('#1E6B45');
     setLanguage('en');
     try {
       expect(cardName(HUGINN_MONSTER_ID)).toBe('Huginn');
@@ -228,15 +228,16 @@ describe('07 ちえのささやき：山札から回避の技カードを1枚選
     expect(defaultSearchEvade(poor2, 'player')).toBe('skl-gauul14-13');
   });
 
-  it('山札に回避が無ければ1枚引く。山札が0枚なら何もしない（負けにならない）', () => {
+  it('山札に回避が無ければ1枚引く。山札が0枚なら使えない（BM の直し・ユーザー決定）', () => {
     const draw = use(scene({ player: [hg(7)] }, { deck: { player: [sor(3), sor(4)] } }), 'player', 'p0');
     expect(draw.sides.player.hand.map((c) => c.cardId)).toEqual([sor(3)]);
     expect(draw.sides.player.deck).toEqual([sor(4)]);
     expect(draw.log.at(-1)?.text).toBe('あなたの山札に回避のカードが無い。かわりに1枚引いた。');
-    const none = use(scene({ player: [hg(7)] }, { deck: { player: [] } }), 'player', 'p0');
-    expect(none.phase).not.toBe('ended');
-    expect(none.sides.player.hand).toHaveLength(0);
-    expect(manaOf(none.sides.player)).toBe(11);
+    const empty = scene({ player: [hg(7)] }, { deck: { player: [] } });
+    expect(cardUsability(empty, 'player', 'p0')).toEqual({ usable: false, reason: '山札がありません' });
+    const none = use(empty, 'player', 'p0');
+    expect(none.sides.player.hand.map((c) => c.cardId)).toEqual([hg(7)]);
+    expect(manaOf(none.sides.player)).toBe(12);
   });
 });
 
