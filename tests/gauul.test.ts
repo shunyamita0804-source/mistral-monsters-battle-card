@@ -204,7 +204,7 @@ describe('ガウル14技：正式データ（2026-10-26。届いた JSON・CSV �
     // 詳しい表示の説明：「回避されない」は1回だけ（効果テキストと攻撃の印で2回にならない。ラズックのみだれづめも同じ）
     expect(describeSkill(getSkill(gau(9)))).toBe('相手モンスター1体にかしこさで4ダメージ。回避されない');
     expect(describeSkill(getSkill(laz(4))).match(/回避されない/g)).toHaveLength(1);
-    expect(skillCardFace(getSkill(gau(14))).description).toBe('マナに関係なく、ちから技・かしこさ技を回避');
+    expect(skillCardFace(getSkill(gau(14))).description).toBe('ちから技、かしこさ技を回避する。');
     setLanguage('en');
     expect(cardName(GAUUL_MONSTER)).toBe('Pyrrow');
     for (const s of skillsOf('mon-gauul')) {

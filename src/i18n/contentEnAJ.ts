@@ -14,29 +14,44 @@ const NAMES: Readonly<Record<string, string>> = {
   'skl-desuoru-14': 'Fade into Darkness',
 };
 
+/**
+ * 防御・回避の文（2026-11-06 指示書 BK【2】でそろえた形。src/data/skillRebuildAJ.ts の tGuard・tDodge）の英語。英語も同じ考え方でそろえる：
+ * 防御「Take 3 less damage from POW skills.」・回避「Dodge POW skills.」「Dodge POW and INT skills that cost 2+ mana.」
+ */
+const STAT_EN = { 'ちから技': 'POW skills', 'かしこさ技': 'INT skills', 'ちから技、かしこさ技': 'POW and INT skills' } as const;
+const GUARD_DODGE_TEXTS: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(STAT_EN).flatMap(([ja, en]) => [
+    ...Array.from({ length: 10 }, (_, n) => [`${ja}の受けるダメージを${n}減らす。`, `Take ${n} less damage from ${en}.`]),
+    [`${ja}を回避する。`, `Dodge ${en}.`],
+    ...[2, 3, 4].map((n) => [`マナ${n}以上の${ja}を回避する。`, `Dodge ${en} that cost ${n}+ mana.`]),
+  ]),
+);
+
 /** 効果の文（日本語 → 英語の仮訳） */
 const TEXTS: Readonly<Record<string, string>> = {
+  ...GUARD_DODGE_TEXTS,
+  // 2026-11-06 指示書 BK【2】：特別な守りの文（防御・回避の形に近づけた案。意味は前と同じ）
+  '次の相手のターン、ちから技の受けるダメージを3減らす。': 'Next enemy turn, take 3 less damage from POW skills.',
+  'ちから技、かしこさ技の受けるダメージを0にする。': 'Reduce damage from POW and INT skills to 0.',
+  '味方への攻撃を代わりに受ける。': 'Take an attack aimed at an ally.',
+  '味方への攻撃を代わりに受け、受けるダメージを2減らす。': 'Take an attack aimed at an ally, and take 2 less damage.',
+  'フォルン以外の味方1体は、次の相手のターン、受けるダメージを1減らす。': '1 ally other than Forn takes 1 less damage during the next enemy turn.',
   回避されても半分のダメージ: 'Half damage even if dodged.',
   回避されない: "Can't be dodged.",
   防御されない: "Can't be guarded.",
   相手1体は次の攻撃を行えない: "1 enemy can't make its next attack.",
-  ちから技に効く: 'Works on POW skills.',
-  かしこさ技に効く: 'Works on INT skills.',
-  'ちから技・かしこさ技に効く': 'Works on POW and INT skills.',
-  'マナに関係なく、ちから技・かしこさ技を回避': 'Dodge any POW or INT skill.',
-  'マナ2以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 2+ mana.',
-  'マナ3以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 3+ mana.',
-  ちから技を回避: 'Dodge POW skills.',
-  かしこさ技を回避: 'Dodge INT skills.',
   '次の自分のターンの終わりまで、全モンスターを水中にする': 'Until the end of your next turn, all monsters are underwater.',
   相手の手札からランダムに1枚捨てさせる: 'The opponent discards 1 random card from their hand.',
   地上の相手だけに使える: 'Can only target ground enemies.',
-  '次の相手のターン、受けるちから技すべて−3': 'Next enemy turn, every POW skill you take is -3.',
   '自分のライフ＋2（もとのLIFEまで）': 'Restore 2 of your own life (up to max).',
   場が水中なら2倍: 'Double damage while the field is underwater.',
   次のターン攻撃の的にならない: "Can't be targeted by attacks next turn.",
   'ちから技・かしこさ技のダメージを0に': 'Reduce POW and INT damage to 0.',
   '相手は次のターン、ラズックしか攻撃できない': 'Next turn, the enemy can only attack Lazuck.',
+  // 2026-11-06 指示書 BK：クロシオ（英語は仮訳）
+  '相手は次のターン、クロシオしか攻撃できない': 'Next turn, the enemy can only attack Kuroshio.',
+  '当たった相手1体を、次の自分の手番の終わりまで水中にする': 'If it hits, that enemy counts as underwater until the end of your next turn.',
+  '水中の相手全員に当たる（守りは1体ずつ）。水中の相手がいないと使えない': "Hits every underwater enemy (each guards separately). Can't be used if no enemy is underwater.",
   '相手の次のターンのちから技−1': "The enemy's POW skills are -1 next turn.",
   '相手の手札1枚をランダムに山札へ（補充なし）': "Shuffle 1 random card from the enemy's hand into their deck (no redraw).",
   相手は次のターン行動できない: "The target can't act next turn.",
@@ -57,7 +72,6 @@ const TEXTS: Readonly<Record<string, string>> = {
   '次のターン、ツムジの攻撃のマナ−1': "Next turn, Tsumuji's attacks cost 1 less mana.",
   '地上の相手全員に当たる（守りは1体ずつ）': 'Hits every ground enemy (each guards separately).',
   '次のターン、最初のかしこさ技を2倍に': 'Next turn, your first INT skill deals double.',
-  味方への攻撃を代わりに受ける: 'Take an attack aimed at an ally.',
   '相手全員に当たる（守りは1体ずつ）': 'Hits every enemy (each guards separately).',
   '当たると自分のライフ−1': 'On hit, you lose 1 life.',
   '当たると自分のライフ−2': 'On hit, you lose 2 life.',
@@ -70,27 +84,20 @@ const TEXTS: Readonly<Record<string, string>> = {
   '相手は次のターン、リリルを攻撃できない': "Next turn, the enemy can't attack Lilil.",
   // 2026-11-02 指示書 AL フォルン（仮訳）
   'フォルン以外の味方1体、次のターンの攻撃＋1': "1 ally other than Forn deals +1 with its attack next turn.",
-  'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1': '1 ally other than Forn takes 1 less damage during the next enemy turn.',
   '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる': 'Draw until you have 5 cards in hand, then discard 1 card.',
   // 2026-11-02 指示書 AQ ウズリオ（仮訳）
   '相手が空中なら +2（ダメージ4）': '+2 if the target is airborne (4 dmg).',
   '相手全員に1ダメージ。空中の相手には2ダメージ': '1 dmg to every enemy, 2 dmg to airborne enemies.',
   '相手の手札1枚をランダムに山札へもどす': "Return 1 random card from the enemy's hand to their deck.",
-  '条件なしで回避': 'Dodge any attack.',
   // 2026-11-05 指示書 AX タイラント・ギアロス（仮訳）
   相手全員にダメージ: 'Damages every enemy.',
   次のターン回避されない: "Next turn, your first attack can't be dodged.",
   次のターン防御されない: "Next turn, your first attack can't be guarded.",
-  ちから技のダメージを3軽減: 'Reduce POW skill damage by 3.',
-  かしこさ技のダメージを3軽減: 'Reduce INT skill damage by 3.',
-  'ちから技・かしこさ技を回避': 'Dodge POW and INT skills.',
-  '消費マナ2以上のちから技・かしこさ技を回避': 'Dodge POW and INT skills that cost 2+ mana.',
   '手札から1枚山札に戻し、1枚引いて、そのあと山札をシャッフル': 'Return 1 card from your hand to your deck, draw 1, then shuffle your deck.',
   山札の上から3枚まで確かめる: 'Look at up to 3 cards from the top of your deck.',
   // 2026-11-05 指示書 BH：クヨウ（英語は仮訳）
   '味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）': 'Remove all bad statuses from 1 ally and restore 1 life (up to max).',
   '次の相手のターンの終わりまで、味方全員に悪い状態がつかない': 'Until the end of the next enemy turn, your monsters cannot get bad statuses.',
-  '味方への攻撃を代わりに受け、ダメージ−2': 'Take an attack aimed at an ally, with 2 less damage.',
   // 2026-11-05 指示書 BI：ラディエル（英語は仮訳）
   '相手1体は次の攻撃を行えない。相手のマナ−1': 'One enemy cannot attack next time. The enemy loses 1 mana.',
   'おたがいの手札を山札に戻し、同じ枚数を引いて山札をシャッフル': 'Both players return their hands to their decks, draw the same number, then shuffle.',

@@ -34,6 +34,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-uzurio': 'ground', // 2026-11-02 指示書 AQ
   'mon-tyrant': 'ground', // 2026-11-05 指示書 AX（確かめ用だけ）
   'mon-kuyo': 'ground', // 2026-11-05 指示書 BH（確かめ用だけ。霧の廃坑ができるまで）
+  'mon-kuroshio': 'water', // 2026-11-06 指示書 BK（確かめ用だけ。セイランの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -72,12 +73,15 @@ const T_HALF = '回避されても半分のダメージ';
 const T_UNDODGE = '回避されない';
 const T_UNBLOCK = '防御されない';
 const T_SEAL = '相手1体は次の攻撃を行えない';
-const T_FORCE = 'ちから技に効く';
-const T_WISDOM = 'かしこさ技に効く';
-const T_BOTH = 'ちから技・かしこさ技に効く';
-const T_DODGE_ALL = 'マナに関係なく、ちから技・かしこさ技を回避';
-const T_DODGE_2 = 'マナ2以上のちから技・かしこさ技を回避';
-const T_DODGE_FORCE = 'ちから技を回避';
+/**
+ * 防御・回避の文（2026-11-06 指示書 BK【2】ユーザー決定。今あるカードも、これから作るカードもこの形）。数字・条件はカードの動き（effect）と同じ値を書く。
+ * - 防御：「ちから技の受けるダメージを3減らす。」「かしこさ技の受けるダメージを3減らす。」「ちから技、かしこさ技の受けるダメージを3減らす。」
+ * - 回避：「ちから技を回避する。」「かしこさ技を回避する。」「ちから技、かしこさ技を回避する。」・マナの条件「マナ2以上のちから技、かしこさ技を回避する。」
+ * 前は「ちから技に効く」（数字はカードの盾の欄だけ）・「マナに関係なく、ちから技・かしこさ技を回避」・「条件なしで回避」などだった（前と後の一覧は docs/bk-kuroshio-20261106.md）
+ */
+const STAT_TEXT = { force: 'ちから技', wisdom: 'かしこさ技', all: 'ちから技、かしこさ技' } as const;
+const tGuard = (reduce: number, against: keyof typeof STAT_TEXT): string => `${STAT_TEXT[against]}の受けるダメージを${reduce}減らす。`;
+const tDodge = (against: keyof typeof STAT_TEXT, minCost?: number): string => `${minCost ? `マナ${minCost}以上の` : ''}${STAT_TEXT[against]}を回避する。`;
 const T_TIDE = '次の自分のターンの終わりまで、全モンスターを水中にする';
 
 /** 17体の12枚（並び＝表示の番号 1〜12。リリルは 2026-11-02 指示書 AK・フォルンは指示書 AL） */
@@ -94,8 +98,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-soramo14-08', name: 'スターフォール', cat: 'か', mana: 4, damage: 6, text: null, rare: true, box: 1 },
     { id: 'skl-soramo14-09', name: 'すなかけ', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2 },
     { id: 'skl-soramo14-10', name: '吠える', cat: '特', mana: 2, damage: null, effect: { type: 'discardRandom' }, text: '相手の手札からランダムに1枚捨てさせる', box: 2 },
-    { id: 'skl-soramo14-12', name: '星のまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: T_BOTH, box: 2 },
-    { id: 'skl-soramo14-14', name: '星影ステップ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0 },
+    { id: 'skl-soramo14-12', name: '星のまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), box: 2 },
+    { id: 'skl-soramo14-14', name: '星影ステップ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, box: 0 },
   ],
   // ガウル（空中・LIFE 6）［箱：烈火の猛攻 16枚］
   'mon-gauul': [
@@ -109,8 +113,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-gauul14-09', name: '聖なる炎', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, box: 0 },
     { id: 'skl-gauul14-08', name: 'フレアレイ', cat: 'か', mana: 4, damage: 6, text: null, rare: true, box: 1 },
     { id: 'skl-gauul14-10', name: '威嚇', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2 },
-    { id: 'skl-gauul14-13', name: '上に飛ぶ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 2 },
-    { id: 'skl-gauul14-14', name: '高速飛行', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0 },
+    { id: 'skl-gauul14-13', name: '上に飛ぶ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), box: 2 },
+    { id: 'skl-gauul14-14', name: '高速飛行', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, box: 0 },
   ],
   // ミュロル（水中・LIFE 6〔2026-11-02 ユーザー決定 7→6〕）［箱：蒼海の守り 16枚］
   'mon-myurol': [
@@ -122,14 +126,14 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-myurol-07', name: 'アクアボール', cat: 'か', mana: 3, damage: 4, text: null, box: 2 },
     {
       id: 'skl-myurol-08', name: 'しめったはだ', cat: '特', mana: 1, damage: null,
-      effect: { type: 'shield', against: 'force', reduce: 3, turns: 2 }, text: '次の相手のターン、受けるちから技すべて−3', box: 3,
+      effect: { type: 'shield', against: 'force', reduce: 3, turns: 2 }, text: '次の相手のターン、ちから技の受けるダメージを3減らす。', box: 3,
     },
     { id: 'skl-myurol-09', name: 'みずあび', cat: '特', mana: 2, damage: null, effect: { type: 'healSelf', amount: 2 }, text: '自分のライフ＋2（もとのLIFEまで）', rare: true, box: 0 },
     // 2026-11-02 ユーザー決定：しっぽガード・みずのまくのマナ 0→1（軽減 −3 はそのまま）
-    { id: 'skl-myurol-10', name: 'しっぽガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2 },
-    { id: 'skl-myurol-11', name: 'みずのまく', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 2 },
-    { id: 'skl-myurol-14', name: 'スリップガード', cat: '防', mana: 2, damage: null, effect: guard(5, 'all'), text: T_BOTH, rare: true, box: 0 },
-    { id: 'skl-myurol-16', name: 'すべってよける', cat: '避', mana: 2, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 0 },
+    { id: 'skl-myurol-10', name: 'しっぽガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), box: 2 },
+    { id: 'skl-myurol-11', name: 'みずのまく', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom'), box: 2 },
+    { id: 'skl-myurol-14', name: 'スリップガード', cat: '防', mana: 2, damage: null, effect: guard(5, 'all'), text: tGuard(5, 'all'), rare: true, box: 0 },
+    { id: 'skl-myurol-16', name: 'すべってよける', cat: '避', mana: 2, damage: null, effect: dodge('force'), text: tDodge('force'), box: 0 },
   ],
   // カルシェル（水中・LIFE 7〔2026-11-02 ユーザー決定 8→7〕）［箱：蒼海の守り 16枚］
   'mon-kalshell': [
@@ -144,9 +148,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 新しい技（絵はデザイン担当に依頼中。届くまでタイダルクラッシュの絵）
     { id: 'skl-kalshell-15', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, box: 0, art: 'kal_sk_15.png' },
     // 2026-11-02 ユーザー決定：からにこもるのマナ 1→2（ちから −5 はそのまま）・あわのまくのマナ 1→2・かしこさ −3→−5
-    { id: 'skl-kalshell-11', name: 'からにこもる', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: T_FORCE, box: 2 },
-    { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: T_WISDOM, box: 2 },
-    { id: 'skl-kalshell-13', name: 'てっぺきシェル', cat: '防', mana: 3, damage: null, effect: { type: 'defense', against: 'all', nullify: true }, text: T_BOTH, rare: true, box: 0 },
+    { id: 'skl-kalshell-11', name: 'からにこもる', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: tGuard(5, 'force'), box: 2 },
+    { id: 'skl-kalshell-12', name: 'あわのまく', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: tGuard(5, 'wisdom'), box: 2 },
+    { id: 'skl-kalshell-13', name: 'てっぺきシェル', cat: '防', mana: 3, damage: null, effect: { type: 'defense', against: 'all', nullify: true }, text: 'ちから技、かしこさ技の受けるダメージを0にする。', rare: true, box: 0 },
   ],
   // ラズック（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 正式配布。指示書 AP で V1：とびかかり 3→2・みだれづめ 2→1・おびきよせ 1→2・ダストキック 1→2）］
   'mon-lazuck': [
@@ -163,8 +167,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
       effect: { type: 'weaken', stat: 'force', amount: 1, duration: 'nextTurn' }, text: '相手の次のターンのちから技−1', box: 2,
     },
     { id: 'skl-lazuck-itazura', name: 'いたずら', cat: '特', mana: 2, damage: null, effect: { type: 'handToDeck' }, text: '相手の手札1枚をランダムに山札へ（補充なし）', rare: true },
-    { id: 'skl-lazuck-15', name: 'シャドウスリップ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: T_DODGE_2, box: 3 },
-    { id: 'skl-lazuck-14', name: 'フェイントステップ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-lazuck-15', name: 'シャドウスリップ', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), box: 3 },
+    { id: 'skl-lazuck-14', name: 'フェイントステップ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // ノビトン（地上・LIFE 8）［箱：烈火の猛攻・蒼海の守り 同じ16枚（2026-11-02 正式配布）］
   'mon-nobiton': [
@@ -177,9 +181,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-nobiton-07', name: 'ダウナーミスト', cat: 'か', mana: 4, damage: 2, effect: atk({ manaDrain: 3 }), text: '相手のマナ−3', rare: true },
     { id: 'skl-nobiton-08', name: '考える', cat: '特', mana: 1, damage: null, effect: { type: 'redrawHand' }, text: '手札をすべて交換', box: 2 },
     { id: 'skl-nobiton-09', name: '不思議な嗅覚', cat: '特', mana: 2, damage: null, effect: { type: 'revealHand' }, text: '相手の手札をすべて見る', rare: true },
-    { id: 'skl-nobiton-10', name: '鼻でまもる', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2 },
-    { id: 'skl-nobiton-12', name: 'のびのびガード', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: T_BOTH, box: 2 },
-    { id: 'skl-nobiton-16', name: '必死によける', cat: '避', mana: 3, damage: null, effect: dodge('all'), text: T_DODGE_ALL, box: 0 },
+    { id: 'skl-nobiton-10', name: '鼻でまもる', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), box: 2 },
+    { id: 'skl-nobiton-12', name: 'のびのびガード', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), box: 2 },
+    { id: 'skl-nobiton-16', name: '必死によける', cat: '避', mana: 3, damage: null, effect: dodge('all'), text: tDodge('all'), box: 0 },
   ],
   // プカリム（空中・LIFE 6）
   'mon-pukarim': [
@@ -193,8 +197,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-pukarim-08', name: 'おおつむじ', cat: 'か', mana: 4, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true },
     { id: 'skl-pukarim-09', name: 'ほっぺにためる', cat: '特', mana: 1, damage: null, effect: { type: 'charge', amount: 2 }, text: '次の攻撃＋2（使うまで続く）' },
     { id: 'skl-pukarim-10', name: 'おいかぜ', cat: '特', mana: 2, damage: null, effect: { type: 'tailwind', amount: 1 }, text: 'プカリム以外の味方1体、次のターンの攻撃＋1', rare: true },
-    { id: 'skl-pukarim-11', name: 'ぷにぷにボディ', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: T_FORCE },
-    { id: 'skl-pukarim-12', name: 'くうきのクッション', cat: '防', mana: 2, damage: null, effect: guard(4, 'all'), text: T_BOTH, rare: true },
+    { id: 'skl-pukarim-11', name: 'ぷにぷにボディ', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force') },
+    { id: 'skl-pukarim-12', name: 'くうきのクッション', cat: '防', mana: 2, damage: null, effect: guard(4, 'all'), text: tGuard(4, 'all'), rare: true },
   ],
   // フルーネ（地上・LIFE 10）
   'mon-flune': [
@@ -208,8 +212,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-flune-08', name: 'はなびらストーム', cat: 'か', mana: 4, damage: 5, text: null, rare: true },
     { id: 'skl-flune-09', name: 'フラワードレイン', cat: 'か', mana: 5, damage: 3, effect: atk({ drain: true }), text: '与えたダメージぶん回復', rare: true },
     { id: 'skl-flune-10', name: 'いやしのみつ', cat: '特', mana: 2, damage: null, effect: { type: 'healAlly', amount: 2 }, text: '味方1体のライフ＋2', rare: true },
-    { id: 'skl-flune-11', name: 'はっぱのたて', cat: '防', mana: 2, damage: null, effect: guard(3, 'force'), text: T_FORCE },
-    { id: 'skl-flune-12', name: 'はなびらのまく', cat: '防', mana: 2, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
+    { id: 'skl-flune-11', name: 'はっぱのたて', cat: '防', mana: 2, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force') },
+    { id: 'skl-flune-12', name: 'はなびらのまく', cat: '防', mana: 2, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom') },
   ],
   // セレフィーン（水中・LIFE 6）
   'mon-serephine': [
@@ -222,9 +226,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-serephine-08', name: 'ルナタイド', cat: 'か', mana: 4, damage: 5, effect: atk({ unblockableVsWater: true }), text: '水中の相手には防御されない', rare: true },
     { id: 'skl-serephine-09', name: 'オーシャンウェーブ', cat: 'か', mana: 4, damage: 5, effect: atk({ undodgeableVsWater: true }), text: '水中の相手は回避できない', rare: true },
     { id: 'skl-serephine-10', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE },
-    { id: 'skl-serephine-12', name: 'すいっとよける', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE },
-    { id: 'skl-serephine-13', name: 'ゆらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避' },
-    { id: 'skl-serephine-14', name: 'ウェーブダンス', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-serephine-12', name: 'すいっとよける', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: tDodge('force') },
+    { id: 'skl-serephine-13', name: 'ゆらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: tDodge('wisdom') },
+    { id: 'skl-serephine-14', name: 'ウェーブダンス', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // ツムジ（地上・LIFE 6）［箱：烈火の猛攻 16枚（2026-11-02 指示書 AM。Wひっかきは2枚続けて使えるよう2枚）］
   'mon-tsumuji': [
@@ -238,8 +242,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-tsumuji-06', name: 'かぜのやいば', cat: 'か', mana: 2, damage: 2, text: null, box: 2 },
     { id: 'skl-tsumuji-09', name: 'あらし', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeableVsAir: true }), text: '空中の相手は回避できない', box: 1 },
     { id: 'skl-tsumuji-08', name: 'かぜのり', cat: '特', mana: 0, damage: null, effect: { type: 'windRide', discount: 1 }, text: '次のターン、ツムジの攻撃のマナ−1', rare: true },
-    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 3 },
-    { id: 'skl-tsumuji-14', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-tsumuji-12', name: 'ひらりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: tDodge('force'), box: 3 },
+    { id: 'skl-tsumuji-14', name: 'かぜよみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // ジオル（地上・LIFE 9）
   'mon-geol': [
@@ -252,9 +256,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-geol-07', name: 'クリスタルショット', cat: 'か', mana: 3, damage: 3, text: null },
     { id: 'skl-geol-08', name: 'クリスタルレイ', cat: 'か', mana: 4, damage: 4, text: null },
     { id: 'skl-geol-10', name: 'エネルギーをためる', cat: '特', mana: 2, damage: null, effect: { type: 'energy' }, text: '次のターン、最初のかしこさ技を2倍に' },
-    { id: 'skl-geol-11', name: 'かばう', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける' },
-    { id: 'skl-geol-13', name: 'すいしょうのたて', cat: '防', mana: 3, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
-    { id: 'skl-geol-14', name: 'うけとめる', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: T_FORCE, rare: true },
+    { id: 'skl-geol-11', name: 'かばう', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける。' },
+    { id: 'skl-geol-13', name: 'すいしょうのたて', cat: '防', mana: 3, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom') },
+    { id: 'skl-geol-14', name: 'うけとめる', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: tGuard(5, 'force'), rare: true },
   ],
   // ヒョウズク（空中・LIFE 7）
   'mon-hyouzuku': [
@@ -268,8 +272,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-hyouzuku-08', name: 'つららのあめ', cat: 'か', mana: 5, damage: 2, effect: atk({ allTargets: true }), text: '相手全員に当たる（守りは1体ずつ）' },
     { id: 'skl-hyouzuku-09', name: 'ふぶき', cat: 'か', mana: 4, damage: 3, effect: atk({ stunTarget: true, stunMark: 'frozen' }), text: '相手は次のターン行動できない', rare: true },
     { id: 'skl-hyouzuku-10', name: 'ひょうが', cat: 'か', mana: 5, damage: 6, text: null, rare: true },
-    { id: 'skl-hyouzuku-13', name: 'まいあがる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL },
-    { id: 'skl-hyouzuku-14', name: 'おとなきはばたき', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-hyouzuku-13', name: 'まいあがる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all') },
+    { id: 'skl-hyouzuku-14', name: 'おとなきはばたき', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // シシエン（地上・LIFE 7）
   'mon-shishien': [
@@ -283,8 +287,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-shishien-06', name: 'たてがみのひばな', cat: 'か', mana: 3, damage: 4, text: null },
     { id: 'skl-shishien-08', name: 'もえるたてがみ', cat: 'か', mana: 3, damage: 6, effect: atk({ selfDamageOnHit: 2 }), text: '当たると自分のライフ−2', rare: true },
     { id: 'skl-shishien-10', name: 'ほのおのほうこう', cat: 'か', mana: 6, damage: 8, effect: atk({ selfDamageOnHit: 2 }), text: '当たると自分のライフ−2', rare: true },
-    { id: 'skl-shishien-11', name: 'たてがみでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE },
-    { id: 'skl-shishien-12', name: 'ねつのとばり', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: T_BOTH, rare: true },
+    { id: 'skl-shishien-11', name: 'たてがみでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force') },
+    { id: 'skl-shishien-12', name: 'ねつのとばり', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), rare: true },
   ],
   // ハクラン（地上・LIFE 7）
   'mon-hakuran': [
@@ -298,8 +302,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-hakuran-05', name: 'みぬくひとみ', cat: 'か', mana: 2, damage: 2, effect: atk({ undodgeable: true }), text: T_UNDODGE },
     { id: 'skl-hakuran-08', name: 'らいうん', cat: 'か', mana: 4, damage: 4, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true },
     { id: 'skl-hakuran-10', name: 'せいなるいかずち', cat: 'か', mana: 5, damage: 7, text: null, rare: true },
-    { id: 'skl-hakuran-12', name: 'ひらりとはねる', cat: '避', mana: 1, damage: null, effect: dodge('all', 3), text: 'マナ3以上のちから技・かしこさ技を回避' },
-    { id: 'skl-hakuran-14', name: 'かすみのあゆみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-hakuran-12', name: 'ひらりとはねる', cat: '避', mana: 1, damage: null, effect: dodge('all', 3), text: tDodge('all', 3) },
+    { id: 'skl-hakuran-14', name: 'かすみのあゆみ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // デスオル（空中・LIFE 7・A）
   'mon-desuoru': [
@@ -321,8 +325,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
       id: 'skl-desuoru-16', name: '死のレクイエム', cat: '特', mana: 4, damage: null,
       effect: { type: 'requiem' }, text: 'ライフ1以下の、デスオル以外のモンスターをすべて倒す', art: 'desuoru_sk_16.webp',
     },
-    { id: 'skl-desuoru-12', name: 'ルーンのまもり', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM },
-    { id: 'skl-desuoru-14', name: 'やみにまぎれる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true },
+    { id: 'skl-desuoru-12', name: 'ルーンのまもり', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom') },
+    { id: 'skl-desuoru-14', name: 'やみにまぎれる', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true },
   ],
   // リリル（空中・LIFE 5・C。2026-11-02 指示書 AK。正本は src/data/official/lilil12_skills_OFFICIAL_20261102.json。新しい効果は無い）
   // ［箱：旅立ちのきらめき 16枚（2026-11-02 正式配布。前の box は JSON の box_copies）］。絵は lilil_sk_NN.webp（番号＝技番号）
@@ -339,9 +343,9 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // カルシェルの すなをほる と同じ（hide）
     { id: 'skl-lilil-09', name: 'うそなき', cat: '特', mana: 2, damage: null, effect: { type: 'hide' }, text: '相手は次のターン、リリルを攻撃できない', rare: true, box: 0, art: 'lilil_sk_09.webp' },
     // 2026-11-02 指示書 AK2：はねでかわす・くるりとかわすのマナ 1→0（ユーザー決定）
-    { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 0, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, box: 2, art: 'lilil_sk_10.webp' },
-    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', box: 2, art: 'lilil_sk_11.webp' },
-    { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: T_DODGE_ALL, rare: true, box: 0, art: 'lilil_sk_12.webp' },
+    { id: 'skl-lilil-10', name: 'はねでかわす', cat: '避', mana: 0, damage: null, effect: dodge('force'), text: tDodge('force'), box: 2, art: 'lilil_sk_10.webp' },
+    { id: 'skl-lilil-11', name: 'くるりとかわす', cat: '避', mana: 0, damage: null, effect: dodge('wisdom'), text: tDodge('wisdom'), box: 2, art: 'lilil_sk_11.webp' },
+    { id: 'skl-lilil-12', name: 'よつばねのまい', cat: '避', mana: 1, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, box: 0, art: 'lilil_sk_12.webp' },
   ],
   // フォルン（地上・LIFE 7・C。2026-11-02 指示書 AL。正本は src/data/official/forn12_skills_OFFICIAL_20261102.json）
   // ［箱：蒼海の守り 16枚（2026-11-02 指示書 AM。正式配布で旅立ちに入っていた16枚のまま）］。絵は forn_sk_NN.webp（番号＝技番号）。新しい効果は 07 そなえのふえ（ward）・09 もりのたより（drawTo）
@@ -354,15 +358,15 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // プカリムの おいかぜ と同じ（tailwind）
     { id: 'skl-forn-06', name: 'はげましのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'tailwind', amount: 1 }, text: 'フォルン以外の味方1体、次のターンの攻撃＋1', box: 2, art: 'forn_sk_06.webp' },
     // 新しい効果（ward）
-    { id: 'skl-forn-07', name: 'そなえのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'ward', reduce: 1 }, text: 'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1', rare: true, box: 2, art: 'forn_sk_07.webp' },
+    { id: 'skl-forn-07', name: 'そなえのふえ', cat: '特', mana: 2, damage: null, effect: { type: 'ward', reduce: 1 }, text: 'フォルン以外の味方1体は、次の相手のターン、受けるダメージを1減らす。', rare: true, box: 2, art: 'forn_sk_07.webp' },
     // ソラモの すなかけ と同じ（seal）
     { id: 'skl-forn-08', name: 'こもりうた', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, box: 2, art: 'forn_sk_08.webp' },
     // 新しい効果（drawTo）
     { id: 'skl-forn-09', name: 'もりのたより', cat: '特', mana: 1, damage: null, effect: { type: 'drawTo', hand: 5 }, text: '山札から手札が5枚になるまで引き、そのあと手札から1枚捨てる', rare: true, box: 0, art: 'forn_sk_09.webp' },
-    { id: 'skl-forn-10', name: 'もこもこガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, box: 2, art: 'forn_sk_10.webp' },
-    { id: 'skl-forn-11', name: 'かんむりのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, box: 1, art: 'forn_sk_11.webp' },
+    { id: 'skl-forn-10', name: 'もこもこガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), box: 2, art: 'forn_sk_10.webp' },
+    { id: 'skl-forn-11', name: 'かんむりのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom'), box: 1, art: 'forn_sk_11.webp' },
     // ジオルの かばう と同じ（cover）
-    { id: 'skl-forn-12', name: 'みがわりのふえ', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける', rare: true, box: 0, art: 'forn_sk_12.webp' },
+    { id: 'skl-forn-12', name: 'みがわりのふえ', cat: '防', mana: 1, damage: null, effect: { type: 'cover' }, text: '味方への攻撃を代わりに受ける。', rare: true, box: 0, art: 'forn_sk_12.webp' },
   ],
   // ウズリオ（地上・LIFE 6・C。2026-11-02 指示書 AQ。正本は src/data/official/uzurio12_and_support3_OFFICIAL_20261102.json）
   // 最初の箱には入れない（box なし）。絵は uzurio_sk_NN.webp（番号＝技番号）。新しい効果は 04 うずまきショット（airBonus）・06 おおたつまき（allTargets＋airBonus。指示書 AS で変えた）
@@ -379,10 +383,10 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-uzurio-07', name: 'すなけむり', cat: '特', mana: 2, damage: null, effect: { type: 'seal' }, text: T_SEAL, art: 'uzurio_sk_07.webp' },
     // ラズックの いたずら と同じ（handToDeck）
     { id: 'skl-uzurio-08', name: 'ふきとばし', cat: '特', mana: 2, damage: null, effect: { type: 'handToDeck' }, text: '相手の手札1枚をランダムに山札へもどす', rare: true, art: 'uzurio_sk_08.webp' },
-    { id: 'skl-uzurio-09', name: 'ひゅるりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: T_DODGE_FORCE, art: 'uzurio_sk_09.webp' },
-    { id: 'skl-uzurio-10', name: 'ふわりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: 'かしこさ技を回避', art: 'uzurio_sk_10.webp' },
+    { id: 'skl-uzurio-09', name: 'ひゅるりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('force'), text: tDodge('force'), art: 'uzurio_sk_09.webp' },
+    { id: 'skl-uzurio-10', name: 'ふわりとかわす', cat: '避', mana: 1, damage: null, effect: dodge('wisdom'), text: tDodge('wisdom'), art: 'uzurio_sk_10.webp' },
     { id: 'skl-uzurio-11', name: 'まきあげキック', cat: 'ち', mana: 3, damage: 3, text: null, art: 'uzurio_sk_11.webp' },
-    { id: 'skl-uzurio-12', name: 'つむじがくれ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'uzurio_sk_12.webp' },
+    { id: 'skl-uzurio-12', name: 'つむじがくれ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'uzurio_sk_12.webp' },
   ],
   // ギアロス（空中・LIFE 8・A。2026-11-05 指示書 AX【3】。正本は src/data/official/gearos_skills_20261105.csv）。機械の塔の守り手テオの切り札。
   // 最初の箱には入れない（box なし）。絵は gearos_sk_NN.webp。レア＝01・06・07・11（進行の案。CSV の ○ と同じ）。
@@ -398,9 +402,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-gearos-07', name: 'オーバードライブγ', cat: 'か', mana: 4, damage: 6, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, art: 'gearos_sk_07.webp' },
     { id: 'skl-gearos-08', name: 'システムチェンジ', cat: '特', mana: 1, damage: null, effect: { type: 'systemChange' }, text: '手札から1枚山札に戻し、1枚引いて、そのあと山札をシャッフル', art: 'gearos_sk_08.webp' },
     { id: 'skl-gearos-09', name: 'システムチェック', cat: '特', mana: 2, damage: null, effect: { type: 'systemCheck', count: 3 }, text: '山札の上から3枚まで確かめる', art: 'gearos_sk_09.webp' },
-    // 効果の文：CSV は「かしこさ技のダメージを3軽減」。防御の文は「どの技に効くか」だけにそろえる決まりなので T_WISDOM（タイラントの 11 と同じ）
-    { id: 'skl-gearos-10', name: 'エネルギーシールド', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: T_WISDOM, art: 'gearos_sk_10.webp' },
-    { id: 'skl-gearos-11', name: '高速機動', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: '消費マナ2以上のちから技・かしこさ技を回避', rare: true, art: 'gearos_sk_11.webp' },
+    { id: 'skl-gearos-10', name: 'エネルギーシールド', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom'), art: 'gearos_sk_10.webp' },
+    { id: 'skl-gearos-11', name: '高速機動', cat: '避', mana: 0, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), rare: true, art: 'gearos_sk_11.webp' },
     { id: 'skl-gearos-12', name: 'ギアクロー', cat: 'ち', mana: 0, damage: 1, text: null, art: 'gearos_sk_12.webp' },
   ],
   // ラディエル（空中・LIFE 9・A。2026-11-05 指示書 BI。天の聖域の切り札）。数字・効果は指示書の表のとおり。回避の技は無い（決まり）。
@@ -417,9 +420,8 @@ export const AJ_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // すなかけ と同じ「攻撃できない」（sealedTurn。クヨウのおはらいで消せて、まよけのふだで防げる悪い状態）＋相手のマナ−1（0 未満にしない。まよけのふだでも減る）
     { id: 'skl-radiel-08', name: 'しんぱんのせんこく', cat: '特', mana: 3, damage: null, effect: { type: 'seal', manaDrain: 1 }, text: '相手1体は次の攻撃を行えない。相手のマナ−1', art: 'radiel_sk_08.webp' },
     { id: 'skl-radiel-09', name: '最後の審判', cat: '特', mana: 3, damage: null, effect: { type: 'lastJudgment' }, text: 'おたがいの手札を山札に戻し、同じ枚数を引いて山札をシャッフル', rare: true, art: 'radiel_sk_09.webp' },
-    // 効果の文：防御の文の決まり（どの技に効くかだけ。軽減の数 5 はカードの盾の欄）
-    { id: 'skl-radiel-10', name: 'つばさの守り', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: T_FORCE, art: 'radiel_sk_10.webp' },
-    { id: 'skl-radiel-11', name: '天の加護', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: T_WISDOM, art: 'radiel_sk_11.webp' },
+    { id: 'skl-radiel-10', name: 'つばさの守り', cat: '防', mana: 2, damage: null, effect: guard(5, 'force'), text: tGuard(5, 'force'), art: 'radiel_sk_10.webp' },
+    { id: 'skl-radiel-11', name: '天の加護', cat: '防', mana: 2, damage: null, effect: guard(5, 'wisdom'), text: tGuard(5, 'wisdom'), art: 'radiel_sk_11.webp' },
     { id: 'skl-radiel-12', name: '天の恵み', cat: '特', mana: 2, damage: null, effect: { type: 'heavenGrace', count: 3 }, text: '自分の捨て札から3枚をマナにする', rare: true, art: 'radiel_sk_12.webp' },
   ],
 };
@@ -444,9 +446,8 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 新しい効果（ジオルの エネルギーをためる と同じ形。次の自分のターンに最初に使う攻撃1回）
     { id: 'skl-tyrant-09', name: '竜のまなざし', cat: '特', mana: 2, damage: null, effect: { type: 'dragonGaze' }, text: '次のターン回避されない', rare: true, art: 'tyrant_sk_09.webp' },
     { id: 'skl-tyrant-10', name: '竜のちから', cat: '特', mana: 2, damage: null, effect: { type: 'dragonMight' }, text: '次のターン防御されない', art: 'tyrant_sk_10.webp' },
-    // 効果の文：CSV は「ちから技のダメージを3軽減」。防御の文は「どの技に効くか」だけにそろえる決まり（軽減の数はカードの盾の欄に出る）なので T_FORCE
-    { id: 'skl-tyrant-11', name: 'ウロコのガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: T_FORCE, art: 'tyrant_sk_11.webp' },
-    { id: 'skl-tyrant-12', name: '上空に飛ぶ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: 'ちから技・かしこさ技を回避', rare: true, art: 'tyrant_sk_12.webp' },
+    { id: 'skl-tyrant-11', name: 'ウロコのガード', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'tyrant_sk_11.webp' },
+    { id: 'skl-tyrant-12', name: '上空に飛ぶ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'tyrant_sk_12.webp' },
   ],
   // クヨウ（地上・LIFE 8・B。2026-11-05 指示書 BH。正本は design-parts/bh-kuyo-20261105/00_instructions_for_claude_code.md の表）。霧の廃坑ができるまで確かめ用だけ。
   // 絵は kuyo_sk_NN.webp（番号＝技番号）。新しい効果は 08 おはらい（purify）・09 まよけのふだ（wardCharm）・11 みがわり（cover の reduce 2）
@@ -462,11 +463,30 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     // 2026-11-05 ユーザー決定（BH の直し）：ライフ＋1 を足した
     { id: 'skl-kuyo-08', name: 'おはらい', cat: '特', mana: 1, damage: null, effect: { type: 'purify', heal: 1 }, text: '味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）', art: 'kuyo_sk_08.webp' },
     { id: 'skl-kuyo-09', name: 'まよけのふだ', cat: '特', mana: 2, damage: null, effect: { type: 'wardCharm' }, text: '次の相手のターンの終わりまで、味方全員に悪い状態がつかない', rare: true, art: 'kuyo_sk_09.webp' },
-    // 効果の文：防御の文の決まり（どの技に効くかだけ。軽減の数 3 はカードの盾の欄）
-    { id: 'skl-kuyo-10', name: 'たてがみのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: T_BOTH, art: 'kuyo_sk_10.webp' },
+    { id: 'skl-kuyo-10', name: 'たてがみのまもり', cat: '防', mana: 1, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), art: 'kuyo_sk_10.webp' },
     // ジオルの かばう と同じ仕組みに −2 を足す（cover の reduce）
-    { id: 'skl-kuyo-11', name: 'みがわり', cat: '防', mana: 1, damage: null, effect: { type: 'cover', reduce: 2 }, text: '味方への攻撃を代わりに受け、ダメージ−2', art: 'kuyo_sk_11.webp' },
-    { id: 'skl-kuyo-12', name: 'きりのなかへ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: '条件なしで回避', rare: true, art: 'kuyo_sk_12.webp' },
+    { id: 'skl-kuyo-11', name: 'みがわり', cat: '防', mana: 1, damage: null, effect: { type: 'cover', reduce: 2 }, text: '味方への攻撃を代わりに受け、受けるダメージを2減らす。', art: 'kuyo_sk_11.webp' },
+    { id: 'skl-kuyo-12', name: 'きりのなかへ', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'kuyo_sk_12.webp' },
+  ],
+  // クロシオ（水中・LIFE 7・B。2026-11-06 指示書 BK。正本は design-parts/bk-kuroshio-20261106/data/kuroshio_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は kuroshio_sk_NN.webp（番号＝技番号）。回避だけ（防御の技は無い）。新しい効果は 04 ひきずりこむ（dragUnder）・07 おおうずしお（allTargets＋waterOnly。地ひびきの水中版）。
+  // 06 はオーシャンウェーブ・08 は halfOnEvade・09 は みちしお・10 は ラズックのおびきよせ・11 は dodge('all', 2)・12 は dodge('all') と同じ作り
+  'mon-kuroshio': [
+    { id: 'skl-kuroshio-01', name: 'ひれはたき', cat: 'ち', mana: 0, damage: 1, text: null, art: 'kuroshio_sk_01.webp' },
+    { id: 'skl-kuroshio-02', name: 'くいつく', cat: 'ち', mana: 1, damage: 2, text: null, art: 'kuroshio_sk_02.webp' },
+    { id: 'skl-kuroshio-03', name: 'テールスラップ', cat: 'ち', mana: 2, damage: 3, text: null, art: 'kuroshio_sk_03.webp' },
+    { id: 'skl-kuroshio-04', name: 'ひきずりこむ', cat: 'ち', mana: 2, damage: 2, effect: atk({ dragUnder: true }), text: '当たった相手1体を、次の自分の手番の終わりまで水中にする', art: 'kuroshio_sk_04.webp' },
+    { id: 'skl-kuroshio-05', name: 'ブリーチダイブ', cat: 'ち', mana: 4, damage: 6, text: null, art: 'kuroshio_sk_05.webp' },
+    { id: 'skl-kuroshio-06', name: 'しおふきキャノン', cat: 'か', mana: 3, damage: 4, effect: atk({ undodgeableVsWater: true }), text: '水中の相手は回避できない', rare: true, art: 'kuroshio_sk_06.webp' },
+    {
+      id: 'skl-kuroshio-07', name: 'おおうずしお', cat: 'か', mana: 5, damage: 3, effect: atk({ allTargets: true, waterOnly: true }),
+      text: '水中の相手全員に当たる（守りは1体ずつ）。水中の相手がいないと使えない', rare: true, art: 'kuroshio_sk_07.webp',
+    },
+    { id: 'skl-kuroshio-08', name: 'オルカストライク', cat: 'ち', mana: 5, damage: 7, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, art: 'kuroshio_sk_08.webp' },
+    { id: 'skl-kuroshio-09', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, art: 'kuroshio_sk_09.webp' },
+    { id: 'skl-kuroshio-10', name: 'よびごえ', cat: '特', mana: 2, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、クロシオしか攻撃できない', art: 'kuroshio_sk_10.webp' },
+    { id: 'skl-kuroshio-11', name: 'もぐってかわす', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), art: 'kuroshio_sk_11.webp' },
+    { id: 'skl-kuroshio-12', name: 'うずまきターン', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'kuroshio_sk_12.webp' },
   ],
 };
 

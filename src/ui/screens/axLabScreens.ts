@@ -5,6 +5,7 @@ import { TYRANT_MONSTER_ID, tyrantSkillId } from '../../data/tyrant.ts';
 import { GEAROS_MONSTER_ID, gearosSkillId } from '../../data/gearos.ts';
 import { KUYO_MONSTER_ID, kuyoSkillId } from '../../data/kuyo.ts';
 import { RADIEL_MONSTER_ID, radielSkillId } from '../../data/radiel.ts';
+import { KUROSHIO_MONSTER_ID, kuroshioSkillId } from '../../data/kuroshio.ts';
 import { swapDeck } from '../../game/battle/playtest.ts';
 import type { Deck } from '../../game/deck/deck.ts';
 import { boosterDeck } from '../../game/story/introV2.ts';
@@ -18,7 +19,7 @@ import { button, h } from '../dom.ts';
 import type { ScreenDefinition } from './types.ts';
 
 /**
- * 2026-11-05 指示書 AX の確かめ用の画面（?qa=1 のときだけ。設定の「QA用」の欄・?qa=1&lab=tyrant／gearos／kuyo〔指示書 BH〕）。作りはジオルの試遊の画面と同じ。
+ * 2026-11-05 指示書 AX の確かめ用の画面（?qa=1 のときだけ。設定の「QA用」の欄・?qa=1&lab=tyrant／gearos／kuyo〔指示書 BH〕／radiel〔BI〕／kuroshio〔BK〕）。作りはジオルの試遊の画面と同じ。
  * - モンスターのバトル用カードと技カード12枚
  * - そのモンスター入りのデッキで対戦（箱の3体目と入れ替え。どちらのデッキも借り物で、持っているカード・セーブのデッキは変えない）
  * - ギアロスは、機械の塔の守り手テオ（enc-machine-boss。切り札がギアロス）とも対戦できる
@@ -46,7 +47,7 @@ function lab16(monsterId: string): Pick {
 }
 
 interface LabSpec {
-  readonly id: 'tyrantLab' | 'gearosLab' | 'kuyoLab' | 'radielLab';
+  readonly id: 'tyrantLab' | 'gearosLab' | 'kuyoLab' | 'radielLab' | 'kuroshioLab';
   readonly monsterId: string;
   /** 新しい効果を目で確かめる用の16枚（新しい効果のカードを多めに） */
   readonly check16: Pick;
@@ -181,4 +182,13 @@ export const radielLabScreen: ScreenDefinition = makeLab({
   check16: [
     [8, 2], [9, 3], [12, 3], [4, 3], [3, 2], [1, 1], [10, 1], [11, 1],
   ].map(([no, copies]) => ({ id: radielSkillId(no as number), copies: copies as number })),
+});
+
+/** クロシオ（2026-11-06 指示書 BK）：ひきずりこむ・おおうずしお・みちしお・しおふきキャノン・よびごえを多めに（ほかは安い攻撃と回避） */
+export const kuroshioLabScreen: ScreenDefinition = makeLab({
+  id: 'kuroshioLab',
+  monsterId: KUROSHIO_MONSTER_ID,
+  check16: [
+    [4, 3], [7, 2], [9, 2], [6, 2], [10, 2], [11, 2], [1, 2], [12, 1],
+  ].map(([no, copies]) => ({ id: kuroshioSkillId(no as number), copies: copies as number })),
 });

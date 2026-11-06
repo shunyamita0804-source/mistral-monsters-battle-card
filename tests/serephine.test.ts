@@ -101,9 +101,9 @@ describe('セレフィーン：データ（届いた JSON・CSV を無改変で�
     expect(getSkill(ser(8)).effectTextJa).toBe('水中の相手には防御されない');
     expect(getSkill(ser(9)).effectTextJa).toBe('水中の相手は回避できない');
     expect(getSkill(ser(10)).effectTextJa).toBe('次の自分のターンの終わりまで、全モンスターを水中にする');
-    expect(getSkill(ser(12)).effectTextJa).toBe('ちから技を回避');
-    expect(getSkill(ser(13)).effectTextJa).toBe('かしこさ技を回避');
-    expect(getSkill(ser(14)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
+    expect(getSkill(ser(12)).effectTextJa).toBe('ちから技を回避する。');
+    expect(getSkill(ser(13)).effectTextJa).toBe('かしこさ技を回避する。');
+    expect(getSkill(ser(14)).effectTextJa).toBe('ちから技、かしこさ技を回避する。');
     expect(serephineJson.skills[9]?.effect).toBe('山札の上から1枚を、そのままマナにする');
   });
 

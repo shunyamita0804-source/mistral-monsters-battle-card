@@ -70,7 +70,7 @@ describe('ツムジ：データ（届いた JSON・CSV を無改変で置き、�
     expect(getSkill(tsu(2)).effectTextJa).toBe('同じターンにもう1枚続けて使える');
     expect(getSkill(tsu(4)).effectTextJa).toBe('回避されない');
     expect(getSkill(tsu(8)).effectTextJa).toBe('次のターン、ツムジの攻撃のマナ−1');
-    expect(getSkill(tsu(14)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
+    expect(getSkill(tsu(14)).effectTextJa).toBe('ちから技、かしこさ技を回避する。');
     expect(tsumujiJson.skills[7]?.effect).toBe('次の自分のターン、ツムジの攻撃技の消費マナを1減らす（0より下にはならない・重ねられない）');
   });
 

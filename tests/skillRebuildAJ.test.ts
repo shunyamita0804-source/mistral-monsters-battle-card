@@ -125,14 +125,16 @@ describe('AJ：15体×12枚のカード（2026-11-02 指示書 AK でリリル�
     expect(by('ground')).toContain('mon-forn');
     expect(by('ground')).toContain('mon-uzurio');
     expect(by('air').sort()).toEqual(['mon-desuoru', 'mon-gauul', 'mon-gearos', 'mon-hyouzuku', 'mon-lilil', 'mon-pukarim', 'mon-radiel']);
-    expect(by('water').sort()).toEqual(['mon-kalshell', 'mon-myurol', 'mon-serephine']);
+    // 2026-11-06 指示書 BK：確かめ用だけのクロシオ（水中）も入れて4体
+    expect(by('water').sort()).toEqual(['mon-kalshell', 'mon-kuroshio', 'mon-myurol', 'mon-serephine']);
     expect(getMonster('mon-gauul').habitat).toBe('air');
   });
 
   it('図鑑の番号：1体ぶん13番（モンスター1＋技12）。全員を振り直す', () => {
     const entries = cardBookEntries();
     // 2026-11-05 指示書 BH：クヨウは確かめ用（AJ_MONSTER_IDS に入らない）だが、図鑑には番号を付ける（ギアロスのあと No.248〜260）
-    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS, 'mon-kuyo'].sort());
+    // 2026-11-06 指示書 BK：クロシオも同じ（ラディエルのあと No.274〜286）
+    expect([...NUMBERED_MONSTERS].sort()).toEqual([...AJ_MONSTER_IDS, 'mon-kuyo', 'mon-kuroshio'].sort());
     let expected = 1;
     for (const id of NUMBERED_MONSTERS) {
       const mine = entries.filter((e) => e.section.kind === 'monster' && e.section.monsterId === id);

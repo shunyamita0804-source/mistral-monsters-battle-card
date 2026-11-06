@@ -101,6 +101,12 @@ export interface BattleMonster {
    * 「1体1ターン1回」のただ1つの例外：その手番の最初の技が続けて使える技のときに付き、2回目を使ったら消える（1ターンに最大2回）
    */
   readonly chain?: { readonly turn: number; readonly cardId: string } | null;
+  /**
+   * ひきずりこむ（2026-11-06 指示書 BK：クロシオ）：untilTurn の手番が終わるまで、このモンスターは水中（habitatOf）。
+   * 使った側の次の自分の手番の終わりまで（みちしおと同じ数え方）。重ねない（もう一度当たったら期限を数え直す）。
+   * 場のカードより強い（場が地上・空中でも水中のまま）。悪い状態（おはらいで消せる・まよけのふだで防ぐ）。倒れたら消える
+   */
+  readonly dragUnder?: { readonly untilTurn: number } | null;
 }
 
 export interface HandCard {
@@ -558,6 +564,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
   // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
   if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
+  // 「水中の相手だけ」（おおうずしお 指示書 BK）：水中の相手がいなければ使えない（灰色）
+  if (skill.effect.type === 'attack' && skill.effect.waterOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.waterOnly'));
   return YES;
 }
 
@@ -659,9 +667,17 @@ export function isTideActive(state: BattleState): boolean {
 export function habitatOf(state: BattleState, monster: BattleMonster | undefined): Habitat | null {
   if (!monster) return null;
   const base = getMonster(monster.cardId).habitat ?? null;
+  // ひきずりこむ（クロシオ 指示書 BK）：その子だけの状態。場のカードより強い（場が地上・空中でも水中のまま）
+  if (base && isDraggedUnder(state, monster)) return 'water';
   // 場が居場所を変えていれば、全員その居場所（みちしお＝水中・まいあがる風＝空中・しずまる大地＝地上）
   const field = fieldHabitat(state);
   return base && field ? field : base;
+}
+
+/** ひきずりこむ（クロシオ 指示書 BK）で、いま水中にされているか（期限の手番の終わりまで・生きているとき） */
+export function isDraggedUnder(state: BattleState, monster: BattleMonster | undefined): boolean {
+  const d = monster?.dragUnder;
+  return !!d && monster.life > 0 && state.turn <= d.untilTurn;
 }
 
 /** その攻撃は、この相手には防御されないか（カードの「防御されない」・水中の相手への「防御されない」） */
@@ -693,10 +709,11 @@ export function requiemVictims(state: BattleState, userUid: string): BattleMonst
  * 悪い状態（2026-11-05 指示書 BH：おはらいで消す・まよけのふだで防ぐもの）。相手の技で味方に付いた、いま効いているもの：
  * sealed＝攻撃できない（すなかけ・威嚇・こもりうた・すなけむり）・stunned＝行動できない／凍る（まきつく・こおりのいき・ふぶき）・
  * weaken＝技のダメージ−（ダストキック・吠える・熱風の威嚇）・taunt＝おびきよせ（決まった相手しか狙えない）・
- * pinned＝回避できない（ジオルのじならし。BH の直しで足した・ユーザー決定）。
+ * pinned＝回避できない（ジオルのじならし。BH の直しで足した・ユーザー決定）・
+ * dragged＝水中にされている（クロシオのひきずりこむ。2026-11-06 指示書 BK・ユーザー決定）。
  * 自分の技で付いた良い状態（ためている・エネルギー・おいかぜ・しめったはだ など）は入らない
  */
-export type BadStatusKind = 'sealed' | 'stunned' | 'weaken' | 'taunt' | 'pinned';
+export type BadStatusKind = 'sealed' | 'stunned' | 'weaken' | 'taunt' | 'pinned' | 'dragged';
 
 export function badStatusKinds(state: BattleState, m: BattleMonster | undefined): BadStatusKind[] {
   if (!m || m.life <= 0) return [];
@@ -707,6 +724,7 @@ export function badStatusKinds(state: BattleState, m: BattleMonster | undefined)
   if (weak) out.push('weaken');
   if (m.taunt && m.taunt.turn >= state.turn) out.push('taunt');
   if (m.pinTurn != null && m.pinTurn >= state.turn) out.push('pinned');
+  if (isDraggedUnder(state, m)) out.push('dragged');
   return out;
 }
 
@@ -729,9 +747,11 @@ export function wardCharmActive(state: BattleState, side: Side): boolean {
 export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?: BattleMonster): BattleMonster[] {
   if (card.kind === 'skill' && targetsEnemy(card)) {
     if (card.effect.type !== 'attack') return aliveMonsters(state.sides[otherSide(side)]);
-    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）
+    // 攻撃の技は、すなをほるで隠れている相手を選べない。「地上の相手だけ」は、いま地上の相手だけ（場が水中なら選べない）。
+    // 「水中の相手だけ」（クロシオのおおうずしお 指示書 BK）は、いま水中の相手だけ（生まれつき水中・ひきずりこむ・みちしお）
     const ground = card.effect.groundOnly;
-    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => !ground || habitatOf(state, m) === 'ground');
+    const water = card.effect.waterOnly;
+    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => (!ground || habitatOf(state, m) === 'ground') && (!water || habitatOf(state, m) === 'water'));
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -948,7 +968,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -1381,7 +1401,7 @@ function useCard(
       // ライフ＋heal（もとの LIFE まで。BH の直し）。悪い状態が無ければ消す記録は出さない
       if (!target) return state;
       const had = badStatusKinds(next, target).length > 0;
-      next = updateMonster(next, target.uid, { sealedTurn: null, stunnedTurn: null, stunMark: null, weaken: null, weakenTurn: null, taunt: null, pinTurn: null });
+      next = updateMonster(next, target.uid, { sealedTurn: null, stunnedTurn: null, stunMark: null, weaken: null, weakenTurn: null, taunt: null, pinTurn: null, dragUnder: null });
       if (had) next = addLog(next, t('battle.log.purify', { name: nameOf(target.cardId) }));
       const after = findMonster(next, target.uid)?.monster;
       const heal = skill.effect.heal ?? 0;
@@ -1479,7 +1499,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);
@@ -1588,6 +1608,17 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
     } else if (target && target.monster.life > 0) {
       next = updateMonster(next, targetUid, { stunnedTurn: state.turn + 1, stunMark: e.stunMark ?? null });
       next = addLog(next, t('battle.log.stun', { name: nameOf(target.monster.cardId) }));
+    }
+  }
+  if (e.dragUnder) {
+    // ひきずりこむ（クロシオ 指示書 BK）：当たったら（防御でダメージが減っても）水中に。期限は使った側の次の自分の手番の終わり（みちしおと同じ）。
+    // 重ねない（数え直す）。まよけのふだの間はつかない。倒れた相手にはつけない
+    const target = findMonster(next, targetUid);
+    if (target && target.monster.life > 0 && wardCharmActive(next, target.side)) {
+      next = wardCharmBlocked(next, target.monster);
+    } else if (target && target.monster.life > 0) {
+      next = updateMonster(next, targetUid, { dragUnder: { untilTurn: state.turn + 2 } });
+      next = addLog(next, t('battle.log.dragUnder', { name: nameOf(target.monster.cardId) }));
     }
   }
   return next;

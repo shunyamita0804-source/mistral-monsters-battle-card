@@ -37,6 +37,19 @@ const v = (text: string): FxBadge => ({ kind: 'value', text });
 const NEXT_TURN: FxBadge = { kind: 'turn', text: '1' };
 const one = (main: FxMainId, marks?: readonly FxMark[], badge?: FxBadge): readonly FxIcon[] => [{ main, ...(marks ? { marks } : {}), ...(badge ? { badge } : {}) }];
 
+/**
+ * 防御・回避の文（2026-11-06 指示書 BK【2】。src/data/skillRebuildAJ.ts の tGuard・tDodge の形）のアイコン。アイコンは前と同じ：
+ * 防御は E05（ちから）・E06（かしこさ）・両方は2つ〔軽減の数はカードの盾の欄〕、回避は E15（ちから・かしこさの印、マナの条件は「2+」の札）
+ */
+function guardDodgeIcons(text: string): readonly FxIcon[] | null {
+  const guard = /^(ちから技|かしこさ技|ちから技、かしこさ技)の受けるダメージを\d+減らす。$/.exec(text);
+  if (guard) return guard[1] === 'ちから技' ? one('e05') : guard[1] === 'かしこさ技' ? one('e06') : [{ main: 'e05' }, { main: 'e06' }];
+  const dodge = /^(?:マナ(\d+)以上の)?(ちから技|かしこさ技|ちから技、かしこさ技)を回避する。$/.exec(text);
+  if (!dodge) return null;
+  const marks: readonly FxMark[] | undefined = dodge[2] === 'ちから技' ? ['force'] : dodge[2] === 'かしこさ技' ? ['wisdom'] : undefined;
+  return one('e15', marks, dodge[1] ? v(`${dodge[1]}+`) : undefined);
+}
+
 const BY_TEXT: Readonly<Record<string, readonly FxIcon[]>> = {
   // ---- 指示書 BA（文が言い切れるもの） ----
   回避されない: one('e01'),
@@ -44,35 +57,26 @@ const BY_TEXT: Readonly<Record<string, readonly FxIcon[]>> = {
   回避されても半分のダメージ: one('e03'),
   相手全員にダメージ: one('e04'),
   '相手全員に当たる（守りは1体ずつ）': one('e04'),
-  ちから技に効く: one('e05'),
-  かしこさ技に効く: one('e06'),
-  'ちから技・かしこさ技に効く': [{ main: 'e05' }, { main: 'e06' }],
-
-  // ---- 指示書 BB：回避 ----
-  'マナに関係なく、ちから技・かしこさ技を回避': one('e15'),
-  条件なしで回避: one('e15'),
-  'ちから技・かしこさ技を回避': one('e15'),
-  'マナ2以上のちから技・かしこさ技を回避': one('e15', undefined, v('2+')),
-  '消費マナ2以上のちから技・かしこさ技を回避': one('e15', undefined, v('2+')),
-  'マナ3以上のちから技・かしこさ技を回避': one('e15', undefined, v('3+')),
-  ちから技を回避: one('e15', ['force']),
-  かしこさ技を回避: one('e15', ['wisdom']),
+  // 防御・回避（2026-11-06 指示書 BK【2】で文をそろえた）は guardDodgeIcons で文の形から決める
+  // てっぺきシェル（0にする）は前と同じ両方の防御のアイコン
+  'ちから技、かしこさ技の受けるダメージを0にする。': [{ main: 'e05' }, { main: 'e06' }],
 
   // ---- 相手を止める・ねらいを変える ----
   相手1体は次の攻撃を行えない: one('s08'),
   相手は次のターン行動できない: one('s07'),
   '相手は次のターン、ラズックしか攻撃できない': one('s13'),
   '相手は次のターン、リリルしか攻撃できない': one('s13'),
+  '相手は次のターン、クロシオしか攻撃できない': one('s13'),
   次のターン攻撃の的にならない: one('s12'),
   '相手は次のターン、リリルを攻撃できない': one('s12'),
 
   // ---- 強く・弱く ----
   '相手の次のターンのちから技−1': one('b02', undefined, v(`${MINUS}1`)),
-  '次の相手のターン、受けるちから技すべて−3': one('e05', undefined, v(`${MINUS}3`)),
+  '次の相手のターン、ちから技の受けるダメージを3減らす。': one('e05', undefined, v(`${MINUS}3`)),
   '次の攻撃＋2（使うまで続く）': one('b09', undefined, v('+2')),
   'プカリム以外の味方1体、次のターンの攻撃＋1': one('b09', ['ally'], v('+1')),
   'フォルン以外の味方1体、次のターンの攻撃＋1': one('b09', ['ally'], v('+1')),
-  'フォルン以外の味方1体、次の相手のターンに受けるダメージ−1': one('b05', ['ally'], v(`${MINUS}1`)),
+  'フォルン以外の味方1体は、次の相手のターン、受けるダメージを1減らす。': one('b05', ['ally'], v(`${MINUS}1`)),
   '次のターン、ツムジの攻撃のマナ−1': one('b13', undefined, v(`${MINUS}1`)),
   '次のターン、最初のかしこさ技を2倍に': one('b03', undefined, v('×2')),
   次のターン回避されない: one('e01', undefined, NEXT_TURN),
@@ -103,9 +107,9 @@ const BY_TEXT: Readonly<Record<string, readonly FxIcon[]>> = {
   '当たると自分のライフ−1': one('e24', undefined, v(`${MINUS}1`)),
   '当たると自分のライフ−2': one('e24', undefined, v(`${MINUS}2`)),
   '当たると自分のライフ−3': one('e24', undefined, v(`${MINUS}3`)),
-  味方への攻撃を代わりに受ける: one('b05', ['ally']),
+  '味方への攻撃を代わりに受ける。': one('b05', ['ally']),
   // 2026-11-05 指示書 BH：クヨウ。みがわりは かばう に −2 の札。2026-11-06 指示書 BJ：おはらい（F01）・まよけのふだ（F02）は新しいアイコン
-  '味方への攻撃を代わりに受け、ダメージ−2': one('b05', ['ally'], v(`${MINUS}2`)),
+  '味方への攻撃を代わりに受け、受けるダメージを2減らす。': one('b05', ['ally'], v(`${MINUS}2`)),
   '味方1体の悪い状態をすべて消し、ライフ＋1（もとのLIFEまで）': one('f01', ['ally'], v('+1')),
   '次の相手のターンの終わりまで、味方全員に悪い状態がつかない': one('f02', ['ally'], NEXT_TURN),
   // 2026-11-05 指示書 BI：ラディエル。しんぱんのせんこく＝攻撃できない＋マナ−1（今あるアイコン）。2026-11-06 指示書 BJ：最後の審判（F03）・天の恵み（F04）は新しいアイコン
@@ -123,6 +127,9 @@ const BY_TEXT: Readonly<Record<string, readonly FxIcon[]>> = {
   '相手が空中なら +2（ダメージ4）': one('b09', ['air'], v('+2')),
   '相手全員に1ダメージ。空中の相手には2ダメージ': one('e04', ['air'], v('+1')),
   '次の自分のターンの終わりまで、全モンスターを水中にする': one('e13', ['water']),
+  // 2026-11-06 指示書 BK：クロシオ。ひきずりこむ＝水中の居場所の印（この相手だけ・次のターン）・おおうずしお＝地ひびきの水中版（今あるアイコン）
+  '当たった相手1体を、次の自分の手番の終わりまで水中にする': one('t03', ['target'], NEXT_TURN),
+  '水中の相手全員に当たる（守りは1体ずつ）。水中の相手がいないと使えない': one('e04', ['water']),
 
   // ---- デスオル ----
   '倒れている味方1体につき＋2': one('b09', ['ko'], v('+2')),
@@ -132,7 +139,7 @@ const BY_TEXT: Readonly<Record<string, readonly FxIcon[]>> = {
 /** その技の効果のアイコン（アイコンにしない技は null＝今の文のまま。仮のカードなど） */
 export function skillEffectIcons(skill: SkillCard): readonly FxIcon[] | null {
   const text = skill.effectTextJa;
-  return text ? (BY_TEXT[text] ?? null) : null;
+  return text ? (BY_TEXT[text] ?? guardDodgeIcons(text)) : null;
 }
 
 /** アイコンにしている効果の文（テスト・報告用） */

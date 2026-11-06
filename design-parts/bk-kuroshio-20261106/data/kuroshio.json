@@ -1,0 +1,29 @@
+{
+  "id": "mon-kuroshio",
+  "name": { "ja": "クロシオ", "en": "Kuroshio" },
+  "life": 7,
+  "internalRank": "B",
+  "habitat": "water",
+  "frameColor": "#F08A78",
+  "guardType": "evade_only",
+  "role": "セイラン地方の王者ナディアの切り札（海のパーティー：クロシオ・カルシェル・ミュロル）。相手を水中にして狩る",
+  "description": {
+    "ja": "（仮）夕暮れの外洋を駆ける、珊瑚の隈取りの海の狩人。",
+    "en": "(draft) A sea hunter with coral markings that races across the open sea at dusk."
+  },
+  "acquisition": "未定（セイラン招待大会の優勝で開く予定。招待大会はまだ作っていない）",
+  "skills": [
+    { "id": "skl-kuroshio-01", "no": 1, "name": "ひれはたき", "cat": "ち", "mana": 0, "damage": 1, "rare": false },
+    { "id": "skl-kuroshio-02", "no": 2, "name": "くいつく", "cat": "ち", "mana": 1, "damage": 2, "rare": false },
+    { "id": "skl-kuroshio-03", "no": 3, "name": "テールスラップ", "cat": "ち", "mana": 2, "damage": 3, "rare": false },
+    { "id": "skl-kuroshio-04", "no": 4, "name": "ひきずりこむ", "cat": "ち", "mana": 2, "damage": 2, "rare": false, "effect": "NEW dragUnder: 当たった相手1体を、次の自分の手番の終わりまで水中にする" },
+    { "id": "skl-kuroshio-05", "no": 5, "name": "ブリーチダイブ", "cat": "ち", "mana": 4, "damage": 6, "rare": false },
+    { "id": "skl-kuroshio-06", "no": 6, "name": "しおふきキャノン", "cat": "か", "mana": 3, "damage": 4, "rare": true, "effect": "undodgeableVsWater（セレフィーンのオーシャンウェーブと同じ）" },
+    { "id": "skl-kuroshio-07", "no": 7, "name": "おおうずしお", "cat": "か", "mana": 5, "damage": 3, "rare": true, "effect": "NEW allTargets + waterOnly（ジオルの地ひびき〔allTargets + groundOnly〕の水中版）" },
+    { "id": "skl-kuroshio-08", "no": 8, "name": "オルカストライク", "cat": "ち", "mana": 5, "damage": 7, "rare": true, "effect": "halfOnEvade" },
+    { "id": "skl-kuroshio-09", "no": 9, "name": "みちしお", "cat": "特", "mana": 2, "damage": null, "rare": false, "effect": "tide（カルシェル・セレフィーンと同じ）" },
+    { "id": "skl-kuroshio-10", "no": 10, "name": "よびごえ", "cat": "特", "mana": 2, "damage": null, "rare": false, "effect": "taunt（ラズックのおびきよせと同じ）" },
+    { "id": "skl-kuroshio-11", "no": 11, "name": "もぐってかわす", "cat": "避", "mana": 1, "damage": null, "rare": false, "effect": "dodge('all', 2)" },
+    { "id": "skl-kuroshio-12", "no": 12, "name": "うずまきターン", "cat": "避", "mana": 2, "damage": null, "rare": true, "effect": "dodge('all')" }
+  ]
+}

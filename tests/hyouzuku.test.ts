@@ -76,7 +76,7 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
     expect(getSkill(hyo(6)).effectTextJa).toBe('防御されない');
     expect(getSkill(hyo(14)).effectTextJa).toBe(getSkill('skl-tsumuji-14').effectTextJa);
     // 指示書 AJ：まいあがるは両方を回避に。はねでつつむ（11）・つばさのたて（12）は外した
-    expect(getSkill(hyo(13)).effectTextJa).toBe('マナに関係なく、ちから技・かしこさ技を回避');
+    expect(getSkill(hyo(13)).effectTextJa).toBe('ちから技、かしこさ技を回避する。');
     expect(hyouzukuJson.skills[10]?.effect).toBe('ちから技・かしこさ技のダメージを2軽減');
   });
 

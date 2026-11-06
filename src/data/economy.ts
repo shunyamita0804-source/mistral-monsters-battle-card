@@ -170,6 +170,10 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // ラディエル（2026-11-05 指示書 BI）：天の聖域でラディエルのモンスターカードを受け取ったら並ぶ（今の決まり）。unlockFlag は付けない。
   // レアの枠は せいなるしせん・てんのはどう・最後の審判・天の恵み。パック pack_radiel.webp・販売機の窓 panel_radiel.webp
   { id: 'radiel', monsterId: 'mon-radiel', rareSkillNames: ajRareNames('mon-radiel') },
+  // クロシオ（2026-11-06 指示書 BK）：準備だけ。セイランの招待大会の優勝で開く予定（開く条件はあとで決める）。今は「モンスターカードを初めて手に入れたら開く」の決まりのままで、
+  // だれもクロシオのモンスターカードを持っていないので並ばない。unlockFlag は付けない。レアの枠は しおふきキャノン・おおうずしお・オルカストライク・うずまきターン。
+  // パック pack_kuroshio.webp・販売機の窓 panel_kuroshio.webp
+  { id: 'kuroshio', monsterId: 'mon-kuroshio', rareSkillNames: ajQaRareNames('mon-kuroshio') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -208,7 +212,7 @@ export function legacyAvailableGachaSeries(storyFlags: readonly string[]): reado
  * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン・指示書 AQ のウズリオ）。
  * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
  */
-const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos', 'kuyo', 'radiel'];
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos', 'kuyo', 'radiel', 'kuroshio'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

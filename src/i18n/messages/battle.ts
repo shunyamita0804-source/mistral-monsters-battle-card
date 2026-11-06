@@ -110,6 +110,8 @@ export const BATTLE = {
   'battle.log.taunt': { ja: '{name}は次のターン、{only}にしか攻撃できない。', en: '{name} can only attack {only} next turn.' },
   // ノビトン（2026-10-25）
   'battle.log.manaDrain': { ja: '{side}のマナが{n}減った。', en: "{side}'s mana went down by {n}." },
+  // 2026-11-06 指示書 BK：クロシオ（ひきずりこむ）
+  'battle.log.dragUnder': { ja: '{name}は水中にひきずりこまれた（次の相手のターンの終わりまで水中）。', en: '{name} was dragged underwater (counts as underwater until the end of the next enemy turn).' },
   'battle.log.stun': { ja: '{name}は次のターン行動できない。', en: "{name} can't act next turn." },
   'battle.log.shield': { ja: '{name}が受ける{stat}技のダメージ-{n}（相手の次のターンまで）。', en: '{name} takes -{n} {stat} damage (until the end of the next turn).' },
   'battle.log.redrawHand': {
@@ -176,6 +178,7 @@ export const BATTLE = {
   // 2026-10-30 指示書 X：状態の印を3つ足した（英語は仮訳）
   'battle.status.frozen': { ja: '凍って行動不可', en: 'Frozen' },
   'battle.status.energy': { ja: 'エネルギー', en: 'Energy' },
+  'battle.status.dragged': { ja: 'ひきずりこまれて水中', en: 'Dragged underwater' },
   'battle.status.noEvade': { ja: '回避できない', en: "Can't dodge" },
   'battle.status.dragonGaze': { ja: '次は回避されない', en: 'Next: no dodge' },
   'battle.status.dragonMight': { ja: '次は防御されない', en: 'Next: no guard' },
@@ -239,6 +242,7 @@ export const BATTLE = {
   'battle.status.shield': { ja: '受ける{stat}−{n}', en: 'Takes {stat} -{n}' },
   'battle.ng.sealed': { ja: 'このターンは攻撃できません（攻撃を封じられています）', en: "Can't attack this turn (sealed by an enemy skill)" },
   'battle.ng.noAttackTarget': { ja: '攻撃できる相手がいません', en: 'No enemy to attack' },
+  'battle.ng.waterOnly': { ja: '水中の相手がいません（水中の相手だけに当たる技）', en: 'No underwater enemies (this skill only hits underwater enemies)' },
   'battle.ng.groundOnly': { ja: '地上の相手がいません（地上の相手だけに使える技）', en: 'No ground enemies (this skill can only target ground enemies)' },
   // 2026-11-02 指示書 AQ：しずめの祈り
   'battle.ng.noField': { ja: '場にカードがありません', en: 'There is no field card' },

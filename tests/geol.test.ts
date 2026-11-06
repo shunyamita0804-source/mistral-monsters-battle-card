@@ -99,8 +99,8 @@ describe('ジオル：データ（届いた JSON・CSV を無改変で置き、�
   it('画面に出す短い文（2026-10-29 ユーザー指示。2026-11-01 指示書 AJ の効果の文）', () => {
     expect(getSkill(geo(5)).effectTextJa).toBe('地上の相手全員に当たる（守りは1体ずつ）');
     expect(getSkill(geo(10)).effectTextJa).toBe('次のターン、最初のかしこさ技を2倍に');
-    expect(getSkill(geo(11)).effectTextJa).toBe('味方への攻撃を代わりに受ける');
-    expect(getSkill(geo(14)).effectTextJa).toBe('ちから技に効く');
+    expect(getSkill(geo(11)).effectTextJa).toBe('味方への攻撃を代わりに受ける。');
+    expect(getSkill(geo(14)).effectTextJa).toBe('ちから技の受けるダメージを5減らす。');
   });
 
   it('モンスター：ライフ9・色は岩の茶・ID mon-geol。ガチャのレアの枠は 3・5・6・14（指示書 AJ）。仮ジオルはゲームから外した', () => {

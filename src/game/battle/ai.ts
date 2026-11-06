@@ -325,6 +325,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const dragon = chooseDragonFocus(state, side, options, enemies, skill);
   if (dragon) return dragon;
 
+  // 2.69 クロシオ（2026-11-06 指示書 BK）：おおうずしお（水中の相手が2体以上）・ひきずりこむ・みちしお・よびごえは、ふつうの攻撃より先
+  const kuroshio = chooseKuroshioTrick(state, side, options, style, skill);
+  if (kuroshio) return kuroshio;
+
   // 2.7 カルシェル・セレフィーン（指示書 AJ）。みちしお（このあと水中で強くなる攻撃を使う）・デスオルの死のレクイエム
   const tide = chooseTide(state, side, options);
   if (tide) return tide;
@@ -629,8 +633,10 @@ function chooseSupportPlay(state: BattleState, side: Side, options: Option[], st
   return null;
 }
 
-/** 場が水中で強くなる攻撃か（場が水中なら2倍・水中の相手に防御／回避されない） */
-const isWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.doubleInWater || k.effect.unblockableVsWater || k.effect.undodgeableVsWater);
+/** 場が水中で強くなる攻撃か（場が水中なら2倍・水中の相手に防御／回避されない・水中の相手全員に〔クロシオのおおうずしお 指示書 BK〕） */
+const isWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.doubleInWater || k.effect.unblockableVsWater || k.effect.undodgeableVsWater || k.effect.waterOnly);
+/** 相手が水中なら強くなる攻撃か（場でなく相手の居場所で決まる：しおふきキャノン・オーシャンウェーブ・ルナタイド・おおうずしお。ひきずりこむで水中にすれば効く） */
+const isVsWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !!(k.effect.unblockableVsWater || k.effect.undodgeableVsWater || k.effect.waterOnly);
 
 /**
  * みちしお（指示書 AJ の追加その3：カルシェル・セレフィーン。使った側の次の自分の手番の終わりまで水中）。手札に水中で強くなる攻撃があり、
@@ -638,7 +644,8 @@ const isWaterAttack = (k: SkillCard): boolean => k.effect.type === 'attack' && !
  * もう水中で次の自分の手番まで続くとき・自分に得なサポートの場を上書きしてしまうときは使わない
  */
 function chooseTide(state: BattleState, side: Side, options: Option[]): BattleAction | null {
-  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'tide');
+  // クロシオのみちしおは chooseKuroshioTrick だけで考える（2026-11-06 指示書 BK）
+  const tide = options.filter(isSkillOption).find((o) => o.def.effect.type === 'tide' && !KUROSHIO_MONSTERS.includes(o.def.monsterId));
   if (!tide) return null;
   const field = activeField(state);
   if (field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 2) return null;
@@ -1205,6 +1212,83 @@ function chooseKuyoTrick(state: BattleState, side: Side, options: Option[], skil
   return null;
 }
 
+/** 指示書 BK の考え方で、ひきずりこむ・おおうずしお・みちしお・よびごえを使うモンスター */
+const KUROSHIO_MONSTERS: readonly string[] = ['mon-kuroshio'];
+/** よびごえ：クロシオ以外の味方のライフがこれ以下なら「少ない」 */
+const KUROSHIO_CALL_LOW_LIFE = 2;
+
+/**
+ * クロシオ（2026-11-06 指示書 BK）。その手番に倒せる相手がいるときはふつうの攻撃に任せる。それ以外は次の順：
+ * 1. おおうずしお：いま水中の相手が2体以上
+ * 2. みちしお（手札におおうずしおがあり、相手が2体以上いて、水中の相手がいないとき）
+ * 3. ひきずりこむ：手札に「相手が水中なら強い攻撃」（しおふきキャノン・おおうずしお・味方のオーシャンウェーブ など。ひきずりこむのほか）があり、水中でない相手がいるとき
+ *    （その相手を水中に。まよけのふだの効いている相手には使わない）
+ * 4. みちしお：手札に水中で強い攻撃（味方のタイダルクラッシュ〔場が水中なら2倍〕も）があるのに、水中の相手がいないとき（タイダルクラッシュは水中の相手がいても）
+ * 5. よびごえ：クロシオの回避の技が手札にある（よびごえのあとのマナで払える）か、クロシオ以外の味方のライフが少ない（2以下）とき。いちばん危ない相手に
+ * 腕前 C は forgetTrick の割合で使いそこねる
+ */
+function chooseKuroshioTrick(state: BattleState, side: Side, options: Option[], style: AiStyle, skill: CpuSkill): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => KUROSHIO_MONSTERS.includes(o.def.monsterId));
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'kuroshioTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  const me = state.sides[side];
+  const foe = otherSide(side);
+  const mana = manaOf(me);
+  const alive = new Set(aliveMonsters(me).map((m) => m.cardId));
+  const foes = attackableMonsters(state, foe);
+  const wetFoes = foes.filter((m) => habitatOf(state, m) === 'water');
+  const handSkills = (except: string): SkillCard[] =>
+    me.hand
+      .filter((c) => c.uid !== except)
+      .map((c) => getPlayCard(c.cardId))
+      .filter((k): k is SkillCard => k.kind === 'skill' && alive.has(k.monsterId));
+
+  const whirl = mine.find((o) => o.def.effect.type === 'attack' && !!o.def.effect.waterOnly);
+  if (whirl && targetsFor(state, side, whirl.def).length >= 2) return attackAction(state, side, whirl, targetsFor(state, side, whirl.def)[0]?.uid ?? '');
+
+  const tide = mine.find((o) => o.def.effect.type === 'tide');
+  const field = activeField(state);
+  const tideLasts = field?.habitat === 'water' && (field.untilTurn ?? Infinity) >= state.turn + 2;
+  const tideUser = tide ? availableUsers(state, side, tide.def)[0] : undefined;
+  const useTide = (): BattleAction | null => (tide && tideUser ? { type: 'useCard', side, cardUid: tide.card.uid, userUid: tideUser.uid } : null);
+  const whirlInHand = handSkills(tide?.card.uid ?? '').some((k) => k.effect.type === 'attack' && !!k.effect.waterOnly);
+  if (tide && !tideLasts && whirlInHand && wetFoes.length === 0 && foes.length >= 2) {
+    const act = useTide();
+    if (act) return act;
+  }
+
+  const drag = mine.find((o) => o.def.effect.type === 'attack' && !!o.def.effect.dragUnder);
+  if (drag && !wardCharmActive(state, foe) && handSkills(drag.card.uid).some(isVsWaterAttack)) {
+    const dry = targetsFor(state, side, drag.def).filter((m) => habitatOf(state, m) !== 'water');
+    const target = pickTarget(state, side, dry, style, skill, 'drag');
+    if (target) return attackAction(state, side, drag, target.uid);
+  }
+
+  if (tide && !tideLasts) {
+    const rest = handSkills(tide.card.uid);
+    const wantVs = wetFoes.length === 0 && rest.some(isVsWaterAttack);
+    const wantDouble = rest.some((k) => k.effect.type === 'attack' && !!k.effect.doubleInWater);
+    const support = fieldSupport(state);
+    const keepField = !!support && field?.owner === side && fieldScore(state, side, support) > 0;
+    if ((wantVs || wantDouble) && !keepField) {
+      const act = useTide();
+      if (act) return act;
+    }
+  }
+
+  const call = mine.find((o) => o.def.effect.type === 'taunt');
+  if (call) {
+    const left = mana - call.def.cost;
+    const evade = handSkills(call.card.uid).some((k) => KUROSHIO_MONSTERS.includes(k.monsterId) && k.effect.type === 'evade' && k.cost <= left);
+    const weakAlly = aliveMonsters(me).some((m) => !KUROSHIO_MONSTERS.includes(m.cardId) && m.life <= KUROSHIO_CALL_LOW_LIFE);
+    const free = aliveMonsters(state.sides[foe]).filter((m) => !(m.taunt && m.taunt.turn >= state.turn + 1));
+    const target = [...free].sort((a, b) => threatOf(state, b) - threatOf(state, a) || b.life - a.life)[0];
+    if ((evade || weakAlly) && target && !wardCharmActive(state, foe)) return attackAction(state, side, call, target.uid);
+  }
+  return null;
+}
+
 /** 指示書 BI の考え方で、しんぱんのせんこく・最後の審判・天の恵みを使うモンスター */
 const RADIEL_MONSTERS: readonly string[] = ['mon-radiel'];
 /** 天の恵みで払いたい「大きな技」の消費マナ（てんりんのさばき 6・てんのはどう 7） */
@@ -1260,7 +1344,7 @@ function chooseSpecial(state: BattleState, side: Side, options: Option[], enemie
   // リリルのうっとりウインクは chooseLililTrick、フォルンのこもりうたは chooseFornTrick だけで考える（2026-11-02 指示書 AK2・AL）
   const special = options
     .filter(isSkillOption)
-    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && !FORN_MONSTERS.includes(o.def.monsterId) && !RADIEL_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
+    .find((o) => ['weaken', 'seal', 'taunt'].includes(o.def.effect.type) && !WINK_MONSTERS.includes(o.def.monsterId) && !FORN_MONSTERS.includes(o.def.monsterId) && !RADIEL_MONSTERS.includes(o.def.monsterId) && !KUROSHIO_MONSTERS.includes(o.def.monsterId) && o.def.cost + spare <= mana);
   const strongestEnemy = [...enemies].sort((a, b) => b.life - a.life)[0];
   return special && strongestEnemy ? attackAction(state, side, special, strongestEnemy.uid) : null;
 }

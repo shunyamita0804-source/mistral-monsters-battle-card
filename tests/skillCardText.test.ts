@@ -17,11 +17,28 @@ describe('カードに書く短い効果の文', () => {
     }
   });
 
-  it('防御の技は「どの技に効くか」だけ（軽減の数を書かない。かばうは別）', () => {
+  it('2026-11-06 指示書 BK【2】：防御・回避の文はそろえた形。数字・条件はカードの動きと同じ（かばう・みがわり・0にする は特別な守り）', () => {
+    const STAT = { force: 'ちから技', wisdom: 'かしこさ技', all: 'ちから技、かしこさ技' } as const;
+    let guards = 0;
+    let dodges = 0;
     for (const card of cardCatalog.all()) {
-      if (card.kind !== 'skill' || card.isPlaceholder || card.category !== 'defense' || card.effect.type === 'cover') continue;
-      expect(card.effectTextJa, card.id).toMatch(/^(マナ\d以上の)?(ちから技|かしこさ技|ちから技・かしこさ技)に効く$/);
+      if (card.kind !== 'skill' || card.isPlaceholder) continue;
+      const e = card.effect;
+      if (e.type === 'defense' && !e.nullify) {
+        guards++;
+        expect(card.effectTextJa, card.id).toBe(`${STAT[e.against]}の受けるダメージを${e.reduce}減らす。`);
+      }
+      if (e.type === 'evade') {
+        dodges++;
+        expect(card.effectTextJa, card.id).toBe(`${e.minCost ? `マナ${e.minCost}以上の` : ''}${STAT[e.against ?? 'all']}を回避する。`);
+      }
+      // 前の言い方が残っていない
+      expect(card.effectTextJa ?? '', card.id).not.toMatch(/に効く$|条件なしで回避|マナに関係なく|を回避$/);
     }
+    expect(guards).toBeGreaterThan(20);
+    expect(dodges).toBeGreaterThan(20);
+    expect(getSkill('skl-kalshell-13').effectTextJa).toBe('ちから技、かしこさ技の受けるダメージを0にする。');
+    expect(getSkill('skl-geol-11').effectTextJa).toBe('味方への攻撃を代わりに受ける。');
   });
 
   it('「重複不可」は「重ねられない」にそろえる', () => {

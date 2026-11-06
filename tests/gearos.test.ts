@@ -70,7 +70,7 @@ describe('ギアロスのデータ（届いた CSV のとおり）', () => {
       expect(r.mana).toBe(Number(mana));
       expect(r.damage).toBe(damage ? Number(damage) : null);
       // 10 エネルギーシールド：防御の文は「どの技に効くか」だけにそろえる決まり（軽減の数 3 は effect に）
-      expect(r.text ?? 'なし').toBe(no === '10' ? 'かしこさ技に効く' : text);
+      expect(r.text ?? 'なし').toBe(no === '10' ? 'かしこさ技の受けるダメージを3減らす。' : no === '11' ? 'マナ2以上のちから技、かしこさ技を回避する。' : text);
       expect(!!r.rare).toBe(rare === '○');
       expect(img).toBe(`gearos_sk_${String(no).padStart(2, '0')}.png`);
     });

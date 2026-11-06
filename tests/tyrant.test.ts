@@ -56,8 +56,8 @@ describe('タイラントのデータ（届いた CSV のとおり）', () => {
       expect(r.cat).toBe(CAT[cat ?? '']);
       expect(r.mana).toBe(Number(mana));
       expect(r.damage).toBe(damage ? Number(damage) : null);
-      // 11 ウロコのガード：防御の文は「どの技に効くか」だけにそろえる決まり（tests/skillCardText.test.ts）。軽減の数 3 は effect に
-      expect(r.text ?? 'なし').toBe(no === '11' ? 'ちから技に効く' : text);
+      // 11 ウロコのガード・12 上空に飛ぶ：防御・回避の文は 2026-11-06 指示書 BK【2】でそろえた形（tests/skillCardText.test.ts）
+      expect(r.text ?? 'なし').toBe(no === '11' ? 'ちから技の受けるダメージを3減らす。' : no === '12' ? 'ちから技、かしこさ技を回避する。' : text);
       expect(!!r.rare).toBe(rare === '○');
       expect(r.art).toBe(tyrantArtFile(Number(no)));
       expect(img).toBe(`tyrant_sk_${String(no).padStart(2, '0')}.png`);
@@ -79,7 +79,8 @@ describe('タイラントのデータ（届いた CSV のとおり）', () => {
 
   it('置き場所は決まっていない：ふつうの一覧・図鑑・ガチャ・箱・ダンジョン・敵の編成に出ない（確かめ用 QA_MONSTERS・QA_SKILLS だけ）', () => {
     // 2026-11-05 指示書 BH：クヨウも確かめ用（霧の廃坑ができるまで）
-    expect(QA_MONSTERS.map((m) => m.id)).toEqual([TYRANT_MONSTER_ID, 'mon-kuyo']);
+    // 2026-11-06 指示書 BK：クロシオも確かめ用（置き場所ができるまで）
+    expect(QA_MONSTERS.map((m) => m.id)).toEqual([TYRANT_MONSTER_ID, 'mon-kuyo', 'mon-kuroshio']);
     expect(QA_SKILLS.filter((k) => k.monsterId === TYRANT_MONSTER_ID)).toHaveLength(12);
     expect(MONSTERS.some((m) => m.id === TYRANT_MONSTER_ID)).toBe(false);
     expect(SKILLS.some((k) => k.monsterId === TYRANT_MONSTER_ID)).toBe(false);

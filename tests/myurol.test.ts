@@ -276,8 +276,8 @@ describe('ミュロル正式14技：初期配布16枚・モンスター', () => 
   it('日本語はカードに書く短い文（skillCardText.ts）か JSON の効果の文。英語は仮訳で、日本語が残らない', () => {
     setLanguage('ja');
     // 指示書 AJ の効果の文
-    expect(skillCardFace(getSkill(myu(8))).description).toBe('次の相手のターン、受けるちから技すべて−3');
-    expect(skillCardFace(getSkill(myu(16))).description).toBe('ちから技を回避');
+    expect(skillCardFace(getSkill(myu(8))).description).toBe('次の相手のターン、ちから技の受けるダメージを3減らす。');
+    expect(skillCardFace(getSkill(myu(16))).description).toBe('ちから技を回避する。');
     for (const s of skillsOf('mon-myurol')) expect(skillCardFace(s).mana).toBe(s.cost);
     setLanguage('en');
     expect(cardName(MYUROL_MONSTER)).toBe('Myurol');

@@ -16,6 +16,7 @@ import { FORN_MONSTER } from './forn.ts';
 import { UZURIO_MONSTER } from './uzurio.ts';
 import { TYRANT_MONSTER } from './tyrant.ts';
 import { KUYO_MONSTER } from './kuyo.ts';
+import { KUROSHIO_MONSTER } from './kuroshio.ts';
 import { RADIEL_MONSTER } from './radiel.ts';
 import { GEAROS_MONSTER, GEAROS_MONSTER_ID, OVERDRIVE_COMBO_COST, OVERDRIVE_COMBO_DAMAGE, OVERDRIVE_COMBO_ID } from './gearos.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
@@ -326,7 +327,8 @@ export const LEGACY_SUPPORT_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map(supp
  */
 // 2026-11-05 指示書 AX【2】：タイラント（置き場所・入手はまだ決まっていない。確かめ用の画面 ?qa=1&lab=tyrant だけ）
 // 2026-11-05 指示書 BH：クヨウ（霧の廃坑の切り札。霧の廃坑ができるまで確かめ用の画面 ?qa=1&lab=kuyo だけ）
-export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER, KUYO_MONSTER].map((m): MonsterCard => {
+// 2026-11-06 指示書 BK：クロシオ（セイランの王者ナディアの切り札。置き場所ができるまで確かめ用の画面 ?qa=1&lab=kuroshio だけ）
+export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER, KUYO_MONSTER, KUROSHIO_MONSTER].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;
 });

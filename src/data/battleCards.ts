@@ -15,6 +15,7 @@ import { FORN_MONSTER_ID } from './forn.ts';
 import { UZURIO_MONSTER_ID } from './uzurio.ts';
 import { TYRANT_MONSTER_ID } from './tyrant.ts';
 import { KUYO_MONSTER_ID } from './kuyo.ts';
+import { KUROSHIO_MONSTER_ID } from './kuroshio.ts';
 import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -93,6 +94,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [GEAROS_MONSTER_ID]: { art: 'gearos_battlecard.png', frame: 'gearos', scale: 0.86, offsetY: 0 },
   // クヨウ（2026-11-05 指示書 BH）：枠は霧の藤ねず（#87649C。カードの絵の枠の色）。絵は届いた kuyo_battlecard.png（1169×1346 透過）を無改変（毛先の半透明はそのまま）。ハクランと同じ大きさ・縦横比
   [KUYO_MONSTER_ID]: { art: 'kuyo_battlecard.png', frame: 'kuyo', scale: 0.8, offsetY: -0.02 },
+  // クロシオ（2026-11-06 指示書 BK）：枠は珊瑚（#F08A78）。絵は届いた透過 PNG（1169×1345）の透明度を 0／255 にそろえたもの（色は変えていない）。クヨウと同じ大きさ
+  [KUROSHIO_MONSTER_ID]: { art: 'kuroshio_battlecard.png', frame: 'kuroshio', scale: 0.8, offsetY: -0.02 },
   // ラディエル（2026-11-05 指示書 BI）：枠は金（#BE7410。カードの絵の枠の色）。絵は届いた radiel_battlecard.png（1169×1346 透過）を無改変（光輪と光の尾の半透明はそのまま）。
   // 翼が絵の幅いっぱいまで広がるので、翼の先が枠の飾りに切られすぎない大きさ
   [RADIEL_MONSTER_ID]: { art: 'radiel_battlecard.png', frame: 'radiel', scale: 0.82, offsetY: -0.01 },

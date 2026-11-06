@@ -11,16 +11,17 @@ import type { MessageKey } from '../src/i18n/messages/index.ts';
 const official = [...SKILLS, ...QA_SKILLS].filter((k) => !k.isPlaceholder);
 
 describe('技カードの効果のアイコン', () => {
-  it('アイコンにする効果の文は、どれも今の技に使われている。効果2つ（ちから技・かしこさ技に効く）はアイコン2つ', () => {
+  it('アイコンにする効果の文は、どれも今の技に使われている。効果2つ（ちから技、かしこさ技の防御）はアイコン2つ', () => {
     for (const text of ICON_EFFECT_TEXTS) expect(official.some((k) => k.effectTextJa === text), text).toBe(true);
-    const both = official.find((k) => k.effectTextJa === 'ちから技・かしこさ技に効く');
+    const both = official.find((k) => k.effectTextJa === 'ちから技、かしこさ技の受けるダメージを3減らす。');
     expect(both && skillEffectIcons(both)?.map((i) => i.main)).toEqual(['e05', 'e06']);
   });
 
   it('指示書 BB：正式の技で効果の文があるもの（132枚）は、すべてアイコンになる（カードに文が出ない）', () => {
     const withText = official.filter((k) => skillBandText(k) !== '');
-    // 2026-11-05 指示書 BH：クヨウの7枚（05・06・08・09・10・11・12）を足して139枚。指示書 BI：ラディエルの10枚を足して149枚
-    expect(withText.length).toBe(149);
+    // 2026-11-05 指示書 BH：クヨウの7枚（05・06・08・09・10・11・12）を足して139枚。指示書 BI：ラディエルの10枚を足して149枚。
+    // 2026-11-06 指示書 BK：クロシオの8枚（04・06〜12）を足して157枚
+    expect(withText.length).toBe(157);
     for (const k of withText) expect(skillEffectIcons(k), `${k.id} ${k.effectTextJa}`).not.toBeNull();
   });
 
@@ -34,8 +35,11 @@ describe('技カードの効果のアイコン', () => {
       return k ? skillEffectIcons(k) : undefined;
     };
     expect(icons('skl-tyrant-09')).toEqual([{ main: 'e01', badge: { kind: 'turn', text: '1' } }]);
-    expect(byText('マナ3以上のちから技・かしこさ技を回避')).toEqual([{ main: 'e15', badge: { kind: 'value', text: '3+' } }]);
-    expect(byText('かしこさ技を回避')).toEqual([{ main: 'e15', marks: ['wisdom'] }]);
+    expect(byText('マナ3以上のちから技、かしこさ技を回避する。')).toEqual([{ main: 'e15', badge: { kind: 'value', text: '3+' } }]);
+    expect(byText('かしこさ技を回避する。')).toEqual([{ main: 'e15', marks: ['wisdom'] }]);
+    // 2026-11-06 指示書 BK【2】：防御の文に数字が入っても、アイコンは前と同じ（軽減の数はカードの盾の欄）
+    expect(byText('ちから技の受けるダメージを5減らす。')).toEqual([{ main: 'e05' }]);
+    expect(byText('ちから技、かしこさ技の受けるダメージを0にする。')).toEqual([{ main: 'e05' }, { main: 'e06' }]);
     expect(byText('相手のマナ−4')).toEqual([{ main: 'b13', badge: { kind: 'value', text: '−4' } }]);
     expect(byText('相手の手札をすべて見て1枚選んで捨てさせる')?.map((i) => i.main)).toEqual(['e18', 'e17']);
     expect(byText('倒れている味方1体につき＋2')).toEqual([{ main: 'b09', marks: ['ko'], badge: { kind: 'value', text: '+2' } }]);

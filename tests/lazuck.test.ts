@@ -367,8 +367,8 @@ describe('ラズックの技の効果（正式14技。ID は同じ名前の技�
 describe('ラズックの技カードの面と日英', () => {
   it('日本語：カードに書く短い文（skillCardText.ts）。回避に余計な但し書きを足さない', () => {
     setLanguage('ja');
-    expect(skillCardFace(getSkill(laz(14))).description).toBe('マナに関係なく、ちから技・かしこさ技を回避');
-    expect(skillCardFace(getSkill(laz(15))).description).toBe('マナ2以上のちから技・かしこさ技を回避');
+    expect(skillCardFace(getSkill(laz(14))).description).toBe('ちから技、かしこさ技を回避する。');
+    expect(skillCardFace(getSkill(laz(15))).description).toBe('マナ2以上のちから技、かしこさ技を回避する。');
     expect(skillCardFace(getSkill(laz(7))).value).toBeNull();
     expect(skillCardFace(getSkill(laz(8))).mana).toBe(0);
   });

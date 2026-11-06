@@ -176,7 +176,7 @@ describe('カルシェル：モンスター・初期配布16枚', () => {
     setLanguage('ja');
     expect(skillCardFace(getSkill(kal(10))).description).toBe('次のターン攻撃の的にならない');
     expect(skillCardFace(getSkill(kal(15))).description).toBe('次の自分のターンの終わりまで、全モンスターを水中にする');
-    expect(skillCardFace(getSkill(kal(13))).description).toBe('ちから技・かしこさ技に効く');
+    expect(skillCardFace(getSkill(kal(13))).description).toBe('ちから技、かしこさ技の受けるダメージを0にする。');
     setLanguage('en');
     expect(cardName(KALSHELL_MONSTER)).toBe('Kalshell');
     for (const s of skillsOf('mon-kalshell')) {

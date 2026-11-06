@@ -20,6 +20,7 @@ import {
   attackableMonsters,
   fieldSupport,
   habitatOf,
+  isDraggedUnder,
   isTideActive,
   handSkillCost,
   recallChoices,
@@ -1915,6 +1916,8 @@ export const battleScreen: ScreenDefinition = {
       if (m.stunnedTurn !== undefined && m.stunnedTurn !== null && m.stunnedTurn >= s.turn) badge('s07', t(m.stunMark === 'frozen' ? 'battle.status.frozen' : 'battle.status.stunned'));
       // ジオルのじならし：この手番に受ける次の攻撃1回を回避できない
       if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn) badge('s09', t('battle.status.noEvade'));
+      // ひきずりこむ（クロシオ 指示書 BK）：印は【仮】で水中の居場所の印（場のカードの居場所の印も水中に変わって光る）
+      if (isDraggedUnder(s, m)) badge('t03', t('battle.status.dragged'));
       // ジオルのエネルギーをためる：次のかしこさ技 2倍
       if (m.energy && s.turn <= m.energy.turn) badge('b03', t('battle.status.energy'), 'x2');
       // タイラントの竜のまなざし・竜のちから

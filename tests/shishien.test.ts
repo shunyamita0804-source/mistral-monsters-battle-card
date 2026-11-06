@@ -95,8 +95,8 @@ describe('シシエン：データ（届いた JSON・CSV を無改変で置き�
     expect(getSkill(shi(8)).effectTextJa).toBe('当たると自分のライフ−2');
     expect(getSkill(shi(9)).effectTextJa).toBe('当たると自分のライフ−3');
     expect(getSkill(shi(10)).effectTextJa).toBe('当たると自分のライフ−2');
-    expect(getSkill(shi(11)).effectTextJa).toBe('ちから技に効く');
-    expect(getSkill(shi(12)).effectTextJa).toBe('ちから技・かしこさ技に効く');
+    expect(getSkill(shi(11)).effectTextJa).toBe('ちから技の受けるダメージを3減らす。');
+    expect(getSkill(shi(12)).effectTextJa).toBe('ちから技、かしこさ技の受けるダメージを3減らす。');
     expect(shishienJson.skills[6]?.effect).toBe('当たったら自分のライフ−1（捨て身）');
   });
 

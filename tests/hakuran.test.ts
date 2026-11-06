@@ -108,7 +108,7 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
 
   it('カードに書く短い文（指示書 AJ の表の文）：回避されない・ひらりとはねる・かすみのあゆみ。ほかは文なし', () => {
     for (const n of [2, 5, 7, 8]) expect(getSkill(hak(n)).effectTextJa).toBe('回避されない');
-    expect(getSkill(hak(12)).effectTextJa).toBe('マナ3以上のちから技・かしこさ技を回避');
+    expect(getSkill(hak(12)).effectTextJa).toBe('マナ3以上のちから技、かしこさ技を回避する。');
     expect(getSkill(hak(14)).effectTextJa).toBe(getSkill('skl-tsumuji-14').effectTextJa);
     for (const n of [1, 3, 4, 6, 9, 10]) expect(getSkill(hak(n)).effectTextJa ?? null).toBe(null);
   });

@@ -71,8 +71,8 @@ describe('フルーネ：データ（届いた JSON・CSV を無改変で置き�
     expect(getSkill(flu(7)).effectTextJa).toBe('相手のマナ−3');
     expect(getSkill(flu(9)).effectTextJa).toBe('与えたダメージぶん回復');
     expect(getSkill(flu(10)).effectTextJa).toBe('味方1体のライフ＋2');
-    expect(getSkill(flu(11)).effectTextJa).toBe('ちから技に効く');
-    expect(getSkill(flu(12)).effectTextJa).toBe('かしこさ技に効く');
+    expect(getSkill(flu(11)).effectTextJa).toBe('ちから技の受けるダメージを3減らす。');
+    expect(getSkill(flu(12)).effectTextJa).toBe('かしこさ技の受けるダメージを3減らす。');
     // 13・14 は指示書 AJ で外した
     // JSON の文は変えていない
     expect(fluneJson.skills[8]?.effect).toBe('与えたダメージぶん、フルーネのライフを回復');
