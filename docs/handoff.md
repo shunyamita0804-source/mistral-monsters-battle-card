@@ -1,8 +1,36 @@
-# 引き継ぎメモ（2026-11-06：指示書 BK〔クロシオ・防御と回避の文〕を main に入れた・未公開。公開済みは 4331e1b〔指示書 BJ まで〕）
+# 引き継ぎメモ（2026-11-06 夜：セッションの引き継ぎ。main＝指示書 BL・ロウガ LIFE 7 まで・**未公開**。公開済みは 4331e1b〔指示書 BJ まで〕）
 
 新しいセッションで読むのは `CLAUDE.md` とこのファイルだけ。他の資料は必要になったときに1つずつ読む。
 
 ## 0. 次のセッションへ
+
+### まず読む：セッションの引き継ぎ（2026-11-06 夜）
+
+- **作業中のものは無い**。このセッションの作業はすべて main に入れた（main＝origin/main。ブランチ `claude/session-handoff-docs-lpz04e` も main と同じ）
+- **公開はしていない**。公開済みは 4331e1b（指示書 BJ まで）。BK〜BL は未公開（公開はユーザーが「公開して」と言ったときだけ）
+- このセッションで main に入れたもの（記録はそれぞれの docs）：
+  | 作業 | 記録 |
+  | --- | --- |
+  | 前の返事待ち（BH・BI・BJ・前からの保留）はすべて「今のまま」に決定 | 各 docs の最後 |
+  | 指示書 BK：クロシオ（`mon-kuroshio`・セイランの王者ナディアの切り札・水中・珊瑚）・ひきずりこむ・おおうずしお。**全技カードの防御・回避の文をそろえた**（`tGuard`・`tDodge`。日英。56枚） | `docs/bk-kuroshio-20261106.md` |
+  | BK2（測るだけ）・BK3：クロシオの強さを Q に（しおふきキャノン⇔ブリーチダイブのレア入れ替え・ブリーチダイブ 6→5・テールスラップ 3→2・もぐってかわす マナ 1→2）。ひきずりこむの記録「〇〇は水中にひきずりこまれた！」 | 同じ docs の最後 |
+  | 指示書 BL：ロウガ（`mon-rouga`・ノルディスの王者アイゼルの切り札・地上・淡い藤色）・とおぼえ（期限つき＋2。`chargeUntil`）。LIFE 8→7（案 R1）・正式カードの絵の LIFE も 7 に | `docs/bl-rouga-20261106.md` |
+- いまの数字（1体入れ替え・腕前 A どうし・レア抜き／レアあり）：クロシオ 64.0／62.1％（B）・ロウガ 66.4／66.2％（B の上）
+- クロシオ・ロウガは**確かめ用だけ**（`?qa=1&lab=kuroshio`・`lab=rouga`。表は `AJ_QA_SKILLS`）。図鑑 No.274〜286・287〜299。ガチャは準備だけ（並ばない）。招待大会（セイラン・ノルディス）を作るときに置く
+- **ユーザーの返事待ち**：BL の要確認 1〜8（`docs/bl-rouga-20261106.md`。強さは R1 で決定済み。尾の色・枠の色の見分けなど）
+- 未完了：iPhone 実機の確認・英語の画面の写真・ひきずりこむの正式な状態の印の絵・招待大会（クロシオ・ロウガの置き場所）
+- 作業のしかた（このセッションで分かったこと）：
+  - 新しいモンスターはクロシオ・ロウガと同じ形：`src/data/〈名前〉.ts`・`AJ_QA_SKILLS`・`MONSTER_HABITAT`・`QA_MONSTERS`・`battleCards`・`cardNames`（名前なし）・`cardNumbers`・`economy`（シリーズ・`LATER_GACHA_SERIES_IDS`）・`monsterPortraits`・英語（`contentEnOfficialDraft`・`contentEnAJ`）・`effectIcons`・確かめ用の画面（`axLabScreens`・`screens`・`registry`・`app`・`settingsScreen`）。
+    ほかのテストの一覧（gachaSeries・skillRebuildAJ・soramoBattleCard・tyrant・peopleBook・baIcons の数）も直す
+  - 絵：`tools/art/kuroshio_assets.py`・`rouga_assets.py` が手本（技・正式カード 508×849・バトル用は `alpha_binarize.py`・パックは `pack_tint.py` の型・ロゴは字の高さ 日本語 174px／英語 160px）。
+    枠は `battle_card_frame.py`（scratchpad に出してから写す）・`npm run art:skillframes`（2分以上かかるので裏で）・販売機の窓 `gacha_panel_build.py`
+  - 防御・回避の文は `skillRebuildAJ.ts` の `tGuard(数, 種類)`・`tDodge(種類, マナ)` で書く（英語とアイコンは文の形から自動）
+  - 試遊：`tests/bkPlaytest.test.ts`（クロシオ）・`tests/blPlaytest.test.ts`（ロウガ。`PLAYTEST_SUBJECT` で変えられる）。`PLAYTEST=200` で約2分。
+    案を測るだけのときは `git worktree add --detach 〈scratchpad〉/案 HEAD` に node_modules をリンクして数字だけ変え、案ごとに別の「バックグラウンドの実行」で回す。終わったら `git worktree remove --force`
+  - 写真：`tools/e2e/bk_kuroshio_shot.cjs`・`bl_rouga_shot.cjs`（開発用サーバー `npx vite --port 5173 --host 127.0.0.1`。ONLY=… でしぼる）
+  - 正式カードの絵の LIFE の数字を変えるときは `tools/art/rouga_life7.py` が手本（同じ書体の子から数字を切り出す。原本は変えず build/ に）
+  - Python のヒアドキュメントは `<<'EOF'`（引用符つき）にする（バッククォートがコマンドとして動いてしまう）
+  - セーブ version は **36**・テスト **1599** 件
 
 ### いまの状態（2026-11-06 ロウガの正式カードの LIFE の数字を 7 に）
 
@@ -45,7 +73,7 @@
   - 霧の廃坑・天の聖域の中身は仮のまま（作るのは指示があったとき）。iPhone 実機の確認・曲と音の試聴は、ユーザーが必要なときに
 - **返事待ちは無い**。次の指示待ち
 
-### まず読む：セッションの引き継ぎ（2026-11-06）
+### その前のセッションの引き継ぎ（2026-11-06 昼。古い）
 
 - **作業中のものは無い**。このセッションの作業はすべて main に入れた（main＝origin/main。ブランチ `claude/claude-handoff-docs-review-nt8pnx` も main と同じ）
 - **2026-11-06 に公開した**（ユーザーの「公開して」）。公開したのは main の `4331e1b`（指示書 BJ まで）。そのあとの main は引き継ぎメモだけ
