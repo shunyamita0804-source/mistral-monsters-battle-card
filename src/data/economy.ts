@@ -171,7 +171,7 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   // レアの枠は せいなるしせん・てんのはどう・最後の審判・天の恵み。パック pack_radiel.webp・販売機の窓 panel_radiel.webp
   { id: 'radiel', monsterId: 'mon-radiel', rareSkillNames: ajRareNames('mon-radiel') },
   // クロシオ（2026-11-06 指示書 BK）：準備だけ。セイランの招待大会の優勝で開く予定（開く条件はあとで決める）。今は「モンスターカードを初めて手に入れたら開く」の決まりのままで、
-  // だれもクロシオのモンスターカードを持っていないので並ばない。unlockFlag は付けない。レアの枠は しおふきキャノン・おおうずしお・オルカストライク・うずまきターン。
+  // だれもクロシオのモンスターカードを持っていないので並ばない。unlockFlag は付けない。レアの枠は ブリーチダイブ・おおうずしお・オルカストライク・うずまきターン（BK3 の Q）。
   // パック pack_kuroshio.webp・販売機の窓 panel_kuroshio.webp
   { id: 'kuroshio', monsterId: 'mon-kuroshio', rareSkillNames: ajQaRareNames('mon-kuroshio') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）

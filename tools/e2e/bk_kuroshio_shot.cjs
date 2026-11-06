@@ -122,6 +122,22 @@ const CLOSE = LANG === 'en' ? 'Close' : '閉じる';
     for (const [n, name] of names) await bookDetail(name, `kuroshio_big_${String(n).padStart(2, '0')}`);
   }
 
+  // 3.5 指示書 BK3：05 ブリーチダイブ（レアに）・06 しおふきキャノン（ノーマルに）・11 もぐってかわす（マナ 2）の大きなカードと、図鑑の並び
+  if (ONLY.includes('bk3')) {
+    await openBook();
+    await page.evaluate(() => {
+      const el = [...document.querySelectorAll('.card-book__item')].find((e) => /ブリーチダイブ|Breach Dive/.test(e.textContent || ''));
+      el?.scrollIntoView({ block: 'start' });
+      const sc = el?.closest('.card-book');
+      if (sc) sc.scrollTop -= 60;
+    });
+    await page.waitForTimeout(800);
+    await waitImages();
+    await page.screenshot({ path: `${out}/bk3_book_grid${suffix}.png` });
+    const names = LANG === 'en' ? [[5, 'Breach Dive'], [6, 'Spout Cannon'], [11, 'Dive Dodge']] : [[5, 'ブリーチダイブ'], [6, 'しおふきキャノン'], [11, 'もぐってかわす']];
+    for (const [n, name] of names) await bookDetail(name, `bk3_big_${String(n).padStart(2, '0')}`);
+  }
+
   /** 対戦を置く（patch で場面を作る） */
   const battle = async (who, patchSrc, foeMonsters, mine = ['mon-kuyo', 'mon-soramo', 'mon-nobiton']) => {
     await page.goto(base);

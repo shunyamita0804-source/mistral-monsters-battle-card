@@ -77,8 +77,11 @@ interface Count {
   /** よびごえの次の相手の手番に、クロシオが狙われた攻撃の数・そのうち回避した数 */
   callAttacks: number;
   callEvaded: number;
+  /** しおふきキャノンを水中の相手に使った回数（水中の相手は回避できない） */
+  cannonWater: number;
+  cannon: number;
 }
-const empty = (): Count => ({ games: 0, wins: 0, deckOut: 0, turns: 0, dragHits: 0, draggedTurns: 0, wetTurns: 0, whirlUsable: 0, whirlUsed: 0, whirlTargets: 0, tide: 0, call: 0, callAttacks: 0, callEvaded: 0 });
+const empty = (): Count => ({ games: 0, wins: 0, deckOut: 0, turns: 0, dragHits: 0, draggedTurns: 0, wetTurns: 0, whirlUsable: 0, whirlUsed: 0, whirlTargets: 0, tide: 0, call: 0, callAttacks: 0, callEvaded: 0, cannonWater: 0, cannon: 0 });
 
 /** 1対戦。数えるのは me の側（クロシオのいる側）の新しい効果。勝ち＝me の勝ち */
 function play(a: Deck, b: Deck, seed: number, first: Side, c: Count, me: Side = 'player', skills: Record<Side, CpuSkill> = { player: SKILL, opponent: SKILL }, lifeScale = 1): void {
@@ -112,6 +115,11 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count, me: Side = 
           c.whirlTargets += targetsFor(s, me, k).length;
         }
         if (k.effect.type === 'tide') c.tide++;
+        if (k.effect.type === 'attack' && k.effect.undodgeableVsWater) {
+          c.cannon++;
+          const tgt = s.sides[foe].monsters.find((m) => m.uid === action.targetUid);
+          if (tgt && habitatOf(s, tgt) === 'water') c.cannonWater++;
+        }
         if (k.effect.type === 'taunt') {
           c.call++;
           callTurn = s.turn + 1;
@@ -154,6 +162,8 @@ const summary = (c: Count): Record<string, number> => ({
   callPerGame: per(c.call, c.games),
   callAttacks: c.callAttacks,
   callEvadedRate: pct(c.callEvaded, c.callAttacks),
+  cannonPerGame: per(c.cannon, c.games),
+  cannonWaterPerGame: per(c.cannonWater, c.games),
 });
 
 function swapSlots(): { key: BoosterKey; slot: number }[] {

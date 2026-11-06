@@ -53,26 +53,26 @@ describe('クロシオのデータ（指示書の表のとおり）', () => {
     expect(m.isPlaceholder).toBe(false);
   });
 
-  it('技12枚：名前・分類・マナ・ダメージ・レアは指示書のとおり（レア＝06・07・08・12）。防御の技は無い（回避だけ）', () => {
+  it('技12枚：名前・分類・マナ・ダメージ・レアは指示書のとおり（レア＝05・07・08・12。BK3 の Q）。防御の技は無い（回避だけ）', () => {
     const table = AJ_QA_SKILLS[KUROSHIO_MONSTER_ID] ?? [];
     const expected: [string, string, number, number | null][] = [
       ['ひれはたき', 'ち', 0, 1],
       ['くいつく', 'ち', 1, 2],
-      ['テールスラップ', 'ち', 2, 3],
+      ['テールスラップ', 'ち', 2, 2], // BK3 の Q：3 → 2
       ['ひきずりこむ', 'ち', 2, 2],
-      ['ブリーチダイブ', 'ち', 4, 6],
+      ['ブリーチダイブ', 'ち', 4, 5], // BK3 の Q：6 → 5
       ['しおふきキャノン', 'か', 3, 4],
       ['おおうずしお', 'か', 5, 3],
       ['オルカストライク', 'ち', 5, 7],
       ['みちしお', '特', 2, null],
       ['よびごえ', '特', 2, null],
-      ['もぐってかわす', '避', 1, null],
+      ['もぐってかわす', '避', 2, null], // BK3 の Q：マナ 1 → 2
       ['うずまきターン', '避', 2, null],
     ];
     expect(table.map((r) => [r.name, r.cat, r.mana, r.damage])).toEqual(expected);
     expect(table.map((r) => r.id)).toEqual(expected.map((_, i) => kr(i + 1)));
     expect(table.map((r) => r.art)).toEqual(expected.map((_, i) => kuroshioArtFile(i + 1)));
-    expect(table.filter((r) => r.rare).map((r) => r.id)).toEqual([kr(6), kr(7), kr(8), kr(12)]);
+    expect(table.filter((r) => r.rare).map((r) => r.id)).toEqual([kr(5), kr(7), kr(8), kr(12)]); // BK3 の Q：06 しおふきキャノン → 05 ブリーチダイブ
     expect(table.some((r) => r.cat === '防')).toBe(false);
     expect(skillsOf(KUROSHIO_MONSTER_ID).map((k) => k.displayNo)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   });
@@ -103,7 +103,7 @@ describe('クロシオのデータ（指示書の表のとおり）', () => {
     expect(JSON.stringify(DUNGEONS)).not.toContain('kuroshio');
     // ガチャのシリーズは準備だけ（クロシオのモンスターカードを持つまで並ばない）
     const series = GACHA_SERIES.find((g) => g.id === 'kuroshio');
-    expect(series?.rareSkillNames).toEqual(['しおふきキャノン', 'おおうずしお', 'オルカストライク', 'うずまきターン']);
+    expect(series?.rareSkillNames).toEqual(['ブリーチダイブ', 'おおうずしお', 'オルカストライク', 'うずまきターン']);
     expect(series?.unlockFlag).toBeUndefined();
     expect(availableGachaSeriesFor(createNewSave()).some((g) => g.id === 'kuroshio')).toBe(false);
   });
@@ -211,7 +211,7 @@ describe('04 ひきずりこむ：当たった相手1体を、次の自分の手
     expect(monster(s, 'o-m1').dragUnder).toEqual({ untilTurn: t0 + 2 });
     expect(habitatOf(s, monster(s, 'o-m1'))).toBe('water');
     expect(badStatusKinds(s, monster(s, 'o-m1'))).toEqual(['dragged']);
-    expect(s.log.at(-1)?.text).toBe('ソラモは水中にひきずりこまれた（次の相手のターンの終わりまで水中）。');
+    expect(s.log.at(-1)?.text).toBe('ソラモは水中にひきずりこまれた！');
     // ほかの相手は変わらない
     expect(habitatOf(s, monster(s, 'o-m2'))).toBe('ground');
     // 相手の手番 → 自分の次の手番の間は水中のまま

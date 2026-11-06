@@ -1,0 +1,40 @@
+{
+ "games": 200,
+ "skill": "A",
+ "swap": {
+  "games": 10800,
+  "win": 64,
+  "deckOut": 44.7,
+  "avgTurns": 34.9,
+  "dragHitsPerGame": 0.314,
+  "draggedTurnsPerGame": 0.308,
+  "wetTurnsPerGame": 0.338,
+  "whirlUsableTurnsPerGame": 0,
+  "whirlUsedPerGame": 0,
+  "whirlTargetsPerUse": 0,
+  "tidePerGame": 0.03,
+  "callPerGame": 0.027,
+  "callAttacks": 106,
+  "callEvadedRate": 9.4,
+  "cannonPerGame": 0.414,
+  "cannonWaterPerGame": 0.157
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 62.1,
+  "deckOut": 45.7,
+  "avgTurns": 35.4,
+  "dragHitsPerGame": 0.313,
+  "draggedTurnsPerGame": 0.306,
+  "wetTurnsPerGame": 0.336,
+  "whirlUsableTurnsPerGame": 0.165,
+  "whirlUsedPerGame": 0.03,
+  "whirlTargetsPerUse": 1.745,
+  "tidePerGame": 0.031,
+  "callPerGame": 0.036,
+  "callAttacks": 171,
+  "callEvadedRate": 15.8,
+  "cannonPerGame": 0.202,
+  "cannonWaterPerGame": 0.074
+ }
+}

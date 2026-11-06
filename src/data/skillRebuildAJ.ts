@@ -471,13 +471,14 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   // クロシオ（水中・LIFE 7・B。2026-11-06 指示書 BK。正本は design-parts/bk-kuroshio-20261106/data/kuroshio_skills.csv）。置き場所ができるまで確かめ用だけ。
   // 絵は kuroshio_sk_NN.webp（番号＝技番号）。回避だけ（防御の技は無い）。新しい効果は 04 ひきずりこむ（dragUnder）・07 おおうずしお（allTargets＋waterOnly。地ひびきの水中版）。
   // 06 はオーシャンウェーブ・08 は halfOnEvade・09 は みちしお・10 は ラズックのおびきよせ・11 は dodge('all', 2)・12 は dodge('all') と同じ作り
+  // 2026-11-06 ユーザー決定（指示書 BK3 の Q）：しおふきキャノンをノーマルに・ブリーチダイブをレアに・ブリーチダイブ 6→5・テールスラップ 3→2・もぐってかわす マナ 1→2
   'mon-kuroshio': [
     { id: 'skl-kuroshio-01', name: 'ひれはたき', cat: 'ち', mana: 0, damage: 1, text: null, art: 'kuroshio_sk_01.webp' },
     { id: 'skl-kuroshio-02', name: 'くいつく', cat: 'ち', mana: 1, damage: 2, text: null, art: 'kuroshio_sk_02.webp' },
-    { id: 'skl-kuroshio-03', name: 'テールスラップ', cat: 'ち', mana: 2, damage: 3, text: null, art: 'kuroshio_sk_03.webp' },
+    { id: 'skl-kuroshio-03', name: 'テールスラップ', cat: 'ち', mana: 2, damage: 2, text: null, art: 'kuroshio_sk_03.webp' },
     { id: 'skl-kuroshio-04', name: 'ひきずりこむ', cat: 'ち', mana: 2, damage: 2, effect: atk({ dragUnder: true }), text: '当たった相手1体を、次の自分の手番の終わりまで水中にする', art: 'kuroshio_sk_04.webp' },
-    { id: 'skl-kuroshio-05', name: 'ブリーチダイブ', cat: 'ち', mana: 4, damage: 6, text: null, art: 'kuroshio_sk_05.webp' },
-    { id: 'skl-kuroshio-06', name: 'しおふきキャノン', cat: 'か', mana: 3, damage: 4, effect: atk({ undodgeableVsWater: true }), text: '水中の相手は回避できない', rare: true, art: 'kuroshio_sk_06.webp' },
+    { id: 'skl-kuroshio-05', name: 'ブリーチダイブ', cat: 'ち', mana: 4, damage: 5, text: null, rare: true, art: 'kuroshio_sk_05.webp' },
+    { id: 'skl-kuroshio-06', name: 'しおふきキャノン', cat: 'か', mana: 3, damage: 4, effect: atk({ undodgeableVsWater: true }), text: '水中の相手は回避できない', art: 'kuroshio_sk_06.webp' },
     {
       id: 'skl-kuroshio-07', name: 'おおうずしお', cat: 'か', mana: 5, damage: 3, effect: atk({ allTargets: true, waterOnly: true }),
       text: '水中の相手全員に当たる（守りは1体ずつ）。水中の相手がいないと使えない', rare: true, art: 'kuroshio_sk_07.webp',
@@ -485,7 +486,7 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-kuroshio-08', name: 'オルカストライク', cat: 'ち', mana: 5, damage: 7, effect: atk({ halfOnEvade: true }), text: T_HALF, rare: true, art: 'kuroshio_sk_08.webp' },
     { id: 'skl-kuroshio-09', name: 'みちしお', cat: '特', mana: 2, damage: null, effect: { type: 'tide' }, text: T_TIDE, art: 'kuroshio_sk_09.webp' },
     { id: 'skl-kuroshio-10', name: 'よびごえ', cat: '特', mana: 2, damage: null, effect: { type: 'taunt' }, text: '相手は次のターン、クロシオしか攻撃できない', art: 'kuroshio_sk_10.webp' },
-    { id: 'skl-kuroshio-11', name: 'もぐってかわす', cat: '避', mana: 1, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), art: 'kuroshio_sk_11.webp' },
+    { id: 'skl-kuroshio-11', name: 'もぐってかわす', cat: '避', mana: 2, damage: null, effect: dodge('all', 2), text: tDodge('all', 2), art: 'kuroshio_sk_11.webp' },
     { id: 'skl-kuroshio-12', name: 'うずまきターン', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), rare: true, art: 'kuroshio_sk_12.webp' },
   ],
 };

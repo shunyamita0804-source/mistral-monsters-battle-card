@@ -4,7 +4,7 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
  * クロシオ（2026-11-06 指示書 BK）。シャチがもとの海の狩人。セイラン地方の王者ナディアの切り札（海のパーティー：クロシオ・カルシェル・ミュロル）。
  * LIFE 7・**内部ランク B**（画面に出さない）・居場所は水中（src/data/skillRebuildAJ.ts の MONSTER_HABITAT）・回避だけ（防御の技は無い）。
  * 技12枚は指示書の表のとおり（表は skillRebuildAJ.ts の AJ_QA_SKILLS['mon-kuroshio']。正本 design-parts/bk-kuroshio-20261106/data/kuroshio_skills.csv）。
- * レア＝06 しおふきキャノン・07 おおうずしお・08 オルカストライク・12 うずまきターン。
+ * レア＝05 ブリーチダイブ・07 おおうずしお・08 オルカストライク・12 うずまきターン（2026-11-06 指示書 BK3 の Q。前は 06 しおふきキャノンがレア）。
  * 新しい効果：04 ひきずりこむ（当たった相手1体を水中に。dragUnder）・07 おおうずしお（水中の相手全員に。allTargets＋waterOnly）。
  * 決まりは docs/battle-rules.md「クロシオの効果の扱い」
  *

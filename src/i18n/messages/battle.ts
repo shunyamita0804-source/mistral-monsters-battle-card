@@ -111,7 +111,7 @@ export const BATTLE = {
   // ノビトン（2026-10-25）
   'battle.log.manaDrain': { ja: '{side}のマナが{n}減った。', en: "{side}'s mana went down by {n}." },
   // 2026-11-06 指示書 BK：クロシオ（ひきずりこむ）
-  'battle.log.dragUnder': { ja: '{name}は水中にひきずりこまれた（次の相手のターンの終わりまで水中）。', en: '{name} was dragged underwater (counts as underwater until the end of the next enemy turn).' },
+  'battle.log.dragUnder': { ja: '{name}は水中にひきずりこまれた！', en: '{name} was dragged underwater!' },
   'battle.log.stun': { ja: '{name}は次のターン行動できない。', en: "{name} can't act next turn." },
   'battle.log.shield': { ja: '{name}が受ける{stat}技のダメージ-{n}（相手の次のターンまで）。', en: '{name} takes -{n} {stat} damage (until the end of the next turn).' },
   'battle.log.redrawHand': {
