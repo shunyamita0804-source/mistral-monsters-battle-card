@@ -45,14 +45,14 @@ describe('ウズリオのデータ（届いた JSON のとおり）', () => {
     }
   });
 
-  it('LIFE 6・地上・空色 #3D8FD6。名前はウズリオ。ID は mon-uzurio', () => {
+  it('LIFE 6・地上・薄い茶色 #A87A5E（2026-11-07 指示書 BQ【2】。前は空色 #3D8FD6）。名前はウズリオ。ID は mon-uzurio', () => {
     const m = getMonster(UZURIO_MONSTER_ID);
     expect(m.name).toBe('ウズリオ');
     expect(m.life).toBe(6);
     expect(m.habitat).toBe('ground');
     expect(MONSTER_HABITAT[UZURIO_MONSTER_ID]).toBe('ground');
-    expect(UZURIO_COLOR).toBe('#3D8FD6');
-    expect(m.themeColor).toBe('#3D8FD6');
+    expect(UZURIO_COLOR).toBe('#A87A5E');
+    expect(m.themeColor).toBe('#A87A5E');
     expect(m.isPlaceholder).toBe(false);
     expect(m.art?.file).toBe('uzurio_official.webp');
   });

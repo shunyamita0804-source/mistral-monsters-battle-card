@@ -3,6 +3,7 @@ import { guardAgainst, guardReduction, skillValue, type PlayCard, type SkillCard
 import {
   aliveMonsters,
   isMenaced,
+  focusActive,
   attackPower,
   availableUsers,
   badStatusKinds,
@@ -369,6 +370,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.995 ベニオウ（2026-11-07 指示書 BP）：おにのいあつ（回避を持つ相手に）・おたけび（次の手番に大きいちから技を撃てるとき）は攻撃より先
   const beniou = chooseBeniouTrick(state, side, options, style, skill);
   if (beniou) return beniou;
+
+  // 2.996 ステラード（2026-11-07 指示書 BQ）：しゅうちゅう（相手にマナを減らす技を持つモンスターがいて、マナが余っているとき）は攻撃より先
+  const stellard = chooseStellardTrick(state, side, options, skill);
+  if (stellard) return stellard;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
@@ -787,7 +792,9 @@ function chooseAttack(state: BattleState, side: Side, options: Option[], enemies
   const attacks = options
     .filter(isSkillOption)
     .filter((o) => o.def.effect.type === 'attack')
-    .filter((o) => forgetRecoil || recoilSafe(state, side, o, enemies));
+    .filter((o) => forgetRecoil || recoilSafe(state, side, o, enemies))
+    // きしのとつげき（ステラード 指示書 BQ）：当てられる相手がみな回避の技を持つときは選ばない（回避されると反動）
+    .filter((o) => !(o.def.effect.type === 'attack' && o.def.effect.selfDamageOnEvade) || targetsFor(state, side, o.def).some((e) => !skillsOf(e.cardId).some((k) => k.effect.type === 'evade')));
   if (attacks.length === 0 || enemies.length === 0) return null;
   const drained = chooseDrain(state, side, attacks, style, skill);
   if (drained) return drained;
@@ -1694,4 +1701,25 @@ function chooseBeniouTrick(state: BattleState, side: Side, options: Option[], st
     if (user && big && aliveMonsters(state.sides[foe]).length > 0) return { type: 'useCard', side, cardUid: roar.card.uid, userUid: user.uid };
   }
   return null;
+}
+
+/** しゅうちゅうを使う目安（指示書 BQ）：マナがこれ以上あるとき（減らされたら困る分がある） */
+const FOCUS_MIN_MANA = 3;
+
+/** その技が相手のマナを減らすか（攻撃の manaDrain・manaZero・しんぱんのせんこく） */
+const drainsMana = (k: SkillCard): boolean => (k.effect.type === 'attack' && (!!k.effect.manaDrain || !!k.effect.manaZero)) || (k.effect.type === 'seal' && !!k.effect.manaDrain);
+
+/**
+ * ステラード（2026-11-07 指示書 BQ）の しゅうちゅう（CPU の目安）。その手番に倒せる相手がいれば使わない。腕前 C は forgetTrick の割合で使いそこねる。
+ * まだ効いておらず、相手の生きているモンスターにマナを減らす技を持つもの（ノビトン・リリル・ノウス・ラディエル など）がいて、マナが FOCUS_MIN_MANA 以上のとき
+ */
+function chooseStellardTrick(state: BattleState, side: Side, options: Option[], skill: CpuSkill): BattleAction | null {
+  const focus = options.filter(isSkillOption).find((o) => o.def.effect.type === 'focus');
+  if (!focus) return null;
+  if (cpuRoll(state, side, 'stellardTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  if (focusActive(state, side) || manaOf(state.sides[side]) < FOCUS_MIN_MANA) return null;
+  const drainers = aliveMonsters(state.sides[otherSide(side)]).some((m) => skillsOf(m.cardId).some(drainsMana));
+  const user = availableUsers(state, side, focus.def)[0];
+  return drainers && user ? { type: 'useCard', side, cardUid: focus.card.uid, userUid: user.uid } : null;
 }

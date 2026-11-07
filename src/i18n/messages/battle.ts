@@ -75,6 +75,10 @@ export const BATTLE = {
   // 2026-11-07 指示書 BN：ノウスのぜんちぜんのう・ときをすいとる
   'battle.log.searchAny': { ja: '{side}はぜんちぜんのうで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Omniscience.' },
   'battle.log.millDeck': { ja: '{side}の山札の上から{n}枚が捨て札になった（{cards}）。', en: "{n} card(s) from the top of {side}'s deck went to the discard pile ({cards})." },
+  // 2026-11-07 指示書 BQ：ステラード（きしのとつげき・しゅうちゅう）
+  'battle.log.chargeEvaded': { ja: '{name}は突撃をかわされ、体勢をくずした！（LIFE−{n}）', en: '{name} had its charge evaded and lost its footing! (LIFE -{n})' },
+  'battle.log.focus': { ja: 'しゅうちゅう！ 次の自分のターンの終わりまでマナを減らされない。', en: 'Focus! Your mana cannot be reduced until the end of your next turn.' },
+  'battle.log.focusBlocked': { ja: 'しゅうちゅうでマナは減らなかった。', en: 'Focus kept the mana from going down.' },
   // 2026-11-07 指示書 BP：ベニオウ（いかり・おたけび・おにのいあつ）
   'battle.log.rage': { ja: '{name}のいかり！ ダメージ＋{n}', en: '{name} is enraged! Damage +{n}' },
   'battle.log.roar': { ja: '{name}のおたけび！ 次のちから技のダメージ2倍（次の自分のターンの終わりまで）。', en: "{name} roars! Its next STR skill deals double damage (until the end of its next turn)." },
@@ -176,6 +180,8 @@ export const BATTLE = {
   'battle.ng.noCheerTarget': { ja: '声援をかけられる味方がいません（まだ動いていない味方だけ）', en: 'No ally to cheer (only allies that have not acted)' },
   'battle.ng.noDeck': { ja: '山札がありません', en: 'Your deck is empty' },
   // 2026-11-07 指示書 BO：ときをすいとる
+  'battle.ng.notAir': { ja: '空中の相手には当たらない技です', en: "This skill can't hit airborne enemies" },
+  'battle.ng.lowLifeOnly': { ja: 'LIFE が{n}以下のときだけ使えます', en: 'Can only be used when LIFE is {n} or less' },
   'battle.ng.menaced': { ja: 'おにのいあつで、回避できません', en: "Cowed by the menace: can't evade" },
   'battle.ng.noOpponentDeck': { ja: '相手は山札がありません', en: "The opponent's deck is empty" },
   'battle.ng.overdriveCards': { ja: 'α・β・γ の3枚が手札にそろっていません', en: 'You need α, β and γ in your hand' },
@@ -202,6 +208,8 @@ export const BATTLE = {
   // 2026-10-30 指示書 X：状態の印を3つ足した（英語は仮訳）
   'battle.status.frozen': { ja: '凍って行動不可', en: 'Frozen' },
   'battle.status.energy': { ja: 'エネルギー', en: 'Energy' },
+  // 2026-11-07 指示書 BQ：ステラード
+  'battle.status.focus': { ja: 'しゅうちゅう（マナを減らされない・次の自分のターンの終わりまで）', en: 'Focus (mana cannot be reduced, until the end of its next turn)' },
   // 2026-11-07 指示書 BP：ベニオウ
   'battle.status.roar': { ja: 'おたけび（次のちから技のダメージ2倍・次の自分のターンまで）', en: 'Roar (next STR skill deals double damage, until its next turn)' },
   'battle.status.menace': { ja: 'おにのいあつ（回避できない・相手の次のターンの終わりまで）', en: "Menace (can't evade, until the end of the opponent's next turn)" },

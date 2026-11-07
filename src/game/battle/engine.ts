@@ -147,6 +147,11 @@ export interface BattleSide {
    * 使った手番＋次の相手の手番。重ねて使っても延びない。クヨウが倒れても残る
    */
   readonly wardCharm?: { readonly untilTurn: number } | null;
+  /**
+   * しゅうちゅう（2026-11-07 指示書 BQ：ステラード）：untilTurn の手番が終わるまで、この側はマナを減らす効果を受けない。
+   * プレイヤー全体にかかる（使ったモンスター ownerUid が倒れても残る。印は ownerUid のモンスター〔倒れていれば生きている味方〕に出す）
+   */
+  readonly focus?: { readonly untilTurn: number; readonly ownerUid: string } | null;
 }
 
 /**
@@ -407,7 +412,9 @@ export function availableUsers(state: BattleState, side: Side, skill: SkillCard)
       m.life > 0 &&
       (!m.acted || chainReady(state, m, skill)) &&
       m.stunnedTurn !== state.turn &&
-      !(attack && m.sealedTurn === state.turn),
+      !(attack && m.sealedTurn === state.turn) &&
+      // ふくつのいちげき（ステラード 指示書 BQ）：LIFE が lowLifeMax 以下のモンスターだけ使える
+      !(skill.effect.type === 'attack' && skill.effect.lowLifeMax !== undefined && m.life > skill.effect.lowLifeMax),
   );
 }
 
@@ -575,6 +582,11 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'drawTo' && state.sides[side].hand.length - 1 >= skill.effect.hand) return NO(t('battle.ng.handEnough', { n: skill.effect.hand }));
   // かぜのり（ツムジ）が効いていれば、攻撃技の消費マナ−1
   if (manaOf(state.sides[side]) < handSkillCost(state, side, skill)) return NO(t('battle.ng.noMana'));
+  // ふくつのいちげき（ステラード 指示書 BQ）：使えるモンスターの LIFE が条件より多いときは理由を出す
+  const lowLife = skill.effect.type === 'attack' ? skill.effect.lowLifeMax : undefined;
+  if (lowLife !== undefined && owner.some((m) => m.life > 0 && !m.acted) && !owner.some((m) => m.life > 0 && m.life <= lowLife)) {
+    return NO(t('battle.ng.lowLifeOnly', { n: lowLife }));
+  }
   if (availableUsers(state, side, skill).length === 0) {
     // まきつくで止められている・すなかけで攻撃を封じられているだけのとき
     const stunned = owner.some((m) => m.life > 0 && !m.acted && m.stunnedTurn === state.turn);
@@ -589,6 +601,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'attack' && attackableMonsters(state, otherSide(side)).length === 0) return NO(t('battle.ng.allHidden'));
   // 「地上の相手だけ」（急降下アタック・地ひびき）：地上の相手がいなければ使えない（空中・水中の相手、場が水中のとき）
   if (skill.effect.type === 'attack' && skill.effect.groundOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.groundOnly'));
+  // 「空中の相手には使えない」（あしばらい 指示書 BQ）：空中でない相手がいなければ使えない（灰色）
+  if (skill.effect.type === 'attack' && skill.effect.notAir && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.notAir'));
   // 「水中の相手だけ」（おおうずしお 指示書 BK）：水中の相手がいなければ使えない（灰色）
   if (skill.effect.type === 'attack' && skill.effect.waterOnly && targetsFor(state, side, skill).length === 0) return NO(t('battle.ng.waterOnly'));
   return YES;
@@ -759,6 +773,12 @@ export function purifyTargets(state: BattleState, side: Side): BattleMonster[] {
   return aliveMonsters(state.sides[side]).filter((m) => badStatusKinds(state, m).length > 0 || m.life < m.maxLife);
 }
 
+/** しゅうちゅう（ステラード 指示書 BQ）が、いま side に効いているか（使った手番から、使った側の次の自分の手番の終わりまで） */
+export function focusActive(state: BattleState, side: Side): boolean {
+  const f = state.sides[side].focus;
+  return !!f && state.turn <= f.untilTurn;
+}
+
 /** まよけのふだが、いま side の味方に効いているか（使った手番から、次の相手の手番の終わりまで） */
 export function wardCharmActive(state: BattleState, side: Side): boolean {
   const w = state.sides[side].wardCharm;
@@ -777,7 +797,9 @@ export function targetsFor(state: BattleState, side: Side, card: PlayCard, user?
     // 「水中の相手だけ」（クロシオのおおうずしお 指示書 BK）は、いま水中の相手だけ（生まれつき水中・ひきずりこむ・みちしお）
     const ground = card.effect.groundOnly;
     const water = card.effect.waterOnly;
-    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => (!ground || habitatOf(state, m) === 'ground') && (!water || habitatOf(state, m) === 'water'));
+    // 「空中の相手には使えない」（あしばらい 指示書 BQ）：いま空中の相手は選べない
+    const notAir = card.effect.notAir;
+    const enemies = attackableMonsters(state, otherSide(side)).filter((m) => (!ground || habitatOf(state, m) === 'ground') && (!water || habitatOf(state, m) === 'water') && (!notAir || habitatOf(state, m) !== 'air'));
     const users = user ? [user] : availableUsers(state, side, card);
     return enemies.filter((e) =>
       users.some((u) => {
@@ -1088,7 +1110,7 @@ function resolvePending(state: BattleState): BattleState {
   else if (evaded) withFx = addFx(next, 'evade', target?.side ?? otherSide(pending.attacker));
   // じならしは、攻撃を1回受けたら消える（当たっても・守っても）
   const after = clearPin(applyDamage(withFx, pending.targetUid, damage), pending.targetUid);
-  const recoiled = damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : after;
+  const recoiled = damage > 0 ? selfDamageOnHit(after, pending.cardId, pending.userUid) : evaded ? selfDamageOnEvade(after, pending.cardId, pending.userUid) : after;
   const drained = evaded ? recoiled : drainHeal(recoiled, pending.cardId, pending.userUid, lost);
   const done = evaded ? drained : attackRiders(drained, pending.cardId, pending.attacker, pending.targetUid);
   return nextAllTarget(done, pending);
@@ -1118,6 +1140,16 @@ function nextAllTarget(state: BattleState, done: PendingAttack): BattleState {
   const power = base.allPower ? (habitatOf(state, target) === 'air' ? base.allPower.air : base.allPower.base) : base.power;
   const pending: PendingAttack = { ...base, power, targetUid: nextUid, responses: [], queue: more, ...(isPinned(state, target) ? { pinned: true } : {}) };
   return { ...state, phase: 'defense', pending };
+}
+
+/** きしのとつげき（ステラード 指示書 BQ）：回避されたとき、使ったモンスターの LIFE−selfDamageOnEvade（反動で倒れてよい）。勝負がついたあとは何もしない */
+function selfDamageOnEvade(state: BattleState, skillId: string, userUid: string): BattleState {
+  const e = attackCardOf(skillId).effect;
+  if (e.type !== 'attack' || !e.selfDamageOnEvade || state.phase === 'ended') return state;
+  const user = findMonster(state, userUid);
+  if (!user || user.monster.life <= 0) return state;
+  const next = addLog(addFx(state, 'recoil', user.side), t('battle.log.chargeEvaded', { name: nameOf(user.monster.cardId), n: e.selfDamageOnEvade }));
+  return applyDamage(next, userUid, e.selfDamageOnEvade);
 }
 
 /**
@@ -1517,6 +1549,10 @@ function useCard(
       return searchEvade(next, side, choice);
     case 'searchAny':
       return searchAny(next, side, choice);
+    case 'focus':
+      // しゅうちゅう（ステラード 指示書 BQ）：使った側の次の自分の手番の終わりまで。重ねない（期限を数え直す）
+      next = updateSide(next, side, { focus: { untilTurn: state.turn + 2, ownerUid: user.uid } });
+      return addLog(next, t('battle.log.focus'));
     case 'roar':
       // おたけび（ベニオウ 指示書 BP）：使った側の次の自分の手番の終わりまで。重ねない（期限を数え直す）
       next = updateMonster(next, user.uid, { roar: { untilTurn: state.turn + 2 } });
@@ -1694,6 +1730,8 @@ function revealHand(state: BattleState, side: Side): BattleState {
 /** 相手（side の反対）のマナを n 減らす（0 より下にはならない）。減らしたカードは捨て札へ */
 function drainMana(state: BattleState, side: Side, n: number): BattleState {
   const victim = otherSide(side);
+  // しゅうちゅう（ステラード 指示書 BQ）：期限の間は、マナを減らす効果を受けない
+  if (focusActive(state, victim)) return addLog(state, t('battle.log.focusBlocked'));
   const before = manaOf(state.sides[victim]);
   const next = payMana(state, victim, n);
   const lost = before - manaOf(next.sides[victim]);
@@ -1703,6 +1741,7 @@ function drainMana(state: BattleState, side: Side, n: number): BattleState {
 /** からっぽのつぼ（ノウス 指示書 BN・BO）：相手（side の反対）のマナを 0 に。減らしたカードは捨て札へ */
 function emptyMana(state: BattleState, side: Side): BattleState {
   const victim = otherSide(side);
+  if (focusActive(state, victim)) return addLog(state, t('battle.log.focusBlocked'));
   const before = manaOf(state.sides[victim]);
   if (before === 0) return addLog(state, t('battle.log.manaAlreadyZero', { side: sideLabel(victim) }));
   return addLog(payMana(state, victim, before), t('battle.log.manaZero', { side: sideLabel(victim) }));

@@ -13,10 +13,10 @@ import type { MonsterCard } from '../game/cards/cardTypes.ts';
  * **置き場所はまだ無い**（ネブラシアの招待大会を作るときに入れる）。今はフギンと同じく確かめ用だけ（?qa=1&lab=nous）。
  * 図鑑には番号だけ付けて出す（フギンのあと。手に入れるまで「？？？」）。ガチャのシリーズは準備だけ（モンスターカードを持つまで並ばない）
  *
- * 絵（原本は design-parts/bn-nous-20261107/art/ に無改変。作り方は tools/art/nous_assets.py）。色：深い琥珀 #CC6A1F
+ * 絵（原本は design-parts/bn-nous-20261107/art/ に無改変。作り方は tools/art/nous_assets.py）。色：茶色 #8C3A10（2026-11-07 指示書 BQ【2】・ユーザー決定。BN の #CC6A1F はガウルと見分けにくかった）
  */
 export const NOUS_MONSTER_ID = 'mon-nous';
-export const NOUS_COLOR = '#CC6A1F';
+export const NOUS_COLOR = '#8C3A10';
 
 export const NOUS_MONSTER: MonsterCard = {
   kind: 'monster',

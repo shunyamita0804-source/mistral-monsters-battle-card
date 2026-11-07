@@ -58,6 +58,11 @@ const TEXTS: Readonly<Record<string, string>> = {
   '手札をすべて山札に戻し、同じ枚数を引く': 'Return your whole hand to the deck and draw the same number of cards.',
   '相手の山札の上から2枚を捨て札にする': "Put the top 2 cards of the opponent's deck into the discard pile.",
   '山札から好きなカードを1枚選んで手札に加える': 'Choose any card from your deck and add it to your hand.',
+  // 2026-11-07 指示書 BQ：ステラード（英語は仮訳）
+  '地上・水中の相手だけ（空中の相手には使えない）': 'Ground and water enemies only (cannot be used on airborne enemies).',
+  '自分のLIFEが2以下のときだけ使える': 'Can only be used when your LIFE is 2 or less.',
+  '回避されると自分のLIFE−2': 'If evaded, your LIFE -2.',
+  '次の自分の手番の終わりまで、マナを減らす効果を受けない': 'Until the end of your next turn, effects that reduce your mana have no effect.',
   // 2026-11-07 指示書 BP：ベニオウ（英語は仮訳）
   '自分のLIFEが半分以下ならダメージ＋3': 'If your LIFE is half or less, damage +3.',
   '自分のLIFEが半分以下ならダメージ＋4': 'If your LIFE is half or less, damage +4.',

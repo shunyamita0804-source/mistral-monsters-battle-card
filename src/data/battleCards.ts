@@ -20,6 +20,7 @@ import { ROUGA_MONSTER_ID } from './rouga.ts';
 import { HUGINN_MONSTER_ID } from './huginn.ts';
 import { NOUS_MONSTER_ID } from './nous.ts';
 import { BENIOU_MONSTER_ID } from './beniou.ts';
+import { STELLARD_MONSTER_ID } from './stellard.ts';
 import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -75,7 +76,7 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [SEREPHINE_MONSTER_ID]: { art: 'serephine_battlecard.png', frame: 'serephine', scale: 0.8, offsetY: -0.02 },
   // ツムジ（2026-10-30 指示書 U）：枠はくすんだ青みの灰（#8FA3B8）。絵は届いた tsumuji_battleart.png（1169×1346。セレフィーンと同じ大きさ・縦横比）を無改変
   [TSUMUJI_MONSTER_ID]: { art: 'tsumuji_battlecard.png', frame: 'tsumuji', scale: 0.8, offsetY: -0.02 },
-  // ヒョウズク（2026-10-30 指示書 W）：枠は銀に近い白（#C8CCD4）。絵は届いた hyouzuku_battleart.png（1169×1346。ツムジと同じ大きさ・縦横比）を無改変
+  // ヒョウズク（2026-10-30 指示書 W）：枠は氷の青（#3D8FD6。2026-11-07 指示書 BQ【2】で銀に近い白 #C8CCD4 から）。絵は届いた hyouzuku_battleart.png（1169×1346。ツムジと同じ大きさ・縦横比）を無改変
   [HYOUZUKU_MONSTER_ID]: { art: 'hyouzuku_battlecard.png', frame: 'hyouzuku', scale: 0.8, offsetY: -0.02 },
   // シシエン（2026-10-31 指示書 AB）：枠は炭色（#3E3A3F）。絵は届いた shishien_battleart.png（1169×1346。ヒョウズクと同じ大きさ・縦横比）を無改変
   [SHISHIEN_MONSTER_ID]: { art: 'shishien_battlecard.png', frame: 'shishien', scale: 0.8, offsetY: -0.02 },
@@ -88,7 +89,7 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [LILIL_MONSTER_ID]: { art: 'lilil_battlecard.png', frame: 'lilil', scale: 0.8, offsetY: -0.01 },
   // フォルン（2026-11-02 指示書 AL）：枠は濃いオリーブ（#7A8B3C）。絵は届いた forn_battleart.png（800×920 透過）を無改変。角の先と笛が切れない大きさ
   [FORN_MONSTER_ID]: { art: 'forn_battlecard.png', frame: 'forn', scale: 0.9, offsetY: 0.01 },
-  // ウズリオ（2026-11-02 指示書 AQ）：枠ははっきりした空色（#3D8FD6）。絵は届いた uzurio_battleart.png（1169×1345 透過）を無改変。
+  // ウズリオ（2026-11-02 指示書 AQ）：枠は薄い茶色（#A87A5E。2026-11-07 指示書 BQ【2】で空色 #3D8FD6 から）。絵は届いた uzurio_battleart.png（1169×1345 透過）を無改変。
   // 頭の大きな渦の毛（絵の上の端まで）と、しっぽの先（絵の左の端まで）が枠に切られない大きさ
   [UZURIO_MONSTER_ID]: { art: 'uzurio_battlecard.png', frame: 'uzurio', scale: 0.8, offsetY: 0 },
   // タイラント（2026-11-05 指示書 AX）：枠は真っ赤（#A31523）。絵は届いた tyrant_battle_transparent.png（800×920）の透明度を 0／255 にそろえたもの。
@@ -104,10 +105,12 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [ROUGA_MONSTER_ID]: { art: 'rouga_battlecard.png', frame: 'rouga', scale: 0.8, offsetY: -0.02 },
   // フギン（2026-11-06 指示書 BM）：枠は深い翠の緑（#1E6B45）。絵は透明度を 0／255 にそろえたもの（色は変えていない）
   [HUGINN_MONSTER_ID]: { art: 'huginn_battlecard.png', frame: 'huginn', scale: 0.8, offsetY: -0.02 },
-  // ノウス（2026-11-07 指示書 BN）：枠は深い琥珀（#CC6A1F）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
+  // ノウス（2026-11-07 指示書 BN）：枠は茶色（#8C3A10。指示書 BQ【2】で深い琥珀 #CC6A1F から）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
   [NOUS_MONSTER_ID]: { art: 'nous_battlecard.png', frame: 'nous', scale: 0.8, offsetY: -0.02 },
   // ベニオウ（2026-11-07 指示書 BP）：枠は深いえんじ（#6B1E3A）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
   [BENIOU_MONSTER_ID]: { art: 'beniou_battlecard.png', frame: 'beniou', scale: 0.8, offsetY: -0.02 },
+  // ステラード（2026-11-07 指示書 BQ）：枠はシルバー（#C8CCD4）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
+  [STELLARD_MONSTER_ID]: { art: 'stellard_battlecard.png', frame: 'stellard', scale: 0.8, offsetY: -0.02 },
   // ラディエル（2026-11-05 指示書 BI）：枠は金（#BE7410。カードの絵の枠の色）。絵は届いた radiel_battlecard.png（1169×1346 透過）を無改変（光輪と光の尾の半透明はそのまま）。
   // 翼が絵の幅いっぱいまで広がるので、翼の先が枠の飾りに切られすぎない大きさ
   [RADIEL_MONSTER_ID]: { art: 'radiel_battlecard.png', frame: 'radiel', scale: 0.82, offsetY: -0.01 },

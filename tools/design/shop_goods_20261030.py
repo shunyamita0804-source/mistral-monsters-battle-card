@@ -26,6 +26,14 @@ MONSTER_CARDS = os.path.join(ROOT, 'assets/images/cards/monsters')
 # 2026-11-02 指示書 AK2：リリルを足した（14種類。ハクラン・デスオルは手に入れ方が決まっていないので入れていない）。指示書 AL：フォルンを足した（15種類）。
 # 指示書 AQ：ウズリオを足した（16種類）
 MONSTERS = ['soramo', 'gauul', 'lazuck', 'nobiton', 'myurol', 'kalshell', 'pukarim', 'geol', 'flune', 'serephine', 'tsumuji', 'hyouzuku', 'shishien', 'lilil', 'forn', 'uzurio', 'gearos', 'radiel']  # 2026-11-05 指示書 BI：ラディエル（天の聖域の切り札）
+# 2026-11-07 指示書 BQ【2】：枠の色を入れ替えた子は、縁を新しい色にした棚のパック（tools/art/pack_retint.py の出力から shop_products.pack_small で作ったもの）を使う。原本は変えない
+SHOP_PACK_OVERRIDE = {name: os.path.join(ROOT, f'design-parts/bq-stellard-20261107/build/shop_pack_{name}.png') for name in ('hyouzuku', 'uzurio')}
+
+
+def _shop_pack(name: str) -> str:
+    return SHOP_PACK_OVERRIDE.get(name, os.path.join(PACKS, f'shop_pack_{name}.png'))
+
+
 # 額の台の額4つ（左から）：初期のモンスターのモンスターカード
 FRAME_MONSTERS = ['soramo', 'gauul', 'nobiton', 'lazuck']
 
@@ -130,7 +138,7 @@ def dress(name: str, im: Image.Image) -> Image.Image:
     for k, (ys, xs, mask) in enumerate(_windows(a, cfg)):
         h, w = mask.shape
         if cfg['kind'] == 'pack':
-            src = _image(os.path.join(PACKS, f'shop_pack_{MONSTERS[(start + k) % len(MONSTERS)]}.png'))
+            src = _image(_shop_pack(MONSTERS[(start + k) % len(MONSTERS)]))
             piece = _cover(src, w, h)
         elif cfg['kind'] == 'card':
             piece = _cover(_image(skills[(start * 7 + k * 3) % len(skills)]), w, h)

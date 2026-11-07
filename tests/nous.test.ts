@@ -26,14 +26,14 @@ const sor = (n: number): string => `skl-soramo14-${String(n).padStart(2, '0')}`;
 const SORAMO_EVADE = sor(14);
 
 describe('ノウスのデータ（指示書の表のとおり）', () => {
-  it('LIFE 7・空中・深い琥珀 #CC6A1F。ID は mon-nous', () => {
+  it('LIFE 7・空中・茶色 #8C3A10。ID は mon-nous', () => {
     const m = getMonster(NOUS_MONSTER_ID);
     expect(m.name).toBe('ノウス');
     expect(m.life).toBe(7);
     expect(m.habitat).toBe('air');
     expect(MONSTER_HABITAT[NOUS_MONSTER_ID]).toBe('air');
     expect(m.themeColor).toBe(NOUS_COLOR);
-    expect(NOUS_COLOR).toBe('#CC6A1F');
+    expect(NOUS_COLOR).toBe('#8C3A10');
     expect(m.description).not.toMatch(/神|祈|信仰/);
   });
 
@@ -101,8 +101,8 @@ describe('ノウスのデータ（指示書の表のとおり）', () => {
       expect(existsSync(`assets/images/${f}`), f).toBe(true);
     }
     expect(BATTLE_CARDS[NOUS_MONSTER_ID]?.frame).toBe('nous');
-    expect(CARD_NAME_LOGOS[NOUS_MONSTER_ID]?.frame).toBe('#CC6A1F');
-    expect(CARD_NAME_LOGOS_EN[NOUS_MONSTER_ID]?.frame).toBe('#CC6A1F');
+    expect(CARD_NAME_LOGOS[NOUS_MONSTER_ID]?.frame).toBe('#8C3A10');
+    expect(CARD_NAME_LOGOS_EN[NOUS_MONSTER_ID]?.frame).toBe('#8C3A10');
     setLanguage('en');
     try {
       expect(cardName(NOUS_MONSTER_ID)).toBe('Nous');

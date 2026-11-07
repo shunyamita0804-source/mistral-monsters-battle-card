@@ -18,14 +18,19 @@ import { officialSkill, twoDigits, type OfficialSkill } from './officialSkills.t
  * - 技 hyouzuku_sk_01〜14.webp（届いた hyouzuku_sk_NN.png を tools/art/card_art_webp.py で幅 827 の WebP に。番号＝技番号）
  * - 正式モンスターカード hyouzuku_official.webp（届いた hyouzuku_official_monstercard_LIFE7.png を幅 508 に縮めただけ。ツムジと同じ）
  * - バトル用 hyouzuku_battlecard.png（届いた hyouzuku_battleart.png を無改変。1169×1346）
- * 色：銀に近い白 #C8CCD4（モンスターカード枠・技カード枠とも）
+ * 色：氷の青 #3D8FD6（2026-11-07 指示書 BQ【2】。前は銀に近い白 #C8CCD4。モンスターカード枠・技カード枠とも）
  * ガチャのレアの枠（JSON の gacha_slot）：09 ふぶき・10 ひょうが・14 おとなきはばたき（HYOUZUKU_GACHA_RARE）
  */
 export const HYOUZUKU_MONSTER_ID = 'mon-hyouzuku';
 export const hyouzukuSkillId = (no: number): string => `skl-hyouzuku-${twoDigits(no)}`;
 
-/** ヒョウズクの色（JSON の frame_color_hex） */
-export const HYOUZUKU_COLOR: string = hyouzukuData.frame_color_hex;
+/**
+ * ヒョウズクの色。2026-11-07 指示書 BQ【2】（ユーザー決定）で氷の青 #3D8FD6（前のウズリオの色）に。
+ * 前は JSON の frame_color_hex（銀に近い白 #C8CCD4。いまはステラードの色）。届いた JSON は変えない
+ */
+export const HYOUZUKU_COLOR: string = '#3D8FD6';
+/** 届いた JSON の色（前の色。くらべる用） */
+export const HYOUZUKU_COLOR_ORIGINAL: string = hyouzukuData.frame_color_hex;
 
 export const HYOUZUKU_MONSTER: MonsterCard = {
   kind: 'monster',

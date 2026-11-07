@@ -83,7 +83,7 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
   it('モンスター：ライフ7・銀に近い白・ID mon-hyouzuku。レアの枠は 09・10・14。枠の絵がある', () => {
     expect(HYOUZUKU_MONSTER).toMatchObject({ id: 'mon-hyouzuku', life: 7, name: 'ヒョウズク', isPlaceholder: false });
     expect(hyouzukuJson.monster_rank).toBe('B');
-    expect(HYOUZUKU_COLOR).toBe('#C8CCD4');
+    expect(HYOUZUKU_COLOR).toBe('#3D8FD6'); // 2026-11-07 指示書 BQ【2】：氷の青（前は #C8CCD4）
     expect(HYOUZUKU_GACHA_RARE).toEqual([hyo(9), hyo(10), hyo(14)]);
     expect(BATTLE_CARDS[HYOUZUKU_MONSTER_ID]?.frame).toBe('hyouzuku');
     expect(existsSync('assets/images/ui/battlecard/frame_hyouzuku.png')).toBe(true);
@@ -149,11 +149,11 @@ describe('ヒョウズク：データ（届いた JSON・CSV を無改変で置�
   });
 
   it('パックの色（pack_tint.py）・パックの絵・販売機の窓・ショップの棚・枠の色の表にヒョウズクがある', () => {
-    expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
+    expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("'hyouzuku': '#3D8FD6'");
     expect(readFileSync('tools/design/gacha_series_build.py', 'utf8')).toMatch(/PACKS = \[.*'tsumuji', 'hyouzuku'(, '[a-z]+')*\]/);
     expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).toMatch(/MONSTERS = \[.*'tsumuji', 'hyouzuku'.*\]/);
     expect(readFileSync('tools/design/gacha_panel_build.py', 'utf8')).toContain("'hyouzuku': (");
-    for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hyouzuku': '#C8CCD4'");
+    for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hyouzuku': '#3D8FD6'");
   });
 });
 

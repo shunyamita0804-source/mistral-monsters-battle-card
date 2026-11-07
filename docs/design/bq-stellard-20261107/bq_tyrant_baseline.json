@@ -1,0 +1,57 @@
+{
+ "games": 200,
+ "skill": "A",
+ "subject": "mon-tyrant",
+ "swap": {
+  "games": 10800,
+  "win": 70.7,
+  "end": {
+   "koWin": 49.6,
+   "deckOutWin": 21.1,
+   "koLoss": 8.5,
+   "deckOutLoss": 20.8,
+   "other": 0
+  },
+  "avgTurns": 34.2,
+  "sweepPerGame": 0,
+  "sweepBlockedPerGame": 0,
+  "lastStandPerGame": 0,
+  "chargePerGame": 0,
+  "chargeRecoilPerGame": 0,
+  "focusPerGame": 0,
+  "focusBlockedPerGame": 0,
+  "subjectDownRate": 91.7,
+  "subjectAvgLifeLeft": 0.21,
+  "byFoe": {
+   "booster-1": 72.8,
+   "booster-2": 65.5,
+   "booster-3": 73.9
+  }
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 68.1,
+  "end": {
+   "koWin": 45.7,
+   "deckOutWin": 22.4,
+   "koLoss": 10.1,
+   "deckOutLoss": 21.8,
+   "other": 0
+  },
+  "avgTurns": 34.9,
+  "sweepPerGame": 0,
+  "sweepBlockedPerGame": 0,
+  "lastStandPerGame": 0,
+  "chargePerGame": 0,
+  "chargeRecoilPerGame": 0,
+  "focusPerGame": 0,
+  "focusBlockedPerGame": 0,
+  "subjectDownRate": 92.4,
+  "subjectAvgLifeLeft": 0.19,
+  "byFoe": {
+   "booster-1": 70.6,
+   "booster-2": 61.7,
+   "booster-3": 71.9
+  }
+ }
+}

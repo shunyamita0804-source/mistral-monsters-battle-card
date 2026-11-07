@@ -19,6 +19,7 @@ import {
   airBonusAgainst,
   rageBonusOf,
   isMenaced,
+  focusActive,
   attackableMonsters,
   fieldSupport,
   habitatOf,
@@ -1972,6 +1973,12 @@ export const battleScreen: ScreenDefinition = {
       // まよけのふだ（クヨウ 指示書 BH）：味方全員に悪い状態がつかない。印は 2026-11-06 指示書 BJ の新しいアイコン（F02）
       const charmSide = s.sides.player.monsters.some((x) => x.uid === m.uid) ? 'player' : 'opponent';
       if (wardCharmActive(s, charmSide)) badge('f02', t('battle.status.wardCharm'));
+      // しゅうちゅう（ステラード 指示書 BQ）：プレイヤー全体にかかる。印は使ったモンスター（倒れていれば生きている味方のいちばん左）に【仮】：マナダウンの印（B13）に「0」
+      const focus = s.sides[charmSide].focus;
+      if (focus && focusActive(s, charmSide)) {
+        const owner = s.sides[charmSide].monsters.find((x) => x.uid === focus.ownerUid && x.life > 0) ?? s.sides[charmSide].monsters.find((x) => x.life > 0);
+        if (owner?.uid === m.uid) badge('b13', t('battle.status.focus'), 0);
+      }
       // 前は右上の角の印だったもの（指示書 AZ でこの1列に）：ほっぺにためる・おいかぜ・声援＝B09 ＋n、かぜのり＝B13 マナ −n
       // はねやすめ（フギン 指示書 BM）：次の回避のマナ0＝回避の印（E15）に 0 の札（ほっぺにためるの B09 とは別の見た目）
       if (m.featherRest && m.life > 0) badge('e15', t('battle.status.featherRest'), 0);

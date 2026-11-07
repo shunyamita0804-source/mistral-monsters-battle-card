@@ -21,6 +21,7 @@ import { ROUGA_MONSTER } from './rouga.ts';
 import { HUGINN_MONSTER } from './huginn.ts';
 import { NOUS_MONSTER } from './nous.ts';
 import { BENIOU_MONSTER } from './beniou.ts';
+import { STELLARD_MONSTER } from './stellard.ts';
 import { RADIEL_MONSTER } from './radiel.ts';
 import { GEAROS_MONSTER, GEAROS_MONSTER_ID, OVERDRIVE_COMBO_COST, OVERDRIVE_COMBO_DAMAGE, OVERDRIVE_COMBO_ID } from './gearos.ts';
 import { LAZUCK_MONSTER, LAZUCK_SKILLS } from './lazuck.ts';
@@ -334,8 +335,9 @@ export const LEGACY_SUPPORT_IDS: readonly string[] = [1, 2, 3, 4, 5, 6].map(supp
 // 2026-11-06 指示書 BK：クロシオ（セイランの王者ナディアの切り札。置き場所ができるまで確かめ用の画面 ?qa=1&lab=kuroshio だけ）
 // 2026-11-06 指示書 BL：ロウガ（ノルディスの王者アイゼルの切り札。?qa=1&lab=rouga だけ）
 // 2026-11-06 指示書 BM：フギン（ネブラシアの王者ザイレンの切り札。?qa=1&lab=huginn だけ）
-// 2026-11-07 指示書 BN：ノウス（ネブラシアの王者ザイレンの本当の切り札。?qa=1&lab=nous だけ）。指示書 BP：ベニオウ（オルティガの王者ゼルガンの切り札。?qa=1&lab=beniou だけ）
-export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER, KUYO_MONSTER, KUROSHIO_MONSTER, ROUGA_MONSTER, HUGINN_MONSTER, NOUS_MONSTER, BENIOU_MONSTER].map((m): MonsterCard => {
+// 2026-11-07 指示書 BN：ノウス（ネブラシアの王者ザイレンの本当の切り札。?qa=1&lab=nous だけ）。指示書 BP：ベニオウ（オルティガの王者ゼルガンの切り札。?qa=1&lab=beniou だけ）。
+// 指示書 BQ：ステラード（アステリアの王者ランスロットの切り札。?qa=1&lab=stellard だけ）
+export const QA_MONSTERS: readonly MonsterCard[] = [TYRANT_MONSTER, KUYO_MONSTER, KUROSHIO_MONSTER, ROUGA_MONSTER, HUGINN_MONSTER, NOUS_MONSTER, BENIOU_MONSTER, STELLARD_MONSTER].map((m): MonsterCard => {
   const habitat = MONSTER_HABITAT[m.id];
   return habitat ? { ...m, habitat } : m;
 });

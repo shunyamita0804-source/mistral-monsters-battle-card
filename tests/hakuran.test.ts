@@ -178,7 +178,7 @@ describe('ハクラン：データ（届いた JSON・CSV を無改変で置き�
     expect(readFileSync('tools/design/shop_goods_20261030.py', 'utf8')).not.toContain("'hakuran'");
     for (const f of ['tools/art/skillcard_simple_build.py', 'tools/art/skillcard_v3_build.py']) expect(readFileSync(f, 'utf8')).toContain("'hakuran': '#237C7A'");
     // 2026-10-31 指示書 AF2：モンスターカードの枠とパックの縁はハクランだけ暗く（シシエンの暗い色と同じしかた）
-    expect(readFileSync('tools/art/battle_card_frame.py', 'utf8')).toContain("FORCE_DARK = {'hakuran'}");
+    expect(readFileSync('tools/art/battle_card_frame.py', 'utf8')).toContain("FORCE_DARK = {'hakuran', 'uzurio'}"); // 2026-11-07 指示書 BQ：ウズリオも
     expect(readFileSync('tools/design/pack_tint.py', 'utf8')).toContain("DEEPER = {'hakuran': 0.12}");
   });
 

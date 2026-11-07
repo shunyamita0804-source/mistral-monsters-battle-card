@@ -5,6 +5,7 @@ import { ROUGA_MONSTER_ID } from './rouga.ts';
 import { HUGINN_MONSTER_ID } from './huginn.ts';
 import { NOUS_MONSTER_ID } from './nous.ts';
 import { BENIOU_MONSTER_ID } from './beniou.ts';
+import { STELLARD_MONSTER_ID } from './stellard.ts';
 import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GAUUL_MONSTER_ID } from './gauul.ts';
 import { GEOL_MONSTER_ID } from './geol.ts';
@@ -81,6 +82,8 @@ export const NUMBERED_MONSTERS: readonly string[] = [
   NOUS_MONSTER_ID,
   // 2026-11-07 指示書 BP：ノウスのあと（No.326〜338）。ベニオウも確かめ用だが、図鑑には番号だけ出す
   BENIOU_MONSTER_ID,
+  // 2026-11-07 指示書 BQ：ベニオウのあと（No.339〜351）。ステラードも確かめ用だが、図鑑には番号だけ出す
+  STELLARD_MONSTER_ID,
 ];
 
 /** 番号を付けるサポートカード（2026-10-30 指示書 Y：正式の11種類。表示の番号 S01〜S07・F01〜F04 の順＝SUPPORTS の並び） */
@@ -102,7 +105,7 @@ function orderedSkills(monsterId: string): SkillCard[] {
 }
 
 // 図鑑に出す確かめ用のモンスター（クヨウ。2026-11-05 指示書 BH・クロシオ。2026-11-06 指示書 BK）の本体と技も引けるように
-const BOOK_QA_CARDS: readonly CardDefinition[] = QA_MONSTERS.filter((m) => m.id === KUYO_MONSTER_ID || m.id === KUROSHIO_MONSTER_ID || m.id === ROUGA_MONSTER_ID || m.id === HUGINN_MONSTER_ID || m.id === NOUS_MONSTER_ID || m.id === BENIOU_MONSTER_ID).flatMap((m) => [m, ...skillsOf(m.id)]);
+const BOOK_QA_CARDS: readonly CardDefinition[] = QA_MONSTERS.filter((m) => m.id === KUYO_MONSTER_ID || m.id === KUROSHIO_MONSTER_ID || m.id === ROUGA_MONSTER_ID || m.id === HUGINN_MONSTER_ID || m.id === NOUS_MONSTER_ID || m.id === BENIOU_MONSTER_ID || m.id === STELLARD_MONSTER_ID).flatMap((m) => [m, ...skillsOf(m.id)]);
 const byId = new Map<string, CardDefinition>([...MONSTERS, ...SKILLS, ...SUPPORTS, ...BOOK_QA_CARDS].map((c) => [c.id, c]));
 
 /** 図鑑の並び（番号つき → 仮） */

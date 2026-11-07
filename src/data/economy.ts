@@ -182,6 +182,8 @@ export const GACHA_SERIES: readonly GachaSeries[] = [
   { id: 'nous', monsterId: 'mon-nous', rareSkillNames: ajQaRareNames('mon-nous') },
   // ベニオウ（2026-11-07 指示書 BP）：準備だけ（オルティガの招待大会で開く予定。今はだれも持っていないので並ばない）。レアの枠は かなぼうくだき・いかりのかなぼう・おにのいちげき・ごうりきのはだ
   { id: 'beniou', monsterId: 'mon-beniou', rareSkillNames: ajQaRareNames('mon-beniou') },
+  // ステラード（2026-11-07 指示書 BQ）：準備だけ（アステリアの招待大会で開く予定。今はだれも持っていないので並ばない）。レアの枠は ふくつのいちげき・きしのとつげき・りゅうせいのやり・ぎんがのかがやき
+  { id: 'stellard', monsterId: 'mon-stellard', rareSkillNames: ajQaRareNames('mon-stellard') },
   // プカリム：ピートに初めて勝ったあとに並ぶ。パックの絵はまだ無い（封をしたパックの絵で出す）。JSON の gacha_slot も同じ（pukarim14_skills_DRAFT_20261029.json）
   { id: 'pukarim', monsterId: 'mon-pukarim', rareSkillNames: ajRareNames('mon-pukarim'), unlockFlag: 'pete-beaten' },
   // ジオル：グラントに初めて勝ったあとに並ぶ。JSON の gacha_slot も同じ（geol14_skills_DRAFT_20261029_rare3.json）
@@ -220,7 +222,7 @@ export function legacyAvailableGachaSeries(storyFlags: readonly string[]): reado
  * v28 の変換（2026-10-30）よりあとに足した、並ぶ条件の記録（unlockFlag）を持たないシリーズ（2026-11-02 指示書 AK のリリル・指示書 AL のフォルン・指示書 AQ のウズリオ）。
  * 前のセーブの変換で「もう並んでいた」扱いにしない（モンスターカードを初めて手に入れたら開く。前の中身で箱を開けた人に並べない）
  */
-const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos', 'kuyo', 'radiel', 'kuroshio', 'rouga', 'huginn', 'nous', 'beniou'];
+const LATER_GACHA_SERIES_IDS: readonly string[] = ['lilil', 'forn', 'uzurio', 'gearos', 'kuyo', 'radiel', 'kuroshio', 'rouga', 'huginn', 'nous', 'beniou', 'stellard'];
 
 /**
  * チュートリアルをスキップした（管理局で箱を選んでいない）セーブで、最初から並ぶ6つ（2026-10-30 指示書 K。2026-10-29 までの「最初から並ぶ」シリーズ）

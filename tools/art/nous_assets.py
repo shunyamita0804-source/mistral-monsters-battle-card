@@ -8,7 +8,7 @@ python3 -I tools/art/nous_assets.py
 - バトル用 nous_battle_transparent.png（1169×1345・透明）：頭の上 約8px・ひづめの下 約3px でほぼ端なので（【絵の直し】1）、
   体を BATTLE_SCALE に縮めて（切らない）同じ 1169×1345 の真ん中に置き、まわりに透明の余白を足す → 透明度を 0／255 にそろえて
   assets/images/cards/monsters/nous_battlecard.png（色は変えない）
-- パック：窓の絵 pack_art_nous.png（948×1660）をほかの子と同じ型に入れる（縁は深い琥珀 #CC6A1F）→ assets/images/ui/gacha/pack_nous.webp。
+- パック：窓の絵 pack_art_nous.png（948×1660）をほかの子と同じ型に入れる（縁は茶色 #8C3A10。指示書 BQ。前は深い琥珀 #CC6A1F）→ assets/images/ui/gacha/pack_nous.webp。
   水晶の頭が窓の上の飾りにかからないよう、絵を PACK_SHIFT px 下げる（【絵の直し】2。フギンと同じ直し）
 - 名前のロゴ name_ja_nous.png（2000×827）・name_en_nous.png（2000×819）：まわりのもやを消し、字の高さをそろえて（日本語 174px・英語 160px）1400×300 の形に
 """
@@ -22,7 +22,7 @@ from PIL import Image
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 SRC = os.path.join(ROOT, 'design-parts/bn-nous-20261107/art')
 BUILD = os.path.join(ROOT, 'design-parts/bn-nous-20261107/build')
-COLOR = '#CC6A1F'
+COLOR = '#8C3A10'  # 2026-11-07 指示書 BQ【2】で茶色（前は #CC6A1F）
 LOGO_HEIGHT = {'ja': 174, 'en': 160}
 LOGO_ANCHOR = (38, 53)
 PACK_SHIFT = int(os.environ.get('PACK_SHIFT', 150))  # パックの窓で絵を下げる量（型の px）

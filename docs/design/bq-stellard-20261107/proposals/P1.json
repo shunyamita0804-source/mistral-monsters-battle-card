@@ -1,0 +1,57 @@
+{
+ "games": 200,
+ "skill": "A",
+ "subject": "mon-stellard",
+ "swap": {
+  "games": 10800,
+  "win": 69.5,
+  "end": {
+   "koWin": 47,
+   "deckOutWin": 22.5,
+   "koLoss": 13.1,
+   "deckOutLoss": 17.4,
+   "other": 0
+  },
+  "avgTurns": 34.5,
+  "sweepPerGame": 0.626,
+  "sweepBlockedPerGame": 0.008,
+  "lastStandPerGame": 0,
+  "chargePerGame": 0,
+  "chargeRecoilPerGame": 0,
+  "focusPerGame": 0.028,
+  "focusBlockedPerGame": 0.003,
+  "subjectDownRate": 92.5,
+  "subjectAvgLifeLeft": 0.18,
+  "byFoe": {
+   "booster-1": 72.6,
+   "booster-2": 60.4,
+   "booster-3": 75.7
+  }
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 69.7,
+  "end": {
+   "koWin": 47.8,
+   "deckOutWin": 21.9,
+   "koLoss": 13.1,
+   "deckOutLoss": 17.2,
+   "other": 0
+  },
+  "avgTurns": 34.1,
+  "sweepPerGame": 0.432,
+  "sweepBlockedPerGame": 0.004,
+  "lastStandPerGame": 0.049,
+  "chargePerGame": 0.045,
+  "chargeRecoilPerGame": 0,
+  "focusPerGame": 0.026,
+  "focusBlockedPerGame": 0.001,
+  "subjectDownRate": 91.5,
+  "subjectAvgLifeLeft": 0.21,
+  "byFoe": {
+   "booster-1": 73.7,
+   "booster-2": 58.6,
+   "booster-3": 76.7
+  }
+ }
+}

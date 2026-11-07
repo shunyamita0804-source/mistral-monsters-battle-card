@@ -1,0 +1,31 @@
+{
+ "games": 100,
+ "skill": "A",
+ "subject": "mon-stellard",
+ "drain": {
+  "games": 16200,
+  "win": 74.3,
+  "end": {
+   "koWin": 46.6,
+   "deckOutWin": 27.6,
+   "koLoss": 11.5,
+   "deckOutLoss": 14.2,
+   "other": 0
+  },
+  "avgTurns": 33.6,
+  "sweepPerGame": 0.541,
+  "sweepBlockedPerGame": 0.016,
+  "lastStandPerGame": 0.046,
+  "chargePerGame": 0.061,
+  "chargeRecoilPerGame": 0,
+  "focusPerGame": 0.09,
+  "focusBlockedPerGame": 0.008,
+  "subjectDownRate": 79.1,
+  "subjectAvgLifeLeft": 0.82,
+  "byFoe": {
+   "mon-nous": 69,
+   "mon-lilil": 79.4,
+   "mon-nobiton": 74.4
+  }
+ }
+}

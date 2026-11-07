@@ -150,6 +150,15 @@ export type SkillEffect =
        * 技のダメージ＋この値（技そのもののダメージに足す。おたけびの2倍は＋込みにかける）
        */
       readonly rageBonus?: number;
+      /**
+       * 空中の相手には使えない（2026-11-07 指示書 BQ：ステラードのあしばらい）。いま空中として扱われている相手（habitatOf）は選べない。
+       * 選べる相手がいなければ使えない。ウズリオのおおたつまきの逆の考え方
+       */
+      readonly notAir?: boolean;
+      /** 使うモンスターの LIFE がこの値以下のときだけ使える（2026-11-07 指示書 BQ：ステラードのふくつのいちげき。LIFE 2 以下） */
+      readonly lowLifeMax?: number;
+      /** 回避されたとき、使ったモンスターの LIFE をこの値だけ減らす（2026-11-07 指示書 BQ：ステラードのきしのとつげき。当たった・防御されたときは無し。反動で倒れてよい） */
+      readonly selfDamageOnEvade?: number;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -338,6 +347,11 @@ export type SkillEffect =
    * 悪い状態（おはらいで消せる・まよけのふだの間はつかない）。重ねない（期限を数え直す）。倒れたら消える
    */
   | { readonly type: 'menace' }
+  /**
+   * 特殊（2026-11-07 指示書 BQ：ステラードのしゅうちゅう）：使った側（プレイヤー全体）は、使った側の次の自分の手番の終わりまで、マナを減らす効果を受けない
+   * （manaDrain・manaZero・しんぱんのせんこく・霧の香 など、相手の技・カードでマナを減らすものすべて）。重ねない（期限を数え直す）。使ったモンスターが倒れても残る
+   */
+  | { readonly type: 'focus' }
   | { readonly type: 'draw' };
 
 export type SkillEffectType = SkillEffect['type'];
@@ -555,8 +569,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm' | 'lastJudgment' | 'heavenGrace' | 'searchEvade' | 'featherRest' | 'millDeck' | 'searchAny' | 'roar' | 'menace';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm', 'lastJudgment', 'heavenGrace', 'searchEvade', 'featherRest', 'millDeck', 'searchAny', 'roar', 'menace'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm' | 'lastJudgment' | 'heavenGrace' | 'searchEvade' | 'featherRest' | 'millDeck' | 'searchAny' | 'roar' | 'menace' | 'focus';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm', 'lastJudgment', 'heavenGrace', 'searchEvade', 'featherRest', 'millDeck', 'searchAny', 'roar', 'menace', 'focus'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

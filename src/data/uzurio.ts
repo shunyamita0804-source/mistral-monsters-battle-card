@@ -17,14 +17,19 @@ import uzurioData from './official/uzurio12_and_support3_OFFICIAL_20261102.json'
  * - 正式モンスターカード uzurio_official.webp（届いた uzurio_official_monstercard_LIFE6.png〔970×1622〕を tools/art/official_card_webp.py で 508×849 に）
  * - バトル用 uzurio_battlecard.png（届いた uzurio_battleart.png を無改変。1169×1345 透過）
  * - パックの窓の絵 pack_art_uzurio.png（パック pack_uzurio.webp・販売機の窓 panel_uzurio.webp・ショップの棚の商品）
- * 色：はっきりした空色 #3D8FD6（モンスターカード枠・技カード枠・パックの色の表）
+ * 色：薄い茶色 #A87A5E（2026-11-07 指示書 BQ【2】。前ははっきりした空色 #3D8FD6。モンスターカード枠・技カード枠・パックの色の表）
  */
 export const UZURIO_MONSTER_ID = 'mon-uzurio';
 
 const monster = uzurioData.monster;
 
-/** ウズリオの色（JSON の frame_color） */
-export const UZURIO_COLOR: string = monster.frame_color;
+/**
+ * ウズリオの色。2026-11-07 指示書 BQ【2】（ユーザー決定）で薄い茶色 #A87A5E に（候補から、ほかの子と見分けやすいものを選んだ。枠は濃いめのしかた）。
+ * 前は JSON の frame_color（空色 #3D8FD6。いまはヒョウズクの色）。届いた JSON は変えない
+ */
+export const UZURIO_COLOR: string = '#A87A5E';
+/** 届いた JSON の色（前の色。くらべる用） */
+export const UZURIO_COLOR_ORIGINAL: string = monster.frame_color;
 
 export const UZURIO_MONSTER: MonsterCard = {
   kind: 'monster',

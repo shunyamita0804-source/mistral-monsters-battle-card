@@ -39,6 +39,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-huginn': 'air', // 2026-11-06 指示書 BM（確かめ用だけ。ネブラシアの招待大会ができるまで）
   'mon-nous': 'air', // 2026-11-07 指示書 BN（確かめ用だけ。ネブラシアの招待大会ができるまで）
   'mon-beniou': 'ground', // 2026-11-07 指示書 BP（確かめ用だけ。オルティガの招待大会ができるまで）
+  'mon-stellard': 'ground', // 2026-11-07 指示書 BQ（確かめ用だけ。アステリアの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -560,6 +561,23 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-beniou-10', name: 'おにのいあつ', cat: '特', mana: 2, damage: null, effect: { type: 'menace' }, text: '相手1体は次の自分の手番の終わりまで回避できない', art: 'beniou_sk_10.webp' },
     { id: 'skl-beniou-11', name: 'かなぼうでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'beniou_sk_11.webp' },
     { id: 'skl-beniou-12', name: 'ごうりきのはだ', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), rare: true, art: 'beniou_sk_12.webp' },
+  ],
+  // ステラード（地上・LIFE 8・A の上。2026-11-07 指示書 BQ。正本は design-parts/bq-stellard-20261107/data/stellard_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は stellard_sk_NN.webp（番号＝技番号）。03 は防御されない・07・08 は回避されない・11・12 はマナ0の防御（tGuard の決まりの形）。回避の技は無い。
+  // 新しい効果：02 あしばらい（notAir）・05 ふくつのいちげき（lowLifeMax）・06 きしのとつげき（selfDamageOnEvade）・10 しゅうちゅう（focus）
+  'mon-stellard': [
+    { id: 'skl-stellard-01', name: 'やりのひとつき', cat: 'ち', mana: 1, damage: 2, text: null, art: 'stellard_sk_01.webp' },
+    { id: 'skl-stellard-02', name: 'あしばらい', cat: 'ち', mana: 2, damage: 4, effect: atk({ notAir: true }), text: '地上・水中の相手だけ（空中の相手には使えない）', art: 'stellard_sk_02.webp' },
+    { id: 'skl-stellard-03', name: 'たてくだき', cat: 'ち', mana: 3, damage: 3, effect: atk({ unblockable: true }), text: T_UNBLOCK, art: 'stellard_sk_03.webp' },
+    { id: 'skl-stellard-04', name: 'ほしのやり', cat: 'ち', mana: 3, damage: 5, text: null, art: 'stellard_sk_04.webp' },
+    { id: 'skl-stellard-05', name: 'ふくつのいちげき', cat: 'ち', mana: 3, damage: 7, effect: atk({ lowLifeMax: 2 }), text: '自分のLIFEが2以下のときだけ使える', rare: true, art: 'stellard_sk_05.webp' },
+    { id: 'skl-stellard-06', name: 'きしのとつげき', cat: 'ち', mana: 4, damage: 8, effect: atk({ selfDamageOnEvade: 2 }), text: '回避されると自分のLIFE−2', rare: true, art: 'stellard_sk_06.webp' },
+    { id: 'skl-stellard-07', name: 'みちびきのほし', cat: 'か', mana: 3, damage: 3, effect: atk({ undodgeable: true }), text: T_UNDODGE, art: 'stellard_sk_07.webp' },
+    { id: 'skl-stellard-08', name: 'りゅうせいのやり', cat: 'か', mana: 4, damage: 5, effect: atk({ undodgeable: true }), text: T_UNDODGE, rare: true, art: 'stellard_sk_08.webp' },
+    { id: 'skl-stellard-09', name: 'ぎんがのかがやき', cat: 'か', mana: 4, damage: 7, text: null, rare: true, art: 'stellard_sk_09.webp' },
+    { id: 'skl-stellard-10', name: 'しゅうちゅう', cat: '特', mana: 0, damage: null, effect: { type: 'focus' }, text: '次の自分の手番の終わりまで、マナを減らす効果を受けない', art: 'stellard_sk_10.webp' },
+    { id: 'skl-stellard-11', name: 'やりでうける', cat: '防', mana: 0, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'stellard_sk_11.webp' },
+    { id: 'skl-stellard-12', name: 'たてでうける', cat: '防', mana: 0, damage: null, effect: guard(3, 'wisdom'), text: tGuard(3, 'wisdom'), art: 'stellard_sk_12.webp' },
   ],
 };
 
