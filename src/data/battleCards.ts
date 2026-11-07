@@ -19,6 +19,7 @@ import { KUROSHIO_MONSTER_ID } from './kuroshio.ts';
 import { ROUGA_MONSTER_ID } from './rouga.ts';
 import { HUGINN_MONSTER_ID } from './huginn.ts';
 import { NOUS_MONSTER_ID } from './nous.ts';
+import { BENIOU_MONSTER_ID } from './beniou.ts';
 import { RADIEL_MONSTER_ID } from './radiel.ts';
 import { GEAROS_MONSTER_ID } from './gearos.ts';
 import { MYUROL_MONSTER_ID } from './myurol.ts';
@@ -105,6 +106,8 @@ export const BATTLE_CARDS: Readonly<Record<string, BattleCardSpec>> = {
   [HUGINN_MONSTER_ID]: { art: 'huginn_battlecard.png', frame: 'huginn', scale: 0.8, offsetY: -0.02 },
   // ノウス（2026-11-07 指示書 BN）：枠は深い琥珀（#CC6A1F）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
   [NOUS_MONSTER_ID]: { art: 'nous_battlecard.png', frame: 'nous', scale: 0.8, offsetY: -0.02 },
+  // ベニオウ（2026-11-07 指示書 BP）：枠は深いえんじ（#6B1E3A）。絵は透明度を 0／255 にそろえ、まわりに透明の余白を足したもの（体は縮めるだけ・色は変えていない）
+  [BENIOU_MONSTER_ID]: { art: 'beniou_battlecard.png', frame: 'beniou', scale: 0.8, offsetY: -0.02 },
   // ラディエル（2026-11-05 指示書 BI）：枠は金（#BE7410。カードの絵の枠の色）。絵は届いた radiel_battlecard.png（1169×1346 透過）を無改変（光輪と光の尾の半透明はそのまま）。
   // 翼が絵の幅いっぱいまで広がるので、翼の先が枠の飾りに切られすぎない大きさ
   [RADIEL_MONSTER_ID]: { art: 'radiel_battlecard.png', frame: 'radiel', scale: 0.82, offsetY: -0.01 },

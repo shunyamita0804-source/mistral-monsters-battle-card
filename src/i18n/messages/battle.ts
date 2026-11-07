@@ -75,6 +75,12 @@ export const BATTLE = {
   // 2026-11-07 指示書 BN：ノウスのぜんちぜんのう・ときをすいとる
   'battle.log.searchAny': { ja: '{side}はぜんちぜんのうで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Omniscience.' },
   'battle.log.millDeck': { ja: '{side}の山札の上から{n}枚が捨て札になった（{cards}）。', en: "{n} card(s) from the top of {side}'s deck went to the discard pile ({cards})." },
+  // 2026-11-07 指示書 BP：ベニオウ（いかり・おたけび・おにのいあつ）
+  'battle.log.rage': { ja: '{name}のいかり！ ダメージ＋{n}', en: '{name} is enraged! Damage +{n}' },
+  'battle.log.roar': { ja: '{name}のおたけび！ 次のちから技のダメージ2倍（次の自分のターンの終わりまで）。', en: "{name} roars! Its next STR skill deals double damage (until the end of its next turn)." },
+  'battle.log.roarDouble': { ja: '{name}のおたけびの力で、ダメージ2倍！', en: "{name}'s roar doubles the damage!" },
+  'battle.log.roarFaded': { ja: '{name}のおたけびの力が消えた。', en: "{name}'s roar wore off." },
+  'battle.log.menace': { ja: '{name}はおにのいあつで足がすくんだ！（回避できない）', en: "{name} is cowed by the ogre's menace! (can't evade)" },
   // 2026-11-07 指示書 BO：からっぽのつぼ の記録
   'battle.log.manaZero': { ja: '{side}のマナが0になった。', en: "{side}'s mana dropped to 0." },
   'battle.log.manaAlreadyZero': { ja: '{side}のマナはもう0だった。', en: "{side}'s mana was already 0." },
@@ -170,6 +176,7 @@ export const BATTLE = {
   'battle.ng.noCheerTarget': { ja: '声援をかけられる味方がいません（まだ動いていない味方だけ）', en: 'No ally to cheer (only allies that have not acted)' },
   'battle.ng.noDeck': { ja: '山札がありません', en: 'Your deck is empty' },
   // 2026-11-07 指示書 BO：ときをすいとる
+  'battle.ng.menaced': { ja: 'おにのいあつで、回避できません', en: "Cowed by the menace: can't evade" },
   'battle.ng.noOpponentDeck': { ja: '相手は山札がありません', en: "The opponent's deck is empty" },
   'battle.ng.overdriveCards': { ja: 'α・β・γ の3枚が手札にそろっていません', en: 'You need α, β and γ in your hand' },
   'battle.ng.stunned': { ja: 'このターンは行動できません（行動不可）', en: "Can't act this turn (stunned)" }, // 2026-10-30 指示書 W：ヒョウズクのこおりのいき・ふぶきでも出るので「まきつく」を外した
@@ -195,6 +202,9 @@ export const BATTLE = {
   // 2026-10-30 指示書 X：状態の印を3つ足した（英語は仮訳）
   'battle.status.frozen': { ja: '凍って行動不可', en: 'Frozen' },
   'battle.status.energy': { ja: 'エネルギー', en: 'Energy' },
+  // 2026-11-07 指示書 BP：ベニオウ
+  'battle.status.roar': { ja: 'おたけび（次のちから技のダメージ2倍・次の自分のターンまで）', en: 'Roar (next STR skill deals double damage, until its next turn)' },
+  'battle.status.menace': { ja: 'おにのいあつ（回避できない・相手の次のターンの終わりまで）', en: "Menace (can't evade, until the end of the opponent's next turn)" },
   'battle.status.dragged': { ja: 'ひきずりこまれて水中', en: 'Dragged underwater' },
   'battle.status.noEvade': { ja: '回避できない', en: "Can't dodge" },
   'battle.status.dragonGaze': { ja: '次は回避されない', en: 'Next: no dodge' },

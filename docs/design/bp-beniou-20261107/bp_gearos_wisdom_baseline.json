@@ -1,0 +1,35 @@
+{
+ "games": 100,
+ "skill": "A",
+ "subject": "mon-gearos",
+ "wisdom": {
+  "games": 16200,
+  "win": 70.5,
+  "end": {
+   "koWin": 44.9,
+   "deckOutWin": 25.6,
+   "koLoss": 15.5,
+   "deckOutLoss": 14,
+   "other": 0
+  },
+  "avgTurns": 34.9,
+  "roarPerGame": 0,
+  "doubledPerGame": 0,
+  "doubledAvgDamage": 0,
+  "doubledKoRate": 0,
+  "doubledOneShotRate": 0,
+  "attacksPerGame": 4.42,
+  "attackKoRate": 24.4,
+  "oneShotPerGame": 0.079,
+  "oneShotRate": 1.8,
+  "ragePerGame": 0,
+  "menacePerGame": 0,
+  "menacedAttacksPerGame": 0,
+  "menacedBlockedEvadePerGame": 0,
+  "byFoe": {
+   "mon-nous": 71.9,
+   "mon-serephine": 81.1,
+   "mon-radiel": 58.5
+  }
+ }
+}

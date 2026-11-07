@@ -48,6 +48,8 @@ export const SCREEN_IDS = [
   'huginnLab',
   /** 2026-11-07 指示書 BN：ノウスの確認用の画面（?qa=1&lab=nous。置き場所ができるまで） */
   'nousLab',
+  /** 2026-11-07 指示書 BP：ベニオウの確認用の画面（?qa=1&lab=beniou。置き場所ができるまで） */
+  'beniouLab',
   'soukaiLab',
   // 2026-11-02 指示書 AT：イベントの確かめ用の入口（?qa=1&lab=events）
   'storyEventLab',

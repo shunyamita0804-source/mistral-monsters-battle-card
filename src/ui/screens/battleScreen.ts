@@ -17,6 +17,8 @@ import {
   guardCost,
   activeField,
   airBonusAgainst,
+  rageBonusOf,
+  isMenaced,
   attackableMonsters,
   fieldSupport,
   habitatOf,
@@ -942,6 +944,11 @@ export const battleScreen: ScreenDefinition = {
      * 空中の相手がいなければ何も渡さない（印字のまま）。ほかの増減（場・声援など）は今までどおり数字に入れない
      */
     const handDamage = (s: BattleState, card: PlayCard): { damage?: number } => {
+      // いかり（ベニオウ 指示書 BP）：使えるベニオウの LIFE が半分以下なら、増えたダメージを見せる（うずまきショットと同じ考え方）
+      if (card.kind === 'skill' && card.effect.type === 'attack' && card.effect.rageBonus && card.stat) {
+        const rage = Math.max(0, ...s.sides.player.monsters.filter((m) => m.cardId === card.monsterId).map((m) => rageBonusOf(card, m)));
+        return rage > 0 ? { damage: card.stat.value + rage } : {};
+      }
       if (card.kind !== 'skill' || card.effect.type !== 'attack' || !card.effect.airBonus || !card.stat) return {};
       const air = attackableMonsters(s, 'opponent').some((m) => airBonusAgainst(s, card, m) > 0);
       return air ? { damage: card.stat.value + card.effect.airBonus } : {};
@@ -1943,6 +1950,10 @@ export const battleScreen: ScreenDefinition = {
       if (m.pinTurn !== undefined && m.pinTurn !== null && m.pinTurn === s.turn) badge('s09', t('battle.status.noEvade'));
       // ひきずりこむ（クロシオ 指示書 BK）：印は【仮】で水中の居場所の印（場のカードの居場所の印も水中に変わって光る）
       if (isDraggedUnder(s, m)) badge('t03', t('battle.status.dragged'));
+      // おにのいあつ（ベニオウ 指示書 BP）：回避できない（じならしと同じ回避不可の印 S09。印は【仮】）
+      if (isMenaced(s, m)) badge('s09', t('battle.status.menace'));
+      // おたけび（ベニオウ 指示書 BP）：次のちから技 2倍（ちからアップの印 B01 に「×2」。印は【仮】）
+      if (m.roar && s.turn <= m.roar.untilTurn) badge('b01', t('battle.status.roar'), 'x2');
       // ジオルのエネルギーをためる：次のかしこさ技 2倍
       if (m.energy && s.turn <= m.energy.turn) badge('b03', t('battle.status.energy'), 'x2');
       // タイラントの竜のまなざし・竜のちから

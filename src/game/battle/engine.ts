@@ -114,6 +114,16 @@ export interface BattleMonster {
    * 場のカードより強い（場が地上・空中でも水中のまま）。悪い状態（おはらいで消せる・まよけのふだで防ぐ）。倒れたら消える
    */
   readonly dragUnder?: { readonly untilTurn: number } | null;
+  /**
+   * おたけび（2026-11-07 指示書 BP：ベニオウ）：untilTurn の手番が終わるまで、このモンスターが次に使うちから技のダメージ2倍。
+   * ちから技を使ったら消える（かしこさ技では消えない）。重ねない（期限を数え直す）。倒れたら消える
+   */
+  readonly roar?: { readonly untilTurn: number } | null;
+  /**
+   * おにのいあつ（2026-11-07 指示書 BP：ベニオウ）：untilTurn の手番が終わるまで、このモンスターは回避の技を使えない（防御は使える）。
+   * 悪い状態（おはらいで消せる・まよけのふだの間はつかない）。重ねない（期限を数え直す）。倒れたら消える
+   */
+  readonly menace?: { readonly untilTurn: number } | null;
 }
 
 export interface HandCard {
@@ -517,6 +527,8 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
     if (type === 'evade' && (undodgeableAgainst(state, attackCard, target) || pending.undodgeable || pending.dragonGaze)) return NO(t('battle.ng.undodgeable'));
     // じならしをかけられたモンスターは、この手番の次の攻撃1回を回避できない（防御はできる）
     if (type === 'evade' && pending.pinned) return NO(t('battle.ng.pinned'));
+    // おにのいあつ（ベニオウ 指示書 BP）：期限の間は回避の技を使えない（防御はできる）。だれの攻撃でも
+    if (type === 'evade' && isMenaced(state, target)) return NO(t('battle.ng.menaced'));
     // 「必要マナ2以上の〜を回避」「消費マナ3以上の〜ダメージ−4」「消費マナ2以下の〜を回避」：
     // 受ける攻撃カードに印字された必要マナで判定（いまのマナの残りではない）
     const minCost = guardMinCost(skill);
@@ -726,7 +738,7 @@ export function requiemVictims(state: BattleState, userUid: string): BattleMonst
  * dragged＝水中にされている（クロシオのひきずりこむ。2026-11-06 指示書 BK・ユーザー決定）。
  * 自分の技で付いた良い状態（ためている・エネルギー・おいかぜ・しめったはだ など）は入らない
  */
-export type BadStatusKind = 'sealed' | 'stunned' | 'weaken' | 'taunt' | 'pinned' | 'dragged';
+export type BadStatusKind = 'sealed' | 'stunned' | 'weaken' | 'taunt' | 'pinned' | 'dragged' | 'menaced';
 
 export function badStatusKinds(state: BattleState, m: BattleMonster | undefined): BadStatusKind[] {
   if (!m || m.life <= 0) return [];
@@ -738,6 +750,7 @@ export function badStatusKinds(state: BattleState, m: BattleMonster | undefined)
   if (m.taunt && m.taunt.turn >= state.turn) out.push('taunt');
   if (m.pinTurn != null && m.pinTurn >= state.turn) out.push('pinned');
   if (isDraggedUnder(state, m)) out.push('dragged');
+  if (isMenaced(state, m)) out.push('menaced');
   return out;
 }
 
@@ -848,6 +861,24 @@ export function tailwindOf(state: BattleState, user: BattleMonster | undefined):
   return w && user.life > 0 && state.turn === w.turn ? w.amount : 0;
 }
 
+/** おにのいあつ（ベニオウ 指示書 BP）で、いま回避の技を使えないか（期限の手番の終わりまで。倒れていれば false） */
+export function isMenaced(state: BattleState, monster: BattleMonster | undefined): boolean {
+  const m = monster?.menace;
+  return !!m && monster.life > 0 && state.turn <= m.untilTurn;
+}
+
+/** おたけび（ベニオウ 指示書 BP）で、この攻撃（ちから技）のダメージが2倍になるか（期限の手番の終わりまで） */
+export function roarOf(state: BattleState, user: BattleMonster | undefined, skill: SkillCard): boolean {
+  const r = user?.roar;
+  return !!r && user.life > 0 && state.turn <= r.untilTurn && skill.effect.type === 'attack' && skill.stat?.type === 'force';
+}
+
+/** いかり（ベニオウ 指示書 BP）で、この技のダメージに足す量（使うモンスターの LIFE が最大 LIFE の半分以下のときだけ。ほかは 0） */
+export function rageBonusOf(skill: SkillCard, user: BattleMonster | undefined): number {
+  const e = skill.effect;
+  return e.type === 'attack' && e.rageBonus && user && user.life > 0 && user.life * 2 <= user.maxLife ? e.rageBonus : 0;
+}
+
 /** じならしで、この手番に受ける次の攻撃を回避できないか（倒れていれば false） */
 export function isPinned(state: BattleState, monster: BattleMonster | undefined): boolean {
   return !!monster && monster.life > 0 && monster.pinTurn === state.turn;
@@ -900,7 +931,8 @@ export function attackPower(state: BattleState, skill: SkillCard, user?: BattleM
   // 2倍（エネルギーをためる・場が水中のタイダルクラッシュ）はカードのダメージにかける。両方なら4倍【要確認：指示書 AJ】
   const water = skill.effect.type === 'attack' && skill.effect.doubleInWater && isTideActive(state);
   // うずまきショット（指示書 AQ）：ねらった相手がいま空中なら、技そのもののダメージに＋（2倍があれば＋込みのダメージにかける）
-  const base = (skill.stat.value + airBonusAgainst(state, skill, target)) * (energyOf(state, user, skill) ? 2 : 1) * (water ? 2 : 1);
+  // いかり・おたけび（ベニオウ 指示書 BP）：いかりの＋は技そのもののダメージに足し、おたけびの2倍は＋込みのダメージにかける（ほかの増減はそのあと）
+  const base = (skill.stat.value + airBonusAgainst(state, skill, target) + rageBonusOf(skill, user)) * (energyOf(state, user, skill) ? 2 : 1) * (water ? 2 : 1) * (roarOf(state, user, skill) ? 2 : 1);
   // ししゃのたむけ：倒れている味方1体につき＋（使った瞬間に数える）
   const fallen = skill.effect.type === 'attack' && skill.effect.fallenAllyBonus ? skill.effect.fallenAllyBonus * fallenAllies(state, user) : 0;
   const boost = chargeOf(user) + tailwindOf(state, user) + cheerOf(state, user) + fallen;
@@ -998,7 +1030,7 @@ function applyDamage(state: BattleState, targetUid: string, damage: number): Bat
   if (!found) return state;
   const life = Math.max(0, found.monster.life - damage);
   // 倒れたら、ほっぺにためた分・おいかぜ・じならし・エネルギーをためる・かぜのり・Wひっかきの続きは消える
-  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null } : { life });
+  let next = updateMonster(state, targetUid, life === 0 ? { life, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null, roar: null, menace: null } : { life });
   next = addLog(next, t(life === 0 ? 'battle.log.damageDown' : 'battle.log.damage', { name: nameOf(found.monster.cardId), n: damage }));
   return checkKnockout(next);
 }
@@ -1137,6 +1169,12 @@ function startTurn(state: BattleState, side: Side): BattleState {
   // とおぼえ（ロウガ 指示書 BL）：期限の手番が過ぎても攻撃しなかったら、＋は消える
   for (const k of ['player', 'opponent'] as const) {
     for (const m of next.sides[k].monsters) {
+      // おたけび（ベニオウ 指示書 BP）：期限の手番が過ぎてもちから技を使わなかったら消える。おにのいあつは期限が過ぎたら消す（記録なし）
+      if (m.roar && state.turn > m.roar.untilTurn) {
+        next = updateMonster(next, m.uid, { roar: null });
+        if (m.life > 0) next = addLog(next, t('battle.log.roarFaded', { name: nameOf(m.cardId) }));
+      }
+      if (m.menace && state.turn > m.menace.untilTurn) next = updateMonster(next, m.uid, { menace: null });
       if (m.chargeUntil != null && state.turn > m.chargeUntil) {
         next = updateMonster(next, m.uid, { charge: null, chargeUntil: null });
         if (m.life > 0 && m.charge) next = addLog(next, t('battle.log.howlFaded', { name: nameOf(m.cardId) }));
@@ -1257,6 +1295,11 @@ function useCard(
       const allPower = allTargets && skill.effect.airBonus ? { base: attackPower(state, skill, user), air: airTarget ? attackPower(state, skill, user, airTarget) : attackPower(state, skill, user) + skill.effect.airBonus } : undefined;
       const energized = energyOf(state, user, skill);
       const undodgeable = undodgeableNow(skill, user) && !skill.effect.undodgeable;
+      // いかり・おたけび（ベニオウ 指示書 BP）：おたけびはちから技を使ったら消える（当たっても・守られても・回避されても）
+      const rage = rageBonusOf(skill, user);
+      const roared = roarOf(state, user, skill);
+      if (rage > 0) next = addLog(next, t('battle.log.rage', { name: nameOf(user.cardId), n: rage }));
+      if (roared) next = addLog(updateMonster(next, user.uid, { roar: null }), t('battle.log.roarDouble', { name: nameOf(user.cardId) }));
       // 吠える（次の技のダメージ−）は、その種類の技を使ったら消える
       if (weakenOf(state, user, skill) > 0) next = updateMonster(next, user.uid, { weaken: null });
       // ほっぺにためる・おいかぜは、攻撃技を使ったら消える（当たっても・守られても・回避されても）。おいかぜは効く手番に使ったときだけ消える
@@ -1445,7 +1488,7 @@ function useCard(
       // ライフ＋heal（もとの LIFE まで。BH の直し）。悪い状態が無ければ消す記録は出さない
       if (!target) return state;
       const had = badStatusKinds(next, target).length > 0;
-      next = updateMonster(next, target.uid, { sealedTurn: null, stunnedTurn: null, stunMark: null, weaken: null, weakenTurn: null, taunt: null, pinTurn: null, dragUnder: null });
+      next = updateMonster(next, target.uid, { sealedTurn: null, stunnedTurn: null, stunMark: null, weaken: null, weakenTurn: null, taunt: null, pinTurn: null, dragUnder: null, menace: null });
       if (had) next = addLog(next, t('battle.log.purify', { name: nameOf(target.cardId) }));
       const after = findMonster(next, target.uid)?.monster;
       const heal = skill.effect.heal ?? 0;
@@ -1474,6 +1517,17 @@ function useCard(
       return searchEvade(next, side, choice);
     case 'searchAny':
       return searchAny(next, side, choice);
+    case 'roar':
+      // おたけび（ベニオウ 指示書 BP）：使った側の次の自分の手番の終わりまで。重ねない（期限を数え直す）
+      next = updateMonster(next, user.uid, { roar: { untilTurn: state.turn + 2 } });
+      return addLog(next, t('battle.log.roar', { name: nameOf(user.cardId) }));
+    case 'menace': {
+      // おにのいあつ（ベニオウ 指示書 BP）：選んだ相手は、使った側の次の自分の手番の終わりまで回避できない。悪い状態（まよけのふだの間はつかない）
+      if (!target) return state;
+      if (wardCharmActive(next, otherSide(side))) return wardCharmBlocked(next, target);
+      next = updateMonster(next, target.uid, { menace: { untilTurn: state.turn + 2 } });
+      return addLog(next, t('battle.log.menace', { name: nameOf(target.cardId) }));
+    }
     case 'millDeck':
       return millDeck(next, side, skill.effect.count);
     case 'featherRest': {
@@ -1554,7 +1608,7 @@ function requiem(state: BattleState, userUid: string): BattleState {
   const victims = requiemVictims(state, userUid);
   let next = state;
   for (const m of victims) {
-    next = updateMonster(next, m.uid, { life: 0, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null });
+    next = updateMonster(next, m.uid, { life: 0, charge: null, chargeUntil: null, featherRest: null, tailwind: null, ward: null, pinTurn: null, energy: null, dragonGaze: null, dragonMight: null, windRide: null, chain: null, cheer: null, dragUnder: null, roar: null, menace: null });
   }
   next = addLog(next, victims.length > 0 ? t('battle.log.requiem', { n: victims.length, names: victims.map((m) => nameOf(m.cardId)).join(t('common.listSeparator')) }) : t('battle.log.requiemNone'));
   return checkKnockout(next);

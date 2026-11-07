@@ -91,6 +91,9 @@ export const CARDS = {
   // 2026-11-07 指示書 BN：ノウスのときをすいとる・ぜんちぜんのう
   'card.effect.millDeck': { ja: '特殊', en: 'Special' },
   'card.effect.searchAny': { ja: '特殊', en: 'Special' },
+  // 2026-11-07 指示書 BP：ベニオウのおたけび・おにのいあつ
+  'card.effect.roar': { ja: '特殊', en: 'Special' },
+  'card.effect.menace': { ja: '特殊', en: 'Special' },
   'card.effect.cover': { ja: '防御', en: 'Guard' },
   'card.supportKind.field': { ja: '全体', en: 'Field' },
 

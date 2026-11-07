@@ -38,6 +38,7 @@ export const MONSTER_HABITAT: Readonly<Record<string, Habitat>> = {
   'mon-rouga': 'ground', // 2026-11-06 指示書 BL（確かめ用だけ。ノルディスの招待大会ができるまで）
   'mon-huginn': 'air', // 2026-11-06 指示書 BM（確かめ用だけ。ネブラシアの招待大会ができるまで）
   'mon-nous': 'air', // 2026-11-07 指示書 BN（確かめ用だけ。ネブラシアの招待大会ができるまで）
+  'mon-beniou': 'ground', // 2026-11-07 指示書 BP（確かめ用だけ。オルティガの招待大会ができるまで）
   'mon-myurol': 'water',
   'mon-kalshell': 'water',
   'mon-serephine': 'water',
@@ -542,6 +543,23 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
     { id: 'skl-nous-10', name: 'ぜんちぜんのう', cat: '特', mana: 3, damage: null, effect: { type: 'searchAny' }, text: '山札から好きなカードを1枚選んで手札に加える', rare: true, art: 'nous_sk_10.webp' },
     { id: 'skl-nous-11', name: 'ろっぽんうででうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'nous_sk_11.webp' },
     { id: 'skl-nous-12', name: 'みらいよち', cat: '避', mana: 2, damage: null, effect: dodge('all'), text: tDodge('all'), art: 'nous_sk_12.webp' },
+  ],
+  // ベニオウ（地上・LIFE 8・A。2026-11-07 指示書 BP。正本は design-parts/bp-beniou-20261107/data/beniou_skills.csv）。置き場所ができるまで確かめ用だけ。
+  // 絵は beniou_sk_NN.webp（番号＝技番号）。05 は防御されない（ジオルのいわくだきと同じ）・11 は guard(3,'force')・12 は guard(3,'all')。回避の技は無い。
+  // 新しい効果：04・06 いかり（rageBonus）・09 おたけび（roar）・10 おにのいあつ（menace）。防御の文は tGuard（決まりの形。CSV の文に「。」を足した形）
+  'mon-beniou': [
+    { id: 'skl-beniou-01', name: 'はりて', cat: 'ち', mana: 1, damage: 2, text: null, art: 'beniou_sk_01.webp' },
+    { id: 'skl-beniou-02', name: 'なぎはらい', cat: 'ち', mana: 2, damage: 4, text: null, art: 'beniou_sk_02.webp' },
+    { id: 'skl-beniou-03', name: 'ふみつけ', cat: 'ち', mana: 3, damage: 5, text: null, art: 'beniou_sk_03.webp' },
+    { id: 'skl-beniou-04', name: 'おにのいかり', cat: 'ち', mana: 3, damage: 3, effect: atk({ rageBonus: 3 }), text: '自分のLIFEが半分以下ならダメージ＋3', art: 'beniou_sk_04.webp' },
+    { id: 'skl-beniou-05', name: 'かなぼうくだき', cat: 'ち', mana: 4, damage: 6, effect: atk({ unblockable: true }), text: T_UNBLOCK, rare: true, art: 'beniou_sk_05.webp' },
+    { id: 'skl-beniou-06', name: 'いかりのかなぼう', cat: 'ち', mana: 5, damage: 6, effect: atk({ rageBonus: 4 }), text: '自分のLIFEが半分以下ならダメージ＋4', rare: true, art: 'beniou_sk_06.webp' },
+    { id: 'skl-beniou-07', name: 'おにのいちげき', cat: 'ち', mana: 7, damage: 11, text: null, rare: true, art: 'beniou_sk_07.webp' },
+    { id: 'skl-beniou-08', name: 'おにび', cat: 'か', mana: 2, damage: 3, text: null, art: 'beniou_sk_08.webp' },
+    { id: 'skl-beniou-09', name: 'おたけび', cat: '特', mana: 2, damage: null, effect: { type: 'roar' }, text: '次の自分の手番の終わりまでに使う次のちから技のダメージを2倍', art: 'beniou_sk_09.webp' },
+    { id: 'skl-beniou-10', name: 'おにのいあつ', cat: '特', mana: 2, damage: null, effect: { type: 'menace' }, text: '相手1体は次の自分の手番の終わりまで回避できない', art: 'beniou_sk_10.webp' },
+    { id: 'skl-beniou-11', name: 'かなぼうでうける', cat: '防', mana: 1, damage: null, effect: guard(3, 'force'), text: tGuard(3, 'force'), art: 'beniou_sk_11.webp' },
+    { id: 'skl-beniou-12', name: 'ごうりきのはだ', cat: '防', mana: 2, damage: null, effect: guard(3, 'all'), text: tGuard(3, 'all'), rare: true, art: 'beniou_sk_12.webp' },
   ],
 };
 

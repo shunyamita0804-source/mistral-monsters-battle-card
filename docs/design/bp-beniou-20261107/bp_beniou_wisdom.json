@@ -1,0 +1,35 @@
+{
+ "games": 100,
+ "skill": "A",
+ "subject": "mon-beniou",
+ "wisdom": {
+  "games": 16200,
+  "win": 62.8,
+  "end": {
+   "koWin": 40.5,
+   "deckOutWin": 22.3,
+   "koLoss": 16.8,
+   "deckOutLoss": 20.5,
+   "other": 0
+  },
+  "avgTurns": 34.3,
+  "roarPerGame": 0.038,
+  "doubledPerGame": 0.017,
+  "doubledAvgDamage": 8.3,
+  "doubledKoRate": 60.4,
+  "doubledOneShotRate": 54.5,
+  "attacksPerGame": 1.869,
+  "attackKoRate": 30.8,
+  "oneShotPerGame": 0.179,
+  "oneShotRate": 9.6,
+  "ragePerGame": 0.113,
+  "menacePerGame": 0.201,
+  "menacedAttacksPerGame": 0.118,
+  "menacedBlockedEvadePerGame": 0.032,
+  "byFoe": {
+   "mon-nous": 63.6,
+   "mon-serephine": 72.7,
+   "mon-radiel": 52.1
+  }
+ }
+}

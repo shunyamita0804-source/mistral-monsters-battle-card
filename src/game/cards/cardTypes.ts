@@ -145,6 +145,11 @@ export type SkillEffect =
        * 減らし方・記録はくしゃみと同じ（マナは悪い状態ではないので、まよけのふだが効いていても減る）
        */
       readonly manaZero?: boolean;
+      /**
+       * いかり（2026-11-07 指示書 BP：ベニオウのおにのいかり・いかりのかなぼう）：使ったときに使ったモンスターの LIFE が最大 LIFE の半分以下なら、
+       * 技のダメージ＋この値（技そのもののダメージに足す。おたけびの2倍は＋込みにかける）
+       */
+      readonly rageBonus?: number;
     }
   /**
    * 防御：ダメージを減らす。正式カードは reduce（減らす量）と against（効く攻撃の種類。'all'＝攻撃すべて）を持つ。
@@ -323,6 +328,16 @@ export type SkillEffect =
    * ちえのささやき（searchEvade）の「回避だけ」をはずした形。山札が0枚なら使えない
    */
   | { readonly type: 'searchAny' }
+  /**
+   * 特殊（2026-11-07 指示書 BP：ベニオウのおたけび）：使ったモンスターに印。次に使うちから技のダメージを2倍（技のダメージ×2 → ほかの増減 → 防御の順）。
+   * 期限は使った側の次の自分の手番の終わり（とおぼえと同じ数え方）。重ねない（期限を数え直す）。ちから技を使ったら消える。かしこさ技では消えない。倒れたら消える
+   */
+  | { readonly type: 'roar' }
+  /**
+   * 特殊（2026-11-07 指示書 BP：ベニオウのおにのいあつ）：選んだ相手1体は、使った側の次の自分の手番の終わりまで回避の技を使えない（防御は使える）。
+   * 悪い状態（おはらいで消せる・まよけのふだの間はつかない）。重ねない（期限を数え直す）。倒れたら消える
+   */
+  | { readonly type: 'menace' }
   | { readonly type: 'draw' };
 
 export type SkillEffectType = SkillEffect['type'];
@@ -399,7 +414,7 @@ export function guardMaxCost(skill: SkillCard): number | null {
 /** 相手モンスター1体を選んで使う技か（攻撃・特殊） */
 export function targetsEnemy(skill: SkillCard): boolean {
   const type = skill.effect.type;
-  return type === 'attack' || type === 'weaken' || type === 'seal' || type === 'taunt' || type === 'pin';
+  return type === 'attack' || type === 'weaken' || type === 'seal' || type === 'taunt' || type === 'pin' || type === 'menace';
 }
 
 /**
@@ -540,8 +555,8 @@ export function officialEffectText(skill: SkillCard): string | null {
 }
 
 /** 説明をゲーム側で組み立てない特殊の効果（正式カードの効果テキストをそのまま出す。仮カードには無い） */
-type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm' | 'lastJudgment' | 'heavenGrace' | 'searchEvade' | 'featherRest' | 'millDeck' | 'searchAny';
-const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm', 'lastJudgment', 'heavenGrace', 'searchEvade', 'featherRest', 'millDeck', 'searchAny'];
+type TextOnlySpecial = 'weaken' | 'seal' | 'taunt' | 'handToDeck' | 'discardRandom' | 'discardChoice' | 'redrawHand' | 'revealHand' | 'shield' | 'healSelf' | 'healAlly' | 'hide' | 'charge' | 'tailwind' | 'pin' | 'energy' | 'dragonGaze' | 'dragonMight' | 'systemChange' | 'systemCheck' | 'windRide' | 'cover' | 'tide' | 'requiem' | 'ward' | 'drawTo' | 'purify' | 'wardCharm' | 'lastJudgment' | 'heavenGrace' | 'searchEvade' | 'featherRest' | 'millDeck' | 'searchAny' | 'roar' | 'menace';
+const TEXT_ONLY_SPECIALS: readonly SkillEffectType[] = ['weaken', 'seal', 'taunt', 'handToDeck', 'discardRandom', 'discardChoice', 'redrawHand', 'revealHand', 'shield', 'healSelf', 'healAlly', 'hide', 'charge', 'tailwind', 'pin', 'energy', 'dragonGaze', 'dragonMight', 'systemChange', 'systemCheck', 'windRide', 'cover', 'tide', 'requiem', 'ward', 'drawTo', 'purify', 'wardCharm', 'lastJudgment', 'heavenGrace', 'searchEvade', 'featherRest', 'millDeck', 'searchAny', 'roar', 'menace'];
 function isTextOnlySpecial(type: SkillEffectType): type is TextOnlySpecial {
   return TEXT_ONLY_SPECIALS.includes(type);
 }

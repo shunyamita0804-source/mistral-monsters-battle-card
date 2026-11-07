@@ -1,0 +1,65 @@
+{
+ "games": 200,
+ "skill": "A",
+ "subject": "mon-beniou",
+ "swap": {
+  "games": 10800,
+  "win": 74.1,
+  "end": {
+   "koWin": 53.3,
+   "deckOutWin": 20.9,
+   "koLoss": 8.3,
+   "deckOutLoss": 17.6,
+   "other": 0
+  },
+  "avgTurns": 33.6,
+  "roarPerGame": 0.047,
+  "doubledPerGame": 0.022,
+  "doubledAvgDamage": 8.1,
+  "doubledKoRate": 60.3,
+  "doubledOneShotRate": 54.4,
+  "attacksPerGame": 2.31,
+  "attackKoRate": 29,
+  "oneShotPerGame": 0.132,
+  "oneShotRate": 5.7,
+  "ragePerGame": 0.176,
+  "menacePerGame": 0.237,
+  "menacedAttacksPerGame": 0.138,
+  "menacedBlockedEvadePerGame": 0.027,
+  "byFoe": {
+   "booster-1": 76.6,
+   "booster-2": 67.7,
+   "booster-3": 78.1
+  }
+ },
+ "swapRare": {
+  "games": 10800,
+  "win": 71.3,
+  "end": {
+   "koWin": 50.1,
+   "deckOutWin": 21.2,
+   "koLoss": 9.4,
+   "deckOutLoss": 19.3,
+   "other": 0
+  },
+  "avgTurns": 34.1,
+  "roarPerGame": 0.04,
+  "doubledPerGame": 0.017,
+  "doubledAvgDamage": 8.5,
+  "doubledKoRate": 67.9,
+  "doubledOneShotRate": 59.2,
+  "attacksPerGame": 1.966,
+  "attackKoRate": 32.4,
+  "oneShotPerGame": 0.21,
+  "oneShotRate": 10.7,
+  "ragePerGame": 0.151,
+  "menacePerGame": 0.258,
+  "menacedAttacksPerGame": 0.14,
+  "menacedBlockedEvadePerGame": 0.025,
+  "byFoe": {
+   "booster-1": 74.4,
+   "booster-2": 63.8,
+   "booster-3": 75.7
+  }
+ }
+}

@@ -21,8 +21,8 @@ describe('技カードの効果のアイコン', () => {
     const withText = official.filter((k) => skillBandText(k) !== '');
     // 2026-11-05 指示書 BH：クヨウの7枚（05・06・08・09・10・11・12）を足して139枚。指示書 BI：ラディエルの10枚を足して149枚。
     // 2026-11-06 指示書 BK：クロシオの8枚（04・06〜12）を足して157枚。指示書 BL：ロウガの6枚（04・05・08・09・11・12）で163枚。
-    // 指示書 BM：フギンの8枚（05〜12）で171枚。指示書 BN：ノウスの8枚（02・04・06・08〜12）で179枚
-    expect(withText.length).toBe(179);
+    // 指示書 BM：フギンの8枚（05〜12）で171枚。指示書 BN：ノウスの8枚（02・04・06・08〜12）で179枚。指示書 BP：ベニオウの7枚（04〜06・09〜12）で186枚
+    expect(withText.length).toBe(186);
     for (const k of withText) expect(skillEffectIcons(k), `${k.id} ${k.effectTextJa}`).not.toBeNull();
   });
 

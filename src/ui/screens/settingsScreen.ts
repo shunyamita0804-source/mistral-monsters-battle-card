@@ -136,6 +136,8 @@ export const settingsScreen: ScreenDefinition = {
                 button(t('axLab.titleOf', { name: cardName('mon-huginn') }), () => ctx.navigate('huginnLab'), 'btn btn--small'),
                 // 2026-11-07 指示書 BN：ノウス（置き場所ができるまで、ここからだけ）
                 button(t('axLab.titleOf', { name: cardName('mon-nous') }), () => ctx.navigate('nousLab'), 'btn btn--small'),
+                // 2026-11-07 指示書 BP：ベニオウ（置き場所ができるまで、ここからだけ）
+                button(t('axLab.titleOf', { name: cardName('mon-beniou') }), () => ctx.navigate('beniouLab'), 'btn btn--small'),
                 // 2026-11-02 指示書 AP：蒼海（みちしおあり）を試す
                 button(t('soukaiLab.title'), () => ctx.navigate('soukaiLab'), 'btn btn--small'),
                 button(t('storyEvent.lab.title'), () => ctx.navigate('storyEventLab'), 'btn btn--small'),

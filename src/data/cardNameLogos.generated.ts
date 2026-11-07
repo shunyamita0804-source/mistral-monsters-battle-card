@@ -12,6 +12,7 @@ export interface CardNameLogo {
 export const LOGO_GLYPH = { left: 40, top: 55, height: 170 } as const;
 export const LOGO_GLYPH_EN = { left: 40, top: 48, height: 170 } as const;
 export const CARD_NAME_LOGOS: Readonly<Record<string, CardNameLogo>> = {
+  'mon-beniou': { file: 'name_ja_beniou.webp', x: 35, y: 50, w: 563, h: 180, frame: '#6B1E3A' },
   'mon-desuoru': { file: 'name_ja_desuoru.webp', x: 31, y: 48, w: 675, h: 189, frame: '#405586' },
   'mon-flune': { file: 'name_ja_flune.webp', x: 31, y: 47, w: 775, h: 191, frame: '#C4DB7C' },
   'mon-forn': { file: 'name_ja_forn.webp', x: 31, y: 48, w: 666, h: 189, frame: '#AAAA57' },
@@ -40,6 +41,7 @@ export const CARD_NAME_LOGOS: Readonly<Record<string, CardNameLogo>> = {
   'mon-uzurio': { file: 'name_ja_uzurio.webp', x: 32, y: 48, w: 652, h: 189, frame: '#5AC2F3' },
 };
 export const CARD_NAME_LOGOS_EN: Readonly<Record<string, CardNameLogo>> = {
+  'mon-beniou': { file: 'name_en_beniou.webp', x: 36, y: 50, w: 519, h: 166, frame: '#6B1E3A' },
   'mon-desuoru': { file: 'name_en_desuoru.webp', x: 32, y: 47, w: 596, h: 175, frame: '#405586' },
   'mon-flune': { file: 'name_en_flune.webp', x: 31, y: 48, w: 588, h: 175, frame: '#C4DB7C' },
   'mon-forn': { file: 'name_en_forn.webp', x: 31, y: 48, w: 468, h: 177, frame: '#AAAA57' },

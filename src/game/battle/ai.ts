@@ -2,6 +2,7 @@ import { getPlayCard, skillsOf } from '../../data/cards.ts';
 import { guardAgainst, guardReduction, skillValue, type PlayCard, type SkillCard, type StatType, type SupportCard } from '../cards/cardTypes.ts';
 import {
   aliveMonsters,
+  isMenaced,
   attackPower,
   availableUsers,
   badStatusKinds,
@@ -249,7 +250,7 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   const options0 = held.size > 0 && !kept.some(isSkillOption) && allOptions.some(isSkillOption) ? allOptions : kept;
   // まよけのふだ（クヨウ 指示書 BH）の効いている相手には、悪い状態をつけるだけの技は使わない（腕前 C は forgetTrick の割合で気づかない）
   const charmed = wardCharmActive(state, otherSide(side)) && cpuRoll(state, side, 'wardCharmSeen', false) >= CPU_SKILL[skill].forgetTrick;
-  const options = charmed ? options0.filter((o) => !['seal', 'taunt', 'weaken', 'pin'].includes(o.def.effect.type)) : options0;
+  const options = charmed ? options0.filter((o) => !['seal', 'taunt', 'weaken', 'pin', 'menace'].includes(o.def.effect.type)) : options0;
   const mine = state.sides[side];
   const enemies = aliveMonsters(state.sides[otherSide(side)]);
 
@@ -364,6 +365,10 @@ export function chooseAction(state: BattleState, side: Side, style: AiStyle = 'n
   // 2.99 ノウス（2026-11-07 指示書 BN）：からっぽのつぼ（相手のマナが多いとき）・ときをすいとる（相手の山札が少ないとき）・ぜんちぜんのう（撃てる攻撃が無いとき）は攻撃より先
   const nous = chooseNousTrick(state, side, options, style, skill);
   if (nous) return nous;
+
+  // 2.995 ベニオウ（2026-11-07 指示書 BP）：おにのいあつ（回避を持つ相手に）・おたけび（次の手番に大きいちから技を撃てるとき）は攻撃より先
+  const beniou = chooseBeniouTrick(state, side, options, style, skill);
+  if (beniou) return beniou;
 
   // 3. 攻撃：倒せる相手がいれば倒し、いなければ一番強い攻撃を（腕前ごとの狙いの）相手へ
   const attack = chooseAttack(state, side, options, enemies, style, skill);
@@ -1184,7 +1189,7 @@ export function pickDrawToDiscard(state: BattleState, side: Side, cardUid: strin
 const KUYO_MONSTERS: readonly string[] = ['mon-kuyo'];
 
 /** 相手に悪い状態をつける技か（すなかけ・ちょうはつ・ダストキック などの特殊、まきつく・こおりのいき などの「行動できない」攻撃） */
-const isStatusSkill = (k: SkillCard): boolean => ['seal', 'taunt', 'weaken', 'pin'].includes(k.effect.type) || (k.effect.type === 'attack' && !!k.effect.stunTarget);
+const isStatusSkill = (k: SkillCard): boolean => ['seal', 'taunt', 'weaken', 'pin', 'menace'].includes(k.effect.type) || (k.effect.type === 'attack' && !!k.effect.stunTarget);
 
 /**
  * クヨウ（2026-11-05 指示書 BH）。first（攻撃より先）：おはらい（悪い状態の味方 → いなければライフが半分以下の味方）→ まよけのふだ。
@@ -1642,6 +1647,51 @@ function chooseNousTrick(state: BattleState, side: Side, options: Option[], styl
       .some((o) => o.card.uid !== search.card.uid && o.def.effect.type === 'attack' && availableUsers(state, side, o.def).some((u) => skillCost(state, o.def, u) <= left));
     const user = availableUsers(state, side, search.def)[0];
     if (!canHit && user) return { type: 'useCard', side, cardUid: search.card.uid, userUid: user.uid };
+  }
+  return null;
+}
+
+/** おたけびを使う目安（指示書 BP）：次の自分の手番に撃ちたいちから技のダメージ（これ以上） */
+const ROAR_MIN_DAMAGE = 4;
+/** 次の自分の手番に増えるマナの見積もり（手札をマナにする分。目安） */
+const ROAR_NEXT_MANA = 2;
+
+/**
+ * ベニオウ（2026-11-07 指示書 BP）の特殊の技（CPU の目安）。その手番に相手を倒せるときは使わない。腕前 C は forgetTrick の割合で使いそこねる。
+ * まよけのふだの効いている相手には、おにのいあつを使わない（ほかの悪い状態をつける技と同じ。chooseAction のはじめで外す）
+ * - おにのいあつ：相手に回避の技を持つ生きたモンスターがいて（まだかかっていない）、味方に攻撃の技を持つ生きたモンスターがいるとき。いちばん危ない相手（腕前 A）に
+ * - おたけび：まだかかっておらず、手札に使ったモンスターのちから技（ダメージ4以上）があり、次の手番のマナの見積もり（払った残り＋2）で払えるとき
+ * - いかりの技は、attackPower に＋が入るので、ふつうの攻撃の選び方で強い技として先に選ばれる
+ */
+function chooseBeniouTrick(state: BattleState, side: Side, options: Option[], style: AiStyle, skill: CpuSkill): BattleAction | null {
+  const mine = options.filter(isSkillOption).filter((o) => o.def.effect.type === 'roar' || o.def.effect.type === 'menace');
+  if (mine.length === 0) return null;
+  if (cpuRoll(state, side, 'beniouTrick', false) < CPU_SKILL[skill].forgetTrick) return null;
+  if (canKillThisTurn(state, side, options)) return null;
+  const me = state.sides[side];
+  const foe = otherSide(side);
+  const mana = manaOf(me);
+
+  const menace = mine.find((o) => o.def.effect.type === 'menace');
+  if (menace) {
+    const evaders = targetsFor(state, side, menace.def).filter((m) => !isMenaced(state, m) && skillsOf(m.cardId).some((k) => k.effect.type === 'evade'));
+    const hitters = aliveMonsters(me).some((m) => skillsOf(m.cardId).some((k) => k.effect.type === 'attack'));
+    const user = availableUsers(state, side, menace.def)[0];
+    const target = hitters && user ? pickTarget(state, side, evaders, style, skill, 'menace') : undefined;
+    if (user && target) return { type: 'useCard', side, cardUid: menace.card.uid, userUid: user.uid, targetUid: target.uid };
+  }
+
+  const roar = mine.find((o) => o.def.effect.type === 'roar');
+  if (roar) {
+    const user = availableUsers(state, side, roar.def).find((m) => !(m.roar && state.turn <= m.roar.untilTurn));
+    const left = mana - roar.def.cost + ROAR_NEXT_MANA;
+    const big = user
+      ? me.hand
+          .filter((c) => c.uid !== roar.card.uid)
+          .map((c) => getPlayCard(c.cardId))
+          .some((k) => k.kind === 'skill' && k.monsterId === user.cardId && k.effect.type === 'attack' && k.stat?.type === 'force' && k.stat.value >= ROAR_MIN_DAMAGE && k.cost <= left)
+      : false;
+    if (user && big && aliveMonsters(state.sides[foe]).length > 0) return { type: 'useCard', side, cardUid: roar.card.uid, userUid: user.uid };
   }
   return null;
 }

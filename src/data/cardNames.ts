@@ -18,6 +18,8 @@ export const NAMELESS_OFFICIAL_ART: ReadonlySet<string> = new Set<string>([
   'mon-huginn',
   // 2026-11-07 指示書 BN：ノウス（届いた正式カードがはじめから名前なし）
   'mon-nous',
+  // 2026-11-07 指示書 BP：ベニオウ（届いた正式カードがはじめから名前なし）
+  'mon-beniou',
   // 2026-11-05 指示書 BI：ラディエル（届いた正式カードがはじめから名前なし）
   'mon-radiel',
 ]);
