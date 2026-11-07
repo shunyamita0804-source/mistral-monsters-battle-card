@@ -1041,6 +1041,14 @@
   overflow-y: auto;
 }
 
+/* ぜんちぜんのう（ノウス 2026-11-07 指示書 BO）：候補が多いときも窓を縦に伸ばさない。窓の中（カードの並び）だけをスクロールにする（論理 px で上限） */
+.battle-pick__grid--scroll {
+  max-height: 440px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+
 .battle-pick__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));

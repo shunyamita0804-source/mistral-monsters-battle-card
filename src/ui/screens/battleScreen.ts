@@ -1338,7 +1338,8 @@ export const battleScreen: ScreenDefinition = {
         body: [
           h(
             'div',
-            { class: 'battle-pick__grid' },
+            // ぜんちぜんのう（指示書 BO）は山札のカードが多いので、並びだけをスクロールにする
+            { class: kind === 'searchAny' ? 'battle-pick__grid battle-pick__grid--scroll' : 'battle-pick__grid' },
             ...choices.map((c) =>
               h(
                 'button',

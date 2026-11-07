@@ -75,6 +75,9 @@ export const BATTLE = {
   // 2026-11-07 指示書 BN：ノウスのぜんちぜんのう・ときをすいとる
   'battle.log.searchAny': { ja: '{side}はぜんちぜんのうで、山札から{card}を手札に加えた。', en: '{side} added {card} from the deck to the hand with Omniscience.' },
   'battle.log.millDeck': { ja: '{side}の山札の上から{n}枚が捨て札になった（{cards}）。', en: "{n} card(s) from the top of {side}'s deck went to the discard pile ({cards})." },
+  // 2026-11-07 指示書 BO：からっぽのつぼ の記録
+  'battle.log.manaZero': { ja: '{side}のマナが0になった。', en: "{side}'s mana dropped to 0." },
+  'battle.log.manaAlreadyZero': { ja: '{side}のマナはもう0だった。', en: "{side}'s mana was already 0." },
   'battle.log.millDeckNone': { ja: '{side}の山札が無い。何も起きなかった。', en: '{side} has no deck. Nothing happened.' },
   'battle.log.featherRest': { ja: '{name}ははねをやすめた。次の回避のマナが0になる。', en: '{name} rests its wings. Its next Evade costs 0 mana.' },
   'battle.log.featherRestUsed': { ja: '{name}ははねやすめの力で、マナを使わずに回避した。', en: '{name} evades for 0 mana thanks to Wing Rest.' },
@@ -166,6 +169,8 @@ export const BATTLE = {
   'battle.ng.noOpponentMana': { ja: '相手のマナが0です', en: 'The opponent has no mana' },
   'battle.ng.noCheerTarget': { ja: '声援をかけられる味方がいません（まだ動いていない味方だけ）', en: 'No ally to cheer (only allies that have not acted)' },
   'battle.ng.noDeck': { ja: '山札がありません', en: 'Your deck is empty' },
+  // 2026-11-07 指示書 BO：ときをすいとる
+  'battle.ng.noOpponentDeck': { ja: '相手は山札がありません', en: "The opponent's deck is empty" },
   'battle.ng.overdriveCards': { ja: 'α・β・γ の3枚が手札にそろっていません', en: 'You need α, β and γ in your hand' },
   'battle.ng.stunned': { ja: 'このターンは行動できません（行動不可）', en: "Can't act this turn (stunned)" }, // 2026-10-30 指示書 W：ヒョウズクのこおりのいき・ふぶきでも出るので「まきつく」を外した
   'battle.ng.evadeMinCost': { ja: '必要マナ{n}以上の攻撃にしか使えません', en: 'Only works against attacks costing {n}+ mana' },

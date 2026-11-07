@@ -110,6 +110,8 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
       }
     }
     const logBefore = s.log.length;
+    /** この行動の前の相手のマナ（からっぽのつぼで0にした量。守りのカードのマナは前の行動で払い済み） */
+    const foeManaBefore = manaOf(s.sides.opponent);
     s = applyAction(s, action);
     const logs = s.log.slice(logBefore).map((l) => l.text);
     for (const l of logs) {
@@ -123,6 +125,11 @@ function play(a: Deck, b: Deck, seed: number, first: Side, c: Count): void {
         const m = /^相手のマナが(\d+)減った。$/.exec(l);
         if (m) {
           add(c.drained, mineAttack, Number(m[1]));
+          add(c.drainHits, mineAttack);
+        }
+        // からっぽのつぼ（指示書 BO で記録の文が「相手のマナが0になった。」「相手のマナはもう0だった。」に）
+        if (l === '相手のマナが0になった。' || l === '相手のマナはもう0だった。') {
+          add(c.drained, mineAttack, foeManaBefore);
           add(c.drainHits, mineAttack);
         }
       }

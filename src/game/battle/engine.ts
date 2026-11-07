@@ -545,8 +545,10 @@ export function cardUsability(state: BattleState, side: Side, cardUid: string): 
   if (skill.effect.type === 'systemCheck' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
   // ちえのささやき（フギン 指示書 BM の直し・ユーザー決定）：山札が0枚なら使えない（暗くして選べない）
   if (skill.effect.type === 'searchEvade' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
-  // ぜんちぜんのう（ノウス 指示書 BN）：ちえのささやきと同じく、山札が0枚なら使えない。ときをすいとるは相手の山札が0枚でも使える（何も起きない）
+  // ぜんちぜんのう（ノウス 指示書 BN）：ちえのささやきと同じく、山札が0枚なら使えない
   if (skill.effect.type === 'searchAny' && state.sides[side].deck.length === 0) return NO(t('battle.ng.noDeck'));
+  // ときをすいとる（ノウス 指示書 BO・ユーザー決定）：相手の山札が0枚なら使えない（灰色。CPU も使わない）
+  if (skill.effect.type === 'millDeck' && state.sides[otherSide(side)].deck.length === 0) return NO(t('battle.ng.noOpponentDeck'));
   // おいかぜ：かけられる味方（使ったモンスターと同じ種類以外で、生きている）がいないときは使えない
   if (skill.effect.type === 'tailwind' && tailwindTargets(state, side, skill).length === 0) return NO(t('battle.ng.noTailwindTarget'));
   // そなえのふえ（フォルン 指示書 AL）：かけられる味方（フォルン以外で、生きている）がいないときは使えない
@@ -1644,6 +1646,14 @@ function drainMana(state: BattleState, side: Side, n: number): BattleState {
   return addLog(next, t('battle.log.manaDrain', { side: sideLabel(victim), n: lost }));
 }
 
+/** からっぽのつぼ（ノウス 指示書 BN・BO）：相手（side の反対）のマナを 0 に。減らしたカードは捨て札へ */
+function emptyMana(state: BattleState, side: Side): BattleState {
+  const victim = otherSide(side);
+  const before = manaOf(state.sides[victim]);
+  if (before === 0) return addLog(state, t('battle.log.manaAlreadyZero', { side: sideLabel(victim) }));
+  return addLog(payMana(state, victim, before), t('battle.log.manaZero', { side: sideLabel(victim) }));
+}
+
 /**
  * 攻撃に付いた効果（正式：ノビトン 2026-10-25。くしゃみ・ダウナーミストの「相手マナ−」、まきつくの「対象は次ターン行動不可」）。
  * 【要仕様確定】回避されなければ発動する（防御でダメージが0になっても発動。回避されたら発動しない）。勝負がついたあとは何もしない
@@ -1653,8 +1663,8 @@ function attackRiders(state: BattleState, skillId: string, attacker: Side, targe
   if (e.type !== 'attack' || state.phase === 'ended') return state;
   let next = state;
   if (e.manaDrain) next = drainMana(next, attacker, e.manaDrain);
-  // からっぽのつぼ（ノウス 指示書 BN）：相手のマナを 0 に（くしゃみと同じ減らし方・記録。もともと 0 なら「0減った」と出す）
-  if (e.manaZero) next = drainMana(next, attacker, manaOf(next.sides[otherSide(attacker)]));
+  // からっぽのつぼ（ノウス 指示書 BN）：相手のマナを 0 に（くしゃみと同じ減らし方）。記録は「〇〇のマナが0になった。」・もともと0なら「〇〇のマナはもう0だった。」（指示書 BO）
+  if (e.manaZero) next = emptyMana(next, attacker);
   if (e.stunTarget) {
     const target = findMonster(next, targetUid);
     if (target && target.monster.life > 0 && wardCharmActive(next, target.side)) {

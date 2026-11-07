@@ -527,12 +527,13 @@ export const AJ_QA_SKILLS: Readonly<Record<string, readonly AjSkillRow[]>> = {
   ],
   // ノウス（空中・LIFE 7・B の上。2026-11-07 指示書 BN。正本は design-parts/bn-nous-20261107/data/nous_skills.csv）。置き場所ができるまで確かめ用だけ。
   // 絵は nous_sk_NN.webp（番号＝技番号）。02・04 は くしゃみと同じ manaDrain・08 は 考える と同じ redrawHand・11 は guard(3,'force')・12 は dodge('all')。
+  // 2026-11-07 指示書 BO（ユーザー決定・案 N3）：04 うずまくつぼ の必要マナ 3 → 2。
   // 新しい効果：06 からっぽのつぼ（manaZero）・09 ときをすいとる（millDeck）・10 ぜんちぜんのう（searchAny）。特殊技ではマナを減らさない（ユーザーの決まり 2026-11-06）
   'mon-nous': [
     { id: 'skl-nous-01', name: 'ろっぽんづき', cat: 'ち', mana: 1, damage: 2, text: null, art: 'nous_sk_01.webp' },
     { id: 'skl-nous-02', name: 'マナをすう', cat: 'か', mana: 1, damage: 1, effect: atk({ manaDrain: 1 }), text: '回避されなければ、相手のマナを1減らす', art: 'nous_sk_02.webp' },
     { id: 'skl-nous-03', name: 'ひかりのわ', cat: 'か', mana: 2, damage: 3, text: null, art: 'nous_sk_03.webp' },
-    { id: 'skl-nous-04', name: 'うずまくつぼ', cat: 'か', mana: 3, damage: 2, effect: atk({ manaDrain: 2 }), text: '回避されなければ、相手のマナを2減らす', art: 'nous_sk_04.webp' },
+    { id: 'skl-nous-04', name: 'うずまくつぼ', cat: 'か', mana: 2, damage: 2, effect: atk({ manaDrain: 2 }), text: '回避されなければ、相手のマナを2減らす', art: 'nous_sk_04.webp' },
     { id: 'skl-nous-05', name: 'ろっぽんうでのらんぶ', cat: 'ち', mana: 4, damage: 6, text: null, rare: true, art: 'nous_sk_05.webp' },
     { id: 'skl-nous-06', name: 'からっぽのつぼ', cat: 'か', mana: 4, damage: 2, effect: atk({ manaZero: true }), text: '回避されなければ、相手のマナを0にする', rare: true, art: 'nous_sk_06.webp' },
     { id: 'skl-nous-07', name: 'ずのうのせんこう', cat: 'か', mana: 4, damage: 7, text: null, rare: true, art: 'nous_sk_07.webp' },

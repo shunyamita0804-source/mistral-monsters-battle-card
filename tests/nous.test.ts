@@ -43,7 +43,7 @@ describe('ノウスのデータ（指示書の表のとおり）', () => {
       ['ろっぽんづき', 'ち', 1, 2],
       ['マナをすう', 'か', 1, 1],
       ['ひかりのわ', 'か', 2, 3],
-      ['うずまくつぼ', 'か', 3, 2],
+      ['うずまくつぼ', 'か', 2, 2], // 指示書 BO（案 N3）：マナ 3 → 2
       ['ろっぽんうでのらんぶ', 'ち', 4, 6],
       ['からっぽのつぼ', 'か', 4, 2],
       ['ずのうのせんこう', 'か', 4, 7],
@@ -164,7 +164,14 @@ describe('06 からっぽのつぼ：回避されなければ、相手のマナ�
     expect(life(s, 'o-m1')).toBe(5);
     expect(manaOf(s.sides.opponent)).toBe(0);
     expect(s.sides.opponent.discard.length).toBe(discard0 + 7);
-    expect(s.log.some((l) => l.text === '相手のマナが7減った。')).toBe(true);
+    expect(s.log.some((l) => l.text === '相手のマナが0になった。')).toBe(true);
+  });
+
+  it('相手のマナがもともと0なら「相手のマナはもう0だった。」（指示書 BO）', () => {
+    const s = defend(use(scene({ player: [ns(6)] }, { mana: { opponent: 0 } }), 'player', 'p0', 'o-m1'), 'opponent', null);
+    expect(life(s, 'o-m1')).toBe(5);
+    expect(s.log.some((l) => l.text === '相手のマナはもう0だった。')).toBe(true);
+    expect(s.log.some((l) => /のマナが\d+減った/.test(l.text))).toBe(false);
   });
 
   it('回避されたらマナは減らない', () => {
@@ -186,16 +193,20 @@ describe('09 ときをすいとる：相手の山札の上から2枚を捨て札
     expect(manaOf(s.sides.player)).toBe(10);
   });
 
-  it('山札が1枚なら1枚、0枚なら何もしない（この技で山札切れの負けにはしない）', () => {
+  it('山札が1枚なら1枚（この技で山札切れの負けにはしない）。0枚なら使えない（指示書 BO）', () => {
     const one = use(scene({ player: [ns(9)] }, { deck: { opponent: [sor(3)] } }), 'player', 'p0');
     expect(one.sides.opponent.deck).toEqual([]);
     expect(one.phase).not.toBe('ended');
     expect(one.log.at(-1)?.text).toMatch(/^相手の山札の上から1枚が捨て札になった/);
     const empty = scene({ player: [ns(9)] }, { deck: { opponent: [] } });
-    expect(cardUsability(empty, 'player', 'p0').usable).toBe(true);
+    expect(cardUsability(empty, 'player', 'p0')).toEqual({ usable: false, reason: '相手は山札がありません' });
     const none = use(empty, 'player', 'p0');
-    expect(none.phase).not.toBe('ended');
-    expect(none.log.at(-1)?.text).toBe('相手の山札が無い。何も起きなかった。');
+    expect(none.sides.player.hand.map((c) => c.cardId)).toEqual([ns(9)]);
+    expect(manaOf(none.sides.player)).toBe(12);
+    // CPU も使わない（ほかに使える攻撃があれば攻撃）
+    const cpu = scene({ player: [ns(9), ns(3)] }, { mana: { player: 4 }, deck: { opponent: [] } });
+    const a = chooseAction(cpu, 'player', 'normal', 'A');
+    expect(a && a.type === 'useCard' && a.cardUid === 'p0').toBe(false);
   });
 });
 
@@ -253,5 +264,14 @@ describe('CPU（指示書 BN）', () => {
   it('ぜんちぜんのう：撃てる攻撃が手札に無いときに使う', () => {
     const yes = scene({ player: [ns(10), ns(11)] }, { mana: { player: 8 }, deck: { player: [sor(1), ns(7)] } });
     expect(chooseAction(yes, 'player', 'normal', 'A')).toMatchObject({ type: 'useCard', cardUid: 'p0' });
+  });
+});
+
+describe('特殊技でマナは減らさない（例外：ラディエルの しんぱんのせんこく。ユーザー決定 2026-11-07・指示書 BO）', () => {
+  it('相手のマナを減らす特殊技は skl-radiel-08 だけ', () => {
+    const all = [...SKILLS, ...QA_SKILLS];
+    const special = all.filter((k) => !['attack', 'defense', 'evade', 'cover'].includes(k.effect.type));
+    const drains = special.filter((k) => /manaDrain|manaZero/.test(JSON.stringify(k.effect)) || /相手のマナ/.test(k.effectTextJa ?? ''));
+    expect(drains.map((k) => k.id)).toEqual(['skl-radiel-08']);
   });
 });
